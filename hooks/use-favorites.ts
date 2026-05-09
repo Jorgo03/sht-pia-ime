@@ -7,6 +7,7 @@ import {
   isFavorite,
   removeFavorite,
 } from '@/data/favorites';
+import { Property } from '@/data/types';
 
 const listeners = new Set<() => void>();
 
@@ -99,4 +100,33 @@ export function useIsFavorite(propertyId: string) {
   }, [user, propertyId, favorited]);
 
   return { favorited, toggle };
+}
+
+export function useFavoriteProperties() {
+  const { user } = useAuth();
+  const [properties, setProperties] = useState<Property[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const refresh = useCallback(() => {
+    if (!user) {
+      setProperties([]);
+      setLoading(false);
+      return;
+    }
+    setLoading(true);
+    getFavorites(user.id)
+      .then(setProperties)
+      .catch(() => setProperties([]))
+      .finally(() => setLoading(false));
+  }, [user]);
+
+  useEffect(() => {
+    refresh();
+    listeners.add(refresh);
+    return () => {
+      listeners.delete(refresh);
+    };
+  }, [refresh]);
+
+  return { properties, loading };
 }

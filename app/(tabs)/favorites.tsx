@@ -1,5 +1,4 @@
 import { useRouter, type Href } from 'expo-router';
-import { useCallback, useState } from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -8,34 +7,18 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useFocusEffect } from '@react-navigation/native';
 
 import { PropertyCard } from '@/components/property/property-card';
 import { GradientBackground } from '@/components/ui/gradient-background';
 import { AtticoColors } from '@/constants/theme';
 import { useAuth } from '@/contexts/auth-context';
-import { getFavorites } from '@/data/favorites';
 import { Property } from '@/data/types';
+import { useFavoriteProperties } from '@/hooks/use-favorites';
 
 export default function FavoritesScreen() {
   const router = useRouter();
   const { user } = useAuth();
-  const [favorites, setFavorites] = useState<Property[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useFocusEffect(
-    useCallback(() => {
-      if (!user) {
-        setFavorites([]);
-        setLoading(false);
-        return;
-      }
-      setLoading(true);
-      getFavorites(user.id)
-        .then(setFavorites)
-        .finally(() => setLoading(false));
-    }, [user]),
-  );
+  const { properties: favorites, loading } = useFavoriteProperties();
 
   const renderItem = ({ item }: { item: Property }) => (
     <PropertyCard

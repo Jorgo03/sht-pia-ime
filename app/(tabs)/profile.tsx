@@ -1,3 +1,4 @@
+import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { Provider } from '@supabase/supabase-js';
 import { useState } from 'react';
@@ -21,11 +22,16 @@ import { useAuth } from '@/contexts/auth-context';
 
 type Role = 'buyer' | 'agent';
 
-const socialProviders: { provider: Provider; label: string; icon: string; color: string }[] = [
-  { provider: 'google', label: 'Google', icon: 'G', color: '#EA4335' },
-  { provider: 'apple', label: 'Apple', icon: '', color: '#000000' },
-  { provider: 'linkedin_oidc', label: 'LinkedIn', icon: 'in', color: '#0A66C2' },
-  { provider: 'yahoo' as Provider, label: 'Yahoo', icon: 'Y', color: '#6001D2' },
+const socialProviders: {
+  provider: Provider;
+  label: string;
+  ionicon: keyof typeof Ionicons.glyphMap;
+  color: string;
+}[] = [
+  { provider: 'google', label: 'Google', ionicon: 'logo-google', color: '#EA4335' },
+  { provider: 'apple', label: 'Apple', ionicon: 'logo-apple', color: '#000000' },
+  { provider: 'linkedin_oidc', label: 'LinkedIn', ionicon: 'logo-linkedin', color: '#0A66C2' },
+  { provider: 'yahoo' as Provider, label: 'Yahoo', ionicon: 'logo-yahoo', color: '#6001D2' },
 ];
 
 export default function ProfileScreen() {
@@ -220,11 +226,7 @@ export default function ProfileScreen() {
                     style={[styles.socialButton, { backgroundColor: sp.color }]}
                     onPress={() => handleSocialLogin(sp.provider)}
                     activeOpacity={0.8}>
-                    {sp.provider === 'apple' ? (
-                      <MaterialIcons name="apple" size={22} color="#fff" />
-                    ) : (
-                      <Text style={styles.socialButtonText}>{sp.icon}</Text>
-                    )}
+                    <Ionicons name={sp.ionicon} size={24} color="#fff" />
                   </TouchableOpacity>
                 ))}
               </View>
