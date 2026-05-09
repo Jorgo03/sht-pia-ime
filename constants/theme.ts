@@ -27,6 +27,20 @@ export const Colors = {
   },
 };
 
+export const AtticoColors = {
+  primary: '#0A2E36',
+  primaryLight: '#0F3D47',
+  accent: '#1A6B5A',
+  accentLight: '#2ECDA7',
+  surface: '#FFFFFF',
+  surfaceAlt: '#F5F7FA',
+  textPrimary: '#FFFFFF',
+  textSecondary: '#B0BEC5',
+  textDark: '#1A1A2E',
+  gradientStart: '#0A2E36',
+  gradientEnd: '#134E5E',
+};
+
 export const Fonts = Platform.select({
   ios: {
     /** iOS `UIFontDescriptorSystemDesignDefault` */
