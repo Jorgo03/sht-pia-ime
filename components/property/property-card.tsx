@@ -3,8 +3,8 @@ import { Image } from 'expo-image';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import { AtticoColors } from '@/constants/theme';
+import { useFavorites } from '@/contexts/favorites-context';
 import { Property } from '@/data/types';
-import { useIsFavorite } from '@/hooks/use-favorites';
 
 interface PropertyCardProps {
   property: Property;
@@ -12,11 +12,8 @@ interface PropertyCardProps {
 }
 
 export function PropertyCard({ property, onPress }: PropertyCardProps) {
-  const { favorited, toggle } = useIsFavorite(property.id);
-
-  const handleFavorite = () => {
-    toggle();
-  };
+  const { isFavorite, toggle } = useFavorites();
+  const favorited = isFavorite(property.id);
 
   return (
     <TouchableOpacity
@@ -32,7 +29,7 @@ export function PropertyCard({ property, onPress }: PropertyCardProps) {
         />
         <TouchableOpacity
           style={styles.heartButton}
-          onPress={handleFavorite}
+          onPress={() => toggle(property.id)}
           activeOpacity={0.7}
           hitSlop={8}>
           <MaterialIcons

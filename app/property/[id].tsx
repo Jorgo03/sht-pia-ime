@@ -17,9 +17,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ActionButton } from '@/components/ui/action-button';
 import { AtticoColors } from '@/constants/theme';
+import { useFavorites } from '@/contexts/favorites-context';
 import { getPropertyById } from '@/data/properties';
 import { Property } from '@/data/types';
-import { useIsFavorite } from '@/hooks/use-favorites';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 const IMAGE_HEIGHT = SCREEN_HEIGHT * 0.42;
@@ -27,7 +27,8 @@ const IMAGE_HEIGHT = SCREEN_HEIGHT * 0.42;
 export default function PropertyDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
-  const { favorited, toggle: toggleFavorite } = useIsFavorite(id ?? '');
+  const { isFavorite, toggle } = useFavorites();
+  const favorited = isFavorite(id ?? '');
   const [property, setProperty] = useState<Property | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -36,10 +37,6 @@ export default function PropertyDetailScreen() {
       .then(setProperty)
       .finally(() => setLoading(false));
   }, [id]);
-
-  const handleFavorite = () => {
-    toggleFavorite();
-  };
 
   if (loading) {
     return (
@@ -87,7 +84,7 @@ export default function PropertyDetailScreen() {
           <Text style={styles.headerBrand}>Shtëpia.ime</Text>
           <TouchableOpacity
             style={styles.headerButton}
-            onPress={handleFavorite}
+            onPress={() => toggle(id ?? '')}
             activeOpacity={0.7}>
             <MaterialIcons
               name={favorited ? 'favorite' : 'favorite-border'}

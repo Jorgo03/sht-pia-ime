@@ -11,14 +11,12 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { PropertyCard } from '@/components/property/property-card';
 import { GradientBackground } from '@/components/ui/gradient-background';
 import { AtticoColors } from '@/constants/theme';
-import { useAuth } from '@/contexts/auth-context';
+import { useFavorites } from '@/contexts/favorites-context';
 import { Property } from '@/data/types';
-import { useFavoriteProperties } from '@/hooks/use-favorites';
 
 export default function FavoritesScreen() {
   const router = useRouter();
-  const { user } = useAuth();
-  const { properties: favorites, loading } = useFavoriteProperties();
+  const { favoriteProperties, loading } = useFavorites();
 
   const renderItem = ({ item }: { item: Property }) => (
     <PropertyCard
@@ -32,18 +30,11 @@ export default function FavoritesScreen() {
       <SafeAreaView style={styles.container} edges={['top']}>
         <Text style={styles.title}>Favorites</Text>
 
-        {!user ? (
-          <View style={styles.center}>
-            <Text style={styles.subtitle}>Sign in to see favorites</Text>
-            <Text style={styles.description}>
-              Go to the Profile tab to sign in
-            </Text>
-          </View>
-        ) : loading ? (
+        {loading ? (
           <View style={styles.center}>
             <ActivityIndicator size="large" color={AtticoColors.accentLight} />
           </View>
-        ) : favorites.length === 0 ? (
+        ) : favoriteProperties.length === 0 ? (
           <View style={styles.center}>
             <Text style={styles.subtitle}>No favorites yet</Text>
             <Text style={styles.description}>
@@ -52,7 +43,7 @@ export default function FavoritesScreen() {
           </View>
         ) : (
           <FlatList
-            data={favorites}
+            data={favoriteProperties}
             renderItem={renderItem}
             keyExtractor={(item) => item.id}
             numColumns={2}
