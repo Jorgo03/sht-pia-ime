@@ -49,11 +49,12 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 24,
     borderWidth: 1,
-    borderColor: AtticoColors.textSecondary,
+    borderColor: AtticoColors.glassBorder,
+    backgroundColor: AtticoColors.glass,
   },
   activeTab: {
-    backgroundColor: AtticoColors.accentLight,
-    borderColor: AtticoColors.accentLight,
+    backgroundColor: AtticoColors.accent,
+    borderColor: AtticoColors.accent,
   },
   tabText: {
     fontSize: 14,
@@ -61,6 +62,6 @@ const styles = StyleSheet.create({
     color: AtticoColors.textSecondary,
   },
   activeTabText: {
-    color: AtticoColors.primary,
+    color: '#fff',
   },
 });

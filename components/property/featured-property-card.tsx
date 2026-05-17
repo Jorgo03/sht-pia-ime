@@ -1,3 +1,4 @@
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Image } from 'expo-image';
 import {
@@ -9,6 +10,7 @@ import {
 } from 'react-native';
 
 import { AtticoColors } from '@/constants/theme';
+import { useFavorites } from '@/contexts/favorites-context';
 import { Property } from '@/data/types';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -24,6 +26,9 @@ export function FeaturedPropertyCard({
   property,
   onPress,
 }: FeaturedPropertyCardProps) {
+  const { isFavorite, toggle } = useFavorites();
+  const favorited = isFavorite(property.id);
+
   return (
     <TouchableOpacity
       style={styles.card}
@@ -36,24 +41,68 @@ export function FeaturedPropertyCard({
         transition={300}
       />
       <LinearGradient
-        colors={['transparent', 'rgba(0,0,0,0.7)']}
+        colors={['transparent', 'rgba(0,0,0,0.8)']}
         style={styles.overlay}>
         <View style={styles.content}>
-          <View style={styles.nameRow}>
-            <Text style={styles.name}>{property.title}</Text>
+          <View style={styles.topRow}>
+            <View style={styles.badge}>
+              <Text style={styles.badgeText}>FEATURED</Text>
+            </View>
+            <TouchableOpacity
+              style={styles.heartButton}
+              onPress={() => toggle(property.id)}
+              activeOpacity={0.7}>
+              <MaterialIcons
+                name={favorited ? 'favorite' : 'favorite-border'}
+                size={22}
+                color={favorited ? AtticoColors.accent : '#fff'}
+              />
+            </TouchableOpacity>
+          </View>
+          <View style={styles.bottom}>
+            <View style={styles.nameRow}>
+              <Text style={styles.name}>{property.title}</Text>
+              <View style={styles.locationRow}>
+                <MaterialIcons name="location-on" size={14} color={AtticoColors.accent} />
+                <Text style={styles.location}>
+                  {property.city ?? property.address}
+                </Text>
+              </View>
+            </View>
             <Text style={styles.price}>
               ${Number(property.price).toLocaleString()}
               <Text style={styles.priceLabel}>
-                /{property.listing_type === 'rent' ? 'mo' : ''}
+                {property.listing_type === 'rent' ? '/mo' : ''}
               </Text>
             </Text>
+            <View style={styles.statsRow}>
+              {property.beds != null && (
+                <View style={styles.stat}>
+                  <MaterialIcons name="bed" size={16} color={AtticoColors.accent} />
+                  <Text style={styles.statText}>{property.beds} Beds</Text>
+                </View>
+              )}
+              {property.baths != null && (
+                <View style={styles.stat}>
+                  <MaterialIcons name="bathtub" size={16} color={AtticoColors.accent} />
+                  <Text style={styles.statText}>{property.baths} Baths</Text>
+                </View>
+              )}
+              {property.sqft != null && (
+                <View style={styles.stat}>
+                  <MaterialIcons name="square-foot" size={16} color={AtticoColors.accent} />
+                  <Text style={styles.statText}>{property.sqft} sqft</Text>
+                </View>
+              )}
+            </View>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={onPress}
+              activeOpacity={0.8}>
+              <Text style={styles.buttonText}>Take a look</Text>
+              <MaterialIcons name="arrow-forward" size={18} color="#fff" />
+            </TouchableOpacity>
           </View>
-          <TouchableOpacity
-            style={styles.button}
-            onPress={onPress}
-            activeOpacity={0.8}>
-            <Text style={styles.buttonText}>Take a look</Text>
-          </TouchableOpacity>
         </View>
       </LinearGradient>
     </TouchableOpacity>
@@ -67,47 +116,102 @@ const styles = StyleSheet.create({
     borderRadius: 24,
     overflow: 'hidden',
     marginHorizontal: 20,
+    borderWidth: 1,
+    borderColor: AtticoColors.glassBorder,
   },
   image: {
     ...StyleSheet.absoluteFillObject,
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
-    justifyContent: 'flex-end',
+    justifyContent: 'space-between',
   },
   content: {
+    flex: 1,
+    justifyContent: 'space-between',
     padding: 20,
-    gap: 16,
+  },
+  topRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+  },
+  badge: {
+    backgroundColor: AtticoColors.accent,
+    paddingHorizontal: 12,
+    paddingVertical: 5,
+    borderRadius: 8,
+  },
+  badgeText: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#fff',
+    letterSpacing: 1,
+  },
+  heartButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(0,0,0,0.3)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  bottom: {
+    gap: 12,
   },
   nameRow: {
     gap: 4,
   },
   name: {
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: '700',
     color: AtticoColors.textPrimary,
   },
+  locationRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  location: {
+    fontSize: 13,
+    color: '#ccc',
+  },
   price: {
-    fontSize: 18,
+    fontSize: 22,
     fontWeight: '700',
-    color: AtticoColors.accentLight,
+    color: AtticoColors.accent,
   },
   priceLabel: {
     fontSize: 13,
     fontWeight: '400',
     color: AtticoColors.textSecondary,
   },
+  statsRow: {
+    flexDirection: 'row',
+    gap: 16,
+  },
+  stat: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  statText: {
+    fontSize: 12,
+    color: '#ccc',
+    fontWeight: '500',
+  },
   button: {
-    backgroundColor: 'rgba(255,255,255,0.2)',
+    backgroundColor: AtticoColors.accent,
     paddingVertical: 14,
     borderRadius: 24,
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.3)',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 8,
   },
   buttonText: {
     fontSize: 15,
-    fontWeight: '600',
-    color: AtticoColors.textPrimary,
+    fontWeight: '700',
+    color: '#fff',
   },
 });

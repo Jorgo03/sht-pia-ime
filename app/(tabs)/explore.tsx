@@ -41,10 +41,10 @@ export default function ExploreScreen() {
           <Text style={styles.brand}>Shtëpia.ime</Text>
           <Text style={styles.title}>Find Apartments</Text>
         </View>
-        <FilterTabs tabs={['Recommend', 'Nearby']} />
+        <FilterTabs tabs={['Recommend', 'Nearby', 'New']} />
         {loading ? (
           <View style={styles.loader}>
-            <ActivityIndicator size="large" color={AtticoColors.accentLight} />
+            <ActivityIndicator size="large" color={AtticoColors.accent} />
           </View>
         ) : (
           <FlatList
@@ -74,7 +74,7 @@ const styles = StyleSheet.create({
   brand: {
     fontSize: 14,
     fontWeight: '600',
-    color: AtticoColors.textSecondary,
+    color: AtticoColors.accent,
     letterSpacing: 1,
     marginBottom: 12,
   },

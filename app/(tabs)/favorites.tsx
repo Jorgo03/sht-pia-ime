@@ -1,3 +1,4 @@
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useRouter, type Href } from 'expo-router';
 import {
   ActivityIndicator,
@@ -32,10 +33,13 @@ export default function FavoritesScreen() {
 
         {loading ? (
           <View style={styles.center}>
-            <ActivityIndicator size="large" color={AtticoColors.accentLight} />
+            <ActivityIndicator size="large" color={AtticoColors.accent} />
           </View>
         ) : favoriteProperties.length === 0 ? (
           <View style={styles.center}>
+            <View style={styles.emptyIcon}>
+              <MaterialIcons name="favorite-border" size={48} color={AtticoColors.accent} />
+            </View>
             <Text style={styles.subtitle}>No favorites yet</Text>
             <Text style={styles.description}>
               Tap the heart icon on a property to save it
@@ -72,7 +76,18 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    gap: 8,
+    gap: 12,
+  },
+  emptyIcon: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: AtticoColors.glass,
+    borderWidth: 1,
+    borderColor: AtticoColors.glassBorder,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 8,
   },
   subtitle: {
     fontSize: 18,

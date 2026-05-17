@@ -10,13 +10,14 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: AtticoColors.accentLight,
+        tabBarActiveTintColor: AtticoColors.accent,
         tabBarInactiveTintColor: AtticoColors.textSecondary,
         headerShown: false,
         tabBarButton: HapticTab,
         tabBarStyle: {
           backgroundColor: AtticoColors.primary,
-          borderTopWidth: 0,
+          borderTopWidth: 1,
+          borderTopColor: AtticoColors.glassBorder,
           height: Platform.OS === 'ios' ? 88 : 64,
           paddingBottom: Platform.OS === 'ios' ? 28 : 8,
           paddingTop: 8,

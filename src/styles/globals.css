@@ -1,0 +1,42 @@
+.app-shell {
+  max-width: 480px;
+  margin: 0 auto;
+  min-height: 100vh;
+  background: var(--fho-bg);
+  position: relative;
+  padding-bottom: 100px;
+  transition: background 0.3s;
+}
+
+.page {
+  padding: 1rem 1.25rem;
+}
+
+.page-title {
+  font-size: 22px;
+  font-weight: 600;
+  margin: 0 0 0.5rem;
+  color: var(--fho-text);
+}
+
+.page-subtitle {
+  font-size: 14px;
+  color: var(--fho-text-muted);
+  margin: 0 0 1.5rem;
+}
+
+.placeholder-card {
+  background: var(--fho-surface);
+  border: 0.5px solid var(--fho-border);
+  border-radius: var(--r-lg);
+  padding: 2rem 1.25rem;
+  text-align: center;
+  color: var(--fho-text-muted);
+  font-size: 14px;
+}
+
+.placeholder-card .icon {
+  display: inline-flex;
+  margin-bottom: 12px;
+  color: var(--fho-orange-2);
+}

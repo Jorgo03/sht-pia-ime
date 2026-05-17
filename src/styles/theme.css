@@ -1,0 +1,39 @@
+:root, [data-theme="light"] {
+  --fho-orange-1: #FF7A40;
+  --fho-orange-2: #E85D2C;
+  --fho-bg: #f4f1ea;
+  --fho-surface: #ffffff;
+  --fho-text: #0a0a0a;
+  --fho-text-muted: #777777;
+  --fho-border: rgba(0,0,0,0.06);
+  --fho-input-bg: #f5f5f5;
+  --fho-input-border: rgba(0,0,0,0.10);
+  --fho-card-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  --r-sm: 10px;
+  --r-md: 14px;
+  --r-lg: 20px;
+  --r-pill: 30px;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Inter", system-ui, sans-serif;
+}
+
+[data-theme="dark"] {
+  --fho-bg: #0a0a0a;
+  --fho-surface: #161616;
+  --fho-text: #ecedee;
+  --fho-text-muted: #7a7a7a;
+  --fho-border: rgba(255,255,255,0.10);
+  --fho-input-bg: #1a1a1a;
+  --fho-input-border: rgba(255,255,255,0.12);
+  --fho-card-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+* { box-sizing: border-box; }
+html, body, #root { height: 100%; }
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  background: var(--fho-bg);
+  color: var(--fho-text);
+  -webkit-font-smoothing: antialiased;
+  transition: background 0.3s, color 0.3s;
+}

@@ -1,0 +1,134 @@
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 1.25rem;
+  border-bottom: 0.5px solid var(--fho-border);
+  background: var(--fho-surface);
+  position: sticky;
+  top: 0;
+  z-index: 40;
+}
+
+.header-brand {
+  font-size: 16px;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--fho-orange-1), var(--fho-orange-2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.lang-switcher {
+  position: relative;
+}
+
+.lang-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 10px;
+  border: 0.5px solid var(--fho-border);
+  background: var(--fho-bg);
+  color: var(--fho-text);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.lang-btn:hover {
+  background: var(--fho-surface);
+}
+
+.lang-flag {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.lang-chevron {
+  transition: transform 0.2s;
+}
+
+.lang-chevron.open {
+  transform: rotate(180deg);
+}
+
+.lang-name {
+  display: inline;
+}
+
+@media (max-width: 400px) {
+  .lang-name {
+    display: none;
+  }
+}
+
+.lang-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  min-width: 170px;
+  background: var(--fho-surface);
+  border: 0.5px solid var(--fho-border);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  padding: 4px;
+  z-index: 100;
+  animation: dropIn 0.15s ease-out;
+}
+
+@keyframes dropIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.lang-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 12px;
+  border: none;
+  background: transparent;
+  color: var(--fho-text);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background 0.15s;
+}
+
+.lang-option:hover {
+  background: var(--fho-bg);
+}
+
+.lang-option.active {
+  background: linear-gradient(135deg, var(--fho-orange-1), var(--fho-orange-2));
+  color: white;
+}
+
+.theme-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  border: 0.5px solid var(--fho-border);
+  background: var(--fho-bg);
+  color: var(--fho-text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.theme-btn:hover {
+  background: var(--fho-surface);
+}

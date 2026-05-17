@@ -35,18 +35,29 @@ export function PropertyCard({ property, onPress }: PropertyCardProps) {
           <MaterialIcons
             name={favorited ? 'favorite' : 'favorite-border'}
             size={20}
-            color={favorited ? '#ef4444' : '#fff'}
+            color={favorited ? AtticoColors.accent : '#fff'}
           />
         </TouchableOpacity>
+        <View style={styles.badge}>
+          <Text style={styles.badgeText}>
+            {property.listing_type === 'rent' ? 'RENT' : 'SALE'}
+          </Text>
+        </View>
       </View>
       <View style={styles.info}>
         <Text style={styles.name} numberOfLines={1}>
           {property.title}
         </Text>
+        <View style={styles.locationRow}>
+          <MaterialIcons name="location-on" size={12} color={AtticoColors.textSecondary} />
+          <Text style={styles.location} numberOfLines={1}>
+            {property.city ?? property.address}
+          </Text>
+        </View>
         <Text style={styles.price}>
           ${Number(property.price).toLocaleString()}
           <Text style={styles.priceLabel}>
-            /{property.listing_type === 'rent' ? 'mo' : ''}
+            {property.listing_type === 'rent' ? '/mo' : ''}
           </Text>
         </Text>
       </View>
@@ -57,10 +68,12 @@ export function PropertyCard({ property, onPress }: PropertyCardProps) {
 const styles = StyleSheet.create({
   card: {
     flex: 1,
-    borderRadius: 18,
+    borderRadius: 20,
     overflow: 'hidden',
     backgroundColor: AtticoColors.primaryLight,
     margin: 6,
+    borderWidth: 1,
+    borderColor: AtticoColors.glassBorder,
   },
   image: {
     width: '100%',
@@ -73,9 +86,24 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: 'rgba(0,0,0,0.3)',
+    backgroundColor: 'rgba(0,0,0,0.4)',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  badge: {
+    position: 'absolute',
+    top: 8,
+    left: 8,
+    backgroundColor: AtticoColors.accent,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 6,
+  },
+  badgeText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#fff',
+    letterSpacing: 0.5,
   },
   info: {
     padding: 12,
@@ -86,10 +114,21 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: AtticoColors.textPrimary,
   },
+  locationRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 2,
+  },
+  location: {
+    fontSize: 11,
+    color: AtticoColors.textSecondary,
+    flex: 1,
+  },
   price: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: '700',
-    color: AtticoColors.accentLight,
+    color: AtticoColors.accent,
+    marginTop: 2,
   },
   priceLabel: {
     fontSize: 11,

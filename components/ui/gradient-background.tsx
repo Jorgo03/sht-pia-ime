@@ -15,7 +15,7 @@ export function GradientBackground({
 }: GradientBackgroundProps) {
   return (
     <LinearGradient
-      colors={colors ?? [AtticoColors.gradientStart, AtticoColors.gradientEnd]}
+      colors={colors ?? [AtticoColors.gradientStart, '#1a1000', AtticoColors.gradientEnd]}
       style={[styles.container, style]}
       {...rest}>
       {children}

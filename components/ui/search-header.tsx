@@ -20,7 +20,7 @@ export function SearchHeader({ title, onSearchPress }: SearchHeaderProps) {
           style={styles.searchButton}
           onPress={onSearchPress}
           activeOpacity={0.7}>
-          <MaterialIcons name="search" size={22} color={AtticoColors.primary} />
+          <MaterialIcons name="search" size={22} color={AtticoColors.accent} />
         </TouchableOpacity>
       </View>
     </View>
@@ -39,7 +39,7 @@ const styles = StyleSheet.create({
   brand: {
     fontSize: 14,
     fontWeight: '600',
-    color: AtticoColors.textSecondary,
+    color: AtticoColors.accent,
     letterSpacing: 1,
   },
   row: {
@@ -58,7 +58,9 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: AtticoColors.surface,
+    backgroundColor: AtticoColors.glass,
+    borderWidth: 1,
+    borderColor: AtticoColors.glassBorder,
     justifyContent: 'center',
     alignItems: 'center',
     marginLeft: 12,

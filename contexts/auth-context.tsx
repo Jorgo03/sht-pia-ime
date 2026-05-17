@@ -1,5 +1,7 @@
 import { Provider } from '@supabase/supabase-js';
 import { Session, User } from '@supabase/supabase-js';
+import * as Linking from 'expo-linking';
+import * as WebBrowser from 'expo-web-browser';
 import {
   createContext,
   ReactNode,
@@ -9,6 +11,7 @@ import {
 } from 'react';
 import { Platform } from 'react-native';
 
+import { signInWithAppleNative } from '@/lib/apple-auth';
 import { supabase } from '@/lib/supabase';
 
 type Role = 'buyer' | 'agent';
@@ -82,16 +85,55 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signInWithProvider = async (provider: Provider) => {
-    const redirectTo =
-      Platform.OS === 'web'
-        ? window.location.origin
-        : 'shtepia-ime://auth/callback';
+    if (provider === 'apple' && Platform.OS === 'ios') {
+      return signInWithAppleNative();
+    }
 
-    const { error } = await supabase.auth.signInWithOAuth({
+    if (Platform.OS === 'web') {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: { redirectTo: window.location.origin },
+      });
+      return { error: error as Error | null };
+    }
+
+    const redirectTo = Linking.createURL('auth/callback');
+
+    const { data, error } = await supabase.auth.signInWithOAuth({
       provider,
-      options: { redirectTo },
+      options: {
+        redirectTo,
+        skipBrowserRedirect: true,
+      },
     });
-    return { error: error as Error | null };
+
+    if (error) return { error: error as Error | null };
+
+    const result = await WebBrowser.openAuthSessionAsync(
+      data.url,
+      redirectTo,
+    );
+
+    if (result.type !== 'success') {
+      return { error: new Error('Authentication was cancelled or the provider is not configured') };
+    }
+
+    const url = new URL(result.url);
+    const code = url.searchParams.get('code');
+    const errorDescription = url.searchParams.get('error_description');
+
+    if (!code) {
+      return {
+        error: new Error(
+          errorDescription ?? 'No authorization code received — check that the provider is enabled in Supabase Dashboard',
+        ),
+      };
+    }
+
+    const { error: exchangeError } =
+      await supabase.auth.exchangeCodeForSession(code);
+
+    return { error: exchangeError as Error | null };
   };
 
   const signOut = async () => {

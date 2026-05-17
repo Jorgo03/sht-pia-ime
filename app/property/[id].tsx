@@ -10,6 +10,7 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
@@ -31,6 +32,9 @@ export default function PropertyDetailScreen() {
   const favorited = isFavorite(id ?? '');
   const [property, setProperty] = useState<Property | null>(null);
   const [loading, setLoading] = useState(true);
+  const [contactName, setContactName] = useState('');
+  const [contactEmail, setContactEmail] = useState('');
+  const [contactMessage, setContactMessage] = useState('');
 
   useEffect(() => {
     getPropertyById(id ?? '')
@@ -38,10 +42,21 @@ export default function PropertyDetailScreen() {
       .finally(() => setLoading(false));
   }, [id]);
 
+  const handleContact = () => {
+    if (!contactName || !contactEmail || !contactMessage) {
+      Alert.alert('Error', 'Please fill in all fields.');
+      return;
+    }
+    Alert.alert('Sent!', 'Your message has been sent to the agent.');
+    setContactName('');
+    setContactEmail('');
+    setContactMessage('');
+  };
+
   if (loading) {
     return (
       <View style={styles.errorContainer}>
-        <ActivityIndicator size="large" color={AtticoColors.accentLight} />
+        <ActivityIndicator size="large" color={AtticoColors.accent} />
       </View>
     );
   }
@@ -71,7 +86,7 @@ export default function PropertyDetailScreen() {
           transition={300}
         />
         <LinearGradient
-          colors={['rgba(0,0,0,0.4)', 'transparent', 'rgba(0,0,0,0.6)']}
+          colors={['rgba(0,0,0,0.5)', 'transparent', 'rgba(0,0,0,0.7)']}
           style={styles.imageOverlay}
         />
         <SafeAreaView style={styles.imageHeader} edges={['top']}>
@@ -89,10 +104,16 @@ export default function PropertyDetailScreen() {
             <MaterialIcons
               name={favorited ? 'favorite' : 'favorite-border'}
               size={24}
-              color={favorited ? '#ef4444' : '#fff'}
+              color={favorited ? AtticoColors.accent : '#fff'}
             />
           </TouchableOpacity>
         </SafeAreaView>
+
+        <View style={styles.imageBadge}>
+          <Text style={styles.imageBadgeText}>
+            {property.listing_type === 'rent' ? 'FOR RENT' : 'FOR SALE'}
+          </Text>
+        </View>
       </View>
 
       <ScrollView
@@ -104,7 +125,7 @@ export default function PropertyDetailScreen() {
           <MaterialIcons
             name="location-on"
             size={16}
-            color={AtticoColors.textSecondary}
+            color={AtticoColors.accent}
           />
           <Text style={styles.location}>
             {property.address}, {property.city}
@@ -126,6 +147,99 @@ export default function PropertyDetailScreen() {
               <Text style={styles.amenityLabel}>{a.name}</Text>
             </View>
           ))}
+        </View>
+
+        {/* Virtual Tour Preview */}
+        <View style={styles.sectionCard}>
+          <View style={styles.sectionHeader}>
+            <MaterialIcons name="360" size={22} color={AtticoColors.accent} />
+            <Text style={styles.sectionTitle}>Virtual Tour</Text>
+          </View>
+          <TouchableOpacity
+            style={styles.tourPreview}
+            activeOpacity={0.8}
+            onPress={() => Alert.alert('Virtual Tour', 'Coming soon!')}>
+            <Image
+              source={{ uri: property.image_urls[0] }}
+              style={styles.tourImage}
+              contentFit="cover"
+            />
+            <View style={styles.tourOverlay}>
+              <View style={styles.playButton}>
+                <MaterialIcons name="play-arrow" size={36} color="#fff" />
+              </View>
+              <Text style={styles.tourText}>Start Virtual Tour</Text>
+            </View>
+          </TouchableOpacity>
+        </View>
+
+        {/* Agent Profile */}
+        <View style={styles.sectionCard}>
+          <View style={styles.sectionHeader}>
+            <MaterialIcons name="person" size={22} color={AtticoColors.accent} />
+            <Text style={styles.sectionTitle}>Listed By</Text>
+          </View>
+          <View style={styles.agentRow}>
+            <View style={styles.agentAvatar}>
+              <MaterialIcons name="person" size={28} color={AtticoColors.accent} />
+            </View>
+            <View style={styles.agentInfo}>
+              <Text style={styles.agentName}>Property Agent</Text>
+              <Text style={styles.agentRole}>Verified Agent</Text>
+              <View style={styles.agentRating}>
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <MaterialIcons
+                    key={star}
+                    name="star"
+                    size={14}
+                    color={star <= 4 ? AtticoColors.accent : '#333'}
+                  />
+                ))}
+                <Text style={styles.agentRatingText}>4.0</Text>
+              </View>
+            </View>
+            <TouchableOpacity
+              style={styles.callButton}
+              onPress={() => Alert.alert('Call', 'Calling agent...')}
+              activeOpacity={0.7}>
+              <MaterialIcons name="phone" size={20} color="#fff" />
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        {/* Contact Form */}
+        <View style={styles.sectionCard}>
+          <View style={styles.sectionHeader}>
+            <MaterialIcons name="mail" size={22} color={AtticoColors.accent} />
+            <Text style={styles.sectionTitle}>Contact Agent</Text>
+          </View>
+          <TextInput
+            style={styles.contactInput}
+            placeholder="Your Name"
+            placeholderTextColor={AtticoColors.textSecondary}
+            value={contactName}
+            onChangeText={setContactName}
+          />
+          <TextInput
+            style={styles.contactInput}
+            placeholder="Your Email"
+            placeholderTextColor={AtticoColors.textSecondary}
+            value={contactEmail}
+            onChangeText={setContactEmail}
+            keyboardType="email-address"
+            autoCapitalize="none"
+          />
+          <TextInput
+            style={[styles.contactInput, styles.contactMessage]}
+            placeholder="I'm interested in this property..."
+            placeholderTextColor={AtticoColors.textSecondary}
+            value={contactMessage}
+            onChangeText={setContactMessage}
+            multiline
+            numberOfLines={4}
+            textAlignVertical="top"
+          />
+          <ActionButton title="Send Message" onPress={handleContact} />
         </View>
 
         <View style={styles.priceRow}>
@@ -154,17 +268,17 @@ export default function PropertyDetailScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: AtticoColors.surface,
+    backgroundColor: AtticoColors.primary,
   },
   errorContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: AtticoColors.surface,
+    backgroundColor: AtticoColors.primary,
   },
   errorText: {
     fontSize: 16,
-    color: AtticoColors.textDark,
+    color: AtticoColors.textPrimary,
   },
   imageContainer: {
     height: IMAGE_HEIGHT,
@@ -186,7 +300,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: 'rgba(0,0,0,0.3)',
+    backgroundColor: 'rgba(0,0,0,0.4)',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -196,9 +310,24 @@ const styles = StyleSheet.create({
     color: '#fff',
     letterSpacing: 1,
   },
+  imageBadge: {
+    position: 'absolute',
+    bottom: 44,
+    left: 20,
+    backgroundColor: AtticoColors.accent,
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+    borderRadius: 8,
+  },
+  imageBadgeText: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: '#fff',
+    letterSpacing: 1,
+  },
   content: {
     flex: 1,
-    backgroundColor: AtticoColors.surface,
+    backgroundColor: AtticoColors.primary,
     borderTopLeftRadius: 28,
     borderTopRightRadius: 28,
     marginTop: -28,
@@ -210,7 +339,7 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 26,
     fontWeight: '700',
-    color: AtticoColors.textDark,
+    color: AtticoColors.textPrimary,
     marginBottom: 8,
   },
   locationRow: {
@@ -226,7 +355,7 @@ const styles = StyleSheet.create({
   description: {
     fontSize: 14,
     lineHeight: 22,
-    color: '#666',
+    color: AtticoColors.textSecondary,
     marginBottom: 8,
   },
   amenityRow: {
@@ -242,7 +371,9 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: '#E8F5F1',
+    backgroundColor: AtticoColors.glass,
+    borderWidth: 1,
+    borderColor: AtticoColors.glassBorder,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -251,6 +382,120 @@ const styles = StyleSheet.create({
     color: AtticoColors.textSecondary,
     fontWeight: '500',
   },
+
+  sectionCard: {
+    backgroundColor: AtticoColors.primaryLight,
+    borderRadius: 20,
+    padding: 16,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: AtticoColors.glassBorder,
+    gap: 12,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  sectionTitle: {
+    fontSize: 17,
+    fontWeight: '700',
+    color: AtticoColors.textPrimary,
+  },
+
+  tourPreview: {
+    borderRadius: 16,
+    overflow: 'hidden',
+    height: 180,
+  },
+  tourImage: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  tourOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.45)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 8,
+  },
+  playButton: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: AtticoColors.accent,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  tourText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#fff',
+  },
+
+  agentRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  agentAvatar: {
+    width: 52,
+    height: 52,
+    borderRadius: 26,
+    backgroundColor: AtticoColors.glass,
+    borderWidth: 1,
+    borderColor: AtticoColors.glassBorder,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  agentInfo: {
+    flex: 1,
+    gap: 2,
+  },
+  agentName: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: AtticoColors.textPrimary,
+  },
+  agentRole: {
+    fontSize: 12,
+    color: AtticoColors.accent,
+    fontWeight: '500',
+  },
+  agentRating: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 2,
+    marginTop: 2,
+  },
+  agentRatingText: {
+    fontSize: 12,
+    color: AtticoColors.textSecondary,
+    marginLeft: 4,
+  },
+  callButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: AtticoColors.accent,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
+  contactInput: {
+    backgroundColor: AtticoColors.glass,
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    fontSize: 14,
+    color: AtticoColors.textPrimary,
+    borderWidth: 1,
+    borderColor: AtticoColors.glassBorder,
+  },
+  contactMessage: {
+    height: 100,
+    paddingTop: 14,
+  },
+
   priceRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -263,9 +508,9 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   price: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: '700',
-    color: AtticoColors.textDark,
+    color: AtticoColors.accent,
   },
   priceSuffix: {
     fontSize: 14,

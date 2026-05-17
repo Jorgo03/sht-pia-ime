@@ -28,17 +28,20 @@ export const Colors = {
 };
 
 export const AtticoColors = {
-  primary: '#0A2E36',
-  primaryLight: '#0F3D47',
-  accent: '#1A6B5A',
-  accentLight: '#2ECDA7',
+  primary: '#0A0A0A',
+  primaryLight: '#161616',
+  accent: '#FF6B00',
+  accentLight: '#FF8533',
+  accentGlow: 'rgba(255,107,0,0.35)',
   surface: '#FFFFFF',
-  surfaceAlt: '#F5F7FA',
+  surfaceAlt: '#F5F5F5',
+  glass: 'rgba(255,255,255,0.06)',
+  glassBorder: 'rgba(255,255,255,0.10)',
   textPrimary: '#FFFFFF',
-  textSecondary: '#B0BEC5',
-  textDark: '#1A1A2E',
-  gradientStart: '#0A2E36',
-  gradientEnd: '#134E5E',
+  textSecondary: '#7A7A7A',
+  textDark: '#1A1A1A',
+  gradientStart: '#0A0A0A',
+  gradientEnd: '#141414',
 };
 
 export const Fonts = Platform.select({

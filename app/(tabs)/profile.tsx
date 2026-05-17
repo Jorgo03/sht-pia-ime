@@ -31,7 +31,6 @@ const socialProviders: {
   { provider: 'google', label: 'Google', ionicon: 'logo-google', color: '#EA4335' },
   { provider: 'apple', label: 'Apple', ionicon: 'logo-apple', color: '#000000' },
   { provider: 'linkedin_oidc', label: 'LinkedIn', ionicon: 'logo-linkedin', color: '#0A66C2' },
-  { provider: 'yahoo' as Provider, label: 'Yahoo', ionicon: 'logo-yahoo', color: '#6001D2' },
 ];
 
 export default function ProfileScreen() {
@@ -119,7 +118,6 @@ export default function ProfileScreen() {
               style={styles.form}
               behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
 
-              {/* Role Tabs */}
               <View style={styles.roleTabs}>
                 <TouchableOpacity
                   style={[styles.roleTab, role === 'buyer' && styles.roleTabActive]}
@@ -128,7 +126,7 @@ export default function ProfileScreen() {
                   <MaterialIcons
                     name="person"
                     size={18}
-                    color={role === 'buyer' ? AtticoColors.primary : AtticoColors.textSecondary}
+                    color={role === 'buyer' ? '#fff' : AtticoColors.textSecondary}
                   />
                   <Text
                     style={[styles.roleTabText, role === 'buyer' && styles.roleTabTextActive]}>
@@ -142,7 +140,7 @@ export default function ProfileScreen() {
                   <MaterialIcons
                     name="business-center"
                     size={18}
-                    color={role === 'agent' ? AtticoColors.primary : AtticoColors.textSecondary}
+                    color={role === 'agent' ? '#fff' : AtticoColors.textSecondary}
                   />
                   <Text
                     style={[styles.roleTabText, role === 'agent' && styles.roleTabTextActive]}>
@@ -211,36 +209,25 @@ export default function ProfileScreen() {
                 onPress={handleAuth}
               />
 
-              {/* Divider */}
               <View style={styles.divider}>
                 <View style={styles.dividerLine} />
                 <Text style={styles.dividerText}>or sign in with</Text>
                 <View style={styles.dividerLine} />
               </View>
 
-              {/* Social Login Buttons */}
               <View style={styles.socialRow}>
                 {socialProviders.map((sp) => (
                   <TouchableOpacity
                     key={sp.provider}
-                    style={[styles.socialButton, { backgroundColor: sp.color }]}
+                    style={styles.socialButton}
                     onPress={() => handleSocialLogin(sp.provider)}
                     activeOpacity={0.8}>
-                    <Ionicons name={sp.ionicon} size={24} color="#fff" />
+                    <Ionicons name={sp.ionicon} size={24} color={sp.color} />
+                    <Text style={styles.socialLabel}>{sp.label}</Text>
                   </TouchableOpacity>
                 ))}
               </View>
 
-              {/* Social labels */}
-              <View style={styles.socialRow}>
-                {socialProviders.map((sp) => (
-                  <Text key={sp.provider} style={styles.socialLabel}>
-                    {sp.label}
-                  </Text>
-                ))}
-              </View>
-
-              {/* Toggle Sign In / Sign Up */}
               <TouchableOpacity
                 onPress={() => setIsSignUp(!isSignUp)}
                 style={styles.toggleButton}>
@@ -284,7 +271,7 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: AtticoColors.accentLight,
+    backgroundColor: AtticoColors.accent,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 8,
@@ -292,7 +279,7 @@ const styles = StyleSheet.create({
   avatarText: {
     fontSize: 32,
     fontWeight: '700',
-    color: AtticoColors.primary,
+    color: '#fff',
   },
   email: {
     fontSize: 16,
@@ -307,13 +294,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 6,
     borderRadius: 16,
-    backgroundColor: AtticoColors.accentLight,
+    backgroundColor: AtticoColors.accent,
     marginTop: 4,
   },
   roleBadgeText: {
     fontSize: 13,
     fontWeight: '700',
-    color: AtticoColors.primary,
+    color: '#fff',
   },
   subtitle: {
     fontSize: 14,
@@ -334,6 +321,8 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 4,
     marginBottom: 8,
+    borderWidth: 1,
+    borderColor: AtticoColors.glassBorder,
   },
   roleTab: {
     flex: 1,
@@ -345,7 +334,7 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   roleTabActive: {
-    backgroundColor: AtticoColors.accentLight,
+    backgroundColor: AtticoColors.accent,
   },
   roleTabText: {
     fontSize: 15,
@@ -353,7 +342,7 @@ const styles = StyleSheet.create({
     color: AtticoColors.textSecondary,
   },
   roleTabTextActive: {
-    color: AtticoColors.primary,
+    color: '#fff',
   },
   formTitle: {
     fontSize: 22,
@@ -375,7 +364,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: AtticoColors.textPrimary,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.1)',
+    borderColor: AtticoColors.glassBorder,
   },
   divider: {
     flexDirection: 'row',
@@ -385,7 +374,7 @@ const styles = StyleSheet.create({
   dividerLine: {
     flex: 1,
     height: 1,
-    backgroundColor: 'rgba(255,255,255,0.15)',
+    backgroundColor: AtticoColors.glassBorder,
   },
   dividerText: {
     fontSize: 13,
@@ -395,25 +384,24 @@ const styles = StyleSheet.create({
   socialRow: {
     flexDirection: 'row',
     justifyContent: 'center',
-    gap: 16,
+    gap: 12,
   },
   socialButton: {
-    width: 52,
+    flex: 1,
     height: 52,
     borderRadius: 16,
+    backgroundColor: AtticoColors.glass,
+    borderWidth: 1,
+    borderColor: AtticoColors.glassBorder,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  socialButtonText: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#fff',
+    flexDirection: 'row',
+    gap: 6,
   },
   socialLabel: {
-    fontSize: 11,
-    color: AtticoColors.textSecondary,
-    width: 52,
-    textAlign: 'center',
+    fontSize: 12,
+    color: AtticoColors.textPrimary,
+    fontWeight: '500',
   },
   toggleButton: {
     alignItems: 'center',
@@ -421,6 +409,6 @@ const styles = StyleSheet.create({
   },
   toggleText: {
     fontSize: 14,
-    color: AtticoColors.accentLight,
+    color: AtticoColors.accent,
   },
 });

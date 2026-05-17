@@ -28,7 +28,7 @@ export function ActionButton({
 
 const styles = StyleSheet.create({
   button: {
-    backgroundColor: AtticoColors.accentLight,
+    backgroundColor: AtticoColors.accent,
     paddingVertical: 16,
     paddingHorizontal: 32,
     borderRadius: 28,
@@ -37,12 +37,12 @@ const styles = StyleSheet.create({
   secondary: {
     backgroundColor: 'transparent',
     borderWidth: 1.5,
-    borderColor: AtticoColors.textPrimary,
+    borderColor: AtticoColors.glassBorder,
   },
   text: {
     fontSize: 16,
     fontWeight: '700',
-    color: AtticoColors.primary,
+    color: '#fff',
   },
   secondaryText: {
     color: AtticoColors.textPrimary,
