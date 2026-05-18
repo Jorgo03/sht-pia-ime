@@ -31,6 +31,11 @@ export function formatPrice(n, lang = 'sq') {
   }).format(num)
 }
 
+export function getLocalizedText(i18nObj, lang, fallback = 'en') {
+  if (!i18nObj || typeof i18nObj !== 'object') return i18nObj ?? ''
+  return i18nObj[lang] ?? i18nObj[fallback] ?? i18nObj.sq ?? Object.values(i18nObj)[0] ?? ''
+}
+
 export function formatDate(dateStr, lang = 'sq') {
   if (!dateStr) return ''
   return new Intl.DateTimeFormat(lang, {

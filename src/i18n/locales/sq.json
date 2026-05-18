@@ -62,6 +62,9 @@
     "house": "Shtëpi",
     "commercial": "Zyrë",
     "land": "Tokë",
+    "office": "Zyrë",
+    "garage": "Garazh",
+    "daily_rent": "Qira ditore",
     "anyLocation": "Çdo vendndodhje",
     "anyType": "Çdo lloj",
     "anyBeds": "Çdo numër",
@@ -89,7 +92,8 @@
     "forSale": "Shitje",
     "forRent": "Qira",
     "featured": "Pronë e veçantë",
-    "location": "Vendndodhja"
+    "location": "Vendndodhja",
+    "call": "Thirr"
   },
   "errors": {
     "generic": "Ndodhi një gabim. Provo përsëri.",
@@ -101,5 +105,102 @@
     "title": "Paneli i Agjentit",
     "subtitle": "Menaxho pronat dhe klientët e tu",
     "comingSoon": "Së shpejti..."
+  },
+  "account": {
+    "welcomeBack": "Mirë se erdhe, {{name}} 👋",
+    "myListings": "Listat e mia",
+    "settings": "Cilësimet"
+  },
+  "listing": {
+    "newListing": "Listim i ri",
+    "myListings": "Listat e mia",
+    "noListings": "Nuk ke lista akoma",
+    "noListingsDesc": "Krijo listimin e parë për të filluar",
+    "confirmDelete": "Je i sigurt që dëshiron ta fshish këtë listim?",
+    "viewPublic": "Shiko listimin",
+    "viewDashboard": "Paneli",
+    "pause": "Pauzë",
+    "activate": "Aktivizo",
+    "delete": "Fshi",
+    "required": "Kjo fushë është e detyrueshme",
+    "minImages": "Minimum 3 foto të nevojshme",
+    "listingType": "Lloji i listimit",
+    "title": "Titulli",
+    "titlePlaceholder": "p.sh. Apartament 2+1 modern në Bllok",
+    "description": "Përshkrimi",
+    "descriptionPlaceholder": "Përshkruaj pronën...",
+    "city": "Qyteti",
+    "address": "Adresa",
+    "addressPlaceholder": "Emri i rrugës dhe numri",
+    "price": "Çmimi",
+    "currency": "Monedha",
+    "surface": "Sipërfaqja",
+    "floor": "Kati",
+    "totalFloors": "Katet totale",
+    "yearBuilt": "Viti i ndërtimit",
+    "features": "Karakteristikat",
+    "images": "Fotot",
+    "dropImages": "Kliko ose tërhiq fotot këtu",
+    "cover": "Kopertinë",
+    "videoUrl": "URL e videos (opsionale)",
+    "phone": "Telefoni",
+    "email": "Email (opsionale)",
+    "back": "Kthehu",
+    "next": "Vazhdo",
+    "saveDraft": "Ruaj draft",
+    "publish": "Publiko",
+    "type": {
+      "sale": "Shitje",
+      "rent": "Qira",
+      "daily_rent": "Qira ditore"
+    },
+    "status": {
+      "active": "Aktiv",
+      "paused": "Pauzuar",
+      "sold": "Shitur",
+      "rented": "Dhënë me qira",
+      "draft": "Draft"
+    },
+    "step": {
+      "basics": "Bazat",
+      "location": "Vendndodhja",
+      "details": "Detajet",
+      "media": "Media",
+      "publish": "Publiko"
+    },
+    "feature": {
+      "balcony": "Ballkon",
+      "parking": "Parking",
+      "elevator": "Ashensor",
+      "garden": "Kopsht",
+      "pool": "Pishinë",
+      "furnished": "E mobiluar",
+      "airConditioning": "Kondicionim",
+      "heating": "Ngrohje",
+      "security": "Siguri",
+      "storage": "Magazinë"
+    }
+  },
+  "dashboard": {
+    "title": "Paneli i pronës",
+    "views": "Shikime",
+    "calls": "Thirrje",
+    "messages": "Mesazhe",
+    "meetings": "Takime",
+    "favourites": "Të preferuara",
+    "recentActivity": "Aktiviteti i fundit",
+    "noActivity": "Nuk ka aktivitet të regjistruar"
+  },
+  "map": {
+    "openInMaps": "Hap në Google Maps",
+    "mapView": "Harta",
+    "gridView": "Rrjeta"
+  },
+  "floorPlan": {
+    "title": "Plani 3D",
+    "orbit": "Orbit",
+    "topView": "Pamje nga lart",
+    "isoView": "Izometrike",
+    "desktopOnly": "Plani 3D — i disponueshëm në desktop"
   }
 }

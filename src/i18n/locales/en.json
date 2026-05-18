@@ -62,6 +62,9 @@
     "house": "House",
     "commercial": "Office",
     "land": "Land",
+    "office": "Office",
+    "garage": "Garage",
+    "daily_rent": "Daily Rent",
     "anyLocation": "Any location",
     "anyType": "Any type",
     "anyBeds": "Any",
@@ -89,7 +92,8 @@
     "forSale": "For Sale",
     "forRent": "For Rent",
     "featured": "Featured",
-    "location": "Location"
+    "location": "Location",
+    "call": "Call"
   },
   "errors": {
     "generic": "Something went wrong. Please try again.",
@@ -101,5 +105,102 @@
     "title": "Agent Dashboard",
     "subtitle": "Manage your properties and clients",
     "comingSoon": "Coming soon..."
+  },
+  "account": {
+    "welcomeBack": "Welcome back, {{name}} 👋",
+    "myListings": "My Listings",
+    "settings": "Settings"
+  },
+  "listing": {
+    "newListing": "New Listing",
+    "myListings": "My Listings",
+    "noListings": "No listings yet",
+    "noListingsDesc": "Create your first listing to start selling or renting",
+    "confirmDelete": "Are you sure you want to delete this listing?",
+    "viewPublic": "View listing",
+    "viewDashboard": "Dashboard",
+    "pause": "Pause",
+    "activate": "Activate",
+    "delete": "Delete",
+    "required": "This field is required",
+    "minImages": "Minimum 3 images required",
+    "listingType": "Listing type",
+    "title": "Title",
+    "titlePlaceholder": "e.g. Modern 2+1 apartment in Blloku",
+    "description": "Description",
+    "descriptionPlaceholder": "Describe the property...",
+    "city": "City",
+    "address": "Address",
+    "addressPlaceholder": "Street name and number",
+    "price": "Price",
+    "currency": "Currency",
+    "surface": "Surface area",
+    "floor": "Floor",
+    "totalFloors": "Total floors",
+    "yearBuilt": "Year built",
+    "features": "Features",
+    "images": "Images",
+    "dropImages": "Click or drag images here",
+    "cover": "Cover",
+    "videoUrl": "Video URL (optional)",
+    "phone": "Phone",
+    "email": "Email (optional)",
+    "back": "Back",
+    "next": "Next",
+    "saveDraft": "Save Draft",
+    "publish": "Publish",
+    "type": {
+      "sale": "Sale",
+      "rent": "Rent",
+      "daily_rent": "Daily Rent"
+    },
+    "status": {
+      "active": "Active",
+      "paused": "Paused",
+      "sold": "Sold",
+      "rented": "Rented",
+      "draft": "Draft"
+    },
+    "step": {
+      "basics": "Basics",
+      "location": "Location",
+      "details": "Details",
+      "media": "Media",
+      "publish": "Publish"
+    },
+    "feature": {
+      "balcony": "Balcony",
+      "parking": "Parking",
+      "elevator": "Elevator",
+      "garden": "Garden",
+      "pool": "Pool",
+      "furnished": "Furnished",
+      "airConditioning": "Air Conditioning",
+      "heating": "Heating",
+      "security": "Security",
+      "storage": "Storage"
+    }
+  },
+  "dashboard": {
+    "title": "Property Dashboard",
+    "views": "Views",
+    "calls": "Calls",
+    "messages": "Messages",
+    "meetings": "Meetings",
+    "favourites": "Favourites",
+    "recentActivity": "Recent Activity",
+    "noActivity": "No activity recorded yet"
+  },
+  "map": {
+    "openInMaps": "Open in Google Maps",
+    "mapView": "Map",
+    "gridView": "Grid"
+  },
+  "floorPlan": {
+    "title": "3D Floor Plan",
+    "orbit": "Orbit",
+    "topView": "Top View",
+    "isoView": "Isometric",
+    "desktopOnly": "3D floor plan viewer — available on desktop"
   }
 }

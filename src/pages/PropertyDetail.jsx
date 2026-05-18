@@ -1,9 +1,16 @@
+import { useEffect, lazy, Suspense } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { ArrowLeft, Heart, Bed, Bath, Ruler, MapPin, Phone, MessageCircle } from 'lucide-react'
+import { ArrowLeft, Heart, Bed, Bath, Ruler, MapPin, Phone, MessageCircle, ExternalLink } from 'lucide-react'
 import { useProperty } from '../hooks/useProperties'
-import { formatPrice, imageFor } from '../lib/format'
+import { formatPrice, imageFor, getLocalizedText } from '../lib/format'
 import { useFavorites } from '../contexts/FavoritesContext'
+import { logActivity } from '../lib/activity'
+
+const PropertyMap = lazy(() => import('../components/PropertyMap'))
+const FloorPlanViewer = import.meta.env.VITE_FEATURE_3D_FLOORPLAN === 'true'
+  ? lazy(() => import('../components/floorplan/FloorPlanViewer'))
+  : null
 
 export default function PropertyDetail() {
   const { id } = useParams()
@@ -11,6 +18,10 @@ export default function PropertyDetail() {
   const { t, i18n } = useTranslation()
   const { property, loading, error } = useProperty(id)
   const { isFavorite, toggle } = useFavorites()
+
+  useEffect(() => {
+    if (property?.id) logActivity(property.id, 'view')
+  }, [property?.id])
 
   if (loading) return <div className="page">{t('common.loading')}</div>
   if (error)   return <div className="page" style={{color:'#c0392b'}}>{t('common.error')}: {error}</div>
@@ -25,8 +36,11 @@ export default function PropertyDetail() {
   const price = formatPrice(property.price, i18n.language)
   const suffix = property.listing_type === 'rent' ? t('property.perMonth') : ''
 
+  const title = getLocalizedText(property.title_i18n, i18n.language) || property.title
+  const description = getLocalizedText(property.description_i18n, i18n.language) || property.description
+
   const phone = property.agent?.phone?.replace(/\s/g, '') || '355691234567'
-  const waMsg = encodeURIComponent(`Hello, I'm interested in "${property.title}".`)
+  const waMsg = encodeURIComponent(`Hello, I'm interested in "${title}".`)
 
   return (
     <div>
@@ -59,7 +73,7 @@ export default function PropertyDetail() {
       <div style={{ padding: '1.25rem' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
           <div>
-            <div style={{ fontSize: 22, fontWeight: 600 }}>{property.title}</div>
+            <div style={{ fontSize: 22, fontWeight: 600 }}>{title}</div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 4, color: 'var(--fho-text-muted)', fontSize: 13, marginTop: 4 }}>
               <MapPin size={12} /> {property.address}, {property.city}
             </div>
@@ -90,7 +104,7 @@ export default function PropertyDetail() {
         </div>
 
         <div style={{ background: 'var(--fho-surface)', borderRadius: 'var(--r-md)', padding: 16, border: '0.5px solid var(--fho-border)', marginBottom: 16 }}>
-          <div style={{ fontSize: 14, lineHeight: 1.6 }}>{property.description}</div>
+          <div style={{ fontSize: 14, lineHeight: 1.6 }}>{description}</div>
         </div>
 
         {property.agent && (
@@ -108,15 +122,40 @@ export default function PropertyDetail() {
         <div style={{ display: 'flex', gap: 10 }}>
           <a
             href={`tel:${phone}`}
+            onClick={() => logActivity(property.id, 'call')}
             style={{ flex: 1, background: 'var(--fho-surface)', border: '0.5px solid var(--fho-border)', borderRadius: 'var(--r-md)', padding: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, fontWeight: 500, color: 'var(--fho-text)', textDecoration: 'none', fontSize: 14 }}
-          ><Phone size={16} /> WhatsApp</a>
+          ><Phone size={16} /> {t('property.call')}</a>
           <a
             href={`https://wa.me/${phone}?text=${waMsg}`}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={() => logActivity(property.id, 'message')}
             style={{ flex: 1, background: 'linear-gradient(135deg, var(--fho-orange-1), var(--fho-orange-2))', borderRadius: 'var(--r-md)', padding: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, fontWeight: 500, color: 'white', textDecoration: 'none', fontSize: 14, boxShadow: '0 4px 12px rgba(232,93,44,0.3)' }}
           ><MessageCircle size={16} /> WhatsApp</a>
         </div>
+
+        {property.latitude && property.longitude && (
+          <div style={{ marginTop: 16 }}>
+            <Suspense fallback={<div style={{ height: 200, background: 'var(--fho-surface)', borderRadius: 'var(--r-md)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--fho-text-muted)' }}>{t('common.loading')}</div>}>
+              <PropertyMap lat={property.latitude} lng={property.longitude} />
+            </Suspense>
+            <a
+              href={`https://www.google.com/maps?q=${property.latitude},${property.longitude}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 8, fontSize: 13, color: 'var(--fho-orange-2)', textDecoration: 'none', fontWeight: 500 }}
+            ><ExternalLink size={14} /> {t('map.openInMaps')}</a>
+          </div>
+        )}
+
+        {FloorPlanViewer && property.floor_plan && (
+          <div style={{ marginTop: 16 }}>
+            <div style={{ fontWeight: 600, fontSize: 15, marginBottom: 8 }}>{t('floorPlan.title')}</div>
+            <Suspense fallback={<div style={{ height: 200, background: 'var(--fho-surface)', borderRadius: 'var(--r-md)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--fho-text-muted)' }}>{t('common.loading')}</div>}>
+              <FloorPlanViewer plan={property.floor_plan} />
+            </Suspense>
+          </div>
+        )}
       </div>
     </div>
   )

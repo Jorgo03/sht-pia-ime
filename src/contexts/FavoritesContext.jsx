@@ -8,24 +8,27 @@ export function FavoritesProvider({ children }) {
   const { user } = useAuth()
   const [favoriteIds, setFavoriteIds] = useState(new Set())
   const [favoriteProperties, setFavoriteProperties] = useState([])
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
 
   const fetchFavorites = useCallback(async () => {
     if (!user) {
       setFavoriteIds(new Set())
       setFavoriteProperties([])
+      setLoading(false)
       return
     }
     setLoading(true)
     try {
       const { data, error } = await supabase
         .from('favorites')
-        .select('property_id, properties(*)')
+        .select('id, created_at, property:properties(*)')
         .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
 
+      console.log('[Favorites] user:', user.id, 'result:', data, error)
       if (error) throw error
 
-      const props = (data ?? []).map((f) => f.properties).filter(Boolean)
+      const props = (data ?? []).map((f) => f.property).filter(Boolean)
       const ids = new Set(props.map((p) => p.id))
 
       setFavoriteIds(ids)
@@ -49,6 +52,8 @@ export function FavoritesProvider({ children }) {
 
   const toggle = useCallback(
     async (propertyId) => {
+      if (!user) return
+
       const wasFav = favoriteIds.has(propertyId)
 
       setFavoriteIds((prev) => {
@@ -68,8 +73,6 @@ export function FavoritesProvider({ children }) {
           .single()
         if (data) setFavoriteProperties((prev) => [...prev, data])
       }
-
-      if (!user) return
 
       try {
         if (wasFav) {

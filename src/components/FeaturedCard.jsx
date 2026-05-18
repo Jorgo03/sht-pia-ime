@@ -1,7 +1,7 @@
 import { Heart, Bed, Bath, Ruler } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { formatPrice, imageFor } from '../lib/format'
+import { formatPrice, imageFor, getLocalizedText } from '../lib/format'
 import { useFavorites } from '../contexts/FavoritesContext'
 
 export default function FeaturedCard({ property }) {
@@ -31,7 +31,7 @@ export default function FeaturedCard({ property }) {
       </div>
       <div className="featured-info">
         <div className="price">{price}{suffix}</div>
-        <div className="name">{property.title} · {property.city}</div>
+        <div className="name">{getLocalizedText(property.title_i18n, i18n.language) || property.title} · {property.city}</div>
         <div className="meta">
           {property.beds > 0 && <span><Bed size={13} /> {property.beds} {t('property.beds')}</span>}
           <span><Bath size={13} /> {property.baths} {t('property.baths')}</span>

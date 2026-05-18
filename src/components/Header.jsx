@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next'
-import { Sun, Moon, ChevronDown } from 'lucide-react'
+import { Sun, Moon, ChevronDown, User, LayoutDashboard, Heart, Settings, LogOut, Plus } from 'lucide-react'
 import { useState, useRef, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useTheme } from '../contexts/ThemeContext'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
@@ -18,19 +19,31 @@ const LANGUAGES = [
 ]
 
 export default function Header() {
-  const { i18n } = useTranslation()
+  const { t, i18n } = useTranslation()
   const { theme, toggle } = useTheme()
-  const { user } = useAuth()
+  const { user, signOut } = useAuth()
+  const navigate = useNavigate()
   const [langOpen, setLangOpen] = useState(false)
-  const dropdownRef = useRef(null)
+  const [accountOpen, setAccountOpen] = useState(false)
+  const [profile, setProfile] = useState(null)
+  const langRef = useRef(null)
+  const accountRef = useRef(null)
 
   const currentLang = LANGUAGES.find(l => l.code === i18n.language) || LANGUAGES[0]
 
   useEffect(() => {
+    if (user) {
+      supabase.from('profiles').select('full_name, avatar_url, role, agency_name').eq('id', user.id).single()
+        .then(({ data }) => { if (data) setProfile(data) })
+    } else {
+      setProfile(null)
+    }
+  }, [user])
+
+  useEffect(() => {
     const handleClick = (e) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
-        setLangOpen(false)
-      }
+      if (langRef.current && !langRef.current.contains(e.target)) setLangOpen(false)
+      if (accountRef.current && !accountRef.current.contains(e.target)) setAccountOpen(false)
     }
     document.addEventListener('mousedown', handleClick)
     return () => document.removeEventListener('mousedown', handleClick)
@@ -49,11 +62,25 @@ export default function Header() {
     }
   }
 
+  const displayName = profile?.full_name || user?.email?.split('@')[0] || ''
+  const initials = displayName.slice(0, 2).toUpperCase()
+
+  const handleNav = (path) => {
+    setAccountOpen(false)
+    navigate(path)
+  }
+
   return (
     <header className="app-header">
-      <div className="header-brand">Shtëpia.ime</div>
+      <div className="header-brand" onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>Shtëpia.ime</div>
       <div className="header-actions">
-        <div className="lang-switcher" ref={dropdownRef}>
+        {user && (
+          <button className="new-listing-btn" onClick={() => navigate('/new-listing')}>
+            <Plus size={16} />
+            <span className="new-listing-label">{t('listing.newListing')}</span>
+          </button>
+        )}
+        <div className="lang-switcher" ref={langRef}>
           <button className="lang-btn" onClick={() => setLangOpen(!langOpen)}>
             <span className="lang-flag">{currentLang.flag}</span>
             <span className="lang-name">{currentLang.name}</span>
@@ -77,6 +104,45 @@ export default function Header() {
         <button className="theme-btn" onClick={toggle} aria-label="Toggle theme">
           {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
         </button>
+        <div className="account-switcher" ref={accountRef}>
+          {user ? (
+            <>
+              <button className="account-avatar-btn" onClick={() => setAccountOpen(!accountOpen)}>
+                {profile?.avatar_url ? (
+                  <img src={profile.avatar_url} alt="" className="account-avatar-img" />
+                ) : (
+                  <span className="account-avatar-initials">{initials}</span>
+                )}
+              </button>
+              {accountOpen && (
+                <div className="account-dropdown">
+                  <div className="account-greeting">
+                    <div className="account-name">{t('account.welcomeBack', { name: displayName })}</div>
+                    <div className="account-email">{user.email}</div>
+                  </div>
+                  <div className="account-divider" />
+                  <button className="account-option" onClick={() => handleNav('/my-listings')}>
+                    <LayoutDashboard size={16} /> {t('account.myListings')}
+                  </button>
+                  <button className="account-option" onClick={() => handleNav('/favorites')}>
+                    <Heart size={16} /> {t('common.favorites')}
+                  </button>
+                  <button className="account-option" onClick={() => handleNav('/profile')}>
+                    <Settings size={16} /> {t('account.settings')}
+                  </button>
+                  <div className="account-divider" />
+                  <button className="account-option account-signout" onClick={() => { setAccountOpen(false); signOut() }}>
+                    <LogOut size={16} /> {t('common.signOut')}
+                  </button>
+                </div>
+              )}
+            </>
+          ) : (
+            <button className="account-signin-btn" onClick={() => navigate('/profile')}>
+              <User size={18} />
+            </button>
+          )}
+        </div>
       </div>
     </header>
   )

@@ -12,7 +12,17 @@ export default function Favorites() {
   const { user, loading: authLoading } = useAuth()
   const { favoriteProperties, loading } = useFavorites()
 
-  if (authLoading) return null
+  if (authLoading) {
+    return (
+      <div className="page">
+        <h1 className="page-title">{t('favourites.title')}</h1>
+        <p className="page-subtitle">{t('favourites.subtitle')}</p>
+        <div className="property-grid">
+          {Array.from({ length: 4 }, (_, i) => <SkeletonCard key={i} />)}
+        </div>
+      </div>
+    )
+  }
 
   if (!user) {
     return (

@@ -62,6 +62,9 @@
     "house": "Dom",
     "commercial": "Biuro",
     "land": "Działka",
+    "office": "Biuro",
+    "garage": "Garaż",
+    "daily_rent": "Wynajem dzienny",
     "anyLocation": "Dowolna lokalizacja",
     "anyType": "Dowolny typ",
     "anyBeds": "Dowolna",
@@ -89,7 +92,8 @@
     "forSale": "Na sprzedaż",
     "forRent": "Do wynajęcia",
     "featured": "Wyróżnione",
-    "location": "Lokalizacja"
+    "location": "Lokalizacja",
+    "call": "Zadzwoń"
   },
   "errors": {
     "generic": "Coś poszło nie tak. Spróbuj ponownie.",
@@ -101,5 +105,75 @@
     "title": "Panel Agenta",
     "subtitle": "Zarządzaj nieruchomościami i klientami",
     "comingSoon": "Wkrótce..."
+  },
+  "account": {
+    "welcomeBack": "Witaj ponownie, {{name}} 👋",
+    "myListings": "Moje ogłoszenia",
+    "settings": "Ustawienia"
+  },
+  "listing": {
+    "newListing": "Nowe ogłoszenie",
+    "myListings": "Moje ogłoszenia",
+    "noListings": "Brak ogłoszeń",
+    "noListingsDesc": "Utwórz swoje pierwsze ogłoszenie",
+    "confirmDelete": "Czy na pewno chcesz usunąć to ogłoszenie?",
+    "viewPublic": "Zobacz ogłoszenie",
+    "viewDashboard": "Dashboard",
+    "pause": "Wstrzymaj",
+    "activate": "Aktywuj",
+    "delete": "Usuń",
+    "required": "Pole wymagane",
+    "minImages": "Wymagane minimum 3 zdjęcia",
+    "listingType": "Typ ogłoszenia",
+    "title": "Tytuł",
+    "titlePlaceholder": "np. Nowoczesne mieszkanie 2+1 w Blloku",
+    "description": "Opis",
+    "descriptionPlaceholder": "Opisz nieruchomość...",
+    "city": "Miasto",
+    "address": "Adres",
+    "addressPlaceholder": "Ulica i numer",
+    "price": "Cena",
+    "currency": "Waluta",
+    "surface": "Powierzchnia",
+    "floor": "Piętro",
+    "totalFloors": "Pięter łącznie",
+    "yearBuilt": "Rok budowy",
+    "features": "Cechy",
+    "images": "Zdjęcia",
+    "dropImages": "Kliknij lub przeciągnij zdjęcia tutaj",
+    "cover": "Okładka",
+    "videoUrl": "URL wideo (opcjonalnie)",
+    "phone": "Telefon",
+    "email": "Email (opcjonalnie)",
+    "back": "Wstecz",
+    "next": "Dalej",
+    "saveDraft": "Zapisz szkic",
+    "publish": "Opublikuj",
+    "type": { "sale": "Sprzedaż", "rent": "Wynajem", "daily_rent": "Wynajem dzienny" },
+    "status": { "active": "Aktywne", "paused": "Wstrzymane", "sold": "Sprzedane", "rented": "Wynajęte", "draft": "Szkic" },
+    "step": { "basics": "Podstawy", "location": "Lokalizacja", "details": "Szczegóły", "media": "Media", "publish": "Publikuj" },
+    "feature": { "balcony": "Balkon", "parking": "Parking", "elevator": "Winda", "garden": "Ogród", "pool": "Basen", "furnished": "Umeblowane", "airConditioning": "Klimatyzacja", "heating": "Ogrzewanie", "security": "Ochrona", "storage": "Schowek" }
+  },
+  "dashboard": {
+    "title": "Dashboard nieruchomości",
+    "views": "Wyświetlenia",
+    "calls": "Połączenia",
+    "messages": "Wiadomości",
+    "meetings": "Spotkania",
+    "favourites": "Ulubione",
+    "recentActivity": "Ostatnia aktywność",
+    "noActivity": "Brak zarejestrowanej aktywności"
+  },
+  "map": {
+    "openInMaps": "Otwórz w Google Maps",
+    "mapView": "Mapa",
+    "gridView": "Siatka"
+  },
+  "floorPlan": {
+    "title": "Plan 3D",
+    "orbit": "Orbita",
+    "topView": "Widok z góry",
+    "isoView": "Izometryczny",
+    "desktopOnly": "Plan 3D — dostępny na komputerze"
   }
 }

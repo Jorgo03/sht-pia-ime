@@ -11,6 +11,9 @@ import Messages from './pages/Messages'
 import Profile from './pages/Profile'
 import PropertyDetail from './pages/PropertyDetail'
 import AgentDashboard from './pages/AgentDashboard'
+import MyListings from './pages/MyListings'
+import PropertyDashboard from './pages/PropertyDashboard'
+import NewListing from './pages/NewListing'
 
 export default function App() {
   return (
@@ -28,6 +31,9 @@ export default function App() {
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/property/:id" element={<PropertyDetail />} />
                 <Route path="/agent-dashboard" element={<AgentDashboard />} />
+                <Route path="/my-listings" element={<MyListings />} />
+                <Route path="/my-listings/:id/dashboard" element={<PropertyDashboard />} />
+                <Route path="/new-listing" element={<NewListing />} />
               </Routes>
               <BottomNav />
             </div>

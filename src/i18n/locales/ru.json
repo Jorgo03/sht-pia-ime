@@ -62,6 +62,9 @@
     "house": "Дом",
     "commercial": "Офис",
     "land": "Участок",
+    "office": "Офис",
+    "garage": "Гараж",
+    "daily_rent": "Посуточная аренда",
     "anyLocation": "Любое расположение",
     "anyType": "Любой тип",
     "anyBeds": "Любое",
@@ -89,7 +92,8 @@
     "forSale": "Продажа",
     "forRent": "Аренда",
     "featured": "Рекомендуемое",
-    "location": "Расположение"
+    "location": "Расположение",
+    "call": "Позвонить"
   },
   "errors": {
     "generic": "Что-то пошло не так. Попробуйте снова.",
@@ -101,5 +105,75 @@
     "title": "Панель агента",
     "subtitle": "Управление недвижимостью и клиентами",
     "comingSoon": "Скоро..."
+  },
+  "account": {
+    "welcomeBack": "С возвращением, {{name}} 👋",
+    "myListings": "Мои объявления",
+    "settings": "Настройки"
+  },
+  "listing": {
+    "newListing": "Новое объявление",
+    "myListings": "Мои объявления",
+    "noListings": "Пока нет объявлений",
+    "noListingsDesc": "Создайте своё первое объявление",
+    "confirmDelete": "Вы уверены, что хотите удалить это объявление?",
+    "viewPublic": "Просмотреть",
+    "viewDashboard": "Панель управления",
+    "pause": "Приостановить",
+    "activate": "Активировать",
+    "delete": "Удалить",
+    "required": "Обязательное поле",
+    "minImages": "Минимум 3 фото",
+    "listingType": "Тип объявления",
+    "title": "Заголовок",
+    "titlePlaceholder": "напр. Современная квартира 2+1 в Блоку",
+    "description": "Описание",
+    "descriptionPlaceholder": "Опишите объект...",
+    "city": "Город",
+    "address": "Адрес",
+    "addressPlaceholder": "Улица и номер дома",
+    "price": "Цена",
+    "currency": "Валюта",
+    "surface": "Площадь",
+    "floor": "Этаж",
+    "totalFloors": "Этажей всего",
+    "yearBuilt": "Год постройки",
+    "features": "Характеристики",
+    "images": "Фотографии",
+    "dropImages": "Нажмите или перетащите фото сюда",
+    "cover": "Обложка",
+    "videoUrl": "URL видео (необязательно)",
+    "phone": "Телефон",
+    "email": "Email (необязательно)",
+    "back": "Назад",
+    "next": "Далее",
+    "saveDraft": "Сохранить черновик",
+    "publish": "Опубликовать",
+    "type": { "sale": "Продажа", "rent": "Аренда", "daily_rent": "Посуточная аренда" },
+    "status": { "active": "Активно", "paused": "Приостановлено", "sold": "Продано", "rented": "Сдано", "draft": "Черновик" },
+    "step": { "basics": "Основное", "location": "Расположение", "details": "Детали", "media": "Медиа", "publish": "Публикация" },
+    "feature": { "balcony": "Балкон", "parking": "Парковка", "elevator": "Лифт", "garden": "Сад", "pool": "Бассейн", "furnished": "С мебелью", "airConditioning": "Кондиционер", "heating": "Отопление", "security": "Охрана", "storage": "Кладовка" }
+  },
+  "dashboard": {
+    "title": "Панель объекта",
+    "views": "Просмотры",
+    "calls": "Звонки",
+    "messages": "Сообщения",
+    "meetings": "Встречи",
+    "favourites": "Избранное",
+    "recentActivity": "Последняя активность",
+    "noActivity": "Активность не зарегистрирована"
+  },
+  "map": {
+    "openInMaps": "Открыть в Google Maps",
+    "mapView": "Карта",
+    "gridView": "Сетка"
+  },
+  "floorPlan": {
+    "title": "3D план этажа",
+    "orbit": "Орбита",
+    "topView": "Вид сверху",
+    "isoView": "Изометрия",
+    "desktopOnly": "3D план — доступен на компьютере"
   }
 }

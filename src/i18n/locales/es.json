@@ -62,6 +62,9 @@
     "house": "Casa",
     "commercial": "Oficina",
     "land": "Terreno",
+    "office": "Oficina",
+    "garage": "Garaje",
+    "daily_rent": "Alquiler diario",
     "anyLocation": "Cualquier ubicación",
     "anyType": "Cualquier tipo",
     "anyBeds": "Cualquiera",
@@ -89,7 +92,8 @@
     "forSale": "En venta",
     "forRent": "En alquiler",
     "featured": "Destacado",
-    "location": "Ubicación"
+    "location": "Ubicación",
+    "call": "Llamar"
   },
   "errors": {
     "generic": "Algo salió mal. Inténtalo de nuevo.",
@@ -101,5 +105,75 @@
     "title": "Panel del Agente",
     "subtitle": "Gestiona tus propiedades y clientes",
     "comingSoon": "Próximamente..."
+  },
+  "account": {
+    "welcomeBack": "Bienvenido de nuevo, {{name}} 👋",
+    "myListings": "Mis anuncios",
+    "settings": "Configuración"
+  },
+  "listing": {
+    "newListing": "Nuevo anuncio",
+    "myListings": "Mis anuncios",
+    "noListings": "Sin anuncios todavía",
+    "noListingsDesc": "Crea tu primer anuncio",
+    "confirmDelete": "¿Seguro que quieres eliminar este anuncio?",
+    "viewPublic": "Ver anuncio",
+    "viewDashboard": "Dashboard",
+    "pause": "Pausar",
+    "activate": "Activar",
+    "delete": "Eliminar",
+    "required": "Campo obligatorio",
+    "minImages": "Mínimo 3 imágenes requeridas",
+    "listingType": "Tipo de anuncio",
+    "title": "Título",
+    "titlePlaceholder": "ej. Apartamento 2+1 moderno en Blloku",
+    "description": "Descripción",
+    "descriptionPlaceholder": "Describe la propiedad...",
+    "city": "Ciudad",
+    "address": "Dirección",
+    "addressPlaceholder": "Calle y número",
+    "price": "Precio",
+    "currency": "Moneda",
+    "surface": "Superficie",
+    "floor": "Planta",
+    "totalFloors": "Plantas totales",
+    "yearBuilt": "Año de construcción",
+    "features": "Características",
+    "images": "Imágenes",
+    "dropImages": "Haz clic o arrastra imágenes aquí",
+    "cover": "Portada",
+    "videoUrl": "URL del video (opcional)",
+    "phone": "Teléfono",
+    "email": "Email (opcional)",
+    "back": "Atrás",
+    "next": "Siguiente",
+    "saveDraft": "Guardar borrador",
+    "publish": "Publicar",
+    "type": { "sale": "Venta", "rent": "Alquiler", "daily_rent": "Alquiler diario" },
+    "status": { "active": "Activo", "paused": "Pausado", "sold": "Vendido", "rented": "Alquilado", "draft": "Borrador" },
+    "step": { "basics": "Básico", "location": "Ubicación", "details": "Detalles", "media": "Medios", "publish": "Publicar" },
+    "feature": { "balcony": "Balcón", "parking": "Parking", "elevator": "Ascensor", "garden": "Jardín", "pool": "Piscina", "furnished": "Amueblado", "airConditioning": "Aire acondicionado", "heating": "Calefacción", "security": "Seguridad", "storage": "Trastero" }
+  },
+  "dashboard": {
+    "title": "Dashboard de propiedad",
+    "views": "Visitas",
+    "calls": "Llamadas",
+    "messages": "Mensajes",
+    "meetings": "Reuniones",
+    "favourites": "Favoritos",
+    "recentActivity": "Actividad reciente",
+    "noActivity": "Sin actividad registrada"
+  },
+  "map": {
+    "openInMaps": "Abrir en Google Maps",
+    "mapView": "Mapa",
+    "gridView": "Cuadrícula"
+  },
+  "floorPlan": {
+    "title": "Plano 3D",
+    "orbit": "Órbita",
+    "topView": "Vista superior",
+    "isoView": "Isométrica",
+    "desktopOnly": "Plano 3D — disponible en escritorio"
   }
 }
