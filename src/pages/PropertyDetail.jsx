@@ -1,7 +1,7 @@
-import { useEffect, lazy, Suspense } from 'react'
+import { useEffect, useState, lazy, Suspense } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { ArrowLeft, Heart, Bed, Bath, Ruler, MapPin, Phone, MessageCircle, ExternalLink } from 'lucide-react'
+import { ArrowLeft, Heart, Bed, Bath, Ruler, MapPin, Phone, MessageCircle, ExternalLink, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useProperty } from '../hooks/useProperties'
 import { formatPrice, imageFor, getLocalizedText } from '../lib/format'
 import { useFavorites } from '../contexts/FavoritesContext'
@@ -18,6 +18,7 @@ export default function PropertyDetail() {
   const { t, i18n } = useTranslation()
   const { property, loading, error } = useProperty(id)
   const { isFavorite, toggle } = useFavorites()
+  const [imgIdx, setImgIdx] = useState(0)
 
   useEffect(() => {
     if (property?.id) logActivity(property.id, 'view')
@@ -28,9 +29,11 @@ export default function PropertyDetail() {
   if (!property) return <div className="page">{t('search.empty')}</div>
 
   const saved = isFavorite(property.id)
+  const images = property.image_urls?.length ? property.image_urls : []
+  const hasMultiple = images.length > 1
 
-  const heroBg = property.image_urls?.[0]
-    ? { backgroundImage: `url(${property.image_urls[0]})`, backgroundSize: 'cover', backgroundPosition: 'center' }
+  const heroBg = images[imgIdx]
+    ? { backgroundImage: `url(${images[imgIdx]})`, backgroundSize: 'cover', backgroundPosition: 'center' }
     : { background: imageFor(property) }
 
   const price = formatPrice(property.price, i18n.language)
@@ -39,8 +42,8 @@ export default function PropertyDetail() {
   const title = getLocalizedText(property.title_i18n, i18n.language) || property.title
   const description = getLocalizedText(property.description_i18n, i18n.language) || property.description
 
-  const phone = property.agent?.phone?.replace(/\s/g, '') || '355691234567'
-  const waMsg = encodeURIComponent(`Hello, I'm interested in "${title}".`)
+  const phone = property.contact_phone?.replace(/\s/g, '') || property.agent?.phone?.replace(/\s/g, '') || '355691234567'
+  const waMsg = encodeURIComponent(`Përshëndetje, jam i interesuar për pronën "${title}". A mund të më jepni më shumë informacion?`)
 
   return (
     <div>
@@ -68,6 +71,35 @@ export default function PropertyDetail() {
             color: saved ? 'var(--fho-orange-2)' : 'inherit'
           }}
         ><Heart size={20} fill={saved ? 'currentColor' : 'none'} /></button>
+        {hasMultiple && (
+          <>
+            <button
+              onClick={() => setImgIdx(i => (i - 1 + images.length) % images.length)}
+              aria-label="Previous"
+              style={{
+                position: 'absolute', top: '50%', left: 12, transform: 'translateY(-50%)',
+                width: 36, height: 36, borderRadius: '50%', background: 'rgba(0,0,0,0.5)',
+                border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                cursor: 'pointer', color: 'white'
+              }}
+            ><ChevronLeft size={20} /></button>
+            <button
+              onClick={() => setImgIdx(i => (i + 1) % images.length)}
+              aria-label="Next"
+              style={{
+                position: 'absolute', top: '50%', right: 12, transform: 'translateY(-50%)',
+                width: 36, height: 36, borderRadius: '50%', background: 'rgba(0,0,0,0.5)',
+                border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                cursor: 'pointer', color: 'white'
+              }}
+            ><ChevronRight size={20} /></button>
+            <div style={{
+              position: 'absolute', bottom: 12, left: '50%', transform: 'translateX(-50%)',
+              background: 'rgba(0,0,0,0.6)', borderRadius: 12, padding: '4px 12px',
+              fontSize: 12, color: 'white', fontWeight: 500
+            }}>{imgIdx + 1} / {images.length}</div>
+          </>
+        )}
       </div>
 
       <div style={{ padding: '1.25rem' }}>
