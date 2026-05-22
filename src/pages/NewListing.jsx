@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { ArrowLeft, ArrowRight, Upload, X, GripVertical } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Upload, X } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
 import '../styles/new-listing.css'
@@ -14,7 +14,7 @@ const FEATURES_LIST = ['balcony', 'parking', 'elevator', 'garden', 'pool', 'furn
 const LANGS = ['sq', 'en', 'de', 'it', 'es', 'pl', 'ru', 'fr']
 
 export default function NewListing() {
-  const { t, i18n } = useTranslation()
+  const { t } = useTranslation()
   const { user } = useAuth()
   const navigate = useNavigate()
   const fileInputRef = useRef(null)

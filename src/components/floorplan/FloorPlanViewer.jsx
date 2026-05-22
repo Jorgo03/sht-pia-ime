@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unknown-property */
 import { useState, Suspense } from 'react'
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls, PerspectiveCamera, Environment } from '@react-three/drei'

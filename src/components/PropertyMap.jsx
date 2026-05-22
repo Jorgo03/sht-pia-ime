@@ -1,7 +1,6 @@
 import { APIProvider, Map, AdvancedMarker } from '@vis.gl/react-google-maps'
 
 const API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || ''
-const TIRANA = { lat: 41.3275, lng: 19.8187 }
 
 export default function PropertyMap({ lat, lng }) {
   const center = { lat: Number(lat), lng: Number(lng) }

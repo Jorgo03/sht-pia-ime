@@ -32,7 +32,7 @@ const emptyPlan = () => ({
 })
 
 export default function FloorPlanEditor({ value, onChange }) {
-  const { t, i18n } = useTranslation()
+  const { i18n } = useTranslation()
   const [plan, setPlan] = useState(value || emptyPlan())
   const [tool, setTool] = useState('wall')
   const [drawing, setDrawing] = useState(null)

@@ -11,7 +11,7 @@ import pl from './locales/pl.json'
 import ru from './locales/ru.json'
 import fr from './locales/fr.json'
 
-i18n
+i18n // eslint-disable-line import/no-named-as-default-member
   .use(LanguageDetector)
   .use(initReactI18next)
   .init({
