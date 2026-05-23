@@ -99,7 +99,17 @@
     "featured": "Featured",
     "location": "Location",
     "call": "Call",
-    "autoTranslated": "Auto-translated"
+    "autoTranslated": "Auto-translated",
+    "whatsappMessage": "Hello, I am interested in the property \"{{title}}\". Can you give me more information?",
+    "similar": "Similar properties"
+  },
+  "messages": {
+    "subtitle": "Conversations with agents",
+    "comingSoon": "WhatsApp chat — coming soon"
+  },
+  "notFound": {
+    "title": "Page not found",
+    "subtitle": "The page you are looking for does not exist or has been moved."
   },
   "errors": {
     "generic": "Something went wrong. Please try again.",

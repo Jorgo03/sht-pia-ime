@@ -99,7 +99,17 @@
     "featured": "Destacado",
     "location": "Ubicación",
     "call": "Llamar",
-    "autoTranslated": "Traducido automáticamente"
+    "autoTranslated": "Traducido automáticamente",
+    "whatsappMessage": "Hola, estoy interesado en la propiedad \"{{title}}\". ¿Pueden darme más información?",
+    "similar": "Propiedades similares"
+  },
+  "messages": {
+    "subtitle": "Conversaciones con agentes",
+    "comingSoon": "Chat WhatsApp — próximamente"
+  },
+  "notFound": {
+    "title": "Página no encontrada",
+    "subtitle": "La página que buscas no existe o ha sido movida."
   },
   "errors": {
     "generic": "Algo salió mal. Inténtalo de nuevo.",

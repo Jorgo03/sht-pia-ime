@@ -1,12 +1,13 @@
 import { useEffect, useState, lazy, Suspense } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { ArrowLeft, Heart, Bed, Bath, Ruler, MapPin, Phone, MessageCircle, ExternalLink, ChevronLeft, ChevronRight, Globe } from 'lucide-react'
-import { useProperty } from '../hooks/useProperties'
+import { ArrowLeft, Heart, Bed, Bath, Ruler, MapPin, Phone, MessageCircle, ExternalLink, ChevronLeft, ChevronRight, Globe, Share2 } from 'lucide-react'
+import { useProperty, useProperties } from '../hooks/useProperties'
 import { useTranslatedProperty } from '../hooks/useTranslatedProperty'
 import { formatPrice, imageFor } from '../lib/format'
 import { useFavorites } from '../contexts/FavoritesContext'
 import { logActivity } from '../lib/activity'
+import PropertyCard from '../components/PropertyCard'
 
 const PropertyMap = lazy(() => import('../components/PropertyMap'))
 const FloorPlanViewer = import.meta.env.VITE_FEATURE_3D_FLOORPLAN === 'true'
@@ -21,10 +22,22 @@ export default function PropertyDetail() {
   const { isFavorite, toggle } = useFavorites()
   const [imgIdx, setImgIdx] = useState(0)
   const { title, description, translating, isTranslated } = useTranslatedProperty(property, i18n.language)
+  const { properties: similar } = useProperties({
+    filter: property?.property_type || 'all',
+    city: property?.city || null,
+  })
+  const similarProperties = similar.filter(p => p.id !== id).slice(0, 4)
 
   useEffect(() => {
     if (property?.id) logActivity(property.id, 'view')
   }, [property?.id])
+
+  useEffect(() => {
+    if (title && property?.city) {
+      document.title = `${title} - ${property.city} | Shtëpia.ime`
+    }
+    return () => { document.title = 'Shtëpia.ime' }
+  }, [title, property?.city])
 
   if (loading) return <div className="page">{t('common.loading')}</div>
   if (error)   return <div className="page" style={{color:'#c0392b'}}>{t('common.error')}: {error}</div>
@@ -42,7 +55,16 @@ export default function PropertyDetail() {
   const suffix = property.listing_type === 'rent' ? t('property.perMonth') : ''
 
   const phone = property.contact_phone?.replace(/\s/g, '') || property.agent?.phone?.replace(/\s/g, '') || '355691234567'
-  const waMsg = encodeURIComponent(`Përshëndetje, jam i interesuar për pronën "${title}". A mund të më jepni më shumë informacion?`)
+  const waMsg = encodeURIComponent(t('property.whatsappMessage', { title }))
+
+  const handleShare = async () => {
+    const url = window.location.href
+    if (navigator.share) {
+      navigator.share({ title, url }).catch(() => {})
+    } else {
+      await navigator.clipboard.writeText(url)
+    }
+  }
 
   return (
     <div>
@@ -58,18 +80,30 @@ export default function PropertyDetail() {
             justifyContent: 'center', cursor: 'pointer'
           }}
         ><ArrowLeft size={20} /></button>
-        <button
-          onClick={(e) => { e.stopPropagation(); toggle(property.id) }}
-          aria-label={t('common.save')}
-          style={{
-            position: 'absolute', top: 16, right: 16, width: 40, height: 40,
-            borderRadius: '50%', background: saved ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.85)',
-            backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
-            border: 'none', display: 'flex', alignItems: 'center',
-            justifyContent: 'center', cursor: 'pointer',
-            color: saved ? 'var(--fho-orange-2)' : 'inherit'
-          }}
-        ><Heart size={20} fill={saved ? 'currentColor' : 'none'} /></button>
+        <div style={{ position: 'absolute', top: 16, right: 16, display: 'flex', gap: 8 }}>
+          <button
+            onClick={handleShare}
+            aria-label="Share"
+            style={{
+              width: 40, height: 40, borderRadius: '50%', background: 'rgba(255,255,255,0.85)',
+              backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
+              border: 'none', display: 'flex', alignItems: 'center',
+              justifyContent: 'center', cursor: 'pointer'
+            }}
+          ><Share2 size={18} /></button>
+          <button
+            onClick={(e) => { e.stopPropagation(); toggle(property.id) }}
+            aria-label={t('common.save')}
+            style={{
+              width: 40, height: 40, borderRadius: '50%',
+              background: saved ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.85)',
+              backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
+              border: 'none', display: 'flex', alignItems: 'center',
+              justifyContent: 'center', cursor: 'pointer',
+              color: saved ? 'var(--fho-orange-2)' : 'inherit'
+            }}
+          ><Heart size={20} fill={saved ? 'currentColor' : 'none'} /></button>
+        </div>
         {hasMultiple && (
           <>
             <button
@@ -200,6 +234,15 @@ export default function PropertyDetail() {
             <Suspense fallback={<div style={{ height: 200, background: 'var(--fho-surface)', borderRadius: 'var(--r-md)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--fho-text-muted)' }}>{t('common.loading')}</div>}>
               <FloorPlanViewer plan={property.floor_plan} />
             </Suspense>
+          </div>
+        )}
+
+        {similarProperties.length > 0 && (
+          <div style={{ marginTop: 24 }}>
+            <div style={{ fontWeight: 600, fontSize: 15, marginBottom: 12 }}>{t('property.similar')}</div>
+            <div className="property-grid">
+              {similarProperties.map(p => <PropertyCard key={p.id} property={p} />)}
+            </div>
           </div>
         )}
       </div>

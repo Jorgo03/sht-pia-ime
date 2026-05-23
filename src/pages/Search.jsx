@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useRef, useEffect, useCallback } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { X, LayoutGrid, Map as MapIcon, RotateCcw, SearchX } from 'lucide-react'
@@ -8,18 +8,24 @@ import SkeletonCard from '../components/SkeletonCard'
 import CustomDropdown from '../components/CustomDropdown'
 import { useProperties } from '../hooks/useProperties'
 import LOCATIONS from '../data/locations'
-
-const CITY_OPTIONS = [
-  { value: '', label: 'Any city' },
-  ...['Tiranë', 'Durrës', 'Vlorë', 'Shkodër', 'Elbasan', 'Fier', 'Korçë',
-    'Berat', 'Lushnjë', 'Pogradec', 'Kavajë', 'Lezhë', 'Gjirokastër',
-    'Sarandë', 'Kukës', 'Peshkopi', 'Krujë', 'Laç', 'Burrel',
-  ].map(c => ({ value: c, label: c })),
-]
 import '../styles/search.css'
 
+const CITIES = ['Tiranë', 'Durrës', 'Vlorë', 'Shkodër', 'Elbasan', 'Fier', 'Korçë',
+  'Berat', 'Lushnjë', 'Pogradec', 'Kavajë', 'Lezhë', 'Gjirokastër',
+  'Sarandë', 'Kukës', 'Peshkopi', 'Krujë', 'Laç', 'Burrel']
+
 const PROPERTY_TYPES = ['apartment', 'villa', 'land', 'office']
+const LISTING_TYPES = ['sale', 'rent', 'daily_rent']
 const EUR_ALL_RATE = 107
+
+function useDebounced(value, delay = 400) {
+  const [debounced, setDebounced] = useState(value)
+  useEffect(() => {
+    const id = setTimeout(() => setDebounced(value), delay)
+    return () => clearTimeout(id)
+  }, [value, delay])
+  return debounced
+}
 
 export default function Search() {
   const { t } = useTranslation()
@@ -32,24 +38,34 @@ export default function Search() {
   const minPrice = searchParams.get('minPrice') || ''
   const maxPrice = searchParams.get('maxPrice') || ''
   const propertyType = searchParams.get('type') || ''
+  const listingType = searchParams.get('listing') || ''
+
+  const CITY_OPTIONS = useMemo(() => [
+    { value: '', label: t('search.anyCity') },
+    ...CITIES.map(c => ({ value: c, label: c })),
+  ], [t])
 
   const selectedCity = LOCATIONS.find(l => l.city === city)
   const location = zone || city
 
+  const debouncedMin = useDebounced(minPrice)
+  const debouncedMax = useDebounced(maxPrice)
+
   const queryMinPrice = useMemo(() => {
-    if (!minPrice) return null
-    const v = Number(minPrice)
+    if (!debouncedMin) return null
+    const v = Number(debouncedMin)
     return currency === 'ALL' ? Math.round(v / EUR_ALL_RATE) : v
-  }, [minPrice, currency])
+  }, [debouncedMin, currency])
 
   const queryMaxPrice = useMemo(() => {
-    if (!maxPrice) return null
-    const v = Number(maxPrice)
+    if (!debouncedMax) return null
+    const v = Number(debouncedMax)
     return currency === 'ALL' ? Math.round(v / EUR_ALL_RATE) : v
-  }, [maxPrice, currency])
+  }, [debouncedMax, currency])
 
   const { properties, loading, error } = useProperties({
     filter: propertyType || 'all',
+    listingType: listingType || null,
     city: location || null,
     minPrice: queryMinPrice,
     maxPrice: queryMaxPrice,
@@ -71,7 +87,7 @@ export default function Search() {
   }
 
   const resetFilters = () => setSearchParams({}, { replace: true })
-  const hasFilters = city || zone || minPrice || maxPrice || propertyType
+  const hasFilters = city || zone || minPrice || maxPrice || propertyType || listingType
 
   return (
     <div className="page search-page">
@@ -101,6 +117,20 @@ export default function Search() {
       </div>
 
       <div className="type-chips">
+        <button
+          className={`type-chip ${!listingType ? 'active' : ''}`}
+          onClick={() => updateFilter('listing', '')}
+        >{t('common.all')}</button>
+        {LISTING_TYPES.map(lt => (
+          <button
+            key={lt}
+            className={`type-chip ${listingType === lt ? 'active' : ''}`}
+            onClick={() => updateFilter('listing', listingType === lt ? '' : lt)}
+          >{t(`search.${lt}`)}</button>
+        ))}
+      </div>
+
+      <div className="type-chips" style={{ marginTop: 0 }}>
         <button
           className={`type-chip ${!propertyType ? 'active' : ''}`}
           onClick={() => updateFilter('type', '')}
@@ -160,13 +190,13 @@ export default function Search() {
               className={viewMode === 'list' ? 'active' : ''}
               onClick={() => setViewMode('list')}
             >
-              <LayoutGrid size={14} /> List
+              <LayoutGrid size={14} /> {t('map.gridView')}
             </button>
             <button
               className={viewMode === 'map' ? 'active' : ''}
               onClick={() => setViewMode('map')}
             >
-              <MapIcon size={14} /> Map
+              <MapIcon size={14} /> {t('map.mapView')}
             </button>
           </div>
         </div>

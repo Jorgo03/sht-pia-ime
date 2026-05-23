@@ -99,7 +99,17 @@
     "featured": "À la une",
     "location": "Emplacement",
     "call": "Appeler",
-    "autoTranslated": "Traduit automatiquement"
+    "autoTranslated": "Traduit automatiquement",
+    "whatsappMessage": "Bonjour, je suis intéressé par le bien \"{{title}}\". Pouvez-vous me donner plus d'informations ?",
+    "similar": "Biens similaires"
+  },
+  "messages": {
+    "subtitle": "Conversations avec les agents",
+    "comingSoon": "Chat WhatsApp — bientôt"
+  },
+  "notFound": {
+    "title": "Page introuvable",
+    "subtitle": "La page que vous recherchez n'existe pas ou a été déplacée."
   },
   "errors": {
     "generic": "Une erreur est survenue. Veuillez réessayer.",

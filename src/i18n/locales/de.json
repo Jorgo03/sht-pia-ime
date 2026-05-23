@@ -99,7 +99,17 @@
     "featured": "Empfohlen",
     "location": "Standort",
     "call": "Anrufen",
-    "autoTranslated": "Automatisch übersetzt"
+    "autoTranslated": "Automatisch übersetzt",
+    "whatsappMessage": "Hallo, ich interessiere mich für die Immobilie \"{{title}}\". Können Sie mir mehr Informationen geben?",
+    "similar": "Ähnliche Immobilien"
+  },
+  "messages": {
+    "subtitle": "Gespräche mit Maklern",
+    "comingSoon": "WhatsApp-Chat — demnächst"
+  },
+  "notFound": {
+    "title": "Seite nicht gefunden",
+    "subtitle": "Die gesuchte Seite existiert nicht oder wurde verschoben."
   },
   "errors": {
     "generic": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",

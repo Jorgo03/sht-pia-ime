@@ -14,6 +14,7 @@ import AgentDashboard from './pages/AgentDashboard'
 import MyListings from './pages/MyListings'
 import PropertyDashboard from './pages/PropertyDashboard'
 import NewListing from './pages/NewListing'
+import NotFound from './pages/NotFound'
 
 export default function App() {
   return (
@@ -34,6 +35,7 @@ export default function App() {
                 <Route path="/my-listings" element={<MyListings />} />
                 <Route path="/my-listings/:id/dashboard" element={<PropertyDashboard />} />
                 <Route path="/new-listing" element={<NewListing />} />
+                <Route path="*" element={<NotFound />} />
               </Routes>
               <BottomNav />
             </div>

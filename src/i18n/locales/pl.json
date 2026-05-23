@@ -99,7 +99,17 @@
     "featured": "Wyróżnione",
     "location": "Lokalizacja",
     "call": "Zadzwoń",
-    "autoTranslated": "Przetłumaczono automatycznie"
+    "autoTranslated": "Przetłumaczono automatycznie",
+    "whatsappMessage": "Dzień dobry, jestem zainteresowany nieruchomością \"{{title}}\". Czy mogą Państwo podać więcej informacji?",
+    "similar": "Podobne nieruchomości"
+  },
+  "messages": {
+    "subtitle": "Rozmowy z agentami",
+    "comingSoon": "Czat WhatsApp — wkrótce"
+  },
+  "notFound": {
+    "title": "Nie znaleziono strony",
+    "subtitle": "Strona, której szukasz, nie istnieje lub została przeniesiona."
   },
   "errors": {
     "generic": "Coś poszło nie tak. Spróbuj ponownie.",

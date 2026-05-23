@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { MapPin, ChevronDown, Search as SearchIcon, SlidersHorizontal } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
+import { Search as SearchIcon, SlidersHorizontal } from 'lucide-react'
+import { useNavigate, Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import FeaturedCard from '../components/FeaturedCard'
 import PropertyCard from '../components/PropertyCard'
@@ -26,14 +26,6 @@ export default function Home() {
 
   return (
     <div>
-      <div className="home-header">
-        <div>
-          <div className="loc-label"><MapPin size={12} /> {t('search.location')}</div>
-          <div className="loc-name">Tiranë <ChevronDown size={14} /></div>
-        </div>
-        <div className="avatar" onClick={() => navigate('/profile')}>FHO</div>
-      </div>
-
       <div className="search-bar" onClick={() => navigate('/search')}>
         <SearchIcon size={16} />
         <span style={{ flex: 1 }}>{t('search.placeholder')}</span>
@@ -76,7 +68,7 @@ export default function Home() {
         <>
           <div className="section-title">
             <h2>{t('common.nearYou')}</h2>
-            <a onClick={() => navigate('/search')}>{t('common.viewAll')}</a>
+            <Link to="/search">{t('common.viewAll')}</Link>
           </div>
           <div className="property-grid">
             {others.map(p => <PropertyCard key={p.id} property={p} />)}

@@ -99,7 +99,17 @@
     "featured": "Pronë e veçantë",
     "location": "Vendndodhja",
     "call": "Thirr",
-    "autoTranslated": "Përkthyer automatikisht"
+    "autoTranslated": "Përkthyer automatikisht",
+    "whatsappMessage": "Përshëndetje, jam i interesuar për pronën \"{{title}}\". A mund të më jepni më shumë informacion?",
+    "similar": "Prona të ngjashme"
+  },
+  "messages": {
+    "subtitle": "Bisedat me agjentët",
+    "comingSoon": "Chat me WhatsApp — së shpejti"
+  },
+  "notFound": {
+    "title": "Faqja nuk u gjet",
+    "subtitle": "Faqja që po kërkoni nuk ekziston ose është zhvendosur."
   },
   "errors": {
     "generic": "Ndodhi një gabim. Provo përsëri.",

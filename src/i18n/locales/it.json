@@ -99,7 +99,17 @@
     "featured": "In evidenza",
     "location": "Posizione",
     "call": "Chiama",
-    "autoTranslated": "Tradotto automaticamente"
+    "autoTranslated": "Tradotto automaticamente",
+    "whatsappMessage": "Salve, sono interessato all'immobile \"{{title}}\". Potete darmi maggiori informazioni?",
+    "similar": "Immobili simili"
+  },
+  "messages": {
+    "subtitle": "Conversazioni con agenti",
+    "comingSoon": "Chat WhatsApp — prossimamente"
+  },
+  "notFound": {
+    "title": "Pagina non trovata",
+    "subtitle": "La pagina che stai cercando non esiste o è stata spostata."
   },
   "errors": {
     "generic": "Qualcosa è andato storto. Riprova.",

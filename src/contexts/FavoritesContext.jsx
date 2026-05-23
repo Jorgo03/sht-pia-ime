@@ -25,7 +25,6 @@ export function FavoritesProvider({ children }) {
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
 
-      console.log('[Favorites] user:', user.id, 'result:', data, error)
       if (error) throw error
 
       const props = (data ?? []).map((f) => f.property).filter(Boolean)
