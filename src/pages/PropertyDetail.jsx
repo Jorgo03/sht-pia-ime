@@ -8,6 +8,7 @@ import { formatPrice, imageFor } from '../lib/format'
 import { useFavorites } from '../contexts/FavoritesContext'
 import { useAuth } from '../contexts/AuthContext'
 import { logActivity } from '../lib/activity'
+import { addRecentlyViewed } from '../hooks/useRecentlyViewed'
 import PropertyCard from '../components/PropertyCard'
 import ImageLightbox from '../components/ImageLightbox'
 import '../styles/property-detail.css'
@@ -36,6 +37,7 @@ export default function PropertyDetail() {
   const [imgIdx, setImgIdx] = useState(0)
   const [lightboxOpen, setLightboxOpen] = useState(false)
   const [loginToast, setLoginToast] = useState(false)
+  const [brokenImages, setBrokenImages] = useState(new Set())
   const { title, description, translating, isTranslated } = useTranslatedProperty(property, i18n.language)
   const { properties: similar } = useProperties({
     filter: property?.property_type || 'all',
@@ -44,7 +46,10 @@ export default function PropertyDetail() {
   const similarProperties = similar.filter(p => p.id !== id).slice(0, 4)
 
   useEffect(() => {
-    if (property?.id) logActivity(property.id, 'view')
+    if (property?.id) {
+      logActivity(property.id, 'view')
+      addRecentlyViewed(property.id)
+    }
   }, [property?.id])
 
   useEffect(() => {
@@ -62,8 +67,9 @@ export default function PropertyDetail() {
   const images = property.image_urls?.length ? property.image_urls : []
   const hasMultiple = images.length > 1
 
-  const heroBg = images[imgIdx]
-    ? { backgroundImage: `url(${images[imgIdx]})` }
+  const currentImg = images[imgIdx]
+  const heroBg = currentImg && !brokenImages.has(currentImg)
+    ? { backgroundImage: `url(${currentImg})` }
     : { background: imageFor(property) }
 
   const price = formatPrice(property.price, i18n.language)
@@ -95,6 +101,14 @@ export default function PropertyDetail() {
   return (
     <div>
       <div className="pd-hero" style={heroBg} onClick={() => images.length > 0 && setLightboxOpen(true)}>
+        {currentImg && !brokenImages.has(currentImg) && (
+          <img
+            src={currentImg}
+            alt=""
+            onError={() => setBrokenImages(prev => new Set(prev).add(currentImg))}
+            style={{ display: 'none' }}
+          />
+        )}
         <button className="pd-hero-btn pd-back" onClick={e => { e.stopPropagation(); navigate(-1) }} aria-label="Back">
           <ArrowLeft size={20} />
         </button>

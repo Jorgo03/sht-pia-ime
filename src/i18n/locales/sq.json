@@ -17,7 +17,8 @@
     "home": "Kreu",
     "favorites": "Të preferuara",
     "messages": "Mesazhe",
-    "profile": "Profili"
+    "profile": "Profili",
+    "recentlyViewed": "Parë së fundmi"
   },
   "auth": {
     "roleClient": "Klient",

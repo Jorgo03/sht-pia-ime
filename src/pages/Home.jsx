@@ -5,7 +5,8 @@ import { useTranslation } from 'react-i18next'
 import FeaturedCard from '../components/FeaturedCard'
 import PropertyCard from '../components/PropertyCard'
 import SkeletonCard from '../components/SkeletonCard'
-import { useProperties } from '../hooks/useProperties'
+import { useProperties, usePropertiesByIds } from '../hooks/useProperties'
+import { useRecentlyViewed } from '../hooks/useRecentlyViewed'
 import '../styles/home.css'
 
 export default function Home() {
@@ -13,6 +14,8 @@ export default function Home() {
   const [filter, setFilter] = useState('all')
   const navigate = useNavigate()
   const { properties, loading, error } = useProperties({ filter })
+  const { recentIds } = useRecentlyViewed()
+  const { properties: recentProperties } = usePropertiesByIds(recentIds.slice(0, 4))
 
   const FILTERS = [
     { id: 'all',        label: t('common.all') },
@@ -63,6 +66,17 @@ export default function Home() {
       )}
 
       {!loading && featured && <FeaturedCard property={featured} />}
+
+      {recentProperties.length > 0 && (
+        <>
+          <div className="section-title">
+            <h2>{t('common.recentlyViewed')}</h2>
+          </div>
+          <div className="property-grid">
+            {recentProperties.map(p => <PropertyCard key={p.id} property={p} />)}
+          </div>
+        </>
+      )}
 
       {others.length > 0 && (
         <>

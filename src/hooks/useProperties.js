@@ -49,6 +49,32 @@ export function useProperties({ filter = 'all', listingType = null, city = null,
   return { properties, loading, error }
 }
 
+export function usePropertiesByIds(ids = []) {
+  const [properties, setProperties] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    if (!ids.length) { setProperties([]); setLoading(false); return }
+    let active = true
+    setLoading(true)
+
+    supabase
+      .from('properties')
+      .select('*')
+      .in('id', ids)
+      .then(({ data }) => {
+        if (!active) return
+        const map = new Map((data || []).map(p => [p.id, p]))
+        setProperties(ids.map(id => map.get(id)).filter(Boolean))
+        setLoading(false)
+      })
+
+    return () => { active = false }
+  }, [JSON.stringify(ids)])
+
+  return { properties, loading }
+}
+
 export function useProperty(id) {
   const [property, setProperty] = useState(null)
   const [loading, setLoading] = useState(true)

@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Heart, Bed, Bath, Ruler } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
@@ -11,8 +12,10 @@ export default function FeaturedCard({ property }) {
   const { user } = useAuth()
   const { isFavorite, toggle } = useFavorites()
   const saved = isFavorite(property.id)
+  const [imgBroken, setImgBroken] = useState(false)
 
-  const bg = property.image_urls?.[0]
+  const hasImage = property.image_urls?.[0] && !imgBroken
+  const bg = hasImage
     ? { backgroundImage: `url(${property.image_urls[0]})`, backgroundSize: 'cover', backgroundPosition: 'center' }
     : { background: imageFor(property) }
 
@@ -27,6 +30,14 @@ export default function FeaturedCard({ property }) {
 
   return (
     <div className="featured-card" style={bg} onClick={() => navigate(`/property/${property.id}`)}>
+      {hasImage && (
+        <img
+          src={property.image_urls[0]}
+          alt=""
+          onError={() => setImgBroken(true)}
+          style={{ display: 'none' }}
+        />
+      )}
       <div className="row-top">
         <div className="badge">{t('property.featured')}</div>
         <button

@@ -17,7 +17,8 @@
     "home": "Inicio",
     "favorites": "Favoritos",
     "messages": "Mensajes",
-    "profile": "Perfil"
+    "profile": "Perfil",
+    "recentlyViewed": "Vistos recientemente"
   },
   "auth": {
     "roleClient": "Cliente",

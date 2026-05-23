@@ -1,4 +1,5 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { useEffect } from 'react'
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
 import { AuthProvider } from './contexts/AuthContext'
 import { FavoritesProvider } from './contexts/FavoritesContext'
 import { ThemeProvider } from './contexts/ThemeContext'
@@ -17,6 +18,12 @@ import NewListing from './pages/NewListing'
 import AgentProfile from './pages/AgentProfile'
 import NotFound from './pages/NotFound'
 
+function ScrollToTop() {
+  const { pathname } = useLocation()
+  useEffect(() => { window.scrollTo(0, 0) }, [pathname])
+  return null
+}
+
 export default function App() {
   return (
     <BrowserRouter>
@@ -24,6 +31,7 @@ export default function App() {
         <AuthProvider>
           <FavoritesProvider>
             <div className="app-shell">
+              <ScrollToTop />
               <Header />
               <Routes>
                 <Route path="/" element={<Home />} />

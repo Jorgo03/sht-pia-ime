@@ -17,7 +17,8 @@
     "home": "Главная",
     "favorites": "Избранное",
     "messages": "Сообщения",
-    "profile": "Профиль"
+    "profile": "Профиль",
+    "recentlyViewed": "Недавно просмотренные"
   },
   "auth": {
     "roleClient": "Клиент",

@@ -8,7 +8,13 @@ import { formatDate } from '../lib/format'
 
 const TYPES = ['view', 'call', 'message', 'meeting', 'favourite']
 const TYPE_ICONS = { call: Phone, message: MessageCircle, meeting: Calendar, view: Eye, favourite: Heart }
-const TYPE_COLORS = { view: '#3498db', call: '#27ae60', message: '#f39c12', meeting: '#8e44ad', favourite: '#e74c3c' }
+const TYPE_COLORS = {
+  view: 'var(--fho-dash-view, #3498db)',
+  call: 'var(--fho-dash-call, #27ae60)',
+  message: 'var(--fho-dash-message, #f39c12)',
+  meeting: 'var(--fho-dash-meeting, #8e44ad)',
+  favourite: 'var(--fho-dash-favourite, #e74c3c)',
+}
 
 export default function PropertyDashboard() {
   const { id } = useParams()

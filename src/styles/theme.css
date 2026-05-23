@@ -14,6 +14,11 @@
   --r-lg: 20px;
   --r-pill: 30px;
   --font-sans: -apple-system, BlinkMacSystemFont, "Inter", system-ui, sans-serif;
+  --fho-status-active: #27ae60;
+  --fho-status-paused: #f39c12;
+  --fho-status-sold: #c0392b;
+  --fho-status-rented: #8e44ad;
+  --fho-status-draft: #7f8c8d;
 }
 
 [data-theme="dark"] {
@@ -25,6 +30,11 @@
   --fho-input-bg: #1a1a1a;
   --fho-input-border: rgba(255,255,255,0.12);
   --fho-card-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  --fho-status-active: #2ecc71;
+  --fho-status-paused: #f1c40f;
+  --fho-status-sold: #e74c3c;
+  --fho-status-rented: #9b59b6;
+  --fho-status-draft: #95a5a6;
 }
 
 * { box-sizing: border-box; }

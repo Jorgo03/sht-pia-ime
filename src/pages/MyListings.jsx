@@ -7,11 +7,11 @@ import { supabase } from '../lib/supabase'
 import { formatPrice, imageFor, getLocalizedText } from '../lib/format'
 
 const STATUS_COLORS = {
-  active: '#27ae60',
-  paused: '#f39c12',
-  sold: '#c0392b',
-  rented: '#8e44ad',
-  draft: '#7f8c8d',
+  active: 'var(--fho-status-active, #27ae60)',
+  paused: 'var(--fho-status-paused, #f39c12)',
+  sold: 'var(--fho-status-sold, #c0392b)',
+  rented: 'var(--fho-status-rented, #8e44ad)',
+  draft: 'var(--fho-status-draft, #7f8c8d)',
 }
 
 export default function MyListings() {

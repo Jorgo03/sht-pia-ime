@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Heart, MapPin } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
@@ -11,8 +12,10 @@ export default function PropertyCard({ property }) {
   const { user } = useAuth()
   const { isFavorite, toggle } = useFavorites()
   const saved = isFavorite(property.id)
+  const [imgBroken, setImgBroken] = useState(false)
 
-  const bg = property.image_urls?.[0]
+  const hasImage = property.image_urls?.[0] && !imgBroken
+  const bg = hasImage
     ? { backgroundImage: `url(${property.image_urls[0]})`, backgroundSize: 'cover', backgroundPosition: 'center' }
     : { background: imageFor(property) }
 
@@ -28,6 +31,14 @@ export default function PropertyCard({ property }) {
   return (
     <div className="mini-card" onClick={() => navigate(`/property/${property.id}`)}>
       <div className="mini-img" style={bg}>
+        {hasImage && (
+          <img
+            src={property.image_urls[0]}
+            alt=""
+            onError={() => setImgBroken(true)}
+            style={{ display: 'none' }}
+          />
+        )}
         <button
           className={`heart-mini ${saved ? 'saved' : ''}`}
           onClick={handleFavorite}
