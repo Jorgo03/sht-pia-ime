@@ -98,7 +98,8 @@
     "forRent": "Zu vermieten",
     "featured": "Empfohlen",
     "location": "Standort",
-    "call": "Anrufen"
+    "call": "Anrufen",
+    "autoTranslated": "Automatisch übersetzt"
   },
   "errors": {
     "generic": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",

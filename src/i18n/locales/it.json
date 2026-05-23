@@ -98,7 +98,8 @@
     "forRent": "In affitto",
     "featured": "In evidenza",
     "location": "Posizione",
-    "call": "Chiama"
+    "call": "Chiama",
+    "autoTranslated": "Tradotto automaticamente"
   },
   "errors": {
     "generic": "Qualcosa è andato storto. Riprova.",

@@ -74,19 +74,21 @@ export function FavoritesProvider({ children }) {
         if (data) setFavoriteProperties((prev) => [...prev, data])
       }
 
-      try {
-        if (wasFav) {
-          await supabase
-            .from('favorites')
-            .delete()
-            .eq('user_id', user.id)
-            .eq('property_id', propertyId)
-        } else {
-          await supabase
-            .from('favorites')
-            .insert({ user_id: user.id, property_id: propertyId })
-        }
-      } catch {
+      let error
+      if (wasFav) {
+        ({ error } = await supabase
+          .from('favorites')
+          .delete()
+          .eq('user_id', user.id)
+          .eq('property_id', propertyId))
+      } else {
+        ({ error } = await supabase
+          .from('favorites')
+          .insert({ user_id: user.id, property_id: propertyId }))
+      }
+
+      if (error) {
+        console.error('[Favorites] toggle failed:', error.message)
         fetchFavorites()
       }
     },

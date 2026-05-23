@@ -98,7 +98,8 @@
     "forRent": "For Rent",
     "featured": "Featured",
     "location": "Location",
-    "call": "Call"
+    "call": "Call",
+    "autoTranslated": "Auto-translated"
   },
   "errors": {
     "generic": "Something went wrong. Please try again.",

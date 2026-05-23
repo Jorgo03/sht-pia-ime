@@ -1,9 +1,10 @@
 import { useEffect, useState, lazy, Suspense } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { ArrowLeft, Heart, Bed, Bath, Ruler, MapPin, Phone, MessageCircle, ExternalLink, ChevronLeft, ChevronRight } from 'lucide-react'
+import { ArrowLeft, Heart, Bed, Bath, Ruler, MapPin, Phone, MessageCircle, ExternalLink, ChevronLeft, ChevronRight, Globe } from 'lucide-react'
 import { useProperty } from '../hooks/useProperties'
-import { formatPrice, imageFor, getLocalizedText } from '../lib/format'
+import { useTranslatedProperty } from '../hooks/useTranslatedProperty'
+import { formatPrice, imageFor } from '../lib/format'
 import { useFavorites } from '../contexts/FavoritesContext'
 import { logActivity } from '../lib/activity'
 
@@ -19,6 +20,7 @@ export default function PropertyDetail() {
   const { property, loading, error } = useProperty(id)
   const { isFavorite, toggle } = useFavorites()
   const [imgIdx, setImgIdx] = useState(0)
+  const { title, description, translating, isTranslated } = useTranslatedProperty(property, i18n.language)
 
   useEffect(() => {
     if (property?.id) logActivity(property.id, 'view')
@@ -38,9 +40,6 @@ export default function PropertyDetail() {
 
   const price = formatPrice(property.price, i18n.language)
   const suffix = property.listing_type === 'rent' ? t('property.perMonth') : ''
-
-  const title = getLocalizedText(property.title_i18n, i18n.language) || property.title
-  const description = getLocalizedText(property.description_i18n, i18n.language) || property.description
 
   const phone = property.contact_phone?.replace(/\s/g, '') || property.agent?.phone?.replace(/\s/g, '') || '355691234567'
   const waMsg = encodeURIComponent(`Përshëndetje, jam i interesuar për pronën "${title}". A mund të më jepni më shumë informacion?`)
@@ -136,7 +135,22 @@ export default function PropertyDetail() {
         </div>
 
         <div style={{ background: 'var(--fho-surface)', borderRadius: 'var(--r-md)', padding: 16, border: '0.5px solid var(--fho-border)', marginBottom: 16 }}>
-          <div style={{ fontSize: 14, lineHeight: 1.6 }}>{description}</div>
+          {translating ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+              <div style={{ height: 14, borderRadius: 4, background: 'var(--fho-input-bg)', animation: 'shimmer 1.5s infinite' }} />
+              <div style={{ height: 14, borderRadius: 4, background: 'var(--fho-input-bg)', animation: 'shimmer 1.5s infinite', animationDelay: '0.15s' }} />
+              <div style={{ height: 14, borderRadius: 4, background: 'var(--fho-input-bg)', animation: 'shimmer 1.5s infinite', animationDelay: '0.3s', width: '70%' }} />
+            </div>
+          ) : (
+            <>
+              <div style={{ fontSize: 14, lineHeight: 1.6 }}>{description}</div>
+              {isTranslated && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 10, fontSize: 11, color: 'var(--fho-text-muted)', fontWeight: 500 }}>
+                  <Globe size={11} /> {t('property.autoTranslated')}
+                </div>
+              )}
+            </>
+          )}
         </div>
 
         {property.agent && (

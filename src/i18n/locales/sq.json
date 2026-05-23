@@ -98,7 +98,8 @@
     "forRent": "Qira",
     "featured": "Pronë e veçantë",
     "location": "Vendndodhja",
-    "call": "Thirr"
+    "call": "Thirr",
+    "autoTranslated": "Përkthyer automatikisht"
   },
   "errors": {
     "generic": "Ndodhi një gabim. Provo përsëri.",

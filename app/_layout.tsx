@@ -21,6 +21,10 @@ export default function RootLayout() {
               name="property/[id]"
               options={{ headerShown: false, presentation: 'card' }}
             />
+            <Stack.Screen
+              name="listing/create"
+              options={{ headerShown: false, presentation: 'card' }}
+            />
           </Stack>
           <StatusBar style="light" />
         </ThemeProvider>

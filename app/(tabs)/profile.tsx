@@ -1,6 +1,7 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { Provider } from '@supabase/supabase-js';
+import { useRouter, type Href } from 'expo-router';
 import { useState } from 'react';
 import {
   Alert,
@@ -34,6 +35,7 @@ const socialProviders: {
 ];
 
 export default function ProfileScreen() {
+  const router = useRouter();
   const { user, signIn, signUp, signOut, signInWithProvider, loading: authLoading } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -104,6 +106,14 @@ export default function ProfileScreen() {
                   {user.user_metadata?.role === 'agent' ? 'Agent' : 'User'}
                 </Text>
               </View>
+              {user.user_metadata?.role === 'agent' && (
+                <View style={styles.agentActions}>
+                  <ActionButton
+                    title="Create Listing"
+                    onPress={() => router.push('/listing/create' as Href)}
+                  />
+                </View>
+              )}
               <Text style={styles.subtitle}>Welcome to Shtëpia.ime</Text>
               <View style={styles.signOutWrap}>
                 <ActionButton
@@ -306,6 +316,10 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: AtticoColors.textSecondary,
     marginTop: 4,
+  },
+  agentActions: {
+    marginTop: 16,
+    width: '100%',
   },
   signOutWrap: {
     marginTop: 32,

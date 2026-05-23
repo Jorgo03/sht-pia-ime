@@ -98,7 +98,8 @@
     "forRent": "Do wynajęcia",
     "featured": "Wyróżnione",
     "location": "Lokalizacja",
-    "call": "Zadzwoń"
+    "call": "Zadzwoń",
+    "autoTranslated": "Przetłumaczono automatycznie"
   },
   "errors": {
     "generic": "Coś poszło nie tak. Spróbuj ponownie.",

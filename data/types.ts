@@ -2,7 +2,9 @@ export interface Property {
   id: string;
   agent_id: string;
   title: string;
+  title_i18n: Record<string, string> | null;
   description: string | null;
+  description_i18n: Record<string, string> | null;
   price: number;
   address: string;
   city: string | null;

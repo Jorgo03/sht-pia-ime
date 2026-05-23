@@ -98,7 +98,8 @@
     "forRent": "En alquiler",
     "featured": "Destacado",
     "location": "Ubicación",
-    "call": "Llamar"
+    "call": "Llamar",
+    "autoTranslated": "Traducido automáticamente"
   },
   "errors": {
     "generic": "Algo salió mal. Inténtalo de nuevo.",
