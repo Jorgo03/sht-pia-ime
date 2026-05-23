@@ -74,7 +74,8 @@
     "anyBeds": "Çdo numër",
     "results_one": "{{count}} pronë",
     "results_other": "{{count}} prona",
-    "empty": "Nuk u gjetën prona për këtë kërkim.",
+    "empty": "Nuk u gjet asnjë pronë",
+    "emptyHint": "Provo të ndryshosh filtrat e kërkimit",
     "apply": "Apliko",
     "reset": "Pastro",
     "filters": "Filtra"

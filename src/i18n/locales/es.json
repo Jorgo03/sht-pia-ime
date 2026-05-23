@@ -74,7 +74,8 @@
     "anyBeds": "Cualquiera",
     "results_one": "{{count}} propiedad",
     "results_other": "{{count}} propiedades",
-    "empty": "No se encontraron propiedades para esta búsqueda.",
+    "empty": "No se encontraron propiedades",
+    "emptyHint": "Intenta ajustar los filtros de búsqueda",
     "apply": "Aplicar",
     "reset": "Restablecer",
     "filters": "Filtros"

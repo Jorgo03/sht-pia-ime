@@ -1,12 +1,21 @@
 import { useState, useMemo } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { X, LayoutGrid, Map as MapIcon } from 'lucide-react'
+import { X, LayoutGrid, Map as MapIcon, RotateCcw, SearchX } from 'lucide-react'
 import PropertyCard from '../components/PropertyCard'
 import PropertyMap from '../components/PropertyMap'
 import SkeletonCard from '../components/SkeletonCard'
+import CustomDropdown from '../components/CustomDropdown'
 import { useProperties } from '../hooks/useProperties'
 import LOCATIONS from '../data/locations'
+
+const CITY_OPTIONS = [
+  { value: '', label: 'Any city' },
+  ...['Tiranë', 'Durrës', 'Vlorë', 'Shkodër', 'Elbasan', 'Fier', 'Korçë',
+    'Berat', 'Lushnjë', 'Pogradec', 'Kavajë', 'Lezhë', 'Gjirokastër',
+    'Sarandë', 'Kukës', 'Peshkopi', 'Krujë', 'Laç', 'Burrel',
+  ].map(c => ({ value: c, label: c })),
+]
 import '../styles/search.css'
 
 const PROPERTY_TYPES = ['apartment', 'villa', 'land', 'office']
@@ -70,25 +79,24 @@ export default function Search() {
       <p className="page-subtitle">{t('search.subtitle')}</p>
 
       <div className="location-selects">
-        <div className="search-filter-group">
-          <label>{t('search.city')}</label>
-          <select value={city} onChange={e => handleCityChange(e.target.value)}>
-            <option value="">{t('search.anyCity')}</option>
-            {LOCATIONS.map(l => (
-              <option key={l.city} value={l.city}>{l.city}</option>
-            ))}
-          </select>
-        </div>
+        <CustomDropdown
+          label={t('search.city')}
+          value={city}
+          options={CITY_OPTIONS}
+          placeholder={t('search.anyCity')}
+          onChange={handleCityChange}
+        />
         {selectedCity && (
-          <div className="search-filter-group">
-            <label>{t('search.neighborhood')}</label>
-            <select value={zone} onChange={e => updateFilter('zone', e.target.value)}>
-              <option value="">{t('search.anyZone')}</option>
-              {selectedCity.zones.map(z => (
-                <option key={z} value={z}>{z}</option>
-              ))}
-            </select>
-          </div>
+          <CustomDropdown
+            label={t('search.neighborhood')}
+            value={zone}
+            options={[
+              { value: '', label: t('search.anyZone') },
+              ...selectedCity.zones.map(z => ({ value: z, label: z })),
+            ]}
+            placeholder={t('search.anyZone')}
+            onChange={v => updateFilter('zone', v)}
+          />
         )}
       </div>
 
@@ -173,11 +181,13 @@ export default function Search() {
           <div style={{ color: '#c0392b' }}>{t('errors.generic')}</div>
         </div>
       ) : properties.length === 0 ? (
-        <div className="placeholder-card empty-state">
-          <div className="empty-icon">🏠</div>
-          <div>{t('search.empty')}</div>
+        <div className="empty-state">
+          <SearchX size={40} className="empty-state-icon" />
+          <div className="empty-state-title">{t('search.empty')}</div>
+          <div className="empty-state-sub">{t('search.emptyHint')}</div>
           {hasFilters && (
-            <button className="clear-filters-btn" onClick={resetFilters}>
+            <button className="empty-reset-btn" onClick={resetFilters}>
+              <RotateCcw size={14} />
               {t('search.reset')}
             </button>
           )}

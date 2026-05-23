@@ -74,7 +74,8 @@
     "anyBeds": "Dowolna",
     "results_one": "{{count}} nieruchomość",
     "results_other": "{{count}} nieruchomości",
-    "empty": "Nie znaleziono nieruchomości dla tego wyszukiwania.",
+    "empty": "Nie znaleziono nieruchomości",
+    "emptyHint": "Spróbuj zmienić filtry wyszukiwania",
     "apply": "Zastosuj",
     "reset": "Resetuj",
     "filters": "Filtry"

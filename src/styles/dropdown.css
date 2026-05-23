@@ -1,0 +1,216 @@
+.dropdown {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+
+.dropdown-label {
+  display: block;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--fho-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  margin-bottom: 6px;
+}
+
+/* --- Trigger button --- */
+
+.dropdown-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: var(--r-sm);
+  border: 1.5px solid var(--fho-input-border);
+  background: #1a1a1a;
+  color: var(--fho-text);
+  font-size: 13px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  text-align: left;
+  gap: 8px;
+}
+
+.dropdown-trigger:hover {
+  border-color: var(--fho-orange-1);
+}
+
+.dropdown-trigger.open {
+  border-color: var(--fho-orange-1);
+  box-shadow: 0 0 0 3px rgba(255, 122, 64, 0.15);
+}
+
+.dropdown-value {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dropdown-value.placeholder {
+  color: var(--fho-text-muted);
+}
+
+.dropdown-chevron {
+  flex-shrink: 0;
+  color: var(--fho-orange-1);
+  transition: transform 0.25s ease;
+}
+
+.dropdown-chevron.rotated {
+  transform: rotate(180deg);
+}
+
+/* --- Menu panel --- */
+
+.dropdown-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background: #1a1a1a;
+  border: 1.5px solid var(--fho-orange-1);
+  border-radius: var(--r-sm);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+  opacity: 0;
+  transform: translateY(-8px);
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  overflow: hidden;
+}
+
+.dropdown-menu.visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+/* --- Search bar inside menu --- */
+
+.dropdown-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.dropdown-search-icon {
+  flex-shrink: 0;
+  color: var(--fho-text-muted);
+}
+
+.dropdown-search input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  color: var(--fho-text);
+  font-size: 13px;
+  font-family: inherit;
+  outline: none;
+}
+
+.dropdown-search input::placeholder {
+  color: var(--fho-text-muted);
+}
+
+/* --- Options list --- */
+
+.dropdown-list {
+  max-height: 250px;
+  overflow-y: auto;
+  padding: 4px 0;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 122, 64, 0.3) transparent;
+}
+
+.dropdown-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.dropdown-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.dropdown-list::-webkit-scrollbar-thumb {
+  background: rgba(255, 122, 64, 0.3);
+  border-radius: 4px;
+}
+
+.dropdown-list::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 122, 64, 0.5);
+}
+
+.dropdown-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 9px 12px;
+  border: none;
+  background: transparent;
+  color: #ccc;
+  font-size: 13px;
+  font-weight: 400;
+  font-family: inherit;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s, color 0.15s;
+}
+
+.dropdown-option:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+}
+
+.dropdown-option.selected {
+  background: linear-gradient(135deg, rgba(255, 122, 64, 0.15), rgba(232, 93, 44, 0.1));
+  color: var(--fho-orange-1);
+  font-weight: 500;
+}
+
+.dropdown-check {
+  flex-shrink: 0;
+  color: var(--fho-orange-1);
+}
+
+.dropdown-empty {
+  padding: 16px 12px;
+  text-align: center;
+  color: var(--fho-text-muted);
+  font-size: 13px;
+}
+
+/* --- Light theme overrides --- */
+
+[data-theme="light"] .dropdown-trigger {
+  background: var(--fho-input-bg);
+}
+
+[data-theme="light"] .dropdown-menu {
+  background: #fff;
+  border-color: var(--fho-orange-1);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+}
+
+[data-theme="light"] .dropdown-search {
+  border-bottom-color: rgba(0, 0, 0, 0.06);
+}
+
+[data-theme="light"] .dropdown-option {
+  color: var(--fho-text);
+}
+
+[data-theme="light"] .dropdown-option:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+[data-theme="light"] .dropdown-option.selected {
+  background: rgba(255, 122, 64, 0.08);
+  color: var(--fho-orange-2);
+}

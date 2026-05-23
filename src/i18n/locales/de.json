@@ -74,7 +74,8 @@
     "anyBeds": "Beliebig",
     "results_one": "{{count}} Immobilie",
     "results_other": "{{count}} Immobilien",
-    "empty": "Keine Immobilien für diese Suche gefunden.",
+    "empty": "Keine Immobilien gefunden",
+    "emptyHint": "Versuche die Suchfilter anzupassen",
     "apply": "Anwenden",
     "reset": "Zurücksetzen",
     "filters": "Filter"

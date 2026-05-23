@@ -74,7 +74,8 @@
     "anyBeds": "Tout",
     "results_one": "{{count}} bien",
     "results_other": "{{count}} biens",
-    "empty": "Aucun bien trouvé pour cette recherche.",
+    "empty": "Aucun bien trouvé",
+    "emptyHint": "Essayez de modifier vos filtres de recherche",
     "apply": "Appliquer",
     "reset": "Réinitialiser",
     "filters": "Filtres"
