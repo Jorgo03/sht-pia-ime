@@ -101,7 +101,8 @@
     "call": "Chiama",
     "autoTranslated": "Tradotto automaticamente",
     "whatsappMessage": "Salve, sono interessato all'immobile \"{{title}}\". Potete darmi maggiori informazioni?",
-    "similar": "Immobili simili"
+    "similar": "Immobili simili",
+    "video": "Video tour"
   },
   "messages": {
     "subtitle": "Conversazioni con agenti",

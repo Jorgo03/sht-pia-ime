@@ -101,7 +101,8 @@
     "call": "Call",
     "autoTranslated": "Auto-translated",
     "whatsappMessage": "Hello, I am interested in the property \"{{title}}\". Can you give me more information?",
-    "similar": "Similar properties"
+    "similar": "Similar properties",
+    "video": "Video tour"
   },
   "messages": {
     "subtitle": "Conversations with agents",

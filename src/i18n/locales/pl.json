@@ -101,7 +101,8 @@
     "call": "Zadzwoń",
     "autoTranslated": "Przetłumaczono automatycznie",
     "whatsappMessage": "Dzień dobry, jestem zainteresowany nieruchomością \"{{title}}\". Czy mogą Państwo podać więcej informacji?",
-    "similar": "Podobne nieruchomości"
+    "similar": "Podobne nieruchomości",
+    "video": "Wideo"
   },
   "messages": {
     "subtitle": "Rozmowy z agentami",

@@ -3,10 +3,12 @@ import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { formatPrice, imageFor, getLocalizedText } from '../lib/format'
 import { useFavorites } from '../contexts/FavoritesContext'
+import { useAuth } from '../contexts/AuthContext'
 
 export default function FeaturedCard({ property }) {
   const navigate = useNavigate()
   const { t, i18n } = useTranslation()
+  const { user } = useAuth()
   const { isFavorite, toggle } = useFavorites()
   const saved = isFavorite(property.id)
 
@@ -17,13 +19,19 @@ export default function FeaturedCard({ property }) {
   const price = formatPrice(property.price, i18n.language)
   const suffix = property.listing_type === 'rent' ? t('property.perMonth') : ''
 
+  const handleFavorite = (e) => {
+    e.stopPropagation()
+    if (!user) { navigate('/profile'); return }
+    toggle(property.id)
+  }
+
   return (
     <div className="featured-card" style={bg} onClick={() => navigate(`/property/${property.id}`)}>
       <div className="row-top">
         <div className="badge">{t('property.featured')}</div>
         <button
           className={`heart-btn ${saved ? 'saved' : ''}`}
-          onClick={(e) => { e.stopPropagation(); toggle(property.id) }}
+          onClick={handleFavorite}
           aria-label={t('common.save')}
         >
           <Heart size={18} fill={saved ? 'currentColor' : 'none'} />

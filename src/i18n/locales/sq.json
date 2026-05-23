@@ -101,7 +101,8 @@
     "call": "Thirr",
     "autoTranslated": "Përkthyer automatikisht",
     "whatsappMessage": "Përshëndetje, jam i interesuar për pronën \"{{title}}\". A mund të më jepni më shumë informacion?",
-    "similar": "Prona të ngjashme"
+    "similar": "Prona të ngjashme",
+    "video": "Video tur"
   },
   "messages": {
     "subtitle": "Bisedat me agjentët",

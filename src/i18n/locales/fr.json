@@ -101,7 +101,8 @@
     "call": "Appeler",
     "autoTranslated": "Traduit automatiquement",
     "whatsappMessage": "Bonjour, je suis intéressé par le bien \"{{title}}\". Pouvez-vous me donner plus d'informations ?",
-    "similar": "Biens similaires"
+    "similar": "Biens similaires",
+    "video": "Visite vidéo"
   },
   "messages": {
     "subtitle": "Conversations avec les agents",

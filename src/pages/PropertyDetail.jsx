@@ -6,21 +6,36 @@ import { useProperty, useProperties } from '../hooks/useProperties'
 import { useTranslatedProperty } from '../hooks/useTranslatedProperty'
 import { formatPrice, imageFor } from '../lib/format'
 import { useFavorites } from '../contexts/FavoritesContext'
+import { useAuth } from '../contexts/AuthContext'
 import { logActivity } from '../lib/activity'
 import PropertyCard from '../components/PropertyCard'
+import ImageLightbox from '../components/ImageLightbox'
+import '../styles/property-detail.css'
 
 const PropertyMap = lazy(() => import('../components/PropertyMap'))
 const FloorPlanViewer = import.meta.env.VITE_FEATURE_3D_FLOORPLAN === 'true'
   ? lazy(() => import('../components/floorplan/FloorPlanViewer'))
   : null
 
+function getVideoEmbedUrl(url) {
+  if (!url) return null
+  const ytMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]+)/)
+  if (ytMatch) return `https://www.youtube.com/embed/${ytMatch[1]}`
+  const vimeoMatch = url.match(/vimeo\.com\/(\d+)/)
+  if (vimeoMatch) return `https://player.vimeo.com/video/${vimeoMatch[1]}`
+  return null
+}
+
 export default function PropertyDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
   const { t, i18n } = useTranslation()
   const { property, loading, error } = useProperty(id)
+  const { user } = useAuth()
   const { isFavorite, toggle } = useFavorites()
   const [imgIdx, setImgIdx] = useState(0)
+  const [lightboxOpen, setLightboxOpen] = useState(false)
+  const [loginToast, setLoginToast] = useState(false)
   const { title, description, translating, isTranslated } = useTranslatedProperty(property, i18n.language)
   const { properties: similar } = useProperties({
     filter: property?.property_type || 'all',
@@ -40,7 +55,7 @@ export default function PropertyDetail() {
   }, [title, property?.city])
 
   if (loading) return <div className="page">{t('common.loading')}</div>
-  if (error)   return <div className="page" style={{color:'#c0392b'}}>{t('common.error')}: {error}</div>
+  if (error) return <div className="page" style={{ color: '#c0392b' }}>{t('common.error')}: {error}</div>
   if (!property) return <div className="page">{t('search.empty')}</div>
 
   const saved = isFavorite(property.id)
@@ -48,7 +63,7 @@ export default function PropertyDetail() {
   const hasMultiple = images.length > 1
 
   const heroBg = images[imgIdx]
-    ? { backgroundImage: `url(${images[imgIdx]})`, backgroundSize: 'cover', backgroundPosition: 'center' }
+    ? { backgroundImage: `url(${images[imgIdx]})` }
     : { background: imageFor(property) }
 
   const price = formatPrice(property.price, i18n.language)
@@ -56,6 +71,7 @@ export default function PropertyDetail() {
 
   const phone = property.contact_phone?.replace(/\s/g, '') || property.agent?.phone?.replace(/\s/g, '') || '355691234567'
   const waMsg = encodeURIComponent(t('property.whatsappMessage', { title }))
+  const videoEmbed = getVideoEmbedUrl(property.video_url)
 
   const handleShare = async () => {
     const url = window.location.href
@@ -66,120 +82,95 @@ export default function PropertyDetail() {
     }
   }
 
+  const handleFavorite = (e) => {
+    e.stopPropagation()
+    if (!user) {
+      setLoginToast(true)
+      setTimeout(() => setLoginToast(false), 2500)
+      return
+    }
+    toggle(property.id)
+  }
+
   return (
     <div>
-      <div style={{ ...heroBg, height: 280, position: 'relative', borderRadius: '0 0 24px 24px', overflow: 'hidden' }}>
-        <button
-          onClick={() => navigate(-1)}
-          aria-label="Back"
-          style={{
-            position: 'absolute', top: 16, left: 16, width: 40, height: 40,
-            borderRadius: '50%', background: 'rgba(255,255,255,0.85)',
-            backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
-            border: 'none', display: 'flex', alignItems: 'center',
-            justifyContent: 'center', cursor: 'pointer'
-          }}
-        ><ArrowLeft size={20} /></button>
-        <div style={{ position: 'absolute', top: 16, right: 16, display: 'flex', gap: 8 }}>
-          <button
-            onClick={handleShare}
-            aria-label="Share"
-            style={{
-              width: 40, height: 40, borderRadius: '50%', background: 'rgba(255,255,255,0.85)',
-              backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
-              border: 'none', display: 'flex', alignItems: 'center',
-              justifyContent: 'center', cursor: 'pointer'
-            }}
-          ><Share2 size={18} /></button>
-          <button
-            onClick={(e) => { e.stopPropagation(); toggle(property.id) }}
-            aria-label={t('common.save')}
-            style={{
-              width: 40, height: 40, borderRadius: '50%',
-              background: saved ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.85)',
-              backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)',
-              border: 'none', display: 'flex', alignItems: 'center',
-              justifyContent: 'center', cursor: 'pointer',
-              color: saved ? 'var(--fho-orange-2)' : 'inherit'
-            }}
-          ><Heart size={20} fill={saved ? 'currentColor' : 'none'} /></button>
+      <div className="pd-hero" style={heroBg} onClick={() => images.length > 0 && setLightboxOpen(true)}>
+        <button className="pd-hero-btn pd-back" onClick={e => { e.stopPropagation(); navigate(-1) }} aria-label="Back">
+          <ArrowLeft size={20} />
+        </button>
+        <div className="pd-actions">
+          <button className="pd-hero-btn" onClick={e => { e.stopPropagation(); handleShare() }} aria-label="Share">
+            <Share2 size={18} />
+          </button>
+          <button className={`pd-hero-btn ${saved ? 'saved' : ''}`} onClick={handleFavorite} aria-label={t('common.save')}>
+            <Heart size={20} fill={saved ? 'currentColor' : 'none'} />
+          </button>
         </div>
         {hasMultiple && (
           <>
-            <button
-              onClick={() => setImgIdx(i => (i - 1 + images.length) % images.length)}
-              aria-label="Previous"
-              style={{
-                position: 'absolute', top: '50%', left: 12, transform: 'translateY(-50%)',
-                width: 36, height: 36, borderRadius: '50%', background: 'rgba(0,0,0,0.5)',
-                border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                cursor: 'pointer', color: 'white'
-              }}
-            ><ChevronLeft size={20} /></button>
-            <button
-              onClick={() => setImgIdx(i => (i + 1) % images.length)}
-              aria-label="Next"
-              style={{
-                position: 'absolute', top: '50%', right: 12, transform: 'translateY(-50%)',
-                width: 36, height: 36, borderRadius: '50%', background: 'rgba(0,0,0,0.5)',
-                border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                cursor: 'pointer', color: 'white'
-              }}
-            ><ChevronRight size={20} /></button>
-            <div style={{
-              position: 'absolute', bottom: 12, left: '50%', transform: 'translateX(-50%)',
-              background: 'rgba(0,0,0,0.6)', borderRadius: 12, padding: '4px 12px',
-              fontSize: 12, color: 'white', fontWeight: 500
-            }}>{imgIdx + 1} / {images.length}</div>
+            <button className="pd-nav pd-nav-prev" onClick={e => { e.stopPropagation(); setImgIdx(i => (i - 1 + images.length) % images.length) }} aria-label="Previous">
+              <ChevronLeft size={20} />
+            </button>
+            <button className="pd-nav pd-nav-next" onClick={e => { e.stopPropagation(); setImgIdx(i => (i + 1) % images.length) }} aria-label="Next">
+              <ChevronRight size={20} />
+            </button>
+            <div className="pd-counter">{imgIdx + 1} / {images.length}</div>
           </>
         )}
       </div>
 
-      <div style={{ padding: '1.25rem' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
+      {lightboxOpen && images.length > 0 && (
+        <ImageLightbox
+          images={images}
+          index={imgIdx}
+          onClose={() => setLightboxOpen(false)}
+          onNavigate={dir => setImgIdx(i => (i + dir + images.length) % images.length)}
+        />
+      )}
+
+      <div className="pd-body">
+        <div className="pd-header">
           <div>
-            <div style={{ fontSize: 22, fontWeight: 600 }}>{title}</div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 4, color: 'var(--fho-text-muted)', fontSize: 13, marginTop: 4 }}>
+            <div className="pd-title">{title}</div>
+            <div className="pd-address">
               <MapPin size={12} /> {property.address}, {property.city}
             </div>
           </div>
-          <div style={{ fontSize: 24, fontWeight: 600, color: 'var(--fho-orange-2)' }}>
-            {price}{suffix}
-          </div>
+          <div className="pd-price">{price}{suffix}</div>
         </div>
 
-        <div style={{ display: 'flex', gap: 8, margin: '16px 0' }}>
+        <div className="pd-specs">
           {property.beds > 0 && (
-            <div style={{ flex: 1, background: 'var(--fho-surface)', borderRadius: 'var(--r-md)', padding: 12, textAlign: 'center', border: '0.5px solid var(--fho-border)' }}>
+            <div className="pd-spec">
               <Bed size={18} style={{ color: 'var(--fho-text-muted)' }} />
-              <div style={{ fontWeight: 600, fontSize: 15, marginTop: 4 }}>{property.beds}</div>
-              <div style={{ fontSize: 11, color: 'var(--fho-text-muted)' }}>{t('property.beds')}</div>
+              <div className="pd-spec-value">{property.beds}</div>
+              <div className="pd-spec-label">{t('property.beds')}</div>
             </div>
           )}
-          <div style={{ flex: 1, background: 'var(--fho-surface)', borderRadius: 'var(--r-md)', padding: 12, textAlign: 'center', border: '0.5px solid var(--fho-border)' }}>
+          <div className="pd-spec">
             <Bath size={18} style={{ color: 'var(--fho-text-muted)' }} />
-            <div style={{ fontWeight: 600, fontSize: 15, marginTop: 4 }}>{property.baths}</div>
-            <div style={{ fontSize: 11, color: 'var(--fho-text-muted)' }}>{t('property.baths')}</div>
+            <div className="pd-spec-value">{property.baths}</div>
+            <div className="pd-spec-label">{t('property.baths')}</div>
           </div>
-          <div style={{ flex: 1, background: 'var(--fho-surface)', borderRadius: 'var(--r-md)', padding: 12, textAlign: 'center', border: '0.5px solid var(--fho-border)' }}>
+          <div className="pd-spec">
             <Ruler size={18} style={{ color: 'var(--fho-text-muted)' }} />
-            <div style={{ fontWeight: 600, fontSize: 15, marginTop: 4 }}>{property.sqft}</div>
-            <div style={{ fontSize: 11, color: 'var(--fho-text-muted)' }}>{t('property.sqft')}</div>
+            <div className="pd-spec-value">{property.sqft}</div>
+            <div className="pd-spec-label">{t('property.sqft')}</div>
           </div>
         </div>
 
-        <div style={{ background: 'var(--fho-surface)', borderRadius: 'var(--r-md)', padding: 16, border: '0.5px solid var(--fho-border)', marginBottom: 16 }}>
+        <div className="pd-card">
           {translating ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-              <div style={{ height: 14, borderRadius: 4, background: 'var(--fho-input-bg)', animation: 'shimmer 1.5s infinite' }} />
-              <div style={{ height: 14, borderRadius: 4, background: 'var(--fho-input-bg)', animation: 'shimmer 1.5s infinite', animationDelay: '0.15s' }} />
-              <div style={{ height: 14, borderRadius: 4, background: 'var(--fho-input-bg)', animation: 'shimmer 1.5s infinite', animationDelay: '0.3s', width: '70%' }} />
+              <div className="pd-shimmer" />
+              <div className="pd-shimmer" style={{ animationDelay: '0.15s' }} />
+              <div className="pd-shimmer" style={{ animationDelay: '0.3s', width: '70%' }} />
             </div>
           ) : (
             <>
-              <div style={{ fontSize: 14, lineHeight: 1.6 }}>{description}</div>
+              <div className="pd-description">{description}</div>
               {isTranslated && (
-                <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 10, fontSize: 11, color: 'var(--fho-text-muted)', fontWeight: 500 }}>
+                <div className="pd-translated-badge">
                   <Globe size={11} /> {t('property.autoTranslated')}
                 </div>
               )}
@@ -188,64 +179,68 @@ export default function PropertyDetail() {
         </div>
 
         {property.agent && (
-          <div style={{ background: 'var(--fho-surface)', borderRadius: 'var(--r-md)', padding: 14, border: '0.5px solid var(--fho-border)', display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
-            <div style={{ width: 44, height: 44, borderRadius: '50%', background: 'linear-gradient(135deg, var(--fho-orange-1), var(--fho-orange-2))', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 600 }}>
+          <div className="pd-card pd-agent" onClick={() => navigate(`/agent/${property.agent.id}`)}>
+            <div className="pd-agent-avatar">
               {property.agent.full_name?.[0] || 'F'}
             </div>
             <div style={{ flex: 1 }}>
-              <div style={{ fontWeight: 600, fontSize: 14 }}>{property.agent.full_name}</div>
-              <div style={{ fontSize: 12, color: 'var(--fho-text-muted)' }}>{property.agent.agency_name}</div>
+              <div className="pd-agent-name">{property.agent.full_name}</div>
+              <div className="pd-agent-agency">{property.agent.agency_name}</div>
             </div>
           </div>
         )}
 
-        <div style={{ display: 'flex', gap: 10 }}>
-          <a
-            href={`tel:${phone}`}
-            onClick={() => logActivity(property.id, 'call')}
-            style={{ flex: 1, background: 'var(--fho-surface)', border: '0.5px solid var(--fho-border)', borderRadius: 'var(--r-md)', padding: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, fontWeight: 500, color: 'var(--fho-text)', textDecoration: 'none', fontSize: 14 }}
-          ><Phone size={16} /> {t('property.call')}</a>
-          <a
-            href={`https://wa.me/${phone}?text=${waMsg}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={() => logActivity(property.id, 'message')}
-            style={{ flex: 1, background: 'linear-gradient(135deg, var(--fho-orange-1), var(--fho-orange-2))', borderRadius: 'var(--r-md)', padding: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, fontWeight: 500, color: 'white', textDecoration: 'none', fontSize: 14, boxShadow: '0 4px 12px rgba(232,93,44,0.3)' }}
-          ><MessageCircle size={16} /> WhatsApp</a>
+        <div className="pd-contact">
+          <a href={`tel:${phone}`} onClick={() => logActivity(property.id, 'call')} className="pd-contact-btn pd-contact-call">
+            <Phone size={16} /> {t('property.call')}
+          </a>
+          <a href={`https://wa.me/${phone}?text=${waMsg}`} target="_blank" rel="noopener noreferrer" onClick={() => logActivity(property.id, 'message')} className="pd-contact-btn pd-contact-wa">
+            <MessageCircle size={16} /> WhatsApp
+          </a>
         </div>
+
+        {videoEmbed && (
+          <div className="pd-video">
+            <div className="pd-section-title">{t('property.video')}</div>
+            <iframe src={videoEmbed} title="Property video" allowFullScreen />
+          </div>
+        )}
 
         {property.latitude && property.longitude && (
           <div style={{ marginTop: 16 }}>
-            <Suspense fallback={<div style={{ height: 200, background: 'var(--fho-surface)', borderRadius: 'var(--r-md)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--fho-text-muted)' }}>{t('common.loading')}</div>}>
+            <Suspense fallback={<div className="pd-card" style={{ height: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--fho-text-muted)' }}>{t('common.loading')}</div>}>
               <PropertyMap lat={property.latitude} lng={property.longitude} />
             </Suspense>
-            <a
-              href={`https://www.google.com/maps?q=${property.latitude},${property.longitude}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 8, fontSize: 13, color: 'var(--fho-orange-2)', textDecoration: 'none', fontWeight: 500 }}
-            ><ExternalLink size={14} /> {t('map.openInMaps')}</a>
+            <a href={`https://www.google.com/maps?q=${property.latitude},${property.longitude}`} target="_blank" rel="noopener noreferrer" className="pd-map-link">
+              <ExternalLink size={14} /> {t('map.openInMaps')}
+            </a>
           </div>
         )}
 
         {FloorPlanViewer && property.floor_plan && (
           <div style={{ marginTop: 16 }}>
-            <div style={{ fontWeight: 600, fontSize: 15, marginBottom: 8 }}>{t('floorPlan.title')}</div>
-            <Suspense fallback={<div style={{ height: 200, background: 'var(--fho-surface)', borderRadius: 'var(--r-md)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--fho-text-muted)' }}>{t('common.loading')}</div>}>
+            <div className="pd-section-title">{t('floorPlan.title')}</div>
+            <Suspense fallback={<div className="pd-card" style={{ height: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--fho-text-muted)' }}>{t('common.loading')}</div>}>
               <FloorPlanViewer plan={property.floor_plan} />
             </Suspense>
           </div>
         )}
 
         {similarProperties.length > 0 && (
-          <div style={{ marginTop: 24 }}>
-            <div style={{ fontWeight: 600, fontSize: 15, marginBottom: 12 }}>{t('property.similar')}</div>
+          <div className="pd-similar">
+            <div className="pd-section-title">{t('property.similar')}</div>
             <div className="property-grid">
               {similarProperties.map(p => <PropertyCard key={p.id} property={p} />)}
             </div>
           </div>
         )}
       </div>
+
+      {loginToast && (
+        <div className="pd-login-toast" onClick={() => navigate('/profile')}>
+          {t('favourites.loginPrompt')}
+        </div>
+      )}
     </div>
   )
 }
