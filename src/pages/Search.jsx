@@ -6,13 +6,8 @@ import PropertyCard from '../components/PropertyCard'
 import PropertyMap from '../components/PropertyMap'
 import SkeletonCard from '../components/SkeletonCard'
 import { useProperties } from '../hooks/useProperties'
+import LOCATIONS from '../data/locations'
 import '../styles/search.css'
-
-const LOCATIONS = [
-  'Blloku', 'Liqeni i Thatë', 'Myslym Shyri', 'Selvia', 'Ali Dem',
-  'Komuna e Parisit', 'Sauk', 'Lunder', '21 Dhjetori', 'Yzberisht',
-  'Rruga e Kavajës', 'Pazari i Ri', 'Don Bosko', 'Tirana e Re', 'Kombinat',
-]
 
 const PROPERTY_TYPES = ['apartment', 'villa', 'land', 'office']
 const EUR_ALL_RATE = 107
@@ -23,10 +18,14 @@ export default function Search() {
   const [currency, setCurrency] = useState('EUR')
   const [viewMode, setViewMode] = useState('list')
 
-  const location = searchParams.get('location') || ''
+  const city = searchParams.get('city') || ''
+  const zone = searchParams.get('zone') || ''
   const minPrice = searchParams.get('minPrice') || ''
   const maxPrice = searchParams.get('maxPrice') || ''
   const propertyType = searchParams.get('type') || ''
+
+  const selectedCity = LOCATIONS.find(l => l.city === city)
+  const location = zone || city
 
   const queryMinPrice = useMemo(() => {
     if (!minPrice) return null
@@ -54,22 +53,43 @@ export default function Search() {
     setSearchParams(params, { replace: true })
   }
 
+  const handleCityChange = (value) => {
+    const params = new URLSearchParams(searchParams)
+    params.delete('zone')
+    if (value) params.set('city', value)
+    else params.delete('city')
+    setSearchParams(params, { replace: true })
+  }
+
   const resetFilters = () => setSearchParams({}, { replace: true })
-  const hasFilters = location || minPrice || maxPrice || propertyType
+  const hasFilters = city || zone || minPrice || maxPrice || propertyType
 
   return (
     <div className="page search-page">
       <h1 className="page-title">{t('search.title')}</h1>
       <p className="page-subtitle">{t('search.subtitle')}</p>
 
-      <div className="search-filter-group">
-        <label>{t('search.location')}</label>
-        <select value={location} onChange={e => updateFilter('location', e.target.value)}>
-          <option value="">{t('search.anyLocation')}</option>
-          {LOCATIONS.map(loc => (
-            <option key={loc} value={loc}>{loc}</option>
-          ))}
-        </select>
+      <div className="location-selects">
+        <div className="search-filter-group">
+          <label>{t('search.city')}</label>
+          <select value={city} onChange={e => handleCityChange(e.target.value)}>
+            <option value="">{t('search.anyCity')}</option>
+            {LOCATIONS.map(l => (
+              <option key={l.city} value={l.city}>{l.city}</option>
+            ))}
+          </select>
+        </div>
+        {selectedCity && (
+          <div className="search-filter-group">
+            <label>{t('search.neighborhood')}</label>
+            <select value={zone} onChange={e => updateFilter('zone', e.target.value)}>
+              <option value="">{t('search.anyZone')}</option>
+              {selectedCity.zones.map(z => (
+                <option key={z} value={z}>{z}</option>
+              ))}
+            </select>
+          </div>
+        )}
       </div>
 
       <div className="type-chips">

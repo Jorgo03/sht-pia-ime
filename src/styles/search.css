@@ -1,4 +1,16 @@
-/* --- Location dropdown --- */
+/* --- Location dropdowns --- */
+
+.location-selects {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.location-selects .search-filter-group {
+  flex: 1;
+  min-width: 0;
+  margin-bottom: 0;
+}
 
 .search-filter-group {
   display: flex;
