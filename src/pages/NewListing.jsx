@@ -6,6 +6,26 @@ import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
 import '../styles/new-listing.css'
 
+function compressImage(file, maxWidth = 1600, quality = 0.8) {
+  return new Promise((resolve) => {
+    if (!file.type.startsWith('image/')) { resolve(file); return }
+    const img = new Image()
+    img.onload = () => {
+      if (img.width <= maxWidth) { resolve(file); return }
+      const canvas = document.createElement('canvas')
+      const ratio = maxWidth / img.width
+      canvas.width = maxWidth
+      canvas.height = Math.round(img.height * ratio)
+      canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height)
+      canvas.toBlob((blob) => {
+        resolve(blob ? new File([blob], file.name, { type: 'image/jpeg' }) : file)
+      }, 'image/jpeg', quality)
+    }
+    img.onerror = () => resolve(file)
+    img.src = URL.createObjectURL(file)
+  })
+}
+
 const STEPS = ['basics', 'location', 'details', 'media', 'publish']
 const PROPERTY_TYPES = ['apartment', 'villa', 'house', 'land', 'commercial', 'office', 'garage']
 const LISTING_TYPES = ['sale', 'rent', 'daily_rent']
@@ -72,11 +92,12 @@ export default function NewListing() {
     }))
   }
 
-  const handleImages = (e) => {
+  const handleImages = async (e) => {
     const files = Array.from(e.target.files)
     const total = images.length + files.length
     if (total > 20) return
-    const newImgs = files.map(f => ({ file: f, preview: URL.createObjectURL(f) }))
+    const compressed = await Promise.all(files.map(f => compressImage(f)))
+    const newImgs = compressed.map(f => ({ file: f, preview: URL.createObjectURL(f) }))
     setImages(prev => [...prev, ...newImgs])
   }
 

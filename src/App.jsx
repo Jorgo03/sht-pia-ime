@@ -17,6 +17,7 @@ import PropertyDashboard from './pages/PropertyDashboard'
 import NewListing from './pages/NewListing'
 import AgentProfile from './pages/AgentProfile'
 import NotFound from './pages/NotFound'
+import CookieConsent from './components/CookieConsent'
 
 function ScrollToTop() {
   const { pathname } = useLocation()
@@ -48,6 +49,7 @@ export default function App() {
                 <Route path="*" element={<NotFound />} />
               </Routes>
               <BottomNav />
+              <CookieConsent />
             </div>
           </FavoritesProvider>
         </AuthProvider>

@@ -1,52 +1,67 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { supabase } from '../lib/supabase'
 
-export function useProperties({ filter = 'all', listingType = null, city = null, minPrice = null, maxPrice = null, beds = null } = {}) {
+const PAGE_SIZE = 20
+
+function buildQuery({ filter, listingType, city, minPrice, maxPrice, beds }) {
+  let query = supabase
+    .from('properties')
+    .select('*')
+    .eq('status', 'active')
+    .order('created_at', { ascending: false })
+
+  if (filter && filter !== 'all') query = query.eq('property_type', filter)
+  if (listingType) query = query.eq('listing_type', listingType)
+  if (city) query = query.ilike('city', `%${city}%`)
+  if (minPrice != null) query = query.gte('price', minPrice)
+  if (maxPrice != null) query = query.lte('price', maxPrice)
+  if (beds != null) query = query.gte('beds', beds)
+  return query
+}
+
+export function useProperties({ filter = 'all', listingType = null, city = null, minPrice = null, maxPrice = null, beds = null, paginate = false } = {}) {
   const [properties, setProperties] = useState([])
   const [loading, setLoading] = useState(true)
+  const [loadingMore, setLoadingMore] = useState(false)
   const [error, setError] = useState(null)
+  const [hasMore, setHasMore] = useState(false)
 
   useEffect(() => {
     let active = true
     setLoading(true)
     setError(null)
 
-    let query = supabase
-      .from('properties')
-      .select('*')
-      .eq('status', 'active')
-      .order('created_at', { ascending: false })
+    const query = buildQuery({ filter, listingType, city, minPrice, maxPrice, beds })
+    const limited = paginate ? query.range(0, PAGE_SIZE - 1) : query
 
-    if (filter && filter !== 'all') {
-      query = query.eq('property_type', filter)
-    }
-    if (listingType) {
-      query = query.eq('listing_type', listingType)
-    }
-    if (city) {
-      query = query.ilike('city', `%${city}%`)
-    }
-    if (minPrice != null) {
-      query = query.gte('price', minPrice)
-    }
-    if (maxPrice != null) {
-      query = query.lte('price', maxPrice)
-    }
-    if (beds != null) {
-      query = query.gte('beds', beds)
-    }
-
-    query.then(({ data, error: err }) => {
+    limited.then(({ data, error: err }) => {
       if (!active) return
       if (err) setError(err.message)
-      else setProperties(data || [])
+      else {
+        setProperties(data || [])
+        setHasMore(paginate && (data || []).length === PAGE_SIZE)
+      }
       setLoading(false)
     })
 
     return () => { active = false }
-  }, [filter, listingType, city, minPrice, maxPrice, beds])
+  }, [filter, listingType, city, minPrice, maxPrice, beds, paginate])
 
-  return { properties, loading, error }
+  const loadMore = useCallback(() => {
+    if (!paginate || loadingMore || !hasMore) return
+    setLoadingMore(true)
+
+    const query = buildQuery({ filter, listingType, city, minPrice, maxPrice, beds })
+    query.range(properties.length, properties.length + PAGE_SIZE - 1)
+      .then(({ data }) => {
+        const newItems = data || []
+        setProperties(prev => [...prev, ...newItems])
+        setHasMore(newItems.length === PAGE_SIZE)
+        setLoadingMore(false)
+      })
+  }, [filter, listingType, city, minPrice, maxPrice, beds, paginate, loadingMore, hasMore, properties.length])
+
+  return { properties, loading, loadingMore, error, hasMore, loadMore }
 }
 
 export function usePropertiesByIds(ids = []) {

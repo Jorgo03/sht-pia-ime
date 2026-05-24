@@ -394,3 +394,31 @@
 .empty-reset-btn:active {
   transform: scale(0.97);
 }
+
+/* --- Load more --- */
+
+.load-more-btn {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  margin-top: 16px;
+  border: 0.5px solid var(--fho-border);
+  border-radius: var(--r-md);
+  background: var(--fho-surface);
+  color: var(--fho-text);
+  font-size: 14px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.load-more-btn:hover {
+  border-color: var(--fho-orange-1);
+  color: var(--fho-orange-2);
+}
+
+.load-more-btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}

@@ -63,12 +63,13 @@ export default function Search() {
     return currency === 'ALL' ? Math.round(v / EUR_ALL_RATE) : v
   }, [debouncedMax, currency])
 
-  const { properties, loading, error } = useProperties({
+  const { properties, loading, loadingMore, error, hasMore, loadMore } = useProperties({
     filter: propertyType || 'all',
     listingType: listingType || null,
     city: location || null,
     minPrice: queryMinPrice,
     maxPrice: queryMaxPrice,
+    paginate: true,
   })
 
   const updateFilter = (key, value) => {
@@ -225,9 +226,20 @@ export default function Search() {
       ) : viewMode === 'map' ? (
         <PropertyMap properties={properties} />
       ) : (
-        <div className="property-grid">
-          {properties.map(p => <PropertyCard key={p.id} property={p} />)}
-        </div>
+        <>
+          <div className="property-grid">
+            {properties.map(p => <PropertyCard key={p.id} property={p} />)}
+          </div>
+          {hasMore && (
+            <button
+              className="load-more-btn"
+              onClick={loadMore}
+              disabled={loadingMore}
+            >
+              {loadingMore ? t('common.loading') : t('common.viewAll')}
+            </button>
+          )}
+        </>
       )}
     </div>
   )
