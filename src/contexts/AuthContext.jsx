@@ -10,18 +10,18 @@ export function AuthProvider({ children }) {
   const [welcomeName, setWelcomeName] = useState(null)
 
   useEffect(() => {
-    let initialized = false
-
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, s) => {
         setSession(s)
         setLoading(false)
         if (s?.user) loadPreferredLanguage(s.user.id)
 
-        if (event === 'SIGNED_IN' && initialized) {
-          const name = s?.user?.user_metadata?.full_name
-            || s?.user?.user_metadata?.name
-            || s?.user?.email?.split('@')[0]
+        // SIGNED_IN fires on fresh logins (email + OAuth redirect)
+        // INITIAL_SESSION fires on page refresh — no toast for that
+        if (event === 'SIGNED_IN' && s?.user) {
+          const name = s.user.user_metadata?.full_name
+            || s.user.user_metadata?.name
+            || s.user.email?.split('@')[0]
           if (name) setWelcomeName(name)
         }
       },
@@ -30,7 +30,6 @@ export function AuthProvider({ children }) {
     supabase.auth.getSession().then(({ data: { session: s } }) => {
       setSession(s)
       setLoading(false)
-      initialized = true
       if (s?.user) loadPreferredLanguage(s.user.id)
     })
 
