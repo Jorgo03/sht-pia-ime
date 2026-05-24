@@ -9,14 +9,19 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    // Set up listener first — catches INITIAL_SESSION event
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (_event, s) => {
+        setSession(s)
+        setLoading(false)
+        if (s?.user) loadPreferredLanguage(s.user.id)
+      },
+    )
+
+    // Fallback: explicitly get session in case INITIAL_SESSION was missed
     supabase.auth.getSession().then(({ data: { session: s } }) => {
       setSession(s)
       setLoading(false)
-      if (s?.user) loadPreferredLanguage(s.user.id)
-    })
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, s) => {
-      setSession(s)
       if (s?.user) loadPreferredLanguage(s.user.id)
     })
 

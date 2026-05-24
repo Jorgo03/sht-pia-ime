@@ -19,20 +19,38 @@ export function FavoritesProvider({ children }) {
     }
     setLoading(true)
     try {
+      // Try join query first (works when FK relationship exists)
       const { data, error } = await supabase
         .from('favorites')
-        .select('id, created_at, property:properties(*)')
+        .select('id, created_at, property_id, property:properties(*)')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
 
       if (error) throw error
 
-      const props = (data ?? []).map((f) => f.property).filter(Boolean)
-      const ids = new Set(props.map((p) => p.id))
+      const hasJoinedData = data?.some((f) => f.property)
 
-      setFavoriteIds(ids)
-      setFavoriteProperties(props)
+      if (hasJoinedData) {
+        const props = (data ?? []).map((f) => f.property).filter(Boolean)
+        const ids = new Set(props.map((p) => p.id))
+        setFavoriteIds(ids)
+        setFavoriteProperties(props)
+      } else {
+        // Fallback: join failed silently, fetch properties separately
+        const ids = new Set((data ?? []).map((f) => f.property_id).filter(Boolean))
+        setFavoriteIds(ids)
+        if (ids.size > 0) {
+          const { data: props } = await supabase
+            .from('properties')
+            .select('*')
+            .in('id', [...ids])
+          setFavoriteProperties(props ?? [])
+        } else {
+          setFavoriteProperties([])
+        }
+      }
     } catch {
+      // Table might not exist yet — start empty
       setFavoriteIds(new Set())
       setFavoriteProperties([])
     } finally {
