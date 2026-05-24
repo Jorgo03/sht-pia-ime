@@ -18,6 +18,7 @@ import NewListing from './pages/NewListing'
 import AgentProfile from './pages/AgentProfile'
 import NotFound from './pages/NotFound'
 import CookieConsent from './components/CookieConsent'
+import WelcomeToast from './components/WelcomeToast'
 
 function ScrollToTop() {
   const { pathname } = useLocation()
@@ -50,6 +51,7 @@ export default function App() {
               </Routes>
               <BottomNav />
               <CookieConsent />
+              <WelcomeToast />
             </div>
           </FavoritesProvider>
         </AuthProvider>

@@ -7,21 +7,30 @@ const AuthContext = createContext(null)
 export function AuthProvider({ children }) {
   const [session, setSession] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [welcomeName, setWelcomeName] = useState(null)
 
   useEffect(() => {
-    // Set up listener first — catches INITIAL_SESSION event
+    let initialized = false
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, s) => {
+      (event, s) => {
         setSession(s)
         setLoading(false)
         if (s?.user) loadPreferredLanguage(s.user.id)
+
+        if (event === 'SIGNED_IN' && initialized) {
+          const name = s?.user?.user_metadata?.full_name
+            || s?.user?.user_metadata?.name
+            || s?.user?.email?.split('@')[0]
+          if (name) setWelcomeName(name)
+        }
       },
     )
 
-    // Fallback: explicitly get session in case INITIAL_SESSION was missed
     supabase.auth.getSession().then(({ data: { session: s } }) => {
       setSession(s)
       setLoading(false)
+      initialized = true
       if (s?.user) loadPreferredLanguage(s.user.id)
     })
 
@@ -58,7 +67,13 @@ export function AuthProvider({ children }) {
   }
 
   const signIn = async (email, password) => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+    if (!error && data?.user) {
+      const name = data.user.user_metadata?.full_name
+        || data.user.user_metadata?.name
+        || data.user.email?.split('@')[0]
+      if (name) setWelcomeName(name)
+    }
     return { error }
   }
 
@@ -90,6 +105,8 @@ export function AuthProvider({ children }) {
         user: session?.user ?? null,
         session,
         loading,
+        welcomeName,
+        clearWelcome: () => setWelcomeName(null),
         signUp,
         signIn,
         signInWithProvider,

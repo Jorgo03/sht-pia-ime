@@ -92,3 +92,28 @@
   from { transform: translateX(-50%) translateY(20px); opacity: 0; }
   to { transform: translateX(-50%) translateY(0); opacity: 1; }
 }
+
+/* --- Welcome toast --- */
+
+.welcome-toast {
+  position: fixed;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 400px;
+  padding: 12px 20px;
+  background: linear-gradient(135deg, var(--fho-orange-1), var(--fho-orange-2));
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: var(--r-md);
+  box-shadow: 0 4px 20px rgba(232, 93, 44, 0.3);
+  z-index: 2000;
+  cursor: pointer;
+  animation: toastIn 0.4s ease-out;
+}
+
+@keyframes toastIn {
+  from { transform: translateX(-50%) translateY(-20px); opacity: 0; }
+  to { transform: translateX(-50%) translateY(0); opacity: 1; }
+}
