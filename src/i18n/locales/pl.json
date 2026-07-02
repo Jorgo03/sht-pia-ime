@@ -18,7 +18,9 @@
     "favorites": "Ulubione",
     "messages": "Wiadomości",
     "profile": "Profil",
-    "recentlyViewed": "Ostatnio oglądane"
+    "recentlyViewed": "Ostatnio oglądane",
+    "back": "Wróć",
+    "send": "Wyślij"
   },
   "auth": {
     "roleClient": "Klient",
@@ -43,7 +45,42 @@
     "continueWithLinkedIn": "LinkedIn",
     "welcome": "Witamy w Shtëpia.ime",
     "user": "Użytkownik",
-    "agent": "Agent"
+    "agent": "Agent",
+    "signInWithEmail": "Zaloguj się kodem email",
+    "otpTitle": "Zaloguj się przez Email",
+    "otpSubtitle": "Wyślemy 6-cyfrowy kod na Twój email",
+    "enterEmail": "Podaj swój adres email",
+    "sendCode": "Wyślij kod",
+    "otpSent": "Kod wysłany! Sprawdź email.",
+    "enterCode": "Wpisz kod",
+    "codeSentTo": "Wysłaliśmy 6-cyfrowy kod na {{email}}",
+    "resendCode": "Nie otrzymałeś? Wyślij ponownie",
+    "kickerSignIn": "WITAJ PONOWNIE",
+    "kickerSignUp": "NOWE KONTO",
+    "heroSignInPre": "Twoje",
+    "heroSignInEm": "kolejne drzwi",
+    "heroSignInPost": "są otwarte.",
+    "heroSignUpPre": "Zacznij",
+    "heroSignUpEm": "szukać domu",
+    "heroSignUpPost": "już dziś."
+  },
+  "home": {
+    "greetingMorning": "Dzień dobry",
+    "greetingEvening": "Dobry wieczór",
+    "matchesToday_one": "{{count}} nowe dopasowanie dzisiaj.",
+    "matchesToday_few": "{{count}} nowe dopasowania dzisiaj.",
+    "matchesToday_many": "{{count}} nowych dopasowań dzisiaj.",
+    "featured": "Polecane w tym tygodniu",
+    "editorsPick": "WYBÓR REDAKCJI",
+    "matched": "Dopasowane do Ciebie",
+    "neighborhoods": "Popularne dzielnice",
+    "seeAll": "Zobacz wszystkie →",
+    "searchPlaceholder": "Miasto, dzielnica, kod pocztowy...",
+    "cityTag": "Tirana",
+    "country": "Albania",
+    "homesCount_one": "{{count}} dom",
+    "homesCount_few": "{{count}} domy",
+    "homesCount_many": "{{count}} domów"
   },
   "search": {
     "title": "Szukaj nieruchomości",
@@ -79,7 +116,16 @@
     "emptyHint": "Spróbuj zmienić filtry wyszukiwania",
     "apply": "Zastosuj",
     "reset": "Resetuj",
-    "filters": "Filtry"
+    "filters": "Filtry",
+    "headline": "Przeglądaj",
+    "headlineEm": "wszystko",
+    "viewList": "Lista",
+    "viewMap": "Mapa",
+    "homesInView": "domów w widoku",
+    "sortedByRelevance": "Sortowane wg trafności",
+    "mapView": "Widok mapy",
+    "filtersTitle": "Filtry",
+    "showHomes": "Pokaż {{count}} ofert"
   },
   "favourites": {
     "title": "Ulubione",
@@ -88,7 +134,12 @@
     "emptyDescription": "Dotknij ikony serca na nieruchomości, aby ją zapisać",
     "loginPrompt": "Zaloguj się, aby zobaczyć ulubione",
     "loginCta": "Zaloguj się",
-    "remove": "Usuń"
+    "remove": "Usuń",
+    "savedCount": "{{count}} zapisanych · uporządkowane dla Ciebie",
+    "headlineEm": "krótka lista",
+    "backToProfile": "← Wróć do profilu",
+    "kicker": "ULUBIONE",
+    "headlinePre": "Twoja"
   },
   "property": {
     "beds": "pokoje",
@@ -105,19 +156,62 @@
     "similar": "Podobne nieruchomości",
     "video": "Wideo"
   },
+  "detail": {
+    "forSale": "Na sprzedaż",
+    "forRent": "Do wynajęcia",
+    "about": "O tej nieruchomości",
+    "whatsInside": "Co w środku",
+    "scheduleViewing": "Umów wizytę",
+    "message": "Wiadomość",
+    "perSqm": "/m²",
+    "beds": "Sypialnie",
+    "baths": "Łazienki",
+    "area": "Powierzchnia",
+    "year": "Rok",
+    "chatInApp": "Czat"
+  },
   "messages": {
     "subtitle": "Rozmowy z agentami",
-    "comingSoon": "Czat WhatsApp — wkrótce"
+    "comingSoon": "Czat WhatsApp — wkrótce",
+    "client": {
+      "kicker": "{{count}} rozmów · {{unread}} nieprzeczytanych",
+      "headlineEm": "z agentami",
+      "headlinePre": "Wiadomości"
+    },
+    "agent": {
+      "kicker": "{{leads}} aktywnych leadów · {{newToday}} nowych dzisiaj",
+      "headlineEm": "zapytania",
+      "headlinePre": "Leady i"
+    },
+    "empty": "Brak rozmów",
+    "emptyHint": "Rozpocznij czat ze strony nieruchomości",
+    "inputPlaceholder": "Napisz wiadomość…",
+    "noMessages": "Brak wiadomości — przywitaj się!",
+    "loginPrompt": "Zaloguj się, aby zobaczyć wiadomości"
   },
   "notFound": {
     "title": "Nie znaleziono strony",
     "subtitle": "Strona, której szukasz, nie istnieje lub została przeniesiona."
   },
+  "profile": {
+    "savedSearches": "Zapisane wyszukiwania",
+    "statSaved": "Zapisane",
+    "statSearches": "Wyszukiwania",
+    "statListings": "Ogłoszenia",
+    "statViewings": "Wizyty"
+  },
   "errors": {
     "generic": "Coś poszło nie tak. Spróbuj ponownie.",
     "authFailed": "Uwierzytelnianie nie powiodło się.",
     "providerNotConfigured": "Ten dostawca nie jest skonfigurowany.",
-    "fillFields": "Wypełnij e-mail i hasło."
+    "fillFields": "Wypełnij e-mail i hasło.",
+    "invalidEmail": "Podaj prawidłowy adres e-mail.",
+    "passwordMin": "Hasło musi mieć co najmniej 8 znaków.",
+    "nameRequired": "Imię i nazwisko wymagane (min. 2 znaki).",
+    "invalidCredentials": "Nieprawidłowy e-mail lub hasło.",
+    "userExists": "Konto z tym e-mailem już istnieje.",
+    "emailNotConfirmed": "Potwierdź swój e-mail przed zalogowaniem.",
+    "rateLimited": "Zbyt wiele żądań. Spróbuj ponownie później."
   },
   "agentDashboard": {
     "title": "Panel Agenta",
@@ -167,10 +261,37 @@
     "next": "Dalej",
     "saveDraft": "Zapisz szkic",
     "publish": "Opublikuj",
-    "type": { "sale": "Sprzedaż", "rent": "Wynajem", "daily_rent": "Wynajem dzienny" },
-    "status": { "active": "Aktywne", "paused": "Wstrzymane", "sold": "Sprzedane", "rented": "Wynajęte", "draft": "Szkic" },
-    "step": { "basics": "Podstawy", "location": "Lokalizacja", "details": "Szczegóły", "media": "Media", "publish": "Publikuj" },
-    "feature": { "balcony": "Balkon", "parking": "Parking", "elevator": "Winda", "garden": "Ogród", "pool": "Basen", "furnished": "Umeblowane", "airConditioning": "Klimatyzacja", "heating": "Ogrzewanie", "security": "Ochrona", "storage": "Schowek" }
+    "type": {
+      "sale": "Sprzedaż",
+      "rent": "Wynajem",
+      "daily_rent": "Wynajem dzienny"
+    },
+    "status": {
+      "active": "Aktywne",
+      "paused": "Wstrzymane",
+      "sold": "Sprzedane",
+      "rented": "Wynajęte",
+      "draft": "Szkic"
+    },
+    "step": {
+      "basics": "Podstawy",
+      "location": "Lokalizacja",
+      "details": "Szczegóły",
+      "media": "Media",
+      "publish": "Publikuj"
+    },
+    "feature": {
+      "balcony": "Balkon",
+      "parking": "Parking",
+      "elevator": "Winda",
+      "garden": "Ogród",
+      "pool": "Basen",
+      "furnished": "Umeblowane",
+      "airConditioning": "Klimatyzacja",
+      "heating": "Ogrzewanie",
+      "security": "Ochrona",
+      "storage": "Schowek"
+    }
   },
   "dashboard": {
     "title": "Dashboard nieruchomości",
@@ -197,5 +318,60 @@
   "cookie": {
     "message": "Ta strona używa plików cookie, aby poprawić Twoje doświadczenia.",
     "accept": "Akceptuję"
+  },
+  "addSheet": {
+    "openLabel": "Utwórz nowe",
+    "title": "Co chcesz",
+    "titleEm": "dodać",
+    "signInFirst": "Zaloguj się, aby kontynuować",
+    "searchSaved": "Wyszukiwanie zapisane",
+    "wantedSaved": "Ogłoszenie o poszukiwaniu dodane",
+    "leadSaved": "Lead dodany",
+    "searchName": "Nazwa wyszukiwania",
+    "maxPrice": "Cena maksymalna (€)",
+    "minBedrooms": "Min. sypialnie",
+    "notes": "Notatki (opcjonalnie)",
+    "leadName": "Imię klienta",
+    "leadPhone": "Numer telefonu",
+    "client": {
+      "listing": {
+        "title": "Wystaw swoją nieruchomość",
+        "sub": "Sprzedaj lub wynajmij nieruchomość"
+      },
+      "search": {
+        "title": "Zapisz wyszukiwanie",
+        "sub": "Otrzymuj powiadomienia o nowych ofertach"
+      },
+      "wanted": {
+        "title": "Poszukiwane mieszkanie",
+        "sub": "Pozwól agentom Cię znaleźć"
+      },
+      "visit": {
+        "title": "Umów oglądanie",
+        "sub": "Zaplanuj wizytę"
+      }
+    },
+    "agent": {
+      "listing": {
+        "title": "Nowe ogłoszenie",
+        "sub": "Dodaj nieruchomość do portfolio"
+      },
+      "lead": {
+        "title": "Nowy lead",
+        "sub": "Śledź potencjalnego klienta"
+      },
+      "viewing": {
+        "title": "Zaplanuj oglądanie",
+        "sub": "Zorganizuj wizytę w nieruchomości"
+      },
+      "open": {
+        "title": "Dzień otwarty",
+        "sub": "Zaplanuj pokaz publiczny"
+      }
+    },
+    "saveError": "Nie udało się zapisać. Spróbuj ponownie."
+  },
+  "authCallback": {
+    "signingIn": "Logowanie…"
   }
 }

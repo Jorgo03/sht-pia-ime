@@ -4,15 +4,15 @@ import { useAuth } from '../contexts/AuthContext'
 
 export default function WelcomeToast() {
   const { t } = useTranslation()
-  const { welcomeName, clearWelcome } = useAuth()
+  const { user, session, welcomeName, clearWelcome } = useAuth()
 
   useEffect(() => {
-    if (!welcomeName) return
+    if (!user || !session || !welcomeName) return
     const id = setTimeout(clearWelcome, 3500)
     return () => clearTimeout(id)
-  }, [welcomeName, clearWelcome])
+  }, [user?.id, welcomeName, clearWelcome])
 
-  if (!welcomeName) return null
+  if (!user || !session || !welcomeName) return null
 
   return (
     <div className="welcome-toast" onClick={clearWelcome}>

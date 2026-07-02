@@ -26,9 +26,21 @@ export function useTranslatedProperty(property, language) {
     const origDesc = property.description || ''
 
     if (language === 'sq') {
-      setTitle(origTitle)
-      setDescription(origDesc)
+      setTitle(property.title_i18n?.sq || origTitle)
+      setDescription(property.description_i18n?.sq || origDesc)
       setIsTranslated(false)
+      setTranslating(false)
+      return
+    }
+
+    // Prefer translations stored by the listing wizard (title_i18n /
+    // description_i18n) — no network call needed when both exist.
+    const storedTitle = property.title_i18n?.[language]
+    const storedDesc = property.description_i18n?.[language]
+    if ((storedTitle || !origTitle) && (storedDesc || !origDesc)) {
+      setTitle(storedTitle || origTitle)
+      setDescription(storedDesc || origDesc)
+      setIsTranslated(Boolean(storedTitle || storedDesc))
       setTranslating(false)
       return
     }

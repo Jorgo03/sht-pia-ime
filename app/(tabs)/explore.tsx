@@ -8,6 +8,7 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 
 import { PropertyCard } from '@/components/property/property-card';
 import { FilterTabs } from '@/components/ui/filter-tabs';
@@ -18,6 +19,7 @@ import { Property } from '@/data/types';
 
 export default function ExploreScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -38,10 +40,12 @@ export default function ExploreScreen() {
     <GradientBackground>
       <SafeAreaView style={styles.container} edges={['top']}>
         <View style={styles.header}>
-          <Text style={styles.brand}>Shtëpia.ime</Text>
-          <Text style={styles.title}>Find Apartments</Text>
+          <Text style={styles.brand}>{t('common.appName')}</Text>
+          <Text style={styles.title}>{t('search.title')}</Text>
         </View>
-        <FilterTabs tabs={['Recommend', 'Nearby', 'New']} />
+        <FilterTabs
+          tabs={[t('common.all'), t('search.sale'), t('search.rent')]}
+        />
         {loading ? (
           <View style={styles.loader}>
             <ActivityIndicator size="large" color={AtticoColors.accent} />

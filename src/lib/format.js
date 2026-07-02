@@ -21,11 +21,11 @@ export function imageFor(property) {
   return gradientFor(property?.id)
 }
 
-export function formatPrice(n, lang = 'sq') {
+export function formatPrice(n, lang = 'sq', currency = 'EUR') {
   const num = Number(n) || 0
   return new Intl.NumberFormat(lang, {
     style: 'currency',
-    currency: 'EUR',
+    currency: currency || 'EUR',
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
   }).format(num)
@@ -43,4 +43,29 @@ export function formatDate(dateStr, lang = 'sq') {
     month: 'short',
     day: 'numeric',
   }).format(new Date(dateStr))
+}
+
+export function formatRelativeTime(iso, locale = 'sq') {
+  if (!iso) return ''
+  const diff = (Date.now() - new Date(iso).getTime()) / 1000
+  const rtf = new Intl.RelativeTimeFormat(locale, { numeric: 'auto' })
+  if (diff < 60) return rtf.format(-Math.floor(diff), 'second')
+  if (diff < 3600) return rtf.format(-Math.floor(diff / 60), 'minute')
+  if (diff < 86400) return rtf.format(-Math.floor(diff / 3600), 'hour')
+  if (diff < 604800) return rtf.format(-Math.floor(diff / 86400), 'day')
+  return new Date(iso).toLocaleDateString(locale)
+}
+
+export function slugify(s) {
+  return s
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '')
+}
+
+export function whatsappUrl(phone, message) {
+  const clean = phone?.replace(/[^0-9]/g, '') || ''
+  return `https://wa.me/${clean}?text=${encodeURIComponent(message)}`
 }

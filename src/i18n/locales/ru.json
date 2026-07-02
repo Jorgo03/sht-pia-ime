@@ -18,7 +18,9 @@
     "favorites": "Избранное",
     "messages": "Сообщения",
     "profile": "Профиль",
-    "recentlyViewed": "Недавно просмотренные"
+    "recentlyViewed": "Недавно просмотренные",
+    "back": "Назад",
+    "send": "Отправить"
   },
   "auth": {
     "roleClient": "Клиент",
@@ -43,7 +45,42 @@
     "continueWithLinkedIn": "LinkedIn",
     "welcome": "Добро пожаловать в Shtëpia.ime",
     "user": "Пользователь",
-    "agent": "Агент"
+    "agent": "Агент",
+    "signInWithEmail": "Войти с кодом по email",
+    "otpTitle": "Войти по Email",
+    "otpSubtitle": "Мы отправим 6-значный код на ваш email",
+    "enterEmail": "Введите ваш адрес электронной почты",
+    "sendCode": "Отправить код",
+    "otpSent": "Код отправлен! Проверьте почту.",
+    "enterCode": "Введите код",
+    "codeSentTo": "Мы отправили 6-значный код на {{email}}",
+    "resendCode": "Не получили? Отправить снова",
+    "kickerSignIn": "С ВОЗВРАЩЕНИЕМ",
+    "kickerSignUp": "НОВЫЙ АККАУНТ",
+    "heroSignInPre": "Ваша",
+    "heroSignInEm": "следующая дверь",
+    "heroSignInPost": "открыта.",
+    "heroSignUpPre": "Начните",
+    "heroSignUpEm": "искать дом",
+    "heroSignUpPost": "уже сегодня."
+  },
+  "home": {
+    "greetingMorning": "Доброе утро",
+    "greetingEvening": "Добрый вечер",
+    "matchesToday_one": "{{count}} новое совпадение сегодня.",
+    "matchesToday_few": "{{count}} новых совпадения сегодня.",
+    "matchesToday_many": "{{count}} новых совпадений сегодня.",
+    "featured": "Избранное этой недели",
+    "editorsPick": "ВЫБОР РЕДАКЦИИ",
+    "matched": "Подобрано для вас",
+    "neighborhoods": "Популярные районы",
+    "seeAll": "Смотреть все →",
+    "searchPlaceholder": "Город, район, индекс...",
+    "cityTag": "Тирана",
+    "country": "Албания",
+    "homesCount_one": "{{count}} дом",
+    "homesCount_few": "{{count}} дома",
+    "homesCount_many": "{{count}} домов"
   },
   "search": {
     "title": "Поиск недвижимости",
@@ -79,7 +116,16 @@
     "emptyHint": "Попробуйте изменить параметры поиска",
     "apply": "Применить",
     "reset": "Сбросить",
-    "filters": "Фильтры"
+    "filters": "Фильтры",
+    "headline": "Исследуйте",
+    "headlineEm": "всё",
+    "viewList": "Список",
+    "viewMap": "Карта",
+    "homesInView": "объектов в поле зрения",
+    "sortedByRelevance": "Сортировка по релевантности",
+    "mapView": "Вид карты",
+    "filtersTitle": "Фильтры",
+    "showHomes": "Показать {{count}} объектов"
   },
   "favourites": {
     "title": "Избранное",
@@ -88,7 +134,12 @@
     "emptyDescription": "Нажмите на значок сердца, чтобы сохранить объект",
     "loginPrompt": "Войдите, чтобы увидеть избранное",
     "loginCta": "Войти",
-    "remove": "Удалить"
+    "remove": "Удалить",
+    "savedCount": "{{count}} сохранено · упорядочено для вас",
+    "headlineEm": "подборка",
+    "backToProfile": "← Назад в профиль",
+    "kicker": "ИЗБРАННОЕ",
+    "headlinePre": "Ваша"
   },
   "property": {
     "beds": "комн.",
@@ -105,19 +156,62 @@
     "similar": "Похожие объекты",
     "video": "Видеотур"
   },
+  "detail": {
+    "forSale": "Прод��жа",
+    "forRent": "Аренда",
+    "about": "Об этом доме",
+    "whatsInside": "Что внутри",
+    "scheduleViewing": "Записаться на просмотр",
+    "message": "Сообщение",
+    "perSqm": "/м²",
+    "beds": "Спальни",
+    "baths": "Ванные",
+    "area": "Площадь",
+    "year": "Год",
+    "chatInApp": "Чат"
+  },
   "messages": {
     "subtitle": "Беседы с агентами",
-    "comingSoon": "Чат WhatsApp — скоро"
+    "comingSoon": "Чат WhatsApp — скоро",
+    "client": {
+      "kicker": "{{count}} бесед · {{unread}} непрочитанных",
+      "headlineEm": "с агентами",
+      "headlinePre": "Сообщения"
+    },
+    "agent": {
+      "kicker": "{{leads}} активных лидов · {{newToday}} новых сегодня",
+      "headlineEm": "запросы",
+      "headlinePre": "Лиды и"
+    },
+    "empty": "Пока нет диалогов",
+    "emptyHint": "Начните чат со страницы объекта",
+    "inputPlaceholder": "Напишите сообщение…",
+    "noMessages": "Сообщений пока нет — поздоровайтесь!",
+    "loginPrompt": "Войдите, чтобы увидеть сообщения"
   },
   "notFound": {
     "title": "Страница не найдена",
     "subtitle": "Страница, которую вы ищете, не существует или была перемещена."
   },
+  "profile": {
+    "savedSearches": "Сохранённые поиски",
+    "statSaved": "Сохранено",
+    "statSearches": "Поиски",
+    "statListings": "Объявления",
+    "statViewings": "Просмотры"
+  },
   "errors": {
     "generic": "Что-то пошло не так. Попробуйте снова.",
     "authFailed": "Ошибка аутентификации.",
     "providerNotConfigured": "Этот провайдер не настроен.",
-    "fillFields": "Заполните электронную почту и пароль."
+    "fillFields": "Заполните электронную почту и пароль.",
+    "invalidEmail": "Введите корректный адрес электронной почты.",
+    "passwordMin": "Пароль должен содержать не менее 8 символов.",
+    "nameRequired": "Полное имя обязательно (мин. 2 символа).",
+    "invalidCredentials": "Неверный email или пароль.",
+    "userExists": "Аккаунт с этим email уже существует.",
+    "emailNotConfirmed": "Подтвердите email перед входом.",
+    "rateLimited": "Слишком много запросов. Попробуйте позже."
   },
   "agentDashboard": {
     "title": "Панель агента",
@@ -167,10 +261,37 @@
     "next": "Далее",
     "saveDraft": "Сохранить черновик",
     "publish": "Опубликовать",
-    "type": { "sale": "Продажа", "rent": "Аренда", "daily_rent": "Посуточная аренда" },
-    "status": { "active": "Активно", "paused": "Приостановлено", "sold": "Продано", "rented": "Сдано", "draft": "Черновик" },
-    "step": { "basics": "Основное", "location": "Расположение", "details": "Детали", "media": "Медиа", "publish": "Публикация" },
-    "feature": { "balcony": "Балкон", "parking": "Парковка", "elevator": "Лифт", "garden": "Сад", "pool": "Бассейн", "furnished": "С мебелью", "airConditioning": "Кондиционер", "heating": "Отопление", "security": "Охрана", "storage": "Кладовка" }
+    "type": {
+      "sale": "Продажа",
+      "rent": "Аренда",
+      "daily_rent": "Посуточная аренда"
+    },
+    "status": {
+      "active": "Активно",
+      "paused": "Приостановлено",
+      "sold": "Продано",
+      "rented": "Сдано",
+      "draft": "Черновик"
+    },
+    "step": {
+      "basics": "Основное",
+      "location": "Расположение",
+      "details": "Детали",
+      "media": "Медиа",
+      "publish": "Публикация"
+    },
+    "feature": {
+      "balcony": "Балкон",
+      "parking": "Парковка",
+      "elevator": "Лифт",
+      "garden": "Сад",
+      "pool": "Бассейн",
+      "furnished": "С мебелью",
+      "airConditioning": "Кондиционер",
+      "heating": "Отопление",
+      "security": "Охрана",
+      "storage": "Кладовка"
+    }
   },
   "dashboard": {
     "title": "Панель объекта",
@@ -197,5 +318,60 @@
   "cookie": {
     "message": "Этот сайт использует файлы cookie для улучшения вашего опыта.",
     "accept": "Принять"
+  },
+  "addSheet": {
+    "openLabel": "Создать",
+    "title": "Что вы хотите",
+    "titleEm": "добавить",
+    "signInFirst": "Войдите, чтобы продолжить",
+    "searchSaved": "Поиск сохранён",
+    "wantedSaved": "Заявка на жильё опубликована",
+    "leadSaved": "Лид добавлен",
+    "searchName": "Название поиска",
+    "maxPrice": "Макс. цена (€)",
+    "minBedrooms": "Мин. спален",
+    "notes": "Заметки (необязательно)",
+    "leadName": "Имя клиента",
+    "leadPhone": "Номер телефона",
+    "client": {
+      "listing": {
+        "title": "Разместите своё жильё",
+        "sub": "Продайте или сдайте недвижимость"
+      },
+      "search": {
+        "title": "Сохранить поиск",
+        "sub": "Получайте уведомления о новых совпадениях"
+      },
+      "wanted": {
+        "title": "Ищу жильё",
+        "sub": "Пусть агенты найдут вас"
+      },
+      "visit": {
+        "title": "Запросить просмотр",
+        "sub": "Запланируйте визит"
+      }
+    },
+    "agent": {
+      "listing": {
+        "title": "Новое объявление",
+        "sub": "Добавьте объект в портфолио"
+      },
+      "lead": {
+        "title": "Новый лид",
+        "sub": "Отслеживайте потенциального клиента"
+      },
+      "viewing": {
+        "title": "Запланировать просмотр",
+        "sub": "Организуйте показ объекта"
+      },
+      "open": {
+        "title": "День открытых дверей",
+        "sub": "Запланируйте открытый показ"
+      }
+    },
+    "saveError": "Не удалось сохранить. Попробуйте ещё раз."
+  },
+  "authCallback": {
+    "signingIn": "Выполняется вход…"
   }
 }

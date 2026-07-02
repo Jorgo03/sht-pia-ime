@@ -18,7 +18,9 @@
     "favorites": "Të preferuara",
     "messages": "Mesazhe",
     "profile": "Profili",
-    "recentlyViewed": "Parë së fundmi"
+    "recentlyViewed": "Parë së fundmi",
+    "back": "Kthehu",
+    "send": "Dërgo"
   },
   "auth": {
     "roleClient": "Klient",
@@ -43,7 +45,38 @@
     "continueWithLinkedIn": "LinkedIn",
     "welcome": "Mirë se erdhe në Shtëpia.ime",
     "user": "Përdorues",
-    "agent": "Agjent"
+    "agent": "Agjent",
+    "signInWithEmail": "Hyr me kod nga emaili",
+    "otpTitle": "Hyr me Email",
+    "otpSubtitle": "Do t'ju dërgojmë një kod 6-shifror në email",
+    "enterEmail": "Ju lutem shkruani emailin tuaj",
+    "sendCode": "Dërgo Kodin",
+    "otpSent": "Kodi u dërgua! Kontrolloni emailin.",
+    "enterCode": "Shkruani Kodin",
+    "codeSentTo": "Dërguam një kod 6-shifror te {{email}}",
+    "resendCode": "Nuk e morët? Dërgo përsëri",
+    "kickerSignIn": "MIRË SE U KTHYE",
+    "kickerSignUp": "LLOGARI E RE",
+    "heroSignInPre": "Dera jote",
+    "heroSignInEm": "e radhës",
+    "heroSignInPost": "është e hapur.",
+    "heroSignUpPre": "Fillo të",
+    "heroSignUpEm": "gjesh shtëpinë",
+    "heroSignUpPost": "që sot."
+  },
+  "home": {
+    "greetingMorning": "Mirëmëngjes",
+    "greetingEvening": "Mirëmbrëma",
+    "matchesToday": "{{count}} përputhje të reja sot.",
+    "featured": "Të zgjedhura këtë javë",
+    "editorsPick": "ZGJEDHJA E REDAKSISË",
+    "matched": "Sipas shijes suaj",
+    "neighborhoods": "Lagje në trend",
+    "seeAll": "Shiko të gjitha →",
+    "searchPlaceholder": "Qytet, lagje, kod postar...",
+    "cityTag": "Tiranë",
+    "country": "Shqipëri",
+    "homesCount": "{{count}} prona"
   },
   "search": {
     "title": "Kërko pronë",
@@ -79,7 +112,16 @@
     "emptyHint": "Provo të ndryshosh filtrat e kërkimit",
     "apply": "Apliko",
     "reset": "Pastro",
-    "filters": "Filtra"
+    "filters": "Filtra",
+    "headline": "Eksploro",
+    "headlineEm": "gjithçka",
+    "viewList": "Lista",
+    "viewMap": "Harta",
+    "homesInView": "prona në shikim",
+    "sortedByRelevance": "Renditur sipas rëndësisë",
+    "mapView": "Pamja e hartës",
+    "filtersTitle": "Filtrat",
+    "showHomes": "Shfaq {{count}} prona"
   },
   "favourites": {
     "title": "Të preferuarat",
@@ -88,7 +130,12 @@
     "emptyDescription": "Kliko ikonën e zemrës në një pronë për ta ruajtur",
     "loginPrompt": "Hyr në llogari për të parë të preferuarat",
     "loginCta": "Hyr në llogari",
-    "remove": "Hiq"
+    "remove": "Hiq",
+    "savedCount": "{{count}} të ruajtura · të organizuara për ty",
+    "headlineEm": "Lista jote",
+    "backToProfile": "← Kthehu te profili",
+    "kicker": "TË PREFERUARAT",
+    "headlinePre": ""
   },
   "property": {
     "beds": "dhoma",
@@ -105,9 +152,38 @@
     "similar": "Prona të ngjashme",
     "video": "Video tur"
   },
+  "detail": {
+    "forSale": "Shitje",
+    "forRent": "Qira",
+    "about": "Rreth kësaj shtëpie",
+    "whatsInside": "Çfarë ka brenda",
+    "scheduleViewing": "Planifiko një vizitë",
+    "message": "Mesazh",
+    "perSqm": "/m²",
+    "beds": "Dhoma gjumi",
+    "baths": "Banjo",
+    "area": "Sipërfaqja",
+    "year": "Viti",
+    "chatInApp": "Bisedo"
+  },
   "messages": {
     "subtitle": "Bisedat me agjentët",
-    "comingSoon": "Chat me WhatsApp — së shpejti"
+    "comingSoon": "Chat me WhatsApp — së shpejti",
+    "client": {
+      "kicker": "{{count}} biseda · {{unread}} pa lexuar",
+      "headlineEm": "me agjentët",
+      "headlinePre": "Mesazhet"
+    },
+    "agent": {
+      "kicker": "{{leads}} lead aktive · {{newToday}} të reja sot",
+      "headlineEm": "kërkesat",
+      "headlinePre": "Klientë &"
+    },
+    "empty": "Ende pa biseda",
+    "emptyHint": "Fillo një bisedë nga faqja e një prone",
+    "inputPlaceholder": "Shkruaj një mesazh…",
+    "noMessages": "Ende pa mesazhe — përshëndetu!",
+    "loginPrompt": "Kyçu për të parë mesazhet"
   },
   "notFound": {
     "title": "Faqja nuk u gjet",
@@ -117,12 +193,78 @@
     "generic": "Ndodhi një gabim. Provo përsëri.",
     "authFailed": "Identifikimi dështoi.",
     "providerNotConfigured": "Ky shërbim nuk është konfiguruar.",
-    "fillFields": "Plotëso emailin dhe fjalëkalimin."
+    "fillFields": "Plotëso emailin dhe fjalëkalimin.",
+    "invalidEmail": "Shkruaj një adresë emaili të vlefshme.",
+    "passwordMin": "Fjalëkalimi duhet të ketë të paktën 8 karaktere.",
+    "nameRequired": "Emri i plotë nevojitet (min 2 karaktere).",
+    "invalidCredentials": "Email ose fjalëkalim i gabuar.",
+    "userExists": "Një llogari me këtë email ekziston.",
+    "emailNotConfirmed": "Konfirmoni emailin përpara se të hyni.",
+    "rateLimited": "Shumë kërkesa. Provo përsëri më vonë."
   },
   "agentDashboard": {
     "title": "Paneli i Agjentit",
     "subtitle": "Menaxho pronat dhe klientët e tu",
     "comingSoon": "Së shpejti..."
+  },
+  "profile": {
+    "savedSearches": "Kërkimet e ruajtura",
+    "statSaved": "Ruajtur",
+    "statSearches": "Kërkime",
+    "statListings": "Lista",
+    "statViewings": "Vizita"
+  },
+  "addSheet": {
+    "openLabel": "Krijo",
+    "title": "Çfarë dëshironi të",
+    "titleEm": "shtoni",
+    "signInFirst": "Hyni për të vazhduar",
+    "searchSaved": "Kërkimi u ruajt",
+    "wantedSaved": "Kërkesa u postua",
+    "leadSaved": "Lead u shtua",
+    "searchName": "Emri i kërkimit",
+    "maxPrice": "Çmimi maks (€)",
+    "minBedrooms": "Min dhoma gjumi",
+    "notes": "Shënime (opsionale)",
+    "leadName": "Emri i klientit",
+    "leadPhone": "Numri i telefonit",
+    "client": {
+      "listing": {
+        "title": "Listo shtëpinë",
+        "sub": "Shit ose jep me qira pronën"
+      },
+      "search": {
+        "title": "Ruaj një kërkim",
+        "sub": "Merr njoftim për përputhje"
+      },
+      "wanted": {
+        "title": "Kërko shtëpi",
+        "sub": "Lejo agjentët të të gjejnë"
+      },
+      "visit": {
+        "title": "Kërko vizitë",
+        "sub": "Planifiko një vizitë"
+      }
+    },
+    "agent": {
+      "listing": {
+        "title": "Listim i ri",
+        "sub": "Shto pronë në portofolin tënd"
+      },
+      "lead": {
+        "title": "Lead i ri",
+        "sub": "Gjurmo një klient potencial"
+      },
+      "viewing": {
+        "title": "Planifiko vizitë",
+        "sub": "Organizo një vizitë prone"
+      },
+      "open": {
+        "title": "Open house",
+        "sub": "Planifiko shfaqje publike"
+      }
+    },
+    "saveError": "Nuk u ruajt. Provo përsëri."
   },
   "account": {
     "welcomeBack": "Mirë se erdhe, {{name}} 👋",
@@ -224,5 +366,8 @@
   "cookie": {
     "message": "Kjo faqe përdor cookies për të përmirësuar përvojën tuaj.",
     "accept": "Pranoj"
+  },
+  "authCallback": {
+    "signingIn": "Duke u kyçur…"
   }
 }

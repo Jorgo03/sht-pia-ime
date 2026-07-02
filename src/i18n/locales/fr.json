@@ -18,7 +18,9 @@
     "favorites": "Favoris",
     "messages": "Messages",
     "profile": "Profil",
-    "recentlyViewed": "Vus récemment"
+    "recentlyViewed": "Vus récemment",
+    "back": "Retour",
+    "send": "Envoyer"
   },
   "auth": {
     "roleClient": "Client",
@@ -43,7 +45,38 @@
     "continueWithLinkedIn": "LinkedIn",
     "welcome": "Bienvenue sur Shtëpia.ime",
     "user": "Utilisateur",
-    "agent": "Agent"
+    "agent": "Agent",
+    "signInWithEmail": "Se connecter avec un code email",
+    "otpTitle": "Se connecter par Email",
+    "otpSubtitle": "Nous vous enverrons un code à 6 chiffres par email",
+    "enterEmail": "Veuillez entrer votre adresse email",
+    "sendCode": "Envoyer le code",
+    "otpSent": "Code envoyé ! Vérifiez votre email.",
+    "enterCode": "Entrer le code",
+    "codeSentTo": "Nous avons envoyé un code à 6 chiffres à {{email}}",
+    "resendCode": "Pas reçu ? Renvoyer",
+    "kickerSignIn": "BON RETOUR",
+    "kickerSignUp": "NOUVEAU COMPTE",
+    "heroSignInPre": "Votre",
+    "heroSignInEm": "prochaine porte",
+    "heroSignInPost": "est ouverte.",
+    "heroSignUpPre": "Commencez à",
+    "heroSignUpEm": "trouver votre chez-vous",
+    "heroSignUpPost": "dès aujourd'hui."
+  },
+  "home": {
+    "greetingMorning": "Bonjour",
+    "greetingEvening": "Bonsoir",
+    "matchesToday": "{{count}} nouvelles correspondances aujourd'hui.",
+    "featured": "À la une cette semaine",
+    "editorsPick": "CHOIX DE LA RÉDACTION",
+    "matched": "Sélectionné pour vous",
+    "neighborhoods": "Quartiers tendance",
+    "seeAll": "Voir tout →",
+    "searchPlaceholder": "Ville, quartier, code postal...",
+    "cityTag": "Tirana",
+    "country": "Albanie",
+    "homesCount": "{{count}} biens"
   },
   "search": {
     "title": "Rechercher des biens",
@@ -79,7 +112,16 @@
     "emptyHint": "Essayez de modifier vos filtres de recherche",
     "apply": "Appliquer",
     "reset": "Réinitialiser",
-    "filters": "Filtres"
+    "filters": "Filtres",
+    "headline": "Explorez",
+    "headlineEm": "tout",
+    "viewList": "Liste",
+    "viewMap": "Carte",
+    "homesInView": "biens affichés",
+    "sortedByRelevance": "Trié par pertinence",
+    "mapView": "Vue carte",
+    "filtersTitle": "Filtres",
+    "showHomes": "Afficher {{count}} biens"
   },
   "favourites": {
     "title": "Favoris",
@@ -88,7 +130,12 @@
     "emptyDescription": "Appuyez sur l'icône cœur d'un bien pour l'enregistrer",
     "loginPrompt": "Connectez-vous pour voir vos favoris",
     "loginCta": "Se connecter",
-    "remove": "Supprimer"
+    "remove": "Supprimer",
+    "savedCount": "{{count}} enregistrés · organisés pour vous",
+    "headlineEm": "sélection",
+    "backToProfile": "← Retour au profil",
+    "kicker": "FAVORIS",
+    "headlinePre": "Votre"
   },
   "property": {
     "beds": "ch.",
@@ -105,19 +152,62 @@
     "similar": "Biens similaires",
     "video": "Visite vidéo"
   },
+  "detail": {
+    "forSale": "À vendre",
+    "forRent": "À louer",
+    "about": "À propos de ce bien",
+    "whatsInside": "Ce qui est inclus",
+    "scheduleViewing": "Planifier une visite",
+    "message": "Message",
+    "perSqm": "/m²",
+    "beds": "Chambres",
+    "baths": "Salles de bain",
+    "area": "Surface",
+    "year": "Année",
+    "chatInApp": "Discuter"
+  },
   "messages": {
     "subtitle": "Conversations avec les agents",
-    "comingSoon": "Chat WhatsApp — bientôt"
+    "comingSoon": "Chat WhatsApp — bientôt",
+    "client": {
+      "kicker": "{{count}} conversations · {{unread}} non lus",
+      "headlineEm": "avec les agents",
+      "headlinePre": "Messages"
+    },
+    "agent": {
+      "kicker": "{{leads}} leads actifs · {{newToday}} nouveaux aujourd'hui",
+      "headlineEm": "demandes",
+      "headlinePre": "Prospects et"
+    },
+    "empty": "Pas encore de conversations",
+    "emptyHint": "Démarrez une discussion depuis la page d'un bien",
+    "inputPlaceholder": "Écrivez un message…",
+    "noMessages": "Pas encore de messages — dites bonjour !",
+    "loginPrompt": "Connectez-vous pour voir vos messages"
   },
   "notFound": {
     "title": "Page introuvable",
     "subtitle": "La page que vous recherchez n'existe pas ou a été déplacée."
   },
+  "profile": {
+    "savedSearches": "Recherches enregistrées",
+    "statSaved": "Enregistrés",
+    "statSearches": "Recherches",
+    "statListings": "Annonces",
+    "statViewings": "Visites"
+  },
   "errors": {
     "generic": "Une erreur est survenue. Veuillez réessayer.",
     "authFailed": "Échec de l'authentification.",
     "providerNotConfigured": "Ce fournisseur n'est pas configuré.",
-    "fillFields": "Veuillez remplir l'e-mail et le mot de passe."
+    "fillFields": "Veuillez remplir l'e-mail et le mot de passe.",
+    "invalidEmail": "Veuillez entrer une adresse e-mail valide.",
+    "passwordMin": "Le mot de passe doit contenir au moins 8 caractères.",
+    "nameRequired": "Nom complet requis (min. 2 caractères).",
+    "invalidCredentials": "E-mail ou mot de passe incorrect.",
+    "userExists": "Un compte avec cet e-mail existe déjà.",
+    "emailNotConfirmed": "Confirmez votre e-mail avant de vous connecter.",
+    "rateLimited": "Trop de requêtes. Veuillez réessayer plus tard."
   },
   "agentDashboard": {
     "title": "Tableau de bord Agent",
@@ -167,10 +257,37 @@
     "next": "Suivant",
     "saveDraft": "Enregistrer le brouillon",
     "publish": "Publier",
-    "type": { "sale": "Vente", "rent": "Location", "daily_rent": "Location journalière" },
-    "status": { "active": "Actif", "paused": "En pause", "sold": "Vendu", "rented": "Loué", "draft": "Brouillon" },
-    "step": { "basics": "Base", "location": "Emplacement", "details": "Détails", "media": "Médias", "publish": "Publier" },
-    "feature": { "balcony": "Balcon", "parking": "Parking", "elevator": "Ascenseur", "garden": "Jardin", "pool": "Piscine", "furnished": "Meublé", "airConditioning": "Climatisation", "heating": "Chauffage", "security": "Sécurité", "storage": "Rangement" }
+    "type": {
+      "sale": "Vente",
+      "rent": "Location",
+      "daily_rent": "Location journalière"
+    },
+    "status": {
+      "active": "Actif",
+      "paused": "En pause",
+      "sold": "Vendu",
+      "rented": "Loué",
+      "draft": "Brouillon"
+    },
+    "step": {
+      "basics": "Base",
+      "location": "Emplacement",
+      "details": "Détails",
+      "media": "Médias",
+      "publish": "Publier"
+    },
+    "feature": {
+      "balcony": "Balcon",
+      "parking": "Parking",
+      "elevator": "Ascenseur",
+      "garden": "Jardin",
+      "pool": "Piscine",
+      "furnished": "Meublé",
+      "airConditioning": "Climatisation",
+      "heating": "Chauffage",
+      "security": "Sécurité",
+      "storage": "Rangement"
+    }
   },
   "dashboard": {
     "title": "Tableau de bord du bien",
@@ -197,5 +314,60 @@
   "cookie": {
     "message": "Ce site utilise des cookies pour améliorer votre expérience.",
     "accept": "Accepter"
+  },
+  "addSheet": {
+    "openLabel": "Créer",
+    "title": "Que souhaitez-vous",
+    "titleEm": "ajouter",
+    "signInFirst": "Connectez-vous pour continuer",
+    "searchSaved": "Recherche enregistrée",
+    "wantedSaved": "Recherche de logement publiée",
+    "leadSaved": "Prospect ajouté",
+    "searchName": "Nom de la recherche",
+    "maxPrice": "Prix maximum (€)",
+    "minBedrooms": "Chambres min.",
+    "notes": "Notes (facultatif)",
+    "leadName": "Nom du client",
+    "leadPhone": "Numéro de téléphone",
+    "client": {
+      "listing": {
+        "title": "Mettez votre bien en ligne",
+        "sub": "Vendez ou louez votre bien"
+      },
+      "search": {
+        "title": "Enregistrer une recherche",
+        "sub": "Soyez alerté des nouvelles annonces"
+      },
+      "wanted": {
+        "title": "Logement recherché",
+        "sub": "Laissez les agents vous trouver"
+      },
+      "visit": {
+        "title": "Demander une visite",
+        "sub": "Planifiez une visite"
+      }
+    },
+    "agent": {
+      "listing": {
+        "title": "Nouvelle annonce",
+        "sub": "Ajoutez un bien à votre portefeuille"
+      },
+      "lead": {
+        "title": "Nouveau prospect",
+        "sub": "Suivez un client potentiel"
+      },
+      "viewing": {
+        "title": "Planifier une visite",
+        "sub": "Organisez une visite du bien"
+      },
+      "open": {
+        "title": "Portes ouvertes",
+        "sub": "Planifiez une visite publique"
+      }
+    },
+    "saveError": "Échec de l'enregistrement. Veuillez réessayer."
+  },
+  "authCallback": {
+    "signingIn": "Connexion en cours…"
   }
 }

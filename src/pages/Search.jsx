@@ -1,74 +1,50 @@
-import { useState, useMemo, useRef, useEffect, useCallback } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { X, LayoutGrid, Map as MapIcon, RotateCcw, SearchX } from 'lucide-react'
+import { Search as SearchIcon, SlidersHorizontal, LayoutGrid, Map as MapIcon, RotateCcw, SearchX, X } from 'lucide-react'
 import PropertyCard from '../components/PropertyCard'
 import PropertyMap from '../components/PropertyMap'
 import SkeletonCard from '../components/SkeletonCard'
-import CustomDropdown from '../components/CustomDropdown'
 import { useProperties } from '../hooks/useProperties'
-import LOCATIONS from '../data/locations'
 import '../styles/search.css'
 
-const CITIES = ['Tiranë', 'Durrës', 'Vlorë', 'Shkodër', 'Elbasan', 'Fier', 'Korçë',
-  'Berat', 'Lushnjë', 'Pogradec', 'Kavajë', 'Lezhë', 'Gjirokastër',
-  'Sarandë', 'Kukës', 'Peshkopi', 'Krujë', 'Laç', 'Burrel']
-
-const PROPERTY_TYPES = ['apartment', 'villa', 'land', 'office']
-const LISTING_TYPES = ['sale', 'rent', 'daily_rent']
-const EUR_ALL_RATE = 107
+const PROPERTY_TYPES = ['apartment', 'villa', 'house', 'land', 'office']
+const BED_OPTIONS = [null, 1, 2, 3, 4]
 
 function useDebounced(value, delay = 400) {
   const [debounced, setDebounced] = useState(value)
-  useEffect(() => {
-    const id = setTimeout(() => setDebounced(value), delay)
-    return () => clearTimeout(id)
-  }, [value, delay])
+  useEffect(() => { const id = setTimeout(() => setDebounced(value), delay); return () => clearTimeout(id) }, [value, delay])
   return debounced
 }
 
 export default function Search() {
   const { t } = useTranslation()
   const [searchParams, setSearchParams] = useSearchParams()
-  const [currency, setCurrency] = useState('EUR')
   const [viewMode, setViewMode] = useState('list')
+  const [filtersOpen, setFiltersOpen] = useState(false)
+  const [searchText, setSearchText] = useState('')
 
   const city = searchParams.get('city') || ''
-  const zone = searchParams.get('zone') || ''
   const minPrice = searchParams.get('minPrice') || ''
   const maxPrice = searchParams.get('maxPrice') || ''
   const propertyType = searchParams.get('type') || ''
   const listingType = searchParams.get('listing') || ''
-
-  const CITY_OPTIONS = useMemo(() => [
-    { value: '', label: t('search.anyCity') },
-    ...CITIES.map(c => ({ value: c, label: c })),
-  ], [t])
-
-  const selectedCity = LOCATIONS.find(l => l.city === city)
-  const location = zone || city
+  const beds = searchParams.get('beds') || ''
 
   const debouncedMin = useDebounced(minPrice)
   const debouncedMax = useDebounced(maxPrice)
+  const debouncedSearch = useDebounced(searchText)
 
-  const queryMinPrice = useMemo(() => {
-    if (!debouncedMin) return null
-    const v = Number(debouncedMin)
-    return currency === 'ALL' ? Math.round(v / EUR_ALL_RATE) : v
-  }, [debouncedMin, currency])
+  const queryMin = useMemo(() => debouncedMin ? Number(debouncedMin) : null, [debouncedMin])
+  const queryMax = useMemo(() => debouncedMax ? Number(debouncedMax) : null, [debouncedMax])
 
-  const queryMaxPrice = useMemo(() => {
-    if (!debouncedMax) return null
-    const v = Number(debouncedMax)
-    return currency === 'ALL' ? Math.round(v / EUR_ALL_RATE) : v
-  }, [debouncedMax, currency])
-
-  const { properties, loading, loadingMore, error, hasMore, loadMore } = useProperties({
+  const { properties, loading, loadingMore, hasMore, loadMore } = useProperties({
     filter: propertyType || 'all',
     listingType: listingType || null,
-    city: location || null,
-    minPrice: queryMinPrice,
-    maxPrice: queryMaxPrice,
+    city: debouncedSearch || city || null,
+    minPrice: queryMin,
+    maxPrice: queryMax,
+    beds: beds ? Number(beds) : null,
     paginate: true,
   })
 
@@ -79,166 +55,137 @@ export default function Search() {
     setSearchParams(params, { replace: true })
   }
 
-  const handleCityChange = (value) => {
-    const params = new URLSearchParams(searchParams)
-    params.delete('zone')
-    if (value) params.set('city', value)
-    else params.delete('city')
-    setSearchParams(params, { replace: true })
-  }
+  const resetFilters = () => { setSearchParams({}, { replace: true }); setSearchText('') }
+  const activeCount = [city, minPrice, maxPrice, propertyType, listingType, beds].filter(Boolean).length
 
-  const resetFilters = () => setSearchParams({}, { replace: true })
-  const hasFilters = city || zone || minPrice || maxPrice || propertyType || listingType
+  useEffect(() => {
+    if (!filtersOpen) return
+    const h = (e) => { if (e.key === 'Escape') setFiltersOpen(false) }
+    window.addEventListener('keydown', h)
+    return () => window.removeEventListener('keydown', h)
+  }, [filtersOpen])
 
   return (
-    <div className="page search-page">
-      <h1 className="page-title">{t('search.title')}</h1>
-      <p className="page-subtitle">{t('search.subtitle')}</p>
-
-      <div className="location-selects">
-        <CustomDropdown
-          label={t('search.city')}
-          value={city}
-          options={CITY_OPTIONS}
-          placeholder={t('search.anyCity')}
-          onChange={handleCityChange}
-        />
-        {selectedCity && (
-          <CustomDropdown
-            label={t('search.neighborhood')}
-            value={zone}
-            options={[
-              { value: '', label: t('search.anyZone') },
-              ...selectedCity.zones.map(z => ({ value: z, label: z })),
-            ]}
-            placeholder={t('search.anyZone')}
-            onChange={v => updateFilter('zone', v)}
-          />
-        )}
-      </div>
-
-      <div className="type-chips">
-        <button
-          className={`type-chip ${!listingType ? 'active' : ''}`}
-          onClick={() => updateFilter('listing', '')}
-        >{t('common.all')}</button>
-        {LISTING_TYPES.map(lt => (
-          <button
-            key={lt}
-            className={`type-chip ${listingType === lt ? 'active' : ''}`}
-            onClick={() => updateFilter('listing', listingType === lt ? '' : lt)}
-          >{t(`search.${lt}`)}</button>
-        ))}
-      </div>
-
-      <div className="type-chips" style={{ marginTop: 0 }}>
-        <button
-          className={`type-chip ${!propertyType ? 'active' : ''}`}
-          onClick={() => updateFilter('type', '')}
-        >{t('common.all')}</button>
-        {PROPERTY_TYPES.map(type => (
-          <button
-            key={type}
-            className={`type-chip ${propertyType === type ? 'active' : ''}`}
-            onClick={() => updateFilter('type', propertyType === type ? '' : type)}
-          >{t(`search.${type}`)}</button>
-        ))}
-      </div>
-
-      <div className="price-range">
-        <label>{t('search.priceRange')}</label>
-        <div className="price-inputs">
-          <div className="price-field">
-            <span className="price-unit">{currency === 'EUR' ? '€' : 'L'}</span>
-            <input
-              type="number"
-              placeholder="0"
-              value={minPrice}
-              onChange={e => updateFilter('minPrice', e.target.value)}
-            />
-          </div>
-          <span className="price-separator">—</span>
-          <div className="price-field">
-            <span className="price-unit">{currency === 'EUR' ? '€' : 'L'}</span>
-            <input
-              type="number"
-              placeholder={currency === 'EUR' ? '1,000,000' : '107,000,000'}
-              value={maxPrice}
-              onChange={e => updateFilter('maxPrice', e.target.value)}
-            />
-          </div>
-          <button
-            className="currency-toggle"
-            onClick={() => setCurrency(c => c === 'EUR' ? 'ALL' : 'EUR')}
-          >{currency}</button>
-        </div>
-      </div>
-
-      {hasFilters && (
-        <button className="search-reset-btn" onClick={resetFilters}>
-          <X size={14} />
-          {t('search.reset')}
-        </button>
-      )}
-
-      {!loading && !error && (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
-          <div className="results-count" style={{ marginBottom: 0 }}>
-            {t('search.results', { count: properties.length })}
-          </div>
+    <div className="search-screen">
+      <div className="search-head">
+        <div className="search-head__row">
+          <h1 className="screen-headline">{t('search.headline')} <em>{t('search.headlineEm')}</em>.</h1>
           <div className="view-toggle">
-            <button
-              className={viewMode === 'list' ? 'active' : ''}
-              onClick={() => setViewMode('list')}
-            >
-              <LayoutGrid size={14} /> {t('map.gridView')}
-            </button>
-            <button
-              className={viewMode === 'map' ? 'active' : ''}
-              onClick={() => setViewMode('map')}
-            >
-              <MapIcon size={14} /> {t('map.mapView')}
-            </button>
+            <button className={viewMode === 'list' ? 'active' : ''} onClick={() => setViewMode('list')}><LayoutGrid size={14} /></button>
+            <button className={viewMode === 'map' ? 'active' : ''} onClick={() => setViewMode('map')}><MapIcon size={14} /></button>
           </div>
         </div>
-      )}
+        <div className="search-controls">
+          <div className="search-field">
+            <SearchIcon size={16} />
+            <input type="text" placeholder={t('search.placeholder')} value={searchText} onChange={e => setSearchText(e.target.value)} />
+          </div>
+          <button className="filter-btn" onClick={() => setFiltersOpen(true)}>
+            <SlidersHorizontal size={16} />
+            {activeCount > 0 && <span className="filter-badge">{activeCount}</span>}
+          </button>
+        </div>
+      </div>
+
+      <div className="result-count">
+        <span><strong>{properties.length}</strong> {t('search.homesInView')}</span>
+        <span className="mono-eyebrow">{viewMode === 'map' ? t('search.mapView') : t('search.sortedByRelevance')}</span>
+      </div>
 
       {loading ? (
-        <div className="property-grid">
+        <div className="property-grid" style={{ padding: '0 1.25rem' }}>
           {Array.from({ length: 6 }, (_, i) => <SkeletonCard key={i} />)}
-        </div>
-      ) : error ? (
-        <div className="placeholder-card">
-          <div style={{ color: '#c0392b' }}>{t('errors.generic')}</div>
         </div>
       ) : properties.length === 0 ? (
         <div className="empty-state">
           <SearchX size={40} className="empty-state-icon" />
           <div className="empty-state-title">{t('search.empty')}</div>
           <div className="empty-state-sub">{t('search.emptyHint')}</div>
-          {hasFilters && (
-            <button className="empty-reset-btn" onClick={resetFilters}>
-              <RotateCcw size={14} />
-              {t('search.reset')}
-            </button>
-          )}
+          {activeCount > 0 && <button className="empty-reset-btn" onClick={resetFilters}><RotateCcw size={14} /> {t('search.reset')}</button>}
         </div>
       ) : viewMode === 'map' ? (
-        <PropertyMap properties={properties} />
+        <div style={{ padding: '0 1.25rem' }}><PropertyMap properties={properties} /></div>
       ) : (
-        <>
-          <div className="property-grid">
+        <div style={{ padding: '0 1.25rem' }}>
+          <div className="property-grid" style={{ padding: 0 }}>
             {properties.map(p => <PropertyCard key={p.id} property={p} />)}
           </div>
           {hasMore && (
-            <button
-              className="load-more-btn"
-              onClick={loadMore}
-              disabled={loadingMore}
-            >
+            <button className="load-more-btn" onClick={loadMore} disabled={loadingMore}>
               {loadingMore ? t('common.loading') : t('common.viewAll')}
             </button>
           )}
+        </div>
+      )}
+
+      {/* Filter bottom sheet */}
+      {filtersOpen && (
+        <>
+          <div className="filter-backdrop" onClick={() => setFiltersOpen(false)} />
+          <div className="filter-sheet">
+            <div className="addsheet-grip" />
+            <div className="filter-sheet__header">
+              <h2 className="filter-sheet__title">{t('search.filtersTitle')}</h2>
+              <button className="link-btn" onClick={resetFilters} style={{ color: 'var(--fho-orange-1)' }}>{t('search.reset')}</button>
+            </div>
+
+            {/* Listing type */}
+            <div className="filter-section">
+              <label className="filter-label">{t('search.listingType')}</label>
+              <div className="segment-control">
+                {['', 'sale', 'rent', 'daily_rent'].map(lt => (
+                  <button key={lt} className={`segment ${listingType === lt ? 'active' : ''}`} onClick={() => updateFilter('listing', lt)}>
+                    {lt === '' ? t('common.all') : t(`listing.type.${lt}`)}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Price range */}
+            <div className="filter-section">
+              <label className="filter-label">{t('search.priceRange')}</label>
+              <div className="price-display">
+                <span className="price-val">€{minPrice || '50,000'}</span>
+                <span className="price-sep">—</span>
+                <span className="price-val">€{maxPrice || '800,000'}</span>
+              </div>
+              <div className="dual-slider">
+                <input type="range" className="dual" min="50000" max="800000" step="10000" value={minPrice || 50000} onChange={e => updateFilter('minPrice', e.target.value)} />
+                <input type="range" className="dual" min="50000" max="800000" step="10000" value={maxPrice || 800000} onChange={e => updateFilter('maxPrice', e.target.value)} />
+                <div className="slider-track">
+                  <div className="slider-fill" style={{ left: `${((Number(minPrice || 50000) - 50000) / 750000) * 100}%`, right: `${100 - ((Number(maxPrice || 800000) - 50000) / 750000) * 100}%` }} />
+                </div>
+              </div>
+            </div>
+
+            {/* Bedrooms */}
+            <div className="filter-section">
+              <label className="filter-label">{t('search.bedrooms')}</label>
+              <div className="bed-chips">
+                {BED_OPTIONS.map(b => (
+                  <button key={b ?? 'any'} className={`bed-chip ${(beds === '' && b === null) || beds === String(b) ? 'active' : ''}`}
+                    onClick={() => updateFilter('beds', b === null ? '' : String(b))}>
+                    {b === null ? t('search.anyBeds') : b === 4 ? '4+' : b}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Property type */}
+            <div className="filter-section">
+              <label className="filter-label">{t('search.propertyType')}</label>
+              <div className="bed-chips">
+                <button className={`bed-chip ${!propertyType ? 'active' : ''}`} onClick={() => updateFilter('type', '')}>{t('common.all')}</button>
+                {PROPERTY_TYPES.map(pt => (
+                  <button key={pt} className={`bed-chip ${propertyType === pt ? 'active' : ''}`} onClick={() => updateFilter('type', pt)}>{t(`search.${pt}`)}</button>
+                ))}
+              </div>
+            </div>
+
+            <button className="cta-pill" onClick={() => setFiltersOpen(false)}>
+              {t('search.showHomes', { count: properties.length })}
+            </button>
+          </div>
         </>
       )}
     </div>

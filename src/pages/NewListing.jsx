@@ -180,6 +180,7 @@ export default function NewListing() {
         total_floors: form.total_floors ? Number(form.total_floors) : null,
         year_built: form.year_built ? Number(form.year_built) : null,
         features: form.features,
+        video_url: form.video_url?.trim() || null,
         image_urls: imageUrls,
         contact_phone: form.contact_phone,
         whatsapp_enabled: form.whatsapp_enabled,

@@ -15,6 +15,7 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 
 import { ActionButton } from '@/components/ui/action-button';
 import { GradientBackground } from '@/components/ui/gradient-background';
@@ -36,6 +37,7 @@ const socialProviders: {
 
 export default function ProfileScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
   const { user, signIn, signUp, signOut, signInWithProvider, loading: authLoading } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -47,7 +49,7 @@ export default function ProfileScreen() {
 
   const handleAuth = async () => {
     if (!email || !password) {
-      Alert.alert('Error', 'Please fill in email and password.');
+      Alert.alert(t('common.error'), t('errors.fillFields'));
       return;
     }
     setLoading(true);
@@ -59,15 +61,15 @@ export default function ProfileScreen() {
       });
       setLoading(false);
       if (error) {
-        Alert.alert('Error', error.message);
+        Alert.alert(t('common.error'), error.message);
       } else {
-        Alert.alert('Success', 'Check your email to confirm your account.');
+        Alert.alert('OK', t('auth.checkEmail'));
       }
     } else {
       const { error } = await signIn(email, password);
       setLoading(false);
       if (error) {
-        Alert.alert('Error', error.message);
+        Alert.alert(t('common.error'), error.message);
       }
     }
   };
@@ -75,7 +77,7 @@ export default function ProfileScreen() {
   const handleSocialLogin = async (provider: Provider) => {
     const { error } = await signInWithProvider(provider);
     if (error) {
-      Alert.alert('Error', error.message);
+      Alert.alert(t('common.error'), error.message);
     }
   };
 
@@ -88,7 +90,7 @@ export default function ProfileScreen() {
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled">
-          <Text style={styles.title}>Profile</Text>
+          <Text style={styles.title}>{t('common.profile')}</Text>
 
           {user ? (
             <View style={styles.signedIn}>
@@ -103,21 +105,21 @@ export default function ProfileScreen() {
               )}
               <View style={styles.roleBadge}>
                 <Text style={styles.roleBadgeText}>
-                  {user.user_metadata?.role === 'agent' ? 'Agent' : 'User'}
+                  {user.user_metadata?.role === 'agent' ? t('auth.agent') : t('auth.user')}
                 </Text>
               </View>
               {user.user_metadata?.role === 'agent' && (
                 <View style={styles.agentActions}>
                   <ActionButton
-                    title="Create Listing"
+                    title={t('listing.newListing')}
                     onPress={() => router.push('/listing/create' as Href)}
                   />
                 </View>
               )}
-              <Text style={styles.subtitle}>Welcome to Shtëpia.ime</Text>
+              <Text style={styles.subtitle}>{t('auth.welcome')}</Text>
               <View style={styles.signOutWrap}>
                 <ActionButton
-                  title="Sign Out"
+                  title={t('common.signOut')}
                   variant="secondary"
                   onPress={() => signOut()}
                 />
@@ -140,7 +142,7 @@ export default function ProfileScreen() {
                   />
                   <Text
                     style={[styles.roleTabText, role === 'buyer' && styles.roleTabTextActive]}>
-                    User
+                    {t('auth.roleClient')}
                   </Text>
                 </TouchableOpacity>
                 <TouchableOpacity
@@ -154,24 +156,24 @@ export default function ProfileScreen() {
                   />
                   <Text
                     style={[styles.roleTabText, role === 'agent' && styles.roleTabTextActive]}>
-                    Agent
+                    {t('auth.roleAgent')}
                   </Text>
                 </TouchableOpacity>
               </View>
 
               <Text style={styles.formTitle}>
-                {isSignUp ? 'Create Account' : 'Sign In'}
+                {isSignUp ? t('auth.createAccount') : t('common.signIn')}
               </Text>
               <Text style={styles.formSubtitle}>
                 {role === 'agent'
-                  ? 'List and manage your properties'
-                  : 'Find your perfect home'}
+                  ? t('auth.agentSubtitle')
+                  : t('auth.clientSubtitle')}
               </Text>
 
               {isSignUp && (
                 <TextInput
                   style={styles.input}
-                  placeholder="Full Name"
+                  placeholder={t('auth.fullName')}
                   placeholderTextColor={AtticoColors.textSecondary}
                   value={fullName}
                   onChangeText={setFullName}
@@ -181,7 +183,7 @@ export default function ProfileScreen() {
 
               <TextInput
                 style={styles.input}
-                placeholder="Email"
+                placeholder={t('auth.email')}
                 placeholderTextColor={AtticoColors.textSecondary}
                 value={email}
                 onChangeText={setEmail}
@@ -190,7 +192,7 @@ export default function ProfileScreen() {
               />
               <TextInput
                 style={styles.input}
-                placeholder="Password"
+                placeholder={t('auth.password')}
                 placeholderTextColor={AtticoColors.textSecondary}
                 value={password}
                 onChangeText={setPassword}
@@ -200,7 +202,7 @@ export default function ProfileScreen() {
               {isSignUp && role === 'agent' && (
                 <TextInput
                   style={styles.input}
-                  placeholder="Agency Name"
+                  placeholder={t('auth.agencyName')}
                   placeholderTextColor={AtticoColors.textSecondary}
                   value={agencyName}
                   onChangeText={setAgencyName}
@@ -211,17 +213,17 @@ export default function ProfileScreen() {
               <ActionButton
                 title={
                   loading
-                    ? 'Loading...'
+                    ? t('common.loading')
                     : isSignUp
-                      ? 'Sign Up'
-                      : 'Sign In'
+                      ? t('common.signUp')
+                      : t('common.signIn')
                 }
                 onPress={handleAuth}
               />
 
               <View style={styles.divider}>
                 <View style={styles.dividerLine} />
-                <Text style={styles.dividerText}>or sign in with</Text>
+                <Text style={styles.dividerText}>{t('auth.signInWith')}</Text>
                 <View style={styles.dividerLine} />
               </View>
 
@@ -243,8 +245,8 @@ export default function ProfileScreen() {
                 style={styles.toggleButton}>
                 <Text style={styles.toggleText}>
                   {isSignUp
-                    ? 'Already have an account? Sign In'
-                    : "Don't have an account? Sign Up"}
+                    ? `${t('auth.hasAccount')} ${t('common.signIn')}`
+                    : `${t('auth.noAccount')} ${t('common.signUp')}`}
                 </Text>
               </TouchableOpacity>
             </KeyboardAvoidingView>

@@ -18,7 +18,9 @@
     "favorites": "Favorites",
     "messages": "Messages",
     "profile": "Profile",
-    "recentlyViewed": "Recently Viewed"
+    "recentlyViewed": "Recently Viewed",
+    "back": "Back",
+    "send": "Send"
   },
   "auth": {
     "roleClient": "Client",
@@ -43,11 +45,96 @@
     "continueWithLinkedIn": "LinkedIn",
     "welcome": "Welcome to Shtëpia.ime",
     "user": "User",
-    "agent": "Agent"
+    "agent": "Agent",
+    "signInWithEmail": "Email Code",
+    "otpTitle": "Sign in with Email",
+    "otpSubtitle": "We'll send a 6-digit code to your email",
+    "enterEmail": "Please enter your email address",
+    "sendCode": "Send Code",
+    "otpSent": "Code sent! Check your email.",
+    "enterCode": "Enter Code",
+    "codeSentTo": "We sent a 6-digit code to {{email}}",
+    "resendCode": "Didn't receive it? Send again",
+    "kickerSignIn": "WELCOME BACK",
+    "kickerSignUp": "NEW ACCOUNT",
+    "heroSignInPre": "Your",
+    "heroSignInEm": "next door",
+    "heroSignInPost": "is open.",
+    "heroSignUpPre": "Start",
+    "heroSignUpEm": "finding home",
+    "heroSignUpPost": "today."
+  },
+  "addSheet": {
+    "openLabel": "Create new",
+    "title": "What would you like to",
+    "titleEm": "add",
+    "signInFirst": "Sign in to continue",
+    "searchSaved": "Search saved",
+    "wantedSaved": "Wanted home posted",
+    "leadSaved": "Lead added",
+    "searchName": "Search name",
+    "maxPrice": "Max price (€)",
+    "minBedrooms": "Min bedrooms",
+    "notes": "Notes (optional)",
+    "leadName": "Client name",
+    "leadPhone": "Phone number",
+    "client": {
+      "listing": {
+        "title": "List your home",
+        "sub": "Sell or rent your property"
+      },
+      "search": {
+        "title": "Save a search",
+        "sub": "Get notified of new matches"
+      },
+      "wanted": {
+        "title": "Wanted home",
+        "sub": "Let agents find you"
+      },
+      "visit": {
+        "title": "Request a viewing",
+        "sub": "Schedule a visit"
+      }
+    },
+    "agent": {
+      "listing": {
+        "title": "New listing",
+        "sub": "Add a property to your portfolio"
+      },
+      "lead": {
+        "title": "New lead",
+        "sub": "Track a potential client"
+      },
+      "viewing": {
+        "title": "Schedule viewing",
+        "sub": "Organize a property visit"
+      },
+      "open": {
+        "title": "Open house",
+        "sub": "Plan a public showing"
+      }
+    },
+    "saveError": "Couldn't save. Please try again."
+  },
+  "home": {
+    "greetingMorning": "Good morning",
+    "greetingEvening": "Good evening",
+    "matchesToday": "{{count}} new matches today.",
+    "featured": "Featured this week",
+    "editorsPick": "Editor's pick",
+    "matched": "Matched to your taste",
+    "neighborhoods": "Trending neighborhoods",
+    "seeAll": "See all →",
+    "searchPlaceholder": "City, neighborhood, postcode…",
+    "cityTag": "Tirana",
+    "country": "Albania",
+    "homesCount": "{{count}} homes"
   },
   "search": {
     "title": "Search properties",
     "subtitle": "Apartments, villas, and offices",
+    "headline": "Explore",
+    "headlineEm": "everything",
     "placeholder": "Search properties in Tirana...",
     "location": "Location",
     "priceRange": "Price range",
@@ -79,16 +166,61 @@
     "emptyHint": "Try adjusting your search filters",
     "apply": "Apply",
     "reset": "Reset",
-    "filters": "Filters"
+    "filters": "Filters",
+    "viewList": "List",
+    "viewMap": "Map",
+    "homesInView": "homes in view",
+    "sortedByRelevance": "Sorted by relevance",
+    "mapView": "Map view",
+    "filtersTitle": "Filters",
+    "showHomes": "Show {{count}} homes"
+  },
+  "detail": {
+    "forSale": "For Sale",
+    "forRent": "For Rent",
+    "about": "About this home",
+    "whatsInside": "What's inside",
+    "scheduleViewing": "Schedule a viewing",
+    "message": "Message",
+    "perSqm": "/m²",
+    "beds": "Beds",
+    "baths": "Baths",
+    "area": "Area",
+    "year": "Year",
+    "chatInApp": "Chat"
   },
   "favourites": {
     "title": "Favorites",
     "subtitle": "Properties you saved",
-    "empty": "No favorites yet",
+    "savedCount": "{{count}} saved · organized for you",
+    "headlineEm": "shortlist",
+    "backToProfile": "← Back to profile",
+    "empty": "No favorites yet. Tap the heart icon on a property to save it.",
     "emptyDescription": "Tap the heart icon on a property to save it",
     "loginPrompt": "Sign in to see your favorites",
     "loginCta": "Sign In",
-    "remove": "Remove"
+    "remove": "Remove",
+    "kicker": "FAVORITES",
+    "headlinePre": "Your"
+  },
+  "messages": {
+    "subtitle": "Conversations with agents",
+    "comingSoon": "WhatsApp chat — coming soon",
+    "client": {
+      "kicker": "{{count}} conversations · {{unread}} unread",
+      "headlineEm": "with agents",
+      "headlinePre": "Messages"
+    },
+    "agent": {
+      "kicker": "{{leads}} active leads · {{newToday}} new today",
+      "headlineEm": "inquiries",
+      "headlinePre": "Leads &"
+    },
+    "empty": "No conversations yet",
+    "emptyHint": "Start a chat from a property page",
+    "inputPlaceholder": "Write a message…",
+    "noMessages": "No messages yet — say hello!",
+    "loginPrompt": "Sign in to see your messages"
   },
   "property": {
     "beds": "beds",
@@ -105,10 +237,6 @@
     "similar": "Similar properties",
     "video": "Video tour"
   },
-  "messages": {
-    "subtitle": "Conversations with agents",
-    "comingSoon": "WhatsApp chat — coming soon"
-  },
   "notFound": {
     "title": "Page not found",
     "subtitle": "The page you are looking for does not exist or has been moved."
@@ -117,12 +245,26 @@
     "generic": "Something went wrong. Please try again.",
     "authFailed": "Authentication failed.",
     "providerNotConfigured": "This provider is not configured.",
-    "fillFields": "Please fill in email and password."
+    "fillFields": "Please fill in email and password.",
+    "invalidEmail": "Please enter a valid email address.",
+    "passwordMin": "Password must be at least 8 characters.",
+    "nameRequired": "Full name is required (min 2 characters).",
+    "invalidCredentials": "Invalid email or password.",
+    "userExists": "An account with this email already exists.",
+    "emailNotConfirmed": "Please confirm your email before signing in.",
+    "rateLimited": "Too many requests. Please try again later."
   },
   "agentDashboard": {
     "title": "Agent Dashboard",
     "subtitle": "Manage your properties and clients",
     "comingSoon": "Coming soon..."
+  },
+  "profile": {
+    "savedSearches": "Saved searches",
+    "statSaved": "Saved",
+    "statSearches": "Searches",
+    "statListings": "Listings",
+    "statViewings": "Viewings"
   },
   "account": {
     "welcomeBack": "Welcome back, {{name}} 👋",
@@ -224,5 +366,8 @@
   "cookie": {
     "message": "This site uses cookies to improve your experience.",
     "accept": "Accept"
+  },
+  "authCallback": {
+    "signingIn": "Signing you in…"
   }
 }

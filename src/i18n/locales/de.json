@@ -18,7 +18,9 @@
     "favorites": "Favoriten",
     "messages": "Nachrichten",
     "profile": "Profil",
-    "recentlyViewed": "Zuletzt angesehen"
+    "recentlyViewed": "Zuletzt angesehen",
+    "back": "Zurück",
+    "send": "Senden"
   },
   "auth": {
     "roleClient": "Kunde",
@@ -43,7 +45,38 @@
     "continueWithLinkedIn": "LinkedIn",
     "welcome": "Willkommen bei Shtëpia.ime",
     "user": "Benutzer",
-    "agent": "Makler"
+    "agent": "Makler",
+    "signInWithEmail": "Mit E-Mail-Code anmelden",
+    "otpTitle": "Mit E-Mail anmelden",
+    "otpSubtitle": "Wir senden einen 6-stelligen Code an Ihre E-Mail",
+    "enterEmail": "Bitte geben Sie Ihre E-Mail-Adresse ein",
+    "sendCode": "Code senden",
+    "otpSent": "Code gesendet! Überprüfen Sie Ihre E-Mail.",
+    "enterCode": "Code eingeben",
+    "codeSentTo": "Wir haben einen 6-stelligen Code an {{email}} gesendet",
+    "resendCode": "Nicht erhalten? Erneut senden",
+    "kickerSignIn": "WILLKOMMEN ZURÜCK",
+    "kickerSignUp": "NEUES KONTO",
+    "heroSignInPre": "Deine",
+    "heroSignInEm": "nächste Tür",
+    "heroSignInPost": "steht offen.",
+    "heroSignUpPre": "Beginne heute,",
+    "heroSignUpEm": "dein Zuhause",
+    "heroSignUpPost": "zu finden."
+  },
+  "home": {
+    "greetingMorning": "Guten Morgen",
+    "greetingEvening": "Guten Abend",
+    "matchesToday": "{{count}} neue Treffer heute.",
+    "featured": "Diese Woche empfohlen",
+    "editorsPick": "REDAKTIONSTIPP",
+    "matched": "Passend zu Ihrem Geschmack",
+    "neighborhoods": "Trendviertel",
+    "seeAll": "Alle anzeigen →",
+    "searchPlaceholder": "Stadt, Stadtteil, PLZ...",
+    "cityTag": "Tirana",
+    "country": "Albanien",
+    "homesCount": "{{count}} Immobilien"
   },
   "search": {
     "title": "Immobilien suchen",
@@ -79,7 +112,16 @@
     "emptyHint": "Versuche die Suchfilter anzupassen",
     "apply": "Anwenden",
     "reset": "Zurücksetzen",
-    "filters": "Filter"
+    "filters": "Filter",
+    "headline": "Entdecke",
+    "headlineEm": "alles",
+    "viewList": "Liste",
+    "viewMap": "Karte",
+    "homesInView": "Immobilien in Sicht",
+    "sortedByRelevance": "Nach Relevanz sortiert",
+    "mapView": "Kartenansicht",
+    "filtersTitle": "Filter",
+    "showHomes": "{{count}} Immobilien anzeigen"
   },
   "favourites": {
     "title": "Favoriten",
@@ -88,7 +130,12 @@
     "emptyDescription": "Tippe auf das Herz-Symbol, um eine Immobilie zu speichern",
     "loginPrompt": "Melde dich an, um deine Favoriten zu sehen",
     "loginCta": "Anmelden",
-    "remove": "Entfernen"
+    "remove": "Entfernen",
+    "savedCount": "{{count}} gespeichert · für dich sortiert",
+    "headlineEm": "Favoritenliste",
+    "backToProfile": "← Zurück zum Profil",
+    "kicker": "FAVORITEN",
+    "headlinePre": "Deine"
   },
   "property": {
     "beds": "Zimmer",
@@ -105,19 +152,62 @@
     "similar": "Ähnliche Immobilien",
     "video": "Videotour"
   },
+  "detail": {
+    "forSale": "Zu verkaufen",
+    "forRent": "Zu vermieten",
+    "about": "Über dieses Zuhause",
+    "whatsInside": "Ausstattung",
+    "scheduleViewing": "Besichtigung vereinbaren",
+    "message": "Nachricht",
+    "perSqm": "/m²",
+    "beds": "Schlafzimmer",
+    "baths": "Bäder",
+    "area": "Fläche",
+    "year": "Baujahr",
+    "chatInApp": "Chat"
+  },
   "messages": {
     "subtitle": "Gespräche mit Maklern",
-    "comingSoon": "WhatsApp-Chat — demnächst"
+    "comingSoon": "WhatsApp-Chat — demnächst",
+    "client": {
+      "kicker": "{{count}} Gespräche · {{unread}} ungelesen",
+      "headlineEm": "mit Maklern",
+      "headlinePre": "Nachrichten"
+    },
+    "agent": {
+      "kicker": "{{leads}} aktive Leads · {{newToday}} neu heute",
+      "headlineEm": "Anfragen",
+      "headlinePre": "Leads &"
+    },
+    "empty": "Noch keine Unterhaltungen",
+    "emptyHint": "Starte einen Chat von einer Immobilienseite",
+    "inputPlaceholder": "Nachricht schreiben…",
+    "noMessages": "Noch keine Nachrichten — sag hallo!",
+    "loginPrompt": "Melde dich an, um deine Nachrichten zu sehen"
   },
   "notFound": {
     "title": "Seite nicht gefunden",
     "subtitle": "Die gesuchte Seite existiert nicht oder wurde verschoben."
   },
+  "profile": {
+    "savedSearches": "Gespeicherte Suchen",
+    "statSaved": "Gespeichert",
+    "statSearches": "Suchen",
+    "statListings": "Inserate",
+    "statViewings": "Besichtigungen"
+  },
   "errors": {
     "generic": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
     "authFailed": "Authentifizierung fehlgeschlagen.",
     "providerNotConfigured": "Dieser Anbieter ist nicht konfiguriert.",
-    "fillFields": "Bitte fülle E-Mail und Passwort aus."
+    "fillFields": "Bitte fülle E-Mail und Passwort aus.",
+    "invalidEmail": "Bitte gib eine gültige E-Mail-Adresse ein.",
+    "passwordMin": "Das Passwort muss mindestens 8 Zeichen haben.",
+    "nameRequired": "Vollständiger Name erforderlich (min. 2 Zeichen).",
+    "invalidCredentials": "Ungültige E-Mail oder Passwort.",
+    "userExists": "Ein Konto mit dieser E-Mail existiert bereits.",
+    "emailNotConfirmed": "Bitte bestätige deine E-Mail vor der Anmeldung.",
+    "rateLimited": "Zu viele Anfragen. Bitte versuche es später erneut."
   },
   "agentDashboard": {
     "title": "Makler-Dashboard",
@@ -167,10 +257,37 @@
     "next": "Weiter",
     "saveDraft": "Entwurf speichern",
     "publish": "Veröffentlichen",
-    "type": { "sale": "Verkauf", "rent": "Miete", "daily_rent": "Tagesmiete" },
-    "status": { "active": "Aktiv", "paused": "Pausiert", "sold": "Verkauft", "rented": "Vermietet", "draft": "Entwurf" },
-    "step": { "basics": "Grundlagen", "location": "Standort", "details": "Details", "media": "Medien", "publish": "Veröffentlichen" },
-    "feature": { "balcony": "Balkon", "parking": "Parkplatz", "elevator": "Aufzug", "garden": "Garten", "pool": "Pool", "furnished": "Möbliert", "airConditioning": "Klimaanlage", "heating": "Heizung", "security": "Sicherheit", "storage": "Abstellraum" }
+    "type": {
+      "sale": "Verkauf",
+      "rent": "Miete",
+      "daily_rent": "Tagesmiete"
+    },
+    "status": {
+      "active": "Aktiv",
+      "paused": "Pausiert",
+      "sold": "Verkauft",
+      "rented": "Vermietet",
+      "draft": "Entwurf"
+    },
+    "step": {
+      "basics": "Grundlagen",
+      "location": "Standort",
+      "details": "Details",
+      "media": "Medien",
+      "publish": "Veröffentlichen"
+    },
+    "feature": {
+      "balcony": "Balkon",
+      "parking": "Parkplatz",
+      "elevator": "Aufzug",
+      "garden": "Garten",
+      "pool": "Pool",
+      "furnished": "Möbliert",
+      "airConditioning": "Klimaanlage",
+      "heating": "Heizung",
+      "security": "Sicherheit",
+      "storage": "Abstellraum"
+    }
   },
   "dashboard": {
     "title": "Immobilien-Dashboard",
@@ -197,5 +314,60 @@
   "cookie": {
     "message": "Diese Website verwendet Cookies, um Ihre Erfahrung zu verbessern.",
     "accept": "Akzeptieren"
+  },
+  "addSheet": {
+    "openLabel": "Neu erstellen",
+    "title": "Was möchtest du",
+    "titleEm": "hinzufügen",
+    "signInFirst": "Melde dich an, um fortzufahren",
+    "searchSaved": "Suche gespeichert",
+    "wantedSaved": "Wohnungsgesuch veröffentlicht",
+    "leadSaved": "Lead hinzugefügt",
+    "searchName": "Name der Suche",
+    "maxPrice": "Höchstpreis (€)",
+    "minBedrooms": "Min. Schlafzimmer",
+    "notes": "Notizen (optional)",
+    "leadName": "Kundenname",
+    "leadPhone": "Telefonnummer",
+    "client": {
+      "listing": {
+        "title": "Immobilie inserieren",
+        "sub": "Verkaufe oder vermiete deine Immobilie"
+      },
+      "search": {
+        "title": "Suche speichern",
+        "sub": "Bei neuen Treffern benachrichtigt werden"
+      },
+      "wanted": {
+        "title": "Wohnungsgesuch",
+        "sub": "Lass Makler dich finden"
+      },
+      "visit": {
+        "title": "Besichtigung anfragen",
+        "sub": "Termin vereinbaren"
+      }
+    },
+    "agent": {
+      "listing": {
+        "title": "Neues Inserat",
+        "sub": "Immobilie zum Portfolio hinzufügen"
+      },
+      "lead": {
+        "title": "Neuer Lead",
+        "sub": "Potenziellen Kunden erfassen"
+      },
+      "viewing": {
+        "title": "Besichtigung planen",
+        "sub": "Immobilienbesichtigung organisieren"
+      },
+      "open": {
+        "title": "Tag der offenen Tür",
+        "sub": "Öffentliche Besichtigung planen"
+      }
+    },
+    "saveError": "Konnte nicht gespeichert werden. Bitte erneut versuchen."
+  },
+  "authCallback": {
+    "signingIn": "Du wirst angemeldet…"
   }
 }

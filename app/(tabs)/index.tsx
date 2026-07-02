@@ -10,20 +10,28 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 
 import { FeaturedPropertyCard } from '@/components/property/featured-property-card';
 import { PropertyCard } from '@/components/property/property-card';
 import { GradientBackground } from '@/components/ui/gradient-background';
 import { SearchHeader } from '@/components/ui/search-header';
 import { AtticoColors } from '@/constants/theme';
+import { useAuth } from '@/contexts/auth-context';
 import { getFeaturedProperty, getProperties } from '@/data/properties';
 import { Property } from '@/data/types';
 
 export default function HomeScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
+  const { user } = useAuth();
   const [featured, setFeatured] = useState<Property | null>(null);
   const [listings, setListings] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? t('home.greetingMorning') : t('home.greetingEvening');
+  const firstName = user?.user_metadata?.full_name?.split(' ')[0] || user?.email?.split('@')[0] || '';
 
   useEffect(() => {
     Promise.all([getFeaturedProperty(), getProperties()])
@@ -34,10 +42,17 @@ export default function HomeScreen() {
       .finally(() => setLoading(false));
   }, []);
 
+  const title = firstName
+    ? `${greeting}, ${firstName}`
+    : greeting;
+
   return (
     <GradientBackground>
       <SafeAreaView style={styles.container} edges={['top']}>
-        <SearchHeader title="Find The Perfect Place" />
+        <SearchHeader
+          title={title}
+          onSearchPress={() => router.push('/(tabs)/explore' as Href)}
+        />
         <ScrollView
           contentContainerStyle={styles.scroll}
           showsVerticalScrollIndicator={false}>
@@ -48,21 +63,27 @@ export default function HomeScreen() {
           ) : (
             <>
               {featured && (
-                <FeaturedPropertyCard
-                  property={featured}
-                  onPress={() =>
-                    router.push(`/property/${featured.id}` as Href)
-                  }
-                />
+                <>
+                  <View style={styles.sectionHeader}>
+                    <Text style={styles.sectionTitle}>{t('home.featured')}</Text>
+                    <Text style={styles.editorsPick}>{t('home.editorsPick')}</Text>
+                  </View>
+                  <FeaturedPropertyCard
+                    property={featured}
+                    onPress={() =>
+                      router.push(`/property/${featured.id}` as Href)
+                    }
+                  />
+                </>
               )}
 
               <View style={styles.section}>
                 <View style={styles.sectionHeader}>
-                  <Text style={styles.sectionTitle}>Popular Listings</Text>
+                  <Text style={styles.sectionTitle}>{t('home.matched')}</Text>
                   <TouchableOpacity
                     onPress={() => router.push('/(tabs)/explore' as Href)}
                     activeOpacity={0.7}>
-                    <Text style={styles.seeAll}>See All</Text>
+                    <Text style={styles.seeAll}>{t('home.seeAll')}</Text>
                   </TouchableOpacity>
                 </View>
                 <View style={styles.grid}>
@@ -83,12 +104,12 @@ export default function HomeScreen() {
                 <View style={styles.statCard}>
                   <MaterialIcons name="home" size={28} color={AtticoColors.accent} />
                   <Text style={styles.statNumber}>250+</Text>
-                  <Text style={styles.statLabel}>Properties</Text>
+                  <Text style={styles.statLabel}>{t('search.results_other', { count: 250 }).split(' ').pop()}</Text>
                 </View>
                 <View style={styles.statCard}>
                   <MaterialIcons name="people" size={28} color={AtticoColors.accent} />
                   <Text style={styles.statNumber}>100+</Text>
-                  <Text style={styles.statLabel}>Agents</Text>
+                  <Text style={styles.statLabel}>{t('auth.agent')}s</Text>
                 </View>
                 <View style={styles.statCard}>
                   <MaterialIcons name="star" size={28} color={AtticoColors.accent} />
@@ -123,13 +144,20 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 6,
+    paddingHorizontal: 20,
     marginBottom: 8,
   },
   sectionTitle: {
     fontSize: 20,
     fontWeight: '700',
     color: AtticoColors.textPrimary,
+  },
+  editorsPick: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: AtticoColors.textSecondary,
+    letterSpacing: 1,
+    textTransform: 'uppercase',
   },
   seeAll: {
     fontSize: 14,

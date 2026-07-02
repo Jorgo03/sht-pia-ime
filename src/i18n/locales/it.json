@@ -18,7 +18,9 @@
     "favorites": "Preferiti",
     "messages": "Messaggi",
     "profile": "Profilo",
-    "recentlyViewed": "Visti di recente"
+    "recentlyViewed": "Visti di recente",
+    "back": "Indietro",
+    "send": "Invia"
   },
   "auth": {
     "roleClient": "Cliente",
@@ -43,7 +45,38 @@
     "continueWithLinkedIn": "LinkedIn",
     "welcome": "Benvenuto su Shtëpia.ime",
     "user": "Utente",
-    "agent": "Agente"
+    "agent": "Agente",
+    "signInWithEmail": "Accedi con codice email",
+    "otpTitle": "Accedi con Email",
+    "otpSubtitle": "Ti invieremo un codice a 6 cifre via email",
+    "enterEmail": "Inserisci il tuo indirizzo email",
+    "sendCode": "Invia codice",
+    "otpSent": "Codice inviato! Controlla la tua email.",
+    "enterCode": "Inserisci codice",
+    "codeSentTo": "Abbiamo inviato un codice a 6 cifre a {{email}}",
+    "resendCode": "Non ricevuto? Invia di nuovo",
+    "kickerSignIn": "BENTORNATO",
+    "kickerSignUp": "NUOVO ACCOUNT",
+    "heroSignInPre": "La tua",
+    "heroSignInEm": "prossima porta",
+    "heroSignInPost": "è aperta.",
+    "heroSignUpPre": "Inizia a",
+    "heroSignUpEm": "trovare casa",
+    "heroSignUpPost": "oggi."
+  },
+  "home": {
+    "greetingMorning": "Buongiorno",
+    "greetingEvening": "Buonasera",
+    "matchesToday": "{{count}} nuovi annunci oggi.",
+    "featured": "In evidenza questa settimana",
+    "editorsPick": "SCELTA DELLA REDAZIONE",
+    "matched": "Su misura per te",
+    "neighborhoods": "Quartieri di tendenza",
+    "seeAll": "Vedi tutto →",
+    "searchPlaceholder": "Città, quartiere, CAP...",
+    "cityTag": "Tirana",
+    "country": "Albania",
+    "homesCount": "{{count}} immobili"
   },
   "search": {
     "title": "Cerca immobili",
@@ -79,7 +112,16 @@
     "emptyHint": "Prova a modificare i filtri di ricerca",
     "apply": "Applica",
     "reset": "Ripristina",
-    "filters": "Filtri"
+    "filters": "Filtri",
+    "headline": "Esplora",
+    "headlineEm": "tutto",
+    "viewList": "Elenco",
+    "viewMap": "Mappa",
+    "homesInView": "immobili visibili",
+    "sortedByRelevance": "Ordinato per rilevanza",
+    "mapView": "Vista mappa",
+    "filtersTitle": "Filtri",
+    "showHomes": "Mostra {{count}} immobili"
   },
   "favourites": {
     "title": "Preferiti",
@@ -88,7 +130,12 @@
     "emptyDescription": "Tocca l'icona del cuore su un immobile per salvarlo",
     "loginPrompt": "Accedi per vedere i tuoi preferiti",
     "loginCta": "Accedi",
-    "remove": "Rimuovi"
+    "remove": "Rimuovi",
+    "savedCount": "{{count}} salvati · organizzati per te",
+    "headlineEm": "selezione",
+    "backToProfile": "← Torna al profilo",
+    "kicker": "PREFERITI",
+    "headlinePre": "La tua"
   },
   "property": {
     "beds": "camere",
@@ -105,19 +152,62 @@
     "similar": "Immobili simili",
     "video": "Video tour"
   },
+  "detail": {
+    "forSale": "In vendita",
+    "forRent": "In affitto",
+    "about": "Informazioni sull'immobile",
+    "whatsInside": "Cosa include",
+    "scheduleViewing": "Prenota una visita",
+    "message": "Messaggio",
+    "perSqm": "/m²",
+    "beds": "Camere",
+    "baths": "Bagni",
+    "area": "Superficie",
+    "year": "Anno",
+    "chatInApp": "Chatta"
+  },
   "messages": {
     "subtitle": "Conversazioni con agenti",
-    "comingSoon": "Chat WhatsApp — prossimamente"
+    "comingSoon": "Chat WhatsApp — prossimamente",
+    "client": {
+      "kicker": "{{count}} conversazioni · {{unread}} non letti",
+      "headlineEm": "con agenti",
+      "headlinePre": "Messaggi"
+    },
+    "agent": {
+      "kicker": "{{leads}} lead attivi · {{newToday}} nuovi oggi",
+      "headlineEm": "richieste",
+      "headlinePre": "Lead e"
+    },
+    "empty": "Ancora nessuna conversazione",
+    "emptyHint": "Avvia una chat dalla pagina di un immobile",
+    "inputPlaceholder": "Scrivi un messaggio…",
+    "noMessages": "Ancora nessun messaggio — saluta!",
+    "loginPrompt": "Accedi per vedere i tuoi messaggi"
   },
   "notFound": {
     "title": "Pagina non trovata",
     "subtitle": "La pagina che stai cercando non esiste o è stata spostata."
   },
+  "profile": {
+    "savedSearches": "Ricerche salvate",
+    "statSaved": "Salvati",
+    "statSearches": "Ricerche",
+    "statListings": "Annunci",
+    "statViewings": "Visite"
+  },
   "errors": {
     "generic": "Qualcosa è andato storto. Riprova.",
     "authFailed": "Autenticazione fallita.",
     "providerNotConfigured": "Questo provider non è configurato.",
-    "fillFields": "Inserisci email e password."
+    "fillFields": "Inserisci email e password.",
+    "invalidEmail": "Inserisci un indirizzo email valido.",
+    "passwordMin": "La password deve avere almeno 8 caratteri.",
+    "nameRequired": "Nome completo richiesto (min. 2 caratteri).",
+    "invalidCredentials": "Email o password non validi.",
+    "userExists": "Un account con questa email esiste già.",
+    "emailNotConfirmed": "Conferma la tua email prima di accedere.",
+    "rateLimited": "Troppe richieste. Riprova più tardi."
   },
   "agentDashboard": {
     "title": "Dashboard Agente",
@@ -167,10 +257,37 @@
     "next": "Avanti",
     "saveDraft": "Salva bozza",
     "publish": "Pubblica",
-    "type": { "sale": "Vendita", "rent": "Affitto", "daily_rent": "Affitto giornaliero" },
-    "status": { "active": "Attivo", "paused": "In pausa", "sold": "Venduto", "rented": "Affittato", "draft": "Bozza" },
-    "step": { "basics": "Base", "location": "Posizione", "details": "Dettagli", "media": "Media", "publish": "Pubblica" },
-    "feature": { "balcony": "Balcone", "parking": "Parcheggio", "elevator": "Ascensore", "garden": "Giardino", "pool": "Piscina", "furnished": "Arredato", "airConditioning": "Aria condizionata", "heating": "Riscaldamento", "security": "Sicurezza", "storage": "Magazzino" }
+    "type": {
+      "sale": "Vendita",
+      "rent": "Affitto",
+      "daily_rent": "Affitto giornaliero"
+    },
+    "status": {
+      "active": "Attivo",
+      "paused": "In pausa",
+      "sold": "Venduto",
+      "rented": "Affittato",
+      "draft": "Bozza"
+    },
+    "step": {
+      "basics": "Base",
+      "location": "Posizione",
+      "details": "Dettagli",
+      "media": "Media",
+      "publish": "Pubblica"
+    },
+    "feature": {
+      "balcony": "Balcone",
+      "parking": "Parcheggio",
+      "elevator": "Ascensore",
+      "garden": "Giardino",
+      "pool": "Piscina",
+      "furnished": "Arredato",
+      "airConditioning": "Aria condizionata",
+      "heating": "Riscaldamento",
+      "security": "Sicurezza",
+      "storage": "Magazzino"
+    }
   },
   "dashboard": {
     "title": "Dashboard immobile",
@@ -197,5 +314,60 @@
   "cookie": {
     "message": "Questo sito utilizza i cookie per migliorare la tua esperienza.",
     "accept": "Accetta"
+  },
+  "addSheet": {
+    "openLabel": "Crea nuovo",
+    "title": "Cosa vorresti",
+    "titleEm": "aggiungere",
+    "signInFirst": "Accedi per continuare",
+    "searchSaved": "Ricerca salvata",
+    "wantedSaved": "Richiesta casa pubblicata",
+    "leadSaved": "Lead aggiunto",
+    "searchName": "Nome della ricerca",
+    "maxPrice": "Prezzo massimo (€)",
+    "minBedrooms": "Camere min.",
+    "notes": "Note (facoltativo)",
+    "leadName": "Nome del cliente",
+    "leadPhone": "Numero di telefono",
+    "client": {
+      "listing": {
+        "title": "Metti in vendita la tua casa",
+        "sub": "Vendi o affitta il tuo immobile"
+      },
+      "search": {
+        "title": "Salva una ricerca",
+        "sub": "Ricevi notifiche sui nuovi annunci"
+      },
+      "wanted": {
+        "title": "Casa cercata",
+        "sub": "Fatti trovare dagli agenti"
+      },
+      "visit": {
+        "title": "Richiedi una visita",
+        "sub": "Pianifica una visita"
+      }
+    },
+    "agent": {
+      "listing": {
+        "title": "Nuovo annuncio",
+        "sub": "Aggiungi un immobile al tuo portafoglio"
+      },
+      "lead": {
+        "title": "Nuovo lead",
+        "sub": "Registra un potenziale cliente"
+      },
+      "viewing": {
+        "title": "Pianifica visita",
+        "sub": "Organizza una visita all'immobile"
+      },
+      "open": {
+        "title": "Porte aperte",
+        "sub": "Pianifica una visita pubblica"
+      }
+    },
+    "saveError": "Impossibile salvare. Riprova."
+  },
+  "authCallback": {
+    "signingIn": "Accesso in corso…"
   }
 }

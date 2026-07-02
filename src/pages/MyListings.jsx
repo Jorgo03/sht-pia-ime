@@ -96,7 +96,7 @@ export default function MyListings() {
                       </span>
                     </div>
                     <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--fho-orange-2)', marginTop: 2 }}>
-                      {formatPrice(p.price, i18n.language)}
+                      {formatPrice(p.price, i18n.language, p.currency)}
                     </div>
                   </div>
                   <div style={{ display: 'flex', gap: 6, marginTop: 6 }}>

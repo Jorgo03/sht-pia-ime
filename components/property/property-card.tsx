@@ -1,10 +1,12 @@
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { Image } from 'expo-image';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
 import { AtticoColors } from '@/constants/theme';
 import { useFavorites } from '@/contexts/favorites-context';
 import { Property } from '@/data/types';
+import { formatPrice, getLocalizedText } from '@/lib/format';
 
 interface PropertyCardProps {
   property: Property;
@@ -12,8 +14,13 @@ interface PropertyCardProps {
 }
 
 export function PropertyCard({ property, onPress }: PropertyCardProps) {
+  const { t, i18n } = useTranslation();
   const { isFavorite, toggle } = useFavorites();
   const favorited = isFavorite(property.id);
+  const title = getLocalizedText(property.title_i18n, i18n.language) || property.title;
+  const price = formatPrice(property.price, i18n.language);
+  const suffix = property.listing_type === 'rent' ? t('property.perMonth') : '';
+  const badgeLabel = property.listing_type === 'rent' ? t('property.forRent') : t('property.forSale');
 
   return (
     <TouchableOpacity
@@ -40,13 +47,13 @@ export function PropertyCard({ property, onPress }: PropertyCardProps) {
         </TouchableOpacity>
         <View style={styles.badge}>
           <Text style={styles.badgeText}>
-            {property.listing_type === 'rent' ? 'RENT' : 'SALE'}
+            {badgeLabel.toUpperCase()}
           </Text>
         </View>
       </View>
       <View style={styles.info}>
         <Text style={styles.name} numberOfLines={1}>
-          {property.title}
+          {title}
         </Text>
         <View style={styles.locationRow}>
           <MaterialIcons name="location-on" size={12} color={AtticoColors.textSecondary} />
@@ -55,9 +62,9 @@ export function PropertyCard({ property, onPress }: PropertyCardProps) {
           </Text>
         </View>
         <Text style={styles.price}>
-          ${Number(property.price).toLocaleString()}
+          {price}
           <Text style={styles.priceLabel}>
-            {property.listing_type === 'rent' ? '/mo' : ''}
+            {suffix}
           </Text>
         </Text>
       </View>

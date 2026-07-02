@@ -5,83 +5,141 @@ import { supabase } from '../lib/supabase'
 const AuthContext = createContext(null)
 
 export function AuthProvider({ children }) {
-  const [session, setSession] = useState(null)
-  const [loading, setLoading] = useState(true)
+  const [state, setState] = useState({
+    user: null,
+    session: null,
+    profile: null,
+    loading: true,
+  })
   const [welcomeName, setWelcomeName] = useState(null)
 
-  useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, s) => {
-        setSession(s)
-        setLoading(false)
-        if (s?.user) loadPreferredLanguage(s.user.id)
+  const showWelcome = (user) => {
+    if (!user) return
+    const name =
+      user.user_metadata?.full_name ||
+      user.user_metadata?.name ||
+      user.user_metadata?.display_name ||
+      user.email?.split('@')[0] ||
+      null
+    if (name) setWelcomeName(name)
+  }
 
-        // SIGNED_IN fires on fresh logins (email + OAuth redirect)
-        // INITIAL_SESSION fires on page refresh — no toast for that
-        if (event === 'SIGNED_IN' && s?.user) {
-          const name = s.user.user_metadata?.full_name
-            || s.user.user_metadata?.name
-            || s.user.email?.split('@')[0]
-          if (name) setWelcomeName(name)
+  const loadProfile = async (userId) => {
+    const { data } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', userId)
+      .single()
+    return data
+  }
+
+  const loadPreferredLanguage = (profile) => {
+    const lang = profile?.preferred_language
+    if (lang && i18n.language !== lang) {
+      i18n.changeLanguage(lang)
+      localStorage.setItem('fho_lang', lang)
+    }
+  }
+
+  useEffect(() => {
+    let active = true
+
+    const sync = async (session) => {
+      if (!active) return
+      if (!session?.user) {
+        setState({ user: null, session: null, profile: null, loading: false })
+        return
+      }
+      const profile = await loadProfile(session.user.id)
+      if (!active) return
+      setState({ user: session.user, session, profile, loading: false })
+      if (profile) loadPreferredLanguage(profile)
+    }
+
+    supabase.auth.getSession().then(({ data }) => sync(data.session))
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        if (event === 'SIGNED_IN' && session?.user) {
+          sync(session)
+          showWelcome(session.user)
+        } else if (event === 'TOKEN_REFRESHED' && session) {
+          sync(session)
+        } else if (event === 'SIGNED_OUT') {
+          setState({ user: null, session: null, profile: null, loading: false })
+        } else if (event === 'INITIAL_SESSION') {
+          sync(session)
         }
       },
     )
 
-    supabase.auth.getSession().then(({ data: { session: s } }) => {
-      setSession(s)
-      setLoading(false)
-      if (s?.user) loadPreferredLanguage(s.user.id)
-    })
-
-    return () => subscription.unsubscribe()
+    return () => { active = false; subscription.unsubscribe() }
   }, [])
 
-  const loadPreferredLanguage = async (userId) => {
-    try {
-      const { data } = await supabase
-        .from('profiles')
-        .select('preferred_language')
-        .eq('id', userId)
-        .single()
-      if (data?.preferred_language && i18n.language !== data.preferred_language) {
-        i18n.changeLanguage(data.preferred_language)
-        localStorage.setItem('fho_lang', data.preferred_language)
-      }
-    } catch {}
+  const refreshProfile = async () => {
+    if (!state.user) return
+    const profile = await loadProfile(state.user.id)
+    setState((s) => ({ ...s, profile }))
+    if (profile) loadPreferredLanguage(profile)
   }
 
   const signUp = async (email, password, options = {}) => {
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
         data: {
-          role: options.role ?? 'buyer',
+          role: options.role ?? 'client',
           full_name: options.full_name,
           agency_name: options.agency_name,
+          preferred_language: i18n.language,
         },
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
       },
     })
+    // The handle_new_user trigger persists role/agency_name from the metadata
+    // above. This update only succeeds when a session already exists (email
+    // confirmation disabled) and is kept as a safety net.
+    if (!error && data?.user && data?.session) {
+      await supabase
+        .from('profiles')
+        .update({
+          role: options.role ?? 'client',
+          full_name: options.full_name || null,
+          agency_name: options.role === 'agent' ? (options.agency_name || null) : null,
+        })
+        .eq('id', data.user.id)
+    }
     return { error }
   }
 
   const signIn = async (email, password) => {
     const { data, error } = await supabase.auth.signInWithPassword({ email, password })
-    if (!error && data?.user) {
-      const name = data.user.user_metadata?.full_name
-        || data.user.user_metadata?.name
-        || data.user.email?.split('@')[0]
-      if (name) setWelcomeName(name)
-    }
+    if (!error && data?.user) showWelcome(data.user)
     return { error }
   }
 
-  const signInWithProvider = async (provider, role = 'buyer') => {
+  const sendOtp = async (email) => {
+    const { error } = await supabase.auth.signInWithOtp({ email })
+    return { error }
+  }
+
+  const verifyOtp = async (email, token) => {
+    const { data, error } = await supabase.auth.verifyOtp({
+      email,
+      token,
+      type: 'email',
+    })
+    if (!error && data?.user) showWelcome(data.user)
+    return { data, error }
+  }
+
+  const signInWithProvider = async (provider) => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
       options: {
-        redirectTo: window.location.origin,
-        queryParams: { role },
+        redirectTo: `${window.location.origin}/auth/callback`,
+        queryParams: { access_type: 'offline', prompt: 'consent' },
       },
     })
     return { error }
@@ -96,23 +154,30 @@ export function AuthProvider({ children }) {
 
   const signOut = async () => {
     await supabase.auth.signOut()
+    setState({ user: null, session: null, profile: null, loading: false })
+  }
+
+  const value = {
+    user: state.user,
+    session: state.session,
+    profile: state.profile,
+    loading: state.loading,
+    isClient: state.profile?.role === 'client' || state.profile?.role === 'buyer',
+    isAgent: state.profile?.role === 'agent',
+    welcomeName,
+    clearWelcome: () => setWelcomeName(null),
+    signUp,
+    signIn,
+    sendOtp,
+    verifyOtp,
+    signInWithProvider,
+    signOut,
+    resetPassword,
+    refreshProfile,
   }
 
   return (
-    <AuthContext.Provider
-      value={{
-        user: session?.user ?? null,
-        session,
-        loading,
-        welcomeName,
-        clearWelcome: () => setWelcomeName(null),
-        signUp,
-        signIn,
-        signInWithProvider,
-        signOut,
-        resetPassword,
-      }}
-    >
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   )
@@ -120,8 +185,6 @@ export function AuthProvider({ children }) {
 
 export function useAuth() {
   const context = useContext(AuthContext)
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider')
-  }
+  if (!context) throw new Error('useAuth must be used within an AuthProvider')
   return context
 }

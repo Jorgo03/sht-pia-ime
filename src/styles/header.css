@@ -3,7 +3,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 10px 1.25rem;
-  border-bottom: 0.5px solid var(--fho-border);
+  border-bottom: 1px solid var(--fho-border);
   background: var(--fho-surface);
   position: sticky;
   top: 0;
@@ -11,12 +11,16 @@
 }
 
 .header-brand {
-  font-size: 16px;
-  font-weight: 700;
-  background: linear-gradient(135deg, var(--fho-orange-1), var(--fho-orange-2));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  font-family: var(--font-serif);
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--fho-orange-1);
+  cursor: pointer;
+}
+
+.header-brand .brand-ime {
+  font-weight: 400;
 }
 
 .header-actions {
@@ -24,6 +28,8 @@
   align-items: center;
   gap: 8px;
 }
+
+/* Language switcher */
 
 .lang-switcher {
   position: relative;
@@ -33,42 +39,49 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 10px;
-  border-radius: 10px;
-  border: 0.5px solid var(--fho-border);
-  background: var(--fho-bg);
+  padding: 7px 11px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--fho-border);
+  background: rgba(26,23,20,0.04);
   color: var(--fho-text);
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 600;
+  font-family: var(--font-sans);
   cursor: pointer;
-  transition: background 0.2s;
+  transition: all 150ms var(--ease-out);
+}
+
+[data-theme="dark"] .lang-btn {
+  background: rgba(255,255,255,0.04);
 }
 
 .lang-btn:hover {
-  background: var(--fho-surface);
+  border-color: var(--fho-border-strong);
 }
 
-.lang-flag {
-  font-size: 16px;
-  line-height: 1;
+.lang-code {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.lang-label {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 600;
 }
 
 .lang-chevron {
-  transition: transform 0.2s;
+  transition: transform 200ms var(--ease-out);
 }
 
 .lang-chevron.open {
   transform: rotate(180deg);
 }
 
-.lang-name {
-  display: inline;
-}
-
 @media (max-width: 400px) {
-  .lang-name {
-    display: none;
-  }
+  .lang-label { display: none; }
 }
 
 .lang-dropdown {
@@ -77,12 +90,12 @@
   right: 0;
   min-width: 170px;
   background: var(--fho-surface);
-  border: 0.5px solid var(--fho-border);
-  border-radius: 12px;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+  border: 1px solid var(--fho-border);
+  border-radius: var(--r-md);
+  box-shadow: var(--fho-card-shadow);
   padding: 4px;
   z-index: 100;
-  animation: dropIn 0.15s ease-out;
+  animation: dropIn 150ms var(--ease-out);
 }
 
 @keyframes dropIn {
@@ -101,57 +114,69 @@
   color: var(--fho-text);
   font-size: 13px;
   font-weight: 500;
+  font-family: var(--font-sans);
   cursor: pointer;
   border-radius: 8px;
-  transition: background 0.15s;
+  transition: background 150ms;
 }
 
-.lang-option:hover {
-  background: var(--fho-bg);
-}
+.lang-option:hover { background: var(--fho-bg); }
 
 .lang-option.active {
   background: linear-gradient(135deg, var(--fho-orange-1), var(--fho-orange-2));
   color: white;
 }
 
+/* Theme button */
+
 .theme-btn {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  border: 0.5px solid var(--fho-border);
-  background: var(--fho-bg);
+  width: 34px;
+  height: 34px;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--fho-border);
+  background: rgba(26,23,20,0.04);
   color: var(--fho-text);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: all 150ms var(--ease-out);
+}
+
+[data-theme="dark"] .theme-btn {
+  background: rgba(255,255,255,0.04);
 }
 
 .theme-btn:hover {
-  background: var(--fho-surface);
+  border-color: var(--fho-border-strong);
 }
+
+/* New listing button */
 
 .new-listing-btn {
   display: flex;
   align-items: center;
   gap: 6px;
   padding: 6px 14px;
-  border-radius: 10px;
+  border-radius: var(--r-sm);
   border: none;
   background: linear-gradient(135deg, var(--fho-orange-1), var(--fho-orange-2));
   color: white;
   font-size: 13px;
   font-weight: 600;
+  font-family: var(--font-sans);
   cursor: pointer;
-  transition: opacity 0.2s;
+  transition: opacity 150ms;
 }
+
 .new-listing-btn:hover { opacity: 0.9; }
+
 @media (max-width: 500px) {
   .new-listing-label { display: none; }
   .new-listing-btn { padding: 6px 8px; }
 }
+
+/* Account */
 
 .account-switcher {
   position: relative;
@@ -161,7 +186,7 @@
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  border: 2px solid var(--fho-orange-2);
+  border: none;
   background: linear-gradient(135deg, var(--fho-orange-1), var(--fho-orange-2));
   color: white;
   display: flex;
@@ -170,8 +195,6 @@
   cursor: pointer;
   padding: 0;
   overflow: hidden;
-  font-size: 13px;
-  font-weight: 600;
 }
 
 .account-avatar-img {
@@ -184,22 +207,28 @@
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.5px;
+  font-family: var(--font-sans);
 }
 
 .account-signin-btn {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  border: 0.5px solid var(--fho-border);
-  background: var(--fho-bg);
+  width: 34px;
+  height: 34px;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--fho-border);
+  background: rgba(26,23,20,0.04);
   color: var(--fho-text);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: all 150ms;
 }
-.account-signin-btn:hover { background: var(--fho-surface); }
+
+[data-theme="dark"] .account-signin-btn {
+  background: rgba(255,255,255,0.04);
+}
+
+.account-signin-btn:hover { border-color: var(--fho-border-strong); }
 
 .account-dropdown {
   position: absolute;
@@ -207,12 +236,12 @@
   right: 0;
   min-width: 240px;
   background: var(--fho-surface);
-  border: 0.5px solid var(--fho-border);
-  border-radius: 14px;
-  box-shadow: 0 12px 32px rgba(0,0,0,0.15);
+  border: 1px solid var(--fho-border);
+  border-radius: var(--r-md);
+  box-shadow: var(--fho-card-shadow);
   padding: 6px;
   z-index: 100;
-  animation: dropIn 0.15s ease-out;
+  animation: dropIn 150ms var(--ease-out);
 }
 
 .account-greeting {
@@ -223,6 +252,7 @@
   font-weight: 600;
   font-size: 14px;
   color: var(--fho-text);
+  font-family: var(--font-sans);
 }
 
 .account-email {
@@ -248,13 +278,13 @@
   color: var(--fho-text);
   font-size: 13px;
   font-weight: 500;
+  font-family: var(--font-sans);
   cursor: pointer;
   border-radius: 10px;
-  transition: background 0.15s;
+  transition: background 150ms;
 }
+
 .account-option:hover { background: var(--fho-bg); }
 
-.account-signout {
-  color: #e74c3c;
-}
+.account-signout { color: #e74c3c; }
 .account-signout:hover { background: rgba(231,76,60,0.08); }

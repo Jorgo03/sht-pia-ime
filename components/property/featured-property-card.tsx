@@ -8,10 +8,12 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
 import { AtticoColors } from '@/constants/theme';
 import { useFavorites } from '@/contexts/favorites-context';
 import { Property } from '@/data/types';
+import { formatPrice, getLocalizedText } from '@/lib/format';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const CARD_WIDTH = SCREEN_WIDTH - 40;
@@ -26,8 +28,12 @@ export function FeaturedPropertyCard({
   property,
   onPress,
 }: FeaturedPropertyCardProps) {
+  const { t, i18n } = useTranslation();
   const { isFavorite, toggle } = useFavorites();
   const favorited = isFavorite(property.id);
+  const title = getLocalizedText(property.title_i18n, i18n.language) || property.title;
+  const price = formatPrice(property.price, i18n.language);
+  const suffix = property.listing_type === 'rent' ? t('property.perMonth') : '';
 
   return (
     <TouchableOpacity
@@ -46,7 +52,7 @@ export function FeaturedPropertyCard({
         <View style={styles.content}>
           <View style={styles.topRow}>
             <View style={styles.badge}>
-              <Text style={styles.badgeText}>FEATURED</Text>
+              <Text style={styles.badgeText}>{t('property.featured').toUpperCase()}</Text>
             </View>
             <TouchableOpacity
               style={styles.heartButton}
@@ -61,7 +67,7 @@ export function FeaturedPropertyCard({
           </View>
           <View style={styles.bottom}>
             <View style={styles.nameRow}>
-              <Text style={styles.name}>{property.title}</Text>
+              <Text style={styles.name}>{title}</Text>
               <View style={styles.locationRow}>
                 <MaterialIcons name="location-on" size={14} color={AtticoColors.accent} />
                 <Text style={styles.location}>
@@ -70,28 +76,28 @@ export function FeaturedPropertyCard({
               </View>
             </View>
             <Text style={styles.price}>
-              ${Number(property.price).toLocaleString()}
+              {price}
               <Text style={styles.priceLabel}>
-                {property.listing_type === 'rent' ? '/mo' : ''}
+                {suffix}
               </Text>
             </Text>
             <View style={styles.statsRow}>
               {property.beds != null && (
                 <View style={styles.stat}>
                   <MaterialIcons name="bed" size={16} color={AtticoColors.accent} />
-                  <Text style={styles.statText}>{property.beds} Beds</Text>
+                  <Text style={styles.statText}>{property.beds} {t('property.beds')}</Text>
                 </View>
               )}
               {property.baths != null && (
                 <View style={styles.stat}>
                   <MaterialIcons name="bathtub" size={16} color={AtticoColors.accent} />
-                  <Text style={styles.statText}>{property.baths} Baths</Text>
+                  <Text style={styles.statText}>{property.baths} {t('property.baths')}</Text>
                 </View>
               )}
               {property.sqft != null && (
                 <View style={styles.stat}>
                   <MaterialIcons name="square-foot" size={16} color={AtticoColors.accent} />
-                  <Text style={styles.statText}>{property.sqft} sqft</Text>
+                  <Text style={styles.statText}>{property.sqft} {t('property.sqft')}</Text>
                 </View>
               )}
             </View>
@@ -99,7 +105,7 @@ export function FeaturedPropertyCard({
               style={styles.button}
               onPress={onPress}
               activeOpacity={0.8}>
-              <Text style={styles.buttonText}>Take a look</Text>
+              <Text style={styles.buttonText}>{t('common.viewAll')}</Text>
               <MaterialIcons name="arrow-forward" size={18} color="#fff" />
             </TouchableOpacity>
           </View>

@@ -1,21 +1,27 @@
 import { NavLink } from 'react-router-dom'
-import { Home, Search, Heart, MessageCircle, User } from 'lucide-react'
+import { Home, Search, Plus, MessageCircle, User } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { useAddSheet } from '../contexts/AddSheetContext'
+import { useUnreadCount } from '../hooks/useUnreadCount'
 
 export default function BottomNav() {
   const { t } = useTranslation()
+  const { openSheet } = useAddSheet()
+  const unread = useUnreadCount()
 
-  const items = [
-    { to: '/',          icon: Home,           label: t('common.home') },
-    { to: '/search',    icon: Search,         label: t('common.search') },
-    { to: '/favorites', icon: Heart,          label: t('common.favorites') },
-    { to: '/messages',  icon: MessageCircle,  label: t('common.messages') },
-    { to: '/profile',   icon: User,           label: t('common.profile') },
+  const left = [
+    { to: '/', icon: Home, label: t('common.home') },
+    { to: '/search', icon: Search, label: t('common.search') },
+  ]
+
+  const right = [
+    { to: '/messages', icon: MessageCircle, label: t('common.messages'), badge: unread || null },
+    { to: '/profile', icon: User, label: t('common.profile') },
   ]
 
   return (
     <nav className="liquid-nav" aria-label="Primary">
-      {items.map(({ to, icon: Icon, label }) => (
+      {left.map(({ to, icon: Icon, label }) => (
         <NavLink
           key={to}
           to={to}
@@ -24,6 +30,26 @@ export default function BottomNav() {
           className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
         >
           <Icon size={22} strokeWidth={1.8} />
+        </NavLink>
+      ))}
+
+      <button
+        className="nav-add"
+        onClick={openSheet}
+        aria-label={t('addSheet.openLabel')}
+      >
+        <Plus size={26} strokeWidth={2.5} />
+      </button>
+
+      {right.map(({ to, icon: Icon, label, badge }) => (
+        <NavLink
+          key={to}
+          to={to}
+          aria-label={label}
+          className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
+        >
+          <Icon size={22} strokeWidth={1.8} />
+          {badge ? <span className="nav-badge">{badge > 9 ? '9+' : badge}</span> : null}
         </NavLink>
       ))}
     </nav>

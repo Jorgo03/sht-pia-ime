@@ -18,7 +18,9 @@
     "favorites": "Favoritos",
     "messages": "Mensajes",
     "profile": "Perfil",
-    "recentlyViewed": "Vistos recientemente"
+    "recentlyViewed": "Vistos recientemente",
+    "back": "Volver",
+    "send": "Enviar"
   },
   "auth": {
     "roleClient": "Cliente",
@@ -43,7 +45,38 @@
     "continueWithLinkedIn": "LinkedIn",
     "welcome": "Bienvenido a Shtëpia.ime",
     "user": "Usuario",
-    "agent": "Agente"
+    "agent": "Agente",
+    "signInWithEmail": "Iniciar sesión con código de email",
+    "otpTitle": "Iniciar sesión con Email",
+    "otpSubtitle": "Te enviaremos un código de 6 dígitos a tu email",
+    "enterEmail": "Introduce tu dirección de email",
+    "sendCode": "Enviar código",
+    "otpSent": "¡Código enviado! Revisa tu email.",
+    "enterCode": "Introduce el código",
+    "codeSentTo": "Enviamos un código de 6 dígitos a {{email}}",
+    "resendCode": "¿No lo recibiste? Enviar de nuevo",
+    "kickerSignIn": "BIENVENIDO DE NUEVO",
+    "kickerSignUp": "CUENTA NUEVA",
+    "heroSignInPre": "Tu",
+    "heroSignInEm": "próxima puerta",
+    "heroSignInPost": "está abierta.",
+    "heroSignUpPre": "Empieza a",
+    "heroSignUpEm": "encontrar tu hogar",
+    "heroSignUpPost": "hoy."
+  },
+  "home": {
+    "greetingMorning": "Buenos días",
+    "greetingEvening": "Buenas noches",
+    "matchesToday": "{{count}} nuevas coincidencias hoy.",
+    "featured": "Destacados esta semana",
+    "editorsPick": "ELECCIÓN DEL EDITOR",
+    "matched": "A tu medida",
+    "neighborhoods": "Barrios en tendencia",
+    "seeAll": "Ver todo →",
+    "searchPlaceholder": "Ciudad, barrio, código postal...",
+    "cityTag": "Tirana",
+    "country": "Albania",
+    "homesCount": "{{count}} viviendas"
   },
   "search": {
     "title": "Buscar propiedades",
@@ -79,7 +112,16 @@
     "emptyHint": "Intenta ajustar los filtros de búsqueda",
     "apply": "Aplicar",
     "reset": "Restablecer",
-    "filters": "Filtros"
+    "filters": "Filtros",
+    "headline": "Explora",
+    "headlineEm": "todo",
+    "viewList": "Lista",
+    "viewMap": "Mapa",
+    "homesInView": "viviendas a la vista",
+    "sortedByRelevance": "Ordenado por relevancia",
+    "mapView": "Vista de mapa",
+    "filtersTitle": "Filtros",
+    "showHomes": "Mostrar {{count}} viviendas"
   },
   "favourites": {
     "title": "Favoritos",
@@ -88,7 +130,12 @@
     "emptyDescription": "Toca el icono del corazón en una propiedad para guardarla",
     "loginPrompt": "Inicia sesión para ver tus favoritos",
     "loginCta": "Iniciar sesión",
-    "remove": "Eliminar"
+    "remove": "Eliminar",
+    "savedCount": "{{count}} guardadas · organizadas para ti",
+    "headlineEm": "lista final",
+    "backToProfile": "← Volver al perfil",
+    "kicker": "FAVORITOS",
+    "headlinePre": "Tu"
   },
   "property": {
     "beds": "hab.",
@@ -105,19 +152,62 @@
     "similar": "Propiedades similares",
     "video": "Video tour"
   },
+  "detail": {
+    "forSale": "En venta",
+    "forRent": "En alquiler",
+    "about": "Sobre esta propiedad",
+    "whatsInside": "Qué incluye",
+    "scheduleViewing": "Agendar una visita",
+    "message": "Mensaje",
+    "perSqm": "/m²",
+    "beds": "Habitaciones",
+    "baths": "Baños",
+    "area": "Superficie",
+    "year": "Año",
+    "chatInApp": "Chat"
+  },
   "messages": {
     "subtitle": "Conversaciones con agentes",
-    "comingSoon": "Chat WhatsApp — próximamente"
+    "comingSoon": "Chat WhatsApp — próximamente",
+    "client": {
+      "kicker": "{{count}} conversaciones · {{unread}} sin leer",
+      "headlineEm": "con agentes",
+      "headlinePre": "Mensajes"
+    },
+    "agent": {
+      "kicker": "{{leads}} leads activos · {{newToday}} nuevos hoy",
+      "headlineEm": "consultas",
+      "headlinePre": "Clientes y"
+    },
+    "empty": "Aún no hay conversaciones",
+    "emptyHint": "Inicia un chat desde la página de una propiedad",
+    "inputPlaceholder": "Escribe un mensaje…",
+    "noMessages": "Aún no hay mensajes — ¡saluda!",
+    "loginPrompt": "Inicia sesión para ver tus mensajes"
   },
   "notFound": {
     "title": "Página no encontrada",
     "subtitle": "La página que buscas no existe o ha sido movida."
   },
+  "profile": {
+    "savedSearches": "Búsquedas guardadas",
+    "statSaved": "Guardados",
+    "statSearches": "Búsquedas",
+    "statListings": "Anuncios",
+    "statViewings": "Visitas"
+  },
   "errors": {
     "generic": "Algo salió mal. Inténtalo de nuevo.",
     "authFailed": "Error de autenticación.",
     "providerNotConfigured": "Este proveedor no está configurado.",
-    "fillFields": "Completa el correo y la contraseña."
+    "fillFields": "Completa el correo y la contraseña.",
+    "invalidEmail": "Introduce una dirección de correo válida.",
+    "passwordMin": "La contraseña debe tener al menos 8 caracteres.",
+    "nameRequired": "Nombre completo requerido (mín. 2 caracteres).",
+    "invalidCredentials": "Correo o contraseña incorrectos.",
+    "userExists": "Ya existe una cuenta con este correo.",
+    "emailNotConfirmed": "Confirma tu correo antes de iniciar sesión.",
+    "rateLimited": "Demasiadas solicitudes. Inténtalo más tarde."
   },
   "agentDashboard": {
     "title": "Panel del Agente",
@@ -167,10 +257,37 @@
     "next": "Siguiente",
     "saveDraft": "Guardar borrador",
     "publish": "Publicar",
-    "type": { "sale": "Venta", "rent": "Alquiler", "daily_rent": "Alquiler diario" },
-    "status": { "active": "Activo", "paused": "Pausado", "sold": "Vendido", "rented": "Alquilado", "draft": "Borrador" },
-    "step": { "basics": "Básico", "location": "Ubicación", "details": "Detalles", "media": "Medios", "publish": "Publicar" },
-    "feature": { "balcony": "Balcón", "parking": "Parking", "elevator": "Ascensor", "garden": "Jardín", "pool": "Piscina", "furnished": "Amueblado", "airConditioning": "Aire acondicionado", "heating": "Calefacción", "security": "Seguridad", "storage": "Trastero" }
+    "type": {
+      "sale": "Venta",
+      "rent": "Alquiler",
+      "daily_rent": "Alquiler diario"
+    },
+    "status": {
+      "active": "Activo",
+      "paused": "Pausado",
+      "sold": "Vendido",
+      "rented": "Alquilado",
+      "draft": "Borrador"
+    },
+    "step": {
+      "basics": "Básico",
+      "location": "Ubicación",
+      "details": "Detalles",
+      "media": "Medios",
+      "publish": "Publicar"
+    },
+    "feature": {
+      "balcony": "Balcón",
+      "parking": "Parking",
+      "elevator": "Ascensor",
+      "garden": "Jardín",
+      "pool": "Piscina",
+      "furnished": "Amueblado",
+      "airConditioning": "Aire acondicionado",
+      "heating": "Calefacción",
+      "security": "Seguridad",
+      "storage": "Trastero"
+    }
   },
   "dashboard": {
     "title": "Dashboard de propiedad",
@@ -197,5 +314,60 @@
   "cookie": {
     "message": "Este sitio utiliza cookies para mejorar su experiencia.",
     "accept": "Aceptar"
+  },
+  "addSheet": {
+    "openLabel": "Crear nuevo",
+    "title": "Qué te gustaría",
+    "titleEm": "añadir",
+    "signInFirst": "Inicia sesión para continuar",
+    "searchSaved": "Búsqueda guardada",
+    "wantedSaved": "Solicitud de vivienda publicada",
+    "leadSaved": "Cliente potencial añadido",
+    "searchName": "Nombre de la búsqueda",
+    "maxPrice": "Precio máximo (€)",
+    "minBedrooms": "Habitaciones mín.",
+    "notes": "Notas (opcional)",
+    "leadName": "Nombre del cliente",
+    "leadPhone": "Número de teléfono",
+    "client": {
+      "listing": {
+        "title": "Publica tu vivienda",
+        "sub": "Vende o alquila tu propiedad"
+      },
+      "search": {
+        "title": "Guardar una búsqueda",
+        "sub": "Recibe avisos de nuevas coincidencias"
+      },
+      "wanted": {
+        "title": "Vivienda buscada",
+        "sub": "Deja que los agentes te encuentren"
+      },
+      "visit": {
+        "title": "Solicitar una visita",
+        "sub": "Programa una visita"
+      }
+    },
+    "agent": {
+      "listing": {
+        "title": "Nuevo anuncio",
+        "sub": "Añade una propiedad a tu cartera"
+      },
+      "lead": {
+        "title": "Nuevo cliente potencial",
+        "sub": "Registra un cliente potencial"
+      },
+      "viewing": {
+        "title": "Programar visita",
+        "sub": "Organiza una visita a la propiedad"
+      },
+      "open": {
+        "title": "Jornada de puertas abiertas",
+        "sub": "Planifica una exhibición pública"
+      }
+    },
+    "saveError": "No se pudo guardar. Inténtalo de nuevo."
+  },
+  "authCallback": {
+    "signingIn": "Iniciando sesión…"
   }
 }

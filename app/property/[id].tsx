@@ -15,12 +15,14 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 
 import { ActionButton } from '@/components/ui/action-button';
 import { AtticoColors } from '@/constants/theme';
 import { useFavorites } from '@/contexts/favorites-context';
 import { getPropertyById } from '@/data/properties';
 import { Property } from '@/data/types';
+import { formatPrice, getLocalizedText } from '@/lib/format';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 const IMAGE_HEIGHT = SCREEN_HEIGHT * 0.42;
@@ -28,6 +30,7 @@ const IMAGE_HEIGHT = SCREEN_HEIGHT * 0.42;
 export default function PropertyDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
+  const { t, i18n } = useTranslation();
   const { isFavorite, toggle } = useFavorites();
   const favorited = isFavorite(id ?? '');
   const [property, setProperty] = useState<Property | null>(null);
@@ -44,10 +47,10 @@ export default function PropertyDetailScreen() {
 
   const handleContact = () => {
     if (!contactName || !contactEmail || !contactMessage) {
-      Alert.alert('Error', 'Please fill in all fields.');
+      Alert.alert(t('common.error'), t('errors.fillFields'));
       return;
     }
-    Alert.alert('Sent!', 'Your message has been sent to the agent.');
+    Alert.alert('OK', t('detail.message'));
     setContactName('');
     setContactEmail('');
     setContactMessage('');
@@ -64,15 +67,21 @@ export default function PropertyDetailScreen() {
   if (!property) {
     return (
       <View style={styles.errorContainer}>
-        <Text style={styles.errorText}>Property not found</Text>
+        <Text style={styles.errorText}>{t('search.empty')}</Text>
       </View>
     );
   }
 
+  const title = getLocalizedText(property.title_i18n, i18n.language) || property.title;
+  const description = getLocalizedText(property.description_i18n, i18n.language) || property.description;
+  const price = formatPrice(property.price, i18n.language);
+  const suffix = property.listing_type === 'rent' ? t('property.perMonth') : '';
+  const badge = property.listing_type === 'rent' ? t('detail.forRent') : t('detail.forSale');
+
   const amenities = [
-    { id: 'bed', name: `${property.beds ?? 0} Beds`, icon: 'bed' },
-    { id: 'bath', name: `${property.baths ?? 0} Baths`, icon: 'bathtub' },
-    { id: 'sqft', name: `${property.sqft ?? '-'} sqft`, icon: 'square-foot' },
+    { id: 'bed', name: `${property.beds ?? 0} ${t('property.beds')}`, icon: 'bed' },
+    { id: 'bath', name: `${property.baths ?? 0} ${t('property.baths')}`, icon: 'bathtub' },
+    { id: 'sqft', name: `${property.sqft ?? '-'} ${t('property.sqft')}`, icon: 'square-foot' },
     { id: 'type', name: property.property_type ?? 'N/A', icon: 'home' },
   ];
 
@@ -111,7 +120,7 @@ export default function PropertyDetailScreen() {
 
         <View style={styles.imageBadge}>
           <Text style={styles.imageBadgeText}>
-            {property.listing_type === 'rent' ? 'FOR RENT' : 'FOR SALE'}
+            {badge.toUpperCase()}
           </Text>
         </View>
       </View>
@@ -120,7 +129,7 @@ export default function PropertyDetailScreen() {
         style={styles.content}
         contentContainerStyle={styles.contentInner}
         showsVerticalScrollIndicator={false}>
-        <Text style={styles.name}>{property.title}</Text>
+        <Text style={styles.name}>{title}</Text>
         <View style={styles.locationRow}>
           <MaterialIcons
             name="location-on"
@@ -132,7 +141,7 @@ export default function PropertyDetailScreen() {
           </Text>
         </View>
 
-        <Text style={styles.description}>{property.description}</Text>
+        <Text style={styles.description}>{description}</Text>
 
         <View style={styles.amenityRow}>
           {amenities.map((a) => (
@@ -153,12 +162,12 @@ export default function PropertyDetailScreen() {
         <View style={styles.sectionCard}>
           <View style={styles.sectionHeader}>
             <MaterialIcons name="360" size={22} color={AtticoColors.accent} />
-            <Text style={styles.sectionTitle}>Virtual Tour</Text>
+            <Text style={styles.sectionTitle}>{t('property.video')}</Text>
           </View>
           <TouchableOpacity
             style={styles.tourPreview}
             activeOpacity={0.8}
-            onPress={() => Alert.alert('Virtual Tour', 'Coming soon!')}>
+            onPress={() => Alert.alert(t('property.video'), t('messages.comingSoon'))}>
             <Image
               source={{ uri: property.image_urls[0] }}
               style={styles.tourImage}
@@ -168,7 +177,7 @@ export default function PropertyDetailScreen() {
               <View style={styles.playButton}>
                 <MaterialIcons name="play-arrow" size={36} color="#fff" />
               </View>
-              <Text style={styles.tourText}>Start Virtual Tour</Text>
+              <Text style={styles.tourText}>{t('property.video')}</Text>
             </View>
           </TouchableOpacity>
         </View>
@@ -177,15 +186,15 @@ export default function PropertyDetailScreen() {
         <View style={styles.sectionCard}>
           <View style={styles.sectionHeader}>
             <MaterialIcons name="person" size={22} color={AtticoColors.accent} />
-            <Text style={styles.sectionTitle}>Listed By</Text>
+            <Text style={styles.sectionTitle}>{t('auth.agent')}</Text>
           </View>
           <View style={styles.agentRow}>
             <View style={styles.agentAvatar}>
               <MaterialIcons name="person" size={28} color={AtticoColors.accent} />
             </View>
             <View style={styles.agentInfo}>
-              <Text style={styles.agentName}>Property Agent</Text>
-              <Text style={styles.agentRole}>Verified Agent</Text>
+              <Text style={styles.agentName}>{t('auth.agent')}</Text>
+              <Text style={styles.agentRole}>{t('auth.agent')}</Text>
               <View style={styles.agentRating}>
                 {[1, 2, 3, 4, 5].map((star) => (
                   <MaterialIcons
@@ -200,7 +209,7 @@ export default function PropertyDetailScreen() {
             </View>
             <TouchableOpacity
               style={styles.callButton}
-              onPress={() => Alert.alert('Call', 'Calling agent...')}
+              onPress={() => Alert.alert(t('property.call'), '...')}
               activeOpacity={0.7}>
               <MaterialIcons name="phone" size={20} color="#fff" />
             </TouchableOpacity>
@@ -211,18 +220,18 @@ export default function PropertyDetailScreen() {
         <View style={styles.sectionCard}>
           <View style={styles.sectionHeader}>
             <MaterialIcons name="mail" size={22} color={AtticoColors.accent} />
-            <Text style={styles.sectionTitle}>Contact Agent</Text>
+            <Text style={styles.sectionTitle}>{t('detail.message')}</Text>
           </View>
           <TextInput
             style={styles.contactInput}
-            placeholder="Your Name"
+            placeholder={t('auth.fullName')}
             placeholderTextColor={AtticoColors.textSecondary}
             value={contactName}
             onChangeText={setContactName}
           />
           <TextInput
             style={styles.contactInput}
-            placeholder="Your Email"
+            placeholder={t('auth.email')}
             placeholderTextColor={AtticoColors.textSecondary}
             value={contactEmail}
             onChangeText={setContactEmail}
@@ -231,7 +240,7 @@ export default function PropertyDetailScreen() {
           />
           <TextInput
             style={[styles.contactInput, styles.contactMessage]}
-            placeholder="I'm interested in this property..."
+            placeholder={t('property.whatsappMessage', { title })}
             placeholderTextColor={AtticoColors.textSecondary}
             value={contactMessage}
             onChangeText={setContactMessage}
@@ -239,25 +248,25 @@ export default function PropertyDetailScreen() {
             numberOfLines={4}
             textAlignVertical="top"
           />
-          <ActionButton title="Send Message" onPress={handleContact} />
+          <ActionButton title={t('detail.message')} onPress={handleContact} />
         </View>
 
         <View style={styles.priceRow}>
           <View>
-            <Text style={styles.priceLabel}>Price</Text>
+            <Text style={styles.priceLabel}>{t('listing.priceLabel')}</Text>
             <Text style={styles.price}>
-              ${Number(property.price).toLocaleString()}
+              {price}
               <Text style={styles.priceSuffix}>
-                {property.listing_type === 'rent' ? '/mo' : ''}
+                {suffix}
               </Text>
             </Text>
           </View>
         </View>
 
         <ActionButton
-          title="Book Now"
+          title={t('detail.scheduleViewing')}
           onPress={() =>
-            Alert.alert('Booking', `Booking ${property.title}...`)
+            Alert.alert(t('detail.scheduleViewing'), title)
           }
         />
       </ScrollView>

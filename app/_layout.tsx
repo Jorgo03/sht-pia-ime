@@ -2,6 +2,7 @@ import { DarkTheme, ThemeProvider } from '@react-navigation/native';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import 'react-native-reanimated';
+import '@/i18n';
 
 import { AuthProvider } from '@/contexts/auth-context';
 import { FavoritesProvider } from '@/contexts/favorites-context';

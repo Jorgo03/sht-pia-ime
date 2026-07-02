@@ -13,18 +13,14 @@
   justify-content: space-around;
   padding: 0 8px;
 
-  background: rgba(255, 255, 255, 0.55);
+  background: rgba(250, 246, 239, 0.65);
   backdrop-filter: blur(28px) saturate(200%);
   -webkit-backdrop-filter: blur(28px) saturate(200%);
 
   border-radius: var(--r-pill);
-  border: 0.5px solid rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.6);
 
-  box-shadow:
-    inset 0 1px 1px rgba(255, 255, 255, 0.9),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.2),
-    0 10px 30px rgba(0, 0, 0, 0.12),
-    0 2px 8px rgba(0, 0, 0, 0.06);
+  box-shadow: var(--fho-nav-shadow);
 }
 
 .nav-item {
@@ -33,44 +29,83 @@
   border: none;
   background: transparent;
   border-radius: 14px;
-  color: rgba(10, 10, 10, 0.5);
+  color: var(--fho-text-faint);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 150ms var(--ease-out);
   padding: 0;
+  position: relative;
+  text-decoration: none;
 }
 
 .nav-item:hover {
-  color: rgba(10, 10, 10, 0.8);
+  color: var(--fho-text);
 }
 
 .nav-item.active {
-  color: white;
+  color: var(--fho-orange-1);
+}
+
+.nav-add {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  border: none;
   background: linear-gradient(135deg, var(--fho-orange-1), var(--fho-orange-2));
-  box-shadow:
-    0 4px 10px rgba(232, 93, 44, 0.45),
-    inset 0 1px 0 rgba(255, 255, 255, 0.3);
-  transform: scale(1.05);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  margin-top: -22px;
+  box-shadow: var(--fho-cta-shadow);
+  transition: transform 150ms var(--ease-out), box-shadow 150ms var(--ease-out);
+}
+
+.nav-add:hover {
+  transform: scale(1.06);
+}
+
+.nav-add:active {
+  transform: scale(0.96);
+}
+
+.nav-badge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  min-width: 16px;
+  height: 16px;
+  border-radius: 8px;
+  background: var(--fho-orange-1);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
 }
 
 @supports not (backdrop-filter: blur(20px)) {
-  .liquid-nav { background: rgba(255, 255, 255, 0.92); }
+  .liquid-nav { background: rgba(250, 246, 239, 0.94); }
 }
 
 [data-theme="dark"] .liquid-nav {
-  background: rgba(20, 20, 22, 0.6);
-  border-color: rgba(255, 255, 255, 0.1);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.1),
-    0 10px 30px rgba(0, 0, 0, 0.4);
+  background: rgba(20, 18, 16, 0.65);
+  border-color: rgba(255, 255, 255, 0.08);
 }
 
 [data-theme="dark"] .nav-item {
-  color: rgba(255, 255, 255, 0.55);
+  color: var(--fho-text-faint);
 }
 
 [data-theme="dark"] .nav-item:hover {
-  color: rgba(255, 255, 255, 0.9);
+  color: var(--fho-text);
+}
+
+[data-theme="dark"] .nav-item.active {
+  color: var(--fho-orange-soft);
 }

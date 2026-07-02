@@ -8,6 +8,7 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 
 import { PropertyCard } from '@/components/property/property-card';
 import { GradientBackground } from '@/components/ui/gradient-background';
@@ -17,6 +18,7 @@ import { Property } from '@/data/types';
 
 export default function FavoritesScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
   const { favoriteProperties, loading } = useFavorites();
 
   const renderItem = ({ item }: { item: Property }) => (
@@ -29,7 +31,7 @@ export default function FavoritesScreen() {
   return (
     <GradientBackground>
       <SafeAreaView style={styles.container} edges={['top']}>
-        <Text style={styles.title}>Favorites</Text>
+        <Text style={styles.title}>{t('favourites.title')}</Text>
 
         {loading ? (
           <View style={styles.center}>
@@ -40,9 +42,9 @@ export default function FavoritesScreen() {
             <View style={styles.emptyIcon}>
               <MaterialIcons name="favorite-border" size={48} color={AtticoColors.accent} />
             </View>
-            <Text style={styles.subtitle}>No favorites yet</Text>
+            <Text style={styles.subtitle}>{t('favourites.empty')}</Text>
             <Text style={styles.description}>
-              Tap the heart icon on a property to save it
+              {t('favourites.emptyDescription')}
             </Text>
           </View>
         ) : (
@@ -93,10 +95,14 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
     color: AtticoColors.textPrimary,
+    textAlign: 'center',
+    paddingHorizontal: 32,
   },
   description: {
     fontSize: 14,
     color: AtticoColors.textSecondary,
+    textAlign: 'center',
+    paddingHorizontal: 32,
   },
   list: {
     paddingHorizontal: 14,

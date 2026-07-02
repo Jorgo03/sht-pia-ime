@@ -90,9 +90,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     if (Platform.OS === 'web') {
+      const origin = typeof window !== 'undefined' ? window.location.origin : '';
       const { error } = await supabase.auth.signInWithOAuth({
         provider,
-        options: { redirectTo: window.location.origin },
+        options: { redirectTo: origin },
       });
       return { error: error as Error | null };
     }
