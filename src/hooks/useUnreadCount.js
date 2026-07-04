@@ -3,20 +3,21 @@ import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
 
 export function useUnreadCount() {
-  const { user, profile } = useAuth()
+  const { user } = useAuth()
   const [count, setCount] = useState(0)
 
   useEffect(() => {
     if (!user) { setCount(0); return }
 
-    const col = profile?.role === 'agent' ? 'unread_for_agent' : 'unread_for_client'
-
+    // Pick the counter per conversation by which side this user is on —
+    // an agent browsing someone else's listing chats as the client.
     const refresh = async () => {
       const { data } = await supabase
         .from('conversations')
-        .select(col)
+        .select('client_id, unread_for_client, unread_for_agent')
         .or(`client_id.eq.${user.id},agent_id.eq.${user.id}`)
-      setCount((data ?? []).reduce((s, r) => s + (r[col] ?? 0), 0))
+      setCount((data ?? []).reduce(
+        (s, r) => s + ((r.client_id === user.id ? r.unread_for_client : r.unread_for_agent) ?? 0), 0))
     }
 
     refresh()
@@ -27,7 +28,7 @@ export function useUnreadCount() {
       .subscribe()
 
     return () => { supabase.removeChannel(channel) }
-  }, [user?.id, profile?.role])
+  }, [user?.id])
 
   return count
 }

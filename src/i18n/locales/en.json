@@ -173,7 +173,11 @@
     "sortedByRelevance": "Sorted by relevance",
     "mapView": "Map view",
     "filtersTitle": "Filters",
-    "showHomes": "Show {{count}} homes"
+    "showHomes": "Show {{count}} homes",
+    "aiPlaceholder": "Try: apartament me 2 dhoma në Tiranë nën 100,000 €",
+    "aiButton": "Smart search",
+    "aiApplied": "Filters applied from your search",
+    "aiFailed": "Couldn't parse that — searching by city instead"
   },
   "detail": {
     "forSale": "For Sale",
@@ -369,5 +373,30 @@
   },
   "authCallback": {
     "signingIn": "Signing you in…"
+  },
+  "ai": {
+    "panelTitle": "AI listing writer",
+    "notesPlaceholder": "Describe the property in your own words — condition, neighborhood, anything special… (optional)",
+    "generate": "Generate with AI",
+    "generating": "Writing…",
+    "regenerate": "Regenerate",
+    "reviewHint": "Draft filled in below — review and edit before publishing.",
+    "errorUnavailable": "AI is unavailable right now — please write manually.",
+    "errorRateLimited": "Too many generations — try again in a while.",
+    "errorGeneric": "Something went wrong. Please try again.",
+    "translateAll": "Translate to all languages",
+    "translating": "Translating…",
+    "translated": "Translated — check each language tab.",
+    "translateFirst": "Write the Albanian title and description first"
+  },
+  "assistant": {
+    "title": "Listing assistant",
+    "subtitle": "Answers based only on this listing",
+    "fabLabel": "Ask about this home",
+    "intro": "Hi! Ask me anything about this listing — price, rooms, features…",
+    "placeholder": "Ask a question…",
+    "thinking": "Thinking…",
+    "unavailable": "I can't answer right now. Please contact the seller via the listing page.",
+    "disclaimer": "AI answers are based only on listing data — verify important details with the seller."
   }
 }

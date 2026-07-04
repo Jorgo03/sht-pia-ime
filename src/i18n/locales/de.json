@@ -121,7 +121,11 @@
     "sortedByRelevance": "Nach Relevanz sortiert",
     "mapView": "Kartenansicht",
     "filtersTitle": "Filter",
-    "showHomes": "{{count}} Immobilien anzeigen"
+    "showHomes": "{{count}} Immobilien anzeigen",
+    "aiPlaceholder": "Versuch: Wohnung mit 2 Zimmern in Tirana unter 100.000 €",
+    "aiButton": "Intelligente Suche",
+    "aiApplied": "Filter aus deiner Suche übernommen",
+    "aiFailed": "Nicht verstanden — Suche nach Stadt stattdessen"
   },
   "favourites": {
     "title": "Favoriten",
@@ -369,5 +373,30 @@
   },
   "authCallback": {
     "signingIn": "Du wirst angemeldet…"
+  },
+  "ai": {
+    "panelTitle": "KI-Inseratsassistent",
+    "notesPlaceholder": "Beschreibe die Immobilie in eigenen Worten — Zustand, Lage, Besonderheiten… (optional)",
+    "generate": "Mit KI erstellen",
+    "generating": "Schreibt…",
+    "regenerate": "Neu erstellen",
+    "reviewHint": "Entwurf unten eingefügt — vor dem Veröffentlichen prüfen und bearbeiten.",
+    "errorUnavailable": "KI ist gerade nicht verfügbar — bitte manuell schreiben.",
+    "errorRateLimited": "Zu viele Anfragen — bitte später erneut versuchen.",
+    "errorGeneric": "Etwas ist schiefgelaufen. Bitte erneut versuchen.",
+    "translateAll": "In alle Sprachen übersetzen",
+    "translating": "Übersetzt…",
+    "translated": "Übersetzt — prüfe jede Sprache.",
+    "translateFirst": "Schreibe zuerst Titel und Beschreibung auf Albanisch"
+  },
+  "assistant": {
+    "title": "Inserats-Assistent",
+    "subtitle": "Antworten nur aus diesem Inserat",
+    "fabLabel": "Frag zu dieser Immobilie",
+    "intro": "Hallo! Frag mich alles zu diesem Inserat — Preis, Zimmer, Ausstattung…",
+    "placeholder": "Stelle eine Frage…",
+    "thinking": "Denkt nach…",
+    "unavailable": "Ich kann gerade nicht antworten. Bitte kontaktiere den Verkäufer über die Inseratsseite.",
+    "disclaimer": "KI-Antworten basieren nur auf Inseratsdaten — wichtige Details mit dem Verkäufer klären."
   }
 }

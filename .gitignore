@@ -12,3 +12,4 @@ expo-env.d.ts
 .expo/
 test-*.png
 test-*.cjs
+.agents/

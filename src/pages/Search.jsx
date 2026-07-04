@@ -1,7 +1,9 @@
 import { useState, useMemo, useEffect } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Search as SearchIcon, SlidersHorizontal, LayoutGrid, Map as MapIcon, RotateCcw, SearchX, X } from 'lucide-react'
+import { Search as SearchIcon, SlidersHorizontal, LayoutGrid, Map as MapIcon, RotateCcw, SearchX, X, Sparkles } from 'lucide-react'
+import { parseSearchQuery } from '../lib/ai'
+import { isEnabled } from '../lib/flags'
 import PropertyCard from '../components/PropertyCard'
 import PropertyMap from '../components/PropertyMap'
 import SkeletonCard from '../components/SkeletonCard'
@@ -23,6 +25,8 @@ export default function Search() {
   const [viewMode, setViewMode] = useState('list')
   const [filtersOpen, setFiltersOpen] = useState(false)
   const [searchText, setSearchText] = useState('')
+  const [aiParsing, setAiParsing] = useState(false)
+  const [aiStatus, setAiStatus] = useState(null) // 'applied' | 'failed'
 
   const city = searchParams.get('city') || ''
   const minPrice = searchParams.get('minPrice') || ''
@@ -55,7 +59,28 @@ export default function Search() {
     setSearchParams(params, { replace: true })
   }
 
-  const resetFilters = () => { setSearchParams({}, { replace: true }); setSearchText('') }
+  const resetFilters = () => { setSearchParams({}, { replace: true }); setSearchText(''); setAiStatus(null) }
+
+  // Feature B — parse a natural-language query into the existing URL filters.
+  // On failure the typed text keeps working as the normal city search.
+  const handleAiSearch = async () => {
+    if (!searchText.trim() || aiParsing) return
+    setAiParsing(true)
+    setAiStatus(null)
+    const filters = await parseSearchQuery(searchText)
+    setAiParsing(false)
+    if (!filters) {
+      setAiStatus('failed')
+      setTimeout(() => setAiStatus(null), 3000)
+      return
+    }
+    const params = new URLSearchParams()
+    for (const [k, v] of Object.entries(filters)) params.set(k, v)
+    setSearchParams(params, { replace: true })
+    setSearchText('')
+    setAiStatus('applied')
+    setTimeout(() => setAiStatus(null), 3000)
+  }
   const activeCount = [city, minPrice, maxPrice, propertyType, listingType, beds].filter(Boolean).length
 
   useEffect(() => {
@@ -78,13 +103,36 @@ export default function Search() {
         <div className="search-controls">
           <div className="search-field">
             <SearchIcon size={16} />
-            <input type="text" placeholder={t('search.placeholder')} value={searchText} onChange={e => setSearchText(e.target.value)} />
+            <input
+              type="text"
+              placeholder={isEnabled('aiSearch') ? t('search.aiPlaceholder') : t('search.placeholder')}
+              value={searchText}
+              onChange={e => setSearchText(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && isEnabled('aiSearch') && handleAiSearch()}
+            />
+            {isEnabled('aiSearch') && searchText.trim() && (
+              <button
+                className="ai-search-btn"
+                onClick={handleAiSearch}
+                disabled={aiParsing}
+                title={t('search.aiButton')}
+                aria-label={t('search.aiButton')}
+              >
+                <Sparkles size={15} className={aiParsing ? 'ai-spin' : ''} />
+              </button>
+            )}
           </div>
           <button className="filter-btn" onClick={() => setFiltersOpen(true)}>
             <SlidersHorizontal size={16} />
             {activeCount > 0 && <span className="filter-badge">{activeCount}</span>}
           </button>
         </div>
+        {aiStatus && (
+          <div className="ai-search-status">
+            <Sparkles size={12} />
+            {aiStatus === 'applied' ? t('search.aiApplied') : t('search.aiFailed')}
+          </div>
+        )}
       </div>
 
       <div className="result-count">

@@ -4,6 +4,9 @@ import { useTranslation } from 'react-i18next'
 import { ArrowLeft, ArrowRight, Upload, X } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import { supabase } from '../lib/supabase'
+import { isEnabled } from '../lib/flags'
+import AiListingPanel from '../components/AiListingPanel'
+import { AutoTranslateButton } from '../components/AutoTranslateButton'
 import '../styles/new-listing.css'
 
 function compressImage(file, maxWidth = 1600, quality = 0.8) {
@@ -24,6 +27,15 @@ function compressImage(file, maxWidth = 1600, quality = 0.8) {
     img.onerror = () => resolve(file)
     img.src = URL.createObjectURL(file)
   })
+}
+
+// Fill only languages the agent hasn't written manually; sq stays untouched.
+function mergeTranslations(existing, translated) {
+  const out = { ...existing }
+  for (const [lang, text] of Object.entries(translated || {})) {
+    if (lang !== 'sq' && text && !out[lang]?.trim()) out[lang] = text
+  }
+  return out
 }
 
 const STEPS = ['basics', 'location', 'details', 'media', 'publish']
@@ -221,6 +233,18 @@ export default function NewListing() {
       <div className="nl-form">
         {step === 0 && (
           <>
+            {isEnabled('aiListingGenerator') && (
+              <AiListingPanel
+                form={form}
+                onApply={({ title, description }) => {
+                  updateI18n('title_i18n', 'sq', title)
+                  updateI18n('description_i18n', 'sq', description)
+                  setTitleLang('sq')
+                  setDescLang('sq')
+                  setErrors(prev => ({ ...prev, title: undefined, description: undefined }))
+                }}
+              />
+            )}
             <div className="nl-field">
               <label>{t('listing.listingType')}</label>
               <div className="nl-radio-group">
@@ -267,6 +291,19 @@ export default function NewListing() {
               />
               {errors.description && <span className="nl-error">{errors.description}</span>}
             </div>
+            {isEnabled('autoTranslate') && (
+              <AutoTranslateButton
+                title={form.title_i18n.sq}
+                description={form.description_i18n.sq}
+                onResult={({ titleMap, descriptionMap }) => {
+                  setForm(prev => ({
+                    ...prev,
+                    title_i18n: mergeTranslations(prev.title_i18n, titleMap),
+                    description_i18n: mergeTranslations(prev.description_i18n, descriptionMap),
+                  }))
+                }}
+              />
+            )}
           </>
         )}
 

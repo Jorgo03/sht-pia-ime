@@ -12,6 +12,8 @@ import { logActivity } from '../lib/activity'
 import { addRecentlyViewed } from '../hooks/useRecentlyViewed'
 import PropertyCard from '../components/PropertyCard'
 import ImageLightbox from '../components/ImageLightbox'
+import ListingAssistant from '../components/ListingAssistant'
+import { isEnabled } from '../lib/flags'
 import '../styles/property-detail.css'
 
 const PropertyMap = lazy(() => import('../components/PropertyMap'))
@@ -224,6 +226,10 @@ export default function PropertyDetail() {
 
       {loginToast && (
         <div className="addsheet-toast" onClick={() => navigate('/profile')}>{t('favourites.loginPrompt')}</div>
+      )}
+
+      {isEnabled('aiAssistant') && property.status === 'active' && (
+        <ListingAssistant property={property} />
       )}
     </div>
   )

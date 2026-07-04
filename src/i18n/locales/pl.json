@@ -125,7 +125,11 @@
     "sortedByRelevance": "Sortowane wg trafności",
     "mapView": "Widok mapy",
     "filtersTitle": "Filtry",
-    "showHomes": "Pokaż {{count}} ofert"
+    "showHomes": "Pokaż {{count}} ofert",
+    "aiPlaceholder": "Spróbuj: mieszkanie 2 pokoje w Tiranie do 100 000 €",
+    "aiButton": "Inteligentne wyszukiwanie",
+    "aiApplied": "Filtry zastosowane z Twojego zapytania",
+    "aiFailed": "Nie zrozumiano — szukanie według miasta"
   },
   "favourites": {
     "title": "Ulubione",
@@ -373,5 +377,30 @@
   },
   "authCallback": {
     "signingIn": "Logowanie…"
+  },
+  "ai": {
+    "panelTitle": "Kreator ogłoszeń AI",
+    "notesPlaceholder": "Opisz nieruchomość własnymi słowami — stan, okolica, coś wyjątkowego… (opcjonalnie)",
+    "generate": "Wygeneruj z AI",
+    "generating": "Pisanie…",
+    "regenerate": "Wygeneruj ponownie",
+    "reviewHint": "Szkic wstawiony poniżej — przejrzyj i edytuj przed publikacją.",
+    "errorUnavailable": "AI jest teraz niedostępne — napisz ręcznie.",
+    "errorRateLimited": "Zbyt wiele żądań — spróbuj później.",
+    "errorGeneric": "Coś poszło nie tak. Spróbuj ponownie.",
+    "translateAll": "Przetłumacz na wszystkie języki",
+    "translating": "Tłumaczenie…",
+    "translated": "Przetłumaczono — sprawdź każdy język.",
+    "translateFirst": "Najpierw napisz tytuł i opis po albańsku"
+  },
+  "assistant": {
+    "title": "Asystent ogłoszenia",
+    "subtitle": "Odpowiedzi tylko na podstawie tego ogłoszenia",
+    "fabLabel": "Zapytaj o ten dom",
+    "intro": "Cześć! Zapytaj mnie o cokolwiek w tym ogłoszeniu — cena, pokoje, udogodnienia…",
+    "placeholder": "Zadaj pytanie…",
+    "thinking": "Myślę…",
+    "unavailable": "Nie mogę teraz odpowiedzieć. Skontaktuj się ze sprzedawcą przez stronę ogłoszenia.",
+    "disclaimer": "Odpowiedzi AI opierają się wyłącznie na danych ogłoszenia — ważne szczegóły potwierdź u sprzedawcy."
   }
 }

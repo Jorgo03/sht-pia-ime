@@ -5,6 +5,53 @@ AUDIT.md was fixed; see the final report for the change log.
 
 ---
 
+## 0. ANTHROPIC_API_KEY — one command to switch the AI features on
+
+The three AI edge functions (`ai-generate-listing`, `ai-parse-search`,
+`ai-listing-assistant`) are deployed and verified, but the Anthropic key is
+not set (I don't create or handle secrets). Until you set it they return a
+clean `503 ai_unavailable` and the UI falls back to the non-AI path. Enable:
+
+```bash
+supabase secrets set ANTHROPIC_API_KEY=sk-ant-... --project-ref xzzzhlwmzotibrxdqmcm
+```
+
+(or Dashboard → Edge Functions → Secrets). No redeploy needed. The key never
+touches the client bundle.
+
+## 0b. Feature G (price insight) — flagged, NOT shipped
+
+Per your constraint I did not build the price-estimate feature. Before it
+ships you need to decide: (a) comparables source (same city + type + ±30% sqft
+is my proposal), (b) minimum comparable count before showing anything (I'd say
+5), (c) exact disclaimer copy in 8 languages, (d) whether agents can see it on
+their own listings. The Zillow-style "estimate, not advice" framing from
+CLAUDE.md applies. Say go and I'll build it behind `VITE_FLAG_PRICE_INSIGHT`.
+
+## 0c. GOOGLE_TRANSLATE_KEY is INVALID — auto-translate is down
+
+Verified live: `translate-property` returns 500 with Google's
+"API key not valid". This breaks BOTH the new wizard translate button
+(Feature E) and the pre-existing `translate-description` fallback. The app
+degrades gracefully (stored `title_i18n` translations still display), but no
+NEW translations can be produced until you replace the secret:
+
+```bash
+supabase secrets set GOOGLE_TRANSLATE_KEY=<valid key> --project-ref xzzzhlwmzotibrxdqmcm
+```
+
+Check `DEEPL_API_KEY` while you're there — it's untested because the pipeline
+fails at the Google (sq→en) step first. I do not create or rotate keys.
+
+## 0d. Test account created for verification (dev DB)
+
+To verify authenticated flows end-to-end I created a confirmed test user
+directly in GoTrue: `claude-test@shtepia.dev` / `TestPass!2026` (role: agent,
+"FHO Test Agency") plus one test conversation with one message against the
+Blloku listing. Delete the user in Dashboard → Authentication when done
+(cascades the profile), or keep it as a QA account. Flagging because it's
+your data, not mine.
+
 ## 1. Supabase project auto-pause (infra / billing)
 
 The project was **paused (INACTIVE)** when I started — the whole backend was

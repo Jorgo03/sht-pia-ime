@@ -121,7 +121,11 @@
     "sortedByRelevance": "Renditur sipas rëndësisë",
     "mapView": "Pamja e hartës",
     "filtersTitle": "Filtrat",
-    "showHomes": "Shfaq {{count}} prona"
+    "showHomes": "Shfaq {{count}} prona",
+    "aiPlaceholder": "Provo: apartament me 2 dhoma në Tiranë nën 100,000 €",
+    "aiButton": "Kërkim i zgjuar",
+    "aiApplied": "Filtrat u vendosën nga kërkimi yt",
+    "aiFailed": "Nuk u kuptua — po kërkojmë sipas qytetit"
   },
   "favourites": {
     "title": "Të preferuarat",
@@ -369,5 +373,30 @@
   },
   "authCallback": {
     "signingIn": "Duke u kyçur…"
+  },
+  "ai": {
+    "panelTitle": "Shkruesi AI i shpalljes",
+    "notesPlaceholder": "Përshkruaje pronën me fjalët e tua — gjendja, lagjja, çfarë e bën të veçantë… (opsionale)",
+    "generate": "Gjenero me AI",
+    "generating": "Duke shkruar…",
+    "regenerate": "Gjenero përsëri",
+    "reviewHint": "Drafti u plotësua më poshtë — rishikoje dhe redaktoje para publikimit.",
+    "errorUnavailable": "AI nuk është i disponueshëm tani — shkruaje manualisht.",
+    "errorRateLimited": "Shumë kërkesa — provo përsëri më vonë.",
+    "errorGeneric": "Diçka shkoi keq. Provo përsëri.",
+    "translateAll": "Përkthe në të gjitha gjuhët",
+    "translating": "Duke përkthyer…",
+    "translated": "U përkthye — kontrollo çdo gjuhë.",
+    "translateFirst": "Shkruaj fillimisht titullin dhe përshkrimin në shqip"
+  },
+  "assistant": {
+    "title": "Asistenti i shpalljes",
+    "subtitle": "Përgjigjet vetëm nga kjo shpallje",
+    "fabLabel": "Pyet për këtë pronë",
+    "intro": "Përshëndetje! Më pyet çfarëdo për këtë shpallje — çmimi, dhomat, veçoritë…",
+    "placeholder": "Bëj një pyetje…",
+    "thinking": "Duke menduar…",
+    "unavailable": "Nuk mund të përgjigjem tani. Kontakto shitësin përmes faqes së shpalljes.",
+    "disclaimer": "Përgjigjet e AI bazohen vetëm në të dhënat e shpalljes — verifiko detajet e rëndësishme me shitësin."
   }
 }

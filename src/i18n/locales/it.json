@@ -121,7 +121,11 @@
     "sortedByRelevance": "Ordinato per rilevanza",
     "mapView": "Vista mappa",
     "filtersTitle": "Filtri",
-    "showHomes": "Mostra {{count}} immobili"
+    "showHomes": "Mostra {{count}} immobili",
+    "aiPlaceholder": "Prova: appartamento con 2 camere a Tirana sotto 100.000 €",
+    "aiButton": "Ricerca intelligente",
+    "aiApplied": "Filtri applicati dalla tua ricerca",
+    "aiFailed": "Non compreso — ricerca per città"
   },
   "favourites": {
     "title": "Preferiti",
@@ -369,5 +373,30 @@
   },
   "authCallback": {
     "signingIn": "Accesso in corso…"
+  },
+  "ai": {
+    "panelTitle": "Redattore IA dell'annuncio",
+    "notesPlaceholder": "Descrivi l'immobile con parole tue — condizioni, quartiere, particolarità… (facoltativo)",
+    "generate": "Genera con IA",
+    "generating": "Scrittura…",
+    "regenerate": "Rigenera",
+    "reviewHint": "Bozza inserita qui sotto — rivedila e modificala prima di pubblicare.",
+    "errorUnavailable": "L'IA non è disponibile al momento — scrivi manualmente.",
+    "errorRateLimited": "Troppe richieste — riprova più tardi.",
+    "errorGeneric": "Qualcosa è andato storto. Riprova.",
+    "translateAll": "Traduci in tutte le lingue",
+    "translating": "Traduzione…",
+    "translated": "Tradotto — controlla ogni lingua.",
+    "translateFirst": "Scrivi prima titolo e descrizione in albanese"
+  },
+  "assistant": {
+    "title": "Assistente dell'annuncio",
+    "subtitle": "Risposte basate solo su questo annuncio",
+    "fabLabel": "Chiedi su questa casa",
+    "intro": "Ciao! Chiedimi qualsiasi cosa su questo annuncio — prezzo, stanze, caratteristiche…",
+    "placeholder": "Fai una domanda…",
+    "thinking": "Sto pensando…",
+    "unavailable": "Non posso rispondere ora. Contatta il venditore dalla pagina dell'annuncio.",
+    "disclaimer": "Le risposte dell'IA si basano solo sui dati dell'annuncio — verifica i dettagli importanti con il venditore."
   }
 }

@@ -403,3 +403,30 @@ input[type="range"].dual::-moz-range-track {
   border-color: var(--fho-orange-1);
   color: var(--fho-orange-2);
 }
+
+/* --- AI natural-language search (Feature B) --- */
+.ai-search-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: var(--fho-orange-1);
+  cursor: pointer;
+  padding: 4px;
+  flex-shrink: 0;
+}
+
+.ai-search-btn:disabled { opacity: 0.6; cursor: default; }
+
+.ai-spin { animation: ai-spin 1.2s linear infinite; }
+@keyframes ai-spin { to { transform: rotate(360deg); } }
+
+.ai-search-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  font-size: 12px;
+  color: var(--fho-orange-1);
+}
