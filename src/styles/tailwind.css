@@ -1,17 +1,35 @@
 /*
- * Tailwind v4 entry — theme + utilities only.
- * Preflight is deliberately NOT imported yet: the legacy hand-rolled CSS in
- * src/styles/* was written against browser defaults, and preflight would
- * change its rendering. Import "tailwindcss/preflight.css" once the legacy
- * CSS is fully converted to utilities.
- *
- * Coexistence note: Tailwind utilities live in a cascade layer, so UNLAYERED
- * legacy CSS always wins a specificity tie. Fine for new components (which
- * carry no legacy classes) — just don't mix a legacy class and a competing
- * utility on the same element and expect the utility to win.
+ * Tailwind v4 entry — full pipeline.
+ * Cascade order (explicit, so it holds regardless of import order):
+ *   theme < base (preflight + app base) < components (legacy CSS) < utilities
+ * Legacy stylesheets are wrapped in @layer components, so utilities now win
+ * ties against legacy classes, and preflight is safely below both.
  */
+@layer theme, base, components, utilities;
+
 @import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/preflight.css' layer(base);
 @import 'tailwindcss/utilities.css' layer(utilities);
+
+/* App base: preflight compat + classes that previously leaned on browser
+ * default h1/p styling (preflight zeroes those). */
+@layer base {
+  button, [role='button'] { cursor: pointer; }
+
+  .page-title {
+    margin: 0 0 4px;
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1.15;
+    color: var(--fho-text);
+  }
+
+  .page-subtitle {
+    margin: 0 0 16px;
+    font-size: 14px;
+    color: var(--fho-text-muted);
+  }
+}
 
 /* dark: variant follows the app's ThemeContext ([data-theme="dark"]), not the OS */
 @custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
@@ -64,4 +82,19 @@
   --shadow-fho-nav: var(--fho-nav-shadow);
 
   --ease-fho-out: var(--ease-out);
+}
+
+/* Shared animations for converted components */
+@theme {
+  --animate-fho-shimmer: fho-shimmer 1.5s infinite;
+  --animate-fho-fade: fho-fade 0.2s ease;
+
+  @keyframes fho-shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+  @keyframes fho-fade {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
 }

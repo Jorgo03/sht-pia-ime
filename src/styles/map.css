@@ -1,3 +1,5 @@
+/* @layered */
+@layer components {
 .view-toggle {
   display: flex;
   gap: 4px;
@@ -175,4 +177,6 @@
 
 .leaflet-popup-tip {
   box-shadow: none !important;
+}
+
 }

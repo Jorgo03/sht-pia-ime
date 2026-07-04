@@ -1,3 +1,5 @@
+/* @layered */
+@layer components {
 .home-screen {
   padding-top: 8px;
 }
@@ -389,4 +391,6 @@
   display: flex;
   align-items: center;
   gap: 3px;
+}
+
 }

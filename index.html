@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="theme-color" content="#FF7A40" />
     <title>Future Home Orange</title>
+    <!-- Canonical cascade-layer order. MUST be declared before any stylesheet
+         loads (module imports hoist page CSS ahead of tailwind.css), otherwise
+         the first @layer block seen would re-order the cascade and preflight
+         would override the component CSS. -->
+    <style>@layer theme, base, components, utilities;</style>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
       integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
       crossorigin="" />

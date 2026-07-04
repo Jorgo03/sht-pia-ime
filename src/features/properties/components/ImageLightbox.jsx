@@ -1,6 +1,8 @@
 import { useEffect, useCallback } from 'react'
 import { X, ChevronLeft, ChevronRight } from 'lucide-react'
-import '../../../styles/lightbox.css'
+
+const navBtn =
+  'absolute top-1/2 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/15 text-white transition-colors hover:bg-white/30'
 
 export default function ImageLightbox({ images, index, onClose, onNavigate }) {
   const handleKey = useCallback((e) => {
@@ -19,28 +21,37 @@ export default function ImageLightbox({ images, index, onClose, onNavigate }) {
   }, [handleKey])
 
   return (
-    <div className="lightbox-overlay" onClick={onClose}>
-      <button className="lightbox-close" onClick={onClose} aria-label="Close">
+    <div
+      className="fixed inset-0 z-[9999] flex animate-fho-fade items-center justify-center bg-black/90"
+      onClick={onClose}
+    >
+      <button
+        className="absolute right-4 top-4 z-10 flex h-11 w-11 items-center justify-center rounded-full bg-white/15 text-white transition-colors hover:bg-white/30"
+        onClick={onClose}
+        aria-label="Close"
+      >
         <X size={24} />
       </button>
 
-      <div className="lightbox-content" onClick={e => e.stopPropagation()}>
-        <img src={images[index]} alt="" className="lightbox-img" />
+      <div className="flex max-h-[85vh] max-w-[90vw] items-center justify-center" onClick={e => e.stopPropagation()}>
+        <img src={images[index]} alt="" className="max-h-[85vh] max-w-full select-none rounded-lg object-contain" />
       </div>
 
       {images.length > 1 && (
         <>
           <button
-            className="lightbox-nav lightbox-prev"
+            className={`${navBtn} left-4`}
             onClick={e => { e.stopPropagation(); onNavigate(-1) }}
             aria-label="Previous"
           ><ChevronLeft size={28} /></button>
           <button
-            className="lightbox-nav lightbox-next"
+            className={`${navBtn} right-4`}
             onClick={e => { e.stopPropagation(); onNavigate(1) }}
             aria-label="Next"
           ><ChevronRight size={28} /></button>
-          <div className="lightbox-counter">{index + 1} / {images.length}</div>
+          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 rounded-fho-lg bg-black/60 px-4 py-1.5 text-sm font-medium text-white">
+            {index + 1} / {images.length}
+          </div>
         </>
       )}
     </div>

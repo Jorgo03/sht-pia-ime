@@ -1,3 +1,5 @@
+/* @layered */
+@layer components {
 .search-screen {
   padding-top: 8px;
 }
@@ -429,4 +431,6 @@ input[type="range"].dual::-moz-range-track {
   margin-top: 8px;
   font-size: 12px;
   color: var(--fho-orange-1);
+}
+
 }

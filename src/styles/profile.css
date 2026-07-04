@@ -1,3 +1,5 @@
+/* @layered */
+@layer components {
 /* --- Auth screen (signed out) --- */
 
 .auth-screen {
@@ -458,4 +460,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
 }

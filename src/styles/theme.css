@@ -74,13 +74,15 @@
   --fho-status-draft: #95a5a6;
 }
 
-* { box-sizing: border-box; }
-html, body, #root { height: 100%; }
-body {
-  margin: 0;
-  font-family: var(--font-sans);
-  background: var(--fho-bg);
-  color: var(--fho-text);
-  -webkit-font-smoothing: antialiased;
-  transition: background 0.3s, color 0.3s;
+/* Base rules live in the `base` layer alongside Tailwind preflight
+ * (box-sizing + body margin now come from preflight itself). */
+@layer base {
+  html, body, #root { height: 100%; }
+  body {
+    font-family: var(--font-sans);
+    background: var(--fho-bg);
+    color: var(--fho-text);
+    -webkit-font-smoothing: antialiased;
+    transition: background 0.3s, color 0.3s;
+  }
 }

@@ -1,3 +1,5 @@
+/* @layered */
+@layer components {
 .dropdown {
   position: relative;
   flex: 1;
@@ -213,4 +215,6 @@
 [data-theme="light"] .dropdown-option.selected {
   background: rgba(255, 122, 64, 0.08);
   color: var(--fho-orange-2);
+}
+
 }

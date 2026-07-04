@@ -1,3 +1,5 @@
+/* @layered */
+@layer components {
 .liquid-nav {
   position: fixed;
   bottom: 18px;
@@ -108,4 +110,6 @@
 
 [data-theme="dark"] .nav-item.active {
   color: var(--fho-orange-soft);
+}
+
 }

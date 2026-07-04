@@ -1,3 +1,5 @@
+/* @layered */
+@layer components {
 .dusk-hero {
   position: absolute;
   inset: 0;
@@ -84,4 +86,6 @@
 
 [data-theme="dark"] .building .win:nth-child(odd) {
   background: rgba(255, 200, 100, 0.45);
+}
+
 }

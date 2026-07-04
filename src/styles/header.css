@@ -1,3 +1,5 @@
+/* @layered */
+@layer components {
 .app-header {
   display: flex;
   align-items: center;
@@ -288,3 +290,5 @@
 
 .account-signout { color: #e74c3c; }
 .account-signout:hover { background: rgba(231,76,60,0.08); }
+
+}
