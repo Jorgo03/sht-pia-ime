@@ -1,0 +1,67 @@
+/*
+ * Tailwind v4 entry — theme + utilities only.
+ * Preflight is deliberately NOT imported yet: the legacy hand-rolled CSS in
+ * src/styles/* was written against browser defaults, and preflight would
+ * change its rendering. Import "tailwindcss/preflight.css" once the legacy
+ * CSS is fully converted to utilities.
+ *
+ * Coexistence note: Tailwind utilities live in a cascade layer, so UNLAYERED
+ * legacy CSS always wins a specificity tie. Fine for new components (which
+ * carry no legacy classes) — just don't mix a legacy class and a competing
+ * utility on the same element and expect the utility to win.
+ */
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/utilities.css' layer(utilities);
+
+/* dark: variant follows the app's ThemeContext ([data-theme="dark"]), not the OS */
+@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
+
+/*
+ * FHO design tokens, bridged from src/styles/theme.css.
+ * `inline` makes utilities emit var(--fho-*) references, so every utility
+ * automatically follows the light/dark theme switch.
+ * Usage: bg-fho-surface, text-fho-text-muted, border-fho-border,
+ *        text-fho-orange-1, font-fho-serif, rounded-fho-md, shadow-fho-card…
+ */
+@theme inline {
+  --color-fho-bg: var(--fho-bg);
+  --color-fho-surface: var(--fho-surface);
+  --color-fho-surface-2: var(--fho-surface-2);
+  --color-fho-text: var(--fho-text);
+  --color-fho-text-muted: var(--fho-text-muted);
+  --color-fho-text-faint: var(--fho-text-faint);
+  --color-fho-text-on-dark: var(--fho-text-on-dark);
+  --color-fho-border: var(--fho-border);
+  --color-fho-border-strong: var(--fho-border-strong);
+  --color-fho-orange-1: var(--fho-orange-1);
+  --color-fho-orange-2: var(--fho-orange-2);
+  --color-fho-orange-deep: var(--fho-orange-deep);
+  --color-fho-orange-tint: var(--fho-orange-tint);
+  --color-fho-orange-soft: var(--fho-orange-soft);
+  --color-fho-glass-bg: var(--fho-glass-bg);
+  --color-fho-glass-border: var(--fho-glass-border);
+  --color-fho-input-bg: var(--fho-input-bg);
+  --color-fho-input-border: var(--fho-input-border);
+  --color-fho-status-active: var(--fho-status-active);
+  --color-fho-status-paused: var(--fho-status-paused);
+  --color-fho-status-sold: var(--fho-status-sold);
+  --color-fho-status-rented: var(--fho-status-rented);
+  --color-fho-status-draft: var(--fho-status-draft);
+
+  --font-fho-serif: var(--font-serif);
+  --font-fho-sans: var(--font-sans);
+  --font-fho-mono: var(--font-mono);
+
+  --radius-fho-sm: var(--r-sm);
+  --radius-fho-md: var(--r-md);
+  --radius-fho-lg: var(--r-lg);
+  --radius-fho-xl: var(--r-xl);
+  --radius-fho-2xl: var(--r-2xl);
+  --radius-fho-pill: var(--r-pill);
+
+  --shadow-fho-card: var(--fho-card-shadow);
+  --shadow-fho-cta: var(--fho-cta-shadow);
+  --shadow-fho-nav: var(--fho-nav-shadow);
+
+  --ease-fho-out: var(--ease-out);
+}

@@ -28,7 +28,7 @@ Shtëpia.ime ("My Home") is a multilingual real estate marketplace built by **Fu
 | Maps | Leaflet — not Google Maps, already decided |
 | AI | Anthropic API, always via Supabase Edge Functions, never client-side |
 
-> **Migration status (2026-07-04):** Tailwind and Router v7 are the decided direction but NOT yet in the repo — today it's hand-rolled CSS in `src/styles/*` (`--fho-*` tokens) and Router v6 with v7 future flags. Until the migration lands, match the existing CSS system; don't write Tailwind classes into components. Remove this note once migrated.
+> **Migration status (2026-07-04): LANDED.** Router v7 (7.18.x) and Tailwind v4 are live, and `src/` is feature-first (`features/{properties,listings,messaging,favorites,auth,quick-add}` + `shared/`). Tailwind runs **without preflight** while the legacy CSS in `src/styles/*` is converted incrementally — new components use the `fho-*` utilities mapped in `src/styles/tailwind.css` (reference component: `src/shared/pages/NotFound.jsx`). Legacy CSS is unlayered so it beats layered utilities on ties — don't mix a legacy class and a competing utility on one element. Import preflight + drop this note when the legacy CSS is gone.
 
 Supabase project ref: `xzzzhlwmzotibrxdqmcm`. Don't add a new library for something Tailwind or an existing hook already solves — ask first.
 

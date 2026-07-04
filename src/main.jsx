@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client'
 import App from './App.jsx'
 import './i18n/index.js'
 import './styles/theme.css'
+import './styles/tailwind.css'
 import './styles/globals.css'
 import './styles/liquid-nav.css'
 
