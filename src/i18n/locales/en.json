@@ -127,9 +127,7 @@
     "seeAll": "See all →",
     "searchPlaceholder": "City, neighborhood, postcode…",
     "country": "Albania",
-    "homesCount": "{{count}} homes",
-    "detectLocation": "Detect my location",
-    "locating": "Locating…"
+    "homesCount": "{{count}} homes"
   },
   "search": {
     "title": "Search properties",

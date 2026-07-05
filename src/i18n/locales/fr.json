@@ -75,9 +75,7 @@
     "seeAll": "Voir tout →",
     "searchPlaceholder": "Ville, quartier, code postal...",
     "country": "Albanie",
-    "homesCount": "{{count}} biens",
-    "detectLocation": "Détecter ma position",
-    "locating": "Localisation…"
+    "homesCount": "{{count}} biens"
   },
   "search": {
     "title": "Rechercher des biens",

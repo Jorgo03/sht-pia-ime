@@ -75,9 +75,7 @@
     "seeAll": "Alle anzeigen →",
     "searchPlaceholder": "Stadt, Stadtteil, PLZ...",
     "country": "Albanien",
-    "homesCount": "{{count}} Immobilien",
-    "detectLocation": "Standort ermitteln",
-    "locating": "Standort wird ermittelt…"
+    "homesCount": "{{count}} Immobilien"
   },
   "search": {
     "title": "Immobilien suchen",
