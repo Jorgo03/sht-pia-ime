@@ -11,16 +11,18 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 function friendlyError(err, t) {
   if (!err?.message) return t('errors.generic')
+  if (err.code === 'email_address_invalid') return t('errors.invalidEmail')
   const map = {
     'Invalid login credentials': 'errors.invalidCredentials',
     'User already registered': 'errors.userExists',
     'Email not confirmed': 'errors.emailNotConfirmed',
+    'is invalid': 'errors.invalidEmail',
     'For security purposes, you can only request this after': 'errors.rateLimited',
     'provider is not enabled': 'errors.providerNotConfigured',
     'Unsupported provider': 'errors.providerNotConfigured',
   }
   const key = Object.keys(map).find((k) => err.message.includes(k))
-  return key ? t(map[key]) : err.message
+  return key ? t(map[key]) : t('errors.generic')
 }
 
 export default function Profile() {
