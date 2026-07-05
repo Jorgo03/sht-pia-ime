@@ -211,7 +211,9 @@
     "invalidCredentials": "Ungültige E-Mail oder Passwort.",
     "userExists": "Ein Konto mit dieser E-Mail existiert bereits.",
     "emailNotConfirmed": "Bitte bestätige deine E-Mail vor der Anmeldung.",
-    "rateLimited": "Zu viele Anfragen. Bitte versuche es später erneut."
+    "rateLimited": "Zu viele Anfragen. Bitte versuche es später erneut.",
+    "valueOutOfRange": "Eine der eingegebenen Zahlen ist zu groß. Bitte prüfe Fläche, Stockwerk oder Baujahr.",
+    "submitFailed": "Das Inserat konnte nicht veröffentlicht werden. Bitte erneut versuchen."
   },
   "agentDashboard": {
     "title": "Makler-Dashboard",
@@ -291,7 +293,8 @@
       "heating": "Heizung",
       "security": "Sicherheit",
       "storage": "Abstellraum"
-    }
+    },
+    "valueOutOfRange": "Der Wert muss zwischen {{min}} und {{max}} liegen."
   },
   "dashboard": {
     "title": "Immobilien-Dashboard",

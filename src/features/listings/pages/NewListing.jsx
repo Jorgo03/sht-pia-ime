@@ -45,6 +45,32 @@ const CITIES = ['Tiranë', 'Durrës', 'Vlorë', 'Shkodër', 'Elbasan', 'Korçë'
 const FEATURES_LIST = ['balcony', 'parking', 'elevator', 'garden', 'pool', 'furnished', 'airConditioning', 'heating', 'security', 'storage']
 const LANGS = ['sq', 'en', 'de', 'it', 'es', 'pl', 'ru', 'fr']
 
+// properties.sqft/beds/floor/total_floors/year_built are Postgres `integer`
+// (±2.14B). Without a client-side bound, a fat-fingered value sails through
+// every step and only fails at final insert with a raw DB error — these caps
+// stop that well before the request ever leaves the browser.
+const MAX_PRICE = 999_999_999
+const MAX_SQFT = 100_000
+const MAX_BEDS = 50
+const MAX_BATHS = 50
+const MIN_FLOOR = -10
+const MAX_FLOOR = 200
+const MIN_YEAR = 1800
+const MAX_YEAR = new Date().getFullYear() + 2
+
+function outOfRange(raw, min, max) {
+  if (raw === '' || raw == null) return false
+  const n = Number(raw)
+  return Number.isNaN(n) || n < min || n > max
+}
+
+function friendlySubmitError(err, t) {
+  if (err?.code === '22003' || /out of range/i.test(err?.message || '')) {
+    return t('errors.valueOutOfRange')
+  }
+  return t('errors.submitFailed')
+}
+
 export default function NewListing() {
   const { t } = useTranslation()
   const { user } = useAuth()
@@ -131,7 +157,16 @@ export default function NewListing() {
     }
     if (step === 2) {
       if (!form.price || Number(form.price) <= 0) errs.price = t('listing.required')
+      else if (Number(form.price) > MAX_PRICE) errs.price = t('listing.valueOutOfRange', { min: 0, max: MAX_PRICE.toLocaleString() })
+
       if (!form.sqft || Number(form.sqft) <= 0) errs.sqft = t('listing.required')
+      else if (Number(form.sqft) > MAX_SQFT) errs.sqft = t('listing.valueOutOfRange', { min: 1, max: MAX_SQFT.toLocaleString() })
+
+      if (outOfRange(form.beds, 0, MAX_BEDS)) errs.beds = t('listing.valueOutOfRange', { min: 0, max: MAX_BEDS })
+      if (outOfRange(form.baths, 0, MAX_BATHS)) errs.baths = t('listing.valueOutOfRange', { min: 0, max: MAX_BATHS })
+      if (outOfRange(form.floor, MIN_FLOOR, MAX_FLOOR)) errs.floor = t('listing.valueOutOfRange', { min: MIN_FLOOR, max: MAX_FLOOR })
+      if (outOfRange(form.total_floors, 1, MAX_FLOOR)) errs.total_floors = t('listing.valueOutOfRange', { min: 1, max: MAX_FLOOR })
+      if (outOfRange(form.year_built, MIN_YEAR, MAX_YEAR)) errs.year_built = t('listing.valueOutOfRange', { min: MIN_YEAR, max: MAX_YEAR })
     }
     if (step === 3) {
       if (images.length < 3) errs.images = t('listing.minImages')
@@ -203,7 +238,7 @@ export default function NewListing() {
       if (error) throw error
       navigate('/my-listings')
     } catch (err) {
-      setErrors({ submit: err.message })
+      setErrors({ submit: friendlySubmitError(err, t) })
     } finally {
       setSubmitting(false)
     }
@@ -328,7 +363,7 @@ export default function NewListing() {
             <div className="nl-row">
               <div className="nl-field" style={{ flex: 2 }}>
                 <label>{t('listing.price')}</label>
-                <input type="number" value={form.price} onChange={e => update('price', e.target.value)} placeholder="0" />
+                <input type="number" min="0" max={MAX_PRICE} value={form.price} onChange={e => update('price', e.target.value)} placeholder="0" />
                 {errors.price && <span className="nl-error">{errors.price}</span>}
               </div>
               <div className="nl-field" style={{ flex: 1 }}>
@@ -342,17 +377,37 @@ export default function NewListing() {
             </div>
             <div className="nl-field">
               <label>{t('listing.surface')} (m²)</label>
-              <input type="number" value={form.sqft} onChange={e => update('sqft', e.target.value)} placeholder="0" />
+              <input type="number" min="1" max={MAX_SQFT} value={form.sqft} onChange={e => update('sqft', e.target.value)} placeholder="0" />
               {errors.sqft && <span className="nl-error">{errors.sqft}</span>}
             </div>
             <div className="nl-row">
-              <div className="nl-field"><label>{t('property.beds')}</label><input type="number" value={form.beds} onChange={e => update('beds', e.target.value)} placeholder="0" /></div>
-              <div className="nl-field"><label>{t('property.baths')}</label><input type="number" value={form.baths} onChange={e => update('baths', e.target.value)} placeholder="0" /></div>
+              <div className="nl-field">
+                <label>{t('property.beds')}</label>
+                <input type="number" min="0" max={MAX_BEDS} value={form.beds} onChange={e => update('beds', e.target.value)} placeholder="0" />
+                {errors.beds && <span className="nl-error">{errors.beds}</span>}
+              </div>
+              <div className="nl-field">
+                <label>{t('property.baths')}</label>
+                <input type="number" min="0" max={MAX_BATHS} value={form.baths} onChange={e => update('baths', e.target.value)} placeholder="0" />
+                {errors.baths && <span className="nl-error">{errors.baths}</span>}
+              </div>
             </div>
             <div className="nl-row">
-              <div className="nl-field"><label>{t('listing.floor')}</label><input type="number" value={form.floor} onChange={e => update('floor', e.target.value)} placeholder="0" /></div>
-              <div className="nl-field"><label>{t('listing.totalFloors')}</label><input type="number" value={form.total_floors} onChange={e => update('total_floors', e.target.value)} placeholder="0" /></div>
-              <div className="nl-field"><label>{t('listing.yearBuilt')}</label><input type="number" value={form.year_built} onChange={e => update('year_built', e.target.value)} placeholder="2024" /></div>
+              <div className="nl-field">
+                <label>{t('listing.floor')}</label>
+                <input type="number" min={MIN_FLOOR} max={MAX_FLOOR} value={form.floor} onChange={e => update('floor', e.target.value)} placeholder="0" />
+                {errors.floor && <span className="nl-error">{errors.floor}</span>}
+              </div>
+              <div className="nl-field">
+                <label>{t('listing.totalFloors')}</label>
+                <input type="number" min="1" max={MAX_FLOOR} value={form.total_floors} onChange={e => update('total_floors', e.target.value)} placeholder="0" />
+                {errors.total_floors && <span className="nl-error">{errors.total_floors}</span>}
+              </div>
+              <div className="nl-field">
+                <label>{t('listing.yearBuilt')}</label>
+                <input type="number" min={MIN_YEAR} max={MAX_YEAR} value={form.year_built} onChange={e => update('year_built', e.target.value)} placeholder="2024" />
+                {errors.year_built && <span className="nl-error">{errors.year_built}</span>}
+              </div>
             </div>
             <div className="nl-field">
               <label>{t('listing.features')}</label>

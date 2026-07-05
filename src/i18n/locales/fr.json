@@ -211,7 +211,9 @@
     "invalidCredentials": "E-mail ou mot de passe incorrect.",
     "userExists": "Un compte avec cet e-mail existe déjà.",
     "emailNotConfirmed": "Confirmez votre e-mail avant de vous connecter.",
-    "rateLimited": "Trop de requêtes. Veuillez réessayer plus tard."
+    "rateLimited": "Trop de requêtes. Veuillez réessayer plus tard.",
+    "valueOutOfRange": "L'un des nombres saisis est trop grand. Vérifiez la surface, l'étage ou l'année de construction.",
+    "submitFailed": "Impossible de publier l'annonce. Veuillez réessayer."
   },
   "agentDashboard": {
     "title": "Tableau de bord Agent",
@@ -291,7 +293,8 @@
       "heating": "Chauffage",
       "security": "Sécurité",
       "storage": "Rangement"
-    }
+    },
+    "valueOutOfRange": "La valeur doit être comprise entre {{min}} et {{max}}."
   },
   "dashboard": {
     "title": "Tableau de bord du bien",

@@ -211,7 +211,9 @@
     "invalidCredentials": "Correo o contraseña incorrectos.",
     "userExists": "Ya existe una cuenta con este correo.",
     "emailNotConfirmed": "Confirma tu correo antes de iniciar sesión.",
-    "rateLimited": "Demasiadas solicitudes. Inténtalo más tarde."
+    "rateLimited": "Demasiadas solicitudes. Inténtalo más tarde.",
+    "valueOutOfRange": "Uno de los números introducidos es demasiado grande. Revisa la superficie, la planta o el año de construcción.",
+    "submitFailed": "No se pudo publicar el anuncio. Inténtalo de nuevo."
   },
   "agentDashboard": {
     "title": "Panel del Agente",
@@ -291,7 +293,8 @@
       "heating": "Calefacción",
       "security": "Seguridad",
       "storage": "Trastero"
-    }
+    },
+    "valueOutOfRange": "El valor debe estar entre {{min}} y {{max}}."
   },
   "dashboard": {
     "title": "Dashboard de propiedad",

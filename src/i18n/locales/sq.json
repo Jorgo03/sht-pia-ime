@@ -204,7 +204,9 @@
     "invalidCredentials": "Email ose fjalëkalim i gabuar.",
     "userExists": "Një llogari me këtë email ekziston.",
     "emailNotConfirmed": "Konfirmoni emailin përpara se të hyni.",
-    "rateLimited": "Shumë kërkesa. Provo përsëri më vonë."
+    "rateLimited": "Shumë kërkesa. Provo përsëri më vonë.",
+    "valueOutOfRange": "Një nga numrat që vendose është shumë i madh. Kontrollo sipërfaqen, katin ose vitin e ndërtimit.",
+    "submitFailed": "Shpallja nuk u publikua. Provo përsëri."
   },
   "agentDashboard": {
     "title": "Paneli i Agjentit",
@@ -343,7 +345,8 @@
       "heating": "Ngrohje",
       "security": "Siguri",
       "storage": "Magazinë"
-    }
+    },
+    "valueOutOfRange": "Vlera duhet të jetë midis {{min}} dhe {{max}}."
   },
   "dashboard": {
     "title": "Paneli i pronës",

@@ -211,7 +211,9 @@
     "invalidCredentials": "Email o password non validi.",
     "userExists": "Un account con questa email esiste già.",
     "emailNotConfirmed": "Conferma la tua email prima di accedere.",
-    "rateLimited": "Troppe richieste. Riprova più tardi."
+    "rateLimited": "Troppe richieste. Riprova più tardi.",
+    "valueOutOfRange": "Uno dei numeri inseriti è troppo grande. Controlla la superficie, il piano o l'anno di costruzione.",
+    "submitFailed": "Impossibile pubblicare l'annuncio. Riprova."
   },
   "agentDashboard": {
     "title": "Dashboard Agente",
@@ -291,7 +293,8 @@
       "heating": "Riscaldamento",
       "security": "Sicurezza",
       "storage": "Magazzino"
-    }
+    },
+    "valueOutOfRange": "Il valore deve essere compreso tra {{min}} e {{max}}."
   },
   "dashboard": {
     "title": "Dashboard immobile",

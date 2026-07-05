@@ -256,7 +256,9 @@
     "invalidCredentials": "Invalid email or password.",
     "userExists": "An account with this email already exists.",
     "emailNotConfirmed": "Please confirm your email before signing in.",
-    "rateLimited": "Too many requests. Please try again later."
+    "rateLimited": "Too many requests. Please try again later.",
+    "valueOutOfRange": "One of the numbers you entered is too large. Please check surface area, floor, or year built.",
+    "submitFailed": "Couldn't publish the listing. Please try again."
   },
   "agentDashboard": {
     "title": "Agent Dashboard",
@@ -343,7 +345,8 @@
       "heating": "Heating",
       "security": "Security",
       "storage": "Storage"
-    }
+    },
+    "valueOutOfRange": "Value must be between {{min}} and {{max}}."
   },
   "dashboard": {
     "title": "Property Dashboard",

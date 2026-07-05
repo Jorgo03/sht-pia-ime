@@ -215,7 +215,9 @@
     "invalidCredentials": "Nieprawidłowy e-mail lub hasło.",
     "userExists": "Konto z tym e-mailem już istnieje.",
     "emailNotConfirmed": "Potwierdź swój e-mail przed zalogowaniem.",
-    "rateLimited": "Zbyt wiele żądań. Spróbuj ponownie później."
+    "rateLimited": "Zbyt wiele żądań. Spróbuj ponownie później.",
+    "valueOutOfRange": "Jedna z wprowadzonych liczb jest zbyt duża. Sprawdź powierzchnię, piętro lub rok budowy.",
+    "submitFailed": "Nie udało się opublikować ogłoszenia. Spróbuj ponownie."
   },
   "agentDashboard": {
     "title": "Panel Agenta",
@@ -295,7 +297,8 @@
       "heating": "Ogrzewanie",
       "security": "Ochrona",
       "storage": "Schowek"
-    }
+    },
+    "valueOutOfRange": "Wartość musi być między {{min}} a {{max}}."
   },
   "dashboard": {
     "title": "Dashboard nieruchomości",
