@@ -7,6 +7,7 @@ import PropertyCard from '../components/PropertyCard'
 import SkeletonCard from '../../../shared/SkeletonCard'
 import { useProperties, usePropertiesByIds } from '../hooks/useProperties'
 import { useRecentlyViewed } from '../hooks/useRecentlyViewed'
+import { useCurrentLocation } from '../hooks/useCurrentLocation'
 import { useAuth } from '../../auth/AuthContext'
 import '../../../styles/home.css'
 
@@ -15,14 +16,15 @@ const NEIGHBORHOOD_COLORS = ['#ff7d1a', '#e85d00', '#cc5200', '#ff9f4a', '#d4722
 export default function Home() {
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const { user } = useAuth()
+  const { user, profile } = useAuth()
   const { properties, loading, error } = useProperties({})
   const { recentIds } = useRecentlyViewed()
   const { properties: recentProperties } = usePropertiesByIds(recentIds.slice(0, 6))
+  const city = useCurrentLocation()
 
   const hour = new Date().getHours()
   const greeting = hour < 12 ? t('home.greetingMorning') : t('home.greetingEvening')
-  const firstName = user?.user_metadata?.full_name?.split(' ')[0] || user?.email?.split('@')[0] || ''
+  const displayName = profile?.full_name || user?.user_metadata?.full_name || user?.email?.split('@')[0] || ''
   const matchCount = properties.length
 
   const featured = properties[0]
@@ -40,10 +42,10 @@ export default function Home() {
       <section className="screen-head">
         <div className="screen-kicker">
           <span className="screen-kicker__dash" />
-          {greeting} · {t('home.cityTag')}
+          {greeting}{city ? ` · ${city}` : ''}
         </div>
         <h1 className="screen-headline">
-          {greeting}{firstName ? `, ${firstName}` : ''}. <em>{t('home.matchesToday', { count: matchCount })}</em>
+          {greeting}{displayName ? `, ${displayName}` : ''}. <em>{t('home.matchesToday', { count: matchCount })}</em>
         </h1>
       </section>
 
