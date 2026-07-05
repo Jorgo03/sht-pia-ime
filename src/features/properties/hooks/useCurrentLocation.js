@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 const CACHE_KEY = 'fho_geo_city'
@@ -15,42 +15,50 @@ function readCache(lang) {
 }
 
 // Real "where the user actually is" for diaspora/foreign users, not a
-// hardcoded city. Client-side geolocation + OpenStreetMap Nominatim reverse
-// geocoding (same no-API-key stack as the Leaflet maps already in this app,
-// so no Edge Function proxy needed). Silent on denial/timeout/failure — the
-// caller just gets null and omits the location segment.
+// hardcoded city — but only on request. Geolocation is a permission prompt,
+// so this never fires on its own; the caller must call requestLocation()
+// from a tap (e.g. a "detect my location" button), matching the same
+// no-API-key stack (Geolocation + OpenStreetMap Nominatim) the Leaflet map
+// already uses, so no Edge Function proxy is needed.
 export function useCurrentLocation() {
   const { i18n } = useTranslation()
   const [city, setCity] = useState(() => readCache(i18n.language))
+  // 'idle' | 'requesting' | 'resolved' | 'denied' | 'unavailable' | 'error'
+  const [status, setStatus] = useState(() => (city ? 'resolved' : 'idle'))
 
   useEffect(() => {
     const cached = readCache(i18n.language)
-    if (cached) { setCity(cached); return }
-    if (!navigator.geolocation) return
+    setCity(cached)
+    setStatus(cached ? 'resolved' : 'idle')
+  }, [i18n.language])
 
-    let cancelled = false
+  const requestLocation = useCallback(() => {
+    if (!navigator.geolocation) { setStatus('unavailable'); return }
+    setStatus('requesting')
     navigator.geolocation.getCurrentPosition(
       async (pos) => {
         try {
           const { latitude, longitude } = pos.coords
           const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}&zoom=10&accept-language=${i18n.language}`
           const r = await fetch(url, { headers: { Accept: 'application/json' } })
-          if (!r.ok || cancelled) return
+          if (!r.ok) { setStatus('error'); return }
           const data = await r.json()
           const resolved = data.address?.city || data.address?.town || data.address?.village || data.address?.municipality
           if (resolved) {
             localStorage.setItem(CACHE_KEY, JSON.stringify({ city: resolved, lang: i18n.language, at: Date.now() }))
             setCity(resolved)
+            setStatus('resolved')
+          } else {
+            setStatus('unavailable')
           }
         } catch {
-          // network/parse failure — leave city as null
+          setStatus('error')
         }
       },
-      () => { /* permission denied or unavailable — leave city as null */ },
+      () => setStatus('denied'),
       { timeout: 8000, maximumAge: CACHE_MS },
     )
-    return () => { cancelled = true }
   }, [i18n.language])
 
-  return city
+  return { city, status, requestLocation }
 }

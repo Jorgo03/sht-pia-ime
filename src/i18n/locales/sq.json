@@ -75,7 +75,9 @@
     "seeAll": "Shiko të gjitha →",
     "searchPlaceholder": "Qytet, lagje, kod postar...",
     "country": "Shqipëri",
-    "homesCount": "{{count}} prona"
+    "homesCount": "{{count}} prona",
+    "detectLocation": "Zbulo vendndodhjen",
+    "locating": "Duke gjetur vendndodhjen…"
   },
   "search": {
     "title": "Kërko pronë",

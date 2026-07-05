@@ -75,7 +75,9 @@
     "seeAll": "Vedi tutto →",
     "searchPlaceholder": "Città, quartiere, CAP...",
     "country": "Albania",
-    "homesCount": "{{count}} immobili"
+    "homesCount": "{{count}} immobili",
+    "detectLocation": "Rileva posizione",
+    "locating": "Localizzazione…"
   },
   "search": {
     "title": "Cerca immobili",

@@ -79,7 +79,9 @@
     "country": "Албания",
     "homesCount_one": "{{count}} дом",
     "homesCount_few": "{{count}} дома",
-    "homesCount_many": "{{count}} домов"
+    "homesCount_many": "{{count}} домов",
+    "detectLocation": "Определить местоположение",
+    "locating": "Определение местоположения…"
   },
   "search": {
     "title": "Поиск недвижимости",

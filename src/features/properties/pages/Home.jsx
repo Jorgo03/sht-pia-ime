@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Search as SearchIcon } from 'lucide-react'
+import { Search as SearchIcon, MapPin } from 'lucide-react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import FeaturedCard from '../components/FeaturedCard'
@@ -20,7 +20,7 @@ export default function Home() {
   const { properties, loading, error } = useProperties({})
   const { recentIds } = useRecentlyViewed()
   const { properties: recentProperties } = usePropertiesByIds(recentIds.slice(0, 6))
-  const city = useCurrentLocation()
+  const { city, status: locationStatus, requestLocation } = useCurrentLocation()
 
   const hour = new Date().getHours()
   const greeting = hour < 12 ? t('home.greetingMorning') : t('home.greetingEvening')
@@ -42,7 +42,22 @@ export default function Home() {
       <section className="screen-head">
         <div className="screen-kicker">
           <span className="screen-kicker__dash" />
-          {greeting}{city ? ` · ${city}` : ''}
+          {greeting}
+          {city && ` · ${city}`}
+          {!city && locationStatus === 'requesting' && (
+            <span className="ml-1.5 inline-flex items-center gap-1 font-fho-mono text-[11px] uppercase tracking-[0.14em] text-fho-text-muted">
+              <MapPin size={11} className="animate-pulse" /> {t('home.locating')}
+            </span>
+          )}
+          {!city && locationStatus !== 'requesting' && (
+            <button
+              type="button"
+              onClick={requestLocation}
+              className="ml-1.5 inline-flex cursor-pointer items-center gap-1 border-0 bg-transparent p-0 font-fho-mono text-[11px] uppercase tracking-[0.14em] text-fho-orange-1 hover:underline"
+            >
+              <MapPin size={11} /> {t('home.detectLocation')}
+            </button>
+          )}
         </div>
         <h1 className="screen-headline">
           {greeting}{displayName ? `, ${displayName}` : ''}. <em>{t('home.matchesToday', { count: matchCount })}</em>

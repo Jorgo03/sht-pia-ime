@@ -79,7 +79,9 @@
     "country": "Albania",
     "homesCount_one": "{{count}} dom",
     "homesCount_few": "{{count}} domy",
-    "homesCount_many": "{{count}} domów"
+    "homesCount_many": "{{count}} domów",
+    "detectLocation": "Wykryj lokalizację",
+    "locating": "Ustalanie lokalizacji…"
   },
   "search": {
     "title": "Szukaj nieruchomości",
