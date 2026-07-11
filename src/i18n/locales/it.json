@@ -231,7 +231,8 @@
     "imageInvalidType": "Sono consentiti solo file immagine",
     "imageTooLarge": "Immagine troppo grande (max {{max}} MB)",
     "imageUploadFailed": "Caricamento immagini non riuscito — riprova",
-    "updateFailed": "Aggiornamento non riuscito — riprova"
+    "updateFailed": "Aggiornamento non riuscito — riprova",
+    "oauthFailed": "Accesso con il provider non riuscito — riprova"
   },
   "agentDashboard": {
     "title": "Dashboard Agente",

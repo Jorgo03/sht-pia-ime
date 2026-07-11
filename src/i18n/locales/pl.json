@@ -235,7 +235,8 @@
     "imageInvalidType": "Dozwolone są tylko pliki graficzne",
     "imageTooLarge": "Obraz jest za duży (maks. {{max}} MB)",
     "imageUploadFailed": "Przesyłanie obrazów nie powiodło się — spróbuj ponownie",
-    "updateFailed": "Aktualizacja nie powiodła się — spróbuj ponownie"
+    "updateFailed": "Aktualizacja nie powiodła się — spróbuj ponownie",
+    "oauthFailed": "Logowanie przez dostawcę nie powiodło się — spróbuj ponownie"
   },
   "agentDashboard": {
     "title": "Panel Agenta",

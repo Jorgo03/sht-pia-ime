@@ -231,7 +231,8 @@
     "imageInvalidType": "Nur Bilddateien sind erlaubt",
     "imageTooLarge": "Bild ist zu groß (max. {{max}} MB)",
     "imageUploadFailed": "Bild-Upload fehlgeschlagen — bitte erneut versuchen",
-    "updateFailed": "Aktualisierung fehlgeschlagen — bitte erneut versuchen"
+    "updateFailed": "Aktualisierung fehlgeschlagen — bitte erneut versuchen",
+    "oauthFailed": "Anmeldung über den Anbieter fehlgeschlagen — bitte erneut versuchen"
   },
   "agentDashboard": {
     "title": "Makler-Dashboard",

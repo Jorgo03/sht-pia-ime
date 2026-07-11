@@ -38,6 +38,18 @@ AUDIT.md was fixed; see the final report for the change log.
   UI, but sending requires cron + email infrastructure (Resend/SES +
   pg_cron); infra choice is yours (see P2-D).
 
+### P2-G. Apple/LinkedIn: credentials entered, but the providers are NOT enabled (2026-07-12)
+
+Verified live against GoTrue (`/auth/v1/settings`): `apple: false`,
+`linkedin_oidc: false`, `google: true`. Clicking either button reaches the
+correct authorize URL and GoTrue answers
+`400 "Unsupported provider: provider is not enabled"`. The client ID/secret
+being saved is not enough — the provider's **Enable** toggle in
+Dashboard → Authentication → Providers must be on (and the change saved).
+App-side wiring is complete and verified; no code change is needed after
+you flip the toggles. Note LinkedIn has two dashboard entries — enable
+**LinkedIn (OIDC)**, not the deprecated "LinkedIn".
+
 ### P2-B. 8 orphaned storage files — approve deletion
 
 `property-images/9c47f15e-…/1783195…` (8 files, 2026-07-04) are referenced by

@@ -276,7 +276,8 @@
     "imageInvalidType": "Only image files are allowed",
     "imageTooLarge": "Image is too large (max {{max}} MB)",
     "imageUploadFailed": "Image upload failed — try again",
-    "updateFailed": "Update failed — try again"
+    "updateFailed": "Update failed — try again",
+    "oauthFailed": "Sign-in with the provider failed — try again"
   },
   "agentDashboard": {
     "title": "Agent Dashboard",

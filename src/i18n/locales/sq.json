@@ -224,7 +224,8 @@
     "imageInvalidType": "Lejohen vetëm skedarë imazhi",
     "imageTooLarge": "Imazhi është shumë i madh (maks. {{max}} MB)",
     "imageUploadFailed": "Ngarkimi i imazheve dështoi — provo përsëri",
-    "updateFailed": "Përditësimi dështoi — provo përsëri"
+    "updateFailed": "Përditësimi dështoi — provo përsëri",
+    "oauthFailed": "Kyçja me ofruesin dështoi — provo përsëri"
   },
   "agentDashboard": {
     "title": "Paneli i Agjentit",

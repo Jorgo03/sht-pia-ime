@@ -231,7 +231,8 @@
     "imageInvalidType": "Seuls les fichiers image sont autorisés",
     "imageTooLarge": "Image trop volumineuse (max {{max}} Mo)",
     "imageUploadFailed": "Échec du téléversement des images — réessayez",
-    "updateFailed": "Échec de la mise à jour — réessayez"
+    "updateFailed": "Échec de la mise à jour — réessayez",
+    "oauthFailed": "La connexion via le fournisseur a échoué — réessayez"
   },
   "agentDashboard": {
     "title": "Tableau de bord Agent",

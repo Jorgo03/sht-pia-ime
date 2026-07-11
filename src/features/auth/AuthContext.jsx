@@ -139,7 +139,12 @@ export function AuthProvider({ children }) {
       provider,
       options: {
         redirectTo: `${window.location.origin}/auth/callback`,
-        queryParams: { access_type: 'offline', prompt: 'consent' },
+        // Google-only params (refresh-token grant + account chooser) —
+        // Apple and LinkedIn don't recognize them and Apple can reject the
+        // authorize request outright on unknown prompt values.
+        ...(provider === 'google'
+          ? { queryParams: { access_type: 'offline', prompt: 'consent' } }
+          : {}),
       },
     })
     return { error }

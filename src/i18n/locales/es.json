@@ -231,7 +231,8 @@
     "imageInvalidType": "Solo se permiten archivos de imagen",
     "imageTooLarge": "La imagen es demasiado grande (máx. {{max}} MB)",
     "imageUploadFailed": "Error al subir las imágenes — inténtalo de nuevo",
-    "updateFailed": "Error al actualizar — inténtalo de nuevo"
+    "updateFailed": "Error al actualizar — inténtalo de nuevo",
+    "oauthFailed": "El inicio de sesión con el proveedor falló — inténtalo de nuevo"
   },
   "agentDashboard": {
     "title": "Panel del Agente",
