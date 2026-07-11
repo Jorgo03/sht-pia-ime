@@ -23,6 +23,12 @@ export default function MyListings() {
   const navigate = useNavigate()
   const [listings, setListings] = useState([])
   const [loading, setLoading] = useState(true)
+  const [actionError, setActionError] = useState(false)
+
+  const flashError = () => {
+    setActionError(true)
+    setTimeout(() => setActionError(false), 3000)
+  }
 
   useEffect(() => {
     if (!user) return
@@ -39,13 +45,15 @@ export default function MyListings() {
 
   const toggleStatus = async (id, current) => {
     const next = current === 'active' ? 'paused' : 'active'
-    await supabase.from('properties').update({ status: next }).eq('id', id)
+    const { error } = await supabase.from('properties').update({ status: next }).eq('id', id)
+    if (error) { flashError(); return }
     setListings(prev => prev.map(p => p.id === id ? { ...p, status: next } : p))
   }
 
   const deleteListing = async (id) => {
     if (!confirm(t('listing.confirmDelete'))) return
-    await supabase.from('properties').delete().eq('id', id)
+    const { error } = await supabase.from('properties').delete().eq('id', id)
+    if (error) { flashError(); return }
     setListings(prev => prev.filter(p => p.id !== id))
   }
 
@@ -70,6 +78,10 @@ export default function MyListings() {
           className="flex items-center gap-1.5 rounded-[10px] border-none bg-[linear-gradient(135deg,var(--fho-orange-1),var(--fho-orange-2))] px-4 py-2 text-[13px] font-semibold text-white"
         ><Plus size={16} /> {t('listing.newListing')}</button>
       </div>
+
+      {actionError && (
+        <div className="addsheet-toast" role="alert" onClick={() => setActionError(false)}>{t('errors.updateFailed')}</div>
+      )}
 
       {loading ? (
         <div className="py-8 text-center text-fho-text-muted">{t('common.loading')}</div>

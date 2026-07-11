@@ -84,7 +84,7 @@ export default function Header() {
             </div>
           )}
         </div>
-        <button className="theme-btn" onClick={toggle} aria-label="Toggle theme">
+        <button className="theme-btn" onClick={toggle} aria-label={t('common.toggleTheme')}>
           {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
         </button>
         <div className="account-switcher" ref={accountRef}>

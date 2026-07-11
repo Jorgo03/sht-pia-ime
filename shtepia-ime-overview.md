@@ -23,7 +23,7 @@ plural suffixes where others use the base key).
 | `messages` | chat messages | participants only; realtime |
 | `saved_searches` | named filter sets (AddSheet) | own rows only |
 | `wanted_homes` | reverse listings (buyer posts wants) | owner CRUD; agents may read `open` ones |
-| `viewings` | viewing requests (schema only, no UI yet) | client + property owner/agent |
+| `viewings` | viewing requests (UI live since pass 2) | client + property owner/agent |
 | `leads` | agent's private lead tracker | own rows only |
 | `property_activity` | view/call/message/meeting analytics | insert open (anon tracking, flagged in advisor); owner read |
 | `property_views` | legacy, unused by app | locked (owner read only) |
@@ -55,13 +55,15 @@ set they return `503 ai_unavailable` and the client falls back to non-AI paths.
 | Listing wizard (draft → publish, images, video URL) | live |
 | My listings + per-property analytics dashboard | live |
 | Messaging (list + thread + realtime + unread) | live (v1, this pass) |
-| Saved searches / wanted homes / leads (create via AddSheet) | live; no manage/view UI yet |
+| Saved searches / wanted homes (create + manage/view at `/saved-searches`) | live (manage UI: pass 2) |
+| Leads (create via AddSheet) | live; count on agent dashboard, no manage UI yet |
 | Auth: email+password, email OTP, Google OAuth | live |
 | Auth: Apple, LinkedIn OIDC | buttons live, provider consoles pending (DECISIONS.md §2–3) |
 | AI: listing generator / NL search / listing assistant | built, behind flags, awaiting ANTHROPIC_API_KEY |
 | Auto-translate listings (Feature E) | live (DeepL/Google pipeline, wizard button) |
-| Viewings scheduling | schema only |
-| Agent dashboard | placeholder |
+| Viewings scheduling (request on property page, manage at `/viewings`) | live (pass 2) |
+| Agent dashboard (stats + pending viewings + wanted-homes feed) | live v1 (pass 2) |
+| Search sorting (newest / price ↑↓) | live (pass 2) |
 | Smart recommendations, photo tagging, price insight | not started (price insight flagged in DECISIONS.md) |
 
 ## Open Business Questions

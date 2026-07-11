@@ -1,12 +1,12 @@
-import { useState } from 'react'
+import { memo, useState } from 'react'
 import { Heart, MapPin, Bed, Bath, Ruler } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { formatPrice, imageFor, getLocalizedText } from '../../../lib/format'
+import { formatPrice, imageFor, getLocalizedText, listingBadgeKey, priceSuffixKey } from '../../../lib/format'
 import { useFavorites } from '../../favorites/FavoritesContext'
 import { useAuth } from '../../auth/AuthContext'
 
-export default function FeaturedCard({ property }) {
+function FeaturedCard({ property }) {
   const navigate = useNavigate()
   const { t, i18n } = useTranslation()
   const { user } = useAuth()
@@ -16,9 +16,13 @@ export default function FeaturedCard({ property }) {
 
   const hasImage = property.image_urls?.[0] && !imgBroken
   const price = formatPrice(property.price, i18n.language, property.currency)
-  const suffix = property.listing_type === 'rent' ? t('property.perMonth') : ''
+  const suffixKey = priceSuffixKey(property.listing_type)
+  const suffix = suffixKey ? t(suffixKey) : ''
   const title = getLocalizedText(property.title_i18n, i18n.language) || property.title
-  const badge = property.listing_type === 'rent' ? t('property.forRent') : t('property.forSale')
+  const badge = t(listingBadgeKey(property.listing_type))
+
+  const open = () => navigate(`/property/${property.id}`)
+  const keyOpen = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open() } }
 
   const handleFavorite = (e) => {
     e.stopPropagation()
@@ -27,10 +31,10 @@ export default function FeaturedCard({ property }) {
   }
 
   return (
-    <div className="featured-card" onClick={() => navigate(`/property/${property.id}`)}>
+    <div className="featured-card" role="button" tabIndex={0} onClick={open} onKeyDown={keyOpen}>
       <div className="featured-card__img">
         {hasImage ? (
-          <img className="featured-card__img-bg" src={property.image_urls[0]} alt={title} onError={() => setImgBroken(true)} />
+          <img className="featured-card__img-bg" src={property.image_urls[0]} alt={title} decoding="async" onError={() => setImgBroken(true)} />
         ) : (
           <div className="featured-card__img-placeholder" style={{ background: imageFor(property) }} />
         )}
@@ -54,3 +58,5 @@ export default function FeaturedCard({ property }) {
     </div>
   )
 }
+
+export default memo(FeaturedCard)

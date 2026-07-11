@@ -20,7 +20,11 @@
     "profile": "Profile",
     "recentlyViewed": "Recently Viewed",
     "back": "Back",
-    "send": "Send"
+    "send": "Send",
+    "toggleTheme": "Toggle theme",
+    "previous": "Previous",
+    "next": "Next",
+    "retry": "Retry"
   },
   "auth": {
     "roleClient": "Client",
@@ -176,7 +180,14 @@
     "aiPlaceholder": "Try: apartament me 2 dhoma në Tiranë nën 100,000 €",
     "aiButton": "Smart search",
     "aiApplied": "Filters applied from your search",
-    "aiFailed": "Couldn't parse that — searching by city instead"
+    "aiFailed": "Couldn't parse that — searching by city instead",
+    "listView": "List view",
+    "sortLabel": "Sort by",
+    "sort": {
+      "newest": "Newest",
+      "price_asc": "Price ↑",
+      "price_desc": "Price ↓"
+    }
   },
   "detail": {
     "forSale": "For Sale",
@@ -190,7 +201,8 @@
     "baths": "Baths",
     "area": "Area",
     "year": "Year",
-    "chatInApp": "Chat"
+    "chatInApp": "Chat",
+    "share": "Share"
   },
   "favourites": {
     "title": "Favorites",
@@ -223,7 +235,8 @@
     "emptyHint": "Start a chat from a property page",
     "inputPlaceholder": "Write a message…",
     "noMessages": "No messages yet — say hello!",
-    "loginPrompt": "Sign in to see your messages"
+    "loginPrompt": "Sign in to see your messages",
+    "sendFailed": "Message not sent — try again"
   },
   "property": {
     "beds": "beds",
@@ -238,7 +251,9 @@
     "autoTranslated": "Auto-translated",
     "whatsappMessage": "Hello, I am interested in the property \"{{title}}\". Can you give me more information?",
     "similar": "Similar properties",
-    "video": "Video tour"
+    "video": "Video tour",
+    "perDay": "/day",
+    "forDailyRent": "Daily Rent"
   },
   "notFound": {
     "title": "Page not found",
@@ -257,12 +272,28 @@
     "emailNotConfirmed": "Please confirm your email before signing in.",
     "rateLimited": "Too many requests. Please try again later.",
     "valueOutOfRange": "One of the numbers you entered is too large. Please check surface area, floor, or year built.",
-    "submitFailed": "Couldn't publish the listing. Please try again."
+    "submitFailed": "Couldn't publish the listing. Please try again.",
+    "imageInvalidType": "Only image files are allowed",
+    "imageTooLarge": "Image is too large (max {{max}} MB)",
+    "imageUploadFailed": "Image upload failed — try again",
+    "updateFailed": "Update failed — try again"
   },
   "agentDashboard": {
     "title": "Agent Dashboard",
     "subtitle": "Manage your properties and clients",
-    "comingSoon": "Coming soon..."
+    "comingSoon": "Coming soon...",
+    "kicker": "Agent workspace",
+    "headlinePre": "Your business at a",
+    "headlineEm": "glance",
+    "statListings": "Active listings",
+    "statViews": "Views (30 days)",
+    "statConversations": "Conversations",
+    "statLeads": "Leads",
+    "pendingViewings": "Pending viewing requests",
+    "noPendingViewings": "No pending requests",
+    "wantedFeed": "Buyers looking now",
+    "wantedFeedSub": "Open requests",
+    "wantedEmpty": "No open buyer requests right now"
   },
   "profile": {
     "savedSearches": "Saved searches",
@@ -400,5 +431,53 @@
     "thinking": "Thinking…",
     "unavailable": "I can't answer right now. Please contact the seller via the listing page.",
     "disclaimer": "AI answers are based only on listing data — verify important details with the seller."
+  },
+  "viewings": {
+    "title": "Viewings",
+    "kicker": "Property viewings",
+    "headlinePre": "Manage your",
+    "headlineEm": "viewings",
+    "requestTitle": "Request a",
+    "requestTitleEm": "viewing",
+    "when": "When?",
+    "request": "Send request",
+    "requestSuccess": "Request sent — you'll be notified once it's confirmed",
+    "requestFailed": "Request failed — try again",
+    "pastDate": "Pick a date in the future",
+    "empty": "No viewings yet",
+    "emptyHint": "Request one from any property page",
+    "mine": "My requests",
+    "incoming": "Requests for your listings",
+    "confirm": "Confirm",
+    "decline": "Decline",
+    "cancel": "Cancel",
+    "from": "From {{name}}",
+    "status": {
+      "requested": "Requested",
+      "confirmed": "Confirmed",
+      "declined": "Declined",
+      "cancelled": "Cancelled"
+    }
+  },
+  "saved": {
+    "kicker": "Searches & requests",
+    "headlinePre": "Your saved",
+    "headlineEm": "searches",
+    "tabSearches": "Searches",
+    "tabWanted": "Wanted homes",
+    "emptySearches": "No saved searches yet",
+    "emptySearchesHint": "Save one from the + button",
+    "emptyWanted": "No wanted-home posts yet",
+    "emptyWantedHint": "Post what you're looking for from the + button",
+    "run": "Run search",
+    "delete": "Delete",
+    "alertsOn": "Turn alerts on",
+    "alertsOff": "Turn alerts off",
+    "markClosed": "Mark as found",
+    "markOpen": "Reopen",
+    "wantedStatus": {
+      "open": "Open",
+      "closed": "Closed"
+    }
   }
 }

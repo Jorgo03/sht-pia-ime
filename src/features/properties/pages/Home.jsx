@@ -16,7 +16,7 @@ export default function Home() {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const { user, profile } = useAuth()
-  const { properties, loading, error } = useProperties({})
+  const { properties, loading, error } = useProperties({ limit: 24 })
   const { recentIds } = useRecentlyViewed()
   const { properties: recentProperties } = usePropertiesByIds(recentIds.slice(0, 6))
 

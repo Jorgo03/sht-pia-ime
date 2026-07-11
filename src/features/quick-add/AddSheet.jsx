@@ -169,7 +169,9 @@ export default function AddSheet() {
         break
       case 'visit':
         closeSheet()
-        navigate('/search?intent=schedule')
+        // Booking happens on the property page ("Schedule viewing" CTA);
+        // this entry point just gets the user browsing.
+        navigate('/search')
         break
       case 'lead':
         setMiniForm('lead')

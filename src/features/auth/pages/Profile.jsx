@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate, useLocation } from 'react-router-dom'
-import { User, Briefcase, Mail, Lock, Eye, EyeOff, ArrowLeft, ArrowRight, Heart, Settings, Building2, LogOut, ChevronRight, Search as SearchIcon, Calendar } from 'lucide-react'
+import { User, Briefcase, Mail, Lock, Eye, EyeOff, ArrowLeft, ArrowRight, Heart, Building2, LogOut, ChevronRight, Search as SearchIcon, Calendar } from 'lucide-react'
 import { useAuth } from '../AuthContext'
 import { useProfileStats } from '../hooks/useProfileStats'
 import DuskHero from '../components/DuskHero'
@@ -164,10 +164,10 @@ export default function Profile() {
 
     const settingsRows = [
       { icon: Heart, label: t('favourites.title'), to: '/favorites', badge: stats.saved || null },
-      { icon: SearchIcon, label: t('profile.savedSearches'), to: null },
+      { icon: SearchIcon, label: t('profile.savedSearches'), to: '/saved-searches', badge: stats.searches || null },
+      { icon: Calendar, label: t('viewings.title'), to: '/viewings' },
       { icon: Building2, label: t('listing.myListings'), to: '/my-listings' },
       ...(isAgent ? [{ icon: Briefcase, label: t('agentDashboard.title'), to: '/agent-dashboard' }] : []),
-      { icon: Settings, label: t('account.settings'), to: null },
     ]
 
     return (

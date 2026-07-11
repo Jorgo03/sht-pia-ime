@@ -34,6 +34,7 @@ export default function Search() {
   const propertyType = searchParams.get('type') || ''
   const listingType = searchParams.get('listing') || ''
   const beds = searchParams.get('beds') || ''
+  const sort = searchParams.get('sort') || 'newest'
 
   const debouncedMin = useDebounced(minPrice)
   const debouncedMax = useDebounced(maxPrice)
@@ -50,6 +51,7 @@ export default function Search() {
     maxPrice: queryMax,
     beds: beds ? Number(beds) : null,
     paginate: true,
+    sort,
   })
 
   const updateFilter = (key, value) => {
@@ -96,8 +98,8 @@ export default function Search() {
         <div className="search-head__row">
           <h1 className="screen-headline">{t('search.headline')} <em>{t('search.headlineEm')}</em>.</h1>
           <div className="view-toggle">
-            <button className={viewMode === 'list' ? 'active' : ''} onClick={() => setViewMode('list')}><LayoutGrid size={14} /></button>
-            <button className={viewMode === 'map' ? 'active' : ''} onClick={() => setViewMode('map')}><MapIcon size={14} /></button>
+            <button className={viewMode === 'list' ? 'active' : ''} onClick={() => setViewMode('list')} aria-label={t('search.listView')} aria-pressed={viewMode === 'list'}><LayoutGrid size={14} /></button>
+            <button className={viewMode === 'map' ? 'active' : ''} onClick={() => setViewMode('map')} aria-label={t('search.mapView')} aria-pressed={viewMode === 'map'}><MapIcon size={14} /></button>
           </div>
         </div>
         <div className="search-controls">
@@ -122,7 +124,7 @@ export default function Search() {
               </button>
             )}
           </div>
-          <button className="filter-btn" onClick={() => setFiltersOpen(true)}>
+          <button className="filter-btn" onClick={() => setFiltersOpen(true)} aria-label={t('search.filtersTitle')}>
             <SlidersHorizontal size={16} />
             {activeCount > 0 && <span className="filter-badge">{activeCount}</span>}
           </button>
@@ -214,6 +216,18 @@ export default function Search() {
                   <button key={b ?? 'any'} className={`bed-chip ${(beds === '' && b === null) || beds === String(b) ? 'active' : ''}`}
                     onClick={() => updateFilter('beds', b === null ? '' : String(b))}>
                     {b === null ? t('search.anyBeds') : b === 4 ? '4+' : b}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Sort */}
+            <div className="filter-section">
+              <label className="filter-label">{t('search.sortLabel')}</label>
+              <div className="segment-control">
+                {['newest', 'price_asc', 'price_desc'].map(s => (
+                  <button key={s} className={`segment ${sort === s ? 'active' : ''}`} onClick={() => updateFilter('sort', s === 'newest' ? '' : s)}>
+                    {t(`search.sort.${s}`)}
                   </button>
                 ))}
               </div>

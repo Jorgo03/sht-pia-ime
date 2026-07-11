@@ -31,6 +31,21 @@ export function formatPrice(n, lang = 'sq', currency = 'EUR') {
   }).format(num)
 }
 
+// i18n key for a listing-type badge / price suffix — the only place that
+// knows all three listing types, so daily_rent can't fall through to "For
+// Sale" again. Suffix is null for sales (no suffix).
+export function listingBadgeKey(listingType) {
+  if (listingType === 'rent') return 'property.forRent'
+  if (listingType === 'daily_rent') return 'property.forDailyRent'
+  return 'property.forSale'
+}
+
+export function priceSuffixKey(listingType) {
+  if (listingType === 'rent') return 'property.perMonth'
+  if (listingType === 'daily_rent') return 'property.perDay'
+  return null
+}
+
 export function getLocalizedText(i18nObj, lang, fallback = 'en') {
   if (!i18nObj || typeof i18nObj !== 'object') return i18nObj ?? ''
   return i18nObj[lang] ?? i18nObj[fallback] ?? i18nObj.sq ?? Object.values(i18nObj)[0] ?? ''

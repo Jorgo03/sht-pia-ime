@@ -20,7 +20,11 @@
     "profile": "Profil",
     "recentlyViewed": "Zuletzt angesehen",
     "back": "Zurück",
-    "send": "Senden"
+    "send": "Senden",
+    "toggleTheme": "Design wechseln",
+    "previous": "Zurück",
+    "next": "Weiter",
+    "retry": "Erneut versuchen"
   },
   "auth": {
     "roleClient": "Kunde",
@@ -124,7 +128,14 @@
     "aiPlaceholder": "Versuch: Wohnung mit 2 Zimmern in Tirana unter 100.000 €",
     "aiButton": "Intelligente Suche",
     "aiApplied": "Filter aus deiner Suche übernommen",
-    "aiFailed": "Nicht verstanden — Suche nach Stadt stattdessen"
+    "aiFailed": "Nicht verstanden — Suche nach Stadt stattdessen",
+    "listView": "Listenansicht",
+    "sortLabel": "Sortieren nach",
+    "sort": {
+      "newest": "Neueste",
+      "price_asc": "Preis ↑",
+      "price_desc": "Preis ↓"
+    }
   },
   "favourites": {
     "title": "Favoriten",
@@ -153,7 +164,9 @@
     "autoTranslated": "Automatisch übersetzt",
     "whatsappMessage": "Hallo, ich interessiere mich für die Immobilie \"{{title}}\". Können Sie mir mehr Informationen geben?",
     "similar": "Ähnliche Immobilien",
-    "video": "Videotour"
+    "video": "Videotour",
+    "perDay": "/Tag",
+    "forDailyRent": "Tagesmiete"
   },
   "detail": {
     "forSale": "Zu verkaufen",
@@ -167,7 +180,8 @@
     "baths": "Bäder",
     "area": "Fläche",
     "year": "Baujahr",
-    "chatInApp": "Chat"
+    "chatInApp": "Chat",
+    "share": "Teilen"
   },
   "messages": {
     "subtitle": "Gespräche mit Maklern",
@@ -186,7 +200,8 @@
     "emptyHint": "Starte einen Chat von einer Immobilienseite",
     "inputPlaceholder": "Nachricht schreiben…",
     "noMessages": "Noch keine Nachrichten — sag hallo!",
-    "loginPrompt": "Melde dich an, um deine Nachrichten zu sehen"
+    "loginPrompt": "Melde dich an, um deine Nachrichten zu sehen",
+    "sendFailed": "Nachricht nicht gesendet — bitte erneut versuchen"
   },
   "notFound": {
     "title": "Seite nicht gefunden",
@@ -212,12 +227,28 @@
     "emailNotConfirmed": "Bitte bestätige deine E-Mail vor der Anmeldung.",
     "rateLimited": "Zu viele Anfragen. Bitte versuche es später erneut.",
     "valueOutOfRange": "Eine der eingegebenen Zahlen ist zu groß. Bitte prüfe Fläche, Stockwerk oder Baujahr.",
-    "submitFailed": "Das Inserat konnte nicht veröffentlicht werden. Bitte erneut versuchen."
+    "submitFailed": "Das Inserat konnte nicht veröffentlicht werden. Bitte erneut versuchen.",
+    "imageInvalidType": "Nur Bilddateien sind erlaubt",
+    "imageTooLarge": "Bild ist zu groß (max. {{max}} MB)",
+    "imageUploadFailed": "Bild-Upload fehlgeschlagen — bitte erneut versuchen",
+    "updateFailed": "Aktualisierung fehlgeschlagen — bitte erneut versuchen"
   },
   "agentDashboard": {
     "title": "Makler-Dashboard",
     "subtitle": "Verwalte deine Immobilien und Kunden",
-    "comingSoon": "Demnächst..."
+    "comingSoon": "Demnächst...",
+    "kicker": "Makler-Cockpit",
+    "headlinePre": "Dein Geschäft auf einen",
+    "headlineEm": "Blick",
+    "statListings": "Aktive Inserate",
+    "statViews": "Aufrufe (30 Tage)",
+    "statConversations": "Unterhaltungen",
+    "statLeads": "Leads",
+    "pendingViewings": "Offene Besichtigungsanfragen",
+    "noPendingViewings": "Keine offenen Anfragen",
+    "wantedFeed": "Suchende Käufer",
+    "wantedFeedSub": "Offene Gesuche",
+    "wantedEmpty": "Derzeit keine offenen Gesuche"
   },
   "account": {
     "welcomeBack": "Willkommen zurück, {{name}} 👋",
@@ -400,5 +431,53 @@
     "thinking": "Denkt nach…",
     "unavailable": "Ich kann gerade nicht antworten. Bitte kontaktiere den Verkäufer über die Inseratsseite.",
     "disclaimer": "KI-Antworten basieren nur auf Inseratsdaten — wichtige Details mit dem Verkäufer klären."
+  },
+  "viewings": {
+    "title": "Besichtigungen",
+    "kicker": "Objektbesichtigungen",
+    "headlinePre": "Verwalte deine",
+    "headlineEm": "Besichtigungen",
+    "requestTitle": "Eine Besichtigung",
+    "requestTitleEm": "anfragen",
+    "when": "Wann?",
+    "request": "Anfrage senden",
+    "requestSuccess": "Anfrage gesendet — du wirst bei Bestätigung benachrichtigt",
+    "requestFailed": "Anfrage fehlgeschlagen — bitte erneut versuchen",
+    "pastDate": "Wähle ein Datum in der Zukunft",
+    "empty": "Noch keine Besichtigungen",
+    "emptyHint": "Frage eine auf einer Objektseite an",
+    "mine": "Meine Anfragen",
+    "incoming": "Anfragen für deine Inserate",
+    "confirm": "Bestätigen",
+    "decline": "Ablehnen",
+    "cancel": "Stornieren",
+    "from": "Von {{name}}",
+    "status": {
+      "requested": "Angefragt",
+      "confirmed": "Bestätigt",
+      "declined": "Abgelehnt",
+      "cancelled": "Storniert"
+    }
+  },
+  "saved": {
+    "kicker": "Suchen & Gesuche",
+    "headlinePre": "Deine gespeicherten",
+    "headlineEm": "Suchen",
+    "tabSearches": "Suchen",
+    "tabWanted": "Gesuche",
+    "emptySearches": "Noch keine gespeicherten Suchen",
+    "emptySearchesHint": "Speichere eine über den +-Button",
+    "emptyWanted": "Noch keine Gesuche",
+    "emptyWantedHint": "Poste dein Gesuch über den +-Button",
+    "run": "Suche starten",
+    "delete": "Löschen",
+    "alertsOn": "Benachrichtigungen aktivieren",
+    "alertsOff": "Benachrichtigungen deaktivieren",
+    "markClosed": "Als gefunden markieren",
+    "markOpen": "Wieder öffnen",
+    "wantedStatus": {
+      "open": "Offen",
+      "closed": "Geschlossen"
+    }
   }
 }

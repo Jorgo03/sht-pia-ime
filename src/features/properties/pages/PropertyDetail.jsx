@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { ChevronLeft, Heart, Share2, MapPin, Phone, MessageCircle, ExternalLink, ChevronRight as ChevRight, Globe, ArrowRight } from 'lucide-react'
 import { useProperty, useProperties } from '../hooks/useProperties'
 import { useTranslatedProperty } from '../hooks/useTranslatedProperty'
-import { formatPrice, imageFor } from '../../../lib/format'
+import { formatPrice, imageFor, listingBadgeKey, priceSuffixKey } from '../../../lib/format'
 import { useFavorites } from '../../favorites/FavoritesContext'
 import { useAuth } from '../../auth/AuthContext'
 import { supabase } from '../../../lib/supabase'
@@ -13,6 +13,7 @@ import { addRecentlyViewed } from '../hooks/useRecentlyViewed'
 import PropertyCard from '../components/PropertyCard'
 import ImageLightbox from '../components/ImageLightbox'
 import ListingAssistant from '../components/ListingAssistant'
+import ViewingRequestSheet from '../../viewings/components/ViewingRequestSheet'
 import { isEnabled } from '../../../lib/flags'
 import '../../../styles/property-detail.css'
 
@@ -28,9 +29,12 @@ export default function PropertyDetail() {
   const [imgIdx, setImgIdx] = useState(0)
   const [lightboxOpen, setLightboxOpen] = useState(false)
   const [loginToast, setLoginToast] = useState(false)
+  const [chatError, setChatError] = useState(false)
+  const [viewingSheet, setViewingSheet] = useState(false)
+  const [viewingToast, setViewingToast] = useState(false)
   const [brokenImages, setBrokenImages] = useState(new Set())
   const { title, description, translating, isTranslated } = useTranslatedProperty(property, i18n.language)
-  const { properties: similar } = useProperties({ filter: property?.property_type || 'all', city: property?.city || null })
+  const { properties: similar } = useProperties({ filter: property?.property_type || 'all', city: property?.city || null, limit: 8 })
   const similarProperties = similar.filter(p => p.id !== id).slice(0, 4)
 
   useEffect(() => {
@@ -51,8 +55,9 @@ export default function PropertyDetail() {
   const hasMultiple = images.length > 1
   const currentImg = images[imgIdx]
   const price = formatPrice(property.price, i18n.language, property.currency)
-  const suffix = property.listing_type === 'rent' ? t('property.perMonth') : ''
-  const badge = property.listing_type === 'rent' ? t('detail.forRent') : t('detail.forSale')
+  const suffixKey = priceSuffixKey(property.listing_type)
+  const suffix = suffixKey ? t(suffixKey) : ''
+  const badge = t(listingBadgeKey(property.listing_type))
   const phone = property.contact_phone?.replace(/\s/g, '') || property.agent?.phone?.replace(/\s/g, '') || null
   const waMsg = encodeURIComponent(t('property.whatsappMessage', { title }))
   const features = property.features || []
@@ -82,6 +87,9 @@ export default function PropertyDetail() {
     if (conversationId) {
       logActivity(property.id, 'message')
       navigate(`/messages?c=${conversationId}`)
+    } else {
+      setChatError(true)
+      setTimeout(() => setChatError(false), 3000)
     }
   }
 
@@ -102,21 +110,21 @@ export default function PropertyDetail() {
       {/* Photo hero */}
       <section className="detail-hero" onClick={() => images.length > 0 && setLightboxOpen(true)}>
         {currentImg && !brokenImages.has(currentImg) ? (
-          <img className="detail-hero__img" src={currentImg} alt={title} onError={() => setBrokenImages(prev => new Set(prev).add(currentImg))} />
+          <img className="detail-hero__img" src={currentImg} alt={title} decoding="async" onError={() => setBrokenImages(prev => new Set(prev).add(currentImg))} />
         ) : (
           <div className="detail-hero__img" style={{ background: imageFor(property) }} />
         )}
         <div className="detail-hero__chrome">
-          <button className="round-btn" onClick={e => { e.stopPropagation(); navigate(-1) }}><ChevronLeft size={20} /></button>
+          <button className="round-btn" onClick={e => { e.stopPropagation(); navigate(-1) }} aria-label={t('common.back')}><ChevronLeft size={20} /></button>
           <div style={{ display: 'flex', gap: 8 }}>
-            <button className={`round-btn ${saved ? 'saved' : ''}`} onClick={handleFavorite}><Heart size={18} fill={saved ? 'currentColor' : 'none'} /></button>
-            <button className="round-btn" onClick={e => { e.stopPropagation(); handleShare() }}><Share2 size={18} /></button>
+            <button className={`round-btn ${saved ? 'saved' : ''}`} onClick={handleFavorite} aria-label={t('common.save')}><Heart size={18} fill={saved ? 'currentColor' : 'none'} /></button>
+            <button className="round-btn" onClick={e => { e.stopPropagation(); handleShare() }} aria-label={t('detail.share')}><Share2 size={18} /></button>
           </div>
         </div>
         {hasMultiple && (
           <>
-            <button className="detail-hero__nav prev" onClick={e => { e.stopPropagation(); setImgIdx(i => (i - 1 + images.length) % images.length) }}><ChevronLeft size={18} /></button>
-            <button className="detail-hero__nav next" onClick={e => { e.stopPropagation(); setImgIdx(i => (i + 1) % images.length) }}><ChevRight size={18} /></button>
+            <button className="detail-hero__nav prev" onClick={e => { e.stopPropagation(); setImgIdx(i => (i - 1 + images.length) % images.length) }} aria-label={t('common.previous')}><ChevronLeft size={18} /></button>
+            <button className="detail-hero__nav next" onClick={e => { e.stopPropagation(); setImgIdx(i => (i + 1) % images.length) }} aria-label={t('common.next')}><ChevRight size={18} /></button>
           </>
         )}
         <div className="detail-hero__dots">
@@ -215,17 +223,42 @@ export default function PropertyDetail() {
         </section>
       )}
 
-      {/* Sticky CTA */}
-      {phone && (
+      {/* Sticky CTA — in-app viewing request (owner sees no CTA on own listing) */}
+      {user?.id !== property.owner_id && user?.id !== property.agent_id && (
         <section className="detail-cta">
-          <button className="cta-pill" onClick={() => { logActivity(property.id, 'meeting'); window.open(`https://wa.me/${phone}?text=${waMsg}`, '_blank') }}>
+          <button
+            className="cta-pill"
+            onClick={() => {
+              if (!user) { setLoginToast(true); setTimeout(() => setLoginToast(false), 2500); return }
+              setViewingSheet(true)
+            }}
+          >
             {t('detail.scheduleViewing')} <ArrowRight size={18} />
           </button>
         </section>
       )}
 
+      {viewingSheet && (
+        <ViewingRequestSheet
+          property={property}
+          onClose={() => setViewingSheet(false)}
+          onDone={() => {
+            setViewingSheet(false)
+            setViewingToast(true)
+            setTimeout(() => setViewingToast(false), 3000)
+          }}
+        />
+      )}
+
+      {viewingToast && (
+        <div className="addsheet-toast" role="status" onClick={() => setViewingToast(false)}>{t('viewings.requestSuccess')}</div>
+      )}
+
       {loginToast && (
         <div className="addsheet-toast" onClick={() => navigate('/profile')}>{t('favourites.loginPrompt')}</div>
+      )}
+      {chatError && (
+        <div className="addsheet-toast" role="alert" onClick={() => setChatError(false)}>{t('errors.generic')}</div>
       )}
 
       {isEnabled('aiAssistant') && property.status === 'active' && (

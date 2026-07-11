@@ -1,12 +1,12 @@
-import { useState } from 'react'
+import { memo, useState } from 'react'
 import { Heart, MapPin, Bed } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { formatPrice, imageFor, getLocalizedText } from '../../../lib/format'
+import { formatPrice, imageFor, getLocalizedText, priceSuffixKey } from '../../../lib/format'
 import { useFavorites } from '../../favorites/FavoritesContext'
 import { useAuth } from '../../auth/AuthContext'
 
-export default function PropertyCard({ property, variant }) {
+function PropertyCard({ property, variant }) {
   const navigate = useNavigate()
   const { t, i18n } = useTranslation()
   const { user } = useAuth()
@@ -16,8 +16,12 @@ export default function PropertyCard({ property, variant }) {
 
   const hasImage = property.image_urls?.[0] && !imgBroken
   const price = formatPrice(property.price, i18n.language, property.currency)
-  const suffix = property.listing_type === 'rent' ? t('property.perMonth') : ''
+  const suffixKey = priceSuffixKey(property.listing_type)
+  const suffix = suffixKey ? t(suffixKey) : ''
   const title = getLocalizedText(property.title_i18n, i18n.language) || property.title
+
+  const open = () => navigate(`/property/${property.id}`)
+  const keyOpen = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open() } }
 
   const handleFavorite = (e) => {
     e.stopPropagation()
@@ -27,10 +31,10 @@ export default function PropertyCard({ property, variant }) {
 
   if (variant === 'compact') {
     return (
-      <div className="compact-card" onClick={() => navigate(`/property/${property.id}`)}>
+      <div className="compact-card" role="button" tabIndex={0} onClick={open} onKeyDown={keyOpen}>
         <div className="compact-card__img">
           {hasImage ? (
-            <img className="compact-card__img-bg" src={property.image_urls[0]} alt={title} onError={() => setImgBroken(true)} />
+            <img className="compact-card__img-bg" src={property.image_urls[0]} alt={title} loading="lazy" decoding="async" onError={() => setImgBroken(true)} />
           ) : (
             <div className="compact-card__img-placeholder" style={{ background: imageFor(property) }} />
           )}
@@ -55,9 +59,9 @@ export default function PropertyCard({ property, variant }) {
     : { background: imageFor(property) }
 
   return (
-    <div className="mini-card" onClick={() => navigate(`/property/${property.id}`)}>
+    <div className="mini-card" role="button" tabIndex={0} onClick={open} onKeyDown={keyOpen} aria-label={title}>
       <div className="mini-img" style={bg}>
-        {hasImage && <img src={property.image_urls[0]} alt="" onError={() => setImgBroken(true)} style={{ display: 'none' }} />}
+        {hasImage && <img src={property.image_urls[0]} alt="" loading="lazy" decoding="async" onError={() => setImgBroken(true)} style={{ display: 'none' }} />}
         <button className={`heart-mini ${saved ? 'saved' : ''}`} onClick={handleFavorite} aria-label={t('common.save')}>
           <Heart size={13} fill={saved ? 'currentColor' : 'none'} />
         </button>
@@ -67,3 +71,5 @@ export default function PropertyCard({ property, variant }) {
     </div>
   )
 }
+
+export default memo(PropertyCard)

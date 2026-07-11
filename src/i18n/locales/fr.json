@@ -20,7 +20,11 @@
     "profile": "Profil",
     "recentlyViewed": "Vus récemment",
     "back": "Retour",
-    "send": "Envoyer"
+    "send": "Envoyer",
+    "toggleTheme": "Changer de thème",
+    "previous": "Précédent",
+    "next": "Suivant",
+    "retry": "Réessayer"
   },
   "auth": {
     "roleClient": "Client",
@@ -124,7 +128,14 @@
     "aiPlaceholder": "Essayez : appartement 2 chambres à Tirana sous 100 000 €",
     "aiButton": "Recherche intelligente",
     "aiApplied": "Filtres appliqués depuis votre recherche",
-    "aiFailed": "Incompris — recherche par ville à la place"
+    "aiFailed": "Incompris — recherche par ville à la place",
+    "listView": "Vue liste",
+    "sortLabel": "Trier par",
+    "sort": {
+      "newest": "Plus récents",
+      "price_asc": "Prix ↑",
+      "price_desc": "Prix ↓"
+    }
   },
   "favourites": {
     "title": "Favoris",
@@ -153,7 +164,9 @@
     "autoTranslated": "Traduit automatiquement",
     "whatsappMessage": "Bonjour, je suis intéressé par le bien \"{{title}}\". Pouvez-vous me donner plus d'informations ?",
     "similar": "Biens similaires",
-    "video": "Visite vidéo"
+    "video": "Visite vidéo",
+    "perDay": "/jour",
+    "forDailyRent": "Location journalière"
   },
   "detail": {
     "forSale": "À vendre",
@@ -167,7 +180,8 @@
     "baths": "Salles de bain",
     "area": "Surface",
     "year": "Année",
-    "chatInApp": "Discuter"
+    "chatInApp": "Discuter",
+    "share": "Partager"
   },
   "messages": {
     "subtitle": "Conversations avec les agents",
@@ -186,7 +200,8 @@
     "emptyHint": "Démarrez une discussion depuis la page d'un bien",
     "inputPlaceholder": "Écrivez un message…",
     "noMessages": "Pas encore de messages — dites bonjour !",
-    "loginPrompt": "Connectez-vous pour voir vos messages"
+    "loginPrompt": "Connectez-vous pour voir vos messages",
+    "sendFailed": "Message non envoyé — réessayez"
   },
   "notFound": {
     "title": "Page introuvable",
@@ -212,12 +227,28 @@
     "emailNotConfirmed": "Confirmez votre e-mail avant de vous connecter.",
     "rateLimited": "Trop de requêtes. Veuillez réessayer plus tard.",
     "valueOutOfRange": "L'un des nombres saisis est trop grand. Vérifiez la surface, l'étage ou l'année de construction.",
-    "submitFailed": "Impossible de publier l'annonce. Veuillez réessayer."
+    "submitFailed": "Impossible de publier l'annonce. Veuillez réessayer.",
+    "imageInvalidType": "Seuls les fichiers image sont autorisés",
+    "imageTooLarge": "Image trop volumineuse (max {{max}} Mo)",
+    "imageUploadFailed": "Échec du téléversement des images — réessayez",
+    "updateFailed": "Échec de la mise à jour — réessayez"
   },
   "agentDashboard": {
     "title": "Tableau de bord Agent",
     "subtitle": "Gérez vos biens et vos clients",
-    "comingSoon": "Bientôt..."
+    "comingSoon": "Bientôt...",
+    "kicker": "Espace agent",
+    "headlinePre": "Votre activité en un",
+    "headlineEm": "coup d'œil",
+    "statListings": "Annonces actives",
+    "statViews": "Vues (30 jours)",
+    "statConversations": "Conversations",
+    "statLeads": "Prospects",
+    "pendingViewings": "Demandes de visite en attente",
+    "noPendingViewings": "Aucune demande en attente",
+    "wantedFeed": "Acheteurs en recherche",
+    "wantedFeedSub": "Demandes ouvertes",
+    "wantedEmpty": "Aucune demande ouverte pour le moment"
   },
   "account": {
     "welcomeBack": "Bon retour, {{name}} 👋",
@@ -400,5 +431,53 @@
     "thinking": "Réflexion…",
     "unavailable": "Je ne peux pas répondre pour le moment. Contactez le vendeur via la page de l'annonce.",
     "disclaimer": "Les réponses de l'IA reposent uniquement sur les données de l'annonce — vérifiez les détails importants avec le vendeur."
+  },
+  "viewings": {
+    "title": "Visites",
+    "kicker": "Visites de biens",
+    "headlinePre": "Gérez vos",
+    "headlineEm": "visites",
+    "requestTitle": "Demander une",
+    "requestTitleEm": "visite",
+    "when": "Quand ?",
+    "request": "Envoyer la demande",
+    "requestSuccess": "Demande envoyée — vous serez averti après confirmation",
+    "requestFailed": "Échec de la demande — réessayez",
+    "pastDate": "Choisissez une date future",
+    "empty": "Pas encore de visites",
+    "emptyHint": "Demandez-en une depuis la page d'un bien",
+    "mine": "Mes demandes",
+    "incoming": "Demandes pour vos annonces",
+    "confirm": "Confirmer",
+    "decline": "Refuser",
+    "cancel": "Annuler",
+    "from": "De {{name}}",
+    "status": {
+      "requested": "Demandée",
+      "confirmed": "Confirmée",
+      "declined": "Refusée",
+      "cancelled": "Annulée"
+    }
+  },
+  "saved": {
+    "kicker": "Recherches et demandes",
+    "headlinePre": "Vos recherches",
+    "headlineEm": "enregistrées",
+    "tabSearches": "Recherches",
+    "tabWanted": "Biens recherchés",
+    "emptySearches": "Pas encore de recherches enregistrées",
+    "emptySearchesHint": "Enregistrez-en une via le bouton +",
+    "emptyWanted": "Pas encore d'annonces de recherche",
+    "emptyWantedHint": "Publiez ce que vous cherchez via le bouton +",
+    "run": "Lancer la recherche",
+    "delete": "Supprimer",
+    "alertsOn": "Activer les alertes",
+    "alertsOff": "Désactiver les alertes",
+    "markClosed": "Marquer comme trouvé",
+    "markOpen": "Rouvrir",
+    "wantedStatus": {
+      "open": "Ouverte",
+      "closed": "Fermée"
+    }
   }
 }

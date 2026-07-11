@@ -20,7 +20,11 @@
     "profile": "Profilo",
     "recentlyViewed": "Visti di recente",
     "back": "Indietro",
-    "send": "Invia"
+    "send": "Invia",
+    "toggleTheme": "Cambia tema",
+    "previous": "Precedente",
+    "next": "Avanti",
+    "retry": "Riprova"
   },
   "auth": {
     "roleClient": "Cliente",
@@ -124,7 +128,14 @@
     "aiPlaceholder": "Prova: appartamento con 2 camere a Tirana sotto 100.000 €",
     "aiButton": "Ricerca intelligente",
     "aiApplied": "Filtri applicati dalla tua ricerca",
-    "aiFailed": "Non compreso — ricerca per città"
+    "aiFailed": "Non compreso — ricerca per città",
+    "listView": "Vista elenco",
+    "sortLabel": "Ordina per",
+    "sort": {
+      "newest": "Più recenti",
+      "price_asc": "Prezzo ↑",
+      "price_desc": "Prezzo ↓"
+    }
   },
   "favourites": {
     "title": "Preferiti",
@@ -153,7 +164,9 @@
     "autoTranslated": "Tradotto automaticamente",
     "whatsappMessage": "Salve, sono interessato all'immobile \"{{title}}\". Potete darmi maggiori informazioni?",
     "similar": "Immobili simili",
-    "video": "Video tour"
+    "video": "Video tour",
+    "perDay": "/giorno",
+    "forDailyRent": "Affitto giornaliero"
   },
   "detail": {
     "forSale": "In vendita",
@@ -167,7 +180,8 @@
     "baths": "Bagni",
     "area": "Superficie",
     "year": "Anno",
-    "chatInApp": "Chatta"
+    "chatInApp": "Chatta",
+    "share": "Condividi"
   },
   "messages": {
     "subtitle": "Conversazioni con agenti",
@@ -186,7 +200,8 @@
     "emptyHint": "Avvia una chat dalla pagina di un immobile",
     "inputPlaceholder": "Scrivi un messaggio…",
     "noMessages": "Ancora nessun messaggio — saluta!",
-    "loginPrompt": "Accedi per vedere i tuoi messaggi"
+    "loginPrompt": "Accedi per vedere i tuoi messaggi",
+    "sendFailed": "Messaggio non inviato — riprova"
   },
   "notFound": {
     "title": "Pagina non trovata",
@@ -212,12 +227,28 @@
     "emailNotConfirmed": "Conferma la tua email prima di accedere.",
     "rateLimited": "Troppe richieste. Riprova più tardi.",
     "valueOutOfRange": "Uno dei numeri inseriti è troppo grande. Controlla la superficie, il piano o l'anno di costruzione.",
-    "submitFailed": "Impossibile pubblicare l'annuncio. Riprova."
+    "submitFailed": "Impossibile pubblicare l'annuncio. Riprova.",
+    "imageInvalidType": "Sono consentiti solo file immagine",
+    "imageTooLarge": "Immagine troppo grande (max {{max}} MB)",
+    "imageUploadFailed": "Caricamento immagini non riuscito — riprova",
+    "updateFailed": "Aggiornamento non riuscito — riprova"
   },
   "agentDashboard": {
     "title": "Dashboard Agente",
     "subtitle": "Gestisci le tue proprietà e i clienti",
-    "comingSoon": "Prossimamente..."
+    "comingSoon": "Prossimamente...",
+    "kicker": "Area agente",
+    "headlinePre": "La tua attività a",
+    "headlineEm": "colpo d'occhio",
+    "statListings": "Annunci attivi",
+    "statViews": "Visualizzazioni (30 gg)",
+    "statConversations": "Conversazioni",
+    "statLeads": "Contatti",
+    "pendingViewings": "Richieste di visita in attesa",
+    "noPendingViewings": "Nessuna richiesta in attesa",
+    "wantedFeed": "Acquirenti in cerca",
+    "wantedFeedSub": "Richieste aperte",
+    "wantedEmpty": "Nessuna richiesta aperta al momento"
   },
   "account": {
     "welcomeBack": "Bentornato, {{name}} 👋",
@@ -400,5 +431,53 @@
     "thinking": "Sto pensando…",
     "unavailable": "Non posso rispondere ora. Contatta il venditore dalla pagina dell'annuncio.",
     "disclaimer": "Le risposte dell'IA si basano solo sui dati dell'annuncio — verifica i dettagli importanti con il venditore."
+  },
+  "viewings": {
+    "title": "Visite",
+    "kicker": "Visite agli immobili",
+    "headlinePre": "Gestisci le tue",
+    "headlineEm": "visite",
+    "requestTitle": "Richiedi una",
+    "requestTitleEm": "visita",
+    "when": "Quando?",
+    "request": "Invia richiesta",
+    "requestSuccess": "Richiesta inviata — riceverai una notifica alla conferma",
+    "requestFailed": "Richiesta non riuscita — riprova",
+    "pastDate": "Scegli una data futura",
+    "empty": "Nessuna visita ancora",
+    "emptyHint": "Richiedine una dalla pagina di un immobile",
+    "mine": "Le mie richieste",
+    "incoming": "Richieste per i tuoi annunci",
+    "confirm": "Conferma",
+    "decline": "Rifiuta",
+    "cancel": "Annulla",
+    "from": "Da {{name}}",
+    "status": {
+      "requested": "Richiesta",
+      "confirmed": "Confermata",
+      "declined": "Rifiutata",
+      "cancelled": "Annullata"
+    }
+  },
+  "saved": {
+    "kicker": "Ricerche e richieste",
+    "headlinePre": "Le tue ricerche",
+    "headlineEm": "salvate",
+    "tabSearches": "Ricerche",
+    "tabWanted": "Case cercate",
+    "emptySearches": "Nessuna ricerca salvata",
+    "emptySearchesHint": "Salvane una dal pulsante +",
+    "emptyWanted": "Nessuna richiesta di casa",
+    "emptyWantedHint": "Pubblica cosa cerchi dal pulsante +",
+    "run": "Avvia ricerca",
+    "delete": "Elimina",
+    "alertsOn": "Attiva avvisi",
+    "alertsOff": "Disattiva avvisi",
+    "markClosed": "Segna come trovata",
+    "markOpen": "Riapri",
+    "wantedStatus": {
+      "open": "Aperta",
+      "closed": "Chiusa"
+    }
   }
 }

@@ -1,5 +1,107 @@
 # Pre-Launch Audit — Shtëpia.ime (Vite web app)
 
+## ═══ PASS 2 — 2026-07-11 ═══
+
+Fresh audit of the current state (post-2026-07-02 fixes + the auth/home
+commits since). Backend: ACTIVE_HEALTHY. Locales: all 8 in sync (326 base
+keys; pl/ru +4 plural forms — correct). Tests: 10/10 pass. Build: clean.
+RLS: every table has policies; realtime publication carries
+`conversations`+`messages`; storage folder-scoped — the July-2 DB fixes held.
+Google OAuth unchanged (live); Apple/LinkedIn still awaiting provider-console
+config (DECISIONS.md §2–3 — nothing new code-side).
+
+### P2.1 SEVERITY 2 — feature broken or wrong
+
+- **P2.1.1 `daily_rent` listings display as "For Sale"** — badge/suffix logic
+  everywhere is binary (`listing_type === 'rent' ? … : forSale`):
+  PropertyCard, FeaturedCard, PropertyDetail, Favorites row. A daily-rent
+  listing gets a "For Sale" badge and no price suffix. No `property.perDay`
+  key exists in any locale. **Fix: shared `listingBadge`/`priceSuffix`
+  helpers + `perDay`/`forDailyRent` keys ×8 locales.**
+- **P2.1.2 Home fetches ALL active properties unbounded** —
+  `useProperties({})` with no pagination/limit; violates the repo's own
+  no-unbounded-fetches rule. Fine at 8 rows, a full-table scan at 100k.
+  PropertyDetail's "similar" fetch has the same problem (fetches every match,
+  slices 4 client-side). **Fix: `limit` option in `useProperties`; Home
+  caps at 24, Similar at 8.**
+- **P2.1.3 Wizard image upload fails silently** — `uploadImages()` ignores
+  per-file errors; a listing can publish with 0 images even though step-4
+  validation demanded 3. Also **no MIME/size validation** before upload
+  (security rule violation — `accept="image/*"` is only a picker hint;
+  `compressImage` passes non-images straight through). **Fix: validate
+  type+size (10 MB cap) at selection with i18n error; abort submit if any
+  upload fails; best-effort cleanup of already-uploaded files on failure.**
+- **P2.1.4 Orphaned storage files confirmed** — 8 files in `property-images`
+  (user folder `9c47f15e…`, 2026-07-04) referenced by no property: the
+  upload-before-insert leak happening in practice. All 8 seed listings use
+  external Unsplash URLs (valid, not broken refs). **Fix: submit-failure
+  cleanup (above); existing 8 orphans flagged in DECISIONS.md §12 — not
+  deleted without owner approval.**
+- **P2.1.5 Dead Profile menu rows** — "Saved searches" and "Settings" render
+  chevron rows with `to: null`; tapping does nothing. Saved searches +
+  wanted homes have create-flows and RLS but **no view/manage UI at all**
+  (data goes in, nothing comes out). **Fix: Phase 3 feature (management
+  screen) + wire the row.**
+
+### P2.2 SEVERITY 3 — wrong/risky but survivable
+
+- **P2.2.1 i18n violations (hardcoded UI strings)** — `Header.jsx`
+  aria-label "Toggle theme"; `ImageLightbox.jsx` aria-labels
+  "Close"/"Previous"/"Next". **Fix: `common.toggleTheme`,
+  `common.previous`, `common.next` keys ×8 (reuse `common.close`).**
+- **P2.2.2 `NewListing` navigates during render** — `if (!user)
+  navigate('/profile')` in the render body (route is already inside
+  `ProtectedRoute`, so it's a latent-pattern violation, not a live bug).
+  **Fix: return null; drop the render-phase navigate.**
+- **P2.2.3 Silent failures in messaging + listings management** — thread
+  `send()` failure gives no feedback (message quietly not sent);
+  `startChat()` ignores insert errors; MyListings `toggleStatus`/`delete`
+  are optimistic with no revert on error. **Fix: i18n error feedback +
+  revert.**
+- **P2.2.4 `messages` UPDATE RLS is participant-wide** — either participant
+  can UPDATE any column of any message in the conversation, including the
+  other side's `body`. Nothing in the app updates messages (mark-read lives
+  on `conversations`). **Fix: drop the unused policy (re-add sender-scoped
+  when message editing ships).**
+- **P2.2.5 Not-memoized cards + non-lazy images** — PropertyCard,
+  FeaturedCard re-render on every parent state change (rule: `React.memo`);
+  card/hero `<img>`s lack `loading="lazy" decoding="async"` (rule). **Fix
+  both.**
+- **P2.2.6 Single 1.26 MB bundle (372 KB gzip)** — no route-level code
+  splitting; recharts (PropertyDashboard-only) and the full wizard load on
+  first paint for every anonymous visitor. Konva is NOT bundled (floorplan
+  components unwired — confirmed). **Fix: `React.lazy` the heavy routes.**
+- **P2.2.7 A11y gaps** — icon-only buttons without accessible names
+  (Search view-toggle, filter button, PropertyDetail hero back/nav,
+  NewListing back); main clickable cards are `<div onClick>` with no
+  keyboard path (PropertyCard, FeaturedCard, fav rows, msg rows). Heading
+  hierarchy is otherwise sound (one h1 per screen, sections use h2/h3).
+  **Fix: aria-labels everywhere; keyboard access (role/tabIndex/Enter) on
+  the card components.**
+- **P2.2.8 Dead code** — `QueryCacheProvider` mounted in App.jsx with zero
+  consumers. **Fix: unmount + delete module.** (Floorplan editor/viewer and
+  `CustomDropdown` stay — plausible future features, cost nothing.)
+
+### P2.3 Noted, not fixed (deliberate)
+
+- Search price-slider hardcodes € and a 50k–800k EUR range regardless of
+  listing currency — needs a product decision on currency-aware filtering
+  (all listings are priced in EUR today).
+- `console.error` in FavoritesContext / translate.js kept — they log
+  genuine failures, not debug noise.
+- `usePropertiesByIds` `JSON.stringify(ids)` dep — smelly but correct.
+- AddSheet client "visit" action navigates to `/search?intent=schedule`
+  (intent ignored) — superseded by the Phase 3 viewings feature on the
+  property page; agent "viewing"/"open" actions pass `?openHouse=` params
+  the wizard ignores (logged in DECISIONS.md §13).
+- `property_activity` INSERT `WITH CHECK (true)` — accepted anon analytics
+  (advisor WARN, known since pass 1).
+- Test artifacts (`test-*.cjs/png`) still at repo root (DECISIONS.md §9).
+
+---
+
+# PASS 1 — 2026-07-02 (historical)
+
 Date: 2026-07-02 · Auditor: Claude Code (autonomous pass)
 Scope: `src/` (active Vite app), Supabase project `xzzzhlwmzotibrxdqmcm`, i18n, RLS, storage, OAuth.
 

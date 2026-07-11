@@ -5,6 +5,76 @@ AUDIT.md was fixed; see the final report for the change log.
 
 ---
 
+## ═══ PASS 2 — 2026-07-11 ═══
+
+### P2-A. Phase 3 feature log (built / skipped)
+
+**Built:**
+- **Viewing scheduling end-to-end** — schema + RLS existed with zero UI; the
+  single biggest missing marketplace loop (every comparable portal has tour
+  booking). Property-page CTA → request sheet → `/viewings` manage page
+  (client cancel / owner confirm-decline). RLS verified as client, owner,
+  and stranger via transaction-scoped SQL simulation.
+- **Saved searches + wanted homes management (`/saved-searches`)** — both
+  create-flows existed but no view/run/delete UI; data went in, nothing came
+  out. Wires the previously-dead Profile row.
+- **Agent dashboard v1** — replaced the "coming soon" placeholder: active
+  listings / 30-day views / conversations / leads stat cards, pending
+  viewing requests inline (confirm/decline), and the open wanted-homes feed
+  (Indomio-style reverse marketplace, agent side — RLS already allowed it).
+- **Search sorting** (newest / price ↑ / price ↓) — table stakes; URL-param
+  driven so share/back behave.
+
+**Skipped, with rationale:**
+- **Price insight** — still flagged per your standing constraint (§0b below);
+  decision checklist unanswered.
+- **AI recommendations / photo tagging** — ANTHROPIC_API_KEY still unset
+  (§0); building more AI surface before the existing three features can even
+  run adds nothing.
+- **Mortgage calculator** — high value for diaspora buyers but needs a
+  product decision on Albanian bank rate assumptions; a wrong default rate
+  is worse than no calculator.
+- **Saved-search email alerts** — `alerts_enabled` toggle now exists in the
+  UI, but sending requires cron + email infrastructure (Resend/SES +
+  pg_cron); infra choice is yours (see P2-D).
+
+### P2-B. 8 orphaned storage files — approve deletion
+
+`property-images/9c47f15e-…/1783195…` (8 files, 2026-07-04) are referenced by
+no listing — leaked by the old upload-then-insert flow (now fixed: submit
+failures clean up after themselves). I don't delete data without your OK.
+One-liner to remove them after you confirm, or delete the folder in
+Dashboard → Storage.
+
+### P2-C. AddSheet agent actions "viewing"/"open house" are half-wired
+
+They navigate to `/new-listing?openHouse=0|1` — params the wizard ignores.
+Open-house events need a product definition (separate table? a flag on
+listings?) or the two actions should be removed from the sheet.
+
+### P2-D. Saved-search alerts need infra
+
+The bell toggle on `/saved-searches` writes `alerts_enabled`, but nothing
+sends alerts. Needs: pg_cron (or scheduled Edge Function) matching new
+listings against saved filters + an email provider. Say which provider and
+I'll build the pipeline next pass.
+
+### P2-E. Sort mixes rent and sale prices
+
+"Price ↑" ranks a €650/month rental above a €95,000 sale. Correct per the
+data model (one `price` column), debatable per UX. Options: force a listing
+type before allowing price sort, or sort within type groups. Product call.
+
+### P2-F. Seed listings carry the dummy phone 355691234567
+
+The 8 seed rows have `contact_phone = '355691234567'` — the code no longer
+invents this number (fixed pass 1), but the seed DATA still points WhatsApp
+CTAs at a possibly-real number. Fine for dev; replace or null before launch.
+
+---
+
+# PASS 1 — 2026-07-02 (historical; §8 superseded — viewings + agent dashboard shipped in pass 2)
+
 ## 0. ANTHROPIC_API_KEY — one command to switch the AI features on
 
 The three AI edge functions (`ai-generate-listing`, `ai-parse-search`,

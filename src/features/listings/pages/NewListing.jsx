@@ -58,6 +58,11 @@ const MAX_FLOOR = 200
 const MIN_YEAR = 1800
 const MAX_YEAR = new Date().getFullYear() + 2
 
+// Storage-side validation: the file picker's accept="image/*" is only a
+// hint — anything can be dropped in. Enforce type + size before upload.
+const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/avif', 'image/gif']
+const MAX_IMAGE_MB = 10
+
 function outOfRange(raw, min, max) {
   if (raw === '' || raw == null) return false
   const n = Number(raw)
@@ -132,8 +137,18 @@ export default function NewListing() {
 
   const handleImages = async (e) => {
     const files = Array.from(e.target.files)
+    e.target.value = ''
     const total = images.length + files.length
     if (total > 20) return
+    if (files.some(f => !ALLOWED_IMAGE_TYPES.includes(f.type))) {
+      setErrors(prev => ({ ...prev, images: t('errors.imageInvalidType') }))
+      return
+    }
+    if (files.some(f => f.size > MAX_IMAGE_MB * 1024 * 1024)) {
+      setErrors(prev => ({ ...prev, images: t('errors.imageTooLarge', { max: MAX_IMAGE_MB }) }))
+      return
+    }
+    setErrors(prev => ({ ...prev, images: undefined }))
     const compressed = await Promise.all(files.map(f => compressImage(f)))
     const newImgs = compressed.map(f => ({ file: f, preview: URL.createObjectURL(f) }))
     setImages(prev => [...prev, ...newImgs])
@@ -181,26 +196,35 @@ export default function NewListing() {
   const next = () => { if (validate()) setStep(s => Math.min(s + 1, STEPS.length - 1)) }
   const prev = () => setStep(s => Math.max(s - 1, 0))
 
+  // Throws on the first failed upload (after removing anything already
+  // uploaded) so a listing can never publish with fewer images than the
+  // agent selected.
   const uploadImages = async () => {
     const urls = []
+    const paths = []
     for (const img of images) {
       const ext = img.file.name.split('.').pop()
       const path = `${user.id}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
       const { error } = await supabase.storage.from('property-images').upload(path, img.file)
-      if (!error) {
-        const { data: { publicUrl } } = supabase.storage.from('property-images').getPublicUrl(path)
-        urls.push(publicUrl)
+      if (error) {
+        if (paths.length) await supabase.storage.from('property-images').remove(paths).catch(() => {})
+        throw Object.assign(new Error('upload_failed'), { uploadFailed: true })
       }
+      paths.push(path)
+      const { data: { publicUrl } } = supabase.storage.from('property-images').getPublicUrl(path)
+      urls.push(publicUrl)
     }
-    return urls
+    return { urls, paths }
   }
 
   const submit = async (asDraft = false) => {
     if (!asDraft && !validate()) return
     setSubmitting(true)
 
+    let uploadedPaths = []
     try {
-      const imageUrls = await uploadImages()
+      const { urls: imageUrls, paths } = await uploadImages()
+      uploadedPaths = paths
 
       const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single()
 
@@ -238,21 +262,23 @@ export default function NewListing() {
       if (error) throw error
       navigate('/my-listings')
     } catch (err) {
-      setErrors({ submit: friendlySubmitError(err, t) })
+      // Insert failed after upload succeeded — remove the now-orphaned files.
+      if (!err?.uploadFailed && uploadedPaths.length) {
+        await supabase.storage.from('property-images').remove(uploadedPaths).catch(() => {})
+      }
+      setErrors({ submit: err?.uploadFailed ? t('errors.imageUploadFailed') : friendlySubmitError(err, t) })
     } finally {
       setSubmitting(false)
     }
   }
 
-  if (!user) {
-    navigate('/profile')
-    return null
-  }
+  // Route is wrapped in ProtectedRoute; this only covers the sign-out-while-open race.
+  if (!user) return null
 
   return (
     <div className="page new-listing-page">
       <div className="nl-header">
-        <button onClick={() => navigate(-1)} className="nl-back"><ArrowLeft size={18} /></button>
+        <button onClick={() => navigate(-1)} className="nl-back" aria-label={t('common.back')}><ArrowLeft size={18} /></button>
         <h1 className="page-title" style={{ margin: 0 }}>{t('listing.newListing')}</h1>
       </div>
 
@@ -440,7 +466,7 @@ export default function NewListing() {
                   <div key={i} className="nl-image-thumb">
                     <img src={img.preview} alt="" />
                     {i === 0 && <span className="nl-cover-badge">{t('listing.cover')}</span>}
-                    <button className="nl-image-remove" onClick={() => removeImage(i)}><X size={12} /></button>
+                    <button className="nl-image-remove" onClick={() => removeImage(i)} aria-label={t('common.close')}><X size={12} /></button>
                   </div>
                 ))}
               </div>

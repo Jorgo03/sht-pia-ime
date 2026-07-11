@@ -20,7 +20,11 @@
     "profile": "Profil",
     "recentlyViewed": "Ostatnio oglądane",
     "back": "Wróć",
-    "send": "Wyślij"
+    "send": "Wyślij",
+    "toggleTheme": "Zmień motyw",
+    "previous": "Poprzedni",
+    "next": "Dalej",
+    "retry": "Spróbuj ponownie"
   },
   "auth": {
     "roleClient": "Klient",
@@ -128,7 +132,14 @@
     "aiPlaceholder": "Spróbuj: mieszkanie 2 pokoje w Tiranie do 100 000 €",
     "aiButton": "Inteligentne wyszukiwanie",
     "aiApplied": "Filtry zastosowane z Twojego zapytania",
-    "aiFailed": "Nie zrozumiano — szukanie według miasta"
+    "aiFailed": "Nie zrozumiano — szukanie według miasta",
+    "listView": "Widok listy",
+    "sortLabel": "Sortuj według",
+    "sort": {
+      "newest": "Najnowsze",
+      "price_asc": "Cena ↑",
+      "price_desc": "Cena ↓"
+    }
   },
   "favourites": {
     "title": "Ulubione",
@@ -157,7 +168,9 @@
     "autoTranslated": "Przetłumaczono automatycznie",
     "whatsappMessage": "Dzień dobry, jestem zainteresowany nieruchomością \"{{title}}\". Czy mogą Państwo podać więcej informacji?",
     "similar": "Podobne nieruchomości",
-    "video": "Wideo"
+    "video": "Wideo",
+    "perDay": "/dzień",
+    "forDailyRent": "Najem dobowy"
   },
   "detail": {
     "forSale": "Na sprzedaż",
@@ -171,7 +184,8 @@
     "baths": "Łazienki",
     "area": "Powierzchnia",
     "year": "Rok",
-    "chatInApp": "Czat"
+    "chatInApp": "Czat",
+    "share": "Udostępnij"
   },
   "messages": {
     "subtitle": "Rozmowy z agentami",
@@ -190,7 +204,8 @@
     "emptyHint": "Rozpocznij czat ze strony nieruchomości",
     "inputPlaceholder": "Napisz wiadomość…",
     "noMessages": "Brak wiadomości — przywitaj się!",
-    "loginPrompt": "Zaloguj się, aby zobaczyć wiadomości"
+    "loginPrompt": "Zaloguj się, aby zobaczyć wiadomości",
+    "sendFailed": "Wiadomość nie została wysłana — spróbuj ponownie"
   },
   "notFound": {
     "title": "Nie znaleziono strony",
@@ -216,12 +231,28 @@
     "emailNotConfirmed": "Potwierdź swój e-mail przed zalogowaniem.",
     "rateLimited": "Zbyt wiele żądań. Spróbuj ponownie później.",
     "valueOutOfRange": "Jedna z wprowadzonych liczb jest zbyt duża. Sprawdź powierzchnię, piętro lub rok budowy.",
-    "submitFailed": "Nie udało się opublikować ogłoszenia. Spróbuj ponownie."
+    "submitFailed": "Nie udało się opublikować ogłoszenia. Spróbuj ponownie.",
+    "imageInvalidType": "Dozwolone są tylko pliki graficzne",
+    "imageTooLarge": "Obraz jest za duży (maks. {{max}} MB)",
+    "imageUploadFailed": "Przesyłanie obrazów nie powiodło się — spróbuj ponownie",
+    "updateFailed": "Aktualizacja nie powiodła się — spróbuj ponownie"
   },
   "agentDashboard": {
     "title": "Panel Agenta",
     "subtitle": "Zarządzaj nieruchomościami i klientami",
-    "comingSoon": "Wkrótce..."
+    "comingSoon": "Wkrótce...",
+    "kicker": "Panel agenta",
+    "headlinePre": "Twój biznes w",
+    "headlineEm": "pigułce",
+    "statListings": "Aktywne ogłoszenia",
+    "statViews": "Wyświetlenia (30 dni)",
+    "statConversations": "Rozmowy",
+    "statLeads": "Leady",
+    "pendingViewings": "Oczekujące prośby o wizytę",
+    "noPendingViewings": "Brak oczekujących próśb",
+    "wantedFeed": "Kupujący szukają",
+    "wantedFeedSub": "Otwarte zapytania",
+    "wantedEmpty": "Obecnie brak otwartych zapytań"
   },
   "account": {
     "welcomeBack": "Witaj ponownie, {{name}} 👋",
@@ -404,5 +435,53 @@
     "thinking": "Myślę…",
     "unavailable": "Nie mogę teraz odpowiedzieć. Skontaktuj się ze sprzedawcą przez stronę ogłoszenia.",
     "disclaimer": "Odpowiedzi AI opierają się wyłącznie na danych ogłoszenia — ważne szczegóły potwierdź u sprzedawcy."
+  },
+  "viewings": {
+    "title": "Wizyty",
+    "kicker": "Oglądanie nieruchomości",
+    "headlinePre": "Zarządzaj swoimi",
+    "headlineEm": "wizytami",
+    "requestTitle": "Poproś o",
+    "requestTitleEm": "wizytę",
+    "when": "Kiedy?",
+    "request": "Wyślij prośbę",
+    "requestSuccess": "Prośba wysłana — otrzymasz powiadomienie po potwierdzeniu",
+    "requestFailed": "Prośba nie powiodła się — spróbuj ponownie",
+    "pastDate": "Wybierz przyszłą datę",
+    "empty": "Brak wizyt",
+    "emptyHint": "Poproś o wizytę na stronie nieruchomości",
+    "mine": "Moje prośby",
+    "incoming": "Prośby dotyczące Twoich ogłoszeń",
+    "confirm": "Potwierdź",
+    "decline": "Odrzuć",
+    "cancel": "Anuluj",
+    "from": "Od {{name}}",
+    "status": {
+      "requested": "Zgłoszona",
+      "confirmed": "Potwierdzona",
+      "declined": "Odrzucona",
+      "cancelled": "Anulowana"
+    }
+  },
+  "saved": {
+    "kicker": "Wyszukiwania i zapytania",
+    "headlinePre": "Twoje zapisane",
+    "headlineEm": "wyszukiwania",
+    "tabSearches": "Wyszukiwania",
+    "tabWanted": "Poszukiwane domy",
+    "emptySearches": "Brak zapisanych wyszukiwań",
+    "emptySearchesHint": "Zapisz je przyciskiem +",
+    "emptyWanted": "Brak ogłoszeń o poszukiwaniu",
+    "emptyWantedHint": "Opublikuj czego szukasz przyciskiem +",
+    "run": "Uruchom wyszukiwanie",
+    "delete": "Usuń",
+    "alertsOn": "Włącz powiadomienia",
+    "alertsOff": "Wyłącz powiadomienia",
+    "markClosed": "Oznacz jako znalezione",
+    "markOpen": "Otwórz ponownie",
+    "wantedStatus": {
+      "open": "Otwarte",
+      "closed": "Zamknięte"
+    }
   }
 }

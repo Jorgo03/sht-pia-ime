@@ -1,10 +1,12 @@
 import { useEffect, useCallback } from 'react'
+import { useTranslation } from 'react-i18next'
 import { X, ChevronLeft, ChevronRight } from 'lucide-react'
 
 const navBtn =
   'absolute top-1/2 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/15 text-white transition-colors hover:bg-white/30'
 
 export default function ImageLightbox({ images, index, onClose, onNavigate }) {
+  const { t } = useTranslation()
   const handleKey = useCallback((e) => {
     if (e.key === 'Escape') onClose()
     if (e.key === 'ArrowLeft') onNavigate(-1)
@@ -28,7 +30,7 @@ export default function ImageLightbox({ images, index, onClose, onNavigate }) {
       <button
         className="absolute right-4 top-4 z-10 flex h-11 w-11 items-center justify-center rounded-full bg-white/15 text-white transition-colors hover:bg-white/30"
         onClick={onClose}
-        aria-label="Close"
+        aria-label={t('common.close')}
       >
         <X size={24} />
       </button>
@@ -42,12 +44,12 @@ export default function ImageLightbox({ images, index, onClose, onNavigate }) {
           <button
             className={`${navBtn} left-4`}
             onClick={e => { e.stopPropagation(); onNavigate(-1) }}
-            aria-label="Previous"
+            aria-label={t('common.previous')}
           ><ChevronLeft size={28} /></button>
           <button
             className={`${navBtn} right-4`}
             onClick={e => { e.stopPropagation(); onNavigate(1) }}
-            aria-label="Next"
+            aria-label={t('common.next')}
           ><ChevronRight size={28} /></button>
           <div className="absolute bottom-6 left-1/2 -translate-x-1/2 rounded-fho-lg bg-black/60 px-4 py-1.5 text-sm font-medium text-white">
             {index + 1} / {images.length}

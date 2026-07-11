@@ -118,7 +118,7 @@ export default function Messages() {
             const name = other?.full_name || other?.agency_name || '?'
             const propTitle = prop ? (getLocalizedText(prop.title_i18n, i18n.language) || prop.title) : ''
             return (
-              <div key={c.id} className={`msg-row ${myUnread > 0 ? 'unread' : ''}`} onClick={() => setSearchParams({ c: c.id })}>
+              <div key={c.id} className={`msg-row ${myUnread > 0 ? 'unread' : ''}`} role="button" tabIndex={0} onClick={() => setSearchParams({ c: c.id })} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setSearchParams({ c: c.id }) } }}>
                 <div className="msg-avatar" style={{ background: 'linear-gradient(135deg, var(--fho-orange-1), var(--fho-orange-2))' }}>
                   {name[0]?.toUpperCase() || '?'}
                 </div>
@@ -144,6 +144,7 @@ function Thread({ conversation, other, property, meIsClient, userId, onBack, onO
   const [messages, setMessages] = useState([])
   const [text, setText] = useState('')
   const [sending, setSending] = useState(false)
+  const [sendError, setSendError] = useState(false)
   const bottomRef = useRef(null)
 
   const markRead = useCallback(() => {
@@ -181,6 +182,7 @@ function Thread({ conversation, other, property, meIsClient, userId, onBack, onO
     const body = text.trim()
     if (!body || sending) return
     setSending(true)
+    setSendError(false)
     const { data, error } = await supabase
       .from('messages')
       .insert({ conversation_id: conversation.id, sender_id: userId, body })
@@ -190,6 +192,8 @@ function Thread({ conversation, other, property, meIsClient, userId, onBack, onO
     if (!error && data) {
       setText('')
       setMessages(prev => (prev.some(m => m.id === data.id) ? prev : [...prev, data]))
+    } else {
+      setSendError(true)
     }
   }
 
@@ -228,6 +232,11 @@ function Thread({ conversation, other, property, meIsClient, userId, onBack, onO
         <div ref={bottomRef} />
       </div>
 
+      {sendError && (
+        <div role="alert" style={{ textAlign: 'center', fontSize: 12, color: '#c0392b', padding: '4px 0' }}>
+          {t('messages.sendFailed')}
+        </div>
+      )}
       <div className="msg-thread__input">
         <input
           type="text"

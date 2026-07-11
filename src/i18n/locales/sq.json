@@ -20,7 +20,11 @@
     "profile": "Profili",
     "recentlyViewed": "Parë së fundmi",
     "back": "Kthehu",
-    "send": "Dërgo"
+    "send": "Dërgo",
+    "toggleTheme": "Ndrysho temën",
+    "previous": "E mëparshme",
+    "next": "Tjetra",
+    "retry": "Provo përsëri"
   },
   "auth": {
     "roleClient": "Klient",
@@ -124,7 +128,14 @@
     "aiPlaceholder": "Provo: apartament me 2 dhoma në Tiranë nën 100,000 €",
     "aiButton": "Kërkim i zgjuar",
     "aiApplied": "Filtrat u vendosën nga kërkimi yt",
-    "aiFailed": "Nuk u kuptua — po kërkojmë sipas qytetit"
+    "aiFailed": "Nuk u kuptua — po kërkojmë sipas qytetit",
+    "listView": "Pamja listë",
+    "sortLabel": "Rendit sipas",
+    "sort": {
+      "newest": "Më të rejat",
+      "price_asc": "Çmimi ↑",
+      "price_desc": "Çmimi ↓"
+    }
   },
   "favourites": {
     "title": "Të preferuarat",
@@ -153,7 +164,9 @@
     "autoTranslated": "Përkthyer automatikisht",
     "whatsappMessage": "Përshëndetje, jam i interesuar për pronën \"{{title}}\". A mund të më jepni më shumë informacion?",
     "similar": "Prona të ngjashme",
-    "video": "Video tur"
+    "video": "Video tur",
+    "perDay": "/ditë",
+    "forDailyRent": "Qira ditore"
   },
   "detail": {
     "forSale": "Shitje",
@@ -167,7 +180,8 @@
     "baths": "Banjo",
     "area": "Sipërfaqja",
     "year": "Viti",
-    "chatInApp": "Bisedo"
+    "chatInApp": "Bisedo",
+    "share": "Ndaj"
   },
   "messages": {
     "subtitle": "Bisedat me agjentët",
@@ -186,7 +200,8 @@
     "emptyHint": "Fillo një bisedë nga faqja e një prone",
     "inputPlaceholder": "Shkruaj një mesazh…",
     "noMessages": "Ende pa mesazhe — përshëndetu!",
-    "loginPrompt": "Kyçu për të parë mesazhet"
+    "loginPrompt": "Kyçu për të parë mesazhet",
+    "sendFailed": "Mesazhi nuk u dërgua — provo përsëri"
   },
   "notFound": {
     "title": "Faqja nuk u gjet",
@@ -205,12 +220,28 @@
     "emailNotConfirmed": "Konfirmoni emailin përpara se të hyni.",
     "rateLimited": "Shumë kërkesa. Provo përsëri më vonë.",
     "valueOutOfRange": "Një nga numrat që vendose është shumë i madh. Kontrollo sipërfaqen, katin ose vitin e ndërtimit.",
-    "submitFailed": "Shpallja nuk u publikua. Provo përsëri."
+    "submitFailed": "Shpallja nuk u publikua. Provo përsëri.",
+    "imageInvalidType": "Lejohen vetëm skedarë imazhi",
+    "imageTooLarge": "Imazhi është shumë i madh (maks. {{max}} MB)",
+    "imageUploadFailed": "Ngarkimi i imazheve dështoi — provo përsëri",
+    "updateFailed": "Përditësimi dështoi — provo përsëri"
   },
   "agentDashboard": {
     "title": "Paneli i Agjentit",
     "subtitle": "Menaxho pronat dhe klientët e tu",
-    "comingSoon": "Së shpejti..."
+    "comingSoon": "Së shpejti...",
+    "kicker": "Paneli i agjentit",
+    "headlinePre": "Biznesi yt me një",
+    "headlineEm": "shikim",
+    "statListings": "Prona aktive",
+    "statViews": "Shikime (30 ditë)",
+    "statConversations": "Biseda",
+    "statLeads": "Klientë potencialë",
+    "pendingViewings": "Kërkesa vizite në pritje",
+    "noPendingViewings": "Asnjë kërkesë në pritje",
+    "wantedFeed": "Blerës që kërkojnë",
+    "wantedFeedSub": "Kërkesa të hapura",
+    "wantedEmpty": "Asnjë kërkesë e hapur për momentin"
   },
   "profile": {
     "savedSearches": "Kërkimet e ruajtura",
@@ -400,5 +431,53 @@
     "thinking": "Duke menduar…",
     "unavailable": "Nuk mund të përgjigjem tani. Kontakto shitësin përmes faqes së shpalljes.",
     "disclaimer": "Përgjigjet e AI bazohen vetëm në të dhënat e shpalljes — verifiko detajet e rëndësishme me shitësin."
+  },
+  "viewings": {
+    "title": "Vizitat",
+    "kicker": "Vizitat e pronave",
+    "headlinePre": "Menaxho",
+    "headlineEm": "vizitat",
+    "requestTitle": "Kërko një",
+    "requestTitleEm": "vizitë",
+    "when": "Kur?",
+    "request": "Dërgo kërkesën",
+    "requestSuccess": "Kërkesa u dërgua — do të njoftohesh kur të konfirmohet",
+    "requestFailed": "Kërkesa dështoi — provo përsëri",
+    "pastDate": "Zgjidh një datë në të ardhmen",
+    "empty": "Ende pa vizita",
+    "emptyHint": "Kërko një vizitë nga faqja e një prone",
+    "mine": "Kërkesat e mia",
+    "incoming": "Kërkesa për pronat e tua",
+    "confirm": "Konfirmo",
+    "decline": "Refuzo",
+    "cancel": "Anulo",
+    "from": "Nga {{name}}",
+    "status": {
+      "requested": "E kërkuar",
+      "confirmed": "E konfirmuar",
+      "declined": "E refuzuar",
+      "cancelled": "E anuluar"
+    }
+  },
+  "saved": {
+    "kicker": "Kërkimet dhe kërkesat",
+    "headlinePre": "Kërkimet e tua të",
+    "headlineEm": "ruajtura",
+    "tabSearches": "Kërkime",
+    "tabWanted": "Shtëpi të kërkuara",
+    "emptySearches": "Ende pa kërkime të ruajtura",
+    "emptySearchesHint": "Ruaj një kërkim nga butoni +",
+    "emptyWanted": "Ende pa kërkesa për shtëpi",
+    "emptyWantedHint": "Posto çfarë kërkon nga butoni +",
+    "run": "Kërko tani",
+    "delete": "Fshi",
+    "alertsOn": "Aktivizo njoftimet",
+    "alertsOff": "Çaktivizo njoftimet",
+    "markClosed": "Mbyll kërkesën",
+    "markOpen": "Rihap kërkesën",
+    "wantedStatus": {
+      "open": "E hapur",
+      "closed": "E mbyllur"
+    }
   }
 }

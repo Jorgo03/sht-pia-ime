@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../auth/AuthContext'
 import { useFavorites } from '../FavoritesContext'
-import { formatPrice, imageFor, getLocalizedText } from '../../../lib/format'
+import { formatPrice, imageFor, getLocalizedText, priceSuffixKey } from '../../../lib/format'
 import SkeletonCard from '../../../shared/SkeletonCard'
 import { useState } from 'react'
 
@@ -67,13 +67,14 @@ function FavRow({ property, lang, onUnsave, onTap }) {
   const hasImage = property.image_urls?.[0] && !imgBroken
   const title = getLocalizedText(property.title_i18n, lang) || property.title
   const price = formatPrice(property.price, lang, property.currency)
-  const suffix = property.listing_type === 'rent' ? t('property.perMonth') : ''
+  const suffixKey = priceSuffixKey(property.listing_type)
+  const suffix = suffixKey ? t(suffixKey) : ''
 
   return (
-    <div className="fav-row" onClick={onTap}>
+    <div className="fav-row" role="button" tabIndex={0} onClick={onTap} onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onTap() } }}>
       <div className="fav-row__img">
         {hasImage ? (
-          <img src={property.image_urls[0]} alt={title} onError={() => setImgBroken(true)} />
+          <img src={property.image_urls[0]} alt={title} loading="lazy" decoding="async" onError={() => setImgBroken(true)} />
         ) : (
           <div className="fav-row__placeholder" style={{ background: imageFor(property) }} />
         )}
@@ -83,7 +84,7 @@ function FavRow({ property, lang, onUnsave, onTap }) {
         <div className="fav-row__loc"><MapPin size={12} /> {property.city || property.address}</div>
         <div className="fav-row__price">{price}{suffix}</div>
       </div>
-      <button className="fav-row__heart" onClick={e => { e.stopPropagation(); onUnsave() }}>
+      <button className="fav-row__heart" onClick={e => { e.stopPropagation(); onUnsave() }} aria-label={t('favourites.remove')}>
         <Heart size={16} fill="currentColor" />
       </button>
     </div>

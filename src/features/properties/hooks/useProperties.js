@@ -3,12 +3,19 @@ import { supabase } from '../../../lib/supabase'
 
 const PAGE_SIZE = 20
 
-function buildQuery({ filter, listingType, city, minPrice, maxPrice, beds }) {
+const SORTS = {
+  newest: { column: 'created_at', ascending: false },
+  price_asc: { column: 'price', ascending: true },
+  price_desc: { column: 'price', ascending: false },
+}
+
+function buildQuery({ filter, listingType, city, minPrice, maxPrice, beds, sort }) {
+  const order = SORTS[sort] || SORTS.newest
   let query = supabase
     .from('properties')
     .select('*')
     .eq('status', 'active')
-    .order('created_at', { ascending: false })
+    .order(order.column, { ascending: order.ascending })
 
   if (filter && filter !== 'all') query = query.eq('property_type', filter)
   if (listingType) query = query.eq('listing_type', listingType)
@@ -19,7 +26,7 @@ function buildQuery({ filter, listingType, city, minPrice, maxPrice, beds }) {
   return query
 }
 
-export function useProperties({ filter = 'all', listingType = null, city = null, minPrice = null, maxPrice = null, beds = null, paginate = false } = {}) {
+export function useProperties({ filter = 'all', listingType = null, city = null, minPrice = null, maxPrice = null, beds = null, paginate = false, limit = null, sort = 'newest' } = {}) {
   const [properties, setProperties] = useState([])
   const [loading, setLoading] = useState(true)
   const [loadingMore, setLoadingMore] = useState(false)
@@ -31,8 +38,8 @@ export function useProperties({ filter = 'all', listingType = null, city = null,
     setLoading(true)
     setError(null)
 
-    const query = buildQuery({ filter, listingType, city, minPrice, maxPrice, beds })
-    const limited = paginate ? query.range(0, PAGE_SIZE - 1) : query
+    const query = buildQuery({ filter, listingType, city, minPrice, maxPrice, beds, sort })
+    const limited = paginate ? query.range(0, PAGE_SIZE - 1) : limit ? query.limit(limit) : query
 
     limited.then(({ data, error: err }) => {
       if (!active) return
@@ -45,13 +52,13 @@ export function useProperties({ filter = 'all', listingType = null, city = null,
     })
 
     return () => { active = false }
-  }, [filter, listingType, city, minPrice, maxPrice, beds, paginate])
+  }, [filter, listingType, city, minPrice, maxPrice, beds, paginate, limit, sort])
 
   const loadMore = useCallback(() => {
     if (!paginate || loadingMore || !hasMore) return
     setLoadingMore(true)
 
-    const query = buildQuery({ filter, listingType, city, minPrice, maxPrice, beds })
+    const query = buildQuery({ filter, listingType, city, minPrice, maxPrice, beds, sort })
     query.range(properties.length, properties.length + PAGE_SIZE - 1)
       .then(({ data }) => {
         const newItems = data || []
@@ -59,7 +66,7 @@ export function useProperties({ filter = 'all', listingType = null, city = null,
         setHasMore(newItems.length === PAGE_SIZE)
         setLoadingMore(false)
       })
-  }, [filter, listingType, city, minPrice, maxPrice, beds, paginate, loadingMore, hasMore, properties.length])
+  }, [filter, listingType, city, minPrice, maxPrice, beds, paginate, sort, loadingMore, hasMore, properties.length])
 
   return { properties, loading, loadingMore, error, hasMore, loadMore }
 }
