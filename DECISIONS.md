@@ -50,6 +50,11 @@ App-side wiring is complete and verified; no code change is needed after
 you flip the toggles. Note LinkedIn has two dashboard entries — enable
 **LinkedIn (OIDC)**, not the deprecated "LinkedIn".
 
+**Update 2026-07-12:** per your call, the Apple and LinkedIn buttons are
+removed from the sign-in screen until the providers are enabled.
+`signInWithProvider` and `/auth/callback` still support them — re-adding is
+just the two buttons in `Profile.jsx` (a comment there marks the spot).
+
 ### P2-B. 8 orphaned storage files — approve deletion
 
 `property-images/9c47f15e-…/1783195…` (8 files, 2026-07-04) are referenced by
