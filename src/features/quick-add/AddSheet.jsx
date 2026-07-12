@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Home, Search, Heart, Eye, Users, CalendarDays, Building2, X, ArrowLeft } from 'lucide-react'
+import { Home, Search, Heart, Eye, Users, CalendarDays, Building2, X, ArrowLeft, Sparkles, Loader2 } from 'lucide-react'
 import { useAddSheet } from './AddSheetContext'
 import { useAuth } from '../auth/AuthContext'
 import { supabase } from '../../lib/supabase'
+import { parseSearchQuery } from '../../lib/ai'
+import { isEnabled } from '../../lib/flags'
 import './AddSheet.css'
 
 function SaveSearchForm({ onClose, onSuccess, onError }) {
@@ -55,6 +57,45 @@ function WantedHomeForm({ onClose, onSuccess, onError }) {
   const [minBedrooms, setMinBedrooms] = useState('')
   const [notes, setNotes] = useState('')
   const [loading, setLoading] = useState(false)
+  // Task 5: free-text wish → ai-parse-search → structured criteria,
+  // plus a live count of active listings matching what's filled in.
+  const [describe, setDescribe] = useState('')
+  const [parsing, setParsing] = useState(false)
+  const [parseFailed, setParseFailed] = useState(false)
+  const [matchCount, setMatchCount] = useState(null)
+
+  const handleParse = async () => {
+    if (!describe.trim() || parsing) return
+    setParsing(true)
+    setParseFailed(false)
+    const filters = await parseSearchQuery(describe)
+    setParsing(false)
+    if (!filters) { setParseFailed(true); return }
+    if (filters.city) setCity(filters.city)
+    if (filters.listing === 'sale' || filters.listing === 'rent') setListingType(filters.listing)
+    if (filters.maxPrice) setMaxPrice(String(filters.maxPrice))
+    if (filters.beds) setMinBedrooms(String(filters.beds))
+    setNotes(describe.trim())
+  }
+
+  // Live match count against active listings (debounced, head-count only)
+  useEffect(() => {
+    if (!city.trim()) { setMatchCount(null); return }
+    let active = true
+    const id = setTimeout(async () => {
+      let q = supabase
+        .from('properties')
+        .select('id', { count: 'exact', head: true })
+        .eq('status', 'active')
+        .eq('listing_type', listingType)
+        .ilike('city', `%${city.trim()}%`)
+      if (maxPrice) q = q.lte('price', Number(maxPrice))
+      if (minBedrooms) q = q.gte('beds', Number(minBedrooms))
+      const { count } = await q
+      if (active) setMatchCount(count ?? 0)
+    }, 600)
+    return () => { active = false; clearTimeout(id) }
+  }, [city, listingType, maxPrice, minBedrooms])
 
   const handleSubmit = async () => {
     if (!city.trim() || !user) return
@@ -76,6 +117,28 @@ function WantedHomeForm({ onClose, onSuccess, onError }) {
     <div className="addsheet-miniform">
       <button className="link-btn otp-back" onClick={onClose}><ArrowLeft size={16} /> {t('common.back')}</button>
       <h3 className="addsheet-miniform__title">{t('addSheet.client.wanted.title')}</h3>
+      {isEnabled('aiSearch') && (
+        <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+          <textarea
+            className="addsheet-input addsheet-textarea"
+            style={{ flex: 1, minHeight: 56 }}
+            placeholder={t('wanted.describePlaceholder')}
+            value={describe}
+            onChange={(e) => { setDescribe(e.target.value); setParseFailed(false) }}
+          />
+          <button
+            className="cta-pill"
+            style={{ width: 46, height: 46, flexShrink: 0, padding: 0 }}
+            onClick={handleParse}
+            disabled={parsing || !describe.trim()}
+            aria-label={t('search.aiButton')}
+            title={t('search.aiButton')}
+          >
+            {parsing ? <Loader2 size={16} className="animate-spin" /> : <Sparkles size={16} />}
+          </button>
+        </div>
+      )}
+      {parseFailed && <div style={{ fontSize: 12, color: 'var(--fho-text-muted)' }}>{t('search.aiFailed')}</div>}
       <input className="addsheet-input" placeholder={t('listing.city') + ' *'} value={city} onChange={(e) => setCity(e.target.value)} autoFocus />
       <div className="addsheet-toggle-row">
         <button className={`addsheet-toggle ${listingType === 'sale' ? 'active' : ''}`} onClick={() => setListingType('sale')}>{t('search.sale')}</button>
@@ -84,6 +147,11 @@ function WantedHomeForm({ onClose, onSuccess, onError }) {
       <input className="addsheet-input" placeholder={t('addSheet.maxPrice')} type="number" value={maxPrice} onChange={(e) => setMaxPrice(e.target.value)} />
       <input className="addsheet-input" placeholder={t('addSheet.minBedrooms')} type="number" value={minBedrooms} onChange={(e) => setMinBedrooms(e.target.value)} />
       <textarea className="addsheet-input addsheet-textarea" placeholder={t('addSheet.notes')} value={notes} onChange={(e) => setNotes(e.target.value)} />
+      {matchCount !== null && (
+        <div style={{ fontSize: 12, color: 'var(--fho-orange-1)', display: 'flex', alignItems: 'center', gap: 6 }}>
+          <Home size={13} /> {t('wanted.matchesNow', { n: matchCount })}
+        </div>
+      )}
       <button className="cta-pill" onClick={handleSubmit} disabled={loading || !city.trim()}>
         {loading ? t('common.loading') : t('common.save')}
       </button>

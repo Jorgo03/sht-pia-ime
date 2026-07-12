@@ -484,5 +484,15 @@
       "open": "Ouverte",
       "closed": "Fermée"
     }
+  },
+  "bell": {
+    "label": "Notifications",
+    "title": "Visites à venir",
+    "empty": "Rien dans les 48 prochaines heures",
+    "viewAll": "Voir toutes les visites"
+  },
+  "wanted": {
+    "describePlaceholder": "Décrivez ce que vous cherchez… p. ex. « appartement 2 pièces à Tirana jusqu'à 150 000 € »",
+    "matchesNow": "Annonces correspondantes actuellement : {{n}}"
   }
 }

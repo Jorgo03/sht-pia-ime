@@ -488,5 +488,15 @@
       "open": "Otwarte",
       "closed": "Zamknięte"
     }
+  },
+  "bell": {
+    "label": "Powiadomienia",
+    "title": "Nadchodzące wizyty",
+    "empty": "Nic w ciągu najbliższych 48 godzin",
+    "viewAll": "Zobacz wszystkie wizyty"
+  },
+  "wanted": {
+    "describePlaceholder": "Opisz, czego szukasz… np. „mieszkanie 2-pokojowe w Tiranie do 150 tys. euro\"",
+    "matchesNow": "Pasujące ogłoszenia teraz: {{n}}"
   }
 }

@@ -484,5 +484,15 @@
       "open": "E hapur",
       "closed": "E mbyllur"
     }
+  },
+  "bell": {
+    "label": "Njoftimet",
+    "title": "Vizitat e ardhshme",
+    "empty": "Asgjë në 48 orët e ardhshme",
+    "viewAll": "Shiko të gjitha vizitat"
+  },
+  "wanted": {
+    "describePlaceholder": "Përshkruaj çfarë kërkon… p.sh. \"apartament 2+1 në Tiranë deri në 150 mijë euro\"",
+    "matchesNow": "Prona që përputhen tani: {{n}}"
   }
 }

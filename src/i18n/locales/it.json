@@ -484,5 +484,15 @@
       "open": "Aperta",
       "closed": "Chiusa"
     }
+  },
+  "bell": {
+    "label": "Notifiche",
+    "title": "Visite in arrivo",
+    "empty": "Niente nelle prossime 48 ore",
+    "viewAll": "Vedi tutte le visite"
+  },
+  "wanted": {
+    "describePlaceholder": "Descrivi cosa cerchi… es. \"bilocale a Tirana fino a 150.000 €\"",
+    "matchesNow": "Annunci corrispondenti ora: {{n}}"
   }
 }

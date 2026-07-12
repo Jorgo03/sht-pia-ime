@@ -61,6 +61,30 @@ to pending_review would strand every listing invisible with nobody able to
 approve it. When the admin role ships, flipping the default is a one-line
 change in NewListing.jsx + a review queue screen.
 
+### MP4. Reminders — what shipped vs. what's infra-gated
+
+The plan's `meetings` table already exists as `viewings` (agent_id,
+property_id, client, datetime, status, notes — richer than spec'd), so no
+new table. Shipped: header notification bell for signed-in users — badge
+with the count of requested/confirmed viewings in the next 48h, dropdown
+listing the next 5 with date/time/status, links to /viewings; refreshes
+every 5 min. **Not shipped: the 30-minutes-before email/push reminder** —
+it needs (a) an email provider (P2-D still unanswered) and (b) push infra
+that doesn't exist for this web app (would be Web Push + service worker, or
+FCM if the Expo app ever ships). Pick the email provider and I'll build the
+pg_cron + Edge Function pipeline next pass.
+
+### MP5. Request broadcast — mapped onto wanted_homes
+
+`requests` table ≙ existing `wanted_homes`; "broadcast to relevant agents" ≙
+the agent-dashboard "Buyers looking now" feed (already live); "My Requests"
+≙ /saved-searches wanted tab (already live). Newly shipped: natural-language
+entry on the wanted-home form — free text → `ai-parse-search` Edge Function
+(needs ANTHROPIC_API_KEY set, §0; degrades to manual fields) → prefills
+city/type/budget/beds, plus a live "listings matching right now: N" count.
+Proactive push notifications to agents on new requests: same infra gap as
+MP4 — logged, not faked.
+
 ### MP-note. Model names in the plan
 The plan's "Sonnet 4.6 / Opus 4.6" don't exist (current: Sonnet 5,
 Opus 4.8, Haiku 4.5), and its claim that "there is no Anthropic model named

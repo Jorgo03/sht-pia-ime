@@ -484,5 +484,15 @@
       "open": "Offen",
       "closed": "Geschlossen"
     }
+  },
+  "bell": {
+    "label": "Benachrichtigungen",
+    "title": "Anstehende Besichtigungen",
+    "empty": "Nichts in den nächsten 48 Stunden",
+    "viewAll": "Alle Besichtigungen ansehen"
+  },
+  "wanted": {
+    "describePlaceholder": "Beschreibe, was du suchst … z. B. „2-Zimmer-Wohnung in Tirana bis 150.000 €\"",
+    "matchesNow": "Passende Inserate aktuell: {{n}}"
   }
 }
