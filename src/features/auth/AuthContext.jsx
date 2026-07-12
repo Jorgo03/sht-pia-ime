@@ -167,12 +167,11 @@ export function AuthProvider({ children }) {
       provider,
       options: {
         redirectTo: `${window.location.origin}/auth/callback`,
-        // Google-only params (refresh-token grant + account chooser) —
-        // Apple and LinkedIn don't recognize them and Apple can reject the
-        // authorize request outright on unknown prompt values.
-        ...(provider === 'google'
-          ? { queryParams: { access_type: 'offline', prompt: 'consent' } }
-          : {}),
+        // Deliberately NO extra queryParams. access_type=offline +
+        // prompt=consent forced Google's legacy consent screen on every
+        // sign-in, which is prone to hanging on a blank page — and the
+        // Google refresh token it grants is unused (Supabase manages its
+        // own session; the app never calls Google APIs directly).
       },
     })
     return { error }
