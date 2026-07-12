@@ -85,6 +85,23 @@ city/type/budget/beds, plus a live "listings matching right now: N" count.
 Proactive push notifications to agents on new requests: same infra gap as
 MP4 — logged, not faked.
 
+### MP7. Store deployment prep — needs the Expo-vs-web decision first
+
+Task 7 (app.json bundle IDs, EAS profiles, store builds) targets the
+**legacy Expo tree**, but the shipping product is the Vite web app — the
+Expo app hasn't been touched since the July migration and lacks every
+feature built since (messaging, viewings, saved searches, AI, the redesign).
+Doing EAS work now would ship a stale prototype to the stores. Decide first
+(DECISIONS §11): (a) mobile = PWA wrapper of the web app (Capacitor — one
+codebase, fastest to store), (b) revive the Expo app (weeks of re-porting),
+or (c) web-only for launch. What DOES apply today regardless:
+- Production **Site URL + Redirect URLs** in Supabase Auth config before
+  launch (§4) — currently localhost-only.
+- **Privacy policy page** — required by both stores AND by GDPR for the web
+  app; needs your data-retention answers before I draft it in 8 languages.
+- **Moderation** — the pending_review status from MP2 is the hook; needs
+  the admin role/UI.
+
 ### MP-note. Model names in the plan
 The plan's "Sonnet 4.6 / Opus 4.6" don't exist (current: Sonnet 5,
 Opus 4.8, Haiku 4.5), and its claim that "there is no Anthropic model named

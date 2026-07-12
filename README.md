@@ -1,72 +1,58 @@
 # Shtëpia.ime
 
-The live app is the Vite web app in `src/` (the Expo notes below are from the
-original template and cover the legacy `app/` tree).
+Multilingual real-estate marketplace for Albania by **Future Home Orange** —
+buyers/renters, agents and agencies, usable by the diaspora in 8 languages
+(sq · en · de · it · es · pl · ru · fr).
 
-## One-click start (Windows)
+## Architecture
 
-Double-click **`start-backend.bat`** in the repository root. It checks that
-Node.js is installed, installs dependencies if `node_modules` is missing,
-verifies port 5173 is free and that the hosted Supabase backend is awake,
-then starts the app at http://localhost:5173.
+| Layer | Tech |
+|---|---|
+| Frontend | Vite + React 19 + React Router v7 (`src/`, feature-first folders) |
+| Styling | Tailwind CSS v4 + design tokens (`src/styles/theme.css`), light+dark |
+| Backend | Supabase — Postgres (RLS on every table), Auth, Storage, Edge Functions |
+| i18n | i18next, 8 locale files kept in sync; per-listing JSONB translations |
+| Maps | Leaflet + OpenStreetMap |
+| AI | Anthropic API via Supabase Edge Functions only (never client-side) |
 
-Note: the backend itself (database, auth, storage, edge functions) runs on
-Supabase's cloud — there is no local backend process to start. The script
-launches the local web app and health-checks the hosted backend.
+The backend is **hosted on Supabase** (project `xzzzhlwmzotibrxdqmcm`) —
+there is no local backend process. Edge Functions live in
+`supabase/functions/`, SQL migrations in `supabase/migrations/`.
 
-To stop: press **Ctrl+C** in the console window (confirm with `Y` if asked),
-then close the window. If the window ever closes itself, it pauses first so
-you can read any error.
+> **Legacy note:** `app/`, `components/`, `contexts/`, `data/` belong to an
+> older Expo React-Native prototype that is not the shipping product. The
+> live app is `src/`. See DECISIONS.md §11.
 
----
+## Setup
 
-# Welcome to your Expo app 👋
-
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
-
-## Get started
-
-1. Install dependencies
-
-   ```bash
-   npm install
+1. Node 20+ and npm.
+2. `npm install`
+3. Create `.env.local` in the repo root:
    ```
-
-2. Start the app
-
-   ```bash
-   npx expo start
+   VITE_SUPABASE_URL=https://<project-ref>.supabase.co
+   VITE_SUPABASE_ANON_KEY=<anon/publishable key>
    ```
+   (Anon key only — service keys and the Anthropic key live exclusively in
+   Supabase Edge Function secrets.)
+4. `npm run dev` → http://localhost:5173
 
-In the output, you'll find options to open the app in a
+### One-click start (Windows)
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+Double-click **`start-backend.bat`** (or `start-frontend.bat`, same thing):
+checks Node, installs deps if missing, verifies port 5173 is free and that
+the hosted Supabase backend is awake, then starts the app. Stop with
+**Ctrl+C** in the console window.
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+## Scripts
 
-## Get a fresh project
+- `npm run dev` — dev server (port 5173)
+- `npm run build` — production build to `dist/`
+- `npm test` — unit tests (AI response sanitizers)
 
-When you're ready, run:
+## Project docs
 
-```bash
-npm run reset-project
-```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+- `CLAUDE.md` — engineering conventions (read first)
+- `shtepia-ime-overview.md` — data model + feature status
+- `AUDIT.md` / `DESIGN_AUDIT.md` — audit history
+- `DECISIONS.md` — pending human decisions & judgment-call log
+- `design-system/MASTER.md` — visual design system
