@@ -44,6 +44,23 @@ in-scope first. When yes, the checklist is:
 5. App code: one button calling `signInWithProvider('azure')` with
    `options.scopes: 'email'` — the existing pattern handles the rest.
 
+### MP2. Test-listing cleanup — AWAITING YOUR APPROVAL + review-gate call
+
+**Deletion candidates (nothing deleted):** the 8 listings owned by
+`system@shtepia.ime` (created 2026-05-15, Unsplash stock photos, all
+"Tiranë …" — Blloku ×2, Myslym Shyri, Selvia, Liqeni i Thatë, Komuna e
+Parisit, Don Bosko, + the €650 rental). One more listing is YOURS
+("Aparrtament modern 2+1 Pazar i Ri", jorgo.dhaskali@gmail.com, real photos,
+2026-07-12) — kept unless you say otherwise. Reply "delete the 8 seed
+listings" and it's one statement.
+
+**Review gate:** `pending_review` is now a legal status and RLS already
+hides it from the public. The publish default was NOT flipped: there is no
+admin/review UI (Super Admin is a planned role), so defaulting new listings
+to pending_review would strand every listing invisible with nobody able to
+approve it. When the admin role ships, flipping the default is a one-line
+change in NewListing.jsx + a review queue screen.
+
 ### MP-note. Model names in the plan
 The plan's "Sonnet 4.6 / Opus 4.6" don't exist (current: Sonnet 5,
 Opus 4.8, Haiku 4.5), and its claim that "there is no Anthropic model named
