@@ -5,6 +5,39 @@ AUDIT.md was fixed; see the final report for the change log.
 
 ---
 
+## ═══ VISUAL PASS — 2026-07-12 (branch feature/visual-redesign) ═══
+
+### V-1. ui-ux-pro-max skill not installed
+The mission's Phase-1 script does not exist in this repo (`skills/` absent).
+`design-system/MASTER.md` was authored by hand to the same parameters
+(variance 7 / motion 6 / density 5) on top of the existing token system.
+Install the skill and re-run if you want its generated baseline compared.
+
+### V-2. Navy (#0a2f63) added as token only
+The brand navy now exists as `--fho-navy` (lifted to `#9db8e0` in dark theme
+for contrast) but is not yet APPLIED anywhere — the warm-paper + orange
+identity is strong and injecting navy without a product surface for "trust"
+elements (verified badges, agency links) risked muddying it. Sanity-check:
+tell me where you want navy used and it's a one-line change per spot.
+
+### V-3. New feature pages left inline-styled
+Viewings / SavedSearches / AgentDashboard / PropertyDashboard use inline
+styles (written pre-redesign). They inherit global focus/stagger polish only.
+Restyling them to CSS classes is mechanical but touches brand-new features —
+deferred to keep this pass zero-risk.
+
+### V-4. MyListings 30px icon buttons kept
+Below the 40px touch floor, but the dense row layout depends on them.
+Flagged, not changed — say the word and I'll enlarge to 38px with tighter
+padding.
+
+### V-5. Verification method
+The Claude browser-pane screenshot pipeline died mid-session (harness bug),
+so visual verification used headless Chrome captures (both themes, Home +
+Detail + Profile + Search) plus computed-style probes. A temporary
+`public/__set-theme-light.html` helper was created for light-theme capture
+and deleted afterwards.
+
 ## ═══ PASS 2 — 2026-07-11 ═══
 
 ### P2-A. Phase 3 feature log (built / skipped)

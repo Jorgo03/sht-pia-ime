@@ -1,0 +1,247 @@
+/* @layered */
+/* polish.css — visual redesign pass (2026-07-12).
+ * Pure-CSS layer imported LAST in main.jsx so it wins source-order ties
+ * inside @layer components. Adds motion, depth and focus treatment on top
+ * of existing components — no markup, props or i18n changes anywhere.
+ * Spec: design-system/MASTER.md §5–6. */
+@layer components {
+
+/* ---------- 1. Keyframes ---------- */
+
+@keyframes riseIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes heartPop {
+  0%   { transform: scale(1); }
+  45%  { transform: scale(1.35); }
+  100% { transform: scale(1); }
+}
+
+@keyframes fabGlow {
+  0%, 100% { box-shadow: var(--fho-cta-shadow); }
+  50%      { box-shadow: 0 12px 32px -8px rgba(255,107,0,0.85); }
+}
+
+@keyframes navDotIn {
+  from { transform: translateX(-50%) scale(0); }
+  to   { transform: translateX(-50%) scale(1); }
+}
+
+/* ---------- 2. Entrance motion ---------- */
+
+/* Screen heads and hero blocks rise in once per mount. */
+.screen-head,
+.detail-title,
+.home-search-bar,
+.search-head,
+.profile-card,
+.nl-header {
+  animation: riseIn var(--t-slow) var(--ease-out) backwards;
+}
+
+/* Staggered list entrances — capped at 8 items so late pages of
+ * "load more" don't animate forever. Grid/list children only. */
+.property-grid > *,
+.h-scroll > *,
+.fav-list > *,
+.msg-list > *,
+.neighborhood-grid > *,
+.featured-card {
+  animation: riseIn var(--t-slow) var(--ease-out) backwards;
+}
+
+.property-grid > *:nth-child(1), .h-scroll > *:nth-child(1), .fav-list > *:nth-child(1), .msg-list > *:nth-child(1), .neighborhood-grid > *:nth-child(1) { animation-delay: 40ms; }
+.property-grid > *:nth-child(2), .h-scroll > *:nth-child(2), .fav-list > *:nth-child(2), .msg-list > *:nth-child(2), .neighborhood-grid > *:nth-child(2) { animation-delay: 90ms; }
+.property-grid > *:nth-child(3), .h-scroll > *:nth-child(3), .fav-list > *:nth-child(3), .msg-list > *:nth-child(3), .neighborhood-grid > *:nth-child(3) { animation-delay: 140ms; }
+.property-grid > *:nth-child(4), .h-scroll > *:nth-child(4), .fav-list > *:nth-child(4), .msg-list > *:nth-child(4), .neighborhood-grid > *:nth-child(4) { animation-delay: 190ms; }
+.property-grid > *:nth-child(5), .h-scroll > *:nth-child(5), .fav-list > *:nth-child(5), .msg-list > *:nth-child(5) { animation-delay: 240ms; }
+.property-grid > *:nth-child(6), .h-scroll > *:nth-child(6), .fav-list > *:nth-child(6), .msg-list > *:nth-child(6) { animation-delay: 290ms; }
+.property-grid > *:nth-child(7), .h-scroll > *:nth-child(7), .fav-list > *:nth-child(7), .msg-list > *:nth-child(7) { animation-delay: 340ms; }
+.property-grid > *:nth-child(8), .h-scroll > *:nth-child(8), .fav-list > *:nth-child(8), .msg-list > *:nth-child(8) { animation-delay: 390ms; }
+
+/* ---------- 3. Hover / press depth on cards ---------- */
+
+@media (hover: hover) {
+  .compact-card:hover,
+  .mini-card:hover,
+  .fav-row:hover,
+  .neighborhood-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--fho-card-shadow-hover);
+    border-color: var(--fho-border-strong);
+  }
+
+  .featured-card:hover .featured-card__body {
+    border-color: var(--fho-border-strong);
+  }
+
+  /* Slow photographic zoom — the "alive" signal on property imagery */
+  .featured-card .featured-card__img-bg,
+  .compact-card .compact-card__img-bg {
+    transition: transform 600ms var(--ease-out);
+  }
+  .featured-card:hover .featured-card__img-bg,
+  .compact-card:hover .compact-card__img-bg {
+    transform: scale(1.04);
+  }
+
+  .home-search-bar:hover {
+    box-shadow: var(--fho-card-shadow);
+    transform: translateY(-1px);
+  }
+}
+
+/* Cards need transition on the new properties (they only had transform). */
+.compact-card, .mini-card, .fav-row, .neighborhood-card, .home-search-bar {
+  transition: transform var(--t-fast) var(--ease-out),
+              box-shadow var(--t-fast) var(--ease-out),
+              border-color var(--t-fast) var(--ease-out);
+}
+
+.mini-card:active, .compact-card:active, .fav-row:active, .neighborhood-card:active {
+  transform: scale(0.98);
+  box-shadow: none;
+}
+
+/* Featured hero keeps its image inside rounded corners while zooming */
+.featured-card__img { overflow: hidden; }
+
+/* ---------- 4. Favorite heart feedback ---------- */
+
+.featured-card__heart.saved svg,
+.compact-card__heart.saved svg,
+.heart-mini.saved svg,
+.round-btn.saved svg,
+.fav-row__heart svg {
+  animation: heartPop 350ms var(--ease-spring);
+}
+
+/* ---------- 5. Focus-visible — one consistent ring everywhere ---------- */
+
+button:focus-visible,
+a:focus-visible,
+[role="button"]:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--fho-ring);
+  outline-offset: 2px;
+  border-radius: inherit;
+}
+
+/* Text fields: ring hugs the field */
+input:focus-visible, textarea:focus-visible, select:focus-visible {
+  outline-offset: 1px;
+}
+
+/* ---------- 6. Buttons — press + top-edge light ---------- */
+
+.cta-pill {
+  box-shadow: var(--fho-cta-shadow), inset 0 1px 0 rgba(255,255,255,0.28);
+}
+
+.pill-btn:active, .ghost-btn:active, .segment:active, .bed-chip:active,
+.filter-btn:active, .load-more-btn:active, .social-btn:active,
+.view-toggle button:active, .lang-btn:active, .theme-btn:active {
+  transform: scale(0.96);
+}
+
+.pill-btn, .ghost-btn, .segment, .bed-chip, .filter-btn, .load-more-btn,
+.social-btn, .lang-btn, .theme-btn {
+  transition: transform var(--t-fast) var(--ease-out),
+              border-color var(--t-fast) var(--ease-out),
+              color var(--t-fast) var(--ease-out),
+              background var(--t-fast) var(--ease-out);
+}
+
+/* Standardize the one stray radius (load-more) to the pill family */
+.load-more-btn { border-radius: var(--r-pill); }
+
+/* ---------- 7. Sheets + backdrops — glass depth ---------- */
+
+.filter-backdrop, .addsheet-backdrop {
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  background: rgba(10, 8, 6, 0.45);
+}
+
+.filter-sheet, .addsheet-panel {
+  animation-timing-function: var(--ease-spring);
+  box-shadow: 0 -18px 60px -24px rgba(0,0,0,0.45);
+}
+
+/* ---------- 8. Property-detail hero scrim ---------- */
+
+/* Keeps the white pager dots (and photo edge) legible on bright images. */
+.detail-hero::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 72px;
+  background: linear-gradient(to top, rgba(0,0,0,0.38), transparent);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ---------- 9. Chrome: glass header to match the nav ---------- */
+
+.app-header {
+  background: color-mix(in srgb, var(--fho-surface) 72%, transparent);
+  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+}
+
+@supports not (backdrop-filter: blur(18px)) {
+  .app-header { background: var(--fho-surface); }
+}
+
+/* ---------- 10. Bottom nav: active dot + FAB idle glow ---------- */
+
+.nav-item.active::after {
+  content: '';
+  position: absolute;
+  bottom: 5px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 4px;
+  border-radius: 999px;
+  background: currentColor;
+  animation: navDotIn var(--t-med) var(--ease-spring);
+}
+
+.nav-add {
+  animation: fabGlow 4s ease-in-out infinite;
+}
+
+/* ---------- 11. Reduced motion — collapse everything ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .screen-head, .detail-title, .home-search-bar, .search-head, .profile-card,
+  .nl-header, .property-grid > *, .h-scroll > *, .fav-list > *, .msg-list > *,
+  .neighborhood-grid > *, .featured-card, .nav-item.active::after,
+  .featured-card__heart.saved svg, .compact-card__heart.saved svg,
+  .heart-mini.saved svg, .round-btn.saved svg, .fav-row__heart svg,
+  .filter-sheet, .addsheet-panel, .filter-backdrop, .cookie-banner,
+  .welcome-toast, .addsheet-toast {
+    animation: none;
+  }
+
+  .nav-add { animation: none; }
+
+  .compact-card, .mini-card, .fav-row, .neighborhood-card, .home-search-bar,
+  .featured-card .featured-card__img-bg, .compact-card .compact-card__img-bg,
+  .cta-pill, .pill-btn, .ghost-btn, .segment, .bed-chip, .filter-btn,
+  .load-more-btn, .social-btn, .lang-btn, .theme-btn {
+    transition: none;
+  }
+
+  @media (hover: hover) {
+    .featured-card:hover .featured-card__img-bg,
+    .compact-card:hover .compact-card__img-bg { transform: none; }
+  }
+}
+
+}
