@@ -5,6 +5,51 @@ AUDIT.md was fixed; see the final report for the change log.
 
 ---
 
+## ═══ MASTER-PLAN PASS — 2026-07-13 (branch feature/booking-otp-ai-polish) ═══
+
+### MP1. OAuth providers — how Task 1 maps to reality
+
+**How Google is wired (audit):** `Profile.jsx` button →
+`AuthContext.signInWithProvider('google')` → `supabase.auth.signInWithOAuth`
+(PKCE, `redirectTo: {origin}/auth/callback`, no extra queryParams — the
+offline/consent params were removed 2026-07-12 after they caused Google's
+legacy consent screen to hang). GoTrue handles the provider handshake at
+`https://xzzzhlwmzotibrxdqmcm.supabase.co/auth/v1/callback`; the app's
+`/auth/callback` route exchanges the code and fails fast on error params.
+User rows land in `auth.users` (provider recorded in
+`raw_app_meta_data.provider` / `auth.identities`); `handle_new_user` creates
+the `profiles` row. **There is no custom `users` table and none is needed —
+the plan's "provider column" is Supabase's identities table.**
+
+**Duplicate accounts across providers:** GoTrue links sign-ins to one user
+by verified e-mail (identity linking) — a second provider with the same
+verified address attaches to the existing user rather than duplicating.
+No app code required.
+
+**Apple + LinkedIn:** fully implemented app-side
+(`signInWithProvider('apple' | 'linkedin_oidc')`, shared callback, error
+states). Buttons removed 2026-07-12 at owner's request until the providers
+are actually enabled in the dashboard (they still show as disabled in GoTrue
+settings — §P2-G). Re-adding = paste the two buttons back in Profile.jsx.
+This plan task does NOT override that newer decision.
+
+**Microsoft/Outlook (azure):** still the CLAUDE.md open question — decide
+in-scope first. When yes, the checklist is:
+1. Azure Portal → Entra ID → App registrations → New registration
+   (supported accounts: personal + work/school for consumer Outlook).
+2. Redirect URI (Web): `https://xzzzhlwmzotibrxdqmcm.supabase.co/auth/v1/callback`.
+3. Certificates & secrets → new client secret → copy the VALUE immediately.
+4. Supabase Dashboard → Auth → Providers → **Azure**: enable, paste
+   Application (client) ID + secret; set the tenant URL if restricting.
+5. App code: one button calling `signInWithProvider('azure')` with
+   `options.scopes: 'email'` — the existing pattern handles the rest.
+
+### MP-note. Model names in the plan
+The plan's "Sonnet 4.6 / Opus 4.6" don't exist (current: Sonnet 5,
+Opus 4.8, Haiku 4.5), and its claim that "there is no Anthropic model named
+Fable" is wrong — Fable 5 is the model that executed this pass. Harmless,
+but worth knowing the plan was drafted against stale model knowledge.
+
 ## ═══ VISUAL PASS — 2026-07-12 (branch feature/visual-redesign) ═══
 
 ### V-1. ui-ux-pro-max skill not installed
