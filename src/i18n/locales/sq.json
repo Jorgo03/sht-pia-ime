@@ -66,7 +66,8 @@
     "heroSignInPost": "është e hapur.",
     "heroSignUpPre": "Fillo të",
     "heroSignUpEm": "gjesh shtëpinë",
-    "heroSignUpPost": "që sot."
+    "heroSignUpPost": "që sot.",
+    "resendIn": "Ridërgo pas {{s}}s"
   },
   "home": {
     "greetingMorning": "Mirëmëngjes",
@@ -225,7 +226,8 @@
     "imageTooLarge": "Imazhi është shumë i madh (maks. {{max}} MB)",
     "imageUploadFailed": "Ngarkimi i imazheve dështoi — provo përsëri",
     "updateFailed": "Përditësimi dështoi — provo përsëri",
-    "oauthFailed": "Kyçja me ofruesin dështoi — provo përsëri"
+    "oauthFailed": "Kyçja me ofruesin dështoi — provo përsëri",
+    "invalidCode": "Kodi është i pasaktë ose ka skaduar"
   },
   "agentDashboard": {
     "title": "Paneli i Agjentit",
@@ -377,7 +379,9 @@
       "security": "Siguri",
       "storage": "Magazinë"
     },
-    "valueOutOfRange": "Vlera duhet të jetë midis {{min}} dhe {{max}}."
+    "valueOutOfRange": "Vlera duhet të jetë midis {{min}} dhe {{max}}.",
+    "draftRestored": "Drafti u rikthye — vazhdo aty ku e le. Fotot duhen shtuar sërish.",
+    "discardDraft": "Fillo nga e para"
   },
   "dashboard": {
     "title": "Paneli i pronës",

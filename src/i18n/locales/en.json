@@ -66,7 +66,8 @@
     "heroSignInPost": "is open.",
     "heroSignUpPre": "Start",
     "heroSignUpEm": "finding home",
-    "heroSignUpPost": "today."
+    "heroSignUpPost": "today.",
+    "resendIn": "Resend in {{s}}s"
   },
   "addSheet": {
     "openLabel": "Create new",
@@ -277,7 +278,8 @@
     "imageTooLarge": "Image is too large (max {{max}} MB)",
     "imageUploadFailed": "Image upload failed — try again",
     "updateFailed": "Update failed — try again",
-    "oauthFailed": "Sign-in with the provider failed — try again"
+    "oauthFailed": "Sign-in with the provider failed — try again",
+    "invalidCode": "The code is wrong or has expired"
   },
   "agentDashboard": {
     "title": "Agent Dashboard",
@@ -377,7 +379,9 @@
       "security": "Security",
       "storage": "Storage"
     },
-    "valueOutOfRange": "Value must be between {{min}} and {{max}}."
+    "valueOutOfRange": "Value must be between {{min}} and {{max}}.",
+    "draftRestored": "Draft restored — continue where you left off. Photos need re-adding.",
+    "discardDraft": "Start fresh"
   },
   "dashboard": {
     "title": "Property Dashboard",

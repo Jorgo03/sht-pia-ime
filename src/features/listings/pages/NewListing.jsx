@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { ArrowLeft, ArrowRight, Upload, X } from 'lucide-react'
@@ -76,43 +76,81 @@ function friendlySubmitError(err, t) {
   return t('errors.submitFailed')
 }
 
+const INITIAL_FORM = {
+  listing_type: 'sale',
+  property_type: 'apartment',
+  title_i18n: { sq: '' },
+  description_i18n: { sq: '' },
+  city: 'Tiranë',
+  address: '',
+  latitude: null,
+  longitude: null,
+  price: '',
+  currency: 'EUR',
+  sqft: '',
+  beds: '',
+  baths: '',
+  floor: '',
+  total_floors: '',
+  year_built: '',
+  features: [],
+  contact_phone: '',
+  whatsapp_enabled: true,
+  contact_email: '',
+  status: 'active',
+}
+
+// Draft persistence: the wizard survives navigation/refresh via
+// localStorage. Selected photos are File objects and can't be serialized —
+// they're the one thing a returning user re-adds.
+const DRAFT_KEY = 'fho_listing_draft'
+const DRAFT_TTL_MS = 7 * 24 * 60 * 60 * 1000
+
+function loadDraft() {
+  try {
+    const raw = localStorage.getItem(DRAFT_KEY)
+    if (!raw) return null
+    const draft = JSON.parse(raw)
+    if (!draft?.form || Date.now() - (draft.savedAt || 0) > DRAFT_TTL_MS) return null
+    return draft
+  } catch {
+    return null
+  }
+}
+
 export default function NewListing() {
   const { t } = useTranslation()
   const { user } = useAuth()
   const navigate = useNavigate()
   const fileInputRef = useRef(null)
 
-  const [step, setStep] = useState(0)
+  const [draft] = useState(loadDraft)
+  const [step, setStep] = useState(draft?.step ?? 0)
   const [submitting, setSubmitting] = useState(false)
   const [errors, setErrors] = useState({})
   const [titleLang, setTitleLang] = useState('sq')
   const [descLang, setDescLang] = useState('sq')
+  const [draftRestored, setDraftRestored] = useState(Boolean(draft))
 
-  const [form, setForm] = useState({
-    listing_type: 'sale',
-    property_type: 'apartment',
-    title_i18n: { sq: '' },
-    description_i18n: { sq: '' },
-    city: 'Tiranë',
-    address: '',
-    latitude: null,
-    longitude: null,
-    price: '',
-    currency: 'EUR',
-    sqft: '',
-    beds: '',
-    baths: '',
-    floor: '',
-    total_floors: '',
-    year_built: '',
-    features: [],
-    contact_phone: '',
-    whatsapp_enabled: true,
-    contact_email: '',
-    status: 'active',
-  })
+  const [form, setForm] = useState(draft?.form ? { ...INITIAL_FORM, ...draft.form } : INITIAL_FORM)
 
   const [images, setImages] = useState([])
+
+  // Persist progress on every change; cleared on successful submit/discard.
+  useEffect(() => {
+    try {
+      localStorage.setItem(DRAFT_KEY, JSON.stringify({ form, step, savedAt: Date.now() }))
+    } catch { /* storage full/blocked — wizard still works, just unsaved */ }
+  }, [form, step])
+
+  const discardDraft = () => {
+    try { localStorage.removeItem(DRAFT_KEY) } catch { /* ignore */ }
+    setForm(INITIAL_FORM)
+    setStep(0)
+    setImages([])
+    setErrors({})
+    setDraftRestored(false)
+  }
 
   const update = (key, value) => {
     setForm(prev => ({ ...prev, [key]: value }))
@@ -260,6 +298,7 @@ export default function NewListing() {
       })
 
       if (error) throw error
+      try { localStorage.removeItem(DRAFT_KEY) } catch { /* ignore */ }
       navigate('/my-listings')
     } catch (err) {
       // Insert failed after upload succeeded — remove the now-orphaned files.
@@ -281,6 +320,13 @@ export default function NewListing() {
         <button onClick={() => navigate(-1)} className="nl-back" aria-label={t('common.back')}><ArrowLeft size={18} /></button>
         <h1 className="page-title" style={{ margin: 0 }}>{t('listing.newListing')}</h1>
       </div>
+
+      {draftRestored && (
+        <div role="status" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, margin: '0 0 12px', padding: '10px 14px', background: 'var(--fho-orange-tint)', border: '1px solid var(--fho-orange-soft)', borderRadius: 'var(--r-md)', fontSize: 13, color: 'var(--fho-text)' }}>
+          <span>{t('listing.draftRestored')}</span>
+          <button className="link-btn" style={{ color: 'var(--fho-orange-2)', whiteSpace: 'nowrap' }} onClick={discardDraft}>{t('listing.discardDraft')}</button>
+        </div>
+      )}
 
       <div className="nl-progress">
         {STEPS.map((s, i) => (

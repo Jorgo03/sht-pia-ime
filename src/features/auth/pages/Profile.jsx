@@ -16,6 +16,7 @@ function friendlyError(err, t) {
     'Invalid login credentials': 'errors.invalidCredentials',
     'User already registered': 'errors.userExists',
     'Email not confirmed': 'errors.emailNotConfirmed',
+    'Token has expired or is invalid': 'errors.invalidCode',
     'is invalid': 'errors.invalidEmail',
     'For security purposes, you can only request this after': 'errors.rateLimited',
     'provider is not enabled': 'errors.providerNotConfigured',
@@ -29,7 +30,7 @@ export default function Profile() {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const location = useLocation()
-  const { user, profile, isAgent, signIn, signUp, signInWithProvider, sendOtp, verifyOtp, signOut, resetPassword, loading: authLoading } = useAuth()
+  const { user, profile, isAgent, signIn, signUp, signInWithProvider, sendOtp, verifyOtp, resendCode, signOut, resetPassword, loading: authLoading } = useAuth()
   const stats = useProfileStats()
 
   const [email, setEmail] = useState('')
@@ -60,7 +61,19 @@ export default function Profile() {
   const [otpStep, setOtpStep] = useState(null)
   const [otpEmail, setOtpEmail] = useState('')
   const [otpCode, setOtpCode] = useState(['', '', '', '', '', ''])
+  // 'email' = code from the Email-Code flow; 'signup' = confirmation code
+  // after a password signup. verifyOtp/resend must match the origin.
+  const [otpType, setOtpType] = useState('email')
+  const [otpError, setOtpError] = useState(false)
+  const [cooldown, setCooldown] = useState(0)
   const otpRefs = useRef([])
+
+  // Resend cooldown ticker
+  useEffect(() => {
+    if (cooldown <= 0) return
+    const id = setInterval(() => setCooldown((s) => (s > 1 ? s - 1 : 0)), 1000)
+    return () => clearInterval(id)
+  }, [cooldown > 0])
 
   const validate = () => {
     if (!EMAIL_RE.test(email)) {
@@ -90,7 +103,17 @@ export default function Profile() {
       })
       setLoading(false)
       if (error) setMessage(friendlyError(error, t))
-      else setMessage(t('auth.checkEmail'))
+      else {
+        // Confirmation email carries a 6-digit code — take the user straight
+        // to the code entry (type 'signup' so verify/resend match).
+        setOtpEmail(email)
+        setOtpType('signup')
+        setOtpCode(['', '', '', '', '', ''])
+        setOtpError(false)
+        setOtpStep('enter-code')
+        setCooldown(30)
+        setMessage(t('auth.checkEmail'))
+      }
     } else {
       const { error } = await signIn(email, password)
       setLoading(false)
@@ -126,6 +149,8 @@ export default function Profile() {
     setOtpStep('enter-email')
     setOtpEmail('')
     setOtpCode(['', '', '', '', '', ''])
+    setOtpType('email')
+    setOtpError(false)
     setMessage('')
   }
 
@@ -139,12 +164,22 @@ export default function Profile() {
     const { error } = await sendOtp(otpEmail)
     setLoading(false)
     if (error) setMessage(friendlyError(error, t))
-    else { setOtpStep('enter-code'); setMessage(t('auth.otpSent')) }
+    else { setOtpStep('enter-code'); setOtpError(false); setCooldown(30); setMessage(t('auth.otpSent')) }
+  }
+
+  const handleResend = async () => {
+    if (cooldown > 0 || loading) return
+    setLoading(true); setMessage(''); setOtpError(false)
+    const { error } = await resendCode(otpEmail, otpType)
+    setLoading(false)
+    if (error) setMessage(friendlyError(error, t))
+    else { setCooldown(30); setMessage(t('auth.otpSent')) }
   }
 
   const handleOtpChange = (index, value) => {
     if (value.length > 1) value = value.slice(-1)
     if (value && !/^\d$/.test(value)) return
+    setOtpError(false)
     const newCode = [...otpCode]
     newCode[index] = value
     setOtpCode(newCode)
@@ -169,9 +204,10 @@ export default function Profile() {
 
   const handleVerifyOtp = async (code) => {
     setLoading(true); setMessage('')
-    const { error } = await verifyOtp(otpEmail, code)
+    const { error } = await verifyOtp(otpEmail, code, otpType)
     setLoading(false)
     if (error) {
+      setOtpError(true)
       setMessage(friendlyError(error, t))
       setOtpCode(['', '', '', '', '', ''])
       otpRefs.current[0]?.focus()
@@ -276,18 +312,20 @@ export default function Profile() {
         <DuskHero />
         <div className="auth-content">
           <div className="auth-glass">
-            <button className="link-btn otp-back" onClick={() => setOtpStep('enter-email')}><ArrowLeft size={16} /> {t('common.back')}</button>
+            <button className="link-btn otp-back" onClick={() => setOtpStep(otpType === 'signup' ? null : 'enter-email')}><ArrowLeft size={16} /> {t('common.back')}</button>
             <div className="otp-icon"><Mail size={32} /></div>
             <h2 className="auth-title">{t('auth.enterCode')}</h2>
             <p className="auth-subtitle">{t('auth.codeSentTo', { email: otpEmail })}</p>
             <div className="otp-inputs" onPaste={handleOtpPaste}>
               {otpCode.map((digit, i) => (
-                <input key={i} ref={(el) => (otpRefs.current[i] = el)} type="text" inputMode="numeric" maxLength={1} className="otp-digit" value={digit} onChange={(e) => handleOtpChange(i, e.target.value)} onKeyDown={(e) => handleOtpKeyDown(i, e)} autoFocus={i === 0} />
+                <input key={i} ref={(el) => (otpRefs.current[i] = el)} type="text" inputMode="numeric" maxLength={1} className={`otp-digit ${digit ? 'filled' : ''} ${otpError ? 'error' : ''}`} value={digit} onChange={(e) => handleOtpChange(i, e.target.value)} onKeyDown={(e) => handleOtpKeyDown(i, e)} autoFocus={i === 0} />
               ))}
             </div>
             {loading && <p className="auth-subtitle">{t('common.loading')}</p>}
-            <button className="link-btn" onClick={handleSendOtp} disabled={loading}>{t('auth.resendCode')}</button>
-            {message && <div className="auth-message">{message}</div>}
+            <button className="link-btn" onClick={handleResend} disabled={loading || cooldown > 0}>
+              {cooldown > 0 ? t('auth.resendIn', { s: cooldown }) : t('auth.resendCode')}
+            </button>
+            {message && <div className={`auth-message ${otpError ? 'auth-message--error' : ''}`} role={otpError ? 'alert' : 'status'}>{message}</div>}
           </div>
         </div>
       </div>

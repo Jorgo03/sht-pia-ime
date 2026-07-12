@@ -152,14 +152,25 @@ export function AuthProvider({ children }) {
     return { error }
   }
 
-  const verifyOtp = async (email, token) => {
+  // type: 'email' for codes requested via signInWithOtp (the "Email Code"
+  // flow); 'signup' for the confirmation code a password signup receives.
+  const verifyOtp = async (email, token, type = 'email') => {
     const { data, error } = await supabase.auth.verifyOtp({
       email,
       token,
-      type: 'email',
+      type,
     })
     if (!error && data?.user) showWelcome(data.user)
     return { data, error }
+  }
+
+  // Resend the right kind of code for the flow that's waiting on it.
+  const resendCode = async (email, type = 'email') => {
+    if (type === 'signup') {
+      const { error } = await supabase.auth.resend({ type: 'signup', email })
+      return { error }
+    }
+    return sendOtp(email)
   }
 
   const signInWithProvider = async (provider) => {
@@ -202,6 +213,7 @@ export function AuthProvider({ children }) {
     signIn,
     sendOtp,
     verifyOtp,
+    resendCode,
     signInWithProvider,
     signOut,
     resetPassword,

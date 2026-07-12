@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Sparkles } from 'lucide-react'
+import { Sparkles, Loader2 } from 'lucide-react'
 import { generateListing } from '../../../lib/ai'
 
 // Feature A — AI listing generator. Sits at the top of the wizard's Basics
@@ -62,7 +62,7 @@ export default function AiListingPanel({ form, onApply }) {
       />
       <div className="ai-panel__row">
         <button type="button" className="ai-panel__btn" onClick={handleGenerate} disabled={generating}>
-          <Sparkles size={14} />
+          {generating ? <Loader2 size={14} className="animate-spin" /> : <Sparkles size={14} />}
           {generating ? t('ai.generating') : applied ? t('ai.regenerate') : t('ai.generate')}
         </button>
         {applied && <span className="ai-panel__hint">{t('ai.reviewHint')}</span>}

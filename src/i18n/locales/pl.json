@@ -66,7 +66,8 @@
     "heroSignInPost": "są otwarte.",
     "heroSignUpPre": "Zacznij",
     "heroSignUpEm": "szukać domu",
-    "heroSignUpPost": "już dziś."
+    "heroSignUpPost": "już dziś.",
+    "resendIn": "Wyślij ponownie za {{s}}s"
   },
   "home": {
     "greetingMorning": "Dzień dobry",
@@ -236,7 +237,8 @@
     "imageTooLarge": "Obraz jest za duży (maks. {{max}} MB)",
     "imageUploadFailed": "Przesyłanie obrazów nie powiodło się — spróbuj ponownie",
     "updateFailed": "Aktualizacja nie powiodła się — spróbuj ponownie",
-    "oauthFailed": "Logowanie przez dostawcę nie powiodło się — spróbuj ponownie"
+    "oauthFailed": "Logowanie przez dostawcę nie powiodło się — spróbuj ponownie",
+    "invalidCode": "Kod jest nieprawidłowy lub wygasł"
   },
   "agentDashboard": {
     "title": "Panel Agenta",
@@ -329,7 +331,9 @@
       "security": "Ochrona",
       "storage": "Schowek"
     },
-    "valueOutOfRange": "Wartość musi być między {{min}} a {{max}}."
+    "valueOutOfRange": "Wartość musi być między {{min}} a {{max}}.",
+    "draftRestored": "Przywrócono szkic — kontynuuj od miejsca, w którym skończyłeś. Zdjęcia trzeba dodać ponownie.",
+    "discardDraft": "Zacznij od nowa"
   },
   "dashboard": {
     "title": "Dashboard nieruchomości",

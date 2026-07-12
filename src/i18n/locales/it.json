@@ -66,7 +66,8 @@
     "heroSignInPost": "è aperta.",
     "heroSignUpPre": "Inizia a",
     "heroSignUpEm": "trovare casa",
-    "heroSignUpPost": "oggi."
+    "heroSignUpPost": "oggi.",
+    "resendIn": "Reinvia tra {{s}}s"
   },
   "home": {
     "greetingMorning": "Buongiorno",
@@ -232,7 +233,8 @@
     "imageTooLarge": "Immagine troppo grande (max {{max}} MB)",
     "imageUploadFailed": "Caricamento immagini non riuscito — riprova",
     "updateFailed": "Aggiornamento non riuscito — riprova",
-    "oauthFailed": "Accesso con il provider non riuscito — riprova"
+    "oauthFailed": "Accesso con il provider non riuscito — riprova",
+    "invalidCode": "Il codice è errato o scaduto"
   },
   "agentDashboard": {
     "title": "Dashboard Agente",
@@ -325,7 +327,9 @@
       "security": "Sicurezza",
       "storage": "Magazzino"
     },
-    "valueOutOfRange": "Il valore deve essere compreso tra {{min}} e {{max}}."
+    "valueOutOfRange": "Il valore deve essere compreso tra {{min}} e {{max}}.",
+    "draftRestored": "Bozza ripristinata — continua da dove eri. Le foto vanno riaggiunte.",
+    "discardDraft": "Ricomincia da capo"
   },
   "dashboard": {
     "title": "Dashboard immobile",

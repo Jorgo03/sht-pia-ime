@@ -66,7 +66,8 @@
     "heroSignInPost": "está abierta.",
     "heroSignUpPre": "Empieza a",
     "heroSignUpEm": "encontrar tu hogar",
-    "heroSignUpPost": "hoy."
+    "heroSignUpPost": "hoy.",
+    "resendIn": "Reenviar en {{s}}s"
   },
   "home": {
     "greetingMorning": "Buenos días",
@@ -232,7 +233,8 @@
     "imageTooLarge": "La imagen es demasiado grande (máx. {{max}} MB)",
     "imageUploadFailed": "Error al subir las imágenes — inténtalo de nuevo",
     "updateFailed": "Error al actualizar — inténtalo de nuevo",
-    "oauthFailed": "El inicio de sesión con el proveedor falló — inténtalo de nuevo"
+    "oauthFailed": "El inicio de sesión con el proveedor falló — inténtalo de nuevo",
+    "invalidCode": "El código es incorrecto o ha caducado"
   },
   "agentDashboard": {
     "title": "Panel del Agente",
@@ -325,7 +327,9 @@
       "security": "Seguridad",
       "storage": "Trastero"
     },
-    "valueOutOfRange": "El valor debe estar entre {{min}} y {{max}}."
+    "valueOutOfRange": "El valor debe estar entre {{min}} y {{max}}.",
+    "draftRestored": "Borrador restaurado — continúa donde lo dejaste. Las fotos deben añadirse de nuevo.",
+    "discardDraft": "Empezar de nuevo"
   },
   "dashboard": {
     "title": "Dashboard de propiedad",
