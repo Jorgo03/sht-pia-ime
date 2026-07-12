@@ -1,3 +1,25 @@
+# Shtëpia.ime
+
+The live app is the Vite web app in `src/` (the Expo notes below are from the
+original template and cover the legacy `app/` tree).
+
+## One-click start (Windows)
+
+Double-click **`start-backend.bat`** in the repository root. It checks that
+Node.js is installed, installs dependencies if `node_modules` is missing,
+verifies port 5173 is free and that the hosted Supabase backend is awake,
+then starts the app at http://localhost:5173.
+
+Note: the backend itself (database, auth, storage, edge functions) runs on
+Supabase's cloud — there is no local backend process to start. The script
+launches the local web app and health-checks the hosted backend.
+
+To stop: press **Ctrl+C** in the console window (confirm with `Y` if asked),
+then close the window. If the window ever closes itself, it pauses first so
+you can read any error.
+
+---
+
 # Welcome to your Expo app 👋
 
 This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
