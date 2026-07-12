@@ -475,9 +475,9 @@
     "tabSearches": "Поиски",
     "tabWanted": "Искомые дома",
     "emptySearches": "Пока нет сохранённых поисков",
-    "emptySearchesHint": "Сохраните поиск кнопкой +",
+    "emptySearchesHint": "Создайте его кнопкой выше",
     "emptyWanted": "Пока нет заявок на дом",
-    "emptyWantedHint": "Опубликуйте, что ищете, кнопкой +",
+    "emptyWantedHint": "Опубликуйте, что ищете, кнопкой выше",
     "run": "Запустить поиск",
     "delete": "Удалить",
     "alertsOn": "Включить уведомления",
@@ -487,7 +487,9 @@
     "wantedStatus": {
       "open": "Открыто",
       "closed": "Закрыто"
-    }
+    },
+    "newSearch": "Новый поиск",
+    "newWanted": "Новая заявка"
   },
   "bell": {
     "label": "Уведомления",

@@ -19,11 +19,6 @@
   100% { transform: scale(1); }
 }
 
-@keyframes fabGlow {
-  0%, 100% { box-shadow: var(--fho-cta-shadow); }
-  50%      { box-shadow: 0 12px 32px -8px rgba(255,107,0,0.85); }
-}
-
 @keyframes navDotIn {
   from { transform: translateX(-50%) scale(0); }
   to   { transform: translateX(-50%) scale(1); }
@@ -212,10 +207,6 @@ input:focus-visible, textarea:focus-visible, select:focus-visible {
   animation: navDotIn var(--t-med) var(--ease-spring);
 }
 
-.nav-add {
-  animation: fabGlow 4s ease-in-out infinite;
-}
-
 /* ---------- 11. Reduced motion — collapse everything ---------- */
 
 @media (prefers-reduced-motion: reduce) {
@@ -228,8 +219,6 @@ input:focus-visible, textarea:focus-visible, select:focus-visible {
   .welcome-toast, .addsheet-toast {
     animation: none;
   }
-
-  .nav-add { animation: none; }
 
   .compact-card, .mini-card, .fav-row, .neighborhood-card, .home-search-bar,
   .featured-card .featured-card__img-bg, .compact-card .compact-card__img-bg,

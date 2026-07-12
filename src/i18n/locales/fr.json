@@ -471,9 +471,9 @@
     "tabSearches": "Recherches",
     "tabWanted": "Biens recherchés",
     "emptySearches": "Pas encore de recherches enregistrées",
-    "emptySearchesHint": "Enregistrez-en une via le bouton +",
+    "emptySearchesHint": "Créez-en une avec le bouton ci-dessus",
     "emptyWanted": "Pas encore d'annonces de recherche",
-    "emptyWantedHint": "Publiez ce que vous cherchez via le bouton +",
+    "emptyWantedHint": "Publiez ce que vous cherchez avec le bouton ci-dessus",
     "run": "Lancer la recherche",
     "delete": "Supprimer",
     "alertsOn": "Activer les alertes",
@@ -483,7 +483,9 @@
     "wantedStatus": {
       "open": "Ouverte",
       "closed": "Fermée"
-    }
+    },
+    "newSearch": "Nouvelle recherche",
+    "newWanted": "Nouvelle demande"
   },
   "bell": {
     "label": "Notifications",

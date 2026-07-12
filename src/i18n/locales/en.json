@@ -471,9 +471,9 @@
     "tabSearches": "Searches",
     "tabWanted": "Wanted homes",
     "emptySearches": "No saved searches yet",
-    "emptySearchesHint": "Save one from the + button",
+    "emptySearchesHint": "Create one with the button above",
     "emptyWanted": "No wanted-home posts yet",
-    "emptyWantedHint": "Post what you're looking for from the + button",
+    "emptyWantedHint": "Post what you're looking for with the button above",
     "run": "Run search",
     "delete": "Delete",
     "alertsOn": "Turn alerts on",
@@ -483,7 +483,9 @@
     "wantedStatus": {
       "open": "Open",
       "closed": "Closed"
-    }
+    },
+    "newSearch": "New saved search",
+    "newWanted": "New wanted post"
   },
   "bell": {
     "label": "Notifications",

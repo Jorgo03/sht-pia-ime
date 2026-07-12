@@ -50,30 +50,6 @@
   color: var(--fho-orange-1);
 }
 
-.nav-add {
-  width: 58px;
-  height: 58px;
-  border-radius: 50%;
-  border: none;
-  background: linear-gradient(135deg, var(--fho-orange-1), var(--fho-orange-2));
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  margin-top: -22px;
-  box-shadow: var(--fho-cta-shadow);
-  transition: transform 150ms var(--ease-out), box-shadow 150ms var(--ease-out);
-}
-
-.nav-add:hover {
-  transform: scale(1.06);
-}
-
-.nav-add:active {
-  transform: scale(0.96);
-}
-
 .nav-badge {
   position: absolute;
   top: 4px;

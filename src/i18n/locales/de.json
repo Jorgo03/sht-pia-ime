@@ -471,9 +471,9 @@
     "tabSearches": "Suchen",
     "tabWanted": "Gesuche",
     "emptySearches": "Noch keine gespeicherten Suchen",
-    "emptySearchesHint": "Speichere eine über den +-Button",
+    "emptySearchesHint": "Erstelle eine mit dem Button oben",
     "emptyWanted": "Noch keine Gesuche",
-    "emptyWantedHint": "Poste dein Gesuch über den +-Button",
+    "emptyWantedHint": "Poste dein Gesuch über den Button oben",
     "run": "Suche starten",
     "delete": "Löschen",
     "alertsOn": "Benachrichtigungen aktivieren",
@@ -483,7 +483,9 @@
     "wantedStatus": {
       "open": "Offen",
       "closed": "Geschlossen"
-    }
+    },
+    "newSearch": "Neue Suche",
+    "newWanted": "Neues Gesuch"
   },
   "bell": {
     "label": "Benachrichtigungen",

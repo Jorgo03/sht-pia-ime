@@ -475,9 +475,9 @@
     "tabSearches": "Wyszukiwania",
     "tabWanted": "Poszukiwane domy",
     "emptySearches": "Brak zapisanych wyszukiwań",
-    "emptySearchesHint": "Zapisz je przyciskiem +",
+    "emptySearchesHint": "Utwórz je przyciskiem powyżej",
     "emptyWanted": "Brak ogłoszeń o poszukiwaniu",
-    "emptyWantedHint": "Opublikuj czego szukasz przyciskiem +",
+    "emptyWantedHint": "Opublikuj czego szukasz przyciskiem powyżej",
     "run": "Uruchom wyszukiwanie",
     "delete": "Usuń",
     "alertsOn": "Włącz powiadomienia",
@@ -487,7 +487,9 @@
     "wantedStatus": {
       "open": "Otwarte",
       "closed": "Zamknięte"
-    }
+    },
+    "newSearch": "Nowe wyszukiwanie",
+    "newWanted": "Nowe ogłoszenie"
   },
   "bell": {
     "label": "Powiadomienia",

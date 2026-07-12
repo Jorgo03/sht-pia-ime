@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Search as SearchIcon, Heart, Trash2, Bell, BellOff, Play, MapPin } from 'lucide-react'
+import { Search as SearchIcon, Heart, Trash2, Bell, BellOff, Play, MapPin, Plus } from 'lucide-react'
 import { useAuth } from '../../auth/AuthContext'
+import { useAddSheet } from '../../quick-add/AddSheetContext'
 import { supabase } from '../../../lib/supabase'
 import { formatPrice, formatDate } from '../../../lib/format'
 
@@ -22,7 +23,15 @@ export default function SavedSearches() {
   const { t, i18n } = useTranslation()
   const navigate = useNavigate()
   const { user } = useAuth()
+  const { openSheet, setMiniForm } = useAddSheet()
   const [tab, setTab] = useState('searches')
+
+  // The bottom-nav "+" (old AddSheet entry point) was removed — this page
+  // is now where saved searches / wanted homes get created.
+  const createNew = () => {
+    setMiniForm(tab === 'searches' ? 'search' : 'wanted')
+    openSheet()
+  }
   const [searches, setSearches] = useState([])
   const [wanted, setWanted] = useState([])
   const [loading, setLoading] = useState(true)
@@ -93,6 +102,10 @@ export default function SavedSearches() {
           {t('saved.tabWanted')} ({wanted.length})
         </button>
       </div>
+
+      <button className="pill-btn" style={{ marginTop: 12, display: 'inline-flex', alignItems: 'center', gap: 6 }} onClick={createNew}>
+        <Plus size={14} /> {tab === 'searches' ? t('saved.newSearch') : t('saved.newWanted')}
+      </button>
 
       {actionError && (
         <div className="addsheet-toast" role="alert" onClick={() => setActionError(false)}>{t('errors.updateFailed')}</div>

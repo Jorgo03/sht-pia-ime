@@ -471,9 +471,9 @@
     "tabSearches": "Ricerche",
     "tabWanted": "Case cercate",
     "emptySearches": "Nessuna ricerca salvata",
-    "emptySearchesHint": "Salvane una dal pulsante +",
+    "emptySearchesHint": "Creane una con il pulsante qui sopra",
     "emptyWanted": "Nessuna richiesta di casa",
-    "emptyWantedHint": "Pubblica cosa cerchi dal pulsante +",
+    "emptyWantedHint": "Pubblica cosa cerchi con il pulsante qui sopra",
     "run": "Avvia ricerca",
     "delete": "Elimina",
     "alertsOn": "Attiva avvisi",
@@ -483,7 +483,9 @@
     "wantedStatus": {
       "open": "Aperta",
       "closed": "Chiusa"
-    }
+    },
+    "newSearch": "Nuova ricerca",
+    "newWanted": "Nuova richiesta"
   },
   "bell": {
     "label": "Notifiche",
