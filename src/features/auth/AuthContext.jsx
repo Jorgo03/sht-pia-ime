@@ -33,6 +33,29 @@ export function AuthProvider({ children }) {
     return data
   }
 
+  // OAuth signups can't carry the role toggle through the provider redirect,
+  // so handle_new_user defaults them to client. Profile.jsx stashes the
+  // chosen role before redirecting; apply it here — once, and only to an
+  // account created moments ago. Signing in again never rewrites a role.
+  const applyPendingRole = async (user, profile) => {
+    let pending = null
+    try {
+      pending = localStorage.getItem('fho_pending_role')
+      if (pending) localStorage.removeItem('fho_pending_role')
+    } catch { return profile }
+    if (pending !== 'agent' && pending !== 'client') return profile
+    if (!profile || profile.role === pending) return profile
+    const isNewAccount = user.created_at && Date.now() - new Date(user.created_at).getTime() < 5 * 60 * 1000
+    if (!isNewAccount) return profile
+    const { data } = await supabase
+      .from('profiles')
+      .update({ role: pending })
+      .eq('id', user.id)
+      .select()
+      .single()
+    return data || profile
+  }
+
   const loadPreferredLanguage = (profile) => {
     const lang = profile?.preferred_language
     if (lang && i18n.language !== lang) {
@@ -50,7 +73,8 @@ export function AuthProvider({ children }) {
         setState({ user: null, session: null, profile: null, loading: false })
         return
       }
-      const profile = await loadProfile(session.user.id)
+      let profile = await loadProfile(session.user.id)
+      profile = await applyPendingRole(session.user, profile)
       if (!active) return
       setState({ user: session.user, session, profile, loading: false })
       if (profile) loadPreferredLanguage(profile)
@@ -84,6 +108,9 @@ export function AuthProvider({ children }) {
   }
 
   const signUp = async (email, password, options = {}) => {
+    // Email flows set the role via metadata — a stale OAuth stash must not
+    // apply on top of them.
+    try { localStorage.removeItem('fho_pending_role') } catch { /* ignore */ }
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -114,6 +141,7 @@ export function AuthProvider({ children }) {
   }
 
   const signIn = async (email, password) => {
+    try { localStorage.removeItem('fho_pending_role') } catch { /* ignore */ }
     const { data, error } = await supabase.auth.signInWithPassword({ email, password })
     if (!error && data?.user) showWelcome(data.user)
     return { error }

@@ -107,6 +107,12 @@ export default function Profile() {
     if (providerLoading) return
     setMessage('')
     setProviderLoading(provider)
+    // The role toggle can't ride through the provider redirect (OAuth
+    // signups carry no role metadata, so the DB trigger defaults to
+    // client). Stash it; AuthContext applies it after the callback, and
+    // only to a freshly created account — existing profiles are never
+    // rewritten by signing in again.
+    try { localStorage.setItem('fho_pending_role', role) } catch { /* storage blocked — role stays client */ }
     const { error } = await signInWithProvider(provider)
     if (error) {
       setProviderLoading(null)
@@ -125,6 +131,10 @@ export default function Profile() {
 
   const handleSendOtp = async () => {
     if (!otpEmail) { setMessage(t('auth.enterEmail')); return }
+    // OTP signups carry no role metadata either — same stash-and-apply
+    // path as OAuth, and overwriting here means an aborted OAuth click
+    // can't leak its role choice into this flow.
+    try { localStorage.setItem('fho_pending_role', role) } catch { /* ignore */ }
     setLoading(true); setMessage('')
     const { error } = await sendOtp(otpEmail)
     setLoading(false)
