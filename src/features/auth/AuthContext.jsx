@@ -148,7 +148,13 @@ export function AuthProvider({ children }) {
   }
 
   const sendOtp = async (email) => {
-    const { error } = await supabase.auth.signInWithOtp({ email })
+    const { error } = await supabase.auth.signInWithOtp({
+      email,
+      // Lets the emailed magic LINK log the user in directly (same
+      // browser/device) via our callback — typing the code stays as the
+      // cross-device fallback.
+      options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
+    })
     return { error }
   }
 

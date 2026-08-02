@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { Sun, Moon, ChevronDown, User, LayoutDashboard, Heart, Settings, LogOut, Plus, Bell, CalendarDays } from 'lucide-react'
+import { Sun, Moon, ChevronDown, User, LayoutDashboard, Heart, Settings, LogOut, Bell, CalendarDays } from 'lucide-react'
 import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTheme } from './ThemeContext'
@@ -67,12 +67,6 @@ export default function Header() {
         Shtëpia<span className="brand-ime">.ime</span>
       </div>
       <div className="header-actions">
-        {user && (
-          <button className="new-listing-btn" onClick={() => navigate('/new-listing')}>
-            <Plus size={16} />
-            <span className="new-listing-label">{t('listing.newListing')}</span>
-          </button>
-        )}
         <div className="lang-switcher" ref={langRef}>
           <button className="lang-btn" onClick={() => setLangOpen(!langOpen)}>
             <span className="lang-code">{currentLang.code}</span>
