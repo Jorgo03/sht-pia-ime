@@ -9,92 +9,164 @@
   --ls-accent: var(--fho-orange-1, #F97316);
   --ls-stroke: var(--fho-text-on-dark, #f5f1ea);
 
+  position: relative;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 20px;
+  overflow: hidden;
   background: var(--ls-bg);
 }
 
 .loading-screen--full {
   position: fixed;
   inset: 0;
+  width: 100vw;
+  height: 100vh;
   z-index: 9999;
 }
 
+/* ---------- Ambient bloom behind the icon ---------- */
+
+.loading-screen__bloom {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(249, 115, 22, 0.18) 0%, rgba(249, 115, 22, 0.06) 45%, transparent 72%);
+  transform: translate(-50%, -58%);
+  pointer-events: none;
+  animation: ls-bloom-pulse 2.6s ease-in-out infinite;
+}
+
+@keyframes ls-bloom-pulse {
+  0%, 100% { opacity: 0.6; transform: translate(-50%, -58%) scale(1); }
+  50%      { opacity: 1;   transform: translate(-50%, -58%) scale(1.08); }
+}
+
+/* ---------- Content stack (icon + wordmark + status text) ---------- */
+
+.loading-screen__content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+
 .loading-screen__icon {
-  width: 96px;
-  height: 96px;
+  width: 120px;
+  height: 120px;
+  overflow: visible;
   animation: ls-breathe 3.2s ease-in-out infinite;
 }
 
-.loading-screen__fill {
-  fill: var(--ls-accent);
+.loading-screen__neon {
+  stroke: var(--ls-accent);
   transform-box: fill-box;
-  transform-origin: 50% 100%;
-  animation:
-    ls-rise 3.2s cubic-bezier(0.45, 0, 0.2, 1) infinite,
-    ls-glow 3.2s ease-in-out infinite;
 }
 
-.loading-screen__outline {
-  stroke: var(--ls-stroke);
-  stroke-width: 2px;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  vector-effect: non-scaling-stroke;
-}
-
-.loading-screen__text {
-  margin: 0;
-  font-family: var(--font-sans, 'Manrope', sans-serif);
-  font-size: 14px;
-  letter-spacing: 0.02em;
-  color: var(--ls-stroke);
-  animation: ls-text-breathe 2.4s ease-in-out infinite;
-}
-
-/* Cycling mode: animation-duration is set inline from the same JS constant
- * that drives the message-swap timer (LoadingScreen.jsx), so the swap
- * always lands during the opacity:0 trough — the content change itself is
- * never visible, only the crossfade is. */
-.loading-screen__text--cycle {
-  animation-name: ls-text-cycle;
-  animation-timing-function: ease-in-out;
-  animation-iteration-count: infinite;
-}
-
-@keyframes ls-text-cycle {
-  0%, 100% { opacity: 0; transform: translateY(3px); }
-  15%      { opacity: 1; transform: translateY(0); }
-  85%      { opacity: 1; transform: translateY(0); }
+.loading-screen__rise-rect {
+  transform-origin: center bottom;
+  transform-box: fill-box;
+  animation: ls-rise 3.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
 
 /* Fill rises 0→100% of the house height, holds full for ~0.5s (56%→72% of
- * the 3.2s cycle), then fades out and snaps back to empty (invisible)
- * before fading back in as a bare outline — reads as a continuous loop
- * rather than a hard reset. */
+ * the 3.2s cycle), then fades out and snaps back to empty (invisible,
+ * leaving the dim ghost outline as the "off" state) before fading back in
+ * — reads as a continuous loop rather than a hard reset. */
 @keyframes ls-rise {
-  0%   { transform: scaleY(0); opacity: 1; }
-  56%  { transform: scaleY(1); opacity: 1; }
-  72%  { transform: scaleY(1); opacity: 1; }
-  85%  { transform: scaleY(1); opacity: 0; }
-  86%  { transform: scaleY(0); opacity: 0; }
-  100% { transform: scaleY(0); opacity: 1; }
-}
-
-@keyframes ls-glow {
-  0%, 42%   { filter: drop-shadow(0 0 0 rgba(249, 115, 22, 0)); }
-  56%       { filter: drop-shadow(0 0 14px rgba(249, 115, 22, 0.55)); }
-  70%       { filter: drop-shadow(0 0 14px rgba(249, 115, 22, 0.55)); }
-  83%, 100% { filter: drop-shadow(0 0 0 rgba(249, 115, 22, 0)); }
+  0%   { transform: translateY(100%); }
+  56%  { transform: translateY(0%); }
+  72%  { transform: translateY(0%); opacity: 1; }
+  85%  { transform: translateY(0%); opacity: 0; }
+  86%  { transform: translateY(100%); opacity: 0; }
+  100% { transform: translateY(100%); opacity: 1; }
 }
 
 @keyframes ls-breathe {
   0%, 50%   { transform: scale(1); }
-  63%       { transform: scale(1.035); }
+  63%       { transform: scale(1.03); }
   72%, 100% { transform: scale(1); }
+}
+
+/* ---------- Wordmark — same two-weight treatment as Header's .header-brand,
+ * scaled up for a hero moment with an added glow. ---------- */
+
+.loading-screen__wordmark {
+  font-family: var(--font-serif);
+  font-size: 28px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1;
+  color: var(--ls-accent);
+  text-shadow: 0 0 20px rgba(249, 115, 22, 0.5), 0 0 40px rgba(249, 115, 22, 0.2);
+  animation: ls-wordmark-breathe 3.2s ease-in-out infinite;
+}
+
+.loading-screen__wordmark-ime {
+  font-weight: 400;
+}
+
+@keyframes ls-wordmark-breathe {
+  0%, 100% { opacity: 0.85; }
+  50%      { opacity: 1; }
+}
+
+/* ---------- OAuth status text ---------- */
+
+.loading-screen__text-slot {
+  position: relative;
+  width: 260px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loading-screen__text {
+  position: absolute;
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0.03em;
+  color: var(--ls-stroke);
+  opacity: 0.55;
+  white-space: nowrap;
+}
+
+/* Single static message (no second entry to crossfade with) keeps the
+ * original gentle breathing fade. */
+.loading-screen__text--a:only-child {
+  position: static;
+  animation: ls-text-breathe 2.4s ease-in-out infinite;
+}
+
+/* Two messages: a true stacked crossfade, pure CSS, no JS timer — both
+ * spans occupy the same spot and hand off opacity to each other with a
+ * brief mutual-invisible gap at the midpoint. */
+.loading-screen__text--a:not(:only-child) { animation: ls-text-cycle-a 4s ease-in-out infinite; }
+.loading-screen__text--b                  { animation: ls-text-cycle-b 4s ease-in-out infinite; }
+
+@keyframes ls-text-cycle-a {
+  0%   { opacity: 1; }
+  38%  { opacity: 1; }
+  48%  { opacity: 0; }
+  92%  { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes ls-text-cycle-b {
+  0%   { opacity: 0; }
+  42%  { opacity: 0; }
+  52%  { opacity: 1; }
+  88%  { opacity: 1; }
+  98%  { opacity: 0; }
+  100% { opacity: 0; }
 }
 
 @keyframes ls-text-breathe {
@@ -102,22 +174,50 @@
   50%      { opacity: 1; }
 }
 
+/* ---------- Decorative sparkle, bottom-right ---------- */
+
+.loading-screen__sparkle {
+  position: absolute;
+  bottom: 40px;
+  right: 40px;
+  width: 20px;
+  height: 20px;
+  fill: var(--ls-accent);
+  opacity: 0.35;
+  animation: ls-sparkle-spin 6s ease-in-out infinite;
+}
+
+@keyframes ls-sparkle-spin {
+  0%   { transform: rotate(0deg) scale(1); opacity: 0.35; }
+  50%  { transform: rotate(45deg) scale(1.2); opacity: 0.7; }
+  100% { transform: rotate(90deg) scale(1); opacity: 0.35; }
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .loading-screen__bloom,
   .loading-screen__icon,
-  .loading-screen__fill,
+  .loading-screen__rise-rect,
+  .loading-screen__wordmark,
   .loading-screen__text,
-  .loading-screen__text--cycle {
+  .loading-screen__text--a,
+  .loading-screen__text--b,
+  .loading-screen__sparkle {
     animation: none;
   }
-  .loading-screen__fill {
-    transform: scaleY(1);
+  .loading-screen__rise-rect {
+    transform: translateY(0%);
     opacity: 1;
-    filter: none;
   }
-  .loading-screen__text,
-  .loading-screen__text--cycle {
-    opacity: 0.9;
-    transform: none;
+  .loading-screen__wordmark {
+    opacity: 1;
+  }
+  /* Reduced motion always resolves to exactly one static, visible message. */
+  .loading-screen__text--a {
+    position: static;
+    opacity: 1;
+  }
+  .loading-screen__text--b {
+    display: none;
   }
 }
 
