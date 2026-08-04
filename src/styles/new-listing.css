@@ -3,7 +3,9 @@
 .new-listing-page {
   max-width: 600px;
   margin: 0 auto;
-  padding-bottom: 120px;
+  /* .nl-actions is a fixed footer sitting ABOVE the fixed bottom nav (see
+   * its rule below) — this has to clear both, not just the old footer. */
+  padding-bottom: 200px;
 }
 
 /* Header */
@@ -82,9 +84,30 @@
   gap: 4px;
   margin-bottom: 24px;
   overflow-x: auto;
+  scrollbar-width: thin; /* Firefox */
+  scrollbar-color: var(--fho-border-strong) transparent;
+}
+
+.nl-progress::-webkit-scrollbar {
+  height: 4px;
+}
+
+.nl-progress::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.nl-progress::-webkit-scrollbar-thumb {
+  background: var(--fho-border-strong);
+  border-radius: 999px;
+}
+
+.nl-progress::-webkit-scrollbar-thumb:hover {
+  background: var(--fho-orange-1);
 }
 
 .nl-step {
+  appearance: none;
+  -webkit-appearance: none;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -97,8 +120,14 @@
   background: var(--fho-surface);
   border: 1px solid var(--fho-border);
   white-space: nowrap;
+  cursor: default;
   transition: all 150ms var(--ease-out);
 }
+
+/* Native `disabled` is deliberately not used (see NewListing.jsx) so
+ * completed/current steps stay fully visible instead of looking dimmed. */
+.nl-step--clickable { cursor: pointer; }
+.nl-step--clickable:hover { border-color: var(--fho-orange-1); color: var(--fho-text); }
 
 .nl-step.active { color: var(--fho-text); }
 
@@ -413,7 +442,11 @@
 
 .nl-actions {
   position: fixed;
-  bottom: 0;
+  /* .liquid-nav sits at bottom:18px, height:62px (z-index:50) — bottom:0
+   * here put this fixed footer directly underneath it, with the nav's
+   * higher stacking order covering the Next button. 18+62=80px clears the
+   * nav's footprint; +16px gives it breathing room above the pill. */
+  bottom: 96px;
   left: 50%;
   transform: translateX(-50%);
   width: 100%;
@@ -422,7 +455,9 @@
   gap: 10px;
   padding: 16px 20px;
   background: var(--fho-surface);
-  border-top: 1px solid var(--fho-border);
+  border: 1px solid var(--fho-border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--fho-card-shadow);
   z-index: 30;
 }
 

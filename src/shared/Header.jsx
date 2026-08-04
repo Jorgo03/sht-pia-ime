@@ -7,6 +7,7 @@ import { useAuth } from '../features/auth/AuthContext'
 import { useUpcomingViewings } from '../features/viewings/hooks/useUpcomingViewings'
 import { getLocalizedText, formatDate } from '../lib/format'
 import { supabase } from '../lib/supabase'
+import Avatar from './Avatar'
 import '../styles/header.css'
 
 const LANGUAGES = [
@@ -57,7 +58,6 @@ export default function Header() {
   }
 
   const displayName = profile?.full_name || user?.user_metadata?.full_name || user?.email?.split('@')[0] || ''
-  const initials = displayName.slice(0, 2).toUpperCase()
 
   const handleNav = (path) => { setAccountOpen(false); navigate(path) }
 
@@ -133,12 +133,13 @@ export default function Header() {
         <div className="account-switcher" ref={accountRef}>
           {user ? (
             <>
-              <button className="account-avatar-btn" onClick={() => setAccountOpen(!accountOpen)}>
-                {profile?.avatar_url ? (
-                  <img src={profile.avatar_url} alt="" className="account-avatar-img" />
-                ) : (
-                  <span className="account-avatar-initials">{initials}</span>
-                )}
+              <button className="account-avatar-btn" onClick={() => setAccountOpen(!accountOpen)} aria-label={t('account.settings')}>
+                <Avatar
+                  src={profile?.avatar_url}
+                  name={profile?.full_name || user?.user_metadata?.full_name}
+                  email={user.email}
+                  size={36}
+                />
               </button>
               {accountOpen && (
                 <div className="account-dropdown">

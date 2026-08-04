@@ -317,7 +317,7 @@ export default function NewListing() {
   return (
     <div className="page new-listing-page">
       <div className="nl-header">
-        <button onClick={() => navigate(-1)} className="nl-back" aria-label={t('common.back')}><ArrowLeft size={18} /></button>
+        <button onClick={() => (step > 0 ? prev() : navigate(-1))} className="nl-back" aria-label={t('common.back')}><ArrowLeft size={18} /></button>
         <h1 className="page-title" style={{ margin: 0 }}>{t('listing.newListing')}</h1>
       </div>
 
@@ -329,12 +329,26 @@ export default function NewListing() {
       )}
 
       <div className="nl-progress">
-        {STEPS.map((s, i) => (
-          <div key={s} className={`nl-step ${i <= step ? 'active' : ''} ${i === step ? 'current' : ''}`}>
-            <div className="nl-step-dot">{i + 1}</div>
-            <span className="nl-step-label">{t(`listing.step.${s}`)}</span>
-          </div>
-        ))}
+        {STEPS.map((s, i) => {
+          // Jumping back to a completed step is safe (its data is already
+          // validated); jumping forward would skip validation on the steps
+          // in between, so only i < step is reachable this way.
+          const clickable = i < step
+          return (
+            <button
+              key={s}
+              type="button"
+              className={`nl-step ${i <= step ? 'active' : ''} ${i === step ? 'current' : ''} ${clickable ? 'nl-step--clickable' : ''}`}
+              onClick={clickable ? () => setStep(i) : undefined}
+              tabIndex={clickable ? 0 : -1}
+              aria-disabled={!clickable}
+              aria-current={i === step ? 'step' : undefined}
+            >
+              <div className="nl-step-dot">{i + 1}</div>
+              <span className="nl-step-label">{t(`listing.step.${s}`)}</span>
+            </button>
+          )
+        })}
       </div>
 
       <div className="nl-form">
