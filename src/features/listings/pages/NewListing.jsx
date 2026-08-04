@@ -560,22 +560,52 @@ export default function NewListing() {
         )}
       </div>
 
-      <div className="nl-actions">
-        {step > 0 && (
-          <button className="nl-btn nl-btn-secondary" onClick={prev}><ArrowLeft size={16} /> {t('listing.back')}</button>
-        )}
-        <div style={{ flex: 1 }} />
-        {step < STEPS.length - 1 ? (
-          <button className="nl-btn nl-btn-primary" onClick={next}>{t('listing.next')} <ArrowRight size={16} /></button>
-        ) : (
-          <>
-            <button className="nl-btn nl-btn-secondary" onClick={() => submit(true)} disabled={submitting}>{t('listing.saveDraft')}</button>
-            <button className="nl-btn nl-btn-primary" onClick={() => submit(false)} disabled={submitting}>
-              {submitting ? t('common.loading') : t('listing.publish')}
+      {step < STEPS.length - 1 ? (
+        // Mid-wizard steps: lightweight floating pair instead of a docked
+        // bar. bottom-24 clears .liquid-nav (18px gap + 62px height = 80px,
+        // +16px breathing room). The app-shell is a centered max-w-480
+        // column, not the full viewport (same as .liquid-nav/.nl-actions
+        // below) — so this positions the same way: a full-width fixed strip
+        // centered via left-1/2/-translate-x-1/2, pointer-events-none so
+        // its empty space never blocks clicks, with the actual buttons
+        // (pointer-events-auto) pushed to its right edge via justify-end.
+        // A plain `right-5` here would anchor to the raw viewport instead
+        // and drift away from the nav on anything wider than ~480px.
+        <div className="pointer-events-none fixed bottom-24 left-1/2 z-50 w-full max-w-[480px] -translate-x-1/2 px-5">
+          <div className="flex items-center justify-end gap-3">
+            {step > 0 && (
+              <button
+                onClick={prev}
+                aria-label={t('listing.back')}
+                title={t('listing.back')}
+                className="pointer-events-auto flex h-12 w-12 items-center justify-center rounded-full border border-fho-border-strong bg-fho-surface text-fho-text shadow-fho-card transition-transform hover:scale-105 active:scale-95"
+              >
+                <ArrowLeft size={20} />
+              </button>
+            )}
+            <button
+              onClick={next}
+              aria-label={t('listing.next')}
+              title={t('listing.next')}
+              className="pointer-events-auto flex h-[58px] w-[58px] items-center justify-center rounded-full bg-[linear-gradient(135deg,var(--fho-orange-1),var(--fho-orange-2))] text-white shadow-fho-cta transition-transform hover:scale-105 active:scale-95"
+            >
+              <ArrowRight size={24} />
             </button>
-          </>
-        )}
-      </div>
+          </div>
+        </div>
+      ) : (
+        // Final (Publish) step keeps the fuller docked bar — a submission
+        // deserves a clearer, paired Save Draft / Publish affordance rather
+        // than a small anonymous corner button.
+        <div className="nl-actions">
+          <button className="nl-btn nl-btn-secondary" onClick={prev}><ArrowLeft size={16} /> {t('listing.back')}</button>
+          <div style={{ flex: 1 }} />
+          <button className="nl-btn nl-btn-secondary" onClick={() => submit(true)} disabled={submitting}>{t('listing.saveDraft')}</button>
+          <button className="nl-btn nl-btn-primary" onClick={() => submit(false)} disabled={submitting}>
+            {submitting ? t('common.loading') : t('listing.publish')}
+          </button>
+        </div>
+      )}
     </div>
   )
 }
