@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { supabase } from '../../../lib/supabase'
+import LoadingScreen from '../../../shared/LoadingScreen'
 
 export default function AuthCallback() {
   const { t } = useTranslation()
@@ -56,26 +57,5 @@ export default function AuthCallback() {
     return () => { clearTimeout(timeout); subscription.unsubscribe() }
   }, [navigate])
 
-  return (
-    <div style={{
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'center',
-      height: '100vh',
-      background: 'var(--fho-bg, #111)',
-    }}>
-      <div style={{
-        width: 40,
-        height: 40,
-        border: '2px solid var(--fho-orange-1, #FF6B00)',
-        borderTopColor: 'transparent',
-        borderRadius: '50%',
-        marginBottom: 16,
-        animation: 'spin 1s linear infinite',
-      }} />
-      <p style={{ color: 'var(--fho-text, #fff)', fontSize: 14 }}>{t('authCallback.signingIn')}</p>
-      <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
-    </div>
-  )
+  return <LoadingScreen state="oauth" text={t('authCallback.signingIn')} />
 }

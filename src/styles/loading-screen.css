@@ -1,0 +1,104 @@
+/* @layered */
+/* Shared full-screen / inline loading indicator (splash + OAuth transition).
+ * Background is a fixed deep charcoal regardless of the app's light/dark
+ * theme — this is a brand moment (app boot, mid-auth), not themed content. */
+@layer components {
+
+.loading-screen {
+  --ls-bg: #121212;
+  --ls-accent: var(--fho-orange-1, #F97316);
+  --ls-stroke: var(--fho-text-on-dark, #f5f1ea);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  background: var(--ls-bg);
+}
+
+.loading-screen--full {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+}
+
+.loading-screen__icon {
+  width: 96px;
+  height: 96px;
+  animation: ls-breathe 3.2s ease-in-out infinite;
+}
+
+.loading-screen__fill {
+  fill: var(--ls-accent);
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation:
+    ls-rise 3.2s cubic-bezier(0.45, 0, 0.2, 1) infinite,
+    ls-glow 3.2s ease-in-out infinite;
+}
+
+.loading-screen__outline {
+  stroke: var(--ls-stroke);
+  stroke-width: 2px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.loading-screen__text {
+  margin: 0;
+  font-family: var(--font-sans, 'Manrope', sans-serif);
+  font-size: 14px;
+  letter-spacing: 0.02em;
+  color: var(--ls-stroke);
+  animation: ls-text-breathe 2.4s ease-in-out infinite;
+}
+
+/* Fill rises 0→100% of the house height, holds full, then fades out and
+ * snaps back to empty (invisible) before fading back in — reads as a
+ * continuous loop rather than a hard reset. */
+@keyframes ls-rise {
+  0%   { transform: scaleY(0); opacity: 1; }
+  55%  { transform: scaleY(1); opacity: 1; }
+  75%  { transform: scaleY(1); opacity: 1; }
+  88%  { transform: scaleY(1); opacity: 0; }
+  89%  { transform: scaleY(0); opacity: 0; }
+  100% { transform: scaleY(0); opacity: 1; }
+}
+
+@keyframes ls-glow {
+  0%, 45%  { filter: drop-shadow(0 0 0 rgba(249, 115, 22, 0)); }
+  60%      { filter: drop-shadow(0 0 14px rgba(249, 115, 22, 0.55)); }
+  78%      { filter: drop-shadow(0 0 14px rgba(249, 115, 22, 0.55)); }
+  92%, 100% { filter: drop-shadow(0 0 0 rgba(249, 115, 22, 0)); }
+}
+
+@keyframes ls-breathe {
+  0%, 50%   { transform: scale(1); }
+  60%       { transform: scale(1.035); }
+  72%, 100% { transform: scale(1); }
+}
+
+@keyframes ls-text-breathe {
+  0%, 100% { opacity: 0.55; }
+  50%      { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loading-screen__icon,
+  .loading-screen__fill,
+  .loading-screen__text {
+    animation: none;
+  }
+  .loading-screen__fill {
+    transform: scaleY(1);
+    opacity: 1;
+    filter: none;
+  }
+  .loading-screen__text {
+    opacity: 0.9;
+  }
+}
+
+}

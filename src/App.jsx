@@ -1,6 +1,6 @@
 import { lazy, Suspense, useEffect } from 'react'
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
-import { AuthProvider } from './features/auth/AuthContext'
+import { AuthProvider, useAuth } from './features/auth/AuthContext'
 import { FavoritesProvider } from './features/favorites/FavoritesContext'
 import { ThemeProvider } from './shared/ThemeContext'
 import { AddSheetProvider, useAddSheet } from './features/quick-add/AddSheetContext'
@@ -8,6 +8,7 @@ import Header from './shared/Header'
 import BottomNav from './shared/BottomNav'
 import AddSheet from './features/quick-add/AddSheet'
 import ProtectedRoute from './shared/ProtectedRoute'
+import LoadingScreen from './shared/LoadingScreen'
 import Home from './features/properties/pages/Home'
 import Search from './features/properties/pages/Search'
 import Favorites from './features/favorites/pages/Favorites'
@@ -49,6 +50,46 @@ function RouteFallback() {
   return <div className="page" />
 }
 
+// Gates the app shell on AuthContext's initial session check (the same
+// `loading` flag ProtectedRoute already waits on) so a cold load shows the
+// splash instead of a flash of signed-out header/nav.
+function AppShell() {
+  const { loading } = useAuth()
+
+  if (loading) return <LoadingScreen state="splash" />
+
+  return (
+    <div className="app-shell">
+      <ScrollToTop />
+      <Header />
+      <Suspense fallback={<RouteFallback />}>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/search" element={<Search />} />
+          <Route path="/favorites" element={<ProtectedRoute><Favorites /></ProtectedRoute>} />
+          <Route path="/messages" element={<ProtectedRoute><Messages /></ProtectedRoute>} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/property/:id" element={<PropertyDetail />} />
+          <Route path="/agent/:id" element={<AgentProfile />} />
+          <Route path="/agent-dashboard" element={<ProtectedRoute requireRole="agent"><AgentDashboard /></ProtectedRoute>} />
+          <Route path="/my-listings" element={<ProtectedRoute><MyListings /></ProtectedRoute>} />
+          <Route path="/my-listings/:id/dashboard" element={<ProtectedRoute><PropertyDashboard /></ProtectedRoute>} />
+          <Route path="/new-listing" element={<ProtectedRoute><NewListing /></ProtectedRoute>} />
+          <Route path="/viewings" element={<ProtectedRoute><Viewings /></ProtectedRoute>} />
+          <Route path="/saved-searches" element={<ProtectedRoute><SavedSearches /></ProtectedRoute>} />
+          <Route path="/auth/callback" element={<AuthCallback />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </Suspense>
+      <BottomNav />
+      <AddSheet />
+      <AddSheetToast />
+      <CookieConsent />
+      <WelcomeToast />
+    </div>
+  )
+}
+
 export default function App() {
   return (
     <BrowserRouter>
@@ -56,34 +97,7 @@ export default function App() {
         <AuthProvider>
           <FavoritesProvider>
             <AddSheetProvider>
-              <div className="app-shell">
-                <ScrollToTop />
-                <Header />
-                <Suspense fallback={<RouteFallback />}>
-                  <Routes>
-                    <Route path="/" element={<Home />} />
-                    <Route path="/search" element={<Search />} />
-                    <Route path="/favorites" element={<ProtectedRoute><Favorites /></ProtectedRoute>} />
-                    <Route path="/messages" element={<ProtectedRoute><Messages /></ProtectedRoute>} />
-                    <Route path="/profile" element={<Profile />} />
-                    <Route path="/property/:id" element={<PropertyDetail />} />
-                    <Route path="/agent/:id" element={<AgentProfile />} />
-                    <Route path="/agent-dashboard" element={<ProtectedRoute requireRole="agent"><AgentDashboard /></ProtectedRoute>} />
-                    <Route path="/my-listings" element={<ProtectedRoute><MyListings /></ProtectedRoute>} />
-                    <Route path="/my-listings/:id/dashboard" element={<ProtectedRoute><PropertyDashboard /></ProtectedRoute>} />
-                    <Route path="/new-listing" element={<ProtectedRoute><NewListing /></ProtectedRoute>} />
-                    <Route path="/viewings" element={<ProtectedRoute><Viewings /></ProtectedRoute>} />
-                    <Route path="/saved-searches" element={<ProtectedRoute><SavedSearches /></ProtectedRoute>} />
-                    <Route path="/auth/callback" element={<AuthCallback />} />
-                    <Route path="*" element={<NotFound />} />
-                  </Routes>
-                </Suspense>
-                <BottomNav />
-                <AddSheet />
-                <AddSheetToast />
-                <CookieConsent />
-                <WelcomeToast />
-              </div>
+              <AppShell />
             </AddSheetProvider>
           </FavoritesProvider>
         </AuthProvider>
