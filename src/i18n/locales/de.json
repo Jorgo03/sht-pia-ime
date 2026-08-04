@@ -410,7 +410,8 @@
     "saveError": "Konnte nicht gespeichert werden. Bitte erneut versuchen."
   },
   "authCallback": {
-    "signingIn": "Du wirst angemeldet…"
+    "signingIn": "Du wirst angemeldet…",
+    "preparingMatches": "Deine Treffer werden vorbereitet…"
   },
   "ai": {
     "panelTitle": "KI-Inseratsassistent",

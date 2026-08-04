@@ -410,7 +410,8 @@
     "saveError": "Impossibile salvare. Riprova."
   },
   "authCallback": {
-    "signingIn": "Accesso in corso…"
+    "signingIn": "Accesso in corso…",
+    "preparingMatches": "Preparazione dei tuoi abbinamenti…"
   },
   "ai": {
     "panelTitle": "Redattore IA dell'annuncio",

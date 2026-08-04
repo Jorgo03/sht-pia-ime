@@ -410,7 +410,8 @@
     "accept": "Accept"
   },
   "authCallback": {
-    "signingIn": "Signing you in…"
+    "signingIn": "Signing you in…",
+    "preparingMatches": "Preparing your matches…"
   },
   "ai": {
     "panelTitle": "AI listing writer",

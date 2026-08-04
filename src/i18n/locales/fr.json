@@ -410,7 +410,8 @@
     "saveError": "Échec de l'enregistrement. Veuillez réessayer."
   },
   "authCallback": {
-    "signingIn": "Connexion en cours…"
+    "signingIn": "Connexion en cours…",
+    "preparingMatches": "Préparation de vos correspondances…"
   },
   "ai": {
     "panelTitle": "Rédacteur IA de l'annonce",

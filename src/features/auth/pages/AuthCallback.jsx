@@ -57,5 +57,5 @@ export default function AuthCallback() {
     return () => { clearTimeout(timeout); subscription.unsubscribe() }
   }, [navigate])
 
-  return <LoadingScreen state="oauth" text={t('authCallback.signingIn')} />
+  return <LoadingScreen state="oauth" text={[t('authCallback.signingIn'), t('authCallback.preparingMatches')]} />
 }

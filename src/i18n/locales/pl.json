@@ -414,7 +414,8 @@
     "saveError": "Nie udało się zapisać. Spróbuj ponownie."
   },
   "authCallback": {
-    "signingIn": "Logowanie…"
+    "signingIn": "Logowanie…",
+    "preparingMatches": "Przygotowujemy Twoje dopasowania…"
   },
   "ai": {
     "panelTitle": "Kreator ogłoszeń AI",

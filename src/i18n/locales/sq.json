@@ -410,7 +410,8 @@
     "accept": "Pranoj"
   },
   "authCallback": {
-    "signingIn": "Duke u kyçur…"
+    "signingIn": "Duke u kyçur…",
+    "preparingMatches": "Duke përgatitur përputhjet e tua…"
   },
   "ai": {
     "panelTitle": "Shkruesi AI i shpalljes",

@@ -55,28 +55,45 @@
   animation: ls-text-breathe 2.4s ease-in-out infinite;
 }
 
-/* Fill rises 0→100% of the house height, holds full, then fades out and
- * snaps back to empty (invisible) before fading back in — reads as a
- * continuous loop rather than a hard reset. */
+/* Cycling mode: animation-duration is set inline from the same JS constant
+ * that drives the message-swap timer (LoadingScreen.jsx), so the swap
+ * always lands during the opacity:0 trough — the content change itself is
+ * never visible, only the crossfade is. */
+.loading-screen__text--cycle {
+  animation-name: ls-text-cycle;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+@keyframes ls-text-cycle {
+  0%, 100% { opacity: 0; transform: translateY(3px); }
+  15%      { opacity: 1; transform: translateY(0); }
+  85%      { opacity: 1; transform: translateY(0); }
+}
+
+/* Fill rises 0→100% of the house height, holds full for ~0.5s (56%→72% of
+ * the 3.2s cycle), then fades out and snaps back to empty (invisible)
+ * before fading back in as a bare outline — reads as a continuous loop
+ * rather than a hard reset. */
 @keyframes ls-rise {
   0%   { transform: scaleY(0); opacity: 1; }
-  55%  { transform: scaleY(1); opacity: 1; }
-  75%  { transform: scaleY(1); opacity: 1; }
-  88%  { transform: scaleY(1); opacity: 0; }
-  89%  { transform: scaleY(0); opacity: 0; }
+  56%  { transform: scaleY(1); opacity: 1; }
+  72%  { transform: scaleY(1); opacity: 1; }
+  85%  { transform: scaleY(1); opacity: 0; }
+  86%  { transform: scaleY(0); opacity: 0; }
   100% { transform: scaleY(0); opacity: 1; }
 }
 
 @keyframes ls-glow {
-  0%, 45%  { filter: drop-shadow(0 0 0 rgba(249, 115, 22, 0)); }
-  60%      { filter: drop-shadow(0 0 14px rgba(249, 115, 22, 0.55)); }
-  78%      { filter: drop-shadow(0 0 14px rgba(249, 115, 22, 0.55)); }
-  92%, 100% { filter: drop-shadow(0 0 0 rgba(249, 115, 22, 0)); }
+  0%, 42%   { filter: drop-shadow(0 0 0 rgba(249, 115, 22, 0)); }
+  56%       { filter: drop-shadow(0 0 14px rgba(249, 115, 22, 0.55)); }
+  70%       { filter: drop-shadow(0 0 14px rgba(249, 115, 22, 0.55)); }
+  83%, 100% { filter: drop-shadow(0 0 0 rgba(249, 115, 22, 0)); }
 }
 
 @keyframes ls-breathe {
   0%, 50%   { transform: scale(1); }
-  60%       { transform: scale(1.035); }
+  63%       { transform: scale(1.035); }
   72%, 100% { transform: scale(1); }
 }
 
@@ -88,7 +105,8 @@
 @media (prefers-reduced-motion: reduce) {
   .loading-screen__icon,
   .loading-screen__fill,
-  .loading-screen__text {
+  .loading-screen__text,
+  .loading-screen__text--cycle {
     animation: none;
   }
   .loading-screen__fill {
@@ -96,8 +114,10 @@
     opacity: 1;
     filter: none;
   }
-  .loading-screen__text {
+  .loading-screen__text,
+  .loading-screen__text--cycle {
     opacity: 0.9;
+    transform: none;
   }
 }
 
