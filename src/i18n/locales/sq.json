@@ -98,7 +98,7 @@
     "apartment": "Apartament",
     "villa": "Vilë",
     "house": "Shtëpi",
-    "commercial": "Zyrë",
+    "commercial": "Ambient komercial",
     "land": "Tokë",
     "office": "Zyrë",
     "garage": "Garazh",
@@ -227,7 +227,9 @@
     "imageUploadFailed": "Ngarkimi i imazheve dështoi — provo përsëri",
     "updateFailed": "Përditësimi dështoi — provo përsëri",
     "oauthFailed": "Kyçja me ofruesin dështoi — provo përsëri",
-    "invalidCode": "Kodi është i pasaktë ose ka skaduar"
+    "invalidCode": "Kodi është i pasaktë ose ka skaduar",
+    "videoInvalidType": "Lejohen vetëm video MP4 ose MOV",
+    "videoTooLarge": "Video është shumë e madhe (maks. {{max}} MB)"
   },
   "agentDashboard": {
     "title": "Paneli i Agjentit",
@@ -381,7 +383,11 @@
     },
     "valueOutOfRange": "Vlera duhet të jetë midis {{min}} dhe {{max}}.",
     "draftRestored": "Drafti u rikthye — vazhdo aty ku e le. Fotot duhen shtuar sërish.",
-    "discardDraft": "Fillo nga e para"
+    "discardDraft": "Fillo nga e para",
+    "pinLocation": "Vendos pikën në hartë",
+    "mapHint": "Prek hartën për të vendosur pikën (ose tërhiqe atë)",
+    "videoUpload": "Video e pronës",
+    "dropVideo": "Tërhiq një video këtu ose kliko (MP4 ose MOV)"
   },
   "dashboard": {
     "title": "Paneli i pronës",
@@ -426,7 +432,8 @@
     "translateAll": "Përkthe në të gjitha gjuhët",
     "translating": "Duke përkthyer…",
     "translated": "U përkthye — kontrollo çdo gjuhë.",
-    "translateFirst": "Shkruaj fillimisht titullin dhe përshkrimin në shqip"
+    "translateFirst": "Shkruaj fillimisht titullin dhe përshkrimin në shqip",
+    "generateTitle": "Gjenero me AI"
   },
   "assistant": {
     "title": "Asistenti i shpalljes",

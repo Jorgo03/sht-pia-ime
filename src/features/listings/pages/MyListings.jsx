@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Plus, BarChart3, Eye, Pause, Play, Trash2 } from 'lucide-react'
 import { useAuth } from '../../auth/AuthContext'
+import BackButton from '../../../shared/BackButton'
 import { supabase } from '../../../lib/supabase'
 import { formatPrice, imageFor, getLocalizedText } from '../../../lib/format'
 
@@ -71,6 +72,7 @@ export default function MyListings() {
 
   return (
     <div className="page">
+      <BackButton />
       <div className="mb-2 flex items-center justify-between">
         <h1 className="page-title m-0">{t('listing.myListings')}</h1>
         <button

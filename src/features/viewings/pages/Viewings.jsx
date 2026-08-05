@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { CalendarDays, Check, X, MapPin } from 'lucide-react'
 import { useAuth } from '../../auth/AuthContext'
+import BackButton from '../../../shared/BackButton'
 import { supabase } from '../../../lib/supabase'
 import { getLocalizedText, formatDate } from '../../../lib/format'
 
@@ -106,6 +107,7 @@ export default function Viewings() {
 
   return (
     <div className="page">
+      <BackButton />
       <div className="screen-head" style={{ padding: 0 }}>
         <div className="screen-kicker"><span className="screen-kicker__dash" />{t('viewings.kicker')}</div>
         <h1 className="screen-headline">{t('viewings.headlinePre')} <em>{t('viewings.headlineEm')}</em>.</h1>

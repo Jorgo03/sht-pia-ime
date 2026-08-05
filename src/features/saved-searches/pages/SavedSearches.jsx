@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { Search as SearchIcon, Heart, Trash2, Bell, BellOff, Play, MapPin, Plus } from 'lucide-react'
 import { useAuth } from '../../auth/AuthContext'
 import { useAddSheet } from '../../quick-add/AddSheetContext'
+import BackButton from '../../../shared/BackButton'
 import { supabase } from '../../../lib/supabase'
 import { formatPrice, formatDate } from '../../../lib/format'
 
@@ -89,6 +90,7 @@ export default function SavedSearches() {
 
   return (
     <div className="page">
+      <BackButton />
       <div className="screen-head" style={{ padding: 0 }}>
         <div className="screen-kicker"><span className="screen-kicker__dash" />{t('saved.kicker')}</div>
         <h1 className="screen-headline">{t('saved.headlinePre')} <em>{t('saved.headlineEm')}</em>.</h1>

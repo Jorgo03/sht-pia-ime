@@ -98,7 +98,7 @@
     "apartment": "Wohnung",
     "villa": "Villa",
     "house": "Haus",
-    "commercial": "Büro",
+    "commercial": "Gewerbefläche",
     "land": "Grundstück",
     "office": "Büro",
     "garage": "Garage",
@@ -234,7 +234,9 @@
     "imageUploadFailed": "Bild-Upload fehlgeschlagen — bitte erneut versuchen",
     "updateFailed": "Aktualisierung fehlgeschlagen — bitte erneut versuchen",
     "oauthFailed": "Anmeldung über den Anbieter fehlgeschlagen — bitte erneut versuchen",
-    "invalidCode": "Der Code ist falsch oder abgelaufen"
+    "invalidCode": "Der Code ist falsch oder abgelaufen",
+    "videoInvalidType": "Nur MP4- oder MOV-Videos sind erlaubt",
+    "videoTooLarge": "Video ist zu groß (max. {{max}} MB)"
   },
   "agentDashboard": {
     "title": "Makler-Dashboard",
@@ -329,7 +331,11 @@
     },
     "valueOutOfRange": "Der Wert muss zwischen {{min}} und {{max}} liegen.",
     "draftRestored": "Entwurf wiederhergestellt — mach weiter, wo du warst. Fotos bitte erneut hinzufügen.",
-    "discardDraft": "Neu beginnen"
+    "discardDraft": "Neu beginnen",
+    "pinLocation": "Standort auf der Karte setzen",
+    "mapHint": "Tippe auf die Karte, um einen Pin zu setzen (oder ziehe ihn)",
+    "videoUpload": "Objektvideo",
+    "dropVideo": "Video hierher ziehen oder klicken (MP4 oder MOV)"
   },
   "dashboard": {
     "title": "Immobilien-Dashboard",
@@ -426,7 +432,8 @@
     "translateAll": "In alle Sprachen übersetzen",
     "translating": "Übersetzt…",
     "translated": "Übersetzt — prüfe jede Sprache.",
-    "translateFirst": "Schreibe zuerst Titel und Beschreibung auf Albanisch"
+    "translateFirst": "Schreibe zuerst Titel und Beschreibung auf Albanisch",
+    "generateTitle": "Mit KI erstellen"
   },
   "assistant": {
     "title": "Inserats-Assistent",

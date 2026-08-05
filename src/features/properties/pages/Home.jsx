@@ -10,8 +10,6 @@ import { useRecentlyViewed } from '../hooks/useRecentlyViewed'
 import { useAuth } from '../../auth/AuthContext'
 import '../../../styles/home.css'
 
-const NEIGHBORHOOD_COLORS = ['#ff7d1a', '#e85d00', '#cc5200', '#ff9f4a', '#d4722a', '#b85c1a']
-
 export default function Home() {
   const { t } = useTranslation()
   const navigate = useNavigate()
@@ -27,13 +25,6 @@ export default function Home() {
 
   const featured = properties[0]
   const matched = properties.slice(1, 7)
-
-  const neighborhoods = properties.reduce((acc, p) => {
-    if (p.city && !acc.find(n => n.name === p.city)) {
-      acc.push({ name: p.city, count: properties.filter(x => x.city === p.city).length })
-    }
-    return acc
-  }, []).slice(0, 4)
 
   return (
     <div className="home-screen">
@@ -100,27 +91,8 @@ export default function Home() {
         </section>
       )}
 
-      {!loading && neighborhoods.length > 0 && (
-        <section>
-          <h2 className="section-title__bare">{t('home.neighborhoods')}</h2>
-          <div className="neighborhood-grid">
-            {neighborhoods.map((n, i) => (
-              <div
-                key={n.name}
-                className="neighborhood-card"
-                style={{ background: `linear-gradient(135deg, ${NEIGHBORHOOD_COLORS[i % NEIGHBORHOOD_COLORS.length]}22, ${NEIGHBORHOOD_COLORS[i % NEIGHBORHOOD_COLORS.length]}06)` }}
-                onClick={() => navigate(`/search?city=${encodeURIComponent(n.name)}`)}
-              >
-                <span className="neighborhood-name">{n.name}</span>
-                <span className="neighborhood-sub">{t('home.country')}</span>
-                <span className="neighborhood-count" style={{ color: NEIGHBORHOOD_COLORS[i % NEIGHBORHOOD_COLORS.length] }}>
-                  {t('home.homesCount', { count: n.count })}
-                </span>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
+      {/* "Trending neighborhoods" removed per owner request 2026-07-14 —
+          CSS (home.css) and i18n keys retained for easy restore. */}
     </div>
   )
 }

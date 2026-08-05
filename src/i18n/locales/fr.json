@@ -98,7 +98,7 @@
     "apartment": "Appartement",
     "villa": "Villa",
     "house": "Maison",
-    "commercial": "Bureau",
+    "commercial": "Local commercial",
     "land": "Terrain",
     "office": "Bureau",
     "garage": "Garage",
@@ -234,7 +234,9 @@
     "imageUploadFailed": "Échec du téléversement des images — réessayez",
     "updateFailed": "Échec de la mise à jour — réessayez",
     "oauthFailed": "La connexion via le fournisseur a échoué — réessayez",
-    "invalidCode": "Le code est incorrect ou a expiré"
+    "invalidCode": "Le code est incorrect ou a expiré",
+    "videoInvalidType": "Seules les vidéos MP4 ou MOV sont autorisées",
+    "videoTooLarge": "Vidéo trop volumineuse (max {{max}} Mo)"
   },
   "agentDashboard": {
     "title": "Tableau de bord Agent",
@@ -329,7 +331,11 @@
     },
     "valueOutOfRange": "La valeur doit être comprise entre {{min}} et {{max}}.",
     "draftRestored": "Brouillon restauré — reprenez où vous en étiez. Les photos sont à rajouter.",
-    "discardDraft": "Repartir de zéro"
+    "discardDraft": "Repartir de zéro",
+    "pinLocation": "Placer le repère",
+    "mapHint": "Touchez la carte pour placer le repère (ou faites-le glisser)",
+    "videoUpload": "Vidéo du bien",
+    "dropVideo": "Glissez une vidéo ici ou cliquez (MP4 ou MOV)"
   },
   "dashboard": {
     "title": "Tableau de bord du bien",
@@ -426,7 +432,8 @@
     "translateAll": "Traduire dans toutes les langues",
     "translating": "Traduction…",
     "translated": "Traduit — vérifiez chaque langue.",
-    "translateFirst": "Écrivez d'abord le titre et la description en albanais"
+    "translateFirst": "Écrivez d'abord le titre et la description en albanais",
+    "generateTitle": "Générer avec IA"
   },
   "assistant": {
     "title": "Assistant de l'annonce",

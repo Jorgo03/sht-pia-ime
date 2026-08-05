@@ -102,7 +102,7 @@
     "apartment": "Mieszkanie",
     "villa": "Willa",
     "house": "Dom",
-    "commercial": "Biuro",
+    "commercial": "Lokal użytkowy",
     "land": "Działka",
     "office": "Biuro",
     "garage": "Garaż",
@@ -238,7 +238,9 @@
     "imageUploadFailed": "Przesyłanie obrazów nie powiodło się — spróbuj ponownie",
     "updateFailed": "Aktualizacja nie powiodła się — spróbuj ponownie",
     "oauthFailed": "Logowanie przez dostawcę nie powiodło się — spróbuj ponownie",
-    "invalidCode": "Kod jest nieprawidłowy lub wygasł"
+    "invalidCode": "Kod jest nieprawidłowy lub wygasł",
+    "videoInvalidType": "Dozwolone są tylko filmy MP4 lub MOV",
+    "videoTooLarge": "Wideo jest za duże (maks. {{max}} MB)"
   },
   "agentDashboard": {
     "title": "Panel Agenta",
@@ -333,7 +335,11 @@
     },
     "valueOutOfRange": "Wartość musi być między {{min}} a {{max}}.",
     "draftRestored": "Przywrócono szkic — kontynuuj od miejsca, w którym skończyłeś. Zdjęcia trzeba dodać ponownie.",
-    "discardDraft": "Zacznij od nowa"
+    "discardDraft": "Zacznij od nowa",
+    "pinLocation": "Zaznacz lokalizację",
+    "mapHint": "Dotknij mapy, aby ustawić pinezkę (lub przeciągnij ją)",
+    "videoUpload": "Wideo nieruchomości",
+    "dropVideo": "Przeciągnij wideo tutaj lub kliknij (MP4 lub MOV)"
   },
   "dashboard": {
     "title": "Dashboard nieruchomości",
@@ -430,7 +436,8 @@
     "translateAll": "Przetłumacz na wszystkie języki",
     "translating": "Tłumaczenie…",
     "translated": "Przetłumaczono — sprawdź każdy język.",
-    "translateFirst": "Najpierw napisz tytuł i opis po albańsku"
+    "translateFirst": "Najpierw napisz tytuł i opis po albańsku",
+    "generateTitle": "Generuj z AI"
   },
   "assistant": {
     "title": "Asystent ogłoszenia",

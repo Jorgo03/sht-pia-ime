@@ -32,7 +32,14 @@ export default function Header() {
   const langRef = useRef(null)
   const accountRef = useRef(null)
   const bellRef = useRef(null)
-  const upcoming = useUpcomingViewings()
+  const { viewings: upcoming, unreadCount, markAsRead } = useUpcomingViewings()
+
+  // Opening the dropdown clears the badge immediately (item 10).
+  const toggleBell = () => {
+    const next = !bellOpen
+    setBellOpen(next)
+    if (next) markAsRead()
+  }
 
   const currentLang = LANGUAGES.find(l => l.code === i18n.language) || LANGUAGES[0]
 
@@ -86,11 +93,11 @@ export default function Header() {
         </div>
         {user && (
           <div className="account-switcher" ref={bellRef}>
-            <button className="theme-btn" style={{ position: 'relative' }} onClick={() => setBellOpen(!bellOpen)} aria-label={t('bell.label')}>
+            <button className="theme-btn" style={{ position: 'relative' }} onClick={toggleBell} aria-label={t('bell.label')}>
               <Bell size={18} />
-              {upcoming.length > 0 && (
+              {unreadCount > 0 && (
                 <span style={{ position: 'absolute', top: 2, right: 2, minWidth: 15, height: 15, borderRadius: 8, background: 'var(--fho-orange-1)', color: '#fff', fontSize: 9, fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 3px' }}>
-                  {upcoming.length}
+                  {unreadCount > 9 ? '9+' : unreadCount}
                 </span>
               )}
             </button>

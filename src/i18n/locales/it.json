@@ -98,7 +98,7 @@
     "apartment": "Appartamento",
     "villa": "Villa",
     "house": "Casa",
-    "commercial": "Ufficio",
+    "commercial": "Locale commerciale",
     "land": "Terreno",
     "office": "Ufficio",
     "garage": "Garage",
@@ -234,7 +234,9 @@
     "imageUploadFailed": "Caricamento immagini non riuscito — riprova",
     "updateFailed": "Aggiornamento non riuscito — riprova",
     "oauthFailed": "Accesso con il provider non riuscito — riprova",
-    "invalidCode": "Il codice è errato o scaduto"
+    "invalidCode": "Il codice è errato o scaduto",
+    "videoInvalidType": "Sono consentiti solo video MP4 o MOV",
+    "videoTooLarge": "Video troppo grande (max {{max}} MB)"
   },
   "agentDashboard": {
     "title": "Dashboard Agente",
@@ -329,7 +331,11 @@
     },
     "valueOutOfRange": "Il valore deve essere compreso tra {{min}} e {{max}}.",
     "draftRestored": "Bozza ripristinata — continua da dove eri. Le foto vanno riaggiunte.",
-    "discardDraft": "Ricomincia da capo"
+    "discardDraft": "Ricomincia da capo",
+    "pinLocation": "Posiziona il segnaposto",
+    "mapHint": "Tocca la mappa per posizionare il segnaposto (o trascinalo)",
+    "videoUpload": "Video dell’immobile",
+    "dropVideo": "Trascina un video qui o clicca (MP4 o MOV)"
   },
   "dashboard": {
     "title": "Dashboard immobile",
@@ -426,7 +432,8 @@
     "translateAll": "Traduci in tutte le lingue",
     "translating": "Traduzione…",
     "translated": "Tradotto — controlla ogni lingua.",
-    "translateFirst": "Scrivi prima titolo e descrizione in albanese"
+    "translateFirst": "Scrivi prima titolo e descrizione in albanese",
+    "generateTitle": "Genera con IA"
   },
   "assistant": {
     "title": "Assistente dell'annuncio",

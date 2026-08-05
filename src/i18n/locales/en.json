@@ -152,7 +152,7 @@
     "apartment": "Apartment",
     "villa": "Villa",
     "house": "House",
-    "commercial": "Office",
+    "commercial": "Commercial space",
     "land": "Land",
     "office": "Office",
     "garage": "Garage",
@@ -279,7 +279,9 @@
     "imageUploadFailed": "Image upload failed — try again",
     "updateFailed": "Update failed — try again",
     "oauthFailed": "Sign-in with the provider failed — try again",
-    "invalidCode": "The code is wrong or has expired"
+    "invalidCode": "The code is wrong or has expired",
+    "videoInvalidType": "Only MP4 or MOV videos are allowed",
+    "videoTooLarge": "Video is too large (max {{max}} MB)"
   },
   "agentDashboard": {
     "title": "Agent Dashboard",
@@ -381,7 +383,11 @@
     },
     "valueOutOfRange": "Value must be between {{min}} and {{max}}.",
     "draftRestored": "Draft restored — continue where you left off. Photos need re-adding.",
-    "discardDraft": "Start fresh"
+    "discardDraft": "Start fresh",
+    "pinLocation": "Pin the location",
+    "mapHint": "Tap the map to drop a pin (or drag it)",
+    "videoUpload": "Property video",
+    "dropVideo": "Drag a video here or click (MP4 or MOV)"
   },
   "dashboard": {
     "title": "Property Dashboard",
@@ -426,7 +432,8 @@
     "translateAll": "Translate to all languages",
     "translating": "Translating…",
     "translated": "Translated — check each language tab.",
-    "translateFirst": "Write the Albanian title and description first"
+    "translateFirst": "Write the Albanian title and description first",
+    "generateTitle": "Generate with AI"
   },
   "assistant": {
     "title": "Listing assistant",

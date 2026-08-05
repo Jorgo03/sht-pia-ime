@@ -183,7 +183,7 @@ export default function Search() {
             <div className="filter-section">
               <label className="filter-label">{t('search.listingType')}</label>
               <div className="segment-control">
-                {['', 'sale', 'rent', 'daily_rent'].map(lt => (
+                {['', 'sale', 'rent'].map(lt => (
                   <button key={lt} className={`segment ${listingType === lt ? 'active' : ''}`} onClick={() => updateFilter('listing', lt)}>
                     {lt === '' ? t('common.all') : t(`listing.type.${lt}`)}
                   </button>

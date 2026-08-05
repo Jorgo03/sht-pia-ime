@@ -1,13 +1,27 @@
 import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { ArrowLeft, ArrowRight, Upload, X } from 'lucide-react'
+import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet'
+import { ArrowLeft, ArrowRight, Upload, X, Film, Sparkles, Loader2 } from 'lucide-react'
 import { useAuth } from '../../auth/AuthContext'
 import { supabase } from '../../../lib/supabase'
 import { isEnabled } from '../../../lib/flags'
+import { generateListing } from '../../../lib/ai'
+import { getMarkerIcon } from '../../properties/components/MapMarker'
 import AiListingPanel from '../components/AiListingPanel'
 import { AutoTranslateButton } from '../components/AutoTranslateButton'
+import '../../../styles/map.css'
 import '../../../styles/new-listing.css'
+
+const TIRANA_CENTER = [41.3275, 19.8187]
+
+// Bridges Leaflet's imperative click events into the pin state.
+function MapClickPicker({ onPick }) {
+  useMapEvents({
+    click(e) { onPick(e.latlng) },
+  })
+  return null
+}
 
 function compressImage(file, maxWidth = 1600, quality = 0.8) {
   return new Promise((resolve) => {
@@ -40,7 +54,9 @@ function mergeTranslations(existing, translated) {
 
 const STEPS = ['basics', 'location', 'details', 'media', 'publish']
 const PROPERTY_TYPES = ['apartment', 'villa', 'house', 'land', 'commercial', 'office', 'garage']
-const LISTING_TYPES = ['sale', 'rent', 'daily_rent']
+// daily_rent removed from creation (owner decision 2026-07-14); display
+// helpers in lib/format keep supporting it in case legacy rows ever exist.
+const LISTING_TYPES = ['sale', 'rent']
 const CITIES = ['Tiranë', 'Durrës', 'Vlorë', 'Shkodër', 'Elbasan', 'Korçë', 'Fier', 'Berat', 'Lushnjë', 'Pogradec', 'Kavajë', 'Gjirokastër', 'Sarandë']
 const FEATURES_LIST = ['balcony', 'parking', 'elevator', 'garden', 'pool', 'furnished', 'airConditioning', 'heating', 'security', 'storage']
 const LANGS = ['sq', 'en', 'de', 'it', 'es', 'pl', 'ru', 'fr']
@@ -62,6 +78,10 @@ const MAX_YEAR = new Date().getFullYear() + 2
 // hint — anything can be dropped in. Enforce type + size before upload.
 const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/avif', 'image/gif']
 const MAX_IMAGE_MB = 10
+
+// Video: MP4/MOV only, capped at Supabase's default per-object limit.
+const ALLOWED_VIDEO_TYPES = ['video/mp4', 'video/quicktime']
+const MAX_VIDEO_MB = 50
 
 function outOfRange(raw, min, max) {
   if (raw === '' || raw == null) return false
@@ -123,6 +143,7 @@ export default function NewListing() {
   const { user } = useAuth()
   const navigate = useNavigate()
   const fileInputRef = useRef(null)
+  const videoInputRef = useRef(null)
 
   const [draft] = useState(loadDraft)
   const [step, setStep] = useState(draft?.step ?? 0)
@@ -135,6 +156,10 @@ export default function NewListing() {
   const [form, setForm] = useState(draft?.form ? { ...INITIAL_FORM, ...draft.form } : INITIAL_FORM)
 
   const [images, setImages] = useState([])
+  // Native video upload (replaces the old YouTube-URL text field). Like the
+  // photos, a File can't be draft-persisted — re-added after a restore.
+  const [video, setVideo] = useState(null)
+  const [aiTitleBusy, setAiTitleBusy] = useState(false)
 
   // Persist progress on every change; cleared on successful submit/discard.
   useEffect(() => {
@@ -197,6 +222,65 @@ export default function NewListing() {
       URL.revokeObjectURL(prev[idx].preview)
       return prev.filter((_, i) => i !== idx)
     })
+  }
+
+  // One video max; accepts from either the picker or a drag-drop. The
+  // accept= attribute is only a picker hint, so type/size are enforced here.
+  const handleVideo = (file) => {
+    if (!file) return
+    if (!ALLOWED_VIDEO_TYPES.includes(file.type)) {
+      setErrors(prev => ({ ...prev, video: t('errors.videoInvalidType') }))
+      return
+    }
+    if (file.size > MAX_VIDEO_MB * 1024 * 1024) {
+      setErrors(prev => ({ ...prev, video: t('errors.videoTooLarge', { max: MAX_VIDEO_MB }) }))
+      return
+    }
+    setErrors(prev => ({ ...prev, video: undefined }))
+    setVideo(prev => {
+      if (prev) URL.revokeObjectURL(prev.preview)
+      return { file, preview: URL.createObjectURL(file) }
+    })
+  }
+
+  const removeVideo = () => {
+    setVideo(prev => {
+      if (prev) URL.revokeObjectURL(prev.preview)
+      return null
+    })
+  }
+
+  // Item 1: title-only AI generation — reuses the existing
+  // ai-generate-listing Edge Function (same grounding/rate limits as the
+  // full panel) and applies just the title, leaving the description alone.
+  const handleAiTitle = async () => {
+    if (aiTitleBusy) return
+    setAiTitleBusy(true)
+    setErrors(prev => ({ ...prev, title: undefined }))
+    try {
+      const result = await generateListing({
+        listing_type: form.listing_type,
+        property_type: form.property_type,
+        city: form.city,
+        address: form.address,
+        price: form.price,
+        currency: form.currency,
+        sqft: form.sqft,
+        beds: form.beds,
+        baths: form.baths,
+        features: form.features,
+        notes: form.description_i18n.sq || '',
+      }, 'sq')
+      updateI18n('title_i18n', 'sq', result.title)
+      setTitleLang('sq')
+    } catch (err) {
+      setErrors(prev => ({
+        ...prev,
+        title: err?.code === 'rate_limited' ? t('ai.errorRateLimited') : t('ai.errorUnavailable'),
+      }))
+    } finally {
+      setAiTitleBusy(false)
+    }
   }
 
   const validate = () => {
@@ -264,6 +348,21 @@ export default function NewListing() {
       const { urls: imageUrls, paths } = await uploadImages()
       uploadedPaths = paths
 
+      // Video rides the same all-or-nothing rule as the photos: a failed
+      // upload aborts the submit and removes everything already uploaded.
+      let videoUrl = null
+      if (video) {
+        const ext = video.file.name.split('.').pop()
+        const path = `${user.id}/video-${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
+        const { error: vErr } = await supabase.storage.from('property-images').upload(path, video.file)
+        if (vErr) {
+          if (uploadedPaths.length) await supabase.storage.from('property-images').remove(uploadedPaths).catch(() => {})
+          throw Object.assign(new Error('upload_failed'), { uploadFailed: true })
+        }
+        uploadedPaths.push(path)
+        videoUrl = supabase.storage.from('property-images').getPublicUrl(path).data.publicUrl
+      }
+
       const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single()
 
       const { error } = await supabase.from('properties').insert({
@@ -289,7 +388,7 @@ export default function NewListing() {
         total_floors: form.total_floors ? Number(form.total_floors) : null,
         year_built: form.year_built ? Number(form.year_built) : null,
         features: form.features,
-        video_url: form.video_url?.trim() || null,
+        video_url: videoUrl,
         image_urls: imageUrls,
         contact_phone: form.contact_phone,
         whatsapp_enabled: form.whatsapp_enabled,
@@ -383,7 +482,21 @@ export default function NewListing() {
               </select>
             </div>
             <div className="nl-field">
-              <label>{t('listing.title')}</label>
+              <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+                {t('listing.title')}
+                {isEnabled('aiListingGenerator') && (
+                  <button
+                    type="button"
+                    className="ai-panel__btn"
+                    style={{ padding: '5px 10px', fontSize: 12 }}
+                    onClick={handleAiTitle}
+                    disabled={aiTitleBusy}
+                  >
+                    {aiTitleBusy ? <Loader2 size={13} className="animate-spin" /> : <Sparkles size={13} />}
+                    {aiTitleBusy ? t('ai.generating') : t('ai.generateTitle')}
+                  </button>
+                )}
+              </label>
               <div className="nl-lang-tabs">
                 {LANGS.map(l => (
                   <button key={l} className={`nl-lang-tab ${titleLang === l ? 'active' : ''}`} onClick={() => setTitleLang(l)}>{l.toUpperCase()}</button>
@@ -440,6 +553,45 @@ export default function NewListing() {
             <div className="nl-field">
               <label>{t('listing.address')}</label>
               <input type="text" value={form.address} onChange={e => update('address', e.target.value)} placeholder={t('listing.addressPlaceholder')} />
+            </div>
+            <div className="nl-field">
+              <label>{t('listing.pinLocation')}</label>
+              <div className="map-wrapper" style={{ height: 260 }}>
+                <MapContainer
+                  center={form.latitude != null && form.longitude != null ? [form.latitude, form.longitude] : TIRANA_CENTER}
+                  zoom={form.latitude != null ? 15 : 12}
+                  scrollWheelZoom={false}
+                  style={{ height: '100%', width: '100%' }}
+                >
+                  <TileLayer
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                  />
+                  <MapClickPicker onPick={({ lat, lng }) => {
+                    update('latitude', Number(lat.toFixed(6)))
+                    update('longitude', Number(lng.toFixed(6)))
+                  }} />
+                  {form.latitude != null && form.longitude != null && (
+                    <Marker
+                      position={[form.latitude, form.longitude]}
+                      icon={getMarkerIcon(form.listing_type)}
+                      draggable
+                      eventHandlers={{
+                        dragend: (e) => {
+                          const { lat, lng } = e.target.getLatLng()
+                          update('latitude', Number(lat.toFixed(6)))
+                          update('longitude', Number(lng.toFixed(6)))
+                        },
+                      }}
+                    />
+                  )}
+                </MapContainer>
+              </div>
+              <span style={{ fontSize: 12, color: 'var(--fho-text-muted)' }}>
+                {form.latitude != null && form.longitude != null
+                  ? `${form.latitude}, ${form.longitude}`
+                  : t('listing.mapHint')}
+              </span>
             </div>
           </>
         )}
@@ -532,8 +684,30 @@ export default function NewListing() {
               </div>
             )}
             <div className="nl-field">
-              <label>{t('listing.videoUrl')}</label>
-              <input type="url" value={form.video_url || ''} onChange={e => update('video_url', e.target.value)} placeholder="https://youtube.com/..." />
+              <label>{t('listing.videoUpload')}</label>
+              {video ? (
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 14px', border: '1px solid var(--fho-border)', borderRadius: 'var(--r-md)', background: 'var(--fho-surface-2)' }}>
+                  <Film size={18} style={{ color: 'var(--fho-orange-1)', flexShrink: 0 }} />
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--fho-text)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{video.file.name}</div>
+                    <div style={{ fontSize: 11, color: 'var(--fho-text-muted)' }}>{(video.file.size / (1024 * 1024)).toFixed(1)} MB</div>
+                  </div>
+                  <button className="nl-image-remove" style={{ position: 'static' }} onClick={removeVideo} aria-label={t('common.close')}><X size={12} /></button>
+                </div>
+              ) : (
+                <div
+                  className="nl-upload-zone"
+                  style={{ padding: 20 }}
+                  onClick={() => videoInputRef.current?.click()}
+                  onDragOver={e => e.preventDefault()}
+                  onDrop={e => { e.preventDefault(); handleVideo(e.dataTransfer.files?.[0]) }}
+                >
+                  <Film size={22} />
+                  <div style={{ fontSize: 12 }}>{t('listing.dropVideo')}</div>
+                </div>
+              )}
+              <input ref={videoInputRef} type="file" accept="video/mp4, video/quicktime" hidden onChange={e => { handleVideo(e.target.files?.[0]); e.target.value = '' }} />
+              {errors.video && <span className="nl-error">{errors.video}</span>}
             </div>
           </>
         )}
@@ -553,7 +727,7 @@ export default function NewListing() {
             </div>
             <div className="nl-field">
               <label>{t('listing.email')}</label>
-              <input type="email" value={form.contact_email} onChange={e => update('contact_email', e.target.value)} placeholder={user?.email || ''} />
+              <input type="email" value={form.contact_email} onChange={e => update('contact_email', e.target.value)} placeholder="john.doe@gmail.com" />
             </div>
             {errors.submit && <div className="nl-error" style={{ marginBottom: 12 }}>{errors.submit}</div>}
           </>
