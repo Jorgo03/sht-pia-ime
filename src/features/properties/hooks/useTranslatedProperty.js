@@ -59,24 +59,32 @@ export function useTranslatedProperty(property, language) {
     setTranslating(true)
     setIsTranslated(false)
 
-    const texts = [origTitle, origDesc].filter(Boolean)
-    if (texts.length === 0) {
+    if (!origTitle && !origDesc) {
       setTranslating(false)
       return
     }
 
-    supabase.functions.invoke('translate-description', {
-      body: { texts, targetLang: language },
-    }).then(({ data, error }) => {
+    // translate-property takes ONE string and returns it in all 8 supported
+    // languages ({ sq, en, de, ... }) — not a batch-of-texts-to-one-target
+    // API. Title and description each need their own call; we keep only the
+    // language actually being viewed and let the rest of the response go
+    // unused. Matches how AutoTranslateButton already calls this function.
+    Promise.all([
+      origTitle
+        ? supabase.functions.invoke('translate-property', { body: { text: origTitle, source: 'sq' } })
+        : Promise.resolve({ data: {}, error: null }),
+      origDesc
+        ? supabase.functions.invoke('translate-property', { body: { text: origDesc, source: 'sq' } })
+        : Promise.resolve({ data: {}, error: null }),
+    ]).then(([titleRes, descRes]) => {
       if (!activeRef.current) return
-      if (error || !data?.translations) {
+      if (titleRes.error || descRes.error) {
         setTranslating(false)
         return
       }
 
-      const t = data.translations
-      const translatedTitle = origTitle ? (t[0] || origTitle) : ''
-      const translatedDesc = origDesc ? (t[origTitle ? 1 : 0] || origDesc) : ''
+      const translatedTitle = origTitle ? (titleRes.data?.[language] || origTitle) : ''
+      const translatedDesc = origDesc ? (descRes.data?.[language] || origDesc) : ''
 
       cache[key] = { title: translatedTitle, description: translatedDesc }
       setTitle(translatedTitle)
