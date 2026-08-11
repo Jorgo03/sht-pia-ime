@@ -98,7 +98,12 @@ Deno.serve(async (req) => {
       },
       body: JSON.stringify({
         model: MODEL,
-        max_tokens: 1024,
+        // Sonnet 5 runs adaptive thinking by default (Sonnet 4.6 did not), and
+        // max_tokens caps thinking + output together. This is a forced
+        // tool_choice extraction, so thinking buys nothing and only risks
+        // eating the budget before the tool_use block is emitted.
+        thinking: { type: 'disabled' },
+        max_tokens: 2000,
         system:
           `You are an expert real-estate copywriter for Shtëpia.ime, an Albanian property marketplace. ` +
           `Write in ${langName}. Use ONLY the facts provided — never invent amenities, measurements, ` +
@@ -132,13 +137,25 @@ Deno.serve(async (req) => {
     });
 
     if (!r.ok) {
+      // The body can echo account details, so it goes to the log only. The
+      // response carries just the status code — enough to tell auth (401)
+      // from billing (400) from an upstream rate limit (429).
       console.error('Anthropic error', r.status, await r.text());
-      return json({ error: 'ai_unavailable' }, 503);
+      return json({ error: 'ai_unavailable', upstream_status: r.status }, 503);
     }
 
     const data = await r.json();
     const toolUse = data.content?.find((b: { type: string }) => b.type === 'tool_use');
-    if (!toolUse?.input?.title) return json({ error: 'ai_unavailable' }, 503);
+    if (!toolUse?.input?.title) {
+      // 200 from Anthropic but no tool call — previously indistinguishable
+      // from an upstream rejection. stop_reason 'max_tokens' here means the
+      // budget ran out before the tool block was emitted.
+      console.error('No tool_use block', data.stop_reason, JSON.stringify(data.usage));
+      return json(
+        { error: 'ai_unavailable', upstream_status: 200, stop_reason: data.stop_reason ?? null },
+        503,
+      );
+    }
 
     return json({
       title: String(toolUse.input.title).slice(0, 120),
