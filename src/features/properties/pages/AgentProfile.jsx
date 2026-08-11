@@ -19,7 +19,11 @@ export default function AgentProfile() {
     setLoading(true)
 
     Promise.all([
-      supabase.from('profiles').select('*').eq('id', id).single(),
+      // Matches the anon SELECT grant on profiles exactly (see the
+      // grant_anon_public_agent_profile_read migration) — this page is
+      // reachable while logged out, and select('*') would reference columns
+      // anon isn't granted (bio, role, ...), failing the whole query.
+      supabase.from('profiles').select('id, full_name, phone, agency_name, avatar_url').eq('id', id).single(),
       supabase.from('properties').select('*').eq('agent_id', id).eq('status', 'active').order('created_at', { ascending: false }),
     ]).then(([profileRes, propsRes]) => {
       if (!active) return

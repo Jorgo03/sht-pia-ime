@@ -47,10 +47,69 @@
   }
 }
 
+/* Leaflet positions .leaflet-container but leaves it at z-index:auto, so it
+   creates no stacking context and its children escape into the root one —
+   panes at 400, controls at 1000 — painting over .liquid-nav (z-index:50).
+   Giving the container a z-index creates the stacking context, scoping those
+   values to the map. Unscoped on purpose: this is Leaflet's behaviour, not
+   .map-wrapper's, so any future map mount is covered too. */
+.leaflet-container {
+  z-index: 0;
+}
+
 .map-wrapper .leaflet-container {
   height: 100%;
   width: 100%;
   background: var(--fho-bg);
+}
+
+/* Leaflet's default marker shadow/border don't apply to divIcons, and the
+   wrapper itself carries no size (see getPriceMarkerIcon) — reset both so
+   only .price-marker's own box is visible. */
+.price-marker-icon {
+  background: transparent;
+  border: none;
+}
+
+.price-marker {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  padding: 4px 9px;
+  border-radius: var(--r-pill);
+  border: 1.5px solid #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  color: #fff;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
+  text-shadow: 0 1px 1px rgba(0,0,0,0.25);
+  cursor: pointer;
+}
+
+.county-marker-icon {
+  background: transparent;
+  border: none;
+}
+
+.county-marker {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  background: var(--fho-orange-1);
+  box-shadow: 0 3px 10px rgba(0,0,0,0.35);
+  color: #fff;
+  font-family: var(--font-sans);
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
 }
 
 .map-popup {

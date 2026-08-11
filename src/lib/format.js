@@ -31,6 +31,17 @@ export function formatPrice(n, lang = 'sq', currency = 'EUR') {
   }).format(num)
 }
 
+// Compact price for a map marker: 200000 -> "€200K", 1250000 -> "€1.3M".
+export function formatCompactPrice(n) {
+  const num = Number(n) || 0
+  if (num >= 1_000_000) {
+    const millions = num / 1_000_000
+    return `€${millions % 1 === 0 ? millions : millions.toFixed(1)}M`
+  }
+  if (num >= 1_000) return `€${Math.round(num / 1_000)}K`
+  return `€${num}`
+}
+
 // i18n key for a listing-type badge / price suffix — the only place that
 // knows all three listing types, so daily_rent can't fall through to "For
 // Sale" again. Suffix is null for sales (no suffix).

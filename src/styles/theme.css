@@ -12,6 +12,10 @@
   --fho-text-muted:   rgba(26,23,20,0.55);
   --fho-text-faint:   rgba(26,23,20,0.4);
   --fho-text-on-dark: #faf6ef;
+  /* Mirror of --fho-text-on-dark: for chips that stay light in BOTH themes
+     (e.g. buttons floating over a photo). Deliberately not overridden in the
+     dark block — using --fho-text here renders invisible in dark mode. */
+  --fho-text-on-light: #1a1714;
 
   --fho-border:        rgba(26,23,20,0.08);
   --fho-border-strong: rgba(26,23,20,0.16);

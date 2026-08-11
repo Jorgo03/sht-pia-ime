@@ -136,7 +136,14 @@
       "newest": "Più recenti",
       "price_asc": "Prezzo ↑",
       "price_desc": "Prezzo ↓"
-    }
+    },
+    "typology": "Tipologia",
+    "bathrooms": "Bagni",
+    "anyBaths": "Qualsiasi",
+    "surface": "Superficie",
+    "minArea": "Sup. min",
+    "maxArea": "Sup. max",
+    "rangeInvalid": "Il minimo deve essere inferiore al massimo"
   },
   "favourites": {
     "title": "Preferiti",
@@ -333,7 +340,7 @@
     "draftRestored": "Bozza ripristinata — continua da dove eri. Le foto vanno riaggiunte.",
     "discardDraft": "Ricomincia da capo",
     "pinLocation": "Posiziona il segnaposto",
-    "mapHint": "Tocca la mappa per posizionare il segnaposto (o trascinalo)",
+    "mapHint": "Tocca la mappa per impostare la posizione",
     "videoUpload": "Video dell’immobile",
     "dropVideo": "Trascina un video qui o clicca (MP4 o MOV)"
   },
@@ -433,7 +440,8 @@
     "translating": "Traduzione…",
     "translated": "Tradotto — controlla ogni lingua.",
     "translateFirst": "Scrivi prima titolo e descrizione in albanese",
-    "generateTitle": "Genera con IA"
+    "generateTitle": "Genera con IA",
+    "titleNeedsFields": "Inserisci tipologia e città per generare un titolo"
   },
   "assistant": {
     "title": "Assistente dell'annuncio",

@@ -136,7 +136,14 @@
       "newest": "Neueste",
       "price_asc": "Preis ↑",
       "price_desc": "Preis ↓"
-    }
+    },
+    "typology": "Immobilientyp",
+    "bathrooms": "Badezimmer",
+    "anyBaths": "Beliebig",
+    "surface": "Wohnfläche",
+    "minArea": "Fläche min",
+    "maxArea": "Fläche max",
+    "rangeInvalid": "Der Mindestwert muss kleiner als der Höchstwert sein"
   },
   "favourites": {
     "title": "Favoriten",
@@ -333,7 +340,7 @@
     "draftRestored": "Entwurf wiederhergestellt — mach weiter, wo du warst. Fotos bitte erneut hinzufügen.",
     "discardDraft": "Neu beginnen",
     "pinLocation": "Standort auf der Karte setzen",
-    "mapHint": "Tippe auf die Karte, um einen Pin zu setzen (oder ziehe ihn)",
+    "mapHint": "Tippe auf die Karte, um den Standort festzulegen",
     "videoUpload": "Objektvideo",
     "dropVideo": "Video hierher ziehen oder klicken (MP4 oder MOV)"
   },
@@ -433,7 +440,8 @@
     "translating": "Übersetzt…",
     "translated": "Übersetzt — prüfe jede Sprache.",
     "translateFirst": "Schreibe zuerst Titel und Beschreibung auf Albanisch",
-    "generateTitle": "Mit KI erstellen"
+    "generateTitle": "Mit KI erstellen",
+    "titleNeedsFields": "Immobilientyp und Stadt angeben, um einen Titel zu generieren"
   },
   "assistant": {
     "title": "Inserats-Assistent",

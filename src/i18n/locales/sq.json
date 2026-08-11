@@ -136,7 +136,14 @@
       "newest": "Më të rejat",
       "price_asc": "Çmimi ↑",
       "price_desc": "Çmimi ↓"
-    }
+    },
+    "typology": "Tipologjia",
+    "bathrooms": "Tualete",
+    "anyBaths": "Çdo numër",
+    "surface": "Sipërfaqja",
+    "minArea": "Sip min",
+    "maxArea": "Sip max",
+    "rangeInvalid": "Vlera minimale duhet të jetë më e vogël se maksimalja"
   },
   "favourites": {
     "title": "Të preferuarat",
@@ -385,7 +392,7 @@
     "draftRestored": "Drafti u rikthye — vazhdo aty ku e le. Fotot duhen shtuar sërish.",
     "discardDraft": "Fillo nga e para",
     "pinLocation": "Vendos pikën në hartë",
-    "mapHint": "Prek hartën për të vendosur pikën (ose tërhiqe atë)",
+    "mapHint": "Prek hartën për të vendosur vendndodhjen e pronës",
     "videoUpload": "Video e pronës",
     "dropVideo": "Tërhiq një video këtu ose kliko (MP4 ose MOV)"
   },
@@ -433,7 +440,8 @@
     "translating": "Duke përkthyer…",
     "translated": "U përkthye — kontrollo çdo gjuhë.",
     "translateFirst": "Shkruaj fillimisht titullin dhe përshkrimin në shqip",
-    "generateTitle": "Gjenero me AI"
+    "generateTitle": "Gjenero me AI",
+    "titleNeedsFields": "Plotëso tipin dhe qytetin për të gjeneruar titullin"
   },
   "assistant": {
     "title": "Asistenti i shpalljes",

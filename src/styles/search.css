@@ -288,97 +288,6 @@
   box-shadow: var(--fho-cta-shadow);
 }
 
-/* Price display */
-
-.price-display {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 14px;
-}
-
-.price-val {
-  font-family: var(--font-serif);
-  font-size: 18px;
-  font-weight: 500;
-  color: var(--fho-text);
-}
-
-.price-sep {
-  color: var(--fho-text-faint);
-}
-
-/* Dual slider */
-
-.dual-slider {
-  position: relative;
-  height: 22px;
-  margin-bottom: 8px;
-}
-
-.dual-slider .slider-track {
-  position: absolute;
-  top: 9px;
-  left: 0;
-  right: 0;
-  height: 4px;
-  background: var(--fho-bg);
-  border-radius: 2px;
-  pointer-events: none;
-}
-
-.slider-fill {
-  position: absolute;
-  top: 0;
-  height: 100%;
-  background: linear-gradient(90deg, var(--fho-orange-1), var(--fho-orange-2));
-  border-radius: 2px;
-}
-
-input[type="range"].dual {
-  -webkit-appearance: none;
-  appearance: none;
-  background: transparent;
-  pointer-events: none;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 22px;
-  margin: 0;
-}
-
-input[type="range"].dual::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 22px;
-  height: 22px;
-  border-radius: 999px;
-  background: #fff;
-  border: 2px solid var(--fho-orange-1);
-  box-shadow: 0 4px 10px rgba(255,107,0,0.35);
-  cursor: grab;
-  pointer-events: auto;
-  margin-top: -9px;
-}
-
-input[type="range"].dual::-moz-range-thumb {
-  width: 22px;
-  height: 22px;
-  border-radius: 999px;
-  background: #fff;
-  border: 2px solid var(--fho-orange-1);
-  box-shadow: 0 4px 10px rgba(255,107,0,0.35);
-  cursor: grab;
-  pointer-events: auto;
-}
-
-input[type="range"].dual::-webkit-slider-runnable-track,
-input[type="range"].dual::-moz-range-track {
-  background: transparent;
-  height: 4px;
-}
-
 /* Bedroom / type chips */
 
 .bed-chips {
@@ -431,6 +340,172 @@ input[type="range"].dual::-moz-range-track {
   margin-top: 8px;
   font-size: 12px;
   color: var(--fho-orange-1);
+}
+
+/* ===== Tier 1 — collapsed inline filter bar ===== */
+
+/* Mobile keeps the existing "Filtrat" button + sheet; the bar would crowd a
+   narrow viewport with controls the sheet already provides. */
+.filter-bar { display: none; }
+
+@media (min-width: 768px) {
+  .filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 12px;
+    background: var(--fho-surface-2);
+    border: 1px solid var(--fho-border);
+    border-radius: var(--r-md);
+  }
+}
+
+.filter-bar__group {
+  display: flex;
+  flex: 1 1 auto;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.filter-bar__field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1 1 148px;
+  min-width: 0;
+  padding: 10px 12px;
+  border-left: 1px solid var(--fho-border);
+  color: var(--fho-orange-1);
+  cursor: pointer;
+}
+
+/* Only the very first field skips the divider — everything else keeps the
+   segmented look from the reference bar, including across a wrap. */
+.filter-bar__group:first-child .filter-bar__field:first-child { border-left: none; }
+
+.filter-bar__field:focus-within { background: var(--fho-orange-tint); }
+
+.filter-bar__field select,
+.filter-bar__field input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  color: var(--fho-text-muted);
+  font-size: 13px;
+  font-weight: 600;
+  font-family: var(--font-sans);
+  outline: none;
+  appearance: none;
+  cursor: pointer;
+}
+
+/* Muted while showing the field name, solid once it holds a real value. */
+.filter-bar__field select.has-value { color: var(--fho-text); }
+.filter-bar__field input { cursor: text; }
+.filter-bar__field input::placeholder { color: var(--fho-text-muted); font-weight: 600; }
+
+.filter-bar__field:has(select)::after {
+  content: '';
+  flex-shrink: 0;
+  border-left: 3.5px solid transparent;
+  border-right: 3.5px solid transparent;
+  border-top: 4px solid var(--fho-text-faint);
+}
+
+/* ===== Select + range inputs inside the expanded sheet ===== */
+
+.filter-select {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  background: var(--fho-surface-2);
+  border: 1px solid var(--fho-border);
+  border-radius: var(--r-md);
+  color: var(--fho-orange-1);
+  transition: border-color 150ms;
+}
+
+.filter-select:focus-within { border-color: var(--fho-orange-1); }
+
+.filter-select select {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  color: var(--fho-text);
+  font-size: 14px;
+  font-family: var(--font-sans);
+  outline: none;
+  cursor: pointer;
+}
+
+/* Sits directly under .filter-label, which already provides the gap. */
+.range-inputs {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.range-input {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  padding: 10px 12px;
+  background: var(--fho-surface-2);
+  border: 1px solid var(--fho-border);
+  border-radius: var(--r-md);
+  color: var(--fho-orange-1);
+  font-size: 13px;
+  transition: border-color 150ms;
+}
+
+.range-input:focus-within { border-color: var(--fho-orange-1); }
+
+.range-input input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  color: var(--fho-text);
+  font-size: 14px;
+  font-family: var(--font-sans);
+  outline: none;
+}
+
+.range-input input::placeholder { color: var(--fho-text-muted); }
+.range-unit { flex-shrink: 0; font-size: 12px; color: var(--fho-text-muted); }
+.range-dash { flex-shrink: 0; color: var(--fho-text-faint); }
+
+/* Spinners steal width from already-narrow fields and duplicate the slider. */
+.filter-bar__field input[type="number"]::-webkit-outer-spin-button,
+.filter-bar__field input[type="number"]::-webkit-inner-spin-button,
+.range-input input[type="number"]::-webkit-outer-spin-button,
+.range-input input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.filter-bar__field input[type="number"],
+.range-input input[type="number"] { -moz-appearance: textfield; }
+
+/* Native dropdowns render options with OS colors — pin them to the theme so
+   they stay readable in dark mode. */
+.filter-bar__field select option,
+.filter-select select option {
+  background: var(--fho-surface-2);
+  color: var(--fho-text);
+}
+
+.filter-warning {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  font-size: 12px;
+  color: #e74c3c;
 }
 
 }

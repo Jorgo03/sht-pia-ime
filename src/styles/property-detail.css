@@ -41,7 +41,9 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  color: var(--fho-text);
+  /* Chip is hardcoded light in both themes, so the icon must be too — see
+     .featured-card__heart for the same fix and the reasoning. */
+  color: var(--fho-text-on-light);
   box-shadow: 0 6px 14px -6px rgba(0,0,0,0.25);
   transition: transform 150ms var(--ease-out);
 }

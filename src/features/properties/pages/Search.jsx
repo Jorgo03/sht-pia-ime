@@ -1,17 +1,20 @@
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useEffect, useCallback } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Search as SearchIcon, SlidersHorizontal, LayoutGrid, Map as MapIcon, RotateCcw, SearchX, X, Sparkles } from 'lucide-react'
+import { Search as SearchIcon, SlidersHorizontal, LayoutGrid, Map as MapIcon, RotateCcw, SearchX, Sparkles, Maximize2, AlertCircle, MapPin } from 'lucide-react'
 import { parseSearchQuery } from '../../../lib/ai'
 import { isEnabled } from '../../../lib/flags'
 import PropertyCard from '../components/PropertyCard'
 import PropertyMap from '../components/PropertyMap'
+import FilterBar from '../components/FilterBar'
 import SkeletonCard from '../../../shared/SkeletonCard'
 import { useProperties } from '../hooks/useProperties'
+import LOCATIONS from '../data/locations'
+import {
+  PROPERTY_TYPES, BED_OPTIONS, BATH_OPTIONS,
+  PRICE_MIN, PRICE_STEP, AREA_MAX,
+} from '../data/filterOptions'
 import '../../../styles/search.css'
-
-const PROPERTY_TYPES = ['apartment', 'villa', 'house', 'land', 'office']
-const BED_OPTIONS = [null, 1, 2, 3, 4]
 
 function useDebounced(value, delay = 400) {
   const [debounced, setDebounced] = useState(value)
@@ -28,38 +31,62 @@ export default function Search() {
   const [aiParsing, setAiParsing] = useState(false)
   const [aiStatus, setAiStatus] = useState(null) // 'applied' | 'failed'
 
+  // URL search params are the single source of truth for every filter, so the
+  // collapsed bar and the expanded sheet read/write the same place — and a
+  // filtered search stays shareable and bookmarkable.
   const city = searchParams.get('city') || ''
   const minPrice = searchParams.get('minPrice') || ''
   const maxPrice = searchParams.get('maxPrice') || ''
   const propertyType = searchParams.get('type') || ''
   const listingType = searchParams.get('listing') || ''
   const beds = searchParams.get('beds') || ''
+  const baths = searchParams.get('baths') || ''
+  const minArea = searchParams.get('minArea') || ''
+  const maxArea = searchParams.get('maxArea') || ''
   const sort = searchParams.get('sort') || 'newest'
+  // TODO: id/referenca — not implemented yet; would read from searchParams here.
+  // TODO: zona — blocked on a `zone` column on properties (see useProperties).
 
   const debouncedMin = useDebounced(minPrice)
   const debouncedMax = useDebounced(maxPrice)
+  const debouncedMinArea = useDebounced(minArea)
+  const debouncedMaxArea = useDebounced(maxArea)
   const debouncedSearch = useDebounced(searchText)
+
+  // An inverted range is a typo in progress, not a query — hold the bound back
+  // until it makes sense again so the user isn't shown a misleading empty state.
+  const priceInvalid = Boolean(minPrice && maxPrice && Number(minPrice) > Number(maxPrice))
+  const areaInvalid = Boolean(minArea && maxArea && Number(minArea) > Number(maxArea))
 
   const queryMin = useMemo(() => debouncedMin ? Number(debouncedMin) : null, [debouncedMin])
   const queryMax = useMemo(() => debouncedMax ? Number(debouncedMax) : null, [debouncedMax])
+  const queryMinArea = useMemo(() => debouncedMinArea ? Number(debouncedMinArea) : null, [debouncedMinArea])
+  const queryMaxArea = useMemo(() => debouncedMaxArea ? Number(debouncedMaxArea) : null, [debouncedMaxArea])
 
-  const { properties, loading, loadingMore, hasMore, loadMore } = useProperties({
+  const rangesValid = !priceInvalid && !areaInvalid
+
+  const { properties, loading, loadingMore, hasMore, loadMore, totalCount } = useProperties({
     filter: propertyType || 'all',
     listingType: listingType || null,
     city: debouncedSearch || city || null,
-    minPrice: queryMin,
-    maxPrice: queryMax,
+    minPrice: rangesValid ? queryMin : null,
+    maxPrice: rangesValid ? queryMax : null,
     beds: beds ? Number(beds) : null,
+    baths: baths ? Number(baths) : null,
+    minArea: rangesValid ? queryMinArea : null,
+    maxArea: rangesValid ? queryMaxArea : null,
     paginate: true,
     sort,
   })
 
-  const updateFilter = (key, value) => {
-    const params = new URLSearchParams(searchParams)
-    if (value) params.set(key, value)
-    else params.delete(key)
-    setSearchParams(params, { replace: true })
-  }
+  const updateFilter = useCallback((key, value) => {
+    setSearchParams(prev => {
+      const params = new URLSearchParams(prev)
+      if (value) params.set(key, value)
+      else params.delete(key)
+      return params
+    }, { replace: true })
+  }, [setSearchParams])
 
   const resetFilters = () => { setSearchParams({}, { replace: true }); setSearchText(''); setAiStatus(null) }
 
@@ -83,7 +110,12 @@ export default function Search() {
     setAiStatus('applied')
     setTimeout(() => setAiStatus(null), 3000)
   }
-  const activeCount = [city, minPrice, maxPrice, propertyType, listingType, beds].filter(Boolean).length
+  const activeCount = [city, minPrice, maxPrice, propertyType, listingType, beds, baths, minArea, maxArea].filter(Boolean).length
+
+  const barValues = useMemo(
+    () => ({ type: propertyType, city, beds, baths, minPrice, maxPrice }),
+    [propertyType, city, beds, baths, minPrice, maxPrice],
+  )
 
   useEffect(() => {
     if (!filtersOpen) return
@@ -135,10 +167,19 @@ export default function Search() {
             {aiStatus === 'applied' ? t('search.aiApplied') : t('search.aiFailed')}
           </div>
         )}
+
+        {/* Tier 1 — inline bar, ≥768px only. Hidden on mobile by CSS, where the
+            "Filtrat" button above opens the same filters as a sheet. */}
+        <FilterBar values={barValues} onChange={updateFilter} />
+        {priceInvalid && (
+          <div className="filter-warning" role="alert">
+            <AlertCircle size={12} /> {t('search.rangeInvalid')}
+          </div>
+        )}
       </div>
 
       <div className="result-count">
-        <span><strong>{properties.length}</strong> {t('search.homesInView')}</span>
+        <span><strong>{totalCount}</strong> {t('search.homesInView')}</span>
         <span className="mono-eyebrow">{viewMode === 'map' ? t('search.mapView') : t('search.sortedByRelevance')}</span>
       </div>
 
@@ -179,6 +220,22 @@ export default function Search() {
               <button className="link-btn" onClick={resetFilters} style={{ color: 'var(--fho-orange-1)' }}>{t('search.reset')}</button>
             </div>
 
+            {/* City — also present in the inline bar, but the bar is hidden
+                below 768px, so mobile needs its own control here. */}
+            <div className="filter-section">
+              <label className="filter-label">{t('search.city')}</label>
+              <div className="filter-select">
+                <MapPin size={15} aria-hidden="true" />
+                <select value={city} onChange={e => updateFilter('city', e.target.value)} aria-label={t('search.city')}>
+                  <option value="">{t('search.anyCity')}</option>
+                  {LOCATIONS.map(l => <option key={l.city} value={l.city}>{l.city}</option>)}
+                </select>
+              </div>
+              {/* TODO: Zona select goes directly below Qyteti, options from
+                  LOCATIONS.find(l => l.city === city).zones — blocked on a
+                  `zone` column on properties. */}
+            </div>
+
             {/* Listing type */}
             <div className="filter-section">
               <label className="filter-label">{t('search.listingType')}</label>
@@ -194,18 +251,41 @@ export default function Search() {
             {/* Price range */}
             <div className="filter-section">
               <label className="filter-label">{t('search.priceRange')}</label>
-              <div className="price-display">
-                <span className="price-val">€{minPrice || '50,000'}</span>
-                <span className="price-sep">—</span>
-                <span className="price-val">€{maxPrice || '800,000'}</span>
+              {/* Open-ended by design: an empty max means no upper bound, so
+                  the filter covers €{PRICE_MIN} upward with no ceiling. */}
+              <div className="range-inputs">
+                <label className="range-input">
+                  <span>€</span>
+                  <input type="number" inputMode="numeric" min={PRICE_MIN} step={PRICE_STEP} placeholder={t('search.minPrice')} value={minPrice} onChange={e => updateFilter('minPrice', e.target.value)} aria-label={t('search.minPrice')} />
+                </label>
+                <span className="range-dash">—</span>
+                <label className="range-input">
+                  <span>€</span>
+                  <input type="number" inputMode="numeric" min={PRICE_MIN} step={PRICE_STEP} placeholder={t('search.maxPrice')} value={maxPrice} onChange={e => updateFilter('maxPrice', e.target.value)} aria-label={t('search.maxPrice')} />
+                </label>
               </div>
-              <div className="dual-slider">
-                <input type="range" className="dual" min="50000" max="800000" step="10000" value={minPrice || 50000} onChange={e => updateFilter('minPrice', e.target.value)} />
-                <input type="range" className="dual" min="50000" max="800000" step="10000" value={maxPrice || 800000} onChange={e => updateFilter('maxPrice', e.target.value)} />
-                <div className="slider-track">
-                  <div className="slider-fill" style={{ left: `${((Number(minPrice || 50000) - 50000) / 750000) * 100}%`, right: `${100 - ((Number(maxPrice || 800000) - 50000) / 750000) * 100}%` }} />
-                </div>
+              {priceInvalid && <div className="filter-warning" role="alert"><AlertCircle size={12} /> {t('search.rangeInvalid')}</div>}
+            </div>
+
+            {/* Surface — no slider on purpose: the listing form permits up to
+                100,000 m², so any slider range wide enough to be correct would
+                be unusable at residential scale. */}
+            <div className="filter-section">
+              <label className="filter-label">{t('search.surface')}</label>
+              <div className="range-inputs">
+                <label className="range-input">
+                  <Maximize2 size={14} />
+                  <input type="number" inputMode="numeric" min="0" max={AREA_MAX} placeholder={t('search.minArea')} value={minArea} onChange={e => updateFilter('minArea', e.target.value)} aria-label={t('search.minArea')} />
+                  <span className="range-unit">m²</span>
+                </label>
+                <span className="range-dash">—</span>
+                <label className="range-input">
+                  <Maximize2 size={14} />
+                  <input type="number" inputMode="numeric" min="0" max={AREA_MAX} placeholder={t('search.maxArea')} value={maxArea} onChange={e => updateFilter('maxArea', e.target.value)} aria-label={t('search.maxArea')} />
+                  <span className="range-unit">m²</span>
+                </label>
               </div>
+              {areaInvalid && <div className="filter-warning" role="alert"><AlertCircle size={12} /> {t('search.rangeInvalid')}</div>}
             </div>
 
             {/* Bedrooms */}
@@ -216,6 +296,19 @@ export default function Search() {
                   <button key={b ?? 'any'} className={`bed-chip ${(beds === '' && b === null) || beds === String(b) ? 'active' : ''}`}
                     onClick={() => updateFilter('beds', b === null ? '' : String(b))}>
                     {b === null ? t('search.anyBeds') : b === 4 ? '4+' : b}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Bathrooms */}
+            <div className="filter-section">
+              <label className="filter-label">{t('search.bathrooms')}</label>
+              <div className="bed-chips">
+                {BATH_OPTIONS.map(b => (
+                  <button key={b ?? 'any'} className={`bed-chip ${(baths === '' && b === null) || baths === String(b) ? 'active' : ''}`}
+                    onClick={() => updateFilter('baths', b === null ? '' : String(b))}>
+                    {b === null ? t('search.anyBaths') : b === 4 ? '4+' : b}
                   </button>
                 ))}
               </div>
@@ -245,7 +338,7 @@ export default function Search() {
             </div>
 
             <button className="cta-pill" onClick={() => setFiltersOpen(false)}>
-              {t('search.showHomes', { count: properties.length })}
+              {t('search.showHomes', { count: totalCount })}
             </button>
           </div>
         </>

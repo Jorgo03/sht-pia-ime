@@ -43,16 +43,17 @@ export function AuthProvider({ children }) {
       pending = localStorage.getItem('fho_pending_role')
       if (pending) localStorage.removeItem('fho_pending_role')
     } catch { return profile }
-    if (pending !== 'agent' && pending !== 'client') return profile
+    if (pending !== 'agent' && pending !== 'buyer') return profile
     if (!profile || profile.role === pending) return profile
     const isNewAccount = user.created_at && Date.now() - new Date(user.created_at).getTime() < 5 * 60 * 1000
     if (!isNewAccount) return profile
-    const { data } = await supabase
-      .from('profiles')
-      .update({ role: pending })
-      .eq('id', user.id)
-      .select()
-      .single()
+    // OAuth can't carry the role picked before the provider redirect, so this
+    // is the one legitimate client-side role write — narrowed to a
+    // SECURITY DEFINER RPC (5-minute window, agent<->buyer only) rather than
+    // a raw column UPDATE, which any signed-in user could otherwise call on
+    // themselves to self-promote to agent.
+    const { data, error } = await supabase.rpc('claim_role', { new_role: pending })
+    if (error) return profile
     return data || profile
   }
 
@@ -116,7 +117,7 @@ export function AuthProvider({ children }) {
       password,
       options: {
         data: {
-          role: options.role ?? 'client',
+          role: options.role ?? 'buyer',
           full_name: options.full_name,
           agency_name: options.agency_name,
           preferred_language: i18n.language,
@@ -125,13 +126,16 @@ export function AuthProvider({ children }) {
       },
     })
     // The handle_new_user trigger persists role/agency_name from the metadata
-    // above. This update only succeeds when a session already exists (email
-    // confirmation disabled) and is kept as a safety net.
+    // above — role is NOT repeated here, since authenticated no longer holds
+    // UPDATE on that column (see restrict_profile_role_writes migration) and
+    // including it would fail this entire statement, silently dropping the
+    // full_name/agency_name update too. This only runs when a session already
+    // exists (email confirmation disabled) and is kept as a safety net for
+    // those two fields.
     if (!error && data?.user && data?.session) {
       await supabase
         .from('profiles')
         .update({
-          role: options.role ?? 'client',
           full_name: options.full_name || null,
           agency_name: options.role === 'agent' ? (options.agency_name || null) : null,
         })

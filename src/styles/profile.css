@@ -15,12 +15,22 @@
   flex-direction: column;
   justify-content: flex-end;
   min-height: calc(100vh - 62px);
-  padding: 20px 20px 22px;
+  /* .liquid-nav sits at bottom:18px, height:62px (z-index:50) — the card is
+     flex-end docked, so without this clearance its bottom (Sign Up link)
+     renders underneath the fixed nav pill instead of above it. 18+62=80px
+     clears the nav's footprint; +22px keeps the original bottom spacing. */
+  padding: 20px 20px 102px;
 }
 
 .auth-headline-block {
   margin-bottom: 20px;
   animation: fadeSlideUp 500ms var(--ease-out) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auth-headline-block, .auth-glass {
+    animation: none;
+  }
 }
 
 .auth-hero-headline {
@@ -40,9 +50,12 @@
   background: var(--fho-orange-soft);
 }
 
+/* Slide only, no opacity — critical sign-in text must stay legible even if
+   the animation never runs (throttled background tab, an extension forcing
+   animation:none, etc.), not just be a broken cosmetic detail. */
 @keyframes fadeSlideUp {
-  from { opacity: 0; transform: translateY(16px); }
-  to { opacity: 1; transform: translateY(0); }
+  from { transform: translateY(16px); }
+  to { transform: translateY(0); }
 }
 
 /* Glass form card */
@@ -60,9 +73,10 @@
   animation: cardRise 850ms 700ms var(--ease-out) both;
 }
 
+/* Slide only — see fadeSlideUp above for why opacity isn't animated here. */
 @keyframes cardRise {
-  from { opacity: 0; transform: translateY(40px); }
-  to { opacity: 1; transform: translateY(0); }
+  from { transform: translateY(40px); }
+  to { transform: translateY(0); }
 }
 
 /* Role toggle */

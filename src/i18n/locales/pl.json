@@ -140,7 +140,14 @@
       "newest": "Najnowsze",
       "price_asc": "Cena ↑",
       "price_desc": "Cena ↓"
-    }
+    },
+    "typology": "Typ nieruchomości",
+    "bathrooms": "Łazienki",
+    "anyBaths": "Dowolna",
+    "surface": "Powierzchnia",
+    "minArea": "Pow. min",
+    "maxArea": "Pow. maks",
+    "rangeInvalid": "Wartość minimalna musi być mniejsza niż maksymalna"
   },
   "favourites": {
     "title": "Ulubione",
@@ -337,7 +344,7 @@
     "draftRestored": "Przywrócono szkic — kontynuuj od miejsca, w którym skończyłeś. Zdjęcia trzeba dodać ponownie.",
     "discardDraft": "Zacznij od nowa",
     "pinLocation": "Zaznacz lokalizację",
-    "mapHint": "Dotknij mapy, aby ustawić pinezkę (lub przeciągnij ją)",
+    "mapHint": "Dotknij mapy, aby ustawić lokalizację",
     "videoUpload": "Wideo nieruchomości",
     "dropVideo": "Przeciągnij wideo tutaj lub kliknij (MP4 lub MOV)"
   },
@@ -437,7 +444,8 @@
     "translating": "Tłumaczenie…",
     "translated": "Przetłumaczono — sprawdź każdy język.",
     "translateFirst": "Najpierw napisz tytuł i opis po albańsku",
-    "generateTitle": "Generuj z AI"
+    "generateTitle": "Generuj z AI",
+    "titleNeedsFields": "Podaj typ nieruchomości i miasto, aby wygenerować tytuł"
   },
   "assistant": {
     "title": "Asystent ogłoszenia",

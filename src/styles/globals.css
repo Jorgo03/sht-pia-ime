@@ -10,6 +10,13 @@
   transition: background 0.3s;
 }
 
+/* .auth-screen fills the remaining viewport itself and already reserves its
+   own nav clearance (see .auth-content in profile.css) — this shell padding
+   would just stack a second, redundant block of flat background under it. */
+.app-shell:has(.auth-screen) {
+  padding-bottom: 0;
+}
+
 .page {
   padding: 1rem 1.25rem;
 }

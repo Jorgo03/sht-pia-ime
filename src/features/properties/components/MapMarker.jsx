@@ -1,4 +1,5 @@
 import L from 'leaflet'
+import { formatCompactPrice } from '../../../lib/format'
 
 const COLORS = {
   sale: '#FF7A40',
@@ -29,6 +30,53 @@ export function getMarkerIcon(listingType) {
     popupAnchor: [0, -36],
   })
   iconCache[color] = icon
+  return icon
+}
+
+const priceIconCache = {}
+
+/**
+ * A price bubble instead of a pin, so the map communicates price at a
+ * glance. iconSize/iconAnchor are [0,0] on purpose: the bubble's own width
+ * varies with label length ("€89K" vs "€1.2M"), so instead of measuring
+ * text we let Leaflet place a zero-size anchor exactly at the coordinate
+ * and use CSS (translate(-50%,-50%) in map.css) to center the bubble over
+ * it regardless of width.
+ */
+export function getPriceMarkerIcon(listingType, price) {
+  const color = COLORS[listingType] || COLORS.sale
+  const label = formatCompactPrice(price)
+  const key = `${color}:${label}`
+  if (priceIconCache[key]) return priceIconCache[key]
+
+  const icon = L.divIcon({
+    className: 'price-marker-icon',
+    html: `<div class="price-marker" style="background:${color}">${label}</div>`,
+    iconSize: [0, 0],
+    iconAnchor: [0, 0],
+    popupAnchor: [0, -18],
+  })
+  priceIconCache[key] = icon
+  return icon
+}
+
+const countIconCache = {}
+
+/**
+ * The circle badge for a county in the map's region-overview mode. Same
+ * zero-size-anchor + CSS-centering trick as getPriceMarkerIcon, but a fixed
+ * circle instead of a width-varying pill since it only ever holds a number.
+ */
+export function getCountMarkerIcon(count) {
+  if (countIconCache[count]) return countIconCache[count]
+
+  const icon = L.divIcon({
+    className: 'county-marker-icon',
+    html: `<div class="county-marker">${count}</div>`,
+    iconSize: [0, 0],
+    iconAnchor: [0, 0],
+  })
+  countIconCache[count] = icon
   return icon
 }
 

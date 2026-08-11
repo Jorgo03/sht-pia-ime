@@ -188,7 +188,14 @@
       "newest": "Newest",
       "price_asc": "Price ↑",
       "price_desc": "Price ↓"
-    }
+    },
+    "typology": "Property type",
+    "bathrooms": "Bathrooms",
+    "anyBaths": "Any",
+    "surface": "Surface area",
+    "minArea": "Min m²",
+    "maxArea": "Max m²",
+    "rangeInvalid": "Minimum must be lower than maximum"
   },
   "detail": {
     "forSale": "For Sale",
@@ -385,7 +392,7 @@
     "draftRestored": "Draft restored — continue where you left off. Photos need re-adding.",
     "discardDraft": "Start fresh",
     "pinLocation": "Pin the location",
-    "mapHint": "Tap the map to drop a pin (or drag it)",
+    "mapHint": "Tap the map to set the property location",
     "videoUpload": "Property video",
     "dropVideo": "Drag a video here or click (MP4 or MOV)"
   },
@@ -433,7 +440,8 @@
     "translating": "Translating…",
     "translated": "Translated — check each language tab.",
     "translateFirst": "Write the Albanian title and description first",
-    "generateTitle": "Generate with AI"
+    "generateTitle": "Generate with AI",
+    "titleNeedsFields": "Fill in property type and city to generate a title"
   },
   "assistant": {
     "title": "Listing assistant",

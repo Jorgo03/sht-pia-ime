@@ -136,7 +136,14 @@
       "newest": "Plus récents",
       "price_asc": "Prix ↑",
       "price_desc": "Prix ↓"
-    }
+    },
+    "typology": "Type de bien",
+    "bathrooms": "Salles de bain",
+    "anyBaths": "Tout",
+    "surface": "Surface",
+    "minArea": "Surf. min",
+    "maxArea": "Surf. max",
+    "rangeInvalid": "Le minimum doit être inférieur au maximum"
   },
   "favourites": {
     "title": "Favoris",
@@ -333,7 +340,7 @@
     "draftRestored": "Brouillon restauré — reprenez où vous en étiez. Les photos sont à rajouter.",
     "discardDraft": "Repartir de zéro",
     "pinLocation": "Placer le repère",
-    "mapHint": "Touchez la carte pour placer le repère (ou faites-le glisser)",
+    "mapHint": "Touchez la carte pour définir l'emplacement",
     "videoUpload": "Vidéo du bien",
     "dropVideo": "Glissez une vidéo ici ou cliquez (MP4 ou MOV)"
   },
@@ -433,7 +440,8 @@
     "translating": "Traduction…",
     "translated": "Traduit — vérifiez chaque langue.",
     "translateFirst": "Écrivez d'abord le titre et la description en albanais",
-    "generateTitle": "Générer avec IA"
+    "generateTitle": "Générer avec IA",
+    "titleNeedsFields": "Renseignez le type et la ville pour générer un titre"
   },
   "assistant": {
     "title": "Assistant de l'annonce",

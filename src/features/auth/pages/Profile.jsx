@@ -39,7 +39,7 @@ export default function Profile() {
   const [fullName, setFullName] = useState('')
   const [agencyName, setAgencyName] = useState('')
   const [isSignUp, setIsSignUp] = useState(false)
-  const [role, setRole] = useState('client')
+  const [role, setRole] = useState('buyer')
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
   // 'google' | 'apple' | 'linkedin_oidc' while the OAuth redirect is starting
@@ -155,7 +155,10 @@ export default function Profile() {
   }
 
   const handleSendOtp = async () => {
-    if (!otpEmail) { setMessage(t('auth.enterEmail')); return }
+    // Same validity check the password form uses. A presence-only guard let
+    // malformed addresses reach Supabase, which rejects them with a raw
+    // "Unable to validate email address: invalid format" 400.
+    if (!EMAIL_RE.test(otpEmail)) { setMessage(t('errors.invalidEmail')); return }
     // OTP signups carry no role metadata either — same stash-and-apply
     // path as OAuth, and overwriting here means an aborted OAuth click
     // can't leak its role choice into this flow.
@@ -169,6 +172,9 @@ export default function Profile() {
 
   const handleResend = async () => {
     if (cooldown > 0 || loading) return
+    // Guarded too: otpEmail is cleared when the component remounts after a
+    // magic-link login, and resending with an empty address 400s.
+    if (!EMAIL_RE.test(otpEmail)) { setMessage(t('errors.invalidEmail')); return }
     setLoading(true); setMessage(''); setOtpError(false)
     const { error } = await resendCode(otpEmail, otpType)
     setLoading(false)
@@ -347,7 +353,7 @@ export default function Profile() {
         </div>
         <div className="auth-glass">
           <div className="role-toggle">
-            <button className={`role-btn ${role === 'client' ? 'active' : ''}`} onClick={() => setRole('client')}><User size={16} /> {t('auth.roleClient')}</button>
+            <button className={`role-btn ${role === 'buyer' ? 'active' : ''}`} onClick={() => setRole('buyer')}><User size={16} /> {t('auth.roleClient')}</button>
             <button className={`role-btn ${role === 'agent' ? 'active' : ''}`} onClick={() => setRole('agent')}><Briefcase size={16} /> {t('auth.roleAgent')}</button>
           </div>
 
