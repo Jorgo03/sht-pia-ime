@@ -2,7 +2,6 @@ import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Image } from 'expo-image';
 import {
-  Dimensions,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -12,12 +11,18 @@ import { useTranslation } from 'react-i18next';
 
 import { AtticoColors } from '@/constants/theme';
 import { useFavorites } from '@/contexts/favorites-context';
+import { useResponsive } from '@/hooks/use-responsive';
 import { Property } from '@/data/types';
 import { formatPrice, getLocalizedText } from '@/lib/format';
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
-const CARD_WIDTH = SCREEN_WIDTH - 40;
-const CARD_HEIGHT = CARD_WIDTH * 1.25;
+/**
+ * Phone: card fills the width edge-to-edge (minus margin), same as before.
+ * Tablet: filling the width would mean an ~980px-wide, ~1225px-tall card at
+ * the 1.25 aspect ratio below — capped so it reads as a hero card, not a
+ * near-fullscreen one.
+ */
+const MAX_CARD_WIDTH = 420;
+const CARD_MARGIN = 20;
 
 interface FeaturedPropertyCardProps {
   property: Property;
@@ -30,14 +35,20 @@ export function FeaturedPropertyCard({
 }: FeaturedPropertyCardProps) {
   const { t, i18n } = useTranslation();
   const { isFavorite, toggle } = useFavorites();
+  const { width: screenWidth, isTablet } = useResponsive();
   const favorited = isFavorite(property.id);
   const title = getLocalizedText(property.title_i18n, i18n.language) || property.title;
   const price = formatPrice(property.price, i18n.language);
   const suffix = property.listing_type === 'rent' ? t('property.perMonth') : '';
 
+  const cardWidth = isTablet
+    ? Math.min(screenWidth - CARD_MARGIN * 2, MAX_CARD_WIDTH)
+    : screenWidth - CARD_MARGIN * 2;
+  const cardHeight = cardWidth * 1.25;
+
   return (
     <TouchableOpacity
-      style={styles.card}
+      style={[styles.card, { width: cardWidth, height: cardHeight }]}
       onPress={onPress}
       activeOpacity={0.9}>
       <Image
@@ -117,11 +128,12 @@ export function FeaturedPropertyCard({
 
 const styles = StyleSheet.create({
   card: {
-    width: CARD_WIDTH,
-    height: CARD_HEIGHT,
+    // width/height are computed per-render in the component (see cardWidth
+    // above) so they respond to rotation and stay capped on tablet.
     borderRadius: 24,
     overflow: 'hidden',
-    marginHorizontal: 20,
+    alignSelf: 'center',
+    marginHorizontal: CARD_MARGIN,
     borderWidth: 1,
     borderColor: AtticoColors.glassBorder,
   },

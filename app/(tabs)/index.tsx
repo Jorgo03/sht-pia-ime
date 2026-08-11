@@ -20,11 +20,14 @@ import { AtticoColors } from '@/constants/theme';
 import { useAuth } from '@/contexts/auth-context';
 import { getFeaturedProperty, getProperties } from '@/data/properties';
 import { Property } from '@/data/types';
+import { useResponsive } from '@/hooks/use-responsive';
 
 export default function HomeScreen() {
   const router = useRouter();
   const { t } = useTranslation();
   const { user } = useAuth();
+  const { columns } = useResponsive();
+  const gridItemWidth = `${100 / columns}%` as const;
   const [featured, setFeatured] = useState<Property | null>(null);
   const [listings, setListings] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
@@ -88,7 +91,7 @@ export default function HomeScreen() {
                 </View>
                 <View style={styles.grid}>
                   {listings.map((item) => (
-                    <View key={item.id} style={styles.gridItem}>
+                    <View key={item.id} style={[styles.gridItem, { width: gridItemWidth }]}>
                       <PropertyCard
                         property={item}
                         onPress={() =>
@@ -169,7 +172,8 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
   },
   gridItem: {
-    width: '50%',
+    // width is computed per-render (gridItemWidth) so column count can
+    // respond to tablet width / rotation instead of being fixed at 2.
   },
   statsSection: {
     flexDirection: 'row',

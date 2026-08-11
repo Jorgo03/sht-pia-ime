@@ -49,6 +49,15 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="map"
+        options={{
+          title: t('search.mapView'),
+          tabBarIcon: ({ color }) => (
+            <IconSymbol size={26} name="map" color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="favorites"
         options={{
           title: t('common.favorites'),

@@ -6,7 +6,6 @@ import { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
-  Dimensions,
   ScrollView,
   StyleSheet,
   Text,
@@ -22,16 +21,15 @@ import { AtticoColors } from '@/constants/theme';
 import { useFavorites } from '@/contexts/favorites-context';
 import { getPropertyById } from '@/data/properties';
 import { Property } from '@/data/types';
+import { useResponsive } from '@/hooks/use-responsive';
 import { formatPrice, getLocalizedText } from '@/lib/format';
-
-const { height: SCREEN_HEIGHT } = Dimensions.get('window');
-const IMAGE_HEIGHT = SCREEN_HEIGHT * 0.42;
 
 export default function PropertyDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const { t, i18n } = useTranslation();
   const { isFavorite, toggle } = useFavorites();
+  const { height: screenHeight, isTablet } = useResponsive();
   const favorited = isFavorite(id ?? '');
   const [property, setProperty] = useState<Property | null>(null);
   const [loading, setLoading] = useState(true);
@@ -72,6 +70,12 @@ export default function PropertyDetailScreen() {
     );
   }
 
+  // On tablet the image sits above a two-column info split rather than
+  // dominating the whole screen, so it can afford to be relatively shorter,
+  // leaving more room for that content — especially in landscape, where
+  // screenHeight is already constrained.
+  const imageHeight = screenHeight * (isTablet ? 0.32 : 0.42);
+
   const title = getLocalizedText(property.title_i18n, i18n.language) || property.title;
   const description = getLocalizedText(property.description_i18n, i18n.language) || property.description;
   const price = formatPrice(property.price, i18n.language);
@@ -85,9 +89,146 @@ export default function PropertyDetailScreen() {
     { id: 'type', name: property.property_type ?? 'N/A', icon: 'home' },
   ];
 
+  // Split into two content groups so tablet can lay them out as columns
+  // (per-brief: gallery full-width, info + agent/contact side by side below)
+  // while phone renders the exact same JSX in a single stacked column.
+  const infoContent = (
+    <>
+      <Text style={styles.name}>{title}</Text>
+      <View style={styles.locationRow}>
+        <MaterialIcons name="location-on" size={16} color={AtticoColors.accent} />
+        <Text style={styles.location}>
+          {property.address}, {property.city}
+        </Text>
+      </View>
+
+      <Text style={styles.description}>{description}</Text>
+
+      <View style={styles.amenityRow}>
+        {amenities.map((a) => (
+          <View key={a.id} style={styles.amenityItem}>
+            <View style={styles.amenityIcon}>
+              <MaterialIcons name={a.icon as any} size={22} color={AtticoColors.accent} />
+            </View>
+            <Text style={styles.amenityLabel}>{a.name}</Text>
+          </View>
+        ))}
+      </View>
+
+      <View style={styles.sectionCard}>
+        <View style={styles.sectionHeader}>
+          <MaterialIcons name="360" size={22} color={AtticoColors.accent} />
+          <Text style={styles.sectionTitle}>{t('property.video')}</Text>
+        </View>
+        <TouchableOpacity
+          style={styles.tourPreview}
+          activeOpacity={0.8}
+          onPress={() => Alert.alert(t('property.video'), t('messages.comingSoon'))}>
+          <Image
+            source={{ uri: property.image_urls[0] }}
+            style={styles.tourImage}
+            contentFit="cover"
+          />
+          <View style={styles.tourOverlay}>
+            <View style={styles.playButton}>
+              <MaterialIcons name="play-arrow" size={36} color="#fff" />
+            </View>
+            <Text style={styles.tourText}>{t('property.video')}</Text>
+          </View>
+        </TouchableOpacity>
+      </View>
+    </>
+  );
+
+  const agentAndContactContent = (
+    <>
+      <View style={styles.sectionCard}>
+        <View style={styles.sectionHeader}>
+          <MaterialIcons name="person" size={22} color={AtticoColors.accent} />
+          <Text style={styles.sectionTitle}>{t('auth.agent')}</Text>
+        </View>
+        <View style={styles.agentRow}>
+          <View style={styles.agentAvatar}>
+            <MaterialIcons name="person" size={28} color={AtticoColors.accent} />
+          </View>
+          <View style={styles.agentInfo}>
+            <Text style={styles.agentName}>{t('auth.agent')}</Text>
+            <Text style={styles.agentRole}>{t('auth.agent')}</Text>
+            <View style={styles.agentRating}>
+              {[1, 2, 3, 4, 5].map((star) => (
+                <MaterialIcons
+                  key={star}
+                  name="star"
+                  size={14}
+                  color={star <= 4 ? AtticoColors.accent : '#333'}
+                />
+              ))}
+              <Text style={styles.agentRatingText}>4.0</Text>
+            </View>
+          </View>
+          <TouchableOpacity
+            style={styles.callButton}
+            onPress={() => Alert.alert(t('property.call'), '...')}
+            activeOpacity={0.7}>
+            <MaterialIcons name="phone" size={20} color="#fff" />
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      <View style={styles.sectionCard}>
+        <View style={styles.sectionHeader}>
+          <MaterialIcons name="mail" size={22} color={AtticoColors.accent} />
+          <Text style={styles.sectionTitle}>{t('detail.message')}</Text>
+        </View>
+        <TextInput
+          style={styles.contactInput}
+          placeholder={t('auth.fullName')}
+          placeholderTextColor={AtticoColors.textSecondary}
+          value={contactName}
+          onChangeText={setContactName}
+        />
+        <TextInput
+          style={styles.contactInput}
+          placeholder={t('auth.email')}
+          placeholderTextColor={AtticoColors.textSecondary}
+          value={contactEmail}
+          onChangeText={setContactEmail}
+          keyboardType="email-address"
+          autoCapitalize="none"
+        />
+        <TextInput
+          style={[styles.contactInput, styles.contactMessage]}
+          placeholder={t('property.whatsappMessage', { title })}
+          placeholderTextColor={AtticoColors.textSecondary}
+          value={contactMessage}
+          onChangeText={setContactMessage}
+          multiline
+          numberOfLines={4}
+          textAlignVertical="top"
+        />
+        <ActionButton title={t('detail.message')} onPress={handleContact} />
+      </View>
+
+      <View style={styles.priceRow}>
+        <View>
+          <Text style={styles.priceLabel}>{t('listing.priceLabel')}</Text>
+          <Text style={styles.price}>
+            {price}
+            <Text style={styles.priceSuffix}>{suffix}</Text>
+          </Text>
+        </View>
+      </View>
+
+      <ActionButton
+        title={t('detail.scheduleViewing')}
+        onPress={() => Alert.alert(t('detail.scheduleViewing'), title)}
+      />
+    </>
+  );
+
   return (
     <View style={styles.container}>
-      <View style={styles.imageContainer}>
+      <View style={[styles.imageContainer, { height: imageHeight }]}>
         <Image
           source={{ uri: property.image_urls[0] }}
           style={styles.image}
@@ -119,9 +260,7 @@ export default function PropertyDetailScreen() {
         </SafeAreaView>
 
         <View style={styles.imageBadge}>
-          <Text style={styles.imageBadgeText}>
-            {badge.toUpperCase()}
-          </Text>
+          <Text style={styles.imageBadgeText}>{badge.toUpperCase()}</Text>
         </View>
       </View>
 
@@ -129,146 +268,17 @@ export default function PropertyDetailScreen() {
         style={styles.content}
         contentContainerStyle={styles.contentInner}
         showsVerticalScrollIndicator={false}>
-        <Text style={styles.name}>{title}</Text>
-        <View style={styles.locationRow}>
-          <MaterialIcons
-            name="location-on"
-            size={16}
-            color={AtticoColors.accent}
-          />
-          <Text style={styles.location}>
-            {property.address}, {property.city}
-          </Text>
-        </View>
-
-        <Text style={styles.description}>{description}</Text>
-
-        <View style={styles.amenityRow}>
-          {amenities.map((a) => (
-            <View key={a.id} style={styles.amenityItem}>
-              <View style={styles.amenityIcon}>
-                <MaterialIcons
-                  name={a.icon as any}
-                  size={22}
-                  color={AtticoColors.accent}
-                />
-              </View>
-              <Text style={styles.amenityLabel}>{a.name}</Text>
-            </View>
-          ))}
-        </View>
-
-        {/* Virtual Tour Preview */}
-        <View style={styles.sectionCard}>
-          <View style={styles.sectionHeader}>
-            <MaterialIcons name="360" size={22} color={AtticoColors.accent} />
-            <Text style={styles.sectionTitle}>{t('property.video')}</Text>
+        {isTablet ? (
+          <View style={styles.tabletSplit}>
+            <View style={styles.tabletColumnLeft}>{infoContent}</View>
+            <View style={styles.tabletColumnRight}>{agentAndContactContent}</View>
           </View>
-          <TouchableOpacity
-            style={styles.tourPreview}
-            activeOpacity={0.8}
-            onPress={() => Alert.alert(t('property.video'), t('messages.comingSoon'))}>
-            <Image
-              source={{ uri: property.image_urls[0] }}
-              style={styles.tourImage}
-              contentFit="cover"
-            />
-            <View style={styles.tourOverlay}>
-              <View style={styles.playButton}>
-                <MaterialIcons name="play-arrow" size={36} color="#fff" />
-              </View>
-              <Text style={styles.tourText}>{t('property.video')}</Text>
-            </View>
-          </TouchableOpacity>
-        </View>
-
-        {/* Agent Profile */}
-        <View style={styles.sectionCard}>
-          <View style={styles.sectionHeader}>
-            <MaterialIcons name="person" size={22} color={AtticoColors.accent} />
-            <Text style={styles.sectionTitle}>{t('auth.agent')}</Text>
-          </View>
-          <View style={styles.agentRow}>
-            <View style={styles.agentAvatar}>
-              <MaterialIcons name="person" size={28} color={AtticoColors.accent} />
-            </View>
-            <View style={styles.agentInfo}>
-              <Text style={styles.agentName}>{t('auth.agent')}</Text>
-              <Text style={styles.agentRole}>{t('auth.agent')}</Text>
-              <View style={styles.agentRating}>
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <MaterialIcons
-                    key={star}
-                    name="star"
-                    size={14}
-                    color={star <= 4 ? AtticoColors.accent : '#333'}
-                  />
-                ))}
-                <Text style={styles.agentRatingText}>4.0</Text>
-              </View>
-            </View>
-            <TouchableOpacity
-              style={styles.callButton}
-              onPress={() => Alert.alert(t('property.call'), '...')}
-              activeOpacity={0.7}>
-              <MaterialIcons name="phone" size={20} color="#fff" />
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        {/* Contact Form */}
-        <View style={styles.sectionCard}>
-          <View style={styles.sectionHeader}>
-            <MaterialIcons name="mail" size={22} color={AtticoColors.accent} />
-            <Text style={styles.sectionTitle}>{t('detail.message')}</Text>
-          </View>
-          <TextInput
-            style={styles.contactInput}
-            placeholder={t('auth.fullName')}
-            placeholderTextColor={AtticoColors.textSecondary}
-            value={contactName}
-            onChangeText={setContactName}
-          />
-          <TextInput
-            style={styles.contactInput}
-            placeholder={t('auth.email')}
-            placeholderTextColor={AtticoColors.textSecondary}
-            value={contactEmail}
-            onChangeText={setContactEmail}
-            keyboardType="email-address"
-            autoCapitalize="none"
-          />
-          <TextInput
-            style={[styles.contactInput, styles.contactMessage]}
-            placeholder={t('property.whatsappMessage', { title })}
-            placeholderTextColor={AtticoColors.textSecondary}
-            value={contactMessage}
-            onChangeText={setContactMessage}
-            multiline
-            numberOfLines={4}
-            textAlignVertical="top"
-          />
-          <ActionButton title={t('detail.message')} onPress={handleContact} />
-        </View>
-
-        <View style={styles.priceRow}>
-          <View>
-            <Text style={styles.priceLabel}>{t('listing.priceLabel')}</Text>
-            <Text style={styles.price}>
-              {price}
-              <Text style={styles.priceSuffix}>
-                {suffix}
-              </Text>
-            </Text>
-          </View>
-        </View>
-
-        <ActionButton
-          title={t('detail.scheduleViewing')}
-          onPress={() =>
-            Alert.alert(t('detail.scheduleViewing'), title)
-          }
-        />
+        ) : (
+          <>
+            {infoContent}
+            {agentAndContactContent}
+          </>
+        )}
       </ScrollView>
     </View>
   );
@@ -290,7 +300,8 @@ const styles = StyleSheet.create({
     color: AtticoColors.textPrimary,
   },
   imageContainer: {
-    height: IMAGE_HEIGHT,
+    // height is computed per-render (imageHeight) so it responds to
+    // rotation and differs between phone and tablet proportions.
   },
   image: {
     ...StyleSheet.absoluteFillObject,
@@ -344,6 +355,21 @@ const styles = StyleSheet.create({
   contentInner: {
     padding: 24,
     paddingBottom: 40,
+  },
+  // Per the brief's own tablet diagram for this screen: gallery stays
+  // full-width above, info + agent/contact split into two columns below.
+  // Left carries the longer content (description, amenities), so it gets
+  // more width; right is the compact, action-oriented column.
+  tabletSplit: {
+    flexDirection: 'row',
+    gap: 32,
+    alignItems: 'flex-start',
+  },
+  tabletColumnLeft: {
+    flex: 3,
+  },
+  tabletColumnRight: {
+    flex: 2,
   },
   name: {
     fontSize: 26,

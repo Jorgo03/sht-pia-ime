@@ -15,11 +15,13 @@ import { GradientBackground } from '@/components/ui/gradient-background';
 import { AtticoColors } from '@/constants/theme';
 import { useFavorites } from '@/contexts/favorites-context';
 import { Property } from '@/data/types';
+import { useResponsive } from '@/hooks/use-responsive';
 
 export default function FavoritesScreen() {
   const router = useRouter();
   const { t } = useTranslation();
   const { favoriteProperties, loading } = useFavorites();
+  const { columns } = useResponsive();
 
   const renderItem = ({ item }: { item: Property }) => (
     <PropertyCard
@@ -49,10 +51,11 @@ export default function FavoritesScreen() {
           </View>
         ) : (
           <FlatList
+            key={`cols-${columns}`}
             data={favoriteProperties}
             renderItem={renderItem}
             keyExtractor={(item) => item.id}
-            numColumns={2}
+            numColumns={columns}
             contentContainerStyle={styles.list}
             showsVerticalScrollIndicator={false}
           />

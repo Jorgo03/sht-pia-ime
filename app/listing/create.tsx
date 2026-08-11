@@ -15,7 +15,9 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 
+import { LocationPicker } from '@/components/listing/location-picker';
 import { ActionButton } from '@/components/ui/action-button';
+import { AiTitleButton } from '@/components/ui/ai-title-button';
 import { AutoTranslateButton } from '@/components/ui/auto-translate-button';
 import { GradientBackground } from '@/components/ui/gradient-background';
 import { AtticoColors } from '@/constants/theme';
@@ -41,6 +43,9 @@ interface ListingForm {
   description_i18n: I18nMap;
   address: string;
   city: string;
+  /** Null until the agent taps the map; excluded from the map tab if unset. */
+  latitude: number | null;
+  longitude: number | null;
   price: string;
   beds: string;
   baths: string;
@@ -55,6 +60,8 @@ const INITIAL_FORM: ListingForm = {
   description_i18n: { sq: '' },
   address: '',
   city: '',
+  latitude: null,
+  longitude: null,
   price: '',
   beds: '',
   baths: '',
@@ -107,6 +114,9 @@ export default function CreateListingScreen() {
     setSubmitting(true);
     try {
       const { error } = await supabase.from('properties').insert({
+        // RLS requires owner_id = auth.uid() on insert; agent_id alone isn't
+        // enough — every publish from this screen was rejected without it.
+        owner_id: user.id,
         agent_id: user.id,
         title: form.title_i18n.sq,
         title_i18n: form.title_i18n,
@@ -115,6 +125,11 @@ export default function CreateListingScreen() {
         price: Number(form.price),
         address: form.address,
         city: form.city || null,
+        latitude: form.latitude,
+        longitude: form.longitude,
+        // This form authors in Albanian and translates outward from it, so sq
+        // is the human-written version; every other i18n key is a translation.
+        source_language: 'sq',
         beds: form.beds ? Number(form.beds) : null,
         baths: form.baths ? Number(form.baths) : null,
         sqft: form.sqft ? Number(form.sqft) : null,
@@ -265,11 +280,32 @@ export default function CreateListingScreen() {
                 value={form.title_i18n[titleLang] ?? ''}
                 onChangeText={(val) => updateI18n('title_i18n', titleLang, val)}
               />
-              <AutoTranslateButton
-                sourceText={form.title_i18n.sq ?? ''}
-                fieldLabel="Title"
-                onResult={(r) => handleTranslateResult('title_i18n', r)}
-              />
+              <View style={styles.titleActions}>
+                {/* Grounded on whatever the form already holds; writes only
+                    the title, leaving any description the agent typed alone. */}
+                <AiTitleButton
+                  details={{
+                    listing_type: form.listing_type,
+                    property_type: form.property_type,
+                    city: form.city,
+                    address: form.address,
+                    price: form.price,
+                    sqft: form.sqft,
+                    beds: form.beds,
+                    baths: form.baths,
+                    notes: form.description_i18n.sq ?? '',
+                  }}
+                  onResult={(title) => {
+                    updateI18n('title_i18n', 'sq', title);
+                    setTitleLang('sq');
+                  }}
+                />
+                <AutoTranslateButton
+                  sourceText={form.title_i18n.sq ?? ''}
+                  fieldLabel="Title"
+                  onResult={(r) => handleTranslateResult('title_i18n', r)}
+                />
+              </View>
             </View>
 
             {/* Description i18n */}
@@ -315,6 +351,15 @@ export default function CreateListingScreen() {
                 placeholderTextColor={AtticoColors.textSecondary}
                 value={form.city}
                 onChangeText={(val) => updateField('city', val)}
+              />
+              {/* Without a pin the listing is invisible on the map tab, since
+                  map queries exclude rows with null coordinates. */}
+              <LocationPicker
+                latitude={form.latitude}
+                longitude={form.longitude}
+                onChange={(lat, lng) =>
+                  setForm((prev) => ({ ...prev, latitude: lat, longitude: lng }))
+                }
               />
             </View>
 
@@ -413,6 +458,14 @@ const styles = StyleSheet.create({
   },
 
   // Sections
+  // Wraps so the two title actions stack on narrow screens instead of
+  // squeezing each other.
+  titleActions: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'flex-start',
+    gap: 8,
+  },
   section: {
     backgroundColor: AtticoColors.primaryLight,
     borderRadius: 20,

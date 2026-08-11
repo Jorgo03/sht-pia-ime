@@ -10,10 +10,14 @@ interface FilterTabsProps {
 }
 
 export function FilterTabs({ tabs, activeTab, onTabChange }: FilterTabsProps) {
-  const [selected, setSelected] = useState(activeTab ?? tabs[0]);
+  // Controlled when `activeTab` is supplied, so an external reset actually
+  // clears the selection instead of leaving a stale highlight behind.
+  // Falls back to internal state for uncontrolled callers.
+  const [internal, setInternal] = useState(tabs[0]);
+  const selected = activeTab ?? internal;
 
   const handlePress = (tab: string) => {
-    setSelected(tab);
+    setInternal(tab);
     onTabChange?.(tab);
   };
 

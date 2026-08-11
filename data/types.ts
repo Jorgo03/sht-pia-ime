@@ -8,15 +8,69 @@ export interface Property {
   price: number;
   address: string;
   city: string | null;
+  /** Stored in the `sqft` column but holds m² — the UI labels it m². */
   sqft: number | null;
   beds: number | null;
   baths: number | null;
-  property_type: 'apartment' | 'house' | 'land' | 'commercial' | null;
-  listing_type: 'sale' | 'rent';
+  /** Mirrors the property_type check constraint on public.properties. */
+  property_type:
+    | 'apartment'
+    | 'house'
+    | 'villa'
+    | 'land'
+    | 'commercial'
+    | 'office'
+    | 'garage'
+    | null;
+  listing_type: 'sale' | 'rent' | 'daily_rent';
   image_urls: string[];
-  status: 'active' | 'pending' | 'sold' | 'draft';
+  status:
+    | 'active'
+    | 'pending'
+    | 'pending_review'
+    | 'sold'
+    | 'rented'
+    | 'paused'
+    | 'draft';
+  /** Null until an agent pins the listing on a map — such rows are excluded
+   *  from map queries rather than rendered at (0, 0). */
+  latitude: number | null;
+  longitude: number | null;
+  /** Language the listing was actually written in; every other key in
+   *  title_i18n/description_i18n is a machine translation. */
+  source_language: string;
   created_at: string;
   updated_at: string;
+}
+
+/** Visible map region, used to re-query listings as the user pans/zooms. */
+export interface MapBounds {
+  minLat: number;
+  maxLat: number;
+  minLng: number;
+  maxLng: number;
+}
+
+export type PropertySort = 'newest' | 'price_asc' | 'price_desc';
+
+/**
+ * The one filter shape shared by the list and map screens. Every field is
+ * optional and null means "unset", so an empty object is a valid unfiltered
+ * query.
+ */
+export interface PropertyFilters {
+  propertyType?: Property['property_type'] | null;
+  listingType?: Property['listing_type'] | null;
+  city?: string | null;
+  minPrice?: number | null;
+  maxPrice?: number | null;
+  beds?: number | null;
+  baths?: number | null;
+  minArea?: number | null;
+  maxArea?: number | null;
+  sort?: PropertySort;
+  /** Map-only: restricts results to the visible region. */
+  bounds?: MapBounds | null;
 }
 
 export interface Favorite {
