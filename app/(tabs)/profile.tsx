@@ -19,8 +19,8 @@ import { useTranslation } from 'react-i18next';
 
 import { ActionButton } from '@/components/ui/action-button';
 import { GradientBackground } from '@/components/ui/gradient-background';
-import { AtticoColors } from '@/constants/theme';
 import { useAuth } from '@/contexts/auth-context';
+import { useFhoTheme } from '@/hooks/use-fho-theme';
 
 type Role = 'buyer' | 'agent';
 
@@ -38,6 +38,7 @@ const socialProviders: {
 export default function ProfileScreen() {
   const router = useRouter();
   const { t } = useTranslation();
+  const { colors, radii, fonts, theme, toggle } = useFhoTheme();
   const { user, signIn, signUp, signOut, signInWithProvider, loading: authLoading } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -90,21 +91,43 @@ export default function ProfileScreen() {
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled">
-          <Text style={styles.title}>{t('common.profile')}</Text>
+          <View style={styles.titleRow}>
+            <Text style={[styles.title, { fontFamily: fonts.serif, color: colors.text }]}>
+              {t('common.profile')}
+            </Text>
+            <TouchableOpacity
+              style={[
+                styles.themeToggle,
+                { borderRadius: radii.pill, backgroundColor: colors.surface2, borderColor: colors.borderStrong },
+              ]}
+              onPress={toggle}
+              accessibilityLabel={t('common.toggleTheme')}
+              hitSlop={8}>
+              <MaterialIcons
+                name={theme === 'dark' ? 'light-mode' : 'dark-mode'}
+                size={20}
+                color={colors.text}
+              />
+            </TouchableOpacity>
+          </View>
 
           {user ? (
             <View style={styles.signedIn}>
-              <View style={styles.avatar}>
-                <Text style={styles.avatarText}>
+              <View style={[styles.avatar, { borderRadius: radii.pill, backgroundColor: colors.orange1 }]}>
+                <Text style={[styles.avatarText, { fontFamily: fonts.serifSemiBold }]}>
                   {(user.user_metadata?.full_name?.[0] ?? user.email?.[0] ?? '?').toUpperCase()}
                 </Text>
               </View>
-              <Text style={styles.email}>{user.email}</Text>
+              <Text style={[styles.email, { fontFamily: fonts.sansSemiBold, color: colors.text }]}>
+                {user.email}
+              </Text>
               {user.user_metadata?.full_name && (
-                <Text style={styles.userName}>{user.user_metadata.full_name}</Text>
+                <Text style={[styles.userName, { fontFamily: fonts.sans, color: colors.textMuted }]}>
+                  {user.user_metadata.full_name}
+                </Text>
               )}
-              <View style={styles.roleBadge}>
-                <Text style={styles.roleBadgeText}>
+              <View style={[styles.roleBadge, { borderRadius: radii.pill, backgroundColor: colors.orangeTint }]}>
+                <Text style={[styles.roleBadgeText, { fontFamily: fonts.sansBold, color: colors.orange1 }]}>
                   {user.user_metadata?.role === 'agent' ? t('auth.agent') : t('auth.user')}
                 </Text>
               </View>
@@ -116,7 +139,9 @@ export default function ProfileScreen() {
                   />
                 </View>
               )}
-              <Text style={styles.subtitle}>{t('auth.welcome')}</Text>
+              <Text style={[styles.subtitle, { fontFamily: fonts.sans, color: colors.textMuted }]}>
+                {t('auth.welcome')}
+              </Text>
               <View style={styles.signOutWrap}>
                 <ActionButton
                   title={t('common.signOut')}
@@ -130,41 +155,55 @@ export default function ProfileScreen() {
               style={styles.form}
               behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
 
-              <View style={styles.roleTabs}>
+              <View style={[styles.roleTabs, { borderRadius: radii.lg, backgroundColor: colors.surface2, borderColor: colors.borderStrong }]}>
                 <TouchableOpacity
-                  style={[styles.roleTab, role === 'buyer' && styles.roleTabActive]}
+                  style={[
+                    styles.roleTab,
+                    { borderRadius: radii.md },
+                    role === 'buyer' && { backgroundColor: colors.orange1 },
+                  ]}
                   onPress={() => setRole('buyer')}
                   activeOpacity={0.7}>
                   <MaterialIcons
                     name="person"
                     size={18}
-                    color={role === 'buyer' ? '#fff' : AtticoColors.textSecondary}
+                    color={role === 'buyer' ? '#fff' : colors.textMuted}
                   />
                   <Text
-                    style={[styles.roleTabText, role === 'buyer' && styles.roleTabTextActive]}>
+                    style={[
+                      styles.roleTabText,
+                      { fontFamily: fonts.sansSemiBold, color: role === 'buyer' ? '#fff' : colors.textMuted },
+                    ]}>
                     {t('auth.roleClient')}
                   </Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                  style={[styles.roleTab, role === 'agent' && styles.roleTabActive]}
+                  style={[
+                    styles.roleTab,
+                    { borderRadius: radii.md },
+                    role === 'agent' && { backgroundColor: colors.orange1 },
+                  ]}
                   onPress={() => setRole('agent')}
                   activeOpacity={0.7}>
                   <MaterialIcons
                     name="business-center"
                     size={18}
-                    color={role === 'agent' ? '#fff' : AtticoColors.textSecondary}
+                    color={role === 'agent' ? '#fff' : colors.textMuted}
                   />
                   <Text
-                    style={[styles.roleTabText, role === 'agent' && styles.roleTabTextActive]}>
+                    style={[
+                      styles.roleTabText,
+                      { fontFamily: fonts.sansSemiBold, color: role === 'agent' ? '#fff' : colors.textMuted },
+                    ]}>
                     {t('auth.roleAgent')}
                   </Text>
                 </TouchableOpacity>
               </View>
 
-              <Text style={styles.formTitle}>
+              <Text style={[styles.formTitle, { fontFamily: fonts.serif, color: colors.text }]}>
                 {isSignUp ? t('auth.createAccount') : t('common.signIn')}
               </Text>
-              <Text style={styles.formSubtitle}>
+              <Text style={[styles.formSubtitle, { fontFamily: fonts.sans, color: colors.textMuted }]}>
                 {role === 'agent'
                   ? t('auth.agentSubtitle')
                   : t('auth.clientSubtitle')}
@@ -172,9 +211,9 @@ export default function ProfileScreen() {
 
               {isSignUp && (
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, { borderRadius: radii.lg, backgroundColor: colors.surface2, borderColor: colors.borderStrong, color: colors.text, fontFamily: fonts.sans }]}
                   placeholder={t('auth.fullName')}
-                  placeholderTextColor={AtticoColors.textSecondary}
+                  placeholderTextColor={colors.textFaint}
                   value={fullName}
                   onChangeText={setFullName}
                   autoCapitalize="words"
@@ -182,18 +221,18 @@ export default function ProfileScreen() {
               )}
 
               <TextInput
-                style={styles.input}
+                style={[styles.input, { borderRadius: radii.lg, backgroundColor: colors.surface2, borderColor: colors.borderStrong, color: colors.text, fontFamily: fonts.sans }]}
                 placeholder={t('auth.email')}
-                placeholderTextColor={AtticoColors.textSecondary}
+                placeholderTextColor={colors.textFaint}
                 value={email}
                 onChangeText={setEmail}
                 autoCapitalize="none"
                 keyboardType="email-address"
               />
               <TextInput
-                style={styles.input}
+                style={[styles.input, { borderRadius: radii.lg, backgroundColor: colors.surface2, borderColor: colors.borderStrong, color: colors.text, fontFamily: fonts.sans }]}
                 placeholder={t('auth.password')}
-                placeholderTextColor={AtticoColors.textSecondary}
+                placeholderTextColor={colors.textFaint}
                 value={password}
                 onChangeText={setPassword}
                 secureTextEntry
@@ -201,9 +240,9 @@ export default function ProfileScreen() {
 
               {isSignUp && role === 'agent' && (
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, { borderRadius: radii.lg, backgroundColor: colors.surface2, borderColor: colors.borderStrong, color: colors.text, fontFamily: fonts.sans }]}
                   placeholder={t('auth.agencyName')}
-                  placeholderTextColor={AtticoColors.textSecondary}
+                  placeholderTextColor={colors.textFaint}
                   value={agencyName}
                   onChangeText={setAgencyName}
                   autoCapitalize="words"
@@ -222,20 +261,24 @@ export default function ProfileScreen() {
               />
 
               <View style={styles.divider}>
-                <View style={styles.dividerLine} />
-                <Text style={styles.dividerText}>{t('auth.signInWith')}</Text>
-                <View style={styles.dividerLine} />
+                <View style={[styles.dividerLine, { backgroundColor: colors.border }]} />
+                <Text style={[styles.dividerText, { fontFamily: fonts.sans, color: colors.textMuted }]}>
+                  {t('auth.signInWith')}
+                </Text>
+                <View style={[styles.dividerLine, { backgroundColor: colors.border }]} />
               </View>
 
               <View style={styles.socialRow}>
                 {socialProviders.map((sp) => (
                   <TouchableOpacity
                     key={sp.provider}
-                    style={styles.socialButton}
+                    style={[styles.socialButton, { borderRadius: radii.lg, backgroundColor: colors.surface2, borderColor: colors.borderStrong }]}
                     onPress={() => handleSocialLogin(sp.provider)}
                     activeOpacity={0.8}>
                     <Ionicons name={sp.ionicon} size={24} color={sp.color} />
-                    <Text style={styles.socialLabel}>{sp.label}</Text>
+                    <Text style={[styles.socialLabel, { fontFamily: fonts.sansMedium, color: colors.text }]}>
+                      {sp.label}
+                    </Text>
                   </TouchableOpacity>
                 ))}
               </View>
@@ -243,7 +286,7 @@ export default function ProfileScreen() {
               <TouchableOpacity
                 onPress={() => setIsSignUp(!isSignUp)}
                 style={styles.toggleButton}>
-                <Text style={styles.toggleText}>
+                <Text style={[styles.toggleText, { fontFamily: fonts.sansSemiBold, color: colors.orange1 }]}>
                   {isSignUp
                     ? `${t('auth.hasAccount')} ${t('common.signIn')}`
                     : `${t('auth.noAccount')} ${t('common.signUp')}`}
@@ -267,56 +310,56 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
     flexGrow: 1,
   },
-  title: {
-    fontSize: 28,
-    fontWeight: '700',
-    color: AtticoColors.textPrimary,
+  titleRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     marginBottom: 24,
+  },
+  title: {
+    fontSize: 30,
+    letterSpacing: -0.5,
+  },
+  themeToggle: {
+    width: 40,
+    height: 40,
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   signedIn: {
     flex: 1,
     alignItems: 'center',
-    paddingTop: 40,
+    paddingTop: 24,
     gap: 8,
   },
   avatar: {
     width: 80,
     height: 80,
-    borderRadius: 40,
-    backgroundColor: AtticoColors.accent,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 8,
   },
   avatarText: {
     fontSize: 32,
-    fontWeight: '700',
     color: '#fff',
   },
   email: {
     fontSize: 16,
-    fontWeight: '600',
-    color: AtticoColors.textPrimary,
   },
   userName: {
     fontSize: 14,
-    color: AtticoColors.textSecondary,
   },
   roleBadge: {
     paddingHorizontal: 16,
     paddingVertical: 6,
-    borderRadius: 16,
-    backgroundColor: AtticoColors.accent,
     marginTop: 4,
   },
   roleBadgeText: {
     fontSize: 13,
-    fontWeight: '700',
-    color: '#fff',
   },
   subtitle: {
     fontSize: 14,
-    color: AtticoColors.textSecondary,
     marginTop: 4,
   },
   agentActions: {
@@ -333,12 +376,9 @@ const styles = StyleSheet.create({
   },
   roleTabs: {
     flexDirection: 'row',
-    backgroundColor: AtticoColors.primaryLight,
-    borderRadius: 16,
     padding: 4,
     marginBottom: 8,
     borderWidth: 1,
-    borderColor: AtticoColors.glassBorder,
   },
   roleTab: {
     flex: 1,
@@ -346,41 +386,25 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 12,
-    borderRadius: 12,
     gap: 6,
-  },
-  roleTabActive: {
-    backgroundColor: AtticoColors.accent,
   },
   roleTabText: {
     fontSize: 15,
-    fontWeight: '600',
-    color: AtticoColors.textSecondary,
-  },
-  roleTabTextActive: {
-    color: '#fff',
   },
   formTitle: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: AtticoColors.textPrimary,
+    fontSize: 24,
     textAlign: 'center',
   },
   formSubtitle: {
     fontSize: 14,
-    color: AtticoColors.textSecondary,
     textAlign: 'center',
     marginBottom: 4,
   },
   input: {
-    backgroundColor: AtticoColors.primaryLight,
-    borderRadius: 16,
     paddingHorizontal: 20,
     paddingVertical: 16,
     fontSize: 16,
-    color: AtticoColors.textPrimary,
     borderWidth: 1,
-    borderColor: AtticoColors.glassBorder,
   },
   divider: {
     flexDirection: 'row',
@@ -390,11 +414,9 @@ const styles = StyleSheet.create({
   dividerLine: {
     flex: 1,
     height: 1,
-    backgroundColor: AtticoColors.glassBorder,
   },
   dividerText: {
     fontSize: 13,
-    color: AtticoColors.textSecondary,
     paddingHorizontal: 12,
   },
   socialRow: {
@@ -405,10 +427,7 @@ const styles = StyleSheet.create({
   socialButton: {
     flex: 1,
     height: 52,
-    borderRadius: 16,
-    backgroundColor: AtticoColors.glass,
     borderWidth: 1,
-    borderColor: AtticoColors.glassBorder,
     justifyContent: 'center',
     alignItems: 'center',
     flexDirection: 'row',
@@ -416,8 +435,6 @@ const styles = StyleSheet.create({
   },
   socialLabel: {
     fontSize: 12,
-    color: AtticoColors.textPrimary,
-    fontWeight: '500',
   },
   toggleButton: {
     alignItems: 'center',
@@ -425,6 +442,5 @@ const styles = StyleSheet.create({
   },
   toggleText: {
     fontSize: 14,
-    color: AtticoColors.accent,
   },
 });

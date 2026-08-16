@@ -2,7 +2,7 @@ import { memo, useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Marker } from 'react-native-maps';
 
-import { AtticoColors } from '@/constants/theme';
+import { useFhoTheme } from '@/hooks/use-fho-theme';
 import { Cluster, formatBubblePrice } from '@/lib/cluster';
 
 interface Props {
@@ -15,6 +15,7 @@ interface Props {
  * the default pin so the map communicates price at a glance.
  */
 function ClusterMarkerBase({ cluster, onPress }: Props) {
+  const { colors, radii, fonts } = useFhoTheme();
   const count = cluster.properties.length;
   const isCluster = count > 1;
 
@@ -39,8 +40,22 @@ function ClusterMarkerBase({ cluster, onPress }: Props) {
       onPress={() => onPress(cluster)}
       tracksViewChanges={tracksViewChanges}
       anchor={{ x: 0.5, y: 0.5 }}>
-      <View style={[styles.bubble, isCluster && styles.clusterBubble]}>
-        <Text style={styles.label} numberOfLines={1}>
+      <View
+        style={[
+          styles.bubble,
+          { borderRadius: radii.md, backgroundColor: colors.orange1, borderColor: '#fff' },
+          // Fixed navy rather than the theme's --fho-navy (which lifts to a pale
+          // blue in dark mode for on-page contrast) — this sits on map tiles,
+          // not app chrome, so it stays legible regardless of app theme.
+          isCluster && {
+            borderRadius: radii.lg,
+            backgroundColor: '#0a2f63',
+            borderColor: colors.orange1,
+            minWidth: 36,
+            paddingHorizontal: 12,
+          },
+        ]}>
+        <Text style={[styles.label, { fontFamily: fonts.sansBold, color: '#fff' }]} numberOfLines={1}>
           {isCluster
             ? String(count)
             : formatBubblePrice(cluster.properties[0].price)}
@@ -54,12 +69,9 @@ export const ClusterMarker = memo(ClusterMarkerBase);
 
 const styles = StyleSheet.create({
   bubble: {
-    backgroundColor: AtticoColors.accent,
     paddingHorizontal: 10,
     paddingVertical: 6,
-    borderRadius: 14,
     borderWidth: 1.5,
-    borderColor: '#FFFFFF',
     shadowColor: '#000',
     shadowOpacity: 0.3,
     shadowRadius: 4,
@@ -68,16 +80,7 @@ const styles = StyleSheet.create({
     minWidth: 44,
     alignItems: 'center',
   },
-  clusterBubble: {
-    backgroundColor: AtticoColors.primary,
-    borderColor: AtticoColors.accent,
-    borderRadius: 18,
-    minWidth: 36,
-    paddingHorizontal: 12,
-  },
   label: {
-    color: AtticoColors.textPrimary,
     fontSize: 13,
-    fontWeight: '700',
   },
 });

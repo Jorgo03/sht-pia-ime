@@ -1,4 +1,5 @@
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useState } from 'react';
 import {
   ActivityIndicator,
@@ -9,7 +10,7 @@ import {
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
-import { AtticoColors } from '@/constants/theme';
+import { useFhoTheme } from '@/hooks/use-fho-theme';
 import { generateListing, type AiError, type ListingDetails } from '@/lib/ai';
 import { type LangCode } from '@/lib/translate';
 
@@ -25,7 +26,7 @@ interface AiTitleButtonProps {
 /**
  * Title-only AI generation. Calls the same ai-generate-listing Edge Function
  * the web wizard uses and applies just the title, leaving the description the
- * agent wrote untouched.
+ * agent wrote untouched. Styled after web's `.ai-panel__btn` gradient chip.
  */
 export function AiTitleButton({
   details,
@@ -33,6 +34,7 @@ export function AiTitleButton({
   onResult,
 }: AiTitleButtonProps) {
   const { t } = useTranslation();
+  const { colors, radii, fonts } = useFhoTheme();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -64,27 +66,37 @@ export function AiTitleButton({
   return (
     <View>
       <TouchableOpacity
-        style={[styles.button, disabled && styles.disabled]}
         onPress={handlePress}
         disabled={disabled}
-        activeOpacity={0.7}
-        accessibilityLabel={t('ai.generateTitle')}>
-        {loading ? (
-          <ActivityIndicator size="small" color={AtticoColors.accent} />
-        ) : (
-          <MaterialIcons
-            name="auto-awesome"
-            size={16}
-            color={AtticoColors.accent}
-          />
-        )}
-        <Text style={styles.text}>
-          {loading ? t('ai.generating') : t('ai.generateTitle')}
-        </Text>
+        activeOpacity={0.8}
+        accessibilityLabel={t('ai.generateTitle')}
+        style={disabled && styles.disabled}>
+        <LinearGradient
+          colors={[colors.orange1, colors.orange2]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={[styles.button, { borderRadius: radii.sm }]}>
+          {loading ? (
+            <ActivityIndicator size="small" color="#fff" />
+          ) : (
+            <MaterialIcons name="auto-awesome" size={16} color="#fff" />
+          )}
+          <Text style={[styles.text, { fontFamily: fonts.sansSemiBold }]}>
+            {loading ? t('ai.generating') : t('ai.generateTitle')}
+          </Text>
+        </LinearGradient>
       </TouchableOpacity>
 
-      {missingContext && <Text style={styles.hint}>{t('ai.titleNeedsFields')}</Text>}
-      {error && <Text style={styles.error}>{error}</Text>}
+      {missingContext && (
+        <Text style={[styles.hint, { fontFamily: fonts.sans, color: colors.textMuted }]}>
+          {t('ai.titleNeedsFields')}
+        </Text>
+      )}
+      {error && (
+        <Text style={[styles.error, { fontFamily: fonts.sans, color: colors.statusSold }]}>
+          {error}
+        </Text>
+      )}
     </View>
   );
 }
@@ -95,29 +107,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     alignSelf: 'flex-start',
     gap: 6,
-    backgroundColor: AtticoColors.glass,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: AtticoColors.glassBorder,
     paddingHorizontal: 14,
     paddingVertical: 10,
   },
   disabled: {
-    opacity: 0.4,
+    opacity: 0.55,
   },
   text: {
     fontSize: 13,
-    fontWeight: '600',
-    color: AtticoColors.accent,
+    color: '#fff',
   },
   hint: {
     marginTop: 6,
     fontSize: 12,
-    color: AtticoColors.textSecondary,
   },
   error: {
     marginTop: 6,
     fontSize: 12,
-    color: '#E74C3C',
   },
 });

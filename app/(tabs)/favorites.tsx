@@ -12,14 +12,15 @@ import { useTranslation } from 'react-i18next';
 
 import { PropertyCard } from '@/components/property/property-card';
 import { GradientBackground } from '@/components/ui/gradient-background';
-import { AtticoColors } from '@/constants/theme';
 import { useFavorites } from '@/contexts/favorites-context';
 import { Property } from '@/data/types';
+import { useFhoTheme } from '@/hooks/use-fho-theme';
 import { useResponsive } from '@/hooks/use-responsive';
 
 export default function FavoritesScreen() {
   const router = useRouter();
   const { t } = useTranslation();
+  const { colors, radii, fonts } = useFhoTheme();
   const { favoriteProperties, loading } = useFavorites();
   const { columns } = useResponsive();
 
@@ -33,19 +34,27 @@ export default function FavoritesScreen() {
   return (
     <GradientBackground>
       <SafeAreaView style={styles.container} edges={['top']}>
-        <Text style={styles.title}>{t('favourites.title')}</Text>
+        <Text style={[styles.title, { fontFamily: fonts.serif, color: colors.text }]}>
+          {t('favourites.title')}
+        </Text>
 
         {loading ? (
           <View style={styles.center}>
-            <ActivityIndicator size="large" color={AtticoColors.accent} />
+            <ActivityIndicator size="large" color={colors.orange1} />
           </View>
         ) : favoriteProperties.length === 0 ? (
           <View style={styles.center}>
-            <View style={styles.emptyIcon}>
-              <MaterialIcons name="favorite-border" size={48} color={AtticoColors.accent} />
+            <View
+              style={[
+                styles.emptyIcon,
+                { borderRadius: radii.pill, backgroundColor: colors.orangeTint },
+              ]}>
+              <MaterialIcons name="favorite-border" size={40} color={colors.orange1} />
             </View>
-            <Text style={styles.subtitle}>{t('favourites.empty')}</Text>
-            <Text style={styles.description}>
+            <Text style={[styles.subtitle, { fontFamily: fonts.serif, color: colors.text }]}>
+              {t('favourites.empty')}
+            </Text>
+            <Text style={[styles.description, { fontFamily: fonts.sans, color: colors.textMuted }]}>
               {t('favourites.emptyDescription')}
             </Text>
           </View>
@@ -71,9 +80,8 @@ const styles = StyleSheet.create({
     paddingTop: 8,
   },
   title: {
-    fontSize: 28,
-    fontWeight: '700',
-    color: AtticoColors.textPrimary,
+    fontSize: 30,
+    letterSpacing: -0.5,
     paddingHorizontal: 20,
     marginBottom: 24,
   },
@@ -86,24 +94,17 @@ const styles = StyleSheet.create({
   emptyIcon: {
     width: 80,
     height: 80,
-    borderRadius: 40,
-    backgroundColor: AtticoColors.glass,
-    borderWidth: 1,
-    borderColor: AtticoColors.glassBorder,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 8,
   },
   subtitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: AtticoColors.textPrimary,
+    fontSize: 19,
     textAlign: 'center',
     paddingHorizontal: 32,
   },
   description: {
     fontSize: 14,
-    color: AtticoColors.textSecondary,
     textAlign: 'center',
     paddingHorizontal: 32,
   },

@@ -20,8 +20,8 @@ import { ActionButton } from '@/components/ui/action-button';
 import { AiTitleButton } from '@/components/ui/ai-title-button';
 import { AutoTranslateButton } from '@/components/ui/auto-translate-button';
 import { GradientBackground } from '@/components/ui/gradient-background';
-import { AtticoColors } from '@/constants/theme';
 import { useAuth } from '@/contexts/auth-context';
+import { useFhoTheme } from '@/hooks/use-fho-theme';
 import { supabase } from '@/lib/supabase';
 import { SUPPORTED_LANGS, type I18nMap } from '@/lib/translate';
 
@@ -72,6 +72,7 @@ const INITIAL_FORM: ListingForm = {
 export default function CreateListingScreen() {
   const router = useRouter();
   const { t } = useTranslation();
+  const { colors, radii, fonts } = useFhoTheme();
   const { user } = useAuth();
   const [form, setForm] = useState<ListingForm>(INITIAL_FORM);
   const [titleLang, setTitleLang] = useState('sq');
@@ -161,20 +162,28 @@ export default function CreateListingScreen() {
     <View style={styles.langTabs}>
       {SUPPORTED_LANGS.map((lang) => {
         const hasContent = !!i18nMap[lang]?.trim();
+        const isActive = activeLang === lang;
         return (
           <TouchableOpacity
             key={lang}
             style={[
               styles.langTab,
-              activeLang === lang && styles.langTabActive,
-              hasContent && activeLang !== lang && styles.langTabFilled,
+              {
+                borderRadius: radii.sm,
+                backgroundColor: isActive ? colors.orange1 : colors.surface2,
+                borderColor: isActive
+                  ? colors.orange1
+                  : hasContent
+                    ? colors.orangeSoft
+                    : colors.borderStrong,
+              },
             ]}
             onPress={() => onSelect(lang)}
             activeOpacity={0.7}>
             <Text
               style={[
                 styles.langTabText,
-                activeLang === lang && styles.langTabTextActive,
+                { fontFamily: fonts.sansBold, color: isActive ? '#fff' : colors.textMuted },
               ]}>
               {lang.toUpperCase()}
             </Text>
@@ -189,12 +198,17 @@ export default function CreateListingScreen() {
       <SafeAreaView style={styles.container} edges={['top']}>
         <View style={styles.header}>
           <TouchableOpacity
-            style={styles.backButton}
+            style={[
+              styles.backButton,
+              { borderRadius: radii.pill, backgroundColor: colors.surface2, borderWidth: 1, borderColor: colors.borderStrong },
+            ]}
             onPress={() => router.back()}
             activeOpacity={0.7}>
-            <MaterialIcons name="chevron-left" size={28} color="#fff" />
+            <MaterialIcons name="chevron-left" size={28} color={colors.text} />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>{t('listing.newListing')}</Text>
+          <Text style={[styles.headerTitle, { fontFamily: fonts.serif, color: colors.text }]}>
+            {t('listing.newListing')}
+          </Text>
           <View style={styles.backButton} />
         </View>
 
@@ -207,76 +221,83 @@ export default function CreateListingScreen() {
             keyboardShouldPersistTaps="handled">
 
             {/* Listing Type */}
-            <View style={styles.section}>
+            <View style={[styles.section, { borderRadius: radii.xl, backgroundColor: colors.surface, borderColor: colors.border }]}>
               <View style={styles.sectionHeader}>
-                <MaterialIcons name="sell" size={20} color={AtticoColors.accent} />
-                <Text style={styles.sectionTitle}>{t('listing.listingType')}</Text>
+                <MaterialIcons name="sell" size={20} color={colors.orange1} />
+                <Text style={[styles.sectionTitle, { fontFamily: fonts.serif, color: colors.text }]}>
+                  {t('listing.listingType')}
+                </Text>
               </View>
-              <View style={styles.toggleRow}>
-                {(['sale', 'rent'] as const).map((type) => (
-                  <TouchableOpacity
-                    key={type}
-                    style={[styles.toggleTab, form.listing_type === type && styles.toggleTabActive]}
-                    onPress={() => updateField('listing_type', type)}
-                    activeOpacity={0.7}>
-                    <MaterialIcons
-                      name={type === 'sale' ? 'paid' : 'vpn-key'}
-                      size={18}
-                      color={form.listing_type === type ? '#fff' : AtticoColors.textSecondary}
-                    />
-                    <Text
-                      style={[
-                        styles.toggleTabText,
-                        form.listing_type === type && styles.toggleTabTextActive,
-                      ]}>
-                      {type === 'sale' ? t('detail.forSale') : t('detail.forRent')}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
+              <View style={[styles.toggleRow, { borderRadius: radii.lg, backgroundColor: colors.bg, borderColor: colors.border }]}>
+                {(['sale', 'rent'] as const).map((type) => {
+                  const active = form.listing_type === type;
+                  return (
+                    <TouchableOpacity
+                      key={type}
+                      style={[styles.toggleTab, { borderRadius: radii.md }, active && { backgroundColor: colors.orange1 }]}
+                      onPress={() => updateField('listing_type', type)}
+                      activeOpacity={0.7}>
+                      <MaterialIcons
+                        name={type === 'sale' ? 'paid' : 'vpn-key'}
+                        size={18}
+                        color={active ? '#fff' : colors.textMuted}
+                      />
+                      <Text style={[styles.toggleTabText, { fontFamily: fonts.sansSemiBold, color: active ? '#fff' : colors.textMuted }]}>
+                        {type === 'sale' ? t('detail.forSale') : t('detail.forRent')}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
               </View>
             </View>
 
             {/* Property Type */}
-            <View style={styles.section}>
+            <View style={[styles.section, { borderRadius: radii.xl, backgroundColor: colors.surface, borderColor: colors.border }]}>
               <View style={styles.sectionHeader}>
-                <MaterialIcons name="home-work" size={20} color={AtticoColors.accent} />
-                <Text style={styles.sectionTitle}>{t('search.propertyType')}</Text>
+                <MaterialIcons name="home-work" size={20} color={colors.orange1} />
+                <Text style={[styles.sectionTitle, { fontFamily: fonts.serif, color: colors.text }]}>
+                  {t('search.propertyType')}
+                </Text>
               </View>
               <View style={styles.chipRow}>
-                {PROPERTY_TYPES.map((pt) => (
-                  <TouchableOpacity
-                    key={pt.value}
-                    style={[styles.chip, form.property_type === pt.value && styles.chipActive]}
-                    onPress={() => updateField('property_type', pt.value)}
-                    activeOpacity={0.7}>
-                    <MaterialIcons
-                      name={pt.icon as any}
-                      size={16}
-                      color={form.property_type === pt.value ? '#fff' : AtticoColors.textSecondary}
-                    />
-                    <Text
+                {PROPERTY_TYPES.map((pt) => {
+                  const active = form.property_type === pt.value;
+                  return (
+                    <TouchableOpacity
+                      key={pt.value}
                       style={[
-                        styles.chipText,
-                        form.property_type === pt.value && styles.chipTextActive,
-                      ]}>
-                      {pt.label}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
+                        styles.chip,
+                        {
+                          borderRadius: radii.md,
+                          backgroundColor: active ? colors.orange1 : colors.surface2,
+                          borderColor: active ? colors.orange1 : colors.borderStrong,
+                        },
+                      ]}
+                      onPress={() => updateField('property_type', pt.value)}
+                      activeOpacity={0.7}>
+                      <MaterialIcons name={pt.icon as any} size={16} color={active ? '#fff' : colors.textMuted} />
+                      <Text style={[styles.chipText, { fontFamily: fonts.sansSemiBold, color: active ? '#fff' : colors.textMuted }]}>
+                        {pt.label}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
               </View>
             </View>
 
             {/* Title i18n */}
-            <View style={styles.section}>
+            <View style={[styles.section, { borderRadius: radii.xl, backgroundColor: colors.surface, borderColor: colors.border }]}>
               <View style={styles.sectionHeader}>
-                <MaterialIcons name="title" size={20} color={AtticoColors.accent} />
-                <Text style={styles.sectionTitle}>{t('listing.title')}</Text>
+                <MaterialIcons name="title" size={20} color={colors.orange1} />
+                <Text style={[styles.sectionTitle, { fontFamily: fonts.serif, color: colors.text }]}>
+                  {t('listing.title')}
+                </Text>
               </View>
               {renderLangTabs(titleLang, setTitleLang, form.title_i18n)}
               <TextInput
-                style={styles.input}
+                style={[styles.input, { borderRadius: radii.lg, backgroundColor: colors.bg, borderColor: colors.border, color: colors.text, fontFamily: fonts.sans }]}
                 placeholder={titleLang === 'sq' ? t('listing.titlePlaceholder') : `${t('listing.title')} (${titleLang.toUpperCase()})`}
-                placeholderTextColor={AtticoColors.textSecondary}
+                placeholderTextColor={colors.textFaint}
                 value={form.title_i18n[titleLang] ?? ''}
                 onChangeText={(val) => updateI18n('title_i18n', titleLang, val)}
               />
@@ -309,16 +330,22 @@ export default function CreateListingScreen() {
             </View>
 
             {/* Description i18n */}
-            <View style={styles.section}>
+            <View style={[styles.section, { borderRadius: radii.xl, backgroundColor: colors.surface, borderColor: colors.border }]}>
               <View style={styles.sectionHeader}>
-                <MaterialIcons name="description" size={20} color={AtticoColors.accent} />
-                <Text style={styles.sectionTitle}>{t('listing.description')}</Text>
+                <MaterialIcons name="description" size={20} color={colors.orange1} />
+                <Text style={[styles.sectionTitle, { fontFamily: fonts.serif, color: colors.text }]}>
+                  {t('listing.description')}
+                </Text>
               </View>
               {renderLangTabs(descLang, setDescLang, form.description_i18n)}
               <TextInput
-                style={[styles.input, styles.textArea]}
+                style={[
+                  styles.input,
+                  styles.textArea,
+                  { borderRadius: radii.lg, backgroundColor: colors.bg, borderColor: colors.border, color: colors.text, fontFamily: fonts.sans },
+                ]}
                 placeholder={descLang === 'sq' ? t('listing.descriptionPlaceholder') : `${t('listing.description')} (${descLang.toUpperCase()})`}
-                placeholderTextColor={AtticoColors.textSecondary}
+                placeholderTextColor={colors.textFaint}
                 value={form.description_i18n[descLang] ?? ''}
                 onChangeText={(val) => updateI18n('description_i18n', descLang, val)}
                 multiline
@@ -333,22 +360,24 @@ export default function CreateListingScreen() {
             </View>
 
             {/* Location */}
-            <View style={styles.section}>
+            <View style={[styles.section, { borderRadius: radii.xl, backgroundColor: colors.surface, borderColor: colors.border }]}>
               <View style={styles.sectionHeader}>
-                <MaterialIcons name="location-on" size={20} color={AtticoColors.accent} />
-                <Text style={styles.sectionTitle}>{t('listing.address')}</Text>
+                <MaterialIcons name="location-on" size={20} color={colors.orange1} />
+                <Text style={[styles.sectionTitle, { fontFamily: fonts.serif, color: colors.text }]}>
+                  {t('listing.address')}
+                </Text>
               </View>
               <TextInput
-                style={styles.input}
+                style={[styles.input, { borderRadius: radii.lg, backgroundColor: colors.bg, borderColor: colors.border, color: colors.text, fontFamily: fonts.sans }]}
                 placeholder={t('listing.addressPlaceholder')}
-                placeholderTextColor={AtticoColors.textSecondary}
+                placeholderTextColor={colors.textFaint}
                 value={form.address}
                 onChangeText={(val) => updateField('address', val)}
               />
               <TextInput
-                style={styles.input}
+                style={[styles.input, { borderRadius: radii.lg, backgroundColor: colors.bg, borderColor: colors.border, color: colors.text, fontFamily: fonts.sans }]}
                 placeholder={t('listing.city')}
-                placeholderTextColor={AtticoColors.textSecondary}
+                placeholderTextColor={colors.textFaint}
                 value={form.city}
                 onChangeText={(val) => updateField('city', val)}
               />
@@ -364,40 +393,42 @@ export default function CreateListingScreen() {
             </View>
 
             {/* Details */}
-            <View style={styles.section}>
+            <View style={[styles.section, { borderRadius: radii.xl, backgroundColor: colors.surface, borderColor: colors.border }]}>
               <View style={styles.sectionHeader}>
-                <MaterialIcons name="info-outline" size={20} color={AtticoColors.accent} />
-                <Text style={styles.sectionTitle}>{t('listing.price')}</Text>
+                <MaterialIcons name="info-outline" size={20} color={colors.orange1} />
+                <Text style={[styles.sectionTitle, { fontFamily: fonts.serif, color: colors.text }]}>
+                  {t('listing.price')}
+                </Text>
               </View>
               <TextInput
-                style={styles.input}
+                style={[styles.input, { borderRadius: radii.lg, backgroundColor: colors.bg, borderColor: colors.border, color: colors.text, fontFamily: fonts.sans }]}
                 placeholder={form.listing_type === 'rent' ? `${t('listing.price')} (${t('property.perMonth')})` : t('listing.price')}
-                placeholderTextColor={AtticoColors.textSecondary}
+                placeholderTextColor={colors.textFaint}
                 value={form.price}
                 onChangeText={(val) => updateField('price', val)}
                 keyboardType="numeric"
               />
               <View style={styles.detailRow}>
                 <TextInput
-                  style={[styles.input, styles.detailInput]}
+                  style={[styles.input, styles.detailInput, { borderRadius: radii.lg, backgroundColor: colors.bg, borderColor: colors.border, color: colors.text, fontFamily: fonts.sans }]}
                   placeholder={t('property.beds')}
-                  placeholderTextColor={AtticoColors.textSecondary}
+                  placeholderTextColor={colors.textFaint}
                   value={form.beds}
                   onChangeText={(val) => updateField('beds', val)}
                   keyboardType="numeric"
                 />
                 <TextInput
-                  style={[styles.input, styles.detailInput]}
+                  style={[styles.input, styles.detailInput, { borderRadius: radii.lg, backgroundColor: colors.bg, borderColor: colors.border, color: colors.text, fontFamily: fonts.sans }]}
                   placeholder={t('property.baths')}
-                  placeholderTextColor={AtticoColors.textSecondary}
+                  placeholderTextColor={colors.textFaint}
                   value={form.baths}
                   onChangeText={(val) => updateField('baths', val)}
                   keyboardType="numeric"
                 />
                 <TextInput
-                  style={[styles.input, styles.detailInput]}
+                  style={[styles.input, styles.detailInput, { borderRadius: radii.lg, backgroundColor: colors.bg, borderColor: colors.border, color: colors.text, fontFamily: fonts.sans }]}
                   placeholder={t('property.sqft')}
-                  placeholderTextColor={AtticoColors.textSecondary}
+                  placeholderTextColor={colors.textFaint}
                   value={form.sqft}
                   onChangeText={(val) => updateField('sqft', val)}
                   keyboardType="numeric"
@@ -441,15 +472,11 @@ const styles = StyleSheet.create({
   backButton: {
     width: 40,
     height: 40,
-    borderRadius: 20,
-    backgroundColor: 'rgba(0,0,0,0.4)',
     justifyContent: 'center',
     alignItems: 'center',
   },
   headerTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: AtticoColors.textPrimary,
+    fontSize: 19,
   },
   scrollContent: {
     paddingHorizontal: 20,
@@ -467,11 +494,8 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   section: {
-    backgroundColor: AtticoColors.primaryLight,
-    borderRadius: 20,
     padding: 16,
     borderWidth: 1,
-    borderColor: AtticoColors.glassBorder,
     gap: 12,
   },
   sectionHeader: {
@@ -480,19 +504,14 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   sectionTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: AtticoColors.textPrimary,
+    fontSize: 17,
   },
 
   // Toggle tabs (sale/rent)
   toggleRow: {
     flexDirection: 'row',
-    backgroundColor: AtticoColors.primary,
-    borderRadius: 16,
     padding: 4,
     borderWidth: 1,
-    borderColor: AtticoColors.glassBorder,
   },
   toggleTab: {
     flex: 1,
@@ -500,19 +519,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 12,
-    borderRadius: 12,
     gap: 6,
-  },
-  toggleTabActive: {
-    backgroundColor: AtticoColors.accent,
   },
   toggleTabText: {
     fontSize: 14,
-    fontWeight: '600',
-    color: AtticoColors.textSecondary,
-  },
-  toggleTabTextActive: {
-    color: '#fff',
   },
 
   // Property type chips
@@ -527,22 +537,10 @@ const styles = StyleSheet.create({
     gap: 6,
     paddingHorizontal: 14,
     paddingVertical: 10,
-    borderRadius: 12,
-    backgroundColor: AtticoColors.glass,
     borderWidth: 1,
-    borderColor: AtticoColors.glassBorder,
-  },
-  chipActive: {
-    backgroundColor: AtticoColors.accent,
-    borderColor: AtticoColors.accent,
   },
   chipText: {
     fontSize: 13,
-    fontWeight: '600',
-    color: AtticoColors.textSecondary,
-  },
-  chipTextActive: {
-    color: '#fff',
   },
 
   // Language tabs
@@ -554,39 +552,20 @@ const styles = StyleSheet.create({
   langTab: {
     width: 38,
     height: 32,
-    borderRadius: 8,
-    backgroundColor: AtticoColors.glass,
     borderWidth: 1,
-    borderColor: AtticoColors.glassBorder,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  langTabActive: {
-    backgroundColor: AtticoColors.accent,
-    borderColor: AtticoColors.accent,
-  },
-  langTabFilled: {
-    borderColor: AtticoColors.accentLight,
-  },
   langTabText: {
     fontSize: 11,
-    fontWeight: '700',
-    color: AtticoColors.textSecondary,
-  },
-  langTabTextActive: {
-    color: '#fff',
   },
 
   // Inputs
   input: {
-    backgroundColor: AtticoColors.primary,
-    borderRadius: 16,
     paddingHorizontal: 20,
     paddingVertical: 16,
     fontSize: 16,
-    color: AtticoColors.textPrimary,
     borderWidth: 1,
-    borderColor: AtticoColors.glassBorder,
   },
   textArea: {
     height: 120,

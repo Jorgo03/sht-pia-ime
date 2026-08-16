@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
-import { AtticoColors } from '@/constants/theme';
+import { useFhoTheme } from '@/hooks/use-fho-theme';
 import { useFilters } from '@/contexts/filters-context';
 import { getPropertiesCount } from '@/data/properties';
 import { Property, PropertySort } from '@/data/types';
@@ -51,11 +51,19 @@ function Chip({
   active: boolean;
   onPress: () => void;
 }) {
+  const { colors, radii, fonts } = useFhoTheme();
   return (
     <Pressable
       onPress={onPress}
-      style={[styles.chip, active && styles.chipActive]}>
-      <Text style={[styles.chipText, active && styles.chipTextActive]}>
+      style={[
+        styles.chip,
+        {
+          borderRadius: radii.pill,
+          borderColor: active ? colors.orange1 : colors.borderStrong,
+          backgroundColor: active ? colors.orange1 : colors.surface2,
+        },
+      ]}>
+      <Text style={[styles.chipText, { fontFamily: fonts.sansSemiBold, color: active ? '#fff' : colors.text }]}>
         {label}
       </Text>
     </Pressable>
@@ -69,9 +77,12 @@ function Section({
   label: string;
   children: React.ReactNode;
 }) {
+  const { colors, fonts } = useFhoTheme();
   return (
     <View style={styles.section}>
-      <Text style={styles.sectionLabel}>{label.toUpperCase()}</Text>
+      <Text style={[styles.sectionLabel, { fontFamily: fonts.mono, color: colors.textMuted }]}>
+        {label.toUpperCase()}
+      </Text>
       {children}
     </View>
   );
@@ -85,6 +96,7 @@ export function FilterSheet({
   onClose: () => void;
 }) {
   const { t } = useTranslation();
+  const { colors, radii, fonts } = useFhoTheme();
   const { filters, queryFilters, setFilter, reset, priceInvalid, areaInvalid } =
     useFilters();
   const [count, setCount] = useState<number | null>(null);
@@ -112,11 +124,15 @@ export function FilterSheet({
       animationType="slide"
       presentationStyle="pageSheet"
       onRequestClose={onClose}>
-      <View style={styles.container}>
+      <View style={[styles.container, { backgroundColor: colors.bg }]}>
         <View style={styles.header}>
-          <Text style={styles.title}>{t('search.filtersTitle')}</Text>
+          <Text style={[styles.title, { fontFamily: fonts.serif, color: colors.text }]}>
+            {t('search.filtersTitle')}
+          </Text>
           <Pressable onPress={reset} hitSlop={12}>
-            <Text style={styles.resetText}>{t('search.reset')}</Text>
+            <Text style={[styles.resetText, { fontFamily: fonts.sansSemiBold, color: colors.orange1 }]}>
+              {t('search.reset')}
+            </Text>
           </Pressable>
         </View>
 
@@ -191,50 +207,50 @@ export function FilterSheet({
           <Section label={t('search.priceRange')}>
             <View style={styles.inputRow}>
               <TextInput
-                style={styles.input}
+                style={[styles.input, { borderRadius: radii.md, borderColor: colors.borderStrong, backgroundColor: colors.surface2, color: colors.text, fontFamily: fonts.sans }]}
                 keyboardType="number-pad"
                 placeholder={t('search.minPrice')}
-                placeholderTextColor={AtticoColors.textSecondary}
+                placeholderTextColor={colors.textFaint}
                 value={filters.minPrice?.toString() ?? ''}
                 onChangeText={(v) => setFilter('minPrice', toNumber(v))}
               />
-              <Text style={styles.dash}>—</Text>
+              <Text style={[styles.dash, { color: colors.textMuted }]}>—</Text>
               <TextInput
-                style={styles.input}
+                style={[styles.input, { borderRadius: radii.md, borderColor: colors.borderStrong, backgroundColor: colors.surface2, color: colors.text, fontFamily: fonts.sans }]}
                 keyboardType="number-pad"
                 placeholder={t('search.maxPrice')}
-                placeholderTextColor={AtticoColors.textSecondary}
+                placeholderTextColor={colors.textFaint}
                 value={filters.maxPrice?.toString() ?? ''}
                 onChangeText={(v) => setFilter('maxPrice', toNumber(v))}
               />
             </View>
             {priceInvalid && (
-              <Text style={styles.warning}>{t('search.rangeInvalid')}</Text>
+              <Text style={[styles.warning, { fontFamily: fonts.sans, color: colors.statusSold }]}>{t('search.rangeInvalid')}</Text>
             )}
           </Section>
 
           <Section label={t('search.surface')}>
             <View style={styles.inputRow}>
               <TextInput
-                style={styles.input}
+                style={[styles.input, { borderRadius: radii.md, borderColor: colors.borderStrong, backgroundColor: colors.surface2, color: colors.text, fontFamily: fonts.sans }]}
                 keyboardType="number-pad"
                 placeholder={t('search.minArea')}
-                placeholderTextColor={AtticoColors.textSecondary}
+                placeholderTextColor={colors.textFaint}
                 value={filters.minArea?.toString() ?? ''}
                 onChangeText={(v) => setFilter('minArea', toNumber(v))}
               />
-              <Text style={styles.dash}>—</Text>
+              <Text style={[styles.dash, { color: colors.textMuted }]}>—</Text>
               <TextInput
-                style={styles.input}
+                style={[styles.input, { borderRadius: radii.md, borderColor: colors.borderStrong, backgroundColor: colors.surface2, color: colors.text, fontFamily: fonts.sans }]}
                 keyboardType="number-pad"
                 placeholder={t('search.maxArea')}
-                placeholderTextColor={AtticoColors.textSecondary}
+                placeholderTextColor={colors.textFaint}
                 value={filters.maxArea?.toString() ?? ''}
                 onChangeText={(v) => setFilter('maxArea', toNumber(v))}
               />
             </View>
             {areaInvalid && (
-              <Text style={styles.warning}>{t('search.rangeInvalid')}</Text>
+              <Text style={[styles.warning, { fontFamily: fonts.sans, color: colors.statusSold }]}>{t('search.rangeInvalid')}</Text>
             )}
           </Section>
 
@@ -288,8 +304,10 @@ export function FilterSheet({
           </Section>
         </ScrollView>
 
-        <Pressable style={styles.cta} onPress={onClose}>
-          <Text style={styles.ctaText}>
+        <Pressable
+          style={[styles.cta, { borderRadius: radii.pill, backgroundColor: colors.orange1 }]}
+          onPress={onClose}>
+          <Text style={[styles.ctaText, { fontFamily: fonts.sansBold }]}>
             {count == null
               ? t('common.loading')
               : t('search.showHomes', { count })}
@@ -304,7 +322,6 @@ export function FilterSheet({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: AtticoColors.primary,
   },
   flex: {
     flex: 1,
@@ -318,14 +335,10 @@ const styles = StyleSheet.create({
     paddingBottom: 12,
   },
   title: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: AtticoColors.textPrimary,
+    fontSize: 26,
   },
   resetText: {
     fontSize: 15,
-    fontWeight: '600',
-    color: AtticoColors.accent,
   },
   scroll: {
     paddingHorizontal: 20,
@@ -336,9 +349,7 @@ const styles = StyleSheet.create({
   },
   sectionLabel: {
     fontSize: 11,
-    fontWeight: '700',
-    letterSpacing: 1,
-    color: AtticoColors.textSecondary,
+    letterSpacing: 1.5,
     marginBottom: 10,
   },
   row: {
@@ -354,22 +365,10 @@ const styles = StyleSheet.create({
   chip: {
     paddingHorizontal: 16,
     paddingVertical: 9,
-    borderRadius: 999,
     borderWidth: 1,
-    borderColor: AtticoColors.glassBorder,
-    backgroundColor: AtticoColors.glass,
-  },
-  chipActive: {
-    backgroundColor: AtticoColors.accent,
-    borderColor: AtticoColors.accent,
   },
   chipText: {
     fontSize: 13,
-    fontWeight: '600',
-    color: AtticoColors.textPrimary,
-  },
-  chipTextActive: {
-    color: AtticoColors.textPrimary,
   },
   inputRow: {
     flexDirection: 'row',
@@ -379,32 +378,22 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     borderWidth: 1,
-    borderColor: AtticoColors.glassBorder,
-    backgroundColor: AtticoColors.glass,
-    borderRadius: 12,
     paddingHorizontal: 14,
     paddingVertical: 12,
-    color: AtticoColors.textPrimary,
     fontSize: 15,
   },
-  dash: {
-    color: AtticoColors.textSecondary,
-  },
+  dash: {},
   warning: {
     marginTop: 8,
     fontSize: 12,
-    color: '#E74C3C',
   },
   cta: {
     margin: 20,
-    borderRadius: 999,
-    backgroundColor: AtticoColors.accent,
     paddingVertical: 16,
     alignItems: 'center',
   },
   ctaText: {
     fontSize: 16,
-    fontWeight: '700',
-    color: AtticoColors.textPrimary,
+    color: '#fff',
   },
 });

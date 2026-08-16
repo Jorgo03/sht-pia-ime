@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-import { AtticoColors } from '@/constants/theme';
+import { useFhoTheme } from '@/hooks/use-fho-theme';
 
 interface FilterTabsProps {
   tabs: string[];
@@ -15,6 +15,7 @@ export function FilterTabs({ tabs, activeTab, onTabChange }: FilterTabsProps) {
   // Falls back to internal state for uncontrolled callers.
   const [internal, setInternal] = useState(tabs[0]);
   const selected = activeTab ?? internal;
+  const { colors, radii, fonts } = useFhoTheme();
 
   const handlePress = (tab: string) => {
     setInternal(tab);
@@ -28,10 +29,24 @@ export function FilterTabs({ tabs, activeTab, onTabChange }: FilterTabsProps) {
         return (
           <TouchableOpacity
             key={tab}
-            style={[styles.tab, isActive && styles.activeTab]}
+            style={[
+              styles.tab,
+              {
+                borderRadius: radii.pill,
+                borderColor: isActive ? colors.orange1 : colors.borderStrong,
+                backgroundColor: isActive ? colors.orange1 : colors.surface2,
+              },
+            ]}
             onPress={() => handlePress(tab)}
             activeOpacity={0.7}>
-            <Text style={[styles.tabText, isActive && styles.activeTabText]}>
+            <Text
+              style={[
+                styles.tabText,
+                {
+                  fontFamily: fonts.sansSemiBold,
+                  color: isActive ? '#fff' : colors.textMuted,
+                },
+              ]}>
               {tab}
             </Text>
           </TouchableOpacity>
@@ -51,21 +66,9 @@ const styles = StyleSheet.create({
   tab: {
     paddingHorizontal: 20,
     paddingVertical: 10,
-    borderRadius: 24,
     borderWidth: 1,
-    borderColor: AtticoColors.glassBorder,
-    backgroundColor: AtticoColors.glass,
-  },
-  activeTab: {
-    backgroundColor: AtticoColors.accent,
-    borderColor: AtticoColors.accent,
   },
   tabText: {
     fontSize: 14,
-    fontWeight: '600',
-    color: AtticoColors.textSecondary,
-  },
-  activeTabText: {
-    color: '#fff',
   },
 });

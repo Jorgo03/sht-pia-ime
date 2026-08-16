@@ -1,4 +1,5 @@
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useState } from 'react';
 import {
   ActivityIndicator,
@@ -9,7 +10,7 @@ import {
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
-import { AtticoColors } from '@/constants/theme';
+import { useFhoTheme } from '@/hooks/use-fho-theme';
 import { translateAll, type I18nMap } from '@/lib/translate';
 
 interface AutoTranslateButtonProps {
@@ -18,12 +19,14 @@ interface AutoTranslateButtonProps {
   fieldLabel: string;
 }
 
+/** Styled after web's `.ai-panel__btn` gradient chip. */
 export function AutoTranslateButton({
   sourceText,
   onResult,
   fieldLabel,
 }: AutoTranslateButtonProps) {
   const { t } = useTranslation();
+  const { colors, radii, fonts } = useFhoTheme();
   const [loading, setLoading] = useState(false);
 
   const handlePress = async () => {
@@ -46,18 +49,24 @@ export function AutoTranslateButton({
 
   return (
     <TouchableOpacity
-      style={[styles.button, disabled && styles.disabled]}
       onPress={handlePress}
       disabled={disabled}
-      activeOpacity={0.7}>
-      {loading ? (
-        <ActivityIndicator size="small" color={AtticoColors.accent} />
-      ) : (
-        <MaterialIcons name="translate" size={16} color={AtticoColors.accent} />
-      )}
-      <Text style={styles.text}>
-        {loading ? 'Translating...' : `Translate ${fieldLabel}`}
-      </Text>
+      activeOpacity={0.8}
+      style={disabled && styles.disabled}>
+      <LinearGradient
+        colors={[colors.orange1, colors.orange2]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={[styles.button, { borderRadius: radii.sm }]}>
+        {loading ? (
+          <ActivityIndicator size="small" color="#fff" />
+        ) : (
+          <MaterialIcons name="translate" size={16} color="#fff" />
+        )}
+        <Text style={[styles.text, { fontFamily: fonts.sansSemiBold }]}>
+          {loading ? 'Translating...' : `Translate ${fieldLabel}`}
+        </Text>
+      </LinearGradient>
     </TouchableOpacity>
   );
 }
@@ -68,10 +77,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     alignSelf: 'flex-start',
     gap: 6,
-    backgroundColor: AtticoColors.glass,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: AtticoColors.glassBorder,
     paddingHorizontal: 14,
     paddingVertical: 10,
   },
@@ -80,7 +85,6 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 13,
-    fontWeight: '600',
-    color: AtticoColors.accent,
+    color: '#fff',
   },
 });

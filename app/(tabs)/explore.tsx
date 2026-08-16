@@ -16,15 +16,16 @@ import { FilterSheet } from '@/components/property/filter-sheet';
 import { PropertyCard } from '@/components/property/property-card';
 import { FilterTabs } from '@/components/ui/filter-tabs';
 import { GradientBackground } from '@/components/ui/gradient-background';
-import { AtticoColors } from '@/constants/theme';
 import { useFilters } from '@/contexts/filters-context';
 import { getProperties, getPropertiesCount, PAGE_SIZE } from '@/data/properties';
 import { Property } from '@/data/types';
+import { useFhoTheme } from '@/hooks/use-fho-theme';
 import { useResponsive } from '@/hooks/use-responsive';
 
 export default function ExploreScreen() {
   const router = useRouter();
   const { t } = useTranslation();
+  const { colors, radii, fonts } = useFhoTheme();
   const { queryFilters, setFilter, activeCount } = useFilters();
   const { columns } = useResponsive();
 
@@ -111,21 +112,24 @@ export default function ExploreScreen() {
     <GradientBackground>
       <SafeAreaView style={styles.container} edges={['top']}>
         <View style={styles.header}>
-          <Text style={styles.brand}>{t('common.appName')}</Text>
+          <Text style={[styles.brand, { fontFamily: fonts.serifSemiBold, color: colors.orange1 }]}>
+            {t('common.appName')}
+          </Text>
           <View style={styles.titleRow}>
-            <Text style={styles.title}>{t('search.title')}</Text>
+            <Text style={[styles.title, { fontFamily: fonts.serif, color: colors.text }]}>
+              {t('search.title')}
+            </Text>
             <Pressable
-              style={styles.filterButton}
+              style={[
+                styles.filterButton,
+                { borderRadius: radii.pill, borderColor: colors.borderStrong, backgroundColor: colors.surface2 },
+              ]}
               onPress={() => setSheetOpen(true)}
               accessibilityLabel={t('search.filtersTitle')}>
-              <MaterialIcons
-                name="tune"
-                size={22}
-                color={AtticoColors.textPrimary}
-              />
+              <MaterialIcons name="tune" size={22} color={colors.text} />
               {activeCount > 0 && (
-                <View style={styles.badge}>
-                  <Text style={styles.badgeText}>{activeCount}</Text>
+                <View style={[styles.badge, { borderRadius: radii.pill, backgroundColor: colors.orange1 }]}>
+                  <Text style={[styles.badgeText, { fontFamily: fonts.sansBold }]}>{activeCount}</Text>
                 </View>
               )}
             </Pressable>
@@ -140,7 +144,7 @@ export default function ExploreScreen() {
 
         {loading ? (
           <View style={styles.loader}>
-            <ActivityIndicator size="large" color={AtticoColors.accent} />
+            <ActivityIndicator size="large" color={colors.orange1} />
           </View>
         ) : (
           <FlatList
@@ -163,22 +167,23 @@ export default function ExploreScreen() {
             onEndReached={loadMore}
             onEndReachedThreshold={0.5}
             ListHeaderComponent={
-              <Text style={styles.count}>
+              <Text style={[styles.count, { fontFamily: fonts.sansSemiBold, color: colors.textMuted }]}>
                 {t('search.results_other', { count: total })}
               </Text>
             }
             ListEmptyComponent={
               <View style={styles.empty}>
-                <Text style={styles.emptyTitle}>{t('search.empty')}</Text>
-                <Text style={styles.emptyHint}>{t('search.emptyHint')}</Text>
+                <Text style={[styles.emptyTitle, { fontFamily: fonts.serif, color: colors.text }]}>
+                  {t('search.empty')}
+                </Text>
+                <Text style={[styles.emptyHint, { fontFamily: fonts.sans, color: colors.textMuted }]}>
+                  {t('search.emptyHint')}
+                </Text>
               </View>
             }
             ListFooterComponent={
               loadingMore ? (
-                <ActivityIndicator
-                  style={styles.footer}
-                  color={AtticoColors.accent}
-                />
+                <ActivityIndicator style={styles.footer} color={colors.orange1} />
               ) : null
             }
           />
@@ -203,10 +208,8 @@ const styles = StyleSheet.create({
     paddingBottom: 16,
   },
   brand: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: AtticoColors.accent,
-    letterSpacing: 1,
+    fontSize: 15,
+    letterSpacing: -0.2,
     marginBottom: 12,
   },
   titleRow: {
@@ -215,17 +218,13 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   title: {
-    fontSize: 28,
-    fontWeight: '700',
-    color: AtticoColors.textPrimary,
+    fontSize: 30,
+    letterSpacing: -0.5,
   },
   filterButton: {
     width: 44,
     height: 44,
-    borderRadius: 22,
     borderWidth: 1,
-    borderColor: AtticoColors.glassBorder,
-    backgroundColor: AtticoColors.glass,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -236,14 +235,11 @@ const styles = StyleSheet.create({
     minWidth: 20,
     paddingHorizontal: 5,
     paddingVertical: 1,
-    borderRadius: 999,
-    backgroundColor: AtticoColors.accent,
     alignItems: 'center',
   },
   badgeText: {
     fontSize: 11,
-    fontWeight: '700',
-    color: AtticoColors.textPrimary,
+    color: '#fff',
   },
   list: {
     paddingHorizontal: 14,
@@ -256,8 +252,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 6,
     paddingBottom: 12,
     fontSize: 13,
-    fontWeight: '600',
-    color: AtticoColors.textSecondary,
   },
   loader: {
     paddingTop: 100,
@@ -272,12 +266,9 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   emptyTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: AtticoColors.textPrimary,
+    fontSize: 18,
   },
   emptyHint: {
     fontSize: 13,
-    color: AtticoColors.textSecondary,
   },
 });

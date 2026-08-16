@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
-import { AtticoColors } from '@/constants/theme';
+import { useFhoTheme } from '@/hooks/use-fho-theme';
 import { useFavorites } from '@/contexts/favorites-context';
 import { useResponsive } from '@/hooks/use-responsive';
 import { Property } from '@/data/types';
@@ -29,11 +29,19 @@ interface FeaturedPropertyCardProps {
   onPress: () => void;
 }
 
+/**
+ * Full-bleed photo hero with a gradient scrim, a mobile-native pattern (web's
+ * `.featured-card` puts a flat surface body below the image instead — there's
+ * no room for that layout at mobile widths). Chip colors/typography still
+ * mirror web's featured-card tokens (mono badge, white heart chip, serif
+ * italic orange price) so it reads as the same brand, just a taller format.
+ */
 export function FeaturedPropertyCard({
   property,
   onPress,
 }: FeaturedPropertyCardProps) {
   const { t, i18n } = useTranslation();
+  const { colors, radii, fonts } = useFhoTheme();
   const { isFavorite, toggle } = useFavorites();
   const { width: screenWidth, isTablet } = useResponsive();
   const favorited = isFavorite(property.id);
@@ -48,7 +56,10 @@ export function FeaturedPropertyCard({
 
   return (
     <TouchableOpacity
-      style={[styles.card, { width: cardWidth, height: cardHeight }]}
+      style={[
+        styles.card,
+        { width: cardWidth, height: cardHeight, borderRadius: radii.xl, borderColor: colors.border },
+      ]}
       onPress={onPress}
       activeOpacity={0.9}>
       <Image
@@ -62,63 +73,68 @@ export function FeaturedPropertyCard({
         style={styles.overlay}>
         <View style={styles.content}>
           <View style={styles.topRow}>
-            <View style={styles.badge}>
-              <Text style={styles.badgeText}>{t('property.featured').toUpperCase()}</Text>
+            <View style={[styles.badge, { borderRadius: radii.sm }]}>
+              <Text style={[styles.badgeText, { fontFamily: fonts.mono }]}>
+                {t('property.featured').toUpperCase()}
+              </Text>
             </View>
             <TouchableOpacity
-              style={styles.heartButton}
+              style={[styles.heartButton, { borderRadius: radii.pill }]}
               onPress={() => toggle(property.id)}
               activeOpacity={0.7}>
               <MaterialIcons
                 name={favorited ? 'favorite' : 'favorite-border'}
                 size={22}
-                color={favorited ? AtticoColors.accent : '#fff'}
+                color={favorited ? colors.orange1 : colors.textOnLight}
               />
             </TouchableOpacity>
           </View>
           <View style={styles.bottom}>
             <View style={styles.nameRow}>
-              <Text style={styles.name}>{title}</Text>
+              <Text style={[styles.name, { fontFamily: fonts.serif }]}>{title}</Text>
               <View style={styles.locationRow}>
-                <MaterialIcons name="location-on" size={14} color={AtticoColors.accent} />
-                <Text style={styles.location}>
+                <MaterialIcons name="location-on" size={14} color={colors.orange1} />
+                <Text style={[styles.location, { fontFamily: fonts.sans }]}>
                   {property.city ?? property.address}
                 </Text>
               </View>
             </View>
-            <Text style={styles.price}>
+            <Text style={[styles.price, { fontFamily: fonts.serif, color: colors.orange1 }]}>
               {price}
-              <Text style={styles.priceLabel}>
+              <Text style={[styles.priceLabel, { fontFamily: fonts.sans }]}>
                 {suffix}
               </Text>
             </Text>
             <View style={styles.statsRow}>
               {property.beds != null && (
                 <View style={styles.stat}>
-                  <MaterialIcons name="bed" size={16} color={AtticoColors.accent} />
-                  <Text style={styles.statText}>{property.beds} {t('property.beds')}</Text>
+                  <MaterialIcons name="bed" size={16} color={colors.orange1} />
+                  <Text style={[styles.statText, { fontFamily: fonts.sansMedium }]}>{property.beds} {t('property.beds')}</Text>
                 </View>
               )}
               {property.baths != null && (
                 <View style={styles.stat}>
-                  <MaterialIcons name="bathtub" size={16} color={AtticoColors.accent} />
-                  <Text style={styles.statText}>{property.baths} {t('property.baths')}</Text>
+                  <MaterialIcons name="bathtub" size={16} color={colors.orange1} />
+                  <Text style={[styles.statText, { fontFamily: fonts.sansMedium }]}>{property.baths} {t('property.baths')}</Text>
                 </View>
               )}
               {property.sqft != null && (
                 <View style={styles.stat}>
-                  <MaterialIcons name="square-foot" size={16} color={AtticoColors.accent} />
-                  <Text style={styles.statText}>{property.sqft} {t('property.sqft')}</Text>
+                  <MaterialIcons name="square-foot" size={16} color={colors.orange1} />
+                  <Text style={[styles.statText, { fontFamily: fonts.sansMedium }]}>{property.sqft} {t('property.sqft')}</Text>
                 </View>
               )}
             </View>
-            <TouchableOpacity
-              style={styles.button}
-              onPress={onPress}
-              activeOpacity={0.8}>
-              <Text style={styles.buttonText}>{t('common.viewAll')}</Text>
-              <MaterialIcons name="arrow-forward" size={18} color="#fff" />
-            </TouchableOpacity>
+            <LinearGradient
+              colors={[colors.orange1, colors.orange2]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={[styles.button, { borderRadius: radii.pill }]}>
+              <TouchableOpacity style={styles.buttonInner} onPress={onPress} activeOpacity={0.8}>
+                <Text style={[styles.buttonText, { fontFamily: fonts.sansBold }]}>{t('common.viewAll')}</Text>
+                <MaterialIcons name="arrow-forward" size={18} color="#fff" />
+              </TouchableOpacity>
+            </LinearGradient>
           </View>
         </View>
       </LinearGradient>
@@ -130,12 +146,10 @@ const styles = StyleSheet.create({
   card: {
     // width/height are computed per-render in the component (see cardWidth
     // above) so they respond to rotation and stay capped on tablet.
-    borderRadius: 24,
     overflow: 'hidden',
     alignSelf: 'center',
     marginHorizontal: CARD_MARGIN,
     borderWidth: 1,
-    borderColor: AtticoColors.glassBorder,
   },
   image: {
     ...StyleSheet.absoluteFillObject,
@@ -155,22 +169,19 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
   },
   badge: {
-    backgroundColor: AtticoColors.accent,
-    paddingHorizontal: 12,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    paddingHorizontal: 10,
     paddingVertical: 5,
-    borderRadius: 8,
   },
   badgeText: {
-    fontSize: 11,
-    fontWeight: '700',
+    fontSize: 10.5,
     color: '#fff',
     letterSpacing: 1,
   },
   heartButton: {
     width: 40,
     height: 40,
-    borderRadius: 20,
-    backgroundColor: 'rgba(0,0,0,0.3)',
+    backgroundColor: '#fff',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -182,8 +193,7 @@ const styles = StyleSheet.create({
   },
   name: {
     fontSize: 24,
-    fontWeight: '700',
-    color: AtticoColors.textPrimary,
+    color: '#fff',
   },
   locationRow: {
     flexDirection: 'row',
@@ -192,17 +202,15 @@ const styles = StyleSheet.create({
   },
   location: {
     fontSize: 13,
-    color: '#ccc',
+    color: '#eee',
   },
   price: {
     fontSize: 22,
-    fontWeight: '700',
-    color: AtticoColors.accent,
+    fontStyle: 'italic',
   },
   priceLabel: {
     fontSize: 13,
-    fontWeight: '400',
-    color: AtticoColors.textSecondary,
+    color: '#eee',
   },
   statsRow: {
     flexDirection: 'row',
@@ -215,13 +223,13 @@ const styles = StyleSheet.create({
   },
   statText: {
     fontSize: 12,
-    color: '#ccc',
-    fontWeight: '500',
+    color: '#eee',
   },
   button: {
-    backgroundColor: AtticoColors.accent,
+    overflow: 'hidden',
+  },
+  buttonInner: {
     paddingVertical: 14,
-    borderRadius: 24,
     alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'center',
@@ -229,7 +237,6 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     fontSize: 15,
-    fontWeight: '700',
     color: '#fff',
   },
 });

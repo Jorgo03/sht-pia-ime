@@ -3,7 +3,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import MapView, { Marker, type LatLng, type Region } from 'react-native-maps';
 import { useTranslation } from 'react-i18next';
 
-import { AtticoColors } from '@/constants/theme';
+import { useFhoTheme } from '@/hooks/use-fho-theme';
 
 /** Fallback view when a listing has no pin yet. */
 const TIRANA: Region = {
@@ -27,6 +27,7 @@ interface Props {
  */
 export function LocationPicker({ latitude, longitude, onChange }: Props) {
   const { t } = useTranslation();
+  const { colors, radii, fonts, isDark } = useFhoTheme();
   const hasPin = latitude != null && longitude != null;
 
   const region = useMemo<Region>(
@@ -55,12 +56,16 @@ export function LocationPicker({ latitude, longitude, onChange }: Props) {
 
   return (
     <View>
-      <View style={styles.mapWrapper}>
+      <View
+        style={[
+          styles.mapWrapper,
+          { borderRadius: radii.md, borderColor: colors.borderStrong },
+        ]}>
         <MapView
           style={styles.map}
           initialRegion={region}
           onPress={(e) => setPin(e.nativeEvent.coordinate)}
-          userInterfaceStyle="dark"
+          userInterfaceStyle={isDark ? 'dark' : 'light'}
           toolbarEnabled={false}>
           {hasPin && (
             <Marker
@@ -68,13 +73,14 @@ export function LocationPicker({ latitude, longitude, onChange }: Props) {
                 latitude: latitude as number,
                 longitude: longitude as number,
               }}
+              pinColor={colors.orange1}
               draggable
               onDragEnd={(e) => setPin(e.nativeEvent.coordinate)}
             />
           )}
         </MapView>
       </View>
-      <Text style={styles.hint}>
+      <Text style={[styles.hint, { fontFamily: fonts.sans, color: colors.textMuted }]}>
         {hasPin
           ? `${(latitude as number).toFixed(5)}, ${(longitude as number).toFixed(5)}`
           : t('listing.mapHint')}
@@ -86,10 +92,8 @@ export function LocationPicker({ latitude, longitude, onChange }: Props) {
 const styles = StyleSheet.create({
   mapWrapper: {
     height: 200,
-    borderRadius: 14,
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: AtticoColors.glassBorder,
   },
   map: {
     flex: 1,
@@ -97,6 +101,5 @@ const styles = StyleSheet.create({
   hint: {
     marginTop: 8,
     fontSize: 12,
-    color: AtticoColors.textSecondary,
   },
 });

@@ -3,7 +3,7 @@ import { Image } from 'expo-image';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
-import { AtticoColors } from '@/constants/theme';
+import { useFhoTheme } from '@/hooks/use-fho-theme';
 import { useFavorites } from '@/contexts/favorites-context';
 import { Property } from '@/data/types';
 import { formatPrice, getLocalizedText } from '@/lib/format';
@@ -13,8 +13,10 @@ interface PropertyCardProps {
   onPress: () => void;
 }
 
+/** Mirrors web's `.compact-card`. */
 export function PropertyCard({ property, onPress }: PropertyCardProps) {
   const { t, i18n } = useTranslation();
+  const { colors, radii, fonts } = useFhoTheme();
   const { isFavorite, toggle } = useFavorites();
   const favorited = isFavorite(property.id);
   const title = getLocalizedText(property.title_i18n, i18n.language) || property.title;
@@ -24,7 +26,14 @@ export function PropertyCard({ property, onPress }: PropertyCardProps) {
 
   return (
     <TouchableOpacity
-      style={styles.card}
+      style={[
+        styles.card,
+        {
+          borderRadius: radii.lg,
+          backgroundColor: colors.surface,
+          borderColor: colors.border,
+        },
+      ]}
       onPress={onPress}
       activeOpacity={0.9}>
       <View>
@@ -35,35 +44,37 @@ export function PropertyCard({ property, onPress }: PropertyCardProps) {
           transition={300}
         />
         <TouchableOpacity
-          style={styles.heartButton}
+          style={[styles.heartButton, { borderRadius: radii.pill }]}
           onPress={() => toggle(property.id)}
           activeOpacity={0.7}
           hitSlop={8}>
           <MaterialIcons
             name={favorited ? 'favorite' : 'favorite-border'}
             size={20}
-            color={favorited ? AtticoColors.accent : '#fff'}
+            color={favorited ? colors.orange1 : colors.textOnLight}
           />
         </TouchableOpacity>
-        <View style={styles.badge}>
-          <Text style={styles.badgeText}>
+        <View style={[styles.badge, { borderRadius: radii.sm, backgroundColor: colors.orange1 }]}>
+          <Text style={[styles.badgeText, { fontFamily: fonts.sansBold }]}>
             {badgeLabel.toUpperCase()}
           </Text>
         </View>
       </View>
       <View style={styles.info}>
-        <Text style={styles.name} numberOfLines={1}>
+        <Text
+          style={[styles.name, { fontFamily: fonts.serif, color: colors.text }]}
+          numberOfLines={1}>
           {title}
         </Text>
         <View style={styles.locationRow}>
-          <MaterialIcons name="location-on" size={12} color={AtticoColors.textSecondary} />
-          <Text style={styles.location} numberOfLines={1}>
+          <MaterialIcons name="location-on" size={12} color={colors.textMuted} />
+          <Text style={[styles.location, { fontFamily: fonts.sans, color: colors.textMuted }]} numberOfLines={1}>
             {property.city ?? property.address}
           </Text>
         </View>
-        <Text style={styles.price}>
+        <Text style={[styles.price, { fontFamily: fonts.serif, color: colors.orange1 }]}>
           {price}
-          <Text style={styles.priceLabel}>
+          <Text style={[styles.priceLabel, { fontFamily: fonts.sans, color: colors.textMuted }]}>
             {suffix}
           </Text>
         </Text>
@@ -75,12 +86,9 @@ export function PropertyCard({ property, onPress }: PropertyCardProps) {
 const styles = StyleSheet.create({
   card: {
     flex: 1,
-    borderRadius: 20,
     overflow: 'hidden',
-    backgroundColor: AtticoColors.primaryLight,
     margin: 6,
     borderWidth: 1,
-    borderColor: AtticoColors.glassBorder,
   },
   image: {
     width: '100%',
@@ -92,8 +100,7 @@ const styles = StyleSheet.create({
     right: 8,
     width: 32,
     height: 32,
-    borderRadius: 16,
-    backgroundColor: 'rgba(0,0,0,0.4)',
+    backgroundColor: 'rgba(255,255,255,0.85)',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -101,14 +108,11 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 8,
     left: 8,
-    backgroundColor: AtticoColors.accent,
     paddingHorizontal: 8,
     paddingVertical: 3,
-    borderRadius: 6,
   },
   badgeText: {
     fontSize: 10,
-    fontWeight: '700',
     color: '#fff',
     letterSpacing: 0.5,
   },
@@ -118,8 +122,6 @@ const styles = StyleSheet.create({
   },
   name: {
     fontSize: 15,
-    fontWeight: '600',
-    color: AtticoColors.textPrimary,
   },
   locationRow: {
     flexDirection: 'row',
@@ -128,18 +130,13 @@ const styles = StyleSheet.create({
   },
   location: {
     fontSize: 11,
-    color: AtticoColors.textSecondary,
     flex: 1,
   },
   price: {
     fontSize: 16,
-    fontWeight: '700',
-    color: AtticoColors.accent,
     marginTop: 2,
   },
   priceLabel: {
     fontSize: 11,
-    fontWeight: '400',
-    color: AtticoColors.textSecondary,
   },
 });

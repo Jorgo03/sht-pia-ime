@@ -17,10 +17,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 
 import { ActionButton } from '@/components/ui/action-button';
-import { AtticoColors } from '@/constants/theme';
 import { useFavorites } from '@/contexts/favorites-context';
 import { getPropertyById } from '@/data/properties';
 import { Property } from '@/data/types';
+import { useFhoTheme } from '@/hooks/use-fho-theme';
 import { useResponsive } from '@/hooks/use-responsive';
 import { formatPrice, getLocalizedText } from '@/lib/format';
 
@@ -28,6 +28,7 @@ export default function PropertyDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const { t, i18n } = useTranslation();
+  const { colors, radii, fonts } = useFhoTheme();
   const { isFavorite, toggle } = useFavorites();
   const { height: screenHeight, isTablet } = useResponsive();
   const favorited = isFavorite(id ?? '');
@@ -56,16 +57,18 @@ export default function PropertyDetailScreen() {
 
   if (loading) {
     return (
-      <View style={styles.errorContainer}>
-        <ActivityIndicator size="large" color={AtticoColors.accent} />
+      <View style={[styles.errorContainer, { backgroundColor: colors.bg }]}>
+        <ActivityIndicator size="large" color={colors.orange1} />
       </View>
     );
   }
 
   if (!property) {
     return (
-      <View style={styles.errorContainer}>
-        <Text style={styles.errorText}>{t('search.empty')}</Text>
+      <View style={[styles.errorContainer, { backgroundColor: colors.bg }]}>
+        <Text style={[styles.errorText, { fontFamily: fonts.sans, color: colors.text }]}>
+          {t('search.empty')}
+        </Text>
       </View>
     );
   }
@@ -94,34 +97,44 @@ export default function PropertyDetailScreen() {
   // while phone renders the exact same JSX in a single stacked column.
   const infoContent = (
     <>
-      <Text style={styles.name}>{title}</Text>
+      <Text style={[styles.name, { fontFamily: fonts.serif, color: colors.text }]}>{title}</Text>
       <View style={styles.locationRow}>
-        <MaterialIcons name="location-on" size={16} color={AtticoColors.accent} />
-        <Text style={styles.location}>
+        <MaterialIcons name="location-on" size={16} color={colors.orange1} />
+        <Text style={[styles.location, { fontFamily: fonts.sans, color: colors.textMuted }]}>
           {property.address}, {property.city}
         </Text>
       </View>
 
-      <Text style={styles.description}>{description}</Text>
+      <Text style={[styles.description, { fontFamily: fonts.sans, color: colors.textMuted }]}>
+        {description}
+      </Text>
 
       <View style={styles.amenityRow}>
         {amenities.map((a) => (
           <View key={a.id} style={styles.amenityItem}>
-            <View style={styles.amenityIcon}>
-              <MaterialIcons name={a.icon as any} size={22} color={AtticoColors.accent} />
+            <View
+              style={[
+                styles.amenityIcon,
+                { borderRadius: radii.pill, backgroundColor: colors.orangeTint },
+              ]}>
+              <MaterialIcons name={a.icon as any} size={22} color={colors.orange1} />
             </View>
-            <Text style={styles.amenityLabel}>{a.name}</Text>
+            <Text style={[styles.amenityLabel, { fontFamily: fonts.sansMedium, color: colors.textMuted }]}>
+              {a.name}
+            </Text>
           </View>
         ))}
       </View>
 
-      <View style={styles.sectionCard}>
+      <View style={[styles.sectionCard, { borderRadius: radii.xl, backgroundColor: colors.surface, borderColor: colors.border }]}>
         <View style={styles.sectionHeader}>
-          <MaterialIcons name="360" size={22} color={AtticoColors.accent} />
-          <Text style={styles.sectionTitle}>{t('property.video')}</Text>
+          <MaterialIcons name="360" size={22} color={colors.orange1} />
+          <Text style={[styles.sectionTitle, { fontFamily: fonts.serif, color: colors.text }]}>
+            {t('property.video')}
+          </Text>
         </View>
         <TouchableOpacity
-          style={styles.tourPreview}
+          style={[styles.tourPreview, { borderRadius: radii.lg }]}
           activeOpacity={0.8}
           onPress={() => Alert.alert(t('property.video'), t('messages.comingSoon'))}>
           <Image
@@ -130,10 +143,12 @@ export default function PropertyDetailScreen() {
             contentFit="cover"
           />
           <View style={styles.tourOverlay}>
-            <View style={styles.playButton}>
+            <View style={[styles.playButton, { borderRadius: radii.pill, backgroundColor: colors.orange1 }]}>
               <MaterialIcons name="play-arrow" size={36} color="#fff" />
             </View>
-            <Text style={styles.tourText}>{t('property.video')}</Text>
+            <Text style={[styles.tourText, { fontFamily: fonts.sansSemiBold }]}>
+              {t('property.video')}
+            </Text>
           </View>
         </TouchableOpacity>
       </View>
@@ -142,32 +157,40 @@ export default function PropertyDetailScreen() {
 
   const agentAndContactContent = (
     <>
-      <View style={styles.sectionCard}>
+      <View style={[styles.sectionCard, { borderRadius: radii.xl, backgroundColor: colors.surface, borderColor: colors.border }]}>
         <View style={styles.sectionHeader}>
-          <MaterialIcons name="person" size={22} color={AtticoColors.accent} />
-          <Text style={styles.sectionTitle}>{t('auth.agent')}</Text>
+          <MaterialIcons name="person" size={22} color={colors.orange1} />
+          <Text style={[styles.sectionTitle, { fontFamily: fonts.serif, color: colors.text }]}>
+            {t('auth.agent')}
+          </Text>
         </View>
         <View style={styles.agentRow}>
-          <View style={styles.agentAvatar}>
-            <MaterialIcons name="person" size={28} color={AtticoColors.accent} />
+          <View style={[styles.agentAvatar, { borderRadius: radii.pill, backgroundColor: colors.orangeTint }]}>
+            <MaterialIcons name="person" size={28} color={colors.orange1} />
           </View>
           <View style={styles.agentInfo}>
-            <Text style={styles.agentName}>{t('auth.agent')}</Text>
-            <Text style={styles.agentRole}>{t('auth.agent')}</Text>
+            <Text style={[styles.agentName, { fontFamily: fonts.sansSemiBold, color: colors.text }]}>
+              {t('auth.agent')}
+            </Text>
+            <Text style={[styles.agentRole, { fontFamily: fonts.sansMedium, color: colors.orange1 }]}>
+              {t('auth.agent')}
+            </Text>
             <View style={styles.agentRating}>
               {[1, 2, 3, 4, 5].map((star) => (
                 <MaterialIcons
                   key={star}
                   name="star"
                   size={14}
-                  color={star <= 4 ? AtticoColors.accent : '#333'}
+                  color={star <= 4 ? colors.orange1 : colors.border}
                 />
               ))}
-              <Text style={styles.agentRatingText}>4.0</Text>
+              <Text style={[styles.agentRatingText, { fontFamily: fonts.sans, color: colors.textMuted }]}>
+                4.0
+              </Text>
             </View>
           </View>
           <TouchableOpacity
-            style={styles.callButton}
+            style={[styles.callButton, { borderRadius: radii.pill, backgroundColor: colors.orange1 }]}
             onPress={() => Alert.alert(t('property.call'), '...')}
             activeOpacity={0.7}>
             <MaterialIcons name="phone" size={20} color="#fff" />
@@ -175,31 +198,37 @@ export default function PropertyDetailScreen() {
         </View>
       </View>
 
-      <View style={styles.sectionCard}>
+      <View style={[styles.sectionCard, { borderRadius: radii.xl, backgroundColor: colors.surface, borderColor: colors.border }]}>
         <View style={styles.sectionHeader}>
-          <MaterialIcons name="mail" size={22} color={AtticoColors.accent} />
-          <Text style={styles.sectionTitle}>{t('detail.message')}</Text>
+          <MaterialIcons name="mail" size={22} color={colors.orange1} />
+          <Text style={[styles.sectionTitle, { fontFamily: fonts.serif, color: colors.text }]}>
+            {t('detail.message')}
+          </Text>
         </View>
         <TextInput
-          style={styles.contactInput}
+          style={[styles.contactInput, { borderRadius: radii.md, backgroundColor: colors.surface2, borderColor: colors.border, color: colors.text, fontFamily: fonts.sans }]}
           placeholder={t('auth.fullName')}
-          placeholderTextColor={AtticoColors.textSecondary}
+          placeholderTextColor={colors.textFaint}
           value={contactName}
           onChangeText={setContactName}
         />
         <TextInput
-          style={styles.contactInput}
+          style={[styles.contactInput, { borderRadius: radii.md, backgroundColor: colors.surface2, borderColor: colors.border, color: colors.text, fontFamily: fonts.sans }]}
           placeholder={t('auth.email')}
-          placeholderTextColor={AtticoColors.textSecondary}
+          placeholderTextColor={colors.textFaint}
           value={contactEmail}
           onChangeText={setContactEmail}
           keyboardType="email-address"
           autoCapitalize="none"
         />
         <TextInput
-          style={[styles.contactInput, styles.contactMessage]}
+          style={[
+            styles.contactInput,
+            styles.contactMessage,
+            { borderRadius: radii.md, backgroundColor: colors.surface2, borderColor: colors.border, color: colors.text, fontFamily: fonts.sans },
+          ]}
           placeholder={t('property.whatsappMessage', { title })}
-          placeholderTextColor={AtticoColors.textSecondary}
+          placeholderTextColor={colors.textFaint}
           value={contactMessage}
           onChangeText={setContactMessage}
           multiline
@@ -211,10 +240,14 @@ export default function PropertyDetailScreen() {
 
       <View style={styles.priceRow}>
         <View>
-          <Text style={styles.priceLabel}>{t('listing.priceLabel')}</Text>
-          <Text style={styles.price}>
+          <Text style={[styles.priceLabel, { fontFamily: fonts.sans, color: colors.textMuted }]}>
+            {t('listing.priceLabel')}
+          </Text>
+          <Text style={[styles.price, { fontFamily: fonts.serif, color: colors.orange1 }]}>
             {price}
-            <Text style={styles.priceSuffix}>{suffix}</Text>
+            <Text style={[styles.priceSuffix, { fontFamily: fonts.sans, color: colors.textMuted }]}>
+              {suffix}
+            </Text>
           </Text>
         </View>
       </View>
@@ -227,7 +260,7 @@ export default function PropertyDetailScreen() {
   );
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.bg }]}>
       <View style={[styles.imageContainer, { height: imageHeight }]}>
         <Image
           source={{ uri: property.image_urls[0] }}
@@ -241,31 +274,31 @@ export default function PropertyDetailScreen() {
         />
         <SafeAreaView style={styles.imageHeader} edges={['top']}>
           <TouchableOpacity
-            style={styles.headerButton}
+            style={[styles.headerButton, { borderRadius: radii.pill }]}
             onPress={() => router.back()}
             activeOpacity={0.7}>
             <MaterialIcons name="chevron-left" size={28} color="#fff" />
           </TouchableOpacity>
-          <Text style={styles.headerBrand}>Shtëpia.ime</Text>
+          <Text style={[styles.headerBrand, { fontFamily: fonts.serifSemiBold }]}>Shtëpia.ime</Text>
           <TouchableOpacity
-            style={styles.headerButton}
+            style={[styles.headerButton, { borderRadius: radii.pill }]}
             onPress={() => toggle(id ?? '')}
             activeOpacity={0.7}>
             <MaterialIcons
               name={favorited ? 'favorite' : 'favorite-border'}
               size={24}
-              color={favorited ? AtticoColors.accent : '#fff'}
+              color={favorited ? colors.orange1 : '#fff'}
             />
           </TouchableOpacity>
         </SafeAreaView>
 
-        <View style={styles.imageBadge}>
-          <Text style={styles.imageBadgeText}>{badge.toUpperCase()}</Text>
+        <View style={[styles.imageBadge, { borderRadius: radii.sm, backgroundColor: colors.orange1 }]}>
+          <Text style={[styles.imageBadgeText, { fontFamily: fonts.mono }]}>{badge.toUpperCase()}</Text>
         </View>
       </View>
 
       <ScrollView
-        style={styles.content}
+        style={[styles.content, { backgroundColor: colors.bg, borderTopLeftRadius: radii.xxl, borderTopRightRadius: radii.xxl }]}
         contentContainerStyle={styles.contentInner}
         showsVerticalScrollIndicator={false}>
         {isTablet ? (
@@ -287,17 +320,14 @@ export default function PropertyDetailScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: AtticoColors.primary,
   },
   errorContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: AtticoColors.primary,
   },
   errorText: {
     fontSize: 16,
-    color: AtticoColors.textPrimary,
   },
   imageContainer: {
     // height is computed per-render (imageHeight) so it responds to
@@ -319,37 +349,28 @@ const styles = StyleSheet.create({
   headerButton: {
     width: 40,
     height: 40,
-    borderRadius: 20,
     backgroundColor: 'rgba(0,0,0,0.4)',
     justifyContent: 'center',
     alignItems: 'center',
   },
   headerBrand: {
-    fontSize: 16,
-    fontWeight: '700',
+    fontSize: 17,
     color: '#fff',
-    letterSpacing: 1,
   },
   imageBadge: {
     position: 'absolute',
     bottom: 44,
     left: 20,
-    backgroundColor: AtticoColors.accent,
     paddingHorizontal: 14,
     paddingVertical: 6,
-    borderRadius: 8,
   },
   imageBadgeText: {
-    fontSize: 12,
-    fontWeight: '700',
+    fontSize: 11,
     color: '#fff',
     letterSpacing: 1,
   },
   content: {
     flex: 1,
-    backgroundColor: AtticoColors.primary,
-    borderTopLeftRadius: 28,
-    borderTopRightRadius: 28,
     marginTop: -28,
   },
   contentInner: {
@@ -373,8 +394,6 @@ const styles = StyleSheet.create({
   },
   name: {
     fontSize: 26,
-    fontWeight: '700',
-    color: AtticoColors.textPrimary,
     marginBottom: 8,
   },
   locationRow: {
@@ -385,12 +404,10 @@ const styles = StyleSheet.create({
   },
   location: {
     fontSize: 14,
-    color: AtticoColors.textSecondary,
   },
   description: {
     fontSize: 14,
     lineHeight: 22,
-    color: AtticoColors.textSecondary,
     marginBottom: 8,
   },
   amenityRow: {
@@ -405,26 +422,17 @@ const styles = StyleSheet.create({
   amenityIcon: {
     width: 48,
     height: 48,
-    borderRadius: 24,
-    backgroundColor: AtticoColors.glass,
-    borderWidth: 1,
-    borderColor: AtticoColors.glassBorder,
     justifyContent: 'center',
     alignItems: 'center',
   },
   amenityLabel: {
     fontSize: 12,
-    color: AtticoColors.textSecondary,
-    fontWeight: '500',
   },
 
   sectionCard: {
-    backgroundColor: AtticoColors.primaryLight,
-    borderRadius: 20,
     padding: 16,
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: AtticoColors.glassBorder,
     gap: 12,
   },
   sectionHeader: {
@@ -433,13 +441,10 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   sectionTitle: {
-    fontSize: 17,
-    fontWeight: '700',
-    color: AtticoColors.textPrimary,
+    fontSize: 18,
   },
 
   tourPreview: {
-    borderRadius: 16,
     overflow: 'hidden',
     height: 180,
   },
@@ -456,14 +461,11 @@ const styles = StyleSheet.create({
   playButton: {
     width: 60,
     height: 60,
-    borderRadius: 30,
-    backgroundColor: AtticoColors.accent,
     justifyContent: 'center',
     alignItems: 'center',
   },
   tourText: {
     fontSize: 14,
-    fontWeight: '600',
     color: '#fff',
   },
 
@@ -475,10 +477,6 @@ const styles = StyleSheet.create({
   agentAvatar: {
     width: 52,
     height: 52,
-    borderRadius: 26,
-    backgroundColor: AtticoColors.glass,
-    borderWidth: 1,
-    borderColor: AtticoColors.glassBorder,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -488,13 +486,9 @@ const styles = StyleSheet.create({
   },
   agentName: {
     fontSize: 16,
-    fontWeight: '600',
-    color: AtticoColors.textPrimary,
   },
   agentRole: {
     fontSize: 12,
-    color: AtticoColors.accent,
-    fontWeight: '500',
   },
   agentRating: {
     flexDirection: 'row',
@@ -504,27 +498,20 @@ const styles = StyleSheet.create({
   },
   agentRatingText: {
     fontSize: 12,
-    color: AtticoColors.textSecondary,
     marginLeft: 4,
   },
   callButton: {
     width: 44,
     height: 44,
-    borderRadius: 22,
-    backgroundColor: AtticoColors.accent,
     justifyContent: 'center',
     alignItems: 'center',
   },
 
   contactInput: {
-    backgroundColor: AtticoColors.glass,
-    borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 14,
     fontSize: 14,
-    color: AtticoColors.textPrimary,
     borderWidth: 1,
-    borderColor: AtticoColors.glassBorder,
   },
   contactMessage: {
     height: 100,
@@ -539,17 +526,12 @@ const styles = StyleSheet.create({
   },
   priceLabel: {
     fontSize: 13,
-    color: AtticoColors.textSecondary,
     marginBottom: 4,
   },
   price: {
     fontSize: 28,
-    fontWeight: '700',
-    color: AtticoColors.accent,
   },
   priceSuffix: {
     fontSize: 14,
-    fontWeight: '400',
-    color: AtticoColors.textSecondary,
   },
 });

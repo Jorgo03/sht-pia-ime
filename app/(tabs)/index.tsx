@@ -16,15 +16,16 @@ import { FeaturedPropertyCard } from '@/components/property/featured-property-ca
 import { PropertyCard } from '@/components/property/property-card';
 import { GradientBackground } from '@/components/ui/gradient-background';
 import { SearchHeader } from '@/components/ui/search-header';
-import { AtticoColors } from '@/constants/theme';
 import { useAuth } from '@/contexts/auth-context';
 import { getFeaturedProperty, getProperties } from '@/data/properties';
 import { Property } from '@/data/types';
+import { useFhoTheme } from '@/hooks/use-fho-theme';
 import { useResponsive } from '@/hooks/use-responsive';
 
 export default function HomeScreen() {
   const router = useRouter();
   const { t } = useTranslation();
+  const { colors, radii, fonts } = useFhoTheme();
   const { user } = useAuth();
   const { columns } = useResponsive();
   const gridItemWidth = `${100 / columns}%` as const;
@@ -61,15 +62,19 @@ export default function HomeScreen() {
           showsVerticalScrollIndicator={false}>
           {loading ? (
             <View style={styles.loader}>
-              <ActivityIndicator size="large" color={AtticoColors.accent} />
+              <ActivityIndicator size="large" color={colors.orange1} />
             </View>
           ) : (
             <>
               {featured && (
                 <>
                   <View style={styles.sectionHeader}>
-                    <Text style={styles.sectionTitle}>{t('home.featured')}</Text>
-                    <Text style={styles.editorsPick}>{t('home.editorsPick')}</Text>
+                    <Text style={[styles.sectionTitle, { fontFamily: fonts.serif, color: colors.text }]}>
+                      {t('home.featured')}
+                    </Text>
+                    <Text style={[styles.editorsPick, { fontFamily: fonts.mono, color: colors.textMuted }]}>
+                      {t('home.editorsPick')}
+                    </Text>
                   </View>
                   <FeaturedPropertyCard
                     property={featured}
@@ -82,11 +87,15 @@ export default function HomeScreen() {
 
               <View style={styles.section}>
                 <View style={styles.sectionHeader}>
-                  <Text style={styles.sectionTitle}>{t('home.matched')}</Text>
+                  <Text style={[styles.sectionTitle, { fontFamily: fonts.serif, color: colors.text }]}>
+                    {t('home.matched')}
+                  </Text>
                   <TouchableOpacity
                     onPress={() => router.push('/(tabs)/explore' as Href)}
                     activeOpacity={0.7}>
-                    <Text style={styles.seeAll}>{t('home.seeAll')}</Text>
+                    <Text style={[styles.seeAll, { fontFamily: fonts.sansSemiBold, color: colors.orange1 }]}>
+                      {t('home.seeAll')}
+                    </Text>
                   </TouchableOpacity>
                 </View>
                 <View style={styles.grid}>
@@ -104,20 +113,20 @@ export default function HomeScreen() {
               </View>
 
               <View style={styles.statsSection}>
-                <View style={styles.statCard}>
-                  <MaterialIcons name="home" size={28} color={AtticoColors.accent} />
-                  <Text style={styles.statNumber}>250+</Text>
-                  <Text style={styles.statLabel}>{t('search.results_other', { count: 250 }).split(' ').pop()}</Text>
+                <View style={[styles.statCard, { borderRadius: radii.lg, backgroundColor: colors.surface, borderColor: colors.border }]}>
+                  <MaterialIcons name="home" size={28} color={colors.orange1} />
+                  <Text style={[styles.statNumber, { fontFamily: fonts.serif, color: colors.text }]}>250+</Text>
+                  <Text style={[styles.statLabel, { fontFamily: fonts.sansMedium, color: colors.textMuted }]}>{t('search.results_other', { count: 250 }).split(' ').pop()}</Text>
                 </View>
-                <View style={styles.statCard}>
-                  <MaterialIcons name="people" size={28} color={AtticoColors.accent} />
-                  <Text style={styles.statNumber}>100+</Text>
-                  <Text style={styles.statLabel}>{t('auth.agent')}s</Text>
+                <View style={[styles.statCard, { borderRadius: radii.lg, backgroundColor: colors.surface, borderColor: colors.border }]}>
+                  <MaterialIcons name="people" size={28} color={colors.orange1} />
+                  <Text style={[styles.statNumber, { fontFamily: fonts.serif, color: colors.text }]}>100+</Text>
+                  <Text style={[styles.statLabel, { fontFamily: fonts.sansMedium, color: colors.textMuted }]}>{t('auth.agent')}s</Text>
                 </View>
-                <View style={styles.statCard}>
-                  <MaterialIcons name="star" size={28} color={AtticoColors.accent} />
-                  <Text style={styles.statNumber}>4.9</Text>
-                  <Text style={styles.statLabel}>Rating</Text>
+                <View style={[styles.statCard, { borderRadius: radii.lg, backgroundColor: colors.surface, borderColor: colors.border }]}>
+                  <MaterialIcons name="star" size={28} color={colors.orange1} />
+                  <Text style={[styles.statNumber, { fontFamily: fonts.serif, color: colors.text }]}>4.9</Text>
+                  <Text style={[styles.statLabel, { fontFamily: fonts.sansMedium, color: colors.textMuted }]}>Rating</Text>
                 </View>
               </View>
             </>
@@ -151,21 +160,16 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   sectionTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: AtticoColors.textPrimary,
+    fontSize: 22,
+    letterSpacing: -0.3,
   },
   editorsPick: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: AtticoColors.textSecondary,
-    letterSpacing: 1,
+    fontSize: 10.5,
+    letterSpacing: 1.4,
     textTransform: 'uppercase',
   },
   seeAll: {
     fontSize: 14,
-    fontWeight: '600',
-    color: AtticoColors.accent,
   },
   grid: {
     flexDirection: 'row',
@@ -183,22 +187,15 @@ const styles = StyleSheet.create({
   },
   statCard: {
     flex: 1,
-    backgroundColor: AtticoColors.glass,
     borderWidth: 1,
-    borderColor: AtticoColors.glassBorder,
-    borderRadius: 16,
     padding: 16,
     alignItems: 'center',
     gap: 6,
   },
   statNumber: {
     fontSize: 20,
-    fontWeight: '700',
-    color: AtticoColors.textPrimary,
   },
   statLabel: {
     fontSize: 12,
-    color: AtticoColors.textSecondary,
-    fontWeight: '500',
   },
 });

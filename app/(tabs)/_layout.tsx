@@ -1,33 +1,34 @@
 import { Tabs } from 'expo-router';
 import React from 'react';
-import { Platform } from 'react-native';
+import { Platform, StyleSheet } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { HapticTab } from '@/components/haptic-tab';
 import { IconSymbol } from '@/components/ui/icon-symbol';
-import { AtticoColors } from '@/constants/theme';
+import { useFhoTheme } from '@/hooks/use-fho-theme';
 
 export default function TabLayout() {
   const { t } = useTranslation();
+  const { colors, fonts } = useFhoTheme();
 
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: AtticoColors.accent,
-        tabBarInactiveTintColor: AtticoColors.textSecondary,
+        tabBarActiveTintColor: colors.orange1,
+        tabBarInactiveTintColor: colors.textMuted,
         headerShown: false,
         tabBarButton: HapticTab,
         tabBarStyle: {
-          backgroundColor: AtticoColors.primary,
-          borderTopWidth: 1,
-          borderTopColor: AtticoColors.glassBorder,
+          backgroundColor: colors.surface,
+          borderTopWidth: StyleSheet.hairlineWidth,
+          borderTopColor: colors.border,
           height: Platform.OS === 'ios' ? 88 : 64,
           paddingBottom: Platform.OS === 'ios' ? 28 : 8,
           paddingTop: 8,
         },
         tabBarLabelStyle: {
           fontSize: 11,
-          fontWeight: '600',
+          fontFamily: fonts.sansSemiBold,
         },
       }}>
       <Tabs.Screen
