@@ -231,6 +231,11 @@ const createStyles = (
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
+      // Without a floor, `justifyContent: 'space-between'` lets a long
+      // wordmark/title grow right up against the actions with zero
+      // breathing room — `leading`'s `flexShrink: 1` only kicks in once
+      // they're already touching.
+      gap: 8,
       paddingHorizontal: 20,
       paddingVertical: 10,
       // The floating variant is chrome over a photo — a border would draw a

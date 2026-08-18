@@ -659,6 +659,11 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
   },
   imageHeader: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 10,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
