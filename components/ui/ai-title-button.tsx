@@ -1,5 +1,5 @@
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   StyleSheet,
@@ -9,7 +9,8 @@ import {
 } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
-import { AtticoColors } from '@/constants/theme';
+import { type AtticoPalette } from '@/constants/theme';
+import { useTheme } from '@/contexts/theme-context';
 import { generateListing, type AiError, type ListingDetails } from '@/lib/ai';
 import { type LangCode } from '@/lib/translate';
 
@@ -33,6 +34,8 @@ export function AiTitleButton({
   onResult,
 }: AiTitleButtonProps) {
   const { t } = useTranslation();
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -70,12 +73,12 @@ export function AiTitleButton({
         activeOpacity={0.7}
         accessibilityLabel={t('ai.generateTitle')}>
         {loading ? (
-          <ActivityIndicator size="small" color={AtticoColors.accent} />
+          <ActivityIndicator size="small" color={colors.accent} />
         ) : (
           <MaterialIcons
             name="auto-awesome"
             size={16}
-            color={AtticoColors.accent}
+            color={colors.accent}
           />
         )}
         <Text style={styles.text}>
@@ -89,16 +92,16 @@ export function AiTitleButton({
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   button: {
     flexDirection: 'row',
     alignItems: 'center',
     alignSelf: 'flex-start',
     gap: 6,
-    backgroundColor: AtticoColors.glass,
+    backgroundColor: colors.glass,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: AtticoColors.glassBorder,
+    borderColor: colors.border,
     paddingHorizontal: 14,
     paddingVertical: 10,
   },
@@ -108,12 +111,12 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 13,
     fontWeight: '600',
-    color: AtticoColors.accent,
+    color: colors.accent,
   },
   hint: {
     marginTop: 6,
     fontSize: 12,
-    color: AtticoColors.textSecondary,
+    color: colors.textSecondary,
   },
   error: {
     marginTop: 6,

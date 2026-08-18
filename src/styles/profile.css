@@ -33,9 +33,17 @@
   }
 }
 
+/* Sign-in prototype's hero: 48px, three stacked lines, near-solid leading. */
 .auth-hero-headline {
   color: var(--fho-text-on-dark) !important;
-  font-size: 32px !important;
+  font-size: 48px !important;
+  line-height: 0.98 !important;
+  letter-spacing: -0.03em !important;
+}
+
+.auth-hero-headline span,
+.auth-hero-headline em {
+  display: block;
 }
 
 .auth-hero-headline em {
@@ -48,6 +56,35 @@
 
 .auth-content .screen-kicker__dash {
   background: var(--fho-orange-soft);
+}
+
+/* Role-context + "Forgot?" row above the CTA (sign-in prototype). */
+
+.auth-access-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 0 4px;
+  font-size: 12.5px;
+}
+
+.auth-access-row span {
+  /* Longer translations (sq, ru) wrap instead of pushing "Forgot?" out. */
+  min-width: 0;
+  color: rgba(255, 235, 210, 0.7);
+}
+
+.auth-forgot {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--fho-orange-soft);
 }
 
 /* Slide only, no opacity — critical sign-in text must stay legible even if

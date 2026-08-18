@@ -87,7 +87,19 @@ export function AuthProvider({ children }) {
       (event, session) => {
         if (event === 'SIGNED_IN' && session?.user) {
           sync(session)
-          showWelcome(session.user)
+          // supabase-js replays SIGNED_IN whenever it restores a persisted
+          // session from storage on page load — not just on a genuine new
+          // sign-in — and it fires that replay *before* INITIAL_SESSION, so
+          // event ordering can't distinguish the two. Only OAuth reaches
+          // this branch for a real sign-in (password/OTP call showWelcome
+          // directly on success); gate it on the flag signInWithProvider
+          // sets right before the redirect.
+          try {
+            if (sessionStorage.getItem('fho_pending_welcome')) {
+              sessionStorage.removeItem('fho_pending_welcome')
+              showWelcome(session.user)
+            }
+          } catch { /* ignore */ }
         } else if (event === 'TOKEN_REFRESHED' && session) {
           sync(session)
         } else if (event === 'SIGNED_OUT') {
@@ -184,6 +196,7 @@ export function AuthProvider({ children }) {
   }
 
   const signInWithProvider = async (provider) => {
+    try { sessionStorage.setItem('fho_pending_welcome', '1') } catch { /* ignore */ }
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
       options: {

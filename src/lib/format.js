@@ -92,6 +92,14 @@ export function slugify(s) {
 }
 
 export function whatsappUrl(phone, message) {
-  const clean = phone?.replace(/[^0-9]/g, '') || ''
+  let clean = phone?.replace(/[^0-9]/g, '') || ''
+  // wa.me requires full international format with no leading 0. Agents
+  // enter local Albanian numbers (e.g. "069 602 0791"), so assume Albania's
+  // country code (355) whenever one isn't already present.
+  if (clean.startsWith('0')) {
+    clean = `355${clean.slice(1)}`
+  } else if (!clean.startsWith('355')) {
+    clean = `355${clean}`
+  }
   return `https://wa.me/${clean}?text=${encodeURIComponent(message)}`
 }

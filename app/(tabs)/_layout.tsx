@@ -1,80 +1,27 @@
 import { Tabs } from 'expo-router';
 import React from 'react';
-import { Platform } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
-import { HapticTab } from '@/components/haptic-tab';
-import { IconSymbol } from '@/components/ui/icon-symbol';
-import { AtticoColors } from '@/constants/theme';
+import { LiquidTabBar } from '@/components/liquid-tab-bar';
 
+// Matches web's src/shared/BottomNav.jsx: Home/Search/Profile are the only
+// real tabs (state-preserving, switched via the floating pill below).
+// Create and Messages — the pill's other two buttons — are stack pushes
+// handled inside LiquidTabBar itself, not tab routes, exactly like
+// BottomNav.jsx's own `/new-listing` and `/messages` links aren't separate
+// router "tabs" on web either. Map and Favorites are no longer tabs at all:
+// Map is now a view-mode toggle inside Explore, Favorites moved into
+// Profile's menu — same places web keeps them.
 export default function TabLayout() {
   const { t } = useTranslation();
 
   return (
     <Tabs
-      screenOptions={{
-        tabBarActiveTintColor: AtticoColors.accent,
-        tabBarInactiveTintColor: AtticoColors.textSecondary,
-        headerShown: false,
-        tabBarButton: HapticTab,
-        tabBarStyle: {
-          backgroundColor: AtticoColors.primary,
-          borderTopWidth: 1,
-          borderTopColor: AtticoColors.glassBorder,
-          height: Platform.OS === 'ios' ? 88 : 64,
-          paddingBottom: Platform.OS === 'ios' ? 28 : 8,
-          paddingTop: 8,
-        },
-        tabBarLabelStyle: {
-          fontSize: 11,
-          fontWeight: '600',
-        },
-      }}>
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: t('common.home'),
-          tabBarIcon: ({ color }) => (
-            <IconSymbol size={26} name="house.fill" color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="explore"
-        options={{
-          title: t('common.search'),
-          tabBarIcon: ({ color }) => (
-            <IconSymbol size={26} name="magnifyingglass" color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="map"
-        options={{
-          title: t('search.mapView'),
-          tabBarIcon: ({ color }) => (
-            <IconSymbol size={26} name="map" color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="favorites"
-        options={{
-          title: t('common.favorites'),
-          tabBarIcon: ({ color }) => (
-            <IconSymbol size={26} name="heart" color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="profile"
-        options={{
-          title: t('common.profile'),
-          tabBarIcon: ({ color }) => (
-            <IconSymbol size={26} name="person" color={color} />
-          ),
-        }}
-      />
+      tabBar={(props) => <LiquidTabBar {...props} />}
+      screenOptions={{ headerShown: false }}>
+      <Tabs.Screen name="index" options={{ title: t('common.home') }} />
+      <Tabs.Screen name="explore" options={{ title: t('common.search') }} />
+      <Tabs.Screen name="profile" options={{ title: t('common.profile') }} />
     </Tabs>
   );
 }

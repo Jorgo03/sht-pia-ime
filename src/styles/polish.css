@@ -42,15 +42,14 @@
 .h-scroll > *,
 .fav-list > *,
 .msg-list > *,
-.neighborhood-grid > *,
 .featured-card {
   animation: riseIn var(--t-slow) var(--ease-out) backwards;
 }
 
-.property-grid > *:nth-child(1), .h-scroll > *:nth-child(1), .fav-list > *:nth-child(1), .msg-list > *:nth-child(1), .neighborhood-grid > *:nth-child(1) { animation-delay: 40ms; }
-.property-grid > *:nth-child(2), .h-scroll > *:nth-child(2), .fav-list > *:nth-child(2), .msg-list > *:nth-child(2), .neighborhood-grid > *:nth-child(2) { animation-delay: 90ms; }
-.property-grid > *:nth-child(3), .h-scroll > *:nth-child(3), .fav-list > *:nth-child(3), .msg-list > *:nth-child(3), .neighborhood-grid > *:nth-child(3) { animation-delay: 140ms; }
-.property-grid > *:nth-child(4), .h-scroll > *:nth-child(4), .fav-list > *:nth-child(4), .msg-list > *:nth-child(4), .neighborhood-grid > *:nth-child(4) { animation-delay: 190ms; }
+.property-grid > *:nth-child(1), .h-scroll > *:nth-child(1), .fav-list > *:nth-child(1), .msg-list > *:nth-child(1) { animation-delay: 40ms; }
+.property-grid > *:nth-child(2), .h-scroll > *:nth-child(2), .fav-list > *:nth-child(2), .msg-list > *:nth-child(2) { animation-delay: 90ms; }
+.property-grid > *:nth-child(3), .h-scroll > *:nth-child(3), .fav-list > *:nth-child(3), .msg-list > *:nth-child(3) { animation-delay: 140ms; }
+.property-grid > *:nth-child(4), .h-scroll > *:nth-child(4), .fav-list > *:nth-child(4), .msg-list > *:nth-child(4) { animation-delay: 190ms; }
 .property-grid > *:nth-child(5), .h-scroll > *:nth-child(5), .fav-list > *:nth-child(5), .msg-list > *:nth-child(5) { animation-delay: 240ms; }
 .property-grid > *:nth-child(6), .h-scroll > *:nth-child(6), .fav-list > *:nth-child(6), .msg-list > *:nth-child(6) { animation-delay: 290ms; }
 .property-grid > *:nth-child(7), .h-scroll > *:nth-child(7), .fav-list > *:nth-child(7), .msg-list > *:nth-child(7) { animation-delay: 340ms; }
@@ -61,8 +60,7 @@
 @media (hover: hover) {
   .compact-card:hover,
   .mini-card:hover,
-  .fav-row:hover,
-  .neighborhood-card:hover {
+  .fav-row:hover {
     transform: translateY(-2px);
     box-shadow: var(--fho-card-shadow-hover);
     border-color: var(--fho-border-strong);
@@ -89,13 +87,13 @@
 }
 
 /* Cards need transition on the new properties (they only had transform). */
-.compact-card, .mini-card, .fav-row, .neighborhood-card, .home-search-bar {
+.compact-card, .mini-card, .fav-row, .home-search-bar {
   transition: transform var(--t-fast) var(--ease-out),
               box-shadow var(--t-fast) var(--ease-out),
               border-color var(--t-fast) var(--ease-out);
 }
 
-.mini-card:active, .compact-card:active, .fav-row:active, .neighborhood-card:active {
+.mini-card:active, .compact-card:active, .fav-row:active {
   transform: scale(0.98);
   box-shadow: none;
 }
@@ -212,7 +210,7 @@ input:focus-visible, textarea:focus-visible, select:focus-visible {
 @media (prefers-reduced-motion: reduce) {
   .screen-head, .detail-title, .home-search-bar, .search-head, .profile-card,
   .nl-header, .property-grid > *, .h-scroll > *, .fav-list > *, .msg-list > *,
-  .neighborhood-grid > *, .featured-card, .nav-item.active::after,
+  .featured-card, .nav-item.active::after,
   .featured-card__heart.saved svg, .compact-card__heart.saved svg,
   .heart-mini.saved svg, .round-btn.saved svg, .fav-row__heart svg,
   .filter-sheet, .addsheet-panel, .filter-backdrop, .cookie-banner,
@@ -220,7 +218,7 @@ input:focus-visible, textarea:focus-visible, select:focus-visible {
     animation: none;
   }
 
-  .compact-card, .mini-card, .fav-row, .neighborhood-card, .home-search-bar,
+  .compact-card, .mini-card, .fav-row, .home-search-bar,
   .featured-card .featured-card__img-bg, .compact-card .compact-card__img-bg,
   .cta-pill, .pill-btn, .ghost-btn, .segment, .bed-chip, .filter-btn,
   .load-more-btn, .social-btn, .lang-btn, .theme-btn {

@@ -9,6 +9,7 @@ import PropertyMap from '../components/PropertyMap'
 import FilterBar from '../components/FilterBar'
 import SkeletonCard from '../../../shared/SkeletonCard'
 import { useProperties } from '../hooks/useProperties'
+import { useDragSheet } from '../../../hooks/useDragSheet'
 import LOCATIONS from '../data/locations'
 import {
   PROPERTY_TYPES, BED_OPTIONS, BATH_OPTIONS,
@@ -124,6 +125,10 @@ export default function Search() {
     return () => window.removeEventListener('keydown', h)
   }, [filtersOpen])
 
+  const { dragHandleProps, dragY, dragTransition } = useDragSheet({
+    onDismiss: () => setFiltersOpen(false),
+  })
+
   return (
     <div className="search-screen">
       <div className="search-head">
@@ -213,11 +218,19 @@ export default function Search() {
       {filtersOpen && (
         <>
           <div className="filter-backdrop" onClick={() => setFiltersOpen(false)} />
-          <div className="filter-sheet">
-            <div className="addsheet-grip" />
-            <div className="filter-sheet__header">
-              <h2 className="filter-sheet__title">{t('search.filtersTitle')}</h2>
-              <button className="link-btn" onClick={resetFilters} style={{ color: 'var(--fho-orange-1)' }}>{t('search.reset')}</button>
+          <div
+            className="filter-sheet"
+            style={{ transform: `translateX(-50%) translateY(${dragY}px)`, transition: dragTransition }}
+          >
+            {/* Drag zone is deliberately just the grip + header — the filter
+                fields below need to scroll normally, so they don't carry
+                the drag handlers. */}
+            <div {...dragHandleProps}>
+              <div className="addsheet-grip" />
+              <div className="filter-sheet__header">
+                <h2 className="filter-sheet__title">{t('search.filtersTitle')}</h2>
+                <button className="link-btn" onClick={resetFilters} style={{ color: 'var(--fho-orange-1)' }}>{t('search.reset')}</button>
+              </div>
             </div>
 
             {/* City — also present in the inline bar, but the bar is hidden

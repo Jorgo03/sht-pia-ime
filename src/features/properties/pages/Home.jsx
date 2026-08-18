@@ -91,8 +91,9 @@ export default function Home() {
         </section>
       )}
 
-      {/* "Trending neighborhoods" removed per owner request 2026-07-14 —
-          CSS (home.css) and i18n keys retained for easy restore. */}
+      {/* "Trending neighborhoods" removed per owner request 2026-07-14; the
+          removal was confirmed permanent 2026-08-18, so its CSS (home.css,
+          polish.css) and `home.neighborhoods` i18n keys are gone too. */}
     </div>
   )
 }

@@ -1,22 +1,34 @@
+import { useMemo } from 'react';
 import { StyleSheet, Text, TouchableOpacity } from 'react-native';
 
-import { AtticoColors } from '@/constants/theme';
+import { type AtticoPalette } from '@/constants/theme';
+import { useTheme } from '@/contexts/theme-context';
 
 interface ActionButtonProps {
   title: string;
   onPress: () => void;
   variant?: 'primary' | 'secondary';
+  disabled?: boolean;
 }
 
 export function ActionButton({
   title,
   onPress,
   variant = 'primary',
+  disabled = false,
 }: ActionButtonProps) {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+
   return (
     <TouchableOpacity
-      style={[styles.button, variant === 'secondary' && styles.secondary]}
+      style={[
+        styles.button,
+        variant === 'secondary' && styles.secondary,
+        disabled && styles.disabled,
+      ]}
       onPress={onPress}
+      disabled={disabled}
       activeOpacity={0.8}>
       <Text
         style={[styles.text, variant === 'secondary' && styles.secondaryText]}>
@@ -26,9 +38,9 @@ export function ActionButton({
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   button: {
-    backgroundColor: AtticoColors.accent,
+    backgroundColor: colors.accent,
     paddingVertical: 16,
     paddingHorizontal: 32,
     borderRadius: 28,
@@ -37,7 +49,10 @@ const styles = StyleSheet.create({
   secondary: {
     backgroundColor: 'transparent',
     borderWidth: 1.5,
-    borderColor: AtticoColors.glassBorder,
+    borderColor: colors.border,
+  },
+  disabled: {
+    opacity: 0.5,
   },
   text: {
     fontSize: 16,
@@ -45,6 +60,6 @@ const styles = StyleSheet.create({
     color: '#fff',
   },
   secondaryText: {
-    color: AtticoColors.textPrimary,
+    color: colors.textPrimary,
   },
 });

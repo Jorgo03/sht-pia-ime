@@ -58,6 +58,20 @@ export default function Profile() {
     }
   }, [location.search, navigate, t])
 
+  // Where to go once a sign-in actually lands. signIn()/verifyOtp() resolving
+  // does NOT mean AuthContext's `user` has updated yet — that happens later,
+  // async, off the SIGNED_IN listener — so navigating to a protected route
+  // right after the call resolves races ProtectedRoute's own `user` check
+  // and bounces straight back here. Deferring the navigate until `user` is
+  // actually truthy avoids that.
+  const [pendingRedirect, setPendingRedirect] = useState(null)
+  useEffect(() => {
+    if (user && pendingRedirect) {
+      navigate(pendingRedirect, { replace: true })
+      setPendingRedirect(null)
+    }
+  }, [user, pendingRedirect, navigate])
+
   const [otpStep, setOtpStep] = useState(null)
   const [otpEmail, setOtpEmail] = useState('')
   const [otpCode, setOtpCode] = useState(['', '', '', '', '', ''])
@@ -120,8 +134,7 @@ export default function Profile() {
       if (error) {
         setMessage(friendlyError(error, t))
       } else {
-        const from = location.state?.from || '/'
-        navigate(from, { replace: true })
+        setPendingRedirect(location.state?.from || '/')
       }
     }
   }
@@ -219,7 +232,7 @@ export default function Profile() {
       otpRefs.current[0]?.focus()
     } else {
       setOtpStep(null)
-      navigate('/')
+      setPendingRedirect(location.state?.from || '/')
     }
   }
 
@@ -345,10 +358,13 @@ export default function Profile() {
       <div className="auth-content">
         <div className="auth-headline-block" style={{ animationDelay: '150ms' }}>
           <div className="screen-kicker"><span className="screen-kicker__dash" />{isSignUp ? t('auth.kickerSignUp') : t('auth.kickerSignIn')}</div>
+          {/* Three stacked lines, per the sign-in prototype — the break points
+              belong to the copy, not to whatever width the viewport happens
+              to be. */}
           <h1 className="screen-headline auth-hero-headline">
-            {isSignUp
-              ? (<>{t('auth.heroSignUpPre')} <em>{t('auth.heroSignUpEm')}</em> {t('auth.heroSignUpPost')}</>)
-              : (<>{t('auth.heroSignInPre')} <em>{t('auth.heroSignInEm')}</em> {t('auth.heroSignInPost')}</>)}
+            <span>{isSignUp ? t('auth.heroSignUpPre') : t('auth.heroSignInPre')}</span>
+            <em>{isSignUp ? t('auth.heroSignUpEm') : t('auth.heroSignInEm')}</em>
+            <span>{isSignUp ? t('auth.heroSignUpPost') : t('auth.heroSignInPost')}</span>
           </h1>
         </div>
         <div className="auth-glass">
@@ -373,12 +389,22 @@ export default function Profile() {
             <div className="field-row"><Building2 size={18} className="field-icon" /><input type="text" className="form-input" placeholder={t('auth.agencyName')} value={agencyName} onChange={(e) => setAgencyName(e.target.value)} /></div>
           )}
 
+          {/* Prototype's row above the CTA: what the selected role gets you on
+              the left, a compact "Forgot?" on the right. Sign-in only. */}
+          {!isSignUp && (
+            <div className="auth-access-row">
+              <span>{role === 'agent' ? t('auth.accessAgent') : t('auth.accessClient')}</span>
+              <button type="button" className="auth-forgot" onClick={handleForgotPassword}>
+                {t('auth.forgotShort')}
+              </button>
+            </div>
+          )}
+
+          {/* Prototype CTA copy: "Step inside" / "Create account". */}
           <button className="cta-pill" onClick={handleAuth} disabled={loading}>
-            {loading ? t('common.loading') : isSignUp ? t('common.signUp') : t('common.signIn')}
+            {loading ? t('common.loading') : isSignUp ? t('auth.createAccount') : t('auth.stepInside')}
             <ArrowRight size={18} />
           </button>
-
-          {!isSignUp && <button className="link-btn" onClick={handleForgotPassword}>{t('auth.forgotPassword')}</button>}
 
           {message && <div className="auth-message">{message}</div>}
 

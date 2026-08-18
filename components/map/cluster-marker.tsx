@@ -1,9 +1,10 @@
-import { memo, useEffect, useState } from 'react';
+import { memo, useEffect, useMemo, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Marker } from 'react-native-maps';
 
-import { AtticoColors } from '@/constants/theme';
-import { Cluster, formatBubblePrice } from '@/lib/cluster';
+import { type AtticoPalette } from '@/constants/theme';
+import { useTheme } from '@/contexts/theme-context';
+import { Cluster, formatBubblePrice, markerColorFor } from '@/lib/cluster';
 
 interface Props {
   cluster: Cluster;
@@ -15,6 +16,8 @@ interface Props {
  * the default pin so the map communicates price at a glance.
  */
 function ClusterMarkerBase({ cluster, onPress }: Props) {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const count = cluster.properties.length;
   const isCluster = count > 1;
 
@@ -39,7 +42,12 @@ function ClusterMarkerBase({ cluster, onPress }: Props) {
       onPress={() => onPress(cluster)}
       tracksViewChanges={tracksViewChanges}
       anchor={{ x: 0.5, y: 0.5 }}>
-      <View style={[styles.bubble, isCluster && styles.clusterBubble]}>
+      <View
+        style={[
+          styles.bubble,
+          !isCluster && { backgroundColor: markerColorFor(cluster.properties[0].listing_type) },
+          isCluster && styles.clusterBubble,
+        ]}>
         <Text style={styles.label} numberOfLines={1}>
           {isCluster
             ? String(count)
@@ -52,9 +60,9 @@ function ClusterMarkerBase({ cluster, onPress }: Props) {
 
 export const ClusterMarker = memo(ClusterMarkerBase);
 
-const styles = StyleSheet.create({
+const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   bubble: {
-    backgroundColor: AtticoColors.accent,
+    backgroundColor: colors.accent,
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 14,
@@ -69,14 +77,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   clusterBubble: {
-    backgroundColor: AtticoColors.primary,
-    borderColor: AtticoColors.accent,
+    backgroundColor: colors.primary,
+    borderColor: colors.accent,
     borderRadius: 18,
     minWidth: 36,
     paddingHorizontal: 12,
   },
   label: {
-    color: AtticoColors.textPrimary,
+    color: colors.textPrimary,
     fontSize: 13,
     fontWeight: '700',
   },

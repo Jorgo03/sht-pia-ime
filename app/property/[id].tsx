@@ -1,12 +1,22 @@
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Image } from 'expo-image';
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useLocalSearchParams, useRouter, Href } from 'expo-router';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
+  Dimensions,
+  FlatList,
+  KeyboardAvoidingView,
+  Linking,
+  Modal,
+  NativeScrollEvent,
+  NativeSyntheticEvent,
+  Platform,
   ScrollView,
+  Share,
   StyleSheet,
   Text,
   TextInput,
@@ -16,48 +26,183 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 
+import { AppHeader } from '@/components/ui/app-header';
 import { ActionButton } from '@/components/ui/action-button';
-import { AtticoColors } from '@/constants/theme';
+import { PrimaryCTA } from '@/components/ui/buttons';
+import { LocationPreviewMap } from '@/components/property/location-preview-map';
+import { PropertyCard } from '@/components/property/property-card';
+import { type AtticoPalette } from '@/constants/theme';
+import { useAuth } from '@/contexts/auth-context';
 import { useFavorites } from '@/contexts/favorites-context';
-import { getPropertyById } from '@/data/properties';
-import { Property } from '@/data/types';
+import { useTheme } from '@/contexts/theme-context';
+import { usePropertiesQuery, usePropertyQuery } from '@/hooks/use-property-queries';
+import { addRecentlyViewed } from '@/hooks/use-recently-viewed';
 import { useResponsive } from '@/hooks/use-responsive';
-import { formatPrice, getLocalizedText } from '@/lib/format';
+import { useTranslatedProperty } from '@/hooks/use-translated-property';
+import { logActivity } from '@/lib/activity';
+import { supabase } from '@/lib/supabase';
+import { formatPrice, listingBadgeKey, priceSuffixKey, whatsappUrl } from '@/lib/format';
+
+// Rounds "now + 1h" to the next half hour — same default the web app's
+// ViewingRequestSheet uses.
+function nextSlot(): Date {
+  const d = new Date(Date.now() + 60 * 60 * 1000);
+  d.setMinutes(d.getMinutes() < 30 ? 30 : 60, 0, 0);
+  return d;
+}
 
 export default function PropertyDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const { t, i18n } = useTranslation();
+  const { user } = useAuth();
   const { isFavorite, toggle } = useFavorites();
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   const { height: screenHeight, isTablet } = useResponsive();
   const favorited = isFavorite(id ?? '');
-  const [property, setProperty] = useState<Property | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [contactName, setContactName] = useState('');
-  const [contactEmail, setContactEmail] = useState('');
+  const { data: property = null, isLoading: loading } = usePropertyQuery(id);
   const [contactMessage, setContactMessage] = useState('');
+  const [sendingMessage, setSendingMessage] = useState(false);
+  const [messageSent, setMessageSent] = useState(false);
+  const [viewingSheetOpen, setViewingSheetOpen] = useState(false);
+  const [viewingDate, setViewingDate] = useState<Date>(nextSlot());
+  const [viewingNotes, setViewingNotes] = useState('');
+  const [requestingViewing, setRequestingViewing] = useState(false);
+  const [imgIndex, setImgIndex] = useState(0);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const heroListRef = useRef<FlatList<string>>(null);
+  const lightboxListRef = useRef<FlatList<string>>(null);
+  const screenWidth = Dimensions.get('window').width;
+  const { title, description, translating, isTranslated } = useTranslatedProperty(property, i18n.language);
 
+  // Matches PropertyDetail.jsx's mount effect exactly — same two calls, same
+  // order, so a mobile visit counts toward the agent's Views stat and shows
+  // up in the visitor's Recently Viewed rail. Fires once per property id
+  // becoming available, whether that data came from the network or (on a
+  // revisit within the cache's staleTime) straight from react-query's cache.
   useEffect(() => {
-    getPropertyById(id ?? '')
-      .then(setProperty)
-      .finally(() => setLoading(false));
-  }, [id]);
+    if (property?.id) {
+      logActivity(property.id, 'view');
+      addRecentlyViewed(property.id);
+    }
+  }, [property?.id]);
 
-  const handleContact = () => {
-    if (!contactName || !contactEmail || !contactMessage) {
-      Alert.alert(t('common.error'), t('errors.fillFields'));
+  const { data: similarRaw = [] } = usePropertiesQuery(
+    { propertyType: property?.property_type ?? null, city: property?.city ?? null },
+    8,
+    !!property,
+  );
+  const similar = useMemo(
+    () => similarRaw.filter((p) => p.id !== property?.id).slice(0, 4),
+    [similarRaw, property?.id],
+  );
+
+  const requireSignIn = () => {
+    Alert.alert(t('favourites.loginPrompt'), '', [
+      { text: t('common.cancel'), style: 'cancel' },
+      { text: t('auth.signIn'), onPress: () => router.push('/(tabs)/profile' as Href) },
+    ]);
+  };
+
+  const agentId = property?.agent?.id || property?.agent_id || property?.owner_id || null;
+  const isOwnListing = !!user && !!agentId && user.id === agentId;
+
+  const handleSendMessage = async () => {
+    if (!property) return;
+    if (!user) return requireSignIn();
+    if (!contactMessage.trim() || !agentId || agentId === user.id) return;
+
+    setSendingMessage(true);
+    // Matches the web app's startChat(): find-or-create the conversation,
+    // then insert the message — same tables, same shape.
+    const { data: existing } = await supabase
+      .from('conversations')
+      .select('id')
+      .eq('property_id', property.id)
+      .eq('client_id', user.id)
+      .eq('agent_id', agentId)
+      .maybeSingle();
+
+    let conversationId = existing?.id;
+    if (!conversationId) {
+      const { data: created } = await supabase
+        .from('conversations')
+        .insert({ property_id: property.id, client_id: user.id, agent_id: agentId })
+        .select('id')
+        .single();
+      conversationId = created?.id;
+    }
+
+    if (conversationId) {
+      await supabase
+        .from('messages')
+        .insert({ conversation_id: conversationId, sender_id: user.id, body: contactMessage.trim() });
+      logActivity(property.id, 'message');
+      setContactMessage('');
+      setMessageSent(true);
+      setTimeout(() => setMessageSent(false), 3000);
+    } else {
+      Alert.alert(t('common.error'), t('errors.generic'));
+    }
+    setSendingMessage(false);
+  };
+
+  const handleShare = () => {
+    if (!property) return;
+    Share.share({ message: title, url: `https://shtepia.ime/property/${property.id}` }).catch(() => {});
+  };
+
+  // Listing-level contact override wins over the agent's own profile phone —
+  // matches web's `phone` derivation in PropertyDetail.jsx exactly.
+  const contactPhone = property?.contact_phone?.replace(/\s/g, '') || property?.agent?.phone?.replace(/\s/g, '') || null;
+
+  const handleCall = () => {
+    if (contactPhone) Linking.openURL(`tel:${contactPhone}`);
+  };
+
+  const handleWhatsApp = () => {
+    if (!property || !contactPhone) return;
+    const message = t('property.whatsappMessage', { title });
+    logActivity(property.id, 'message');
+    Linking.openURL(whatsappUrl(contactPhone, message));
+  };
+
+  const openViewingSheet = () => {
+    if (!user) return requireSignIn();
+    setViewingDate(nextSlot());
+    setViewingNotes('');
+    setViewingSheetOpen(true);
+  };
+
+  const submitViewingRequest = async () => {
+    if (!property || !user) return;
+    if (viewingDate.getTime() < Date.now()) {
+      Alert.alert(t('common.error'), t('viewings.pastDate'));
       return;
     }
-    Alert.alert('OK', t('detail.message'));
-    setContactName('');
-    setContactEmail('');
-    setContactMessage('');
+    setRequestingViewing(true);
+    const { error } = await supabase.from('viewings').insert({
+      property_id: property.id,
+      client_id: user.id,
+      agent_id: agentId === user.id ? null : agentId,
+      scheduled_at: viewingDate.toISOString(),
+      notes: viewingNotes.trim() || null,
+    });
+    setRequestingViewing(false);
+    if (error) {
+      Alert.alert(t('common.error'), t('viewings.requestFailed'));
+      return;
+    }
+    logActivity(property.id, 'meeting');
+    setViewingSheetOpen(false);
+    Alert.alert(t('viewings.requestSuccess'));
   };
 
   if (loading) {
     return (
       <View style={styles.errorContainer}>
-        <ActivityIndicator size="large" color={AtticoColors.accent} />
+        <ActivityIndicator size="large" color={colors.accent} />
       </View>
     );
   }
@@ -76,17 +221,28 @@ export default function PropertyDetailScreen() {
   // screenHeight is already constrained.
   const imageHeight = screenHeight * (isTablet ? 0.32 : 0.42);
 
-  const title = getLocalizedText(property.title_i18n, i18n.language) || property.title;
-  const description = getLocalizedText(property.description_i18n, i18n.language) || property.description;
-  const price = formatPrice(property.price, i18n.language);
-  const suffix = property.listing_type === 'rent' ? t('property.perMonth') : '';
-  const badge = property.listing_type === 'rent' ? t('detail.forRent') : t('detail.forSale');
+  const images = property.image_urls?.length ? property.image_urls : [];
+  const price = formatPrice(property.price, i18n.language, property.currency);
+  const suffixKey = priceSuffixKey(property.listing_type);
+  const suffix = suffixKey ? t(suffixKey) : '';
+  // listingBadgeKey() handles all 3 listing types (sale/rent/daily_rent) —
+  // a bare rent-only check silently mislabels daily-rent listings as "For
+  // Sale", matching the bug already found and fixed on the property cards.
+  const badge = t(listingBadgeKey(property.listing_type));
+  const propertyTypeLabel = property.property_type ? t(`search.${property.property_type}`) : '';
+  const agent = property.agent;
+  const agentInitial = agent?.full_name?.[0]?.toUpperCase() || 'A';
+  const features = property.features ?? [];
+  const pricePerSqm = property.sqft && property.sqft > 0 ? Math.round(property.price / property.sqft) : null;
 
   const amenities = [
     { id: 'bed', name: `${property.beds ?? 0} ${t('property.beds')}`, icon: 'bed' },
     { id: 'bath', name: `${property.baths ?? 0} ${t('property.baths')}`, icon: 'bathtub' },
     { id: 'sqft', name: `${property.sqft ?? '-'} ${t('property.sqft')}`, icon: 'square-foot' },
     { id: 'type', name: property.property_type ?? 'N/A', icon: 'home' },
+    ...(property.year_built
+      ? [{ id: 'year', name: `${property.year_built}`, icon: 'calendar-today' }]
+      : []),
   ];
 
   // Split into two content groups so tablet can lay them out as columns
@@ -94,120 +250,167 @@ export default function PropertyDetailScreen() {
   // while phone renders the exact same JSX in a single stacked column.
   const infoContent = (
     <>
+      <View style={styles.kickerRow}>
+        <View style={styles.kickerDash} />
+        <Text style={styles.kicker}>
+          {badge.toUpperCase()}
+          {propertyTypeLabel ? ` · ${propertyTypeLabel.toUpperCase()}` : ''}
+        </Text>
+      </View>
       <Text style={styles.name}>{title}</Text>
       <View style={styles.locationRow}>
-        <MaterialIcons name="location-on" size={16} color={AtticoColors.accent} />
+        <MaterialIcons name="location-on" size={16} color={colors.accent} />
         <Text style={styles.location}>
           {property.address}, {property.city}
         </Text>
       </View>
 
-      <Text style={styles.description}>{description}</Text>
+      {translating ? (
+        <View style={styles.shimmerGroup}>
+          <View style={styles.shimmerLine} />
+          <View style={styles.shimmerLine} />
+          <View style={[styles.shimmerLine, { width: '70%' }]} />
+        </View>
+      ) : (
+        <>
+          <Text style={styles.description}>{description}</Text>
+          {isTranslated && (
+            <View style={styles.translatedBadge}>
+              <MaterialIcons name="language" size={12} color={colors.textSecondary} />
+              <Text style={styles.translatedBadgeText}>{t('property.autoTranslated')}</Text>
+            </View>
+          )}
+        </>
+      )}
 
       <View style={styles.amenityRow}>
         {amenities.map((a) => (
           <View key={a.id} style={styles.amenityItem}>
             <View style={styles.amenityIcon}>
-              <MaterialIcons name={a.icon as any} size={22} color={AtticoColors.accent} />
+              <MaterialIcons name={a.icon as any} size={22} color={colors.accent} />
             </View>
             <Text style={styles.amenityLabel}>{a.name}</Text>
           </View>
         ))}
       </View>
 
-      <View style={styles.sectionCard}>
-        <View style={styles.sectionHeader}>
-          <MaterialIcons name="360" size={22} color={AtticoColors.accent} />
-          <Text style={styles.sectionTitle}>{t('property.video')}</Text>
-        </View>
-        <TouchableOpacity
-          style={styles.tourPreview}
-          activeOpacity={0.8}
-          onPress={() => Alert.alert(t('property.video'), t('messages.comingSoon'))}>
-          <Image
-            source={{ uri: property.image_urls[0] }}
-            style={styles.tourImage}
-            contentFit="cover"
-          />
-          <View style={styles.tourOverlay}>
-            <View style={styles.playButton}>
-              <MaterialIcons name="play-arrow" size={36} color="#fff" />
-            </View>
-            <Text style={styles.tourText}>{t('property.video')}</Text>
+      {features.length > 0 && (
+        <View style={styles.sectionCard}>
+          <View style={styles.sectionHeader}>
+            <MaterialIcons name="checklist" size={22} color={colors.accent} />
+            <Text style={styles.sectionTitle}>{t('detail.whatsInside')}</Text>
           </View>
-        </TouchableOpacity>
-      </View>
+          <View style={styles.featuresGrid}>
+            {features.map((f) => (
+              <View key={f} style={styles.featurePill}>
+                <View style={styles.featureDot} />
+                <Text style={styles.featurePillText}>{t(`listing.feature.${f}`, f)}</Text>
+              </View>
+            ))}
+          </View>
+        </View>
+      )}
+
+      {property.latitude != null && property.longitude != null && (
+        <View style={styles.sectionCard}>
+          <View style={styles.sectionHeader}>
+            <MaterialIcons name="map" size={22} color={colors.accent} />
+            <Text style={styles.sectionTitle}>{t('property.location')}</Text>
+          </View>
+          <View style={styles.mapPreview} pointerEvents="none">
+            <LocationPreviewMap latitude={property.latitude} longitude={property.longitude} />
+          </View>
+          <TouchableOpacity
+            style={styles.openMapsLink}
+            onPress={() =>
+              Linking.openURL(`https://www.google.com/maps?q=${property.latitude},${property.longitude}`)
+            }
+            activeOpacity={0.7}>
+            <MaterialIcons name="open-in-new" size={14} color={colors.accent} />
+            <Text style={styles.openMapsLinkText}>{t('map.openInMaps')}</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
+      {similar.length > 0 && (
+        <View style={styles.sectionCard}>
+          <View style={styles.sectionHeader}>
+            <MaterialIcons name="apartment" size={22} color={colors.accent} />
+            <Text style={styles.sectionTitle}>{t('property.similar')}</Text>
+          </View>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.similarRow}>
+            {similar.map((p) => (
+              <View key={p.id} style={styles.similarCard}>
+                <PropertyCard property={p} />
+              </View>
+            ))}
+          </ScrollView>
+        </View>
+      )}
     </>
   );
 
   const agentAndContactContent = (
     <>
-      <View style={styles.sectionCard}>
-        <View style={styles.sectionHeader}>
-          <MaterialIcons name="person" size={22} color={AtticoColors.accent} />
-          <Text style={styles.sectionTitle}>{t('auth.agent')}</Text>
-        </View>
-        <View style={styles.agentRow}>
-          <View style={styles.agentAvatar}>
-            <MaterialIcons name="person" size={28} color={AtticoColors.accent} />
-          </View>
-          <View style={styles.agentInfo}>
-            <Text style={styles.agentName}>{t('auth.agent')}</Text>
-            <Text style={styles.agentRole}>{t('auth.agent')}</Text>
-            <View style={styles.agentRating}>
-              {[1, 2, 3, 4, 5].map((star) => (
-                <MaterialIcons
-                  key={star}
-                  name="star"
-                  size={14}
-                  color={star <= 4 ? AtticoColors.accent : '#333'}
-                />
-              ))}
-              <Text style={styles.agentRatingText}>4.0</Text>
-            </View>
+      {agent && (
+        <View style={styles.sectionCard}>
+          <View style={styles.sectionHeader}>
+            <MaterialIcons name="person" size={22} color={colors.accent} />
+            <Text style={styles.sectionTitle}>{t('auth.agent')}</Text>
           </View>
           <TouchableOpacity
-            style={styles.callButton}
-            onPress={() => Alert.alert(t('property.call'), '...')}
-            activeOpacity={0.7}>
-            <MaterialIcons name="phone" size={20} color="#fff" />
+            style={styles.agentRow}
+            activeOpacity={0.8}
+            onPress={() => router.push(`/agent/${agent.id}` as Href)}>
+            <View style={styles.agentAvatar}>
+              <Text style={styles.agentAvatarText}>{agentInitial}</Text>
+            </View>
+            <View style={styles.agentInfo}>
+              <Text style={styles.agentName}>{agent.full_name || t('auth.agent')}</Text>
+              {agent.agency_name ? <Text style={styles.agentRole}>{agent.agency_name}</Text> : null}
+            </View>
+            {contactPhone ? (
+              <TouchableOpacity style={styles.callButton} onPress={handleCall} activeOpacity={0.7}>
+                <MaterialIcons name="phone" size={20} color="#fff" />
+              </TouchableOpacity>
+            ) : null}
           </TouchableOpacity>
         </View>
-      </View>
+      )}
 
-      <View style={styles.sectionCard}>
-        <View style={styles.sectionHeader}>
-          <MaterialIcons name="mail" size={22} color={AtticoColors.accent} />
-          <Text style={styles.sectionTitle}>{t('detail.message')}</Text>
+      {!isOwnListing && (
+        <View style={styles.sectionCard}>
+          <View style={styles.sectionHeader}>
+            <MaterialIcons name="mail" size={22} color={colors.accent} />
+            <Text style={styles.sectionTitle}>{t('detail.message')}</Text>
+          </View>
+          <TextInput
+            style={[styles.contactInput, styles.contactMessage]}
+            placeholder={t('property.whatsappMessage', { title })}
+            placeholderTextColor={colors.textSecondary}
+            value={contactMessage}
+            onChangeText={setContactMessage}
+            multiline
+            numberOfLines={4}
+            textAlignVertical="top"
+          />
+          {messageSent ? (
+            <Text style={styles.sentConfirm}>{t('detail.message')} ✓</Text>
+          ) : (
+            <ActionButton
+              title={sendingMessage ? t('common.loading') : t('detail.chatInApp')}
+              onPress={handleSendMessage}
+              disabled={sendingMessage || !contactMessage.trim()}
+            />
+          )}
+          {contactPhone ? (
+            <TouchableOpacity style={styles.whatsappButton} onPress={handleWhatsApp} activeOpacity={0.8}>
+              <MaterialIcons name="chat" size={18} color={colors.accent} />
+              <Text style={styles.whatsappButtonText}>WhatsApp</Text>
+            </TouchableOpacity>
+          ) : null}
         </View>
-        <TextInput
-          style={styles.contactInput}
-          placeholder={t('auth.fullName')}
-          placeholderTextColor={AtticoColors.textSecondary}
-          value={contactName}
-          onChangeText={setContactName}
-        />
-        <TextInput
-          style={styles.contactInput}
-          placeholder={t('auth.email')}
-          placeholderTextColor={AtticoColors.textSecondary}
-          value={contactEmail}
-          onChangeText={setContactEmail}
-          keyboardType="email-address"
-          autoCapitalize="none"
-        />
-        <TextInput
-          style={[styles.contactInput, styles.contactMessage]}
-          placeholder={t('property.whatsappMessage', { title })}
-          placeholderTextColor={AtticoColors.textSecondary}
-          value={contactMessage}
-          onChangeText={setContactMessage}
-          multiline
-          numberOfLines={4}
-          textAlignVertical="top"
-        />
-        <ActionButton title={t('detail.message')} onPress={handleContact} />
-      </View>
+      )}
 
       <View style={styles.priceRow}>
         <View>
@@ -216,52 +419,105 @@ export default function PropertyDetailScreen() {
             {price}
             <Text style={styles.priceSuffix}>{suffix}</Text>
           </Text>
+          {pricePerSqm != null && (
+            <Text style={styles.pricePerSqm}>
+              ≈ {formatPrice(pricePerSqm, i18n.language, property.currency)}{t('detail.perSqm')}
+            </Text>
+          )}
         </View>
       </View>
 
-      <ActionButton
-        title={t('detail.scheduleViewing')}
-        onPress={() => Alert.alert(t('detail.scheduleViewing'), title)}
-      />
+      {!isOwnListing && (
+        // Web's sticky CTA is `.cta-pill` (globals.css:229) — 54px gradient
+        // pill with the cta shadow and a trailing ArrowRight. ActionButton is
+        // a flat accent fill at radius 28 and matched neither.
+        <PrimaryCTA label={t('detail.scheduleViewing')} onPress={openViewingSheet} />
+      )}
     </>
   );
 
   return (
     <View style={styles.container}>
       <View style={[styles.imageContainer, { height: imageHeight }]}>
-        <Image
-          source={{ uri: property.image_urls[0] }}
-          style={styles.image}
-          contentFit="cover"
-          transition={300}
-        />
+        {images.length > 0 ? (
+          <FlatList
+            ref={heroListRef}
+            data={images}
+            horizontal
+            pagingEnabled
+            showsHorizontalScrollIndicator={false}
+            keyExtractor={(uri, i) => `${uri}-${i}`}
+            onMomentumScrollEnd={(e: NativeSyntheticEvent<NativeScrollEvent>) => {
+              const idx = Math.round(e.nativeEvent.contentOffset.x / screenWidth);
+              setImgIndex(idx);
+            }}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                activeOpacity={0.95}
+                onPress={() => setLightboxOpen(true)}
+                style={{ width: screenWidth, height: imageHeight }}>
+                <Image source={{ uri: item }} style={styles.image} contentFit="cover" transition={300} />
+              </TouchableOpacity>
+            )}
+          />
+        ) : (
+          <View style={[styles.image, styles.imagePlaceholder]}>
+            <MaterialIcons name="home" size={48} color="rgba(255,255,255,0.3)" />
+          </View>
+        )}
         <LinearGradient
           colors={['rgba(0,0,0,0.5)', 'transparent', 'rgba(0,0,0,0.7)']}
           style={styles.imageOverlay}
+          pointerEvents="none"
         />
+        {/* The shared header, floating over the hero rather than above it —
+            this screen's gallery is full-bleed, and boxing it under a solid
+            bar would cost the image the top of the screen. Language/theme are
+            off: share and save are the contextual actions here, and six
+            controls don't fit across a phone. */}
         <SafeAreaView style={styles.imageHeader} edges={['top']}>
-          <TouchableOpacity
-            style={styles.headerButton}
-            onPress={() => router.back()}
-            activeOpacity={0.7}>
-            <MaterialIcons name="chevron-left" size={28} color="#fff" />
-          </TouchableOpacity>
-          <Text style={styles.headerBrand}>Shtëpia.ime</Text>
-          <TouchableOpacity
-            style={styles.headerButton}
-            onPress={() => toggle(id ?? '')}
-            activeOpacity={0.7}>
-            <MaterialIcons
-              name={favorited ? 'favorite' : 'favorite-border'}
-              size={24}
-              color={favorited ? AtticoColors.accent : '#fff'}
-            />
-          </TouchableOpacity>
+          <AppHeader
+            floating
+            showControls={false}
+            onBack={() => router.back()}
+            trailing={
+              <>
+                <TouchableOpacity
+                  style={styles.headerButton}
+                  onPress={handleShare}
+                  activeOpacity={0.7}>
+                  <MaterialIcons name="share" size={20} color="#fff" />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.headerButton}
+                  onPress={() => toggle(id ?? '')}
+                  activeOpacity={0.7}>
+                  <MaterialIcons
+                    name={favorited ? 'favorite' : 'favorite-border'}
+                    size={24}
+                    color={favorited ? colors.accent : '#fff'}
+                  />
+                </TouchableOpacity>
+              </>
+            }
+          />
         </SafeAreaView>
 
-        <View style={styles.imageBadge}>
-          <Text style={styles.imageBadgeText}>{badge.toUpperCase()}</Text>
-        </View>
+        {images.length > 1 && (
+          images.length <= 8 ? (
+            <View style={styles.dotsRow} pointerEvents="none">
+              {images.map((_, i) => (
+                <View key={i} style={[styles.dot, i === imgIndex && styles.dotActive]} />
+              ))}
+            </View>
+          ) : (
+            // Past ~8 photos individual dots stop being legible — same
+            // compact counter the lightbox below already uses.
+            <View style={styles.heroCounter} pointerEvents="none">
+              <Text style={styles.heroCounterText}>{imgIndex + 1} / {images.length}</Text>
+            </View>
+          )
+        )}
       </View>
 
       <ScrollView
@@ -280,24 +536,112 @@ export default function PropertyDetailScreen() {
           </>
         )}
       </ScrollView>
+
+      <Modal visible={viewingSheetOpen} transparent animationType="slide" onRequestClose={() => setViewingSheetOpen(false)}>
+        <KeyboardAvoidingView
+          style={styles.modalBackdrop}
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+          <View style={styles.modalSheet}>
+            <View style={styles.modalHeader}>
+              {/* requestTitle ("Request a") + requestTitleEm ("viewing") — same
+                  two-key split as the web sheet's <h2>, joined with a space
+                  since RN Text can't apply <em> styling to a partial string
+                  the way the web JSX does. */}
+              <Text style={styles.modalTitle}>
+                {t('viewings.requestTitle')} {t('viewings.requestTitleEm')}
+              </Text>
+              <TouchableOpacity onPress={() => setViewingSheetOpen(false)} hitSlop={8}>
+                <MaterialIcons name="close" size={22} color={colors.textSecondary} />
+              </TouchableOpacity>
+            </View>
+            <Text style={styles.modalLabel}>{t('viewings.when')}</Text>
+            <DateTimePicker
+              value={viewingDate}
+              mode="datetime"
+              display="spinner"
+              minimumDate={nextSlot()}
+              onChange={(_event, date) => date && setViewingDate(date)}
+              themeVariant="dark"
+            />
+            <TextInput
+              style={[styles.contactInput, styles.contactMessage, { marginTop: 12 }]}
+              placeholder={t('addSheet.notes')}
+              placeholderTextColor={colors.textSecondary}
+              value={viewingNotes}
+              onChangeText={setViewingNotes}
+              multiline
+              numberOfLines={3}
+              textAlignVertical="top"
+            />
+            {/* Web's ViewingRequestSheet submit is a `.cta-pill` with no
+                trailing glyph — hence icon={null}. */}
+            <PrimaryCTA
+              label={requestingViewing ? t('common.loading') : t('viewings.request')}
+              icon={null}
+              loading={requestingViewing}
+              onPress={submitViewingRequest}
+              disabled={requestingViewing}
+            />
+          </View>
+        </KeyboardAvoidingView>
+      </Modal>
+
+      <Modal
+        visible={lightboxOpen}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setLightboxOpen(false)}>
+        <View style={styles.lightboxBackdrop}>
+          <TouchableOpacity
+            style={styles.lightboxClose}
+            onPress={() => setLightboxOpen(false)}
+            activeOpacity={0.7}
+            hitSlop={8}>
+            <MaterialIcons name="close" size={24} color="#fff" />
+          </TouchableOpacity>
+          <FlatList
+            ref={lightboxListRef}
+            data={images}
+            horizontal
+            pagingEnabled
+            showsHorizontalScrollIndicator={false}
+            initialScrollIndex={imgIndex}
+            getItemLayout={(_data, i) => ({ length: screenWidth, offset: screenWidth * i, index: i })}
+            keyExtractor={(uri, i) => `lightbox-${uri}-${i}`}
+            onMomentumScrollEnd={(e: NativeSyntheticEvent<NativeScrollEvent>) => {
+              setImgIndex(Math.round(e.nativeEvent.contentOffset.x / screenWidth));
+            }}
+            renderItem={({ item }) => (
+              <View style={{ width: screenWidth, justifyContent: 'center', alignItems: 'center' }}>
+                <Image source={{ uri: item }} style={styles.lightboxImage} contentFit="contain" />
+              </View>
+            )}
+          />
+          {images.length > 1 && (
+            <View style={styles.lightboxCounter} pointerEvents="none">
+              <Text style={styles.lightboxCounterText}>{imgIndex + 1} / {images.length}</Text>
+            </View>
+          )}
+        </View>
+      </Modal>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: AtticoColors.primary,
+    backgroundColor: colors.primary,
   },
   errorContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: AtticoColors.primary,
+    backgroundColor: colors.primary,
   },
   errorText: {
     fontSize: 16,
-    color: AtticoColors.textPrimary,
+    color: colors.textPrimary,
   },
   imageContainer: {
     // height is computed per-render (imageHeight) so it responds to
@@ -324,30 +668,88 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  headerBrand: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#fff',
-    letterSpacing: 1,
+  imagePlaceholder: {
+    backgroundColor: colors.primaryLight,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  imageBadge: {
+  dotsRow: {
     position: 'absolute',
-    bottom: 44,
-    left: 20,
-    backgroundColor: AtticoColors.accent,
-    paddingHorizontal: 14,
-    paddingVertical: 6,
-    borderRadius: 8,
+    bottom: 14,
+    left: 0,
+    right: 0,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 6,
   },
-  imageBadgeText: {
-    fontSize: 12,
-    fontWeight: '700',
+  dot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: 'rgba(255,255,255,0.5)',
+  },
+  dotActive: {
+    width: 18,
+    backgroundColor: '#fff',
+  },
+  heroCounter: {
+    position: 'absolute',
+    bottom: 14,
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+  },
+  heroCounterText: {
+    backgroundColor: 'rgba(0,0,0,0.5)',
     color: '#fff',
-    letterSpacing: 1,
+    fontSize: 11,
+    fontWeight: '600',
+    paddingHorizontal: 10,
+    paddingVertical: 3,
+    borderRadius: 999,
+    overflow: 'hidden',
+  },
+  lightboxBackdrop: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.95)',
+    justifyContent: 'center',
+  },
+  lightboxClose: {
+    position: 'absolute',
+    top: 50,
+    right: 20,
+    zIndex: 1,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  lightboxImage: {
+    width: '100%',
+    height: '85%',
+  },
+  lightboxCounter: {
+    position: 'absolute',
+    bottom: 40,
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+  },
+  lightboxCounterText: {
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    color: '#fff',
+    fontSize: 13,
+    fontWeight: '600',
+    paddingHorizontal: 16,
+    paddingVertical: 6,
+    borderRadius: 12,
+    overflow: 'hidden',
   },
   content: {
     flex: 1,
-    backgroundColor: AtticoColors.primary,
+    backgroundColor: colors.primary,
     borderTopLeftRadius: 28,
     borderTopRightRadius: 28,
     marginTop: -28,
@@ -371,10 +773,27 @@ const styles = StyleSheet.create({
   tabletColumnRight: {
     flex: 2,
   },
+  kickerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginBottom: 6,
+  },
+  kickerDash: {
+    width: 14,
+    height: 1,
+    backgroundColor: colors.accent,
+  },
+  kicker: {
+    fontSize: 11,
+    letterSpacing: 1.5,
+    color: colors.textSecondary,
+    fontWeight: '600',
+  },
   name: {
     fontSize: 26,
     fontWeight: '700',
-    color: AtticoColors.textPrimary,
+    color: colors.textPrimary,
     marginBottom: 8,
   },
   locationRow: {
@@ -385,13 +804,77 @@ const styles = StyleSheet.create({
   },
   location: {
     fontSize: 14,
-    color: AtticoColors.textSecondary,
+    color: colors.textSecondary,
   },
   description: {
     fontSize: 14,
     lineHeight: 22,
-    color: AtticoColors.textSecondary,
+    color: colors.textSecondary,
     marginBottom: 8,
+  },
+  shimmerGroup: {
+    gap: 8,
+    marginBottom: 8,
+  },
+  shimmerLine: {
+    height: 14,
+    borderRadius: 7,
+    backgroundColor: colors.glass,
+  },
+  translatedBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    alignSelf: 'flex-start',
+    marginBottom: 8,
+  },
+  translatedBadgeText: {
+    fontSize: 11,
+    fontWeight: '500',
+    color: colors.textSecondary,
+  },
+  featuresGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  featurePill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 999,
+    backgroundColor: colors.glass,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  featureDot: {
+    width: 5,
+    height: 5,
+    borderRadius: 2.5,
+    backgroundColor: colors.accent,
+  },
+  featurePillText: {
+    fontSize: 12,
+    fontWeight: '500',
+    color: colors.textPrimary,
+  },
+  mapPreview: {
+    height: 160,
+    borderRadius: 14,
+    overflow: 'hidden',
+  },
+  openMapsLink: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    alignSelf: 'flex-start',
+  },
+  openMapsLinkText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: colors.accent,
   },
   amenityRow: {
     flexDirection: 'row',
@@ -406,25 +889,25 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: AtticoColors.glass,
+    backgroundColor: colors.glass,
     borderWidth: 1,
-    borderColor: AtticoColors.glassBorder,
+    borderColor: colors.border,
     justifyContent: 'center',
     alignItems: 'center',
   },
   amenityLabel: {
     fontSize: 12,
-    color: AtticoColors.textSecondary,
+    color: colors.textSecondary,
     fontWeight: '500',
   },
 
   sectionCard: {
-    backgroundColor: AtticoColors.primaryLight,
+    backgroundColor: colors.primaryLight,
     borderRadius: 20,
     padding: 16,
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: AtticoColors.glassBorder,
+    borderColor: colors.border,
     gap: 12,
   },
   sectionHeader: {
@@ -435,36 +918,14 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 17,
     fontWeight: '700',
-    color: AtticoColors.textPrimary,
+    color: colors.textPrimary,
   },
 
-  tourPreview: {
-    borderRadius: 16,
-    overflow: 'hidden',
-    height: 180,
+  similarRow: {
+    gap: 4,
   },
-  tourImage: {
-    ...StyleSheet.absoluteFillObject,
-  },
-  tourOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.45)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: 8,
-  },
-  playButton: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: AtticoColors.accent,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  tourText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#fff',
+  similarCard: {
+    width: 180,
   },
 
   agentRow: {
@@ -476,11 +937,16 @@ const styles = StyleSheet.create({
     width: 52,
     height: 52,
     borderRadius: 26,
-    backgroundColor: AtticoColors.glass,
+    backgroundColor: colors.glass,
     borderWidth: 1,
-    borderColor: AtticoColors.glassBorder,
+    borderColor: colors.border,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  agentAvatarText: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: colors.accent,
   },
   agentInfo: {
     flex: 1,
@@ -489,46 +955,56 @@ const styles = StyleSheet.create({
   agentName: {
     fontSize: 16,
     fontWeight: '600',
-    color: AtticoColors.textPrimary,
+    color: colors.textPrimary,
   },
   agentRole: {
     fontSize: 12,
-    color: AtticoColors.accent,
+    color: colors.accent,
     fontWeight: '500',
-  },
-  agentRating: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 2,
-    marginTop: 2,
-  },
-  agentRatingText: {
-    fontSize: 12,
-    color: AtticoColors.textSecondary,
-    marginLeft: 4,
   },
   callButton: {
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: AtticoColors.accent,
+    backgroundColor: colors.accent,
     justifyContent: 'center',
     alignItems: 'center',
   },
 
   contactInput: {
-    backgroundColor: AtticoColors.glass,
+    backgroundColor: colors.glass,
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 14,
     fontSize: 14,
-    color: AtticoColors.textPrimary,
+    color: colors.textPrimary,
     borderWidth: 1,
-    borderColor: AtticoColors.glassBorder,
+    borderColor: colors.border,
   },
   contactMessage: {
     height: 100,
     paddingTop: 14,
+  },
+  sentConfirm: {
+    textAlign: 'center',
+    color: colors.accent,
+    fontWeight: '600',
+    paddingVertical: 14,
+  },
+  whatsappButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    paddingVertical: 12,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  whatsappButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: colors.accent,
   },
 
   priceRow: {
@@ -539,17 +1015,51 @@ const styles = StyleSheet.create({
   },
   priceLabel: {
     fontSize: 13,
-    color: AtticoColors.textSecondary,
+    color: colors.textSecondary,
     marginBottom: 4,
   },
   price: {
     fontSize: 28,
     fontWeight: '700',
-    color: AtticoColors.accent,
+    color: colors.accent,
   },
   priceSuffix: {
     fontSize: 14,
     fontWeight: '400',
-    color: AtticoColors.textSecondary,
+    color: colors.textSecondary,
+  },
+  pricePerSqm: {
+    fontSize: 12,
+    color: colors.textSecondary,
+    marginTop: 2,
+  },
+
+  modalBackdrop: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    justifyContent: 'flex-end',
+  },
+  modalSheet: {
+    backgroundColor: colors.primaryLight,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    padding: 20,
+    paddingBottom: 36,
+    gap: 12,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: colors.textPrimary,
+  },
+  modalLabel: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: colors.textSecondary,
   },
 });

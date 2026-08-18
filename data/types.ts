@@ -1,6 +1,9 @@
 export interface Property {
   id: string;
   agent_id: string;
+  owner_id?: string | null;
+  /** Present when fetched via getPropertyById's embedded profiles select. */
+  agent?: Pick<Profile, 'id' | 'full_name' | 'phone' | 'agency_name' | 'avatar_url'> | null;
   title: string;
   title_i18n: Record<string, string> | null;
   description: string | null;
@@ -24,6 +27,7 @@ export interface Property {
     | null;
   listing_type: 'sale' | 'rent' | 'daily_rent';
   image_urls: string[];
+  features?: string[] | null;
   status:
     | 'active'
     | 'pending'
@@ -36,6 +40,12 @@ export interface Property {
    *  from map queries rather than rendered at (0, 0). */
   latitude: number | null;
   longitude: number | null;
+  year_built: number | null;
+  currency?: string | null;
+  /** Listing-level contact overrides — take priority over the agent's own
+   *  profile phone/email, same as web's PropertyDetail.jsx `phone` derivation. */
+  contact_phone?: string | null;
+  contact_email?: string | null;
   /** Language the listing was actually written in; every other key in
    *  title_i18n/description_i18n is a machine translation. */
   source_language: string;

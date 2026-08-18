@@ -13,3 +13,5 @@ expo-env.d.ts
 test-*.png
 test-*.cjs
 .agents/
+.vercel
+.env*

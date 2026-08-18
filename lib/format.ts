@@ -33,14 +33,29 @@ export function fallbackColorsFor(id: string | undefined): [string, string] {
   return FALLBACK_COLORS[hashId(id) % FALLBACK_COLORS.length];
 }
 
-export function formatPrice(n: number | string, lang: string = 'sq'): string {
+export function formatPrice(n: number | string, lang: string = 'sq', currency: string | null = 'EUR'): string {
   const num = Number(n) || 0;
   return new Intl.NumberFormat(lang, {
     style: 'currency',
-    currency: 'EUR',
+    currency: currency || 'EUR',
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
   }).format(num);
+}
+
+// Mirrors src/lib/format.js exactly — the only place that knows all three
+// listing types, so daily_rent can't fall through to "For Sale"/no-suffix
+// the way a bare `listing_type === 'rent'` check does.
+export function listingBadgeKey(listingType: string | null | undefined): string {
+  if (listingType === 'rent') return 'property.forRent';
+  if (listingType === 'daily_rent') return 'property.forDailyRent';
+  return 'property.forSale';
+}
+
+export function priceSuffixKey(listingType: string | null | undefined): string | null {
+  if (listingType === 'rent') return 'property.perMonth';
+  if (listingType === 'daily_rent') return 'property.perDay';
+  return null;
 }
 
 export function getLocalizedText(
@@ -79,6 +94,16 @@ export function formatRelativeTime(iso: string | null | undefined, locale: strin
 }
 
 export function whatsappUrl(phone: string | undefined, message: string): string {
-  const clean = phone?.replace(/[^0-9]/g, '') || '';
+  let clean = phone?.replace(/[^0-9]/g, '') || '';
+  // wa.me requires full international format with no leading 0. Agents
+  // enter local Albanian numbers (e.g. "069 602 0791"), so assume Albania's
+  // country code (355) whenever one isn't already present — without this,
+  // WhatsApp's Universal Link handler silently rejects the malformed number
+  // and Linking.openURL fails with "Unable to open URL".
+  if (clean.startsWith('0')) {
+    clean = `355${clean.slice(1)}`;
+  } else if (!clean.startsWith('355')) {
+    clean = `355${clean}`;
+  }
   return `https://wa.me/${clean}?text=${encodeURIComponent(message)}`;
 }

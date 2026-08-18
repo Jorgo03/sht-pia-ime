@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-import { AtticoColors } from '@/constants/theme';
+import { type AtticoPalette } from '@/constants/theme';
+import { useTheme } from '@/contexts/theme-context';
 
 interface FilterTabsProps {
   tabs: string[];
@@ -10,6 +11,8 @@ interface FilterTabsProps {
 }
 
 export function FilterTabs({ tabs, activeTab, onTabChange }: FilterTabsProps) {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
   // Controlled when `activeTab` is supplied, so an external reset actually
   // clears the selection instead of leaving a stale highlight behind.
   // Falls back to internal state for uncontrolled callers.
@@ -41,7 +44,7 @@ export function FilterTabs({ tabs, activeTab, onTabChange }: FilterTabsProps) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   container: {
     flexDirection: 'row',
     paddingHorizontal: 20,
@@ -53,17 +56,17 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 24,
     borderWidth: 1,
-    borderColor: AtticoColors.glassBorder,
-    backgroundColor: AtticoColors.glass,
+    borderColor: colors.border,
+    backgroundColor: colors.glass,
   },
   activeTab: {
-    backgroundColor: AtticoColors.accent,
-    borderColor: AtticoColors.accent,
+    backgroundColor: colors.accent,
+    borderColor: colors.accent,
   },
   tabText: {
     fontSize: 14,
     fontWeight: '600',
-    color: AtticoColors.textSecondary,
+    color: colors.textSecondary,
   },
   activeTabText: {
     color: '#fff',

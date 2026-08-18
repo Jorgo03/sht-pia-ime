@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet'
-import { ArrowLeft, ArrowRight, Upload, X, Film, Sparkles, Loader2 } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Upload, X, Film, Sparkles, Loader2, Check } from 'lucide-react'
 import { useAuth } from '../../auth/AuthContext'
 import { supabase } from '../../../lib/supabase'
 import { isEnabled } from '../../../lib/flags'
@@ -427,25 +427,29 @@ export default function NewListing() {
         </div>
       )}
 
-      <div className="nl-progress">
+      <div className="nl-progress" role="list" aria-label={t('listing.newListing')}>
         {STEPS.map((s, i) => {
           // Jumping back to a completed step is safe (its data is already
           // validated); jumping forward would skip validation on the steps
           // in between, so only i < step is reachable this way.
           const clickable = i < step
+          const completed = i < step
+          const current = i === step
           return (
-            <button
-              key={s}
-              type="button"
-              className={`nl-step ${i <= step ? 'active' : ''} ${i === step ? 'current' : ''} ${clickable ? 'nl-step--clickable' : ''}`}
-              onClick={clickable ? () => setStep(i) : undefined}
-              tabIndex={clickable ? 0 : -1}
-              aria-disabled={!clickable}
-              aria-current={i === step ? 'step' : undefined}
-            >
-              <div className="nl-step-dot">{i + 1}</div>
-              <span className="nl-step-label">{t(`listing.step.${s}`)}</span>
-            </button>
+            <div key={s} className="nl-step-item" role="listitem">
+              <button
+                type="button"
+                className={`nl-step ${completed ? 'completed' : ''} ${current ? 'current' : ''} ${clickable ? 'nl-step--clickable' : ''}`}
+                onClick={clickable ? () => setStep(i) : undefined}
+                tabIndex={clickable ? 0 : -1}
+                aria-disabled={!clickable}
+                aria-current={current ? 'step' : undefined}
+              >
+                <span className="nl-step-dot">{completed ? <Check size={13} strokeWidth={3} /> : i + 1}</span>
+                <span className="nl-step-label">{t(`listing.step.${s}`)}</span>
+              </button>
+              {i < STEPS.length - 1 && <span className={`nl-step-line ${i < step ? 'filled' : ''}`} />}
+            </div>
           )
         })}
       </div>

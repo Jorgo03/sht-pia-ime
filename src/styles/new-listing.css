@@ -60,28 +60,15 @@
   margin-left: auto;
 }
 
-/* Progress bar */
-
-.nl-progress-bar {
-  height: 4px;
-  background: var(--fho-bg);
-  border-radius: 2px;
-  margin-bottom: 20px;
-  overflow: hidden;
-}
-
-.nl-progress-fill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--fho-orange-1), var(--fho-orange-2));
-  border-radius: 2px;
-  transition: width 350ms cubic-bezier(.2,.7,.3,1);
-}
-
-/* Step pills (legacy) */
+/* Step indicator — dot-and-line track: completed steps get a checkmark and
+ * a filled connecting line, the current step is emphasized with a glow,
+ * future steps stay outlined/muted. Horizontal-scroll fallback stays as a
+ * safety net, but at 5 steps with only the current label shown it fits
+ * comfortably down to the smallest supported phone width. */
 
 .nl-progress {
   display: flex;
-  gap: 4px;
+  align-items: center;
   margin-bottom: 24px;
   overflow-x: auto;
   scrollbar-width: thin; /* Firefox */
@@ -105,20 +92,39 @@
   background: var(--fho-orange-1);
 }
 
+.nl-step-item {
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+}
+
+.nl-step-line {
+  width: 18px;
+  height: 2px;
+  margin: 0 2px;
+  flex-shrink: 0;
+  background: var(--fho-border);
+  transition: background 250ms var(--ease-out);
+}
+
+.nl-step-line.filled {
+  background: linear-gradient(90deg, var(--fho-orange-1), var(--fho-orange-2));
+}
+
 .nl-step {
   appearance: none;
   -webkit-appearance: none;
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 10px;
+  padding: 4px 6px;
   border-radius: var(--r-pill);
   font-size: 12px;
   font-weight: 500;
   font-family: var(--font-sans);
   color: var(--fho-text-muted);
-  background: var(--fho-surface);
-  border: 1px solid var(--fho-border);
+  background: transparent;
+  border: none;
   white-space: nowrap;
   cursor: default;
   transition: all 150ms var(--ease-out);
@@ -127,31 +133,43 @@
 /* Native `disabled` is deliberately not used (see NewListing.jsx) so
  * completed/current steps stay fully visible instead of looking dimmed. */
 .nl-step--clickable { cursor: pointer; }
-.nl-step--clickable:hover { border-color: var(--fho-orange-1); color: var(--fho-text); }
-
-.nl-step.active { color: var(--fho-text); }
-
-.nl-step.current {
-  background: linear-gradient(135deg, var(--fho-orange-1), var(--fho-orange-2));
-  color: white;
-  border-color: transparent;
-}
+.nl-step--clickable:hover .nl-step-dot { border-color: var(--fho-orange-1); }
 
 .nl-step-dot {
-  width: 20px;
-  height: 20px;
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
   font-size: 11px;
   font-weight: 700;
+  border: 1.5px solid var(--fho-border);
+  background: var(--fho-surface);
+  color: var(--fho-text-muted);
+  transition: all 250ms var(--ease-out);
 }
 
-.nl-step.current .nl-step-dot { background: rgba(255,255,255,0.25); }
-.nl-step-label { display: none; }
+.nl-step.completed { color: var(--fho-text); }
+.nl-step.completed .nl-step-dot {
+  background: linear-gradient(135deg, var(--fho-orange-1), var(--fho-orange-2));
+  border-color: transparent;
+  color: #fff;
+}
+
+.nl-step.current { color: var(--fho-text); }
+.nl-step.current .nl-step-dot {
+  background: linear-gradient(135deg, var(--fho-orange-1), var(--fho-orange-2));
+  border-color: transparent;
+  color: #fff;
+  transform: scale(1.15);
+  box-shadow: 0 0 0 4px var(--fho-orange-tint);
+}
+
+.nl-step-label { display: none; font-weight: 600; }
 .nl-step.current .nl-step-label { display: inline; }
-@media (min-width: 500px) { .nl-step-label { display: inline; } }
+@media (min-width: 560px) { .nl-step-label { display: inline; font-weight: 500; } }
 
 /* Section label */
 

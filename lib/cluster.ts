@@ -76,6 +76,20 @@ export function clusterProperties(
   });
 }
 
+/** Same per-type palette as web's MapMarker.jsx MARKER_COLORS, so a bubble's
+ *  color means the same thing on both apps. */
+export const MARKER_COLORS: Record<string, string> = {
+  sale: '#FF7A40',
+  rent: '#3B82F6',
+  daily_rent: '#3B82F6',
+  commercial: '#22C55E',
+  land: '#EAB308',
+};
+
+export function markerColorFor(listingType: string | null | undefined): string {
+  return MARKER_COLORS[listingType ?? ''] ?? MARKER_COLORS.sale;
+}
+
 /** Compact price for a map bubble: 200000 -> "€200K", 1250000 -> "€1.3M". */
 export function formatBubblePrice(price: number): string {
   if (price >= 1_000_000) {

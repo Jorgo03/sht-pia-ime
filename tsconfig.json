@@ -4,7 +4,14 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./*"]
-    }
+    },
+    // Lets tsc resolve Metro's platform-extension convention (foo.native.tsx /
+    // foo.web.tsx, no bare foo.tsx) the same way the bundler does at runtime —
+    // without this, `import { X } from './x'` can't find a module that only
+    // exists as x.native.tsx/x.web.tsx. Native is tried first since native.tsx
+    // and web.tsx are required to expose the same prop types, so either one is
+    // equally valid for type-checking.
+    "moduleSuffixes": [".native", ""]
   },
   "extends": "expo/tsconfig.base",
   "include": [

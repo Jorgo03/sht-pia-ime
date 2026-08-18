@@ -369,3 +369,51 @@ passwords". Not something I can toggle via the API.
 Decide whether the Expo app is still a target; if not, extracting the web app
 into its own repo (or deleting the Expo tree) would remove ~30 dependencies
 and a lot of confusion. Not done — too destructive to decide unilaterally.
+
+---
+
+## ═══ MOBILE PARITY PASS — 2026-08-18 ═══
+
+Two items from the design-handoff phase list were **not built**, because each
+contradicted a decision already recorded in this repo.
+
+**Both resolved by the owner on 2026-08-18: keep the price inputs as they are,
+drop trending neighborhoods.** Neither is open any more; they're kept here so
+the next person to read the handoff doesn't re-raise them as gaps.
+
+### MP-A. Dual-thumb price slider (filter sheet)
+
+The handoff asks for a dual-thumb range slider. Web's `Search.jsx` uses two
+plain number inputs (`.range-inputs`), and mobile's filter sheet already
+matches that. Building the slider on mobile only would put the two apps on
+different controls for the same filter, against CLAUDE.md's "web is the design
+source of truth".
+
+**RESOLVED 2026-08-18 — no slider, on either app.** The number inputs stay.
+They also express "min set, max unbounded" cleanly, which a two-thumb slider
+can't without an extra "no max" affordance. The handoff item is closed, not
+deferred.
+
+### MP-B. "Trending neighborhoods" on Home
+
+The handoff asks for this section on mobile. `Home.jsx:94` says it was
+*removed from web per owner request on 2026-07-14*, with the CSS and i18n
+keys deliberately retained "for easy restore". Adding it to mobile would
+re-introduce something you killed three weeks earlier.
+
+**RESOLVED 2026-08-18 — dropped for good, on both apps.** The 2026-07-14
+removal stands and mobile never gets the section. Note the now-dead
+`home.css` rules and `home.neighborhoods` i18n keys are still in the tree,
+kept back when the removal was thought to be reversible; they're safe to
+delete whenever someone is next in those files.
+
+### Also worth knowing
+
+- **`listing/new` is now the create entry point.** The tab-bar "+" and My
+  Listings' "New Listing" pill both point at the wizard. `listing/create`
+  (the single-scroll form) is untouched and still reachable by route — say
+  the word once the wizard has taken a real submission and it can go.
+- **Password reset on mobile completes on web.** `resetPassword` omits
+  `redirectTo`, so Supabase uses the project Site URL. There is no in-app
+  recovery screen and no deep link registered for one; adding those is the
+  only way to keep the flow inside the app.

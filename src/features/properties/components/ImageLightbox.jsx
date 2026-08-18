@@ -1,12 +1,17 @@
 import { useEffect, useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
 import { X, ChevronLeft, ChevronRight } from 'lucide-react'
+import { useSwipe } from '../../../hooks/useSwipe'
 
 const navBtn =
   'absolute top-1/2 flex h-12 w-12 -translate-y-1/2 items-center justify-center rounded-full bg-white/15 text-white transition-colors hover:bg-white/30'
 
 export default function ImageLightbox({ images, index, onClose, onNavigate }) {
   const { t } = useTranslation()
+  const swipe = useSwipe({
+    onSwipeLeft: () => onNavigate(1),
+    onSwipeRight: () => onNavigate(-1),
+  })
   const handleKey = useCallback((e) => {
     if (e.key === 'Escape') onClose()
     if (e.key === 'ArrowLeft') onNavigate(-1)
@@ -35,8 +40,15 @@ export default function ImageLightbox({ images, index, onClose, onNavigate }) {
         <X size={24} />
       </button>
 
-      <div className="flex max-h-[85vh] max-w-[90vw] items-center justify-center" onClick={e => e.stopPropagation()}>
-        <img src={images[index]} alt="" className="max-h-[85vh] max-w-full select-none rounded-lg object-contain" />
+      <div
+        className="flex max-h-[85vh] max-w-[90vw] items-center justify-center"
+        onClick={e => e.stopPropagation()}
+        onPointerDown={images.length > 1 ? swipe.onPointerDown : undefined}
+        onPointerUp={images.length > 1 ? swipe.onPointerUp : undefined}
+        onPointerCancel={images.length > 1 ? swipe.onPointerCancel : undefined}
+        style={images.length > 1 ? swipe.style : undefined}
+      >
+        <img src={images[index]} alt="" draggable={false} className="max-h-[85vh] max-w-full select-none rounded-lg object-contain" />
       </div>
 
       {images.length > 1 && (
