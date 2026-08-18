@@ -131,15 +131,30 @@ export function AppHeader({
             </Text>
             {subtitle}
           </View>
-        ) : (
+        ) : !onBack ? (
           /* `.header-brand`: serif 22/600 in orange, with `.ime` a lighter
              weight. These are static per-weight files, so the pair is
              Newsreader 600 + 500 rather than one family at two weights. */
           <Text style={styles.brand}>
             Shtëpia<Text style={styles.brandIme}>.ime</Text>
           </Text>
-        )}
+        ) : null}
       </View>
+
+      {/* Pushed screens with no title of their own (viewings, my-listings,
+          saved-searches, agent-dashboard, the property-detail hero) used to
+          show the wordmark crammed right against the back chevron. Centering
+          it over the full bar — the standard back/title/actions nav-bar
+          layout — reads as an intentional page title instead of branding
+          that got shoved into a corner. Screens with their own `title` are
+          untouched; that block still sits next to the chevron. */}
+      {!title && onBack && (
+        <View style={styles.brandCentered} pointerEvents="none">
+          <Text style={styles.brand}>
+            Shtëpia<Text style={styles.brandIme}>.ime</Text>
+          </Text>
+        </View>
+      )}
 
       <View style={styles.actions}>
         {showControls && (
@@ -228,6 +243,14 @@ const createStyles = (
 
   return StyleSheet.create({
     header: {
+      // The property-detail hero wraps this in a `flexDirection: 'row'`
+      // SafeAreaView (see property/[id].tsx's `imageHeader`) so it can
+      // pin the whole bar to the top of the image — but a row parent sizes
+      // a lone child to its own content width by default, not the parent's
+      // full width, which silently shrink-wrapped this to just the visible
+      // controls. `width: '100%'` makes it fill its container regardless of
+      // which parent (row or column) it's dropped into.
+      width: '100%',
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
@@ -261,6 +284,23 @@ const createStyles = (
       // The chevron's own optical inset, so the wordmark still lines up with
       // the 20px page gutter when there's no back button.
       marginLeft: hasBack ? -6 : 0,
+    },
+    // The centered wordmark for a back-button screen with no title of its
+    // own. Insets are fixed rather than measured against the actual chevron/
+    // actions width — that's the standard nav-bar trade-off (Slack, iOS
+    // Mail, etc. all do the same): a screen with no trailing controls won't
+    // be pixel-perfect optically centered, but it's still dead-centered on
+    // the bar itself, which reads as intentional. 56 clears the chevron on
+    // one side and a two-icon action group (share + favorite, ~88px) on the
+    // other with room to spare.
+    brandCentered: {
+      position: 'absolute',
+      left: 56,
+      right: 56,
+      top: 0,
+      bottom: 0,
+      alignItems: 'center',
+      justifyContent: 'center',
     },
     backBtn: {
       width: 28,
