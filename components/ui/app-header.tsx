@@ -244,9 +244,13 @@ const createStyles = (
       borderBottomColor: line,
       overflow: 'hidden',
     },
-    // Web's header is `--fho-surface` at 72% behind an 18px blur.
+    // Web's header is `--fho-surface` at 72% behind an 18px blur. That token
+    // is `colors.primaryLight` here, not `colors.surface` — the latter is
+    // hardcoded pure white in both palettes (unrelated to theme), which was
+    // rendering the header as a flat white/gray bar that never matched the
+    // cream (light) or dark-brown (dark) page background behind it.
     tint: {
-      backgroundColor: onDark ? 'rgba(20,17,14,0.45)' : colors.surface + 'b8',
+      backgroundColor: onDark ? 'rgba(20,17,14,0.45)' : colors.primaryLight + 'b8',
     },
     leading: {
       flexDirection: 'row',
