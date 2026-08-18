@@ -1,5 +1,424 @@
 # Pre-Launch Audit — Shtëpia.ime (Vite web app)
 
+## ═══ PASS 7 — 2026-08-18: AUTHENTICATION RE-AUDIT (owner super-prompt) ═══
+
+Scope per owner request, unchanged from Pass 6: auth and Login/Sign Up only.
+Re-read `contexts/auth-context.tsx` (mobile), `src/features/auth/AuthContext.jsx`
+(web), `ProtectedRoute.jsx`, `AuthCallback.jsx`, both Profile screens, and the
+role-consuming call sites across mobile end-to-end against the owner's
+checklist before touching anything, rather than assuming Pass 6 was still
+complete. Three of the four items below were already correct; the fourth
+(role source on mobile) was a real, previously-undiscovered gap.
+
+### Status
+
+| Method | UI | Backend | Callback | Session | Status |
+|---|---|---|---|---|---|
+| Email + Password | ✅ | ✅ | n/a | ✅ | **Fully working** |
+| Google | ✅ | ✅ | ✅ | ✅ | **Fully working** — role now correctly reaches `profiles` on mobile too (see GAP 1) |
+| Apple | ✅ | ✅ | ✅ (shared) | ✅ once enabled | **App code complete; blocked on external config** (unchanged from Pass 6) |
+| LinkedIn | ✅ | ✅ | ✅ (shared) | ✅ once enabled | **App code complete; blocked on external config** (unchanged from Pass 6) |
+| Email 6-digit Code | ✅ | ✅ | n/a | ✅ | **Fully working** |
+| Sign Up | ✅ | ✅ | n/a | ✅ | **Fully working** on both platforms, all four entry paths |
+
+### Findings
+
+**GAP 1 (mobile, real, pre-existing) — role was read from `user.user_metadata.role`
+instead of the `profiles` table, and OAuth/email-code signups never claimed a
+role at all.** Web's `AuthContext.jsx` has always treated `profiles.role` as
+the single source of truth: it fetches the profile row on every session sync,
+and for OAuth/OTP signups — which can't carry a custom `role` field through a
+provider redirect or a magic-link email — it stashes the toggle the user
+picked (`localStorage['fho_pending_role']`) before the redirect and claims it
+afterward via the `claim_role` RPC once a session lands (5-minute window, new
+accounts only). Mobile's `contexts/auth-context.tsx` never fetched `profiles`
+at all — it exposed only the raw Supabase auth `user` — and three call sites
+(`app/(tabs)/profile.tsx`, `hooks/use-profile-stats.ts`,
+`app/messages/index.tsx`) independently computed `isAgent` from
+`user.user_metadata?.role`. That field is populated only by the password-signup
+path (`signUp()`'s own `options.data.role`); Google/Apple/LinkedIn never set
+it, and Supabase doesn't sync the RPC's `profiles.role` write back into auth
+metadata. Net effect: **every agent who signed up via Google/Apple/LinkedIn on
+mobile was permanently shown and treated as a buyer** — wrong role badge,
+wrong stat card, wrong messages inbox unread column/copy, and the Agent
+Dashboard link never appeared, with no way to fix it from within the app,
+because mobile also never stashed a pending role before those redirects in
+the first place. This was live and would have hit any real mobile OAuth agent
+signup — not a hypothetical.
+
+Fixed by porting web's exact architecture: `contexts/auth-context.tsx` now
+fetches the `profiles` row on every session sync, runs `applyPendingRole`
+(same RPC, same 5-minute/new-account guard, using `AsyncStorage` in place of
+`localStorage`), and exposes `profile`/`isAgent`/`isClient`/`refreshProfile`
+on the context. `app/(tabs)/profile.tsx`'s `handleProvider` and `handleSendOtp`
+now stash `fho_pending_role` before their respective redirects, mirroring
+web's `handleProvider`/`handleSendOtp` exactly (including clearing a stale
+stash before a password signup, so an abandoned OAuth click can't leak a role
+choice into it). The three call sites now read `isAgent`/`profile` from
+context instead of re-deriving it from metadata.
+
+**GAP 2 (both platforms, minor, real) — email wasn't trimmed before
+validation or submission.** A pasted email with leading/trailing whitespace
+failed the `EMAIL_RE` regex outright (`^[^\s@]+...`) and surfaced a false
+"invalid email" instead of being silently cleaned up, which is standard
+practice everywhere else. Fixed in both `validate()`/`validateAuth()` (test
+the trimmed value) and every submit path (`handleAuth`, `handleSendOtp`,
+`handleResend`, `handleForgotPassword` and mobile's equivalents) — trimmed
+once, then written back into state so downstream handlers on the same screen
+stay consistent. Worth noting live-testing found this mostly moot on desktop
+web: `<input type="email">` already strips whitespace at the DOM level before
+React ever sees it (verified directly in the browser). React Native's
+`TextInput` has no such built-in sanitization, so this was a live, unmitigated
+bug on mobile specifically; the web-side fix is defense-in-depth for engines
+that don't sanitize (older WebViews, Expo's own web target).
+
+**Everything else re-verified, no regression, nothing to redo:** session
+restoration / welcome-toast dedup / redirect race (web); `onAuthStateChange`
+listener cleanup (both); `handle_new_user` trigger idempotency; storage
+config (`AsyncStorage`, `flowType: 'pkce'`, `persistSession`,
+`autoRefreshToken`); double-submit guards (`disabled={loading}` on every
+submit button, both platforms); show/hide password toggle (both platforms,
+pre-existing); `ProtectedRoute`'s loading/redirect/role-gate logic;
+`AuthCallback`'s `settled` ref + 15s timeout + `getSession()`-then-listener
+race handling; friendly, localized error mapping on all 6 mobile call sites
+and web's equivalent; confirm-password field and 2×2 social-button grid
+(Pass 6); Apple/LinkedIn buttons restored and still correctly blocked only by
+external provider config, not app code (re-confirmed live below).
+
+```
+GET /auth/v1/authorize?provider=google        -> 302 accounts.google.com  (enabled)
+GET /auth/v1/authorize?provider=apple         -> 400 provider is not enabled
+GET /auth/v1/authorize?provider=linkedin_oidc -> 400 provider is not enabled
+```
+
+### External configuration required (unchanged from Pass 6 — no invented values)
+
+**Apple** — Provider: Apple. Missing: Apple Developer Program enrollment +
+Services ID + Sign In with Apple key, plus the Supabase Dashboard provider
+toggle. Where: Apple Developer console, then Supabase Dashboard →
+Authentication → Providers → Apple. Redirect URL:
+`https://xzzzhlwmzotibrxdqmcm.supabase.co/auth/v1/callback`. Full checklist:
+DECISIONS.md §2.
+
+**LinkedIn** — Provider: LinkedIn (OIDC). Missing: a LinkedIn Developer app
+with the "Sign In with LinkedIn using OpenID Connect" product, plus the
+Supabase Dashboard provider toggle (the **LinkedIn (OIDC)** entry
+specifically, not the deprecated plain "LinkedIn" one). Where: LinkedIn
+Developer portal, then Supabase Dashboard → Authentication → Providers.
+Redirect URL: `https://xzzzhlwmzotibrxdqmcm.supabase.co/auth/v1/callback`.
+Full checklist: DECISIONS.md §3.
+
+No code changes needed on either once the dashboard toggles are on — Google
+already proves the exact same app-side code path end-to-end.
+
+### Files changed
+
+- `contexts/auth-context.tsx` — added `Profile` type, `loadProfile`,
+  `applyPendingRole` (ported from web, `AsyncStorage` in place of
+  `localStorage`), rewrote the session-sync effect to fetch/refresh the
+  profile on every auth event, added `profile`/`isAgent`/`isClient`/
+  `refreshProfile` to the context value and its type.
+- `app/(tabs)/profile.tsx` — destructure `profile`/`isAgent` from context
+  instead of computing a local `isAgent` from `user.user_metadata`; `handleProvider`
+  and `handleSendOtp` now stash `fho_pending_role` via `AsyncStorage` before
+  their redirects (and `handleAuth`'s password-signup path clears a stale
+  stash first); `displayName` now prefers `profile?.full_name`, matching
+  web; email trimmed in `validateAuth` and every submit path.
+- `hooks/use-profile-stats.ts` — reads `isAgent` from `useAuth()` instead of
+  `user.user_metadata?.role`.
+- `app/messages/index.tsx` — same fix, for the unread-column selection and
+  the empty-state copy.
+- `src/features/auth/pages/Profile.jsx` — email trimmed in `validate()` and
+  every submit path (`handleAuth`, `handleSendOtp`, `handleForgotPassword`);
+  no role-source change needed, web already read `profiles.role` correctly.
+
+### Verification
+
+- `npx tsc --noEmit` — clean.
+- `npm run lint` (`expo lint`) — 0 errors, 16 warnings (unchanged baseline).
+- `npm run build` — ✓ (web, 8.70s).
+- `npm test` — 10/10.
+- `npx expo-doctor` — 17/18 (the one failure is the pre-existing,
+  already-documented `android/`-prebuild-vs-`app.json` drift; unrelated to
+  auth).
+- Live browser: submitted the sign-in form with a nonexistent account —
+  got the correctly localized "Email ose fjalëkalim i gabuar." message, not a
+  raw Supabase error; confirmed no request-side effect beyond the expected
+  401 (no account created, no side effect). Verified light and dark mode on
+  the login card (text/inputs/buttons/error message all legible in both).
+  Verified the sign-up form still renders the confirm-password field, role
+  toggle, and all four social buttons (Google/Apple/LinkedIn/Email-code)
+  correctly. Confirmed via DOM inspection that the email-trim fix is moot on
+  desktop web specifically (browser-level `type="email"` sanitization already
+  strips whitespace) but real and now fixed on mobile's `TextInput`, which has
+  no equivalent.
+
+### Not done / needs the owner
+
+- Apple + LinkedIn Dashboard/Developer-console configuration (external,
+  documented above and in DECISIONS.md §2–3 — cannot be done from code).
+- Did not create a live test account (password or OAuth) against the shared
+  production Supabase project to avoid seeding real rows into `auth.users`/
+  `profiles` — the invalid-credentials path was tested instead, which
+  exercises the same validation/error-handling code without side effects.
+  If the owner wants full password/OAuth signup verified end-to-end on a
+  real account, that's a five-minute manual pass on either app.
+
+## ═══ PASS 6 — 2026-08-18: AUTHENTICATION-ONLY AUDIT & FIX ═══
+
+Scope per owner request: auth and Login/Sign Up only. No other feature area
+touched. Audited both `src/features/auth/AuthContext.jsx` (web) and
+`contexts/auth-context.tsx` (mobile) line-by-line, plus
+`AuthCallback.jsx`, both Supabase clients, and the `handle_new_user` trigger
+migration, before changing anything.
+
+### Status
+
+| Method | UI | Backend | Callback | Session | Status |
+|---|---|---|---|---|---|
+| Email + Password | ✅ | ✅ | n/a | ✅ | **Fully working** |
+| Google | ✅ | ✅ | ✅ | ✅ | **Fully working** — verified live (302 to accounts.google.com) |
+| Apple | ✅ (restored) | ✅ | ✅ (shared) | ✅ once enabled | **App code complete; blocked on external config** |
+| LinkedIn | ✅ (restored) | ✅ | ✅ (shared) | ✅ once enabled | **App code complete; blocked on external config** |
+| Email 6-digit Code | ✅ | ✅ | n/a | ✅ | **Fully working** |
+
+### Findings — most were already correct; four were real gaps
+
+**Session restoration / welcome-toast dedup / redirect race** — already fixed
+in an earlier session pass (`sessionStorage` pending-welcome flag,
+`pendingRedirect` deferred navigation, `AuthCallback`'s `settled` ref +
+15s timeout). Re-verified this pass, no regression, nothing to redo.
+
+**`onAuthStateChange` listener cleanup** — correct on both platforms: one
+subscription per mount, `unsubscribe()` in the effect's cleanup. No leak, no
+duplicate.
+
+**Profile creation / new-vs-existing-user race safety** — `handle_new_user`
+(migration `20260702_tighten_properties_select_fix_signup_trigger.sql`) is a
+`SECURITY DEFINER` trigger with `on conflict (id) do nothing` — idempotent,
+race-safe, fires identically for password/OAuth/OTP signup since they all
+insert into the same `auth.users` row. Reads `full_name` OR `name` from
+metadata (covers both this app's own signup shape and whatever a given OAuth
+provider populates) and validates `role` against a fixed set rather than
+trusting it blindly. Not touched — no flaw found, and per this repo's
+standing rule, `SECURITY DEFINER` functions only get modified for a *found*
+authorization flaw, not on general principle.
+
+**Storage/session config** — mobile's `AsyncStorage` (not `expo-secure-store`)
+is the Supabase-recommended choice for Expo specifically (`SecureStore` has a
+2KB value cap a JWT session can exceed) — correct as-is, not a bug.
+`flowType: 'pkce'`, `persistSession`, `autoRefreshToken`,
+`detectSessionInUrl` (web-only) all already correct on both clients.
+
+**GAP 1 — mobile had no client-side validation.** `handleAuth` only checked
+for non-empty fields. Web already validates email format, 8-character
+password minimum, and full-name-on-signup. Added the identical `validateAuth()`
+to mobile, same rules, same order, reusing the same (already-shared,
+already-translated) `errors.*` keys web uses.
+
+**GAP 2 — mobile exposed raw Supabase errors to the user.** Every failure
+path on mobile (`handleAuth`, OTP send/resend/verify, forgot-password) did
+`Alert.alert(t('common.error'), error.message)` — Supabase's own English
+driver text, unlocalized, shown directly, on all 6 call sites. Web has had a
+`friendlyError()` mapper for this since before this session. Ported it to
+mobile as `friendlyAuthError()` (same match strings, same fallback), applied
+at all 6 sites.
+
+**GAP 3 — no confirm-password field, either platform.** Added to both,
+sign-up only, validated in the same function as the other sign-up rules.
+Two new shared i18n keys (`auth.confirmPassword`, `errors.passwordMismatch`)
+in all 8 locale files.
+
+**GAP 4 (found live, not from code review) — Apple/LinkedIn buttons showed a
+raw JSON error page, not a friendly in-app message.** Restored the buttons
+per owner request (see "Apple/LinkedIn" below), wrote a comment claiming
+`friendlyAuthError`/`friendlyError` would catch a disabled-provider failure
+for them — then actually clicked both buttons in a live browser on all three
+targets (Vite web, Expo-as-web, and reasoned through the true-native path)
+before trusting that comment. It was wrong for two of the three:
+`signInWithOAuth` does a full-page navigation to Supabase's `/authorize`
+endpoint rather than a fetchable request, so a disabled provider's raw
+`{"code":400,...}` JSON replaces the page before any React/RN code runs —
+confirmed identically on the real Vite app and on Expo's own web target.
+True native (iOS/Android) is better-behaved: `WebBrowser.openAuthSessionAsync`
+returns control to JS either way, so the same failure surfaces as this
+screen's own (generic, but localized) error Alert. Corrected the comment in
+both files to describe the verified behavior instead of the incorrect
+assumption, rather than leave confidently-wrong documentation in place.
+
+### Apple/LinkedIn — a decision, not a bug
+
+Both were fully implemented app-side since 2026-07-12
+(`signInWithProvider('apple'|'linkedin_oidc')`, shared `AuthCallback`,
+native `signInWithAppleNative` already built and wired on iOS) but the
+*buttons* were deliberately removed from the UI that same day, per an
+explicit owner instruction, specifically to avoid shipping a button that
+fails on every tap. Before touching this, verified live whether that
+Supabase Dashboard state had changed since — it hadn't:
+
+```
+GET /auth/v1/authorize?provider=google        -> 302 accounts.google.com  (enabled)
+GET /auth/v1/authorize?provider=apple         -> 400 provider is not enabled
+GET /auth/v1/authorize?provider=linkedin_oidc -> 400 provider is not enabled
+```
+
+Flagged the conflict between that prior decision and this task's "all five
+methods must be integrated" requirement rather than silently picking a side;
+owner chose to show the buttons now, accepting they'll fail until the
+external config below is done. Buttons restored on both apps.
+
+### External configuration required (cannot be done from code — no invented values)
+
+**Apple** — Provider: Apple. What's missing: Apple Developer Program
+enrollment + Services ID + Sign In with Apple key, and the Supabase Dashboard
+provider toggle. Where: Apple Developer console, then Supabase Dashboard →
+Authentication → Providers → Apple. Exact redirect URL required:
+`https://xzzzhlwmzotibrxdqmcm.supabase.co/auth/v1/callback` (Services ID's
+Return URL). Full checklist already in DECISIONS.md §2 — unchanged by this
+pass, still accurate.
+
+**LinkedIn** — Provider: LinkedIn (OIDC). What's missing: a LinkedIn
+Developer app with the "Sign In with LinkedIn using OpenID Connect" product,
+plus the Supabase Dashboard provider toggle. Where: LinkedIn Developer
+portal, then Supabase Dashboard → Authentication → Providers → **LinkedIn
+(OIDC)** specifically (not the deprecated plain "LinkedIn" entry). Exact
+redirect URL required: `https://xzzzhlwmzotibrxdqmcm.supabase.co/auth/v1/callback`.
+Full checklist already in DECISIONS.md §3 — unchanged by this pass, still
+accurate.
+
+No code changes will be needed on either once the dashboard toggles are on —
+confirmed by the fact that Google, which needed the exact same app-side code
+path, already works end-to-end.
+
+### Files changed
+
+- `app/(tabs)/profile.tsx` — added `friendlyAuthError()`, `EMAIL_RE`,
+  `validateAuth()`; replaced 6 raw `error.message` sites; added
+  `confirmPassword` state + field; generalized `handleGoogleLogin` →
+  `handleProvider(provider)`; added Apple + LinkedIn buttons; fixed
+  `socialRow`/`socialButton` to wrap into a 2×2 grid for 4 buttons; removed a
+  stale comment.
+- `src/features/auth/pages/Profile.jsx` — added `confirmPassword` state +
+  field + match validation; restored Apple + LinkedIn buttons (`Apple`,
+  `Linkedin` icons from the already-installed `lucide-react`); corrected the
+  removal-era comment to document the live-verified OAuth-redirect
+  error-catch limitation.
+- `src/i18n/locales/{sq,en,de,it,es,pl,ru,fr}.json` — `auth.confirmPassword`,
+  `errors.passwordMismatch`.
+
+### Verification
+
+- `npx tsc --noEmit` — clean.
+- `npx expo lint` — 0 errors, 16 warnings (unchanged pre-existing baseline).
+- `npm run build` — ✓ (web).
+- `npm test` — 10/10.
+- `npx expo-doctor` — 17/18 (the one failure is the pre-existing, already-
+  documented `android/`-prebuild-vs-`app.json` drift; unrelated to auth).
+- Fresh iOS Metro bundle — HTTP 200, new mobile auth code confirmed present.
+- Live browser: web sign-up form (confirm-password field renders, 2×2 social
+  grid renders); Expo-as-web equivalent (same); clicked Apple on both web
+  targets and observed the actual failure mode directly rather than assuming
+  the error-handling code covered it (see GAP 4 above).
+
+### Not done / needs the owner
+
+- Apple + LinkedIn Dashboard/Developer-console configuration (external,
+  documented above and in DECISIONS.md §2–3 — cannot be done from code).
+- The Apple-button raw-JSON-page failure mode on web is not fixable from
+  client-side error handling — it disappears once the Dashboard config is
+  done, not before.
+
+## ═══ PASS 5 — 2026-08-18: TARGETED AUDIT (auth / dates / dark-mode notifications / WhatsApp / AI) ═══
+
+Scope: a user-supplied generic "full audit" template covering five areas.
+Rather than executing it blindly, each area was checked against this actual
+codebase first; only genuine findings were fixed. No DB/RLS changes.
+
+**Auth** — no new findings. Everything the template asks for (listener
+cleanup, no duplicate welcome toast, no auth-state flash, session
+restoration) was already fixed in the 2026-08-18 mobile-parity pass earlier
+this session. Re-verified `onAuthStateChange` subscribes once and
+`unsubscribe()`s on cleanup, both platforms.
+
+**Calendar** — doesn't exist as a feature; there is no calendar-grid UI
+anywhere in the app. The closest analog is the viewing-scheduling date
+picker (native `DateTimePicker` on mobile, `<input type="date">` on web).
+Not something to invent.
+
+**Date format → DD/MM/YYYY (owner decision, 2026-08-18)** — `formatDate()`
+in `src/lib/format.js` / `lib/format.ts` used
+`Intl.DateTimeFormat(lang, {month:'short', ...})`, producing per-locale
+month names (e.g. "18 gush 2026"). Owner chose to standardize on a fixed
+numeric `DD/MM/YYYY` in every language instead. Changed both files
+(mirrored, per their own "two files, parallel APIs" convention) to build
+the string from local date components directly; `formatRelativeTime()`'s
+"more than a week ago" fallback now calls `formatDate()` instead of
+duplicating a second `toLocaleDateString` rule. All source values are
+`timestamptz` (`scheduled_at`, `created_at`) — never a bare date-only
+string — so there's no UTC-midnight-parsed-as-local off-by-one-day risk.
+Verified with real ISO timestamps at the boundary (`2026-12-31T23:59:00Z`
+→ `01/01/2027` in a UTC+ timezone, correct local-day resolution, not a
+bug). 11 display call sites across both apps confirmed unaffected by
+signature (the now-unused `lang` param was kept rather than touched, to
+avoid a churn-only edit to all 11 call sites for zero behavior change).
+
+**Dark-mode notification bug — FOUND AND FIXED.** `.addsheet-toast`
+(globals.css; used by 7 toasts: viewing confirmations, 4 error banners,
+login prompt) set `background: var(--fho-text)` /
+`color: var(--fho-text-on-dark)`. In light mode that's near-black-on-cream
+— fine, matches its "always-dark chip" design intent. In dark mode
+`--fho-text` flips to near-white (`#f0ece6`) while `--fho-text-on-dark`
+stays near-white (`#faf6ef`) — **near-invisible white-on-white text**,
+dark mode only. Root cause: a theme-*reactive* token used where an
+always-dark value was needed; `--fho-text-on-dark` was already correctly
+"always light," it just had no "always dark" partner. Fixed: background is
+now a fixed `#1a1714` in both themes. This is web-only — mobile has no
+directly-equivalent toast component.
+
+**WhatsApp** — already fully implemented (`whatsappUrl()` in
+`lib/format.ts`/`.js`, defaults to Albania's country code when one isn't
+present, strips formatting characters). No gap found.
+
+**AI — corrected finding.** My first pass concluded `ai-listing-assistant`
+(the per-listing buyer chat backend — grounded server-side in one listing,
+prompt-injection-hardened, rate-limited) had "zero UI consumer on either
+platform." **That was wrong on web** — `src/features/properties/components/
+ListingAssistant.jsx` already existed (dated 2026-08-05, predates this
+session), fully wired to `askListingAssistant()` in `lib/ai.js`, gated
+behind the pre-existing `aiAssistant` feature flag, and rendered from
+`PropertyDetail.jsx`. The mistake: I grepped for the literal Edge Function
+name as a string and for the AI-generator's own symbol names, never for
+callers of the *wrapper function* itself — the one search that would have
+found it. **Mobile genuinely had no equivalent** — that part of the
+finding stood. Built `components/property/listing-assistant.tsx` +
+`askListingAssistant()` in `lib/ai.ts`, matching web's component
+behaviorally (same flow, same already-translated `assistant.*` i18n keys
+in all 8 locales — a full FAB→panel→intro-bubble→thinking→disclaimer set
+that already existed, unused) and wired into `app/property/[id].tsx`
+behind the same `status === 'active'` gate web uses (mobile has no flags
+module, so it ships unconditionally like the other two AI features already
+do there).
+
+**Live verification, not just code review**: opened the public (no-auth-
+required) `/property/:id` route, opened the assistant panel, sent a real
+question through the actual UI. Got back the graceful `unavailable`
+fallback bubble. Traced this to source with a direct `curl` against both
+`ai-listing-assistant` and `ai-parse-search` (bypassing the UI's
+error-swallowing) — both return `503 {"error":"ai_unavailable"}`. This is
+**not a bug**: DECISIONS.md §0 (dated 2026-07-02, predates this session)
+already documents that `ANTHROPIC_API_KEY` has never been set as a
+Supabase secret, by deliberate choice ("I don't create or handle
+secrets"), with the exact one-line command to enable it. All three AI
+functions degrade to this same clean 503 until the owner runs it — the new
+mobile assistant will start working the instant the key is set, with no
+further code changes.
+
+Verification this pass: `tsc --noEmit` clean · `expo lint` 0 errors / 16
+warnings (unchanged baseline) · web build ✓ · `npm test` 10/10 · fresh iOS
+Metro bundle HTTP 200, new component confirmed present · live browser
+round-trip against the public property-detail route and the deployed Edge
+Functions.
+
 ## ═══ PASS 4 — 2026-08-15: FULL APPLICATION FUNCTIONAL AUDIT ═══
 
 Scope: not source inspection alone — every flow below was actually exercised

@@ -13,13 +13,10 @@ interface ProfileStats {
 /**
  * Mirrors web's useProfileStats.js — three counts for the profile stats
  * strip: saved favorites, saved searches, and a role-dependent third count
- * (active listings for agents, upcoming viewings for clients). RN's
- * auth-context doesn't fetch the `profiles` row (see auth-context.tsx), so
- * role comes from user_metadata, same as the rest of profile.tsx.
+ * (active listings for agents, upcoming viewings for clients).
  */
 export function useProfileStats(): ProfileStats {
-  const { user } = useAuth();
-  const isAgent = user?.user_metadata?.role === 'agent';
+  const { user, isAgent } = useAuth();
   const [stats, setStats] = useState<ProfileStats>({
     loading: true,
     saved: 0,

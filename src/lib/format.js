@@ -62,13 +62,15 @@ export function getLocalizedText(i18nObj, lang, fallback = 'en') {
   return i18nObj[lang] ?? i18nObj[fallback] ?? i18nObj.sq ?? Object.values(i18nObj)[0] ?? ''
 }
 
+// Fixed DD/MM/YYYY in every language (owner decision, 2026-08-18) rather than
+// each locale's own month-name style — `lang` is kept only so existing call
+// sites don't need touching; it no longer drives the output.
 export function formatDate(dateStr, lang = 'sq') {
   if (!dateStr) return ''
-  return new Intl.DateTimeFormat(lang, {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-  }).format(new Date(dateStr))
+  const d = new Date(dateStr)
+  const day = String(d.getDate()).padStart(2, '0')
+  const month = String(d.getMonth() + 1).padStart(2, '0')
+  return `${day}/${month}/${d.getFullYear()}`
 }
 
 export function formatRelativeTime(iso, locale = 'sq') {
@@ -79,7 +81,9 @@ export function formatRelativeTime(iso, locale = 'sq') {
   if (diff < 3600) return rtf.format(-Math.floor(diff / 60), 'minute')
   if (diff < 86400) return rtf.format(-Math.floor(diff / 3600), 'hour')
   if (diff < 604800) return rtf.format(-Math.floor(diff / 86400), 'day')
-  return new Date(iso).toLocaleDateString(locale)
+  // Beyond a week, fall back to the same DD/MM/YYYY every other displayed
+  // date uses, rather than a second, separate date-formatting rule.
+  return formatDate(iso)
 }
 
 export function slugify(s) {

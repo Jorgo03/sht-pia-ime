@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate, useLocation } from 'react-router-dom'
-import { User, Briefcase, Mail, Lock, Eye, EyeOff, ArrowLeft, ArrowRight, Heart, Building2, LogOut, ChevronRight, Search as SearchIcon, Calendar, Loader2 } from 'lucide-react'
+import { User, Briefcase, Mail, Lock, Eye, EyeOff, ArrowLeft, ArrowRight, Heart, Building2, LogOut, ChevronRight, Search as SearchIcon, Calendar, Loader2, Apple, Linkedin } from 'lucide-react'
 import { useAuth } from '../AuthContext'
 import { useProfileStats } from '../hooks/useProfileStats'
 import DuskHero from '../components/DuskHero'
@@ -35,6 +35,7 @@ export default function Profile() {
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
   const [showPw, setShowPw] = useState(false)
   const [fullName, setFullName] = useState('')
   const [agencyName, setAgencyName] = useState('')
@@ -90,7 +91,7 @@ export default function Profile() {
   }, [cooldown > 0])
 
   const validate = () => {
-    if (!EMAIL_RE.test(email)) {
+    if (!EMAIL_RE.test(email.trim())) {
       setMessage(t('errors.invalidEmail'))
       return false
     }
@@ -98,9 +99,15 @@ export default function Profile() {
       setMessage(t('errors.passwordMin'))
       return false
     }
-    if (isSignUp && fullName.trim().length < 2) {
-      setMessage(t('errors.nameRequired'))
-      return false
+    if (isSignUp) {
+      if (fullName.trim().length < 2) {
+        setMessage(t('errors.nameRequired'))
+        return false
+      }
+      if (password !== confirmPassword) {
+        setMessage(t('errors.passwordMismatch'))
+        return false
+      }
     }
     return true
   }
@@ -108,9 +115,11 @@ export default function Profile() {
   const handleAuth = async () => {
     setMessage('')
     if (!validate()) return
+    const cleanEmail = email.trim()
+    setEmail(cleanEmail)
     setLoading(true)
     if (isSignUp) {
-      const { error } = await signUp(email, password, {
+      const { error } = await signUp(cleanEmail, password, {
         role,
         full_name: fullName.trim(),
         agency_name: role === 'agent' ? agencyName.trim() || undefined : undefined,
@@ -120,7 +129,7 @@ export default function Profile() {
       else {
         // Confirmation email carries a 6-digit code — take the user straight
         // to the code entry (type 'signup' so verify/resend match).
-        setOtpEmail(email)
+        setOtpEmail(cleanEmail)
         setOtpType('signup')
         setOtpCode(['', '', '', '', '', ''])
         setOtpError(false)
@@ -129,7 +138,7 @@ export default function Profile() {
         setMessage(t('auth.checkEmail'))
       }
     } else {
-      const { error } = await signIn(email, password)
+      const { error } = await signIn(cleanEmail, password)
       setLoading(false)
       if (error) {
         setMessage(friendlyError(error, t))
@@ -171,13 +180,15 @@ export default function Profile() {
     // Same validity check the password form uses. A presence-only guard let
     // malformed addresses reach Supabase, which rejects them with a raw
     // "Unable to validate email address: invalid format" 400.
-    if (!EMAIL_RE.test(otpEmail)) { setMessage(t('errors.invalidEmail')); return }
+    const cleanEmail = otpEmail.trim()
+    if (!EMAIL_RE.test(cleanEmail)) { setMessage(t('errors.invalidEmail')); return }
+    setOtpEmail(cleanEmail)
     // OTP signups carry no role metadata either — same stash-and-apply
     // path as OAuth, and overwriting here means an aborted OAuth click
     // can't leak its role choice into this flow.
     try { localStorage.setItem('fho_pending_role', role) } catch { /* ignore */ }
     setLoading(true); setMessage('')
-    const { error } = await sendOtp(otpEmail)
+    const { error } = await sendOtp(cleanEmail)
     setLoading(false)
     if (error) setMessage(friendlyError(error, t))
     else { setOtpStep('enter-code'); setOtpError(false); setCooldown(30); setMessage(t('auth.otpSent')) }
@@ -237,9 +248,11 @@ export default function Profile() {
   }
 
   const handleForgotPassword = async () => {
-    if (!email) { setMessage(t('auth.enterEmail')); return }
+    const cleanEmail = email.trim()
+    if (!cleanEmail) { setMessage(t('auth.enterEmail')); return }
+    setEmail(cleanEmail)
     setMessage('')
-    const { error } = await resetPassword(email)
+    const { error } = await resetPassword(cleanEmail)
     setMessage(error ? friendlyError(error, t) : t('auth.resetSent'))
   }
 
@@ -385,6 +398,13 @@ export default function Profile() {
             <button className="field-eye" onClick={() => setShowPw(!showPw)} type="button">{showPw ? <EyeOff size={18} /> : <Eye size={18} />}</button>
           </div>
 
+          {isSignUp && (
+            <div className="field-row">
+              <Lock size={18} className="field-icon" />
+              <input type={showPw ? 'text' : 'password'} className="form-input" placeholder={t('auth.confirmPassword')} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleAuth()} />
+            </div>
+          )}
+
           {isSignUp && role === 'agent' && (
             <div className="field-row"><Building2 size={18} className="field-icon" /><input type="text" className="form-input" placeholder={t('auth.agencyName')} value={agencyName} onChange={(e) => setAgencyName(e.target.value)} /></div>
           )}
@@ -417,10 +437,30 @@ export default function Profile() {
               )}
               {t('auth.continueWithGoogle')}
             </button>
-            {/* Apple + LinkedIn removed until the providers are enabled in the
-                Supabase dashboard (DECISIONS.md P2-G) — signInWithProvider and
-                the callback already support them, so re-adding is just the
-                buttons: handleProvider('apple') / handleProvider('linkedin_oidc'). */}
+            {/* Re-added per owner request 2026-08-18 (DECISIONS.md P2-G):
+                signInWithProvider/AuthCallback already fully support both —
+                this app code was never the gap. Supabase Dashboard still has
+                both providers toggled off as of this date (verified live via
+                a direct /auth/v1/authorize probe).
+                IMPORTANT: `handleProvider`'s own error handling (below) does
+                NOT catch a disabled-provider failure for these two, and
+                that's not fixable from here — signInWithOAuth navigates the
+                whole page to Supabase's /authorize endpoint rather than
+                making a fetchable request, so GoTrue's raw JSON 400 replaces
+                this page before any React code runs; verified live, not
+                assumed. `providerNotConfigured` only ever fires for the
+                OTP/password paths, which stay on this page. This is the
+                exact rough edge the 2026-07-12 removal was avoiding — it's
+                back now because that's what was asked for, but it isn't
+                solved, only re-exposed until the Dashboard config lands. */}
+            <button className="social-btn" onClick={() => handleProvider('apple')} disabled={!!providerLoading}>
+              {providerLoading === 'apple' ? <Loader2 size={18} className="animate-spin" /> : <Apple size={18} />}
+              {t('auth.continueWithApple')}
+            </button>
+            <button className="social-btn" onClick={() => handleProvider('linkedin_oidc')} disabled={!!providerLoading}>
+              {providerLoading === 'linkedin_oidc' ? <Loader2 size={18} className="animate-spin" /> : <Linkedin size={18} />}
+              {t('auth.continueWithLinkedIn')}
+            </button>
             <button className="social-btn" onClick={handleGoogleOtp} disabled={!!providerLoading}>
               <Mail size={18} />
               {t('auth.signInWithEmail')}

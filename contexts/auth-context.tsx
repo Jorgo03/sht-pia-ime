@@ -1,5 +1,6 @@
 import { Provider } from '@supabase/supabase-js';
 import { Session, User } from '@supabase/supabase-js';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Linking from 'expo-linking';
 import * as WebBrowser from 'expo-web-browser';
 import {
@@ -22,10 +23,24 @@ interface SignUpOptions {
   agency_name?: string;
 }
 
+interface Profile {
+  id: string;
+  role: string | null;
+  full_name: string | null;
+  agency_name: string | null;
+  avatar_url: string | null;
+  preferred_language: string | null;
+  [key: string]: unknown;
+}
+
 interface AuthContextValue {
   user: User | null;
   session: Session | null;
+  profile: Profile | null;
   loading: boolean;
+  isAgent: boolean;
+  isClient: boolean;
+  refreshProfile: () => Promise<void>;
   signUp: (
     email: string,
     password: string,
@@ -57,14 +72,67 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const loadProfile = async (userId: string): Promise<Profile | null> => {
+    const { data } = await supabase.from('profiles').select('*').eq('id', userId).single();
+    return (data as Profile | null) ?? null;
+  };
+
+  // Mirrors web's AuthContext.applyPendingRole. OAuth and email-code signups
+  // can't carry the role toggle through the provider/magic-link redirect, so
+  // handle_new_user always defaults them to 'buyer' — profile.tsx stashes the
+  // chosen role in AsyncStorage right before those two flows start (see
+  // handleProvider/handleSendOtp), and this applies it once, only to an
+  // account created moments ago. Signing in again later never rewrites an
+  // existing role.
+  const applyPendingRole = async (
+    user: User,
+    currentProfile: Profile | null,
+  ): Promise<Profile | null> => {
+    let pending: string | null = null;
+    try {
+      pending = await AsyncStorage.getItem('fho_pending_role');
+      if (pending) await AsyncStorage.removeItem('fho_pending_role');
+    } catch {
+      return currentProfile;
+    }
+    if (pending !== 'agent' && pending !== 'buyer') return currentProfile;
+    if (!currentProfile || currentProfile.role === pending) return currentProfile;
+    const isNewAccount =
+      !!user.created_at && Date.now() - new Date(user.created_at).getTime() < 5 * 60 * 1000;
+    if (!isNewAccount) return currentProfile;
+    // Same narrowed SECURITY DEFINER RPC web uses (5-minute window,
+    // agent<->buyer only) rather than a raw profiles UPDATE, which any
+    // signed-in user could otherwise call on themselves to self-promote.
+    const { data, error } = await supabase.rpc('claim_role', { new_role: pending });
+    if (error) return currentProfile;
+    return (data as Profile | null) ?? currentProfile;
+  };
+
   useEffect(() => {
+    let active = true;
+
+    const sync = async (s: Session | null) => {
+      if (!active) return;
+      if (!s?.user) {
+        setSession(null);
+        setProfile(null);
+        setLoading(false);
+        return;
+      }
+      let p = await loadProfile(s.user.id);
+      p = await applyPendingRole(s.user, p);
+      if (!active) return;
+      setSession(s);
+      setProfile(p);
+      setLoading(false);
+    };
+
     supabase.auth
       .getSession()
-      .then(({ data: { session: s } }) => {
-        setSession(s);
-      })
+      .then(({ data: { session: s } }) => sync(s))
       .catch((err) => {
         // getSession() can reject on a genuine network failure (it may hit
         // the network to refresh an expired token) — on a bad connection
@@ -73,20 +141,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // screen forever, since AppGate (app/_layout.tsx) now waits on it.
         // Degrade to signed-out rather than hang.
         console.error('Session restore failed, continuing signed-out:', err);
+        if (!active) return;
         setSession(null);
-      })
-      .finally(() => {
+        setProfile(null);
         setLoading(false);
       });
 
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, s) => {
-      setSession(s);
+      sync(s);
     });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      active = false;
+      subscription.unsubscribe();
+    };
   }, []);
+
+  const refreshProfile = async () => {
+    if (!session?.user) return;
+    const p = await loadProfile(session.user.id);
+    setProfile(p);
+  };
 
   const signUp = async (
     email: string,
@@ -215,7 +292,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       value={{
         user: session?.user ?? null,
         session,
+        profile,
         loading,
+        isAgent: profile?.role === 'agent',
+        isClient: profile?.role === 'client' || profile?.role === 'buyer',
+        refreshProfile,
         signUp,
         signIn,
         signInWithProvider,

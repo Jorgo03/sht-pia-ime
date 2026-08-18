@@ -39,7 +39,7 @@ interface PropertyStub {
 export default function MessagesInboxScreen() {
   const router = useRouter();
   const { t, i18n } = useTranslation();
-  const { user } = useAuth();
+  const { user, isAgent } = useAuth();
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const [conversations, setConversations] = useState<Conversation[]>([]);
@@ -94,7 +94,6 @@ export default function MessagesInboxScreen() {
     };
   }, [user, loadConversations]);
 
-  const isAgent = user?.user_metadata?.role === 'agent';
   const unreadTotal = conversations.reduce(
     (sum, c) => sum + ((c.client_id === user?.id ? c.unread_for_client : c.unread_for_agent) ?? 0),
     0,

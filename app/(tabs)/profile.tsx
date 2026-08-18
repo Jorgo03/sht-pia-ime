@@ -1,6 +1,8 @@
+import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Provider } from '@supabase/supabase-js';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter, type Href } from 'expo-router';
 import { useEffect, useMemo, useState } from 'react';
 import {
@@ -37,11 +39,42 @@ type Role = 'buyer' | 'agent';
 /** Seconds the resend link stays locked after a code goes out — same 30 web uses. */
 const RESEND_COOLDOWN_S = 30;
 
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+/**
+ * Maps raw Supabase Auth error text to a localized, user-facing message.
+ * Mirrors web's `friendlyError()` in src/features/auth/pages/Profile.jsx
+ * exactly (same match strings) — before this, every failure on this screen
+ * surfaced Supabase's own English driver text via a bare `error.message`,
+ * regardless of the user's selected language.
+ */
+function friendlyAuthError(
+  err: { message?: string; code?: string } | null | undefined,
+  t: (key: string) => string,
+): string {
+  if (!err?.message) return t('errors.generic');
+  if (err.code === 'email_address_invalid') return t('errors.invalidEmail');
+  const map: Record<string, string> = {
+    'Invalid login credentials': 'errors.invalidCredentials',
+    'User already registered': 'errors.userExists',
+    'Email not confirmed': 'errors.emailNotConfirmed',
+    'Token has expired or is invalid': 'errors.invalidCode',
+    'is invalid': 'errors.invalidEmail',
+    'For security purposes, you can only request this after': 'errors.rateLimited',
+    'provider is not enabled': 'errors.providerNotConfigured',
+    'Unsupported provider': 'errors.providerNotConfigured',
+  };
+  const key = Object.keys(map).find((k) => err.message!.includes(k));
+  return key ? t(map[key]) : t('errors.generic');
+}
+
 export default function ProfileScreen() {
   const router = useRouter();
   const { t } = useTranslation();
   const {
     user,
+    profile,
+    isAgent: isAgentAccount,
     signIn,
     signUp,
     signOut,
@@ -64,12 +97,16 @@ export default function ProfileScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [agencyName, setAgencyName] = useState('');
   const [isSignUp, setIsSignUp] = useState(false);
   const [role, setRole] = useState<Role>('buyer');
   const [loading, setLoading] = useState(false);
-  const [googleLoading, setGoogleLoading] = useState(false);
+  // Tracks which provider button is mid-redirect, so the others stay usable
+  // and a double-tap on the same one can't fire a second redirect — mirrors
+  // web's single `providerLoading` state rather than one flag per provider.
+  const [providerLoading, setProviderLoading] = useState<Provider | null>(null);
   // Email-code (OTP) flow — web's equivalent lives in Profile.jsx's
   // handleGoogleOtp/otpStep state.
   const [otpSending, setOtpSending] = useState(false);
@@ -95,48 +132,91 @@ export default function ProfileScreen() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cooldown > 0]);
 
-  const handleAuth = async () => {
-    if (!email || !password) {
-      Alert.alert(t('common.error'), t('errors.fillFields'));
-      return;
+  // Mirrors web's validate(): same rules, same order, so the two apps reject
+  // (and word) a bad submission identically. Previously this screen only
+  // checked for non-empty fields — a malformed email or a 3-character
+  // password reached Supabase and came back as a raw, unlocalized error.
+  const validateAuth = (): boolean => {
+    if (!EMAIL_RE.test(email.trim())) {
+      Alert.alert(t('common.error'), t('errors.invalidEmail'));
+      return false;
     }
+    if (password.length < 8) {
+      Alert.alert(t('common.error'), t('errors.passwordMin'));
+      return false;
+    }
+    if (isSignUp) {
+      if (fullName.trim().length < 2) {
+        Alert.alert(t('common.error'), t('errors.nameRequired'));
+        return false;
+      }
+      if (password !== confirmPassword) {
+        Alert.alert(t('common.error'), t('errors.passwordMismatch'));
+        return false;
+      }
+    }
+    return true;
+  };
+
+  const handleAuth = async () => {
+    if (!validateAuth()) return;
+    const cleanEmail = email.trim();
+    setEmail(cleanEmail);
     setLoading(true);
     if (isSignUp) {
-      const { error } = await signUp(email, password, {
+      // OAuth and email-code signups can't carry the role toggle through
+      // their redirect, so those two paths stash it for applyPendingRole to
+      // claim afterward (see handleProvider/handleSendOtp below) — but a
+      // password signup passes role straight through signUp's own metadata,
+      // so no stash is needed here, and any stale stash from an abandoned
+      // OAuth attempt must not leak into this flow.
+      try {
+        await AsyncStorage.removeItem('fho_pending_role');
+      } catch {
+        /* ignore */
+      }
+      const { error } = await signUp(cleanEmail, password, {
         role,
-        full_name: fullName || undefined,
-        agency_name: role === 'agent' ? agencyName || undefined : undefined,
+        full_name: fullName.trim() || undefined,
+        agency_name: role === 'agent' ? agencyName.trim() || undefined : undefined,
       });
       setLoading(false);
       if (error) {
-        Alert.alert(t('common.error'), error.message);
+        Alert.alert(t('common.error'), friendlyAuthError(error, t));
       } else {
         Alert.alert('OK', t('auth.checkEmail'));
       }
     } else {
-      const { error } = await signIn(email, password);
+      const { error } = await signIn(cleanEmail, password);
       setLoading(false);
       if (error) {
-        Alert.alert(t('common.error'), error.message);
+        Alert.alert(t('common.error'), friendlyAuthError(error, t));
       }
     }
   };
 
-  // Google is the only social provider currently enabled in the Supabase
-  // dashboard — matches web's own Profile.jsx, which dropped Apple/LinkedIn
-  // for the same reason (DECISIONS.md P2-G) rather than ship dead buttons.
   // Mirrors web's handleGoogleOtp: needs the email field filled first, then
   // swaps the form to code entry rather than navigating away.
   const handleSendOtp = async () => {
-    if (!email) {
+    const cleanEmail = email.trim();
+    if (!cleanEmail) {
       Alert.alert(t('common.error'), t('auth.enterEmail'));
       return;
     }
+    setEmail(cleanEmail);
+    // OTP signups carry no role metadata either — same stash-and-apply path
+    // as OAuth (see auth-context's applyPendingRole), and overwriting here
+    // means an aborted OAuth click can't leak its role choice into this flow.
+    try {
+      await AsyncStorage.setItem('fho_pending_role', role);
+    } catch {
+      /* storage blocked — role stays buyer */
+    }
     setOtpSending(true);
-    const { error } = await sendOtp(email);
+    const { error } = await sendOtp(cleanEmail);
     setOtpSending(false);
     if (error) {
-      Alert.alert(t('common.error'), error.message);
+      Alert.alert(t('common.error'), friendlyAuthError(error, t));
       return;
     }
     setOtpCode('');
@@ -155,7 +235,7 @@ export default function ProfileScreen() {
     const { error } = await resendCode(email, 'email');
     setOtpSending(false);
     if (error) {
-      Alert.alert(t('common.error'), error.message);
+      Alert.alert(t('common.error'), friendlyAuthError(error, t));
       return;
     }
     setCooldown(RESEND_COOLDOWN_S);
@@ -170,7 +250,7 @@ export default function ProfileScreen() {
     const { error } = await verifyOtp(email, code, 'email');
     setOtpVerifying(false);
     if (error) {
-      Alert.alert(t('common.error'), error.message);
+      Alert.alert(t('common.error'), friendlyAuthError(error, t));
       setOtpCode('');
       setOtpError(true);
       return;
@@ -184,34 +264,48 @@ export default function ProfileScreen() {
   // (see resetPassword in auth-context) — there's no in-app recovery screen —
   // so the copy stays "check your email", which is true on both platforms.
   const handleForgotPassword = async () => {
-    if (!email) {
+    const cleanEmail = email.trim();
+    if (!cleanEmail) {
       Alert.alert(t('common.error'), t('auth.enterEmail'));
       return;
     }
+    setEmail(cleanEmail);
     setResetSending(true);
-    const { error } = await resetPassword(email);
+    const { error } = await resetPassword(cleanEmail);
     setResetSending(false);
     Alert.alert(
       error ? t('common.error') : t('auth.checkEmail'),
-      error ? error.message : t('auth.resetSent'),
+      error ? friendlyAuthError(error, t) : t('auth.resetSent'),
     );
   };
 
-  const handleGoogleLogin = async () => {
-    setGoogleLoading(true);
-    const { error } = await signInWithProvider('google' as Provider);
-    setGoogleLoading(false);
-    if (error) {
-      Alert.alert(t('common.error'), error.message);
+  const handleProvider = async (provider: Provider) => {
+    if (providerLoading) return;
+    // OAuth can't carry the role toggle through the provider redirect —
+    // handle_new_user always defaults a fresh account to 'buyer', so stash
+    // the chosen role for auth-context's applyPendingRole to claim once the
+    // session lands (5-minute window, new accounts only).
+    try {
+      await AsyncStorage.setItem('fho_pending_role', role);
+    } catch {
+      /* storage blocked — role stays buyer */
     }
+    setProviderLoading(provider);
+    const { error } = await signInWithProvider(provider);
+    setProviderLoading(null);
+    if (error) {
+      Alert.alert(t('common.error'), friendlyAuthError(error, t));
+    }
+    // On success (native): the browser/credential sheet already returned a
+    // session and onAuthStateChange swaps this screen away, so there's
+    // nothing further to do here on the happy path.
   };
 
   if (authLoading) return null;
 
   if (user) {
-    const displayName = user.user_metadata?.full_name || user.email?.split('@')[0] || '?';
+    const displayName = profile?.full_name || user.user_metadata?.full_name || user.email?.split('@')[0] || '?';
     const initial = (displayName[0] ?? '?').toUpperCase();
-    const isAgent = user.user_metadata?.role === 'agent';
 
     return (
       <GradientBackground>
@@ -231,7 +325,7 @@ export default function ProfileScreen() {
               </LinearGradient>
               <Text style={styles.profileName}>{displayName}</Text>
               <View style={styles.roleBadge}>
-                <Text style={styles.roleBadgeText}>{isAgent ? t('auth.agent') : t('auth.user')}</Text>
+                <Text style={styles.roleBadgeText}>{isAgentAccount ? t('auth.agent') : t('auth.user')}</Text>
               </View>
               <Text style={styles.profileEmail}>{user.email}</Text>
             </View>
@@ -249,7 +343,7 @@ export default function ProfileScreen() {
               <View style={styles.statItem}>
                 <Text style={styles.statValue}>{stats.loading ? '–' : stats.third}</Text>
                 <Text style={styles.statLabel}>
-                  {isAgent ? t('profile.statListings') : t('profile.statViewings')}
+                  {isAgentAccount ? t('profile.statListings') : t('profile.statViewings')}
                 </Text>
               </View>
             </View>
@@ -321,7 +415,7 @@ export default function ProfileScreen() {
                 <Text style={styles.menuRowText}>{t('listing.myListings')}</Text>
                 <MaterialIcons name="chevron-right" size={18} color={colors.textSecondary} />
               </TouchableOpacity>
-              {isAgent && (
+              {isAgentAccount && (
                 <>
                   <View style={styles.menuDivider} />
                   <TouchableOpacity
@@ -532,6 +626,20 @@ export default function ProfileScreen() {
                 </TouchableOpacity>
               </View>
 
+              {isSignUp && (
+                <View style={styles.fieldRow}>
+                  <MaterialIcons name="lock-outline" size={18} color="rgba(255,255,255,0.35)" style={styles.fieldIcon} />
+                  <TextInput
+                    style={styles.fieldInput}
+                    placeholder={t('auth.confirmPassword')}
+                    placeholderTextColor="rgba(255,255,255,0.35)"
+                    value={confirmPassword}
+                    onChangeText={setConfirmPassword}
+                    secureTextEntry={!showPassword}
+                  />
+                </View>
+              )}
+
               {isSignUp && role === 'agent' && (
                 <View style={styles.fieldRow}>
                   <MaterialIcons name="business" size={18} color="rgba(255,255,255,0.35)" style={styles.fieldIcon} />
@@ -594,14 +702,56 @@ export default function ProfileScreen() {
               <View style={styles.socialRow}>
                 <TouchableOpacity
                   style={styles.socialButton}
-                  onPress={handleGoogleLogin}
+                  onPress={() => handleProvider('google' as Provider)}
                   activeOpacity={0.8}
-                  disabled={googleLoading}>
+                  disabled={!!providerLoading}>
                   <GoogleLogo size={18} />
                   {/* Full label, allowed to wrap to a second line — that's
                       what web does in the same half-width cell. */}
                   <Text style={styles.socialLabel}>
-                    {googleLoading ? t('common.loading') : t('auth.continueWithGoogle')}
+                    {providerLoading === 'google' ? t('common.loading') : t('auth.continueWithGoogle')}
+                  </Text>
+                </TouchableOpacity>
+
+                {/* Re-added per owner request 2026-08-18 (DECISIONS.md P2-G):
+                    signInWithProvider/signInWithAppleNative already fully
+                    support both. Supabase Dashboard still has both providers
+                    toggled off as of this date (verified live).
+                    What "fails" looks like differs by platform, verified live
+                    on each rather than assumed:
+                    - True native (iOS/Android): WebBrowser.openAuthSessionAsync
+                      returns control to JS either way, so a disabled provider
+                      surfaces as this screen's own friendly generic-error
+                      Alert — friendlyAuthError's specific-message map doesn't
+                      match this particular Error's wording, but the fallback
+                      is still a localized message, never raw text.
+                    - Expo running as a web target (Platform.OS === 'web'
+                      branch) and the true Vite web app: identical rough edge
+                      to each other — signInWithOAuth does a full-page
+                      navigation to Supabase's /authorize endpoint rather than
+                      a fetchable request, so a disabled provider's raw JSON
+                      400 replaces the page before any app code runs. Not
+                      fixable from in-app error handling; goes away once the
+                      Dashboard config lands. */}
+                <TouchableOpacity
+                  style={styles.socialButton}
+                  onPress={() => handleProvider('apple' as Provider)}
+                  activeOpacity={0.8}
+                  disabled={!!providerLoading}>
+                  <Ionicons name="logo-apple" size={19} color="#f5f0e8" />
+                  <Text style={styles.socialLabel}>
+                    {providerLoading === 'apple' ? t('common.loading') : t('auth.continueWithApple')}
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.socialButton}
+                  onPress={() => handleProvider('linkedin_oidc' as Provider)}
+                  activeOpacity={0.8}
+                  disabled={!!providerLoading}>
+                  <Ionicons name="logo-linkedin" size={18} color="#0A66C2" />
+                  <Text style={styles.socialLabel}>
+                    {providerLoading === 'linkedin_oidc' ? t('common.loading') : t('auth.continueWithLinkedIn')}
                   </Text>
                 </TouchableOpacity>
 
@@ -1010,12 +1160,17 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
 
   // Web's .social-buttons: `grid-template-columns: 1fr 1fr; gap: 8px`.
+  // Web's `.social-buttons` is a CSS grid, 1fr 1fr — 4 buttons wrap into a
+  // clean 2x2. `flex: 1` on the button doesn't wrap predictably, so this
+  // uses a percentage width against a wrapping row instead, same effect.
   socialRow: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: 8,
   },
   socialButton: {
-    flex: 1,
+    width: '47%',
+    flexGrow: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',

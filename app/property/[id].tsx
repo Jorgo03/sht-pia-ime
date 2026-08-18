@@ -29,6 +29,7 @@ import { useTranslation } from 'react-i18next';
 import { AppHeader } from '@/components/ui/app-header';
 import { ActionButton } from '@/components/ui/action-button';
 import { PrimaryCTA } from '@/components/ui/buttons';
+import { ListingAssistant } from '@/components/property/listing-assistant';
 import { LocationPreviewMap } from '@/components/property/location-preview-map';
 import { PropertyCard } from '@/components/property/property-card';
 import { type AtticoPalette } from '@/constants/theme';
@@ -624,6 +625,10 @@ export default function PropertyDetailScreen() {
           )}
         </View>
       </Modal>
+
+      {/* Web gates this on `status === 'active'` too — a paused/draft/sold
+          listing shouldn't invite questions the agent isn't fielding. */}
+      {property.status === 'active' && <ListingAssistant property={property} />}
     </View>
   );
 }

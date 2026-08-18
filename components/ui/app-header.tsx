@@ -12,14 +12,14 @@ import { supabase } from '@/lib/supabase';
 
 /** Same list, same native-language labels as web's Header.jsx LANGUAGES. */
 const LANGUAGES = [
-  { code: 'sq', name: 'Shqip' },
-  { code: 'en', name: 'English' },
-  { code: 'de', name: 'Deutsch' },
-  { code: 'it', name: 'Italiano' },
-  { code: 'es', name: 'Español' },
-  { code: 'pl', name: 'Polski' },
-  { code: 'ru', name: 'Русский' },
-  { code: 'fr', name: 'Français' },
+  { code: 'sq', name: 'Shqip', flag: '🇦🇱' },
+  { code: 'en', name: 'English', flag: '🇬🇧' },
+  { code: 'de', name: 'Deutsch', flag: '🇩🇪' },
+  { code: 'it', name: 'Italiano', flag: '🇮🇹' },
+  { code: 'es', name: 'Español', flag: '🇪🇸' },
+  { code: 'pl', name: 'Polski', flag: '🇵🇱' },
+  { code: 'ru', name: 'Русский', flag: '🇷🇺' },
+  { code: 'fr', name: 'Français', flag: '🇫🇷' },
 ];
 
 /**
@@ -83,8 +83,8 @@ export function AppHeader({
   );
   const [langOpen, setLangOpen] = useState(false);
 
-  // Web's `.lang-label` is hidden under 400px, so phones show the code alone.
-  const code = (i18n.language || 'sq').slice(0, 2).toUpperCase();
+  const currentFlag =
+    LANGUAGES.find((l) => l.code === i18n.language)?.flag ?? LANGUAGES[0].flag;
 
   // Mirrors web's Header.jsx changeLanguage(): i18next's own storage-backed
   // detector persists the choice, and it's also written to the profile row so
@@ -150,7 +150,7 @@ export function AppHeader({
               style={styles.langBtn}
               onPress={() => setLangOpen(true)}
               accessibilityRole="button">
-              <Text style={styles.langCode}>{code}</Text>
+              <Text style={styles.langCode}>{currentFlag}</Text>
               <MaterialIcons name="expand-more" size={14} color={styles.langCode.color} />
             </Pressable>
 
@@ -194,12 +194,12 @@ export function AppHeader({
                     <LinearGradient
                       colors={[colors.accent, colors.accentEnd]}
                       style={styles.langRow}>
-                      <Text style={[styles.langRowCode, styles.langRowActive]}>{lang.code}</Text>
+                      <Text style={styles.langRowCode}>{lang.flag}</Text>
                       <Text style={[styles.langRowName, styles.langRowActive]}>{lang.name}</Text>
                     </LinearGradient>
                   ) : (
                     <View style={styles.langRow}>
-                      <Text style={styles.langRowCode}>{lang.code}</Text>
+                      <Text style={styles.langRowCode}>{lang.flag}</Text>
                       <Text style={styles.langRowName}>{lang.name}</Text>
                     </View>
                   )}
@@ -297,10 +297,13 @@ const createStyles = (
     },
     // `.lang-code`: mono 11, uppercase, 0.05em. Also the source of `fg` for
     // the sibling icon button, so their tints can never drift apart.
+    // Holds the trigger's flag glyph. Also the shared color reference the
+    // header's other icons (theme toggle, back chevron) read via
+    // `styles.langCode.color`, so this stays even though it's no longer
+    // rendering a text code.
     langCode: {
-      fontFamily: Fonts?.mono,
-      fontSize: 11,
-      letterSpacing: 0.55,
+      fontSize: 16,
+      lineHeight: 18,
       color: fg,
     },
     // `.theme-btn` / `.account-signin-btn`: 34px square, r-sm.
@@ -347,10 +350,10 @@ const createStyles = (
       borderRadius: 10,
     },
     langRowCode: {
-      fontFamily: Fonts?.mono,
-      fontSize: 12,
-      color: colors.textSecondary,
+      fontSize: 18,
+      lineHeight: 20,
       width: 24,
+      textAlign: 'center',
     },
     langRowName: {
       fontFamily: Fonts?.sansMedium,
