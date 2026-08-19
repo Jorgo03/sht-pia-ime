@@ -129,6 +129,7 @@
   },
   "home": {
     "greetingMorning": "Good morning",
+    "greetingAfternoon": "Good afternoon",
     "greetingEvening": "Good evening",
     "matchesToday": "{{count}} new matches today.",
     "featured": "Featured this week",

@@ -10,6 +10,15 @@ import { useRecentlyViewed } from '../hooks/useRecentlyViewed'
 import { useAuth } from '../../auth/AuthContext'
 import '../../../styles/home.css'
 
+// Device-local hour, not UTC — 6-12 morning, 12-19 afternoon, else evening.
+// The previous version only split morning/evening (hour < 12), which
+// silently mislabeled both the afternoon and the 00:00-05:59 window.
+function getGreeting(hour, t) {
+  if (hour >= 6 && hour < 12) return t('home.greetingMorning')
+  if (hour >= 12 && hour < 19) return t('home.greetingAfternoon')
+  return t('home.greetingEvening')
+}
+
 export default function Home() {
   const { t } = useTranslation()
   const navigate = useNavigate()
@@ -18,8 +27,7 @@ export default function Home() {
   const { recentIds } = useRecentlyViewed()
   const { properties: recentProperties } = usePropertiesByIds(recentIds.slice(0, 6))
 
-  const hour = new Date().getHours()
-  const greeting = hour < 12 ? t('home.greetingMorning') : t('home.greetingEvening')
+  const greeting = getGreeting(new Date().getHours(), t)
   const displayName = profile?.full_name || user?.user_metadata?.full_name || user?.email?.split('@')[0] || ''
   const matchCount = properties.length
 

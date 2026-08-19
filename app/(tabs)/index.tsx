@@ -31,6 +31,15 @@ import { useRecentlyViewed } from '@/hooks/use-recently-viewed';
 // do before this pass (a real behavioral mismatch vs. the browser).
 const HOME_LIMIT = 24;
 
+// Device-local hour, not UTC — 6-12 morning, 12-19 afternoon, else evening.
+// The previous version only split morning/evening (hour < 12), which
+// silently mislabeled both the afternoon and the 00:00-05:59 window.
+function getGreeting(hour: number, t: (key: string) => string): string {
+  if (hour >= 6 && hour < 12) return t('home.greetingMorning');
+  if (hour >= 12 && hour < 19) return t('home.greetingAfternoon');
+  return t('home.greetingEvening');
+}
+
 export default function HomeScreen() {
   const router = useRouter();
   const { t } = useTranslation();
@@ -50,8 +59,7 @@ export default function HomeScreen() {
   // scroll has to reserve its full footprint or the last row sits under it.
   const tabBarClearance = useTabBarClearance();
 
-  const hour = new Date().getHours();
-  const greeting = hour < 12 ? t('home.greetingMorning') : t('home.greetingEvening');
+  const greeting = getGreeting(new Date().getHours(), t);
   const firstName = user?.user_metadata?.full_name?.split(' ')[0] || user?.email?.split('@')[0] || '';
   const matchCount = listings.length;
 

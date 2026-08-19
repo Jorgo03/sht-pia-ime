@@ -77,6 +77,7 @@
   },
   "home": {
     "greetingMorning": "Dzień dobry",
+    "greetingAfternoon": "Dobre popołudnie",
     "greetingEvening": "Dobry wieczór",
     "matchesToday_one": "{{count}} nowe dopasowanie dzisiaj.",
     "matchesToday_few": "{{count}} nowe dopasowania dzisiaj.",

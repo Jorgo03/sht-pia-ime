@@ -77,6 +77,7 @@
   },
   "home": {
     "greetingMorning": "Buenos días",
+    "greetingAfternoon": "Buenas tardes",
     "greetingEvening": "Buenas noches",
     "matchesToday": "{{count}} nuevas coincidencias hoy.",
     "featured": "Destacados esta semana",
