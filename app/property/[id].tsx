@@ -653,10 +653,10 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     // rotation and differs between phone and tablet proportions.
   },
   image: {
-    ...StyleSheet.absoluteFill,
+    ...StyleSheet.absoluteFillObject,
   },
   imageOverlay: {
-    ...StyleSheet.absoluteFill,
+    ...StyleSheet.absoluteFillObject,
   },
   imageHeader: {
     position: 'absolute',

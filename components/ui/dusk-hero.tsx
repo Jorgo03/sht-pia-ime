@@ -87,7 +87,7 @@ export function DuskHero({ bandHeight = 260 }: { bandHeight?: number }) {
 
 const styles = StyleSheet.create({
   hero: {
-    ...StyleSheet.absoluteFill,
+    ...StyleSheet.absoluteFillObject,
     overflow: 'hidden',
   },
   buildings: {

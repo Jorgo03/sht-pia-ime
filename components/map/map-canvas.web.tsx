@@ -47,7 +47,7 @@ export const MapCanvas = forwardRef(MapCanvasWeb);
 
 const styles = StyleSheet.create({
   container: {
-    ...StyleSheet.absoluteFill,
+    ...StyleSheet.absoluteFillObject,
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,

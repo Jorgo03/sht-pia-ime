@@ -141,7 +141,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     width: '100%',
   },
   image: {
-    ...StyleSheet.absoluteFill,
+    ...StyleSheet.absoluteFillObject,
   },
   badge: {
     position: 'absolute',

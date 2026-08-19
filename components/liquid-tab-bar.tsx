@@ -1,10 +1,4 @@
-// expo-router's <Tabs tabBar={...}> passes its own BottomTabBarProps, not
-// @react-navigation/bottom-tabs's — same shape, but the header-options
-// branch deep inside `descriptors` types `tintColor` differently
-// (ColorValue vs string) between the two packages, so importing from
-// @react-navigation/bottom-tabs directly doesn't structurally match what
-// Tabs actually provides.
-import type { BottomTabBarProps } from 'expo-router/build/react-navigation/bottom-tabs/types';
+import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter, usePathname, type Href } from 'expo-router';
@@ -188,7 +182,7 @@ const styles = StyleSheet.create({
     ...Shadows.nav,
   },
   pillBg: {
-    ...StyleSheet.absoluteFill,
+    ...StyleSheet.absoluteFillObject,
     borderRadius: 999,
     overflow: 'hidden',
   },

@@ -53,7 +53,7 @@ export function PrimaryCTA({
           colors={[colors.accent, colors.accentEnd]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
-          style={StyleSheet.absoluteFill}
+          style={StyleSheet.absoluteFillObject}
         />
         <Text style={styles.ctaLabel}>{label}</Text>
         {icon && !loading ? <MaterialIcons name={icon} size={18} color="#fff" /> : null}

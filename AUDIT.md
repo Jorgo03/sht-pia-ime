@@ -1,111 +1,23 @@
 # Pre-Launch Audit — Shtëpia.ime (Vite web app)
 
-## ═══ PASS 8 — 2026-08-19: EXPO SDK 54 → 57 UPGRADE ═══
+## ═══ PASS 8 — 2026-08-19: EXPO SDK 54 → 57 UPGRADE — REVERTED ═══
 
-### Root cause of "app stuck on Expo, wants an update"
+Attempted to fix "app stuck on Expo, wants an update" by upgrading SDK 54 →
+57 (root cause: Expo Go only runs the current SDK, and this project had
+fallen three majors behind). Upgrade succeeded — fresh bundle fetches for
+both platforms returned 200, live browser smoke test through tab navigation
+and a property detail screen all worked, `tsc`/`expo-doctor`/build/tests all
+clean. **Reverted at owner's request** in a follow-up commit (`git revert`
+of `2e49e9a`, which had already been pushed) — owner confirmed understanding
+this restores the original "Expo Go can't open the project" problem before
+asking for the revert. `DECISIONS.md`'s unrelated Google OAuth checklist
+(added in the same original commit) was deliberately kept, not rolled back
+with the rest.
 
-Not a code bug — this project was on Expo SDK 54 while the published stable
-was SDK 57 (58 already in preview), three major releases behind. Expo Go
-only runs the current SDK (occasionally one back), so it couldn't load this
-project at all; what read as "stuck, wants an update" was Expo Go refusing
-an incompatible project, not a real update prompt. Confirmed via `npm view
-expo versions` before touching anything.
-
-### What changed
-
-`npm install expo@^57.0.0` then `npx expo install --fix` (aligned ~30
-`expo-*`/React Native packages), plus a manual bump of `expo-router`
-(excluded from auto-fix by an existing `expo.install.exclude` entry from an
-earlier version-pinning incident) from the old `6.x` line to `57.x`.
-
-**Breaking changes found and fixed, in the order they surfaced:**
-
-1. **`app.json` schema** — `newArchEnabled` (top-level) and
-   `android.edgeToEdgeEnabled` no longer exist as config fields; both are
-   mandatory/default as of this SDK and the toggles were removed. Deleted
-   both.
-2. **`tsconfig.json`** — `baseUrl` is deprecated under the TS 6.0 bump that
-   came along with the SDK upgrade (removed by TS 7.0). Removed it; `paths`
-   alone still resolves `@/*` correctly since TS anchors `paths` to the
-   tsconfig's own directory by default now.
-3. **`StyleSheet.absoluteFillObject` removed from React Native** (RN 0.81 →
-   0.86) — replaced by `StyleSheet.absoluteFill`, same plain-object shape,
-   drop-in rename across 14 call sites in 10 files.
-4. **Three unused default-Expo-template scaffold files** newly failed to
-   type-check under the upgraded types (`hooks/use-theme-color.ts`,
-   `components/ui/icon-symbol.tsx`, `components/ui/icon-symbol.ios.tsx`,
-   `components/haptic-tab.tsx`) — confirmed via grep that nothing in the app
-   imports any of them (the real theming lives in
-   `contexts/theme-context.tsx`); deleted rather than patched.
-5. **`expo-router` is no longer compatible with `@react-navigation/*` as of
-   SDK 56** — direct imports from `@react-navigation/native`,
-   `@react-navigation/bottom-tabs`, or `@react-navigation/elements` in app
-   code now throw at bundle time (`withMetroMultiPlatform.js` explicitly
-   checks for and rejects them; `@react-navigation/core` alone is
-   silently redirected to `expo-router/react-navigation`, everything else
-   errors). expo-router now vendors and re-exports what's still needed
-   directly from its own top-level package. Fixed:
-   - `app/_layout.tsx` — `DarkTheme`/`DefaultTheme`/`ThemeProvider` now
-     imported from `expo-router` instead of `@react-navigation/native`.
-   - `components/liquid-tab-bar.tsx` — its `BottomTabBarProps` type import
-     switched from `@react-navigation/bottom-tabs` to
-     `expo-router/build/react-navigation/bottom-tabs/types` (same shape,
-     but expo-router's `<Tabs tabBar={...}>` passes its own version of the
-     type, not `@react-navigation/bottom-tabs`'s — the two disagree on
-     `tintColor: string` vs `ColorValue` deep inside header options).
-   - `components/haptic-tab.tsx` deleted (unused; imported
-     `@react-navigation/bottom-tabs`/`@react-navigation/elements` directly).
-   - `@react-navigation/bottom-tabs`, `@react-navigation/elements`,
-     `@react-navigation/native` removed from `package.json`'s direct
-     dependencies (still installed transitively via expo-router itself;
-     nothing in app code imports them directly anymore — confirmed by grep
-     before and after).
-
-### Not fixed — flagged, in scope for a separate pass
-
-`eslint-config-expo` was bumped to `~57.0.1` as part of the aligned
-dependency set, and its new version enables stricter React-Compiler-era
-`eslint-plugin-react-hooks` rules (`set-state-in-effect`, `immutability`)
-that the old config never checked. This surfaced **49 lint errors** (up
-from the prior 0-errors/16-warnings baseline) across pre-existing patterns
-this app has always had (`setState` inside a plain `useEffect`, mutating
-`document.documentElement.lang` directly) — none of them new bugs from this
-upgrade, none of them block Metro from bundling or the app from running.
-Left alone rather than let a 3-major-version SDK bump balloon into an
-unrelated lint cleanup across many files; worth a dedicated pass.
-
-`android/`/`ios/` prebuild folders were not regenerated (`expo prebuild
---clean`) — they still reflect SDK 54's native requirements. Doesn't affect
-Expo Go (which never touches them), but a real native/EAS build will need a
-clean prebuild before it'll work correctly against the new dependency
-versions.
-
-### Verification
-
-- `npx tsc --noEmit` — clean.
-- `npx expo-doctor` — 20/21 (the one failure is the pre-existing,
-  already-documented `android/`-prebuild-vs-`app.json` drift, unrelated).
-- `npm run build` (web) — ✓. `npm test` — 10/10.
-- Fresh Metro bundle fetched directly for both `platform=android` and
-  `platform=ios` — HTTP 200, ~13MB, no compile errors (previously a `500`
-  with the exact `react-navigation` incompatibility error above).
-- Live browser smoke test against the Expo web target: Home → tab-bar nav
-  to Explore → tapped into a property detail screen — all rendered
-  correctly, including the header/gallery fixes from earlier passes, with no new
-  console errors (only the pre-existing, unrelated `translate-property`
-  Edge Function 500 from DECISIONS.md §0c).
-
-### Files changed
-
-`package.json`/`package-lock.json` (expo 54→57 + ~30 aligned deps,
-`expo-router` 6.x→57.x, `@react-navigation/*` removed), `app.json`,
-`tsconfig.json`, `app/_layout.tsx`, `app/property/[id].tsx`,
-`app/listing/new.tsx`, `components/liquid-tab-bar.tsx`,
-`components/map/map-canvas.web.tsx`,
-`components/property/{featured-property-card,filter-sheet,listing-assistant}.tsx`,
-`components/ui/{buttons,dusk-hero,field}.tsx`. Deleted:
-`components/haptic-tab.tsx`, `components/ui/icon-symbol{,.ios}.tsx`,
-`hooks/use-theme-color.ts`.
+If mobile testing needs to work again, the fix is the same upgrade —
+`npm install expo@^57.0.0 && npx expo install --fix` plus the breaking-change
+fixes already worked out once (see this pass's commit history for the exact
+diffs, since this section itself was reverted along with the code).
 
 ## ═══ PASS 7 — 2026-08-18: AUTHENTICATION RE-AUDIT (owner super-prompt) ═══
 
