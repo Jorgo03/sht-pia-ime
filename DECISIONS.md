@@ -417,3 +417,73 @@ delete whenever someone is next in those files.
   `redirectTo`, so Supabase uses the project Site URL. There is no in-app
   recovery screen and no deep link registered for one; adding those is the
   only way to keep the flow inside the app.
+
+---
+
+## ═══ GOOGLE OAUTH REDIRECT CONFIGURATION — 2026-08-18 ═══
+
+Supersedes §4 above, which only covered localhost from before the production
+Vercel deploy existed. App code is verified correct (unchanged since Pass 6/7
+audits) — everything below is dashboard-only, in two consoles I don't have
+access to. Live-verified via direct `curl` against Supabase's `/authorize`
+endpoint: the Google provider is enabled, has a real `client_id`
+(`1086087149243-ml0312i5dj6gjcjm6fpmops98pv17t24.apps.googleusercontent.com`),
+and correctly forwards the fixed Supabase callback below to Google.
+
+**The chain:** `App → Supabase /authorize → Google → Supabase /auth/v1/callback → app's /auth/callback`
+
+### Google Cloud Console → your OAuth client → Authorized redirect URIs
+
+Needs **exactly one** entry (this is Supabase's own fixed callback — the
+same for every environment, not the app's URL):
+
+```
+https://xzzzhlwmzotibrxdqmcm.supabase.co/auth/v1/callback
+```
+
+Not the Vercel URL, not localhost, no trailing slash. If this is wrong,
+Google rejects the request with `Error 400: redirect_uri_mismatch` before
+your app is ever involved — the app's `/auth/callback` route is not the
+cause of that error.
+
+### Supabase Dashboard → Authentication → URL Configuration
+
+**Redirect URLs** (allow-list) needs both:
+```
+http://localhost:5173/auth/callback
+https://real-estate-app-my-self-f307.vercel.app/auth/callback
+```
+
+**Site URL** should be the production domain before launch:
+```
+https://real-estate-app-my-self-f307.vercel.app
+```
+
+These are exactly the values the code sends — confirmed by hitting
+`/auth/v1/authorize?provider=google&redirect_to=...` directly for both the
+localhost and production values; both are accepted at the initiate step.
+Whether they're actually on this allow-list can only be confirmed by
+completing a real sign-in (Supabase validates the allow-list on the final
+redirect back, after Google's leg completes) — not something I can do
+myself; I don't authenticate with real credentials, including for testing.
+
+### Diagnosing which side is still wrong (if it still fails after the above)
+
+Open the production site, click **Continue with Google**:
+- `Error 400: redirect_uri_mismatch` → Google Cloud Console's redirect URI
+  is still wrong.
+- Reaches the Google account picker, then bounces back to the login page →
+  Google Cloud is fine; Supabase's redirect allow-list is the remaining
+  piece.
+- Lands back in the app signed in → fixed.
+
+### Mobile (Expo Go) uses a different redirect URI — not these two
+
+Native `signInWithProvider` (`contexts/auth-context.tsx`) never sends the
+web callback. It computes its own via `Linking.createURL('auth/callback')`
+at runtime — `exp://192.168.0.8:8081/--/auth/callback` under Expo Go on this
+LAN, or `shtepia-ime://auth/callback` in a real installed build — and
+exchanges the code inline after the in-app browser session closes, with no
+shared callback screen between platforms. Nothing to add to either dashboard
+list above for this to work; it's a separate flow by design, already
+verified correct in code.

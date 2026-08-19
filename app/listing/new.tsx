@@ -497,7 +497,7 @@ export default function NewListingWizard() {
                       colors={[colors.accent, colors.accentEnd]}
                       start={{ x: 0, y: 0 }}
                       end={{ x: 1, y: 1 }}
-                      style={StyleSheet.absoluteFillObject}
+                      style={StyleSheet.absoluteFill}
                     />
                   )}
                   <Text style={[styles.radioText, active && styles.radioTextActive]}>
@@ -994,7 +994,7 @@ export default function NewListingWizard() {
                           colors={[colors.accent, colors.accentEnd]}
                           start={{ x: 0, y: 0 }}
                           end={{ x: 1, y: 1 }}
-                          style={[StyleSheet.absoluteFillObject, styles.stepDotFill]}
+                          style={[StyleSheet.absoluteFill, styles.stepDotFill]}
                         />
                       )}
                       {completed ? (
@@ -1015,7 +1015,7 @@ export default function NewListingWizard() {
                         colors={[colors.accent, colors.accentEnd]}
                         start={{ x: 0, y: 0 }}
                         end={{ x: 1, y: 0 }}
-                        style={StyleSheet.absoluteFillObject}
+                        style={StyleSheet.absoluteFill}
                       />
                     )}
                   </View>

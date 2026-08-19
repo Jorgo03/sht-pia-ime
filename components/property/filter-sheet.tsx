@@ -110,7 +110,7 @@ function Segment({
                 colors={[colors.accent, colors.accentEnd]}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
-                style={StyleSheet.absoluteFillObject}
+                style={StyleSheet.absoluteFill}
               />
             )}
             <Text style={[styles.segmentText, isActive && styles.segmentTextActive]}>
@@ -601,7 +601,7 @@ const createStyles = (colors: AtticoPalette, sheetHeight: number = 0) => StyleSh
     elevation: 6,
   },
   ctaGradient: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
   },
   ctaText: {
     fontFamily: Fonts?.sansBold,
