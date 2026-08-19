@@ -5,6 +5,40 @@ AUDIT.md was fixed; see the final report for the change log.
 
 ---
 
+## ═══ AUTH INCIDENT REMEDIATION — 2026-08-19 ═══
+
+Full findings in `AUTH_AUDIT.md`; fixes on branch `fix/auth-recovery-and-validation`.
+One judgment call from that pass needs your read, since I deliberately left
+a security-advisor finding half-addressed rather than risk breaking a working
+feature:
+
+**`current_user_is_agent()` / `buyer_has_open_wanted_home(uuid)` are still
+callable by `anon`.** Supabase's security advisor flags this (both are
+`SECURITY DEFINER`). I fixed the same finding for a third function,
+`claim_role`, which was risk-free to tighten. These two are different: both
+run *inside* `public.profiles`' own SELECT policy, which `anon` also
+evaluates for the public `/agent/:id` page and property-listing agent info —
+logged-out visitors reading an agent's profile is an intentional feature, not
+a bug. For an agent row, `role = 'agent'` short-circuits before either
+function is ever called, so revoking `anon`'s access wouldn't touch that
+path. But for a *non-agent* row, none of the policy's earlier conditions are
+true for an anonymous caller, so Postgres has to evaluate the function call
+to resolve the expression — and if `anon` lacks EXECUTE, that's not "row
+excluded," it's the whole query erroring out with "permission denied." I
+could not fully verify every anon-reachable query path never touches a
+non-agent row, so I left this alone rather than risk silently breaking the
+public agent-profile pages.
+
+The clean fix is restructuring the policy so an anon caller never reaches
+that branch at all — something like adding an explicit `auth.role() =
+'authenticated' AND (...)` guard around the wanted-home clause, so the
+function calls are structurally unreachable for anon instead of merely
+returning false. That's a real but small policy change, deliberately not
+made in this pass since it wasn't the confirmed incident and deserves its
+own focused review rather than being bundled into an auth-recovery fix. Say
+the word and I'll do it as its own change, with the same before/after
+verification approach as the rest of this pass.
+
 ## ═══ MASTER-PLAN PASS — 2026-07-13 (branch feature/booking-otp-ai-polish) ═══
 
 ### MP1. OAuth providers — how Task 1 maps to reality

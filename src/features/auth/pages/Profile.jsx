@@ -12,7 +12,7 @@ export default function Profile() {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const location = useLocation()
-  const { user, profile, isAgent, signIn, signUp, signInWithProvider, sendOtp, verifyOtp, resendCode, signOut, resetPassword, loading: authLoading } = useAuth()
+  const { user, profile, isAgent, signIn, signUp, signInWithProvider, sendOtp, verifyOtp, resendCode, signOut, resetPassword, passwordRecovery, updatePassword, loading: authLoading } = useAuth()
   const stats = useProfileStats()
 
   const [email, setEmail] = useState('')
@@ -25,6 +25,10 @@ export default function Profile() {
   const [role, setRole] = useState('buyer')
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
+  const [newPassword, setNewPassword] = useState('')
+  const [confirmNewPassword, setConfirmNewPassword] = useState('')
+  const [showNewPw, setShowNewPw] = useState(false)
+  const [recoveryDone, setRecoveryDone] = useState(false)
   // 'google' | 'apple' | 'linkedin_oidc' while the OAuth redirect is starting
   const [providerLoading, setProviderLoading] = useState(null)
   const oauthErrorShown = useRef(false)
@@ -77,11 +81,16 @@ export default function Profile() {
       setMessage(t('errors.invalidEmail'))
       return false
     }
-    if (password.length < 8) {
-      setMessage(t('errors.passwordMin'))
-      return false
-    }
     if (isSignUp) {
+      // The 8-char minimum is a signup-time policy, not a login-time one —
+      // an existing account may predate this rule with a shorter password,
+      // and Supabase's own /token endpoint (not this form) is the authority
+      // on whether a login password is correct. Applying it to login would
+      // silently lock out that account before any request is even sent.
+      if (password.length < 8) {
+        setMessage(t('errors.passwordMin'))
+        return false
+      }
       if (fullName.trim().length < 2) {
         setMessage(t('errors.nameRequired'))
         return false
@@ -90,6 +99,9 @@ export default function Profile() {
         setMessage(t('errors.passwordMismatch'))
         return false
       }
+    } else if (!password) {
+      setMessage(t('errors.passwordRequired'))
+      return false
     }
     return true
   }
@@ -100,33 +112,35 @@ export default function Profile() {
     const cleanEmail = email.trim()
     setEmail(cleanEmail)
     setLoading(true)
-    if (isSignUp) {
-      const { error } = await signUp(cleanEmail, password, {
-        role,
-        full_name: fullName.trim(),
-        agency_name: role === 'agent' ? agencyName.trim() || undefined : undefined,
-      })
-      setLoading(false)
-      if (error) setMessage(friendlyError(error, t))
-      else {
-        // Confirmation email carries a 6-digit code — take the user straight
-        // to the code entry (type 'signup' so verify/resend match).
-        setOtpEmail(cleanEmail)
-        setOtpType('signup')
-        setOtpCode(['', '', '', '', '', ''])
-        setOtpError(false)
-        setOtpStep('enter-code')
-        setCooldown(30)
-        setMessage(t('auth.checkEmail'))
-      }
-    } else {
-      const { error } = await signIn(cleanEmail, password)
-      setLoading(false)
-      if (error) {
-        setMessage(friendlyError(error, t))
+    try {
+      if (isSignUp) {
+        const { error } = await signUp(cleanEmail, password, {
+          role,
+          full_name: fullName.trim(),
+          agency_name: role === 'agent' ? agencyName.trim() || undefined : undefined,
+        })
+        if (error) setMessage(friendlyError(error, t))
+        else {
+          // Confirmation email carries a 6-digit code — take the user
+          // straight to the code entry (type 'signup' so verify/resend match).
+          setOtpEmail(cleanEmail)
+          setOtpType('signup')
+          setOtpCode(['', '', '', '', '', ''])
+          setOtpError(false)
+          setOtpStep('enter-code')
+          setCooldown(30)
+          setMessage(t('auth.checkEmail'))
+        }
       } else {
-        setPendingRedirect(location.state?.from || '/')
+        const { error } = await signIn(cleanEmail, password)
+        if (error) {
+          setMessage(friendlyError(error, t))
+        } else {
+          setPendingRedirect(location.state?.from || '/')
+        }
       }
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -170,10 +184,13 @@ export default function Profile() {
     // can't leak its role choice into this flow.
     try { localStorage.setItem('fho_pending_role', role) } catch { /* ignore */ }
     setLoading(true); setMessage('')
-    const { error } = await sendOtp(cleanEmail)
-    setLoading(false)
-    if (error) setMessage(friendlyError(error, t))
-    else { setOtpStep('enter-code'); setOtpError(false); setCooldown(30); setMessage(t('auth.otpSent')) }
+    try {
+      const { error } = await sendOtp(cleanEmail)
+      if (error) setMessage(friendlyError(error, t))
+      else { setOtpStep('enter-code'); setOtpError(false); setCooldown(30); setMessage(t('auth.otpSent')) }
+    } finally {
+      setLoading(false)
+    }
   }
 
   const handleResend = async () => {
@@ -182,10 +199,13 @@ export default function Profile() {
     // magic-link login, and resending with an empty address 400s.
     if (!EMAIL_RE.test(otpEmail)) { setMessage(t('errors.invalidEmail')); return }
     setLoading(true); setMessage(''); setOtpError(false)
-    const { error } = await resendCode(otpEmail, otpType)
-    setLoading(false)
-    if (error) setMessage(friendlyError(error, t))
-    else { setCooldown(30); setMessage(t('auth.otpSent')) }
+    try {
+      const { error } = await resendCode(otpEmail, otpType)
+      if (error) setMessage(friendlyError(error, t))
+      else { setCooldown(30); setMessage(t('auth.otpSent')) }
+    } finally {
+      setLoading(false)
+    }
   }
 
   const handleOtpChange = (index, value) => {
@@ -216,16 +236,19 @@ export default function Profile() {
 
   const handleVerifyOtp = async (code) => {
     setLoading(true); setMessage('')
-    const { error } = await verifyOtp(otpEmail, code, otpType)
-    setLoading(false)
-    if (error) {
-      setOtpError(true)
-      setMessage(friendlyError(error, t))
-      setOtpCode(['', '', '', '', '', ''])
-      otpRefs.current[0]?.focus()
-    } else {
-      setOtpStep(null)
-      setPendingRedirect(location.state?.from || '/')
+    try {
+      const { error } = await verifyOtp(otpEmail, code, otpType)
+      if (error) {
+        setOtpError(true)
+        setMessage(friendlyError(error, t))
+        setOtpCode(['', '', '', '', '', ''])
+        otpRefs.current[0]?.focus()
+      } else {
+        setOtpStep(null)
+        setPendingRedirect(location.state?.from || '/')
+      }
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -238,7 +261,82 @@ export default function Profile() {
     setMessage(error ? friendlyError(error, t) : t('auth.resetSent'))
   }
 
+  // Completes a password-recovery link. Reuses the signup password policy
+  // (8-char minimum) since a fresh password set here is exactly that case,
+  // not a login — see validate()'s equivalent branch.
+  const handleUpdatePassword = async () => {
+    setMessage('')
+    if (newPassword.length < 8) { setMessage(t('errors.passwordMin')); return }
+    if (newPassword !== confirmNewPassword) { setMessage(t('errors.passwordMismatch')); return }
+    setLoading(true)
+    try {
+      const { error } = await updatePassword(newPassword)
+      if (error) {
+        setMessage(friendlyError(error, t))
+      } else {
+        setNewPassword('')
+        setConfirmNewPassword('')
+        setRecoveryDone(true)
+        setMessage(t('auth.recoverySuccess'))
+      }
+    } finally {
+      setLoading(false)
+    }
+  }
+
   if (authLoading) return null
+
+  // ─── Password recovery ───
+  // Checked before the signed-in branch below: a recovery link's session is
+  // real (the user IS authenticated), but landing on the ordinary dashboard
+  // here would mean the reset never actually happens — the old password
+  // stays in effect with no indication anything is wrong.
+  if (passwordRecovery) {
+    return (
+      <div className="profile-page auth-screen">
+        <DuskHero />
+        <div className="auth-content">
+          <div className="auth-glass">
+            <div className="otp-icon"><Lock size={32} /></div>
+            <h2 className="auth-title">{t('auth.recoveryTitle')}</h2>
+            <p className="auth-subtitle">{t('auth.recoverySubtitle')}</p>
+            {!recoveryDone && (
+              <>
+                <div className="field-row">
+                  <Lock size={18} className="field-icon" />
+                  <input
+                    type={showNewPw ? 'text' : 'password'}
+                    className="form-input"
+                    placeholder={t('auth.newPassword')}
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleUpdatePassword()}
+                    autoFocus
+                  />
+                  <button className="field-eye" onClick={() => setShowNewPw(!showNewPw)} type="button">{showNewPw ? <EyeOff size={18} /> : <Eye size={18} />}</button>
+                </div>
+                <div className="field-row">
+                  <Lock size={18} className="field-icon" />
+                  <input
+                    type={showNewPw ? 'text' : 'password'}
+                    className="form-input"
+                    placeholder={t('auth.confirmPassword')}
+                    value={confirmNewPassword}
+                    onChange={(e) => setConfirmNewPassword(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleUpdatePassword()}
+                  />
+                </div>
+                <button className="cta-pill" onClick={handleUpdatePassword} disabled={loading}>
+                  {loading ? t('common.loading') : t('auth.updatePassword')}
+                </button>
+              </>
+            )}
+            {message && <div className={`auth-message ${recoveryDone ? '' : 'auth-message--error'}`} role="status">{message}</div>}
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   // ─── Signed-in dashboard ───
   if (user) {

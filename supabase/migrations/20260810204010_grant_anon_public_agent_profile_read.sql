@@ -1,0 +1,23 @@
+-- Regression from the earlier `revoke all on public.profiles from anon`
+-- (which correctly closed the role-escalation hole): anon lost ALL
+-- privileges on profiles, including SELECT — so any query that even joins
+-- profiles (e.g. a property listing's agent info) now fails outright with
+-- "permission denied for table profiles", not just a null field. This broke
+-- /property/:id and /agent/:id for every logged-out visitor, since neither
+-- route requires auth.
+--
+-- The profiles SELECT policy already has an unconditional `role = 'agent'`
+-- branch (agents are an intentionally public marketplace listing — any
+-- authenticated user can already read a full agent row). That policy has no
+-- `TO` clause, so it applies to every role including anon — it just never
+-- got a chance to run, because the grant-layer block happens before RLS is
+-- even evaluated. This grant is what lets anon actually reach that branch.
+--
+-- Columns are the exact set the app's two logged-out-reachable call sites
+-- use (property listing's agent join, the public agent profile page) — not
+-- a blanket `select *`. Tested empirically: the RLS policy's own
+-- `role = 'agent'` check evaluates fine without `role` itself being granted,
+-- and a buyer row stays correctly unreadable by anon (confirmed in a
+-- rolled-back transaction before this migration).
+
+grant select (id, full_name, phone, agency_name, avatar_url) on public.profiles to anon;
