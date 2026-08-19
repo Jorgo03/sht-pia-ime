@@ -136,16 +136,24 @@ export default function ProfileScreen() {
   // (and word) a bad submission identically. Previously this screen only
   // checked for non-empty fields — a malformed email or a 3-character
   // password reached Supabase and came back as a raw, unlocalized error.
+  //
+  // The 8-char minimum is a signup-time policy, not a login-time one — an
+  // existing account may predate this rule with a shorter password, and
+  // Supabase's own /token endpoint (not this form) is the authority on
+  // whether a login password is correct. This previously applied the
+  // signup-only rule unconditionally, so a login with a blank or short
+  // password showed "at least 8 characters" instead of a login-appropriate
+  // message — same defect web's Profile.jsx had, fixed there first.
   const validateAuth = (): boolean => {
     if (!EMAIL_RE.test(email.trim())) {
       Alert.alert(t('common.error'), t('errors.invalidEmail'));
       return false;
     }
-    if (password.length < 8) {
-      Alert.alert(t('common.error'), t('errors.passwordMin'));
-      return false;
-    }
     if (isSignUp) {
+      if (password.length < 8) {
+        Alert.alert(t('common.error'), t('errors.passwordMin'));
+        return false;
+      }
       if (fullName.trim().length < 2) {
         Alert.alert(t('common.error'), t('errors.nameRequired'));
         return false;
@@ -154,6 +162,9 @@ export default function ProfileScreen() {
         Alert.alert(t('common.error'), t('errors.passwordMismatch'));
         return false;
       }
+    } else if (!password) {
+      Alert.alert(t('common.error'), t('errors.passwordRequired'));
+      return false;
     }
     return true;
   };
