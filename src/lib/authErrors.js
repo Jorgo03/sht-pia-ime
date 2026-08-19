@@ -15,6 +15,13 @@ export function friendlyError(err, t) {
     'Token has expired or is invalid': 'errors.invalidCode',
     'is invalid': 'errors.invalidEmail',
     'For security purposes, you can only request this after': 'errors.rateLimited',
+    // Distinct from the per-identity cooldown above: this is Supabase's
+    // project-wide email-sending quota (code: over_email_send_rate_limit),
+    // confirmed live in production — hit after enough OTP/recovery/signup
+    // emails go out in a short window on the default built-in email service
+    // (no custom SMTP configured). Same user-facing message fits both: the
+    // user just needs to wait, regardless of which limit tripped.
+    'email rate limit exceeded': 'errors.rateLimited',
     'provider is not enabled': 'errors.providerNotConfigured',
     'Unsupported provider': 'errors.providerNotConfigured',
   }

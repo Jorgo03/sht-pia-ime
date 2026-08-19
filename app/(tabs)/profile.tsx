@@ -61,6 +61,10 @@ function friendlyAuthError(
     'Token has expired or is invalid': 'errors.invalidCode',
     'is invalid': 'errors.invalidEmail',
     'For security purposes, you can only request this after': 'errors.rateLimited',
+    // Distinct from the per-identity cooldown above: Supabase's project-wide
+    // email-sending quota (code: over_email_send_rate_limit), confirmed live
+    // in production. Mirrors the web fix in src/lib/authErrors.js.
+    'email rate limit exceeded': 'errors.rateLimited',
     'provider is not enabled': 'errors.providerNotConfigured',
     'Unsupported provider': 'errors.providerNotConfigured',
   };
