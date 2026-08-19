@@ -5,26 +5,8 @@ import { User, Briefcase, Mail, Lock, Eye, EyeOff, ArrowLeft, ArrowRight, Heart,
 import { useAuth } from '../AuthContext'
 import { useProfileStats } from '../hooks/useProfileStats'
 import DuskHero from '../components/DuskHero'
+import { EMAIL_RE, friendlyError } from '../../../lib/authErrors'
 import '../../../styles/profile.css'
-
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-
-function friendlyError(err, t) {
-  if (!err?.message) return t('errors.generic')
-  if (err.code === 'email_address_invalid') return t('errors.invalidEmail')
-  const map = {
-    'Invalid login credentials': 'errors.invalidCredentials',
-    'User already registered': 'errors.userExists',
-    'Email not confirmed': 'errors.emailNotConfirmed',
-    'Token has expired or is invalid': 'errors.invalidCode',
-    'is invalid': 'errors.invalidEmail',
-    'For security purposes, you can only request this after': 'errors.rateLimited',
-    'provider is not enabled': 'errors.providerNotConfigured',
-    'Unsupported provider': 'errors.providerNotConfigured',
-  }
-  const key = Object.keys(map).find((k) => err.message.includes(k))
-  return key ? t(map[key]) : t('errors.generic')
-}
 
 export default function Profile() {
   const { t } = useTranslation()
