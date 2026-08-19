@@ -1,0 +1,32 @@
+-- Security advisor finding (AUTH_AUDIT.md P2): public.claim_role(text) is
+-- executable by anon via /rest/v1/rpc/claim_role. Root cause, confirmed
+-- live: Supabase's project-level default privileges grant EXECUTE on every
+-- new public-schema function to anon/authenticated automatically — the
+-- creating migration's `revoke all ... from public` never covered anon
+-- specifically, since anon's grant comes from that separate default-privilege
+-- rule, not from the PUBLIC pseudo-role.
+--
+-- claim_role's own body already guards this safely (auth.uid() is null for
+-- anon, so the row lookup finds nothing and it raises 'no profile for
+-- current user' rather than mutating anything) — this is defense-in-depth,
+-- not a fix for an active exploit.
+--
+-- Deliberately NOT applied to current_user_is_agent()/buyer_has_open_
+-- wanted_home(uuid), the other two functions this same advisor flags: both
+-- are called inside the public.profiles SELECT policy's OR chain (see
+-- 20260810200825_fix_cross_table_policy_recursion.sql), which anon also
+-- evaluates for the public /agent/:id and property-listing agent-info reads
+-- (20260810204010_grant_anon_public_agent_profile_read.sql). For an agent
+-- row, `role = 'agent'` short-circuits before reaching either function call,
+-- so that grant is unused today — but for a non-agent row, none of the
+-- earlier OR terms are true for an anon caller, so Postgres must still
+-- evaluate the final term to resolve the expression, which requires anon to
+-- have EXECUTE on both functions even though the answer is always false for
+-- anon. Revoking it would turn "row correctly excluded" into "query errors
+-- out with permission denied" the moment a scan reaches any buyer-role row —
+-- breaking the public agent-profile feature, not just tightening it. Left
+-- as-is; flagged in AUTH_AUDIT.md's remediation section for the owner to
+-- weigh, since fixing it properly needs restructuring the policy (e.g. an
+-- explicit anon-only short-circuit branch) rather than a plain revoke.
+
+revoke execute on function public.claim_role(text) from anon;

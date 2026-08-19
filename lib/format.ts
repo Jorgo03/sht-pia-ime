@@ -33,14 +33,29 @@ export function fallbackColorsFor(id: string | undefined): [string, string] {
   return FALLBACK_COLORS[hashId(id) % FALLBACK_COLORS.length];
 }
 
-export function formatPrice(n: number | string, lang: string = 'sq'): string {
+export function formatPrice(n: number | string, lang: string = 'sq', currency: string | null = 'EUR'): string {
   const num = Number(n) || 0;
   return new Intl.NumberFormat(lang, {
     style: 'currency',
-    currency: 'EUR',
+    currency: currency || 'EUR',
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
   }).format(num);
+}
+
+// Mirrors src/lib/format.js exactly — the only place that knows all three
+// listing types, so daily_rent can't fall through to "For Sale"/no-suffix
+// the way a bare `listing_type === 'rent'` check does.
+export function listingBadgeKey(listingType: string | null | undefined): string {
+  if (listingType === 'rent') return 'property.forRent';
+  if (listingType === 'daily_rent') return 'property.forDailyRent';
+  return 'property.forSale';
+}
+
+export function priceSuffixKey(listingType: string | null | undefined): string | null {
+  if (listingType === 'rent') return 'property.perMonth';
+  if (listingType === 'daily_rent') return 'property.perDay';
+  return null;
 }
 
 export function getLocalizedText(
@@ -58,13 +73,15 @@ export function getLocalizedText(
   );
 }
 
+// Fixed DD/MM/YYYY in every language (owner decision, 2026-08-18) rather than
+// each locale's own month-name style — `lang` is kept only so existing call
+// sites don't need touching; it no longer drives the output.
 export function formatDate(dateStr: string | null | undefined, lang: string = 'sq'): string {
   if (!dateStr) return '';
-  return new Intl.DateTimeFormat(lang, {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-  }).format(new Date(dateStr));
+  const d = new Date(dateStr);
+  const day = String(d.getDate()).padStart(2, '0');
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  return `${day}/${month}/${d.getFullYear()}`;
 }
 
 export function formatRelativeTime(iso: string | null | undefined, locale: string = 'sq'): string {
@@ -75,10 +92,22 @@ export function formatRelativeTime(iso: string | null | undefined, locale: strin
   if (diff < 3600) return rtf.format(-Math.floor(diff / 60), 'minute');
   if (diff < 86400) return rtf.format(-Math.floor(diff / 3600), 'hour');
   if (diff < 604800) return rtf.format(-Math.floor(diff / 86400), 'day');
-  return new Date(iso).toLocaleDateString(locale);
+  // Beyond a week, fall back to the same DD/MM/YYYY every other displayed
+  // date uses, rather than a second, separate date-formatting rule.
+  return formatDate(iso);
 }
 
 export function whatsappUrl(phone: string | undefined, message: string): string {
-  const clean = phone?.replace(/[^0-9]/g, '') || '';
+  let clean = phone?.replace(/[^0-9]/g, '') || '';
+  // wa.me requires full international format with no leading 0. Agents
+  // enter local Albanian numbers (e.g. "069 602 0791"), so assume Albania's
+  // country code (355) whenever one isn't already present — without this,
+  // WhatsApp's Universal Link handler silently rejects the malformed number
+  // and Linking.openURL fails with "Unable to open URL".
+  if (clean.startsWith('0')) {
+    clean = `355${clean.slice(1)}`;
+  } else if (!clean.startsWith('355')) {
+    clean = `355${clean}`;
+  }
   return `https://wa.me/${clean}?text=${encodeURIComponent(message)}`;
 }

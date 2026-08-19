@@ -1,40 +1,23 @@
 import { useState, useRef, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate, useLocation } from 'react-router-dom'
-import { User, Briefcase, Mail, Lock, Eye, EyeOff, ArrowLeft, ArrowRight, Heart, Building2, LogOut, ChevronRight, Search as SearchIcon, Calendar, Loader2 } from 'lucide-react'
+import { User, Briefcase, Mail, Lock, Eye, EyeOff, ArrowLeft, ArrowRight, Heart, Building2, LogOut, ChevronRight, Search as SearchIcon, Calendar, Loader2, Apple, Linkedin } from 'lucide-react'
 import { useAuth } from '../AuthContext'
 import { useProfileStats } from '../hooks/useProfileStats'
 import DuskHero from '../components/DuskHero'
+import { EMAIL_RE, friendlyError } from '../../../lib/authErrors'
 import '../../../styles/profile.css'
-
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-
-function friendlyError(err, t) {
-  if (!err?.message) return t('errors.generic')
-  if (err.code === 'email_address_invalid') return t('errors.invalidEmail')
-  const map = {
-    'Invalid login credentials': 'errors.invalidCredentials',
-    'User already registered': 'errors.userExists',
-    'Email not confirmed': 'errors.emailNotConfirmed',
-    'Token has expired or is invalid': 'errors.invalidCode',
-    'is invalid': 'errors.invalidEmail',
-    'For security purposes, you can only request this after': 'errors.rateLimited',
-    'provider is not enabled': 'errors.providerNotConfigured',
-    'Unsupported provider': 'errors.providerNotConfigured',
-  }
-  const key = Object.keys(map).find((k) => err.message.includes(k))
-  return key ? t(map[key]) : t('errors.generic')
-}
 
 export default function Profile() {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const location = useLocation()
-  const { user, profile, isAgent, signIn, signUp, signInWithProvider, sendOtp, verifyOtp, resendCode, signOut, resetPassword, loading: authLoading } = useAuth()
+  const { user, profile, isAgent, signIn, signUp, signInWithProvider, sendOtp, verifyOtp, resendCode, signOut, resetPassword, passwordRecovery, updatePassword, loading: authLoading } = useAuth()
   const stats = useProfileStats()
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
   const [showPw, setShowPw] = useState(false)
   const [fullName, setFullName] = useState('')
   const [agencyName, setAgencyName] = useState('')
@@ -42,6 +25,10 @@ export default function Profile() {
   const [role, setRole] = useState('buyer')
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
+  const [newPassword, setNewPassword] = useState('')
+  const [confirmNewPassword, setConfirmNewPassword] = useState('')
+  const [showNewPw, setShowNewPw] = useState(false)
+  const [recoveryDone, setRecoveryDone] = useState(false)
   // 'google' | 'apple' | 'linkedin_oidc' while the OAuth redirect is starting
   const [providerLoading, setProviderLoading] = useState(null)
   const oauthErrorShown = useRef(false)
@@ -57,6 +44,20 @@ export default function Profile() {
       navigate('/profile', { replace: true })
     }
   }, [location.search, navigate, t])
+
+  // Where to go once a sign-in actually lands. signIn()/verifyOtp() resolving
+  // does NOT mean AuthContext's `user` has updated yet — that happens later,
+  // async, off the SIGNED_IN listener — so navigating to a protected route
+  // right after the call resolves races ProtectedRoute's own `user` check
+  // and bounces straight back here. Deferring the navigate until `user` is
+  // actually truthy avoids that.
+  const [pendingRedirect, setPendingRedirect] = useState(null)
+  useEffect(() => {
+    if (user && pendingRedirect) {
+      navigate(pendingRedirect, { replace: true })
+      setPendingRedirect(null)
+    }
+  }, [user, pendingRedirect, navigate])
 
   const [otpStep, setOtpStep] = useState(null)
   const [otpEmail, setOtpEmail] = useState('')
@@ -76,16 +77,30 @@ export default function Profile() {
   }, [cooldown > 0])
 
   const validate = () => {
-    if (!EMAIL_RE.test(email)) {
+    if (!EMAIL_RE.test(email.trim())) {
       setMessage(t('errors.invalidEmail'))
       return false
     }
-    if (password.length < 8) {
-      setMessage(t('errors.passwordMin'))
-      return false
-    }
-    if (isSignUp && fullName.trim().length < 2) {
-      setMessage(t('errors.nameRequired'))
+    if (isSignUp) {
+      // The 8-char minimum is a signup-time policy, not a login-time one —
+      // an existing account may predate this rule with a shorter password,
+      // and Supabase's own /token endpoint (not this form) is the authority
+      // on whether a login password is correct. Applying it to login would
+      // silently lock out that account before any request is even sent.
+      if (password.length < 8) {
+        setMessage(t('errors.passwordMin'))
+        return false
+      }
+      if (fullName.trim().length < 2) {
+        setMessage(t('errors.nameRequired'))
+        return false
+      }
+      if (password !== confirmPassword) {
+        setMessage(t('errors.passwordMismatch'))
+        return false
+      }
+    } else if (!password) {
+      setMessage(t('errors.passwordRequired'))
       return false
     }
     return true
@@ -94,35 +109,38 @@ export default function Profile() {
   const handleAuth = async () => {
     setMessage('')
     if (!validate()) return
+    const cleanEmail = email.trim()
+    setEmail(cleanEmail)
     setLoading(true)
-    if (isSignUp) {
-      const { error } = await signUp(email, password, {
-        role,
-        full_name: fullName.trim(),
-        agency_name: role === 'agent' ? agencyName.trim() || undefined : undefined,
-      })
-      setLoading(false)
-      if (error) setMessage(friendlyError(error, t))
-      else {
-        // Confirmation email carries a 6-digit code — take the user straight
-        // to the code entry (type 'signup' so verify/resend match).
-        setOtpEmail(email)
-        setOtpType('signup')
-        setOtpCode(['', '', '', '', '', ''])
-        setOtpError(false)
-        setOtpStep('enter-code')
-        setCooldown(30)
-        setMessage(t('auth.checkEmail'))
-      }
-    } else {
-      const { error } = await signIn(email, password)
-      setLoading(false)
-      if (error) {
-        setMessage(friendlyError(error, t))
+    try {
+      if (isSignUp) {
+        const { error } = await signUp(cleanEmail, password, {
+          role,
+          full_name: fullName.trim(),
+          agency_name: role === 'agent' ? agencyName.trim() || undefined : undefined,
+        })
+        if (error) setMessage(friendlyError(error, t))
+        else {
+          // Confirmation email carries a 6-digit code — take the user
+          // straight to the code entry (type 'signup' so verify/resend match).
+          setOtpEmail(cleanEmail)
+          setOtpType('signup')
+          setOtpCode(['', '', '', '', '', ''])
+          setOtpError(false)
+          setOtpStep('enter-code')
+          setCooldown(30)
+          setMessage(t('auth.checkEmail'))
+        }
       } else {
-        const from = location.state?.from || '/'
-        navigate(from, { replace: true })
+        const { error } = await signIn(cleanEmail, password)
+        if (error) {
+          setMessage(friendlyError(error, t))
+        } else {
+          setPendingRedirect(location.state?.from || '/')
+        }
       }
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -158,16 +176,21 @@ export default function Profile() {
     // Same validity check the password form uses. A presence-only guard let
     // malformed addresses reach Supabase, which rejects them with a raw
     // "Unable to validate email address: invalid format" 400.
-    if (!EMAIL_RE.test(otpEmail)) { setMessage(t('errors.invalidEmail')); return }
+    const cleanEmail = otpEmail.trim()
+    if (!EMAIL_RE.test(cleanEmail)) { setMessage(t('errors.invalidEmail')); return }
+    setOtpEmail(cleanEmail)
     // OTP signups carry no role metadata either — same stash-and-apply
     // path as OAuth, and overwriting here means an aborted OAuth click
     // can't leak its role choice into this flow.
     try { localStorage.setItem('fho_pending_role', role) } catch { /* ignore */ }
     setLoading(true); setMessage('')
-    const { error } = await sendOtp(otpEmail)
-    setLoading(false)
-    if (error) setMessage(friendlyError(error, t))
-    else { setOtpStep('enter-code'); setOtpError(false); setCooldown(30); setMessage(t('auth.otpSent')) }
+    try {
+      const { error } = await sendOtp(cleanEmail)
+      if (error) setMessage(friendlyError(error, t))
+      else { setOtpStep('enter-code'); setOtpError(false); setCooldown(30); setMessage(t('auth.otpSent')) }
+    } finally {
+      setLoading(false)
+    }
   }
 
   const handleResend = async () => {
@@ -176,10 +199,13 @@ export default function Profile() {
     // magic-link login, and resending with an empty address 400s.
     if (!EMAIL_RE.test(otpEmail)) { setMessage(t('errors.invalidEmail')); return }
     setLoading(true); setMessage(''); setOtpError(false)
-    const { error } = await resendCode(otpEmail, otpType)
-    setLoading(false)
-    if (error) setMessage(friendlyError(error, t))
-    else { setCooldown(30); setMessage(t('auth.otpSent')) }
+    try {
+      const { error } = await resendCode(otpEmail, otpType)
+      if (error) setMessage(friendlyError(error, t))
+      else { setCooldown(30); setMessage(t('auth.otpSent')) }
+    } finally {
+      setLoading(false)
+    }
   }
 
   const handleOtpChange = (index, value) => {
@@ -210,27 +236,107 @@ export default function Profile() {
 
   const handleVerifyOtp = async (code) => {
     setLoading(true); setMessage('')
-    const { error } = await verifyOtp(otpEmail, code, otpType)
-    setLoading(false)
-    if (error) {
-      setOtpError(true)
-      setMessage(friendlyError(error, t))
-      setOtpCode(['', '', '', '', '', ''])
-      otpRefs.current[0]?.focus()
-    } else {
-      setOtpStep(null)
-      navigate('/')
+    try {
+      const { error } = await verifyOtp(otpEmail, code, otpType)
+      if (error) {
+        setOtpError(true)
+        setMessage(friendlyError(error, t))
+        setOtpCode(['', '', '', '', '', ''])
+        otpRefs.current[0]?.focus()
+      } else {
+        setOtpStep(null)
+        setPendingRedirect(location.state?.from || '/')
+      }
+    } finally {
+      setLoading(false)
     }
   }
 
   const handleForgotPassword = async () => {
-    if (!email) { setMessage(t('auth.enterEmail')); return }
+    const cleanEmail = email.trim()
+    if (!cleanEmail) { setMessage(t('auth.enterEmail')); return }
+    setEmail(cleanEmail)
     setMessage('')
-    const { error } = await resetPassword(email)
+    const { error } = await resetPassword(cleanEmail)
     setMessage(error ? friendlyError(error, t) : t('auth.resetSent'))
   }
 
+  // Completes a password-recovery link. Reuses the signup password policy
+  // (8-char minimum) since a fresh password set here is exactly that case,
+  // not a login — see validate()'s equivalent branch.
+  const handleUpdatePassword = async () => {
+    setMessage('')
+    if (newPassword.length < 8) { setMessage(t('errors.passwordMin')); return }
+    if (newPassword !== confirmNewPassword) { setMessage(t('errors.passwordMismatch')); return }
+    setLoading(true)
+    try {
+      const { error } = await updatePassword(newPassword)
+      if (error) {
+        setMessage(friendlyError(error, t))
+      } else {
+        setNewPassword('')
+        setConfirmNewPassword('')
+        setRecoveryDone(true)
+        setMessage(t('auth.recoverySuccess'))
+      }
+    } finally {
+      setLoading(false)
+    }
+  }
+
   if (authLoading) return null
+
+  // ─── Password recovery ───
+  // Checked before the signed-in branch below: a recovery link's session is
+  // real (the user IS authenticated), but landing on the ordinary dashboard
+  // here would mean the reset never actually happens — the old password
+  // stays in effect with no indication anything is wrong.
+  if (passwordRecovery) {
+    return (
+      <div className="profile-page auth-screen">
+        <DuskHero />
+        <div className="auth-content">
+          <div className="auth-glass">
+            <div className="otp-icon"><Lock size={32} /></div>
+            <h2 className="auth-title">{t('auth.recoveryTitle')}</h2>
+            <p className="auth-subtitle">{t('auth.recoverySubtitle')}</p>
+            {!recoveryDone && (
+              <>
+                <div className="field-row">
+                  <Lock size={18} className="field-icon" />
+                  <input
+                    type={showNewPw ? 'text' : 'password'}
+                    className="form-input"
+                    placeholder={t('auth.newPassword')}
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleUpdatePassword()}
+                    autoFocus
+                  />
+                  <button className="field-eye" onClick={() => setShowNewPw(!showNewPw)} type="button">{showNewPw ? <EyeOff size={18} /> : <Eye size={18} />}</button>
+                </div>
+                <div className="field-row">
+                  <Lock size={18} className="field-icon" />
+                  <input
+                    type={showNewPw ? 'text' : 'password'}
+                    className="form-input"
+                    placeholder={t('auth.confirmPassword')}
+                    value={confirmNewPassword}
+                    onChange={(e) => setConfirmNewPassword(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleUpdatePassword()}
+                  />
+                </div>
+                <button className="cta-pill" onClick={handleUpdatePassword} disabled={loading}>
+                  {loading ? t('common.loading') : t('auth.updatePassword')}
+                </button>
+              </>
+            )}
+            {message && <div className={`auth-message ${recoveryDone ? '' : 'auth-message--error'}`} role="status">{message}</div>}
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   // ─── Signed-in dashboard ───
   if (user) {
@@ -345,10 +451,13 @@ export default function Profile() {
       <div className="auth-content">
         <div className="auth-headline-block" style={{ animationDelay: '150ms' }}>
           <div className="screen-kicker"><span className="screen-kicker__dash" />{isSignUp ? t('auth.kickerSignUp') : t('auth.kickerSignIn')}</div>
+          {/* Three stacked lines, per the sign-in prototype — the break points
+              belong to the copy, not to whatever width the viewport happens
+              to be. */}
           <h1 className="screen-headline auth-hero-headline">
-            {isSignUp
-              ? (<>{t('auth.heroSignUpPre')} <em>{t('auth.heroSignUpEm')}</em> {t('auth.heroSignUpPost')}</>)
-              : (<>{t('auth.heroSignInPre')} <em>{t('auth.heroSignInEm')}</em> {t('auth.heroSignInPost')}</>)}
+            <span>{isSignUp ? t('auth.heroSignUpPre') : t('auth.heroSignInPre')}</span>
+            <em>{isSignUp ? t('auth.heroSignUpEm') : t('auth.heroSignInEm')}</em>
+            <span>{isSignUp ? t('auth.heroSignUpPost') : t('auth.heroSignInPost')}</span>
           </h1>
         </div>
         <div className="auth-glass">
@@ -369,16 +478,33 @@ export default function Profile() {
             <button className="field-eye" onClick={() => setShowPw(!showPw)} type="button">{showPw ? <EyeOff size={18} /> : <Eye size={18} />}</button>
           </div>
 
+          {isSignUp && (
+            <div className="field-row">
+              <Lock size={18} className="field-icon" />
+              <input type={showPw ? 'text' : 'password'} className="form-input" placeholder={t('auth.confirmPassword')} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleAuth()} />
+            </div>
+          )}
+
           {isSignUp && role === 'agent' && (
             <div className="field-row"><Building2 size={18} className="field-icon" /><input type="text" className="form-input" placeholder={t('auth.agencyName')} value={agencyName} onChange={(e) => setAgencyName(e.target.value)} /></div>
           )}
 
+          {/* Prototype's row above the CTA: what the selected role gets you on
+              the left, a compact "Forgot?" on the right. Sign-in only. */}
+          {!isSignUp && (
+            <div className="auth-access-row">
+              <span>{role === 'agent' ? t('auth.accessAgent') : t('auth.accessClient')}</span>
+              <button type="button" className="auth-forgot" onClick={handleForgotPassword}>
+                {t('auth.forgotShort')}
+              </button>
+            </div>
+          )}
+
+          {/* Prototype CTA copy: "Step inside" / "Create account". */}
           <button className="cta-pill" onClick={handleAuth} disabled={loading}>
-            {loading ? t('common.loading') : isSignUp ? t('common.signUp') : t('common.signIn')}
+            {loading ? t('common.loading') : isSignUp ? t('auth.createAccount') : t('auth.stepInside')}
             <ArrowRight size={18} />
           </button>
-
-          {!isSignUp && <button className="link-btn" onClick={handleForgotPassword}>{t('auth.forgotPassword')}</button>}
 
           {message && <div className="auth-message">{message}</div>}
 
@@ -391,10 +517,30 @@ export default function Profile() {
               )}
               {t('auth.continueWithGoogle')}
             </button>
-            {/* Apple + LinkedIn removed until the providers are enabled in the
-                Supabase dashboard (DECISIONS.md P2-G) — signInWithProvider and
-                the callback already support them, so re-adding is just the
-                buttons: handleProvider('apple') / handleProvider('linkedin_oidc'). */}
+            {/* Re-added per owner request 2026-08-18 (DECISIONS.md P2-G):
+                signInWithProvider/AuthCallback already fully support both —
+                this app code was never the gap. Supabase Dashboard still has
+                both providers toggled off as of this date (verified live via
+                a direct /auth/v1/authorize probe).
+                IMPORTANT: `handleProvider`'s own error handling (below) does
+                NOT catch a disabled-provider failure for these two, and
+                that's not fixable from here — signInWithOAuth navigates the
+                whole page to Supabase's /authorize endpoint rather than
+                making a fetchable request, so GoTrue's raw JSON 400 replaces
+                this page before any React code runs; verified live, not
+                assumed. `providerNotConfigured` only ever fires for the
+                OTP/password paths, which stay on this page. This is the
+                exact rough edge the 2026-07-12 removal was avoiding — it's
+                back now because that's what was asked for, but it isn't
+                solved, only re-exposed until the Dashboard config lands. */}
+            <button className="social-btn" onClick={() => handleProvider('apple')} disabled={!!providerLoading}>
+              {providerLoading === 'apple' ? <Loader2 size={18} className="animate-spin" /> : <Apple size={18} />}
+              {t('auth.continueWithApple')}
+            </button>
+            <button className="social-btn" onClick={() => handleProvider('linkedin_oidc')} disabled={!!providerLoading}>
+              {providerLoading === 'linkedin_oidc' ? <Loader2 size={18} className="animate-spin" /> : <Linkedin size={18} />}
+              {t('auth.continueWithLinkedIn')}
+            </button>
             <button className="social-btn" onClick={handleGoogleOtp} disabled={!!providerLoading}>
               <Mail size={18} />
               {t('auth.signInWithEmail')}

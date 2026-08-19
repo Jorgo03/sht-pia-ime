@@ -8,6 +8,17 @@ export const PAGE_SIZE = 20;
  *  unbounded fetch, and more pins than this is unreadable anyway. */
 export const MAP_MARKER_LIMIT = 200;
 
+/**
+ * Every card/marker rendering (grid, compact, featured, map bubble, map
+ * preview) reads only these columns. `select('*')` here would also pull
+ * `description`, `description_i18n`, `features`, `floor_plan`, `video_url`,
+ * contact fields, etc. — none of them rendered in a list/map context, all of
+ * them dead weight on every page of results and every map pan. Detail views
+ * (getPropertyById) still fetch everything, since they render everything.
+ */
+const LIST_COLUMNS =
+  'id, agent_id, owner_id, title, title_i18n, price, currency, address, city, sqft, beds, baths, property_type, listing_type, image_urls, status, latitude, longitude, created_at';
+
 const SORTS: Record<PropertySort, { column: string; ascending: boolean }> = {
   newest: { column: 'created_at', ascending: false },
   price_asc: { column: 'price', ascending: true },
@@ -53,7 +64,7 @@ function baseQuery(filters: PropertyFilters) {
   return applyFilters(
     supabase
       .from('properties')
-      .select('*')
+      .select(LIST_COLUMNS)
       .eq('status', 'active')
       .order(order.column, { ascending: order.ascending }),
     filters,
@@ -103,7 +114,7 @@ export async function getMapProperties(
   const { data, error } = await applyFilters(
     supabase
       .from('properties')
-      .select('*')
+      .select(LIST_COLUMNS)
       .eq('status', 'active')
       .not('latitude', 'is', null)
       .not('longitude', 'is', null),
@@ -115,9 +126,12 @@ export async function getMapProperties(
 }
 
 export async function getPropertyById(id: string): Promise<Property | null> {
+  // Matches the web app's useProperty() query exactly — the embedded select
+  // is scoped to the anon SELECT grant on profiles (id, full_name, phone,
+  // agency_name, avatar_url), so this works for signed-out visitors too.
   const { data, error } = await supabase
     .from('properties')
-    .select('*')
+    .select('*, agent:profiles(id, full_name, phone, agency_name, avatar_url)')
     .eq('id', id)
     .single();
 
@@ -125,15 +139,19 @@ export async function getPropertyById(id: string): Promise<Property | null> {
   return data;
 }
 
-export async function getFeaturedProperty(): Promise<Property | null> {
-  const { data, error } = await supabase
-    .from('properties')
-    .select('*')
-    .eq('status', 'active')
-    .order('price', { ascending: false })
-    .limit(1)
-    .single();
-
-  if (error) return null;
-  return data;
+/**
+ * Batch lookup preserving the caller's id order — same contract as web's
+ * usePropertiesByIds(), used for the Home screen's "Recently Viewed" rail.
+ */
+export async function getPropertiesByIds(ids: string[]): Promise<Property[]> {
+  if (!ids.length) return [];
+  const { data, error } = await supabase.from('properties').select(LIST_COLUMNS).in('id', ids);
+  if (error) return [];
+  // Supabase's column-string type inference marks every selected column as
+  // required (it has no generated Database types to know owner_id is
+  // nullable-optional on the real table) — cast rather than fight it, same
+  // as the join-shape casts elsewhere in this file/codebase.
+  const rows = (data ?? []) as unknown as Property[];
+  const byId = new Map(rows.map((p) => [p.id, p]));
+  return ids.map((id) => byId.get(id)).filter((p): p is Property => !!p);
 }

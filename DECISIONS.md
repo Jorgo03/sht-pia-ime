@@ -5,6 +5,40 @@ AUDIT.md was fixed; see the final report for the change log.
 
 ---
 
+## ═══ AUTH INCIDENT REMEDIATION — 2026-08-19 ═══
+
+Full findings in `AUTH_AUDIT.md`; fixes on branch `fix/auth-recovery-and-validation`.
+One judgment call from that pass needs your read, since I deliberately left
+a security-advisor finding half-addressed rather than risk breaking a working
+feature:
+
+**`current_user_is_agent()` / `buyer_has_open_wanted_home(uuid)` are still
+callable by `anon`.** Supabase's security advisor flags this (both are
+`SECURITY DEFINER`). I fixed the same finding for a third function,
+`claim_role`, which was risk-free to tighten. These two are different: both
+run *inside* `public.profiles`' own SELECT policy, which `anon` also
+evaluates for the public `/agent/:id` page and property-listing agent info —
+logged-out visitors reading an agent's profile is an intentional feature, not
+a bug. For an agent row, `role = 'agent'` short-circuits before either
+function is ever called, so revoking `anon`'s access wouldn't touch that
+path. But for a *non-agent* row, none of the policy's earlier conditions are
+true for an anonymous caller, so Postgres has to evaluate the function call
+to resolve the expression — and if `anon` lacks EXECUTE, that's not "row
+excluded," it's the whole query erroring out with "permission denied." I
+could not fully verify every anon-reachable query path never touches a
+non-agent row, so I left this alone rather than risk silently breaking the
+public agent-profile pages.
+
+The clean fix is restructuring the policy so an anon caller never reaches
+that branch at all — something like adding an explicit `auth.role() =
+'authenticated' AND (...)` guard around the wanted-home clause, so the
+function calls are structurally unreachable for anon instead of merely
+returning false. That's a real but small policy change, deliberately not
+made in this pass since it wasn't the confirmed incident and deserves its
+own focused review rather than being bundled into an auth-recovery fix. Say
+the word and I'll do it as its own change, with the same before/after
+verification approach as the rest of this pass.
+
 ## ═══ MASTER-PLAN PASS — 2026-07-13 (branch feature/booking-otp-ai-polish) ═══
 
 ### MP1. OAuth providers — how Task 1 maps to reality
@@ -369,3 +403,121 @@ passwords". Not something I can toggle via the API.
 Decide whether the Expo app is still a target; if not, extracting the web app
 into its own repo (or deleting the Expo tree) would remove ~30 dependencies
 and a lot of confusion. Not done — too destructive to decide unilaterally.
+
+---
+
+## ═══ MOBILE PARITY PASS — 2026-08-18 ═══
+
+Two items from the design-handoff phase list were **not built**, because each
+contradicted a decision already recorded in this repo.
+
+**Both resolved by the owner on 2026-08-18: keep the price inputs as they are,
+drop trending neighborhoods.** Neither is open any more; they're kept here so
+the next person to read the handoff doesn't re-raise them as gaps.
+
+### MP-A. Dual-thumb price slider (filter sheet)
+
+The handoff asks for a dual-thumb range slider. Web's `Search.jsx` uses two
+plain number inputs (`.range-inputs`), and mobile's filter sheet already
+matches that. Building the slider on mobile only would put the two apps on
+different controls for the same filter, against CLAUDE.md's "web is the design
+source of truth".
+
+**RESOLVED 2026-08-18 — no slider, on either app.** The number inputs stay.
+They also express "min set, max unbounded" cleanly, which a two-thumb slider
+can't without an extra "no max" affordance. The handoff item is closed, not
+deferred.
+
+### MP-B. "Trending neighborhoods" on Home
+
+The handoff asks for this section on mobile. `Home.jsx:94` says it was
+*removed from web per owner request on 2026-07-14*, with the CSS and i18n
+keys deliberately retained "for easy restore". Adding it to mobile would
+re-introduce something you killed three weeks earlier.
+
+**RESOLVED 2026-08-18 — dropped for good, on both apps.** The 2026-07-14
+removal stands and mobile never gets the section. Note the now-dead
+`home.css` rules and `home.neighborhoods` i18n keys are still in the tree,
+kept back when the removal was thought to be reversible; they're safe to
+delete whenever someone is next in those files.
+
+### Also worth knowing
+
+- **`listing/new` is now the create entry point.** The tab-bar "+" and My
+  Listings' "New Listing" pill both point at the wizard. `listing/create`
+  (the single-scroll form) is untouched and still reachable by route — say
+  the word once the wizard has taken a real submission and it can go.
+- **Password reset on mobile completes on web.** `resetPassword` omits
+  `redirectTo`, so Supabase uses the project Site URL. There is no in-app
+  recovery screen and no deep link registered for one; adding those is the
+  only way to keep the flow inside the app.
+
+---
+
+## ═══ GOOGLE OAUTH REDIRECT CONFIGURATION — 2026-08-18 ═══
+
+Supersedes §4 above, which only covered localhost from before the production
+Vercel deploy existed. App code is verified correct (unchanged since Pass 6/7
+audits) — everything below is dashboard-only, in two consoles I don't have
+access to. Live-verified via direct `curl` against Supabase's `/authorize`
+endpoint: the Google provider is enabled, has a real `client_id`
+(`1086087149243-ml0312i5dj6gjcjm6fpmops98pv17t24.apps.googleusercontent.com`),
+and correctly forwards the fixed Supabase callback below to Google.
+
+**The chain:** `App → Supabase /authorize → Google → Supabase /auth/v1/callback → app's /auth/callback`
+
+### Google Cloud Console → your OAuth client → Authorized redirect URIs
+
+Needs **exactly one** entry (this is Supabase's own fixed callback — the
+same for every environment, not the app's URL):
+
+```
+https://xzzzhlwmzotibrxdqmcm.supabase.co/auth/v1/callback
+```
+
+Not the Vercel URL, not localhost, no trailing slash. If this is wrong,
+Google rejects the request with `Error 400: redirect_uri_mismatch` before
+your app is ever involved — the app's `/auth/callback` route is not the
+cause of that error.
+
+### Supabase Dashboard → Authentication → URL Configuration
+
+**Redirect URLs** (allow-list) needs both:
+```
+http://localhost:5173/auth/callback
+https://real-estate-app-my-self-f307.vercel.app/auth/callback
+```
+
+**Site URL** should be the production domain before launch:
+```
+https://real-estate-app-my-self-f307.vercel.app
+```
+
+These are exactly the values the code sends — confirmed by hitting
+`/auth/v1/authorize?provider=google&redirect_to=...` directly for both the
+localhost and production values; both are accepted at the initiate step.
+Whether they're actually on this allow-list can only be confirmed by
+completing a real sign-in (Supabase validates the allow-list on the final
+redirect back, after Google's leg completes) — not something I can do
+myself; I don't authenticate with real credentials, including for testing.
+
+### Diagnosing which side is still wrong (if it still fails after the above)
+
+Open the production site, click **Continue with Google**:
+- `Error 400: redirect_uri_mismatch` → Google Cloud Console's redirect URI
+  is still wrong.
+- Reaches the Google account picker, then bounces back to the login page →
+  Google Cloud is fine; Supabase's redirect allow-list is the remaining
+  piece.
+- Lands back in the app signed in → fixed.
+
+### Mobile (Expo Go) uses a different redirect URI — not these two
+
+Native `signInWithProvider` (`contexts/auth-context.tsx`) never sends the
+web callback. It computes its own via `Linking.createURL('auth/callback')`
+at runtime — `exp://192.168.0.8:8081/--/auth/callback` under Expo Go on this
+LAN, or `shtepia-ime://auth/callback` in a real installed build — and
+exchanges the code inline after the in-app browser session closes, with no
+shared callback screen between platforms. Nothing to add to either dashboard
+list above for this to work; it's a separate flow by design, already
+verified correct in code.

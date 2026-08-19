@@ -213,7 +213,12 @@
   transform: translateX(-50%);
   max-width: 380px;
   padding: 14px 20px;
-  background: var(--fho-text);
+  /* Fixed dark chip in BOTH themes, on purpose — not var(--fho-text), which
+     flips to near-white in dark mode and left this near-invisible (white
+     text on a white chip). --fho-text-on-dark alone already is the correct
+     "always-light" text token; the background needs its own always-dark
+     counterpart rather than a theme-reactive one. */
+  background: #1a1714;
   color: var(--fho-text-on-dark);
   font-size: 14px;
   font-weight: 500;

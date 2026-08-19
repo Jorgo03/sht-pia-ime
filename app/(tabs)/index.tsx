@@ -1,8 +1,6 @@
-import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import { useRouter, type Href } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useFocusEffect, useRouter, type Href } from 'expo-router';
+import { useCallback, useMemo } from 'react';
 import {
-  ActivityIndicator,
   ScrollView,
   StyleSheet,
   Text,
@@ -12,56 +10,98 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 
+import { useTabBarClearance } from '@/components/liquid-tab-bar';
 import { FeaturedPropertyCard } from '@/components/property/featured-property-card';
-import { PropertyCard } from '@/components/property/property-card';
+import { PropertyCard, getCompactCardSnapInterval } from '@/components/property/property-card';
 import { GradientBackground } from '@/components/ui/gradient-background';
+import { RiseIn } from '@/components/ui/motion';
+import { AppHeader } from '@/components/ui/app-header';
 import { SearchHeader } from '@/components/ui/search-header';
-import { AtticoColors } from '@/constants/theme';
+import { SkeletonCard } from '@/components/ui/skeleton-card';
+import { Fonts, type AtticoPalette } from '@/constants/theme';
 import { useAuth } from '@/contexts/auth-context';
-import { getFeaturedProperty, getProperties } from '@/data/properties';
-import { Property } from '@/data/types';
+import { useTheme } from '@/contexts/theme-context';
 import { useResponsive } from '@/hooks/use-responsive';
+import { usePropertiesByIdsQuery, usePropertiesQuery } from '@/hooks/use-property-queries';
+import { useRecentlyViewed } from '@/hooks/use-recently-viewed';
+
+// Mirrors web's Home.jsx exactly: one query, sorted newest-first (the
+// default sort), featured = properties[0], matched = properties.slice(1, 7)
+// — NOT a separate "highest price" query, which is what this screen used to
+// do before this pass (a real behavioral mismatch vs. the browser).
+const HOME_LIMIT = 24;
+
+// Device-local hour, not UTC — 6-12 morning, 12-19 afternoon, else evening.
+// The previous version only split morning/evening (hour < 12), which
+// silently mislabeled both the afternoon and the 00:00-05:59 window.
+function getGreeting(hour: number, t: (key: string) => string): string {
+  if (hour >= 6 && hour < 12) return t('home.greetingMorning');
+  if (hour >= 12 && hour < 19) return t('home.greetingAfternoon');
+  return t('home.greetingEvening');
+}
 
 export default function HomeScreen() {
   const router = useRouter();
   const { t } = useTranslation();
   const { user } = useAuth();
-  const { columns } = useResponsive();
-  const gridItemWidth = `${100 / columns}%` as const;
-  const [featured, setFeatured] = useState<Property | null>(null);
-  const [listings, setListings] = useState<Property[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+  const { recentIds, reload: reloadRecent } = useRecentlyViewed();
 
-  const hour = new Date().getHours();
-  const greeting = hour < 12 ? t('home.greetingMorning') : t('home.greetingEvening');
+  // react-query cache means Home <-> Property Detail <-> back within the
+  // 60s staleTime shows the same list instantly with zero network calls,
+  // instead of the full-screen spinner this used to force on every focus.
+  const { data: listings = [], isLoading: loading, isError, refetch } = usePropertiesQuery({}, HOME_LIMIT);
+  const { data: recentProperties = [] } = usePropertiesByIdsQuery(recentIds.slice(0, 6));
+  const { width: screenWidth } = useResponsive();
+  const snapInterval = getCompactCardSnapInterval(screenWidth);
+  // The nav pill floats above content rather than pushing it up, so the
+  // scroll has to reserve its full footprint or the last row sits under it.
+  const tabBarClearance = useTabBarClearance();
+
+  const greeting = getGreeting(new Date().getHours(), t);
   const firstName = user?.user_metadata?.full_name?.split(' ')[0] || user?.email?.split('@')[0] || '';
+  const matchCount = listings.length;
 
-  useEffect(() => {
-    Promise.all([getFeaturedProperty(), getProperties()])
-      .then(([feat, all]) => {
-        setFeatured(feat);
-        setListings(all.filter((p) => p.id !== feat?.id).slice(0, 4));
-      })
-      .finally(() => setLoading(false));
-  }, []);
+  // Recently Viewed reads AsyncStorage, not the network — refreshing it on
+  // focus is free and needs no cache-staleness tradeoff, unlike `listings`.
+  useFocusEffect(
+    useCallback(() => {
+      reloadRecent();
+    }, [reloadRecent]),
+  );
 
-  const title = firstName
-    ? `${greeting}, ${firstName}`
-    : greeting;
+  const featured = listings[0] ?? null;
+  const matched = listings.slice(1, 7);
+
+  const headline = firstName ? `${greeting}, ${firstName}.` : `${greeting}.`;
 
   return (
     <GradientBackground>
       <SafeAreaView style={styles.container} edges={['top']}>
+        {/* Web's `.app-header` sits above the greeting hero on Home too. */}
+        <AppHeader />
         <SearchHeader
-          title={title}
+          kicker={greeting}
+          headline={headline}
+          emphasis={t('home.matchesToday', { count: matchCount })}
           onSearchPress={() => router.push('/(tabs)/explore' as Href)}
         />
         <ScrollView
-          contentContainerStyle={styles.scroll}
+          contentContainerStyle={[styles.scroll, { paddingBottom: tabBarClearance }]}
           showsVerticalScrollIndicator={false}>
           {loading ? (
-            <View style={styles.loader}>
-              <ActivityIndicator size="large" color={AtticoColors.accent} />
+            <View style={styles.skeletonGrid}>
+              {Array.from({ length: 4 }, (_, i) => (
+                <SkeletonCard key={i} />
+              ))}
+            </View>
+          ) : isError ? (
+            <View style={styles.errorCard}>
+              <Text style={styles.errorText}>{t('common.error')}</Text>
+              <TouchableOpacity onPress={() => refetch()} activeOpacity={0.7}>
+                <Text style={styles.retryText}>{t('common.retry')}</Text>
+              </TouchableOpacity>
             </View>
           ) : (
             <>
@@ -71,55 +111,56 @@ export default function HomeScreen() {
                     <Text style={styles.sectionTitle}>{t('home.featured')}</Text>
                     <Text style={styles.editorsPick}>{t('home.editorsPick')}</Text>
                   </View>
-                  <FeaturedPropertyCard
-                    property={featured}
-                    onPress={() =>
-                      router.push(`/property/${featured.id}` as Href)
-                    }
-                  />
+                  <RiseIn>
+                    <FeaturedPropertyCard property={featured} />
+                  </RiseIn>
                 </>
               )}
 
-              <View style={styles.section}>
-                <View style={styles.sectionHeader}>
-                  <Text style={styles.sectionTitle}>{t('home.matched')}</Text>
-                  <TouchableOpacity
-                    onPress={() => router.push('/(tabs)/explore' as Href)}
-                    activeOpacity={0.7}>
-                    <Text style={styles.seeAll}>{t('home.seeAll')}</Text>
-                  </TouchableOpacity>
+              {matched.length > 0 && (
+                <View style={styles.section}>
+                  <View style={styles.sectionHeader}>
+                    <Text style={styles.sectionTitle}>{t('home.matched')}</Text>
+                    <TouchableOpacity
+                      onPress={() => router.push('/(tabs)/explore' as Href)}
+                      activeOpacity={0.7}>
+                      <Text style={styles.seeAll}>{t('home.seeAll')}</Text>
+                    </TouchableOpacity>
+                  </View>
+                  <ScrollView
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    contentContainerStyle={styles.hScroll}
+                    decelerationRate="fast"
+                    snapToInterval={snapInterval}>
+                    {matched.map((item, i) => (
+                      <RiseIn key={item.id} index={i}>
+                        <PropertyCard property={item} variant="compact" />
+                      </RiseIn>
+                    ))}
+                  </ScrollView>
                 </View>
-                <View style={styles.grid}>
-                  {listings.map((item) => (
-                    <View key={item.id} style={[styles.gridItem, { width: gridItemWidth }]}>
-                      <PropertyCard
-                        property={item}
-                        onPress={() =>
-                          router.push(`/property/${item.id}` as Href)
-                        }
-                      />
-                    </View>
-                  ))}
-                </View>
-              </View>
+              )}
 
-              <View style={styles.statsSection}>
-                <View style={styles.statCard}>
-                  <MaterialIcons name="home" size={28} color={AtticoColors.accent} />
-                  <Text style={styles.statNumber}>250+</Text>
-                  <Text style={styles.statLabel}>{t('search.results_other', { count: 250 }).split(' ').pop()}</Text>
+              {recentProperties.length > 0 && (
+                <View style={styles.section}>
+                  <View style={styles.sectionHeader}>
+                    <Text style={styles.sectionTitle}>{t('common.recentlyViewed')}</Text>
+                  </View>
+                  <ScrollView
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    contentContainerStyle={styles.hScroll}
+                    decelerationRate="fast"
+                    snapToInterval={snapInterval}>
+                    {recentProperties.map((item, i) => (
+                      <RiseIn key={item.id} index={i}>
+                        <PropertyCard property={item} variant="compact" />
+                      </RiseIn>
+                    ))}
+                  </ScrollView>
                 </View>
-                <View style={styles.statCard}>
-                  <MaterialIcons name="people" size={28} color={AtticoColors.accent} />
-                  <Text style={styles.statNumber}>100+</Text>
-                  <Text style={styles.statLabel}>{t('auth.agent')}s</Text>
-                </View>
-                <View style={styles.statCard}>
-                  <MaterialIcons name="star" size={28} color={AtticoColors.accent} />
-                  <Text style={styles.statNumber}>4.9</Text>
-                  <Text style={styles.statLabel}>Rating</Text>
-                </View>
-              </View>
+              )}
             </>
           )}
         </ScrollView>
@@ -128,77 +169,72 @@ export default function HomeScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   container: {
     flex: 1,
   },
   scroll: {
     paddingBottom: 24,
   },
-  loader: {
-    paddingTop: 100,
+  skeletonGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    paddingHorizontal: 14,
+  },
+  errorCard: {
+    marginHorizontal: 20,
+    padding: 16,
+    borderRadius: 18,
+    backgroundColor: colors.primaryLight,
+    borderWidth: 1,
+    borderColor: colors.border,
     alignItems: 'center',
+    gap: 8,
+  },
+  errorText: {
+    fontSize: 14,
+    color: colors.textPrimary,
+  },
+  retryText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: colors.accent,
   },
   section: {
     marginTop: 28,
-    paddingHorizontal: 14,
   },
   sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 20,
-    marginBottom: 8,
+    marginBottom: 10,
   },
+  // Matches web's .section-title h2 — serif/500, not bold sans.
   sectionTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: AtticoColors.textPrimary,
+    fontFamily: Fonts?.serif,
+    fontSize: 18,
+    fontWeight: '500',
+    color: colors.textPrimary,
   },
+  // Matches web's .mono-eyebrow — monospace, not bold sans.
   editorsPick: {
+    fontFamily: Fonts?.mono,
     fontSize: 11,
-    fontWeight: '600',
-    color: AtticoColors.textSecondary,
+    color: colors.textSecondary,
     letterSpacing: 1,
     textTransform: 'uppercase',
   },
+  // Matches web's .section-title a — muted by default, orange only on
+  // :hover, which has no touch equivalent, so muted is the practical
+  // always-on state here rather than always-orange.
   seeAll: {
     fontSize: 14,
     fontWeight: '600',
-    color: AtticoColors.accent,
+    color: colors.textSecondary,
   },
-  grid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-  },
-  gridItem: {
-    // width is computed per-render (gridItemWidth) so column count can
-    // respond to tablet width / rotation instead of being fixed at 2.
-  },
-  statsSection: {
-    flexDirection: 'row',
+  hScroll: {
     paddingHorizontal: 20,
     gap: 12,
-    marginTop: 28,
-  },
-  statCard: {
-    flex: 1,
-    backgroundColor: AtticoColors.glass,
-    borderWidth: 1,
-    borderColor: AtticoColors.glassBorder,
-    borderRadius: 16,
-    padding: 16,
-    alignItems: 'center',
-    gap: 6,
-  },
-  statNumber: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: AtticoColors.textPrimary,
-  },
-  statLabel: {
-    fontSize: 12,
-    color: AtticoColors.textSecondary,
-    fontWeight: '500',
   },
 });

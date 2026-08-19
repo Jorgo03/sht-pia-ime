@@ -15,6 +15,7 @@ import ImageLightbox from '../components/ImageLightbox'
 import ListingAssistant from '../components/ListingAssistant'
 import ViewingRequestSheet from '../../viewings/components/ViewingRequestSheet'
 import { isEnabled } from '../../../lib/flags'
+import { useSwipe } from '../../../hooks/useSwipe'
 import '../../../styles/property-detail.css'
 
 const PropertyMap = lazy(() => import('../components/PropertyMap'))
@@ -36,6 +37,11 @@ export default function PropertyDetail() {
   const { title, description, translating, isTranslated } = useTranslatedProperty(property, i18n.language)
   const { properties: similar } = useProperties({ filter: property?.property_type || 'all', city: property?.city || null, limit: 8 })
   const similarProperties = similar.filter(p => p.id !== id).slice(0, 4)
+  const images = property?.image_urls?.length ? property.image_urls : []
+  const swipe = useSwipe({
+    onSwipeLeft: () => setImgIdx(i => (i + 1) % images.length),
+    onSwipeRight: () => setImgIdx(i => (i - 1 + images.length) % images.length),
+  })
 
   useEffect(() => {
     if (property?.id) { logActivity(property.id, 'view'); addRecentlyViewed(property.id) }
@@ -51,7 +57,6 @@ export default function PropertyDetail() {
   if (!property) return <div className="page">{t('search.empty')}</div>
 
   const saved = isFavorite(property.id)
-  const images = property.image_urls?.length ? property.image_urls : []
   const hasMultiple = images.length > 1
   const currentImg = images[imgIdx]
   const price = formatPrice(property.price, i18n.language, property.currency)
@@ -108,9 +113,16 @@ export default function PropertyDetail() {
   return (
     <div className="detail-screen">
       {/* Photo hero */}
-      <section className="detail-hero" onClick={() => images.length > 0 && setLightboxOpen(true)}>
+      <section
+        className="detail-hero"
+        onClick={() => images.length > 0 && setLightboxOpen(true)}
+        onPointerDown={hasMultiple ? swipe.onPointerDown : undefined}
+        onPointerUp={hasMultiple ? swipe.onPointerUp : undefined}
+        onPointerCancel={hasMultiple ? swipe.onPointerCancel : undefined}
+        style={hasMultiple ? swipe.style : undefined}
+      >
         {currentImg && !brokenImages.has(currentImg) ? (
-          <img className="detail-hero__img" src={currentImg} alt={title} decoding="async" onError={() => setBrokenImages(prev => new Set(prev).add(currentImg))} />
+          <img className="detail-hero__img" src={currentImg} alt={title} decoding="async" draggable={false} onError={() => setBrokenImages(prev => new Set(prev).add(currentImg))} />
         ) : (
           <div className="detail-hero__img" style={{ background: imageFor(property) }} />
         )}
@@ -123,15 +135,22 @@ export default function PropertyDetail() {
         </div>
         {hasMultiple && (
           <>
+            {/* Desktop-only click nav — mobile relies on the swipe gesture above. */}
             <button className="detail-hero__nav prev" onClick={e => { e.stopPropagation(); setImgIdx(i => (i - 1 + images.length) % images.length) }} aria-label={t('common.previous')}><ChevronLeft size={18} /></button>
             <button className="detail-hero__nav next" onClick={e => { e.stopPropagation(); setImgIdx(i => (i + 1) % images.length) }} aria-label={t('common.next')}><ChevRight size={18} /></button>
           </>
         )}
-        <div className="detail-hero__dots">
-          {images.slice(0, 5).map((_, i) => (
-            <span key={i} className={`dot ${i === imgIdx ? 'active' : ''}`} />
-          ))}
-        </div>
+        {hasMultiple && (
+          images.length <= 8 ? (
+            <div className="detail-hero__dots">
+              {images.map((_, i) => (
+                <span key={i} className={`dot ${i === imgIdx ? 'active' : ''}`} />
+              ))}
+            </div>
+          ) : (
+            <div className="detail-hero__counter">{imgIdx + 1} / {images.length}</div>
+          )
+        )}
       </section>
 
       {lightboxOpen && images.length > 0 && (

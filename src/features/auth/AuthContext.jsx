@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState } from 'react'
 import i18n from '../../i18n/index.js'
 import { supabase } from '../../lib/supabase'
+import { classifyAuthEvent } from '../../lib/authEvents'
 
 const AuthContext = createContext(null)
 
@@ -12,6 +13,11 @@ export function AuthProvider({ children }) {
     loading: true,
   })
   const [welcomeName, setWelcomeName] = useState(null)
+  // True from the moment a password-recovery link's session lands until
+  // updatePassword() succeeds. While true, the UI shows the new-password
+  // form instead of the ordinary signed-in dashboard, even though the
+  // recovery session is itself a real, valid session.
+  const [passwordRecovery, setPasswordRecovery] = useState(false)
 
   const showWelcome = (user) => {
     if (!user) return
@@ -25,12 +31,20 @@ export function AuthProvider({ children }) {
   }
 
   const loadProfile = async (userId) => {
-    const { data } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', userId)
-      .single()
-    return data
+    try {
+      const { data } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single()
+      return data ?? null
+    } catch {
+      // A thrown exception here (network failure, not an RLS/API-level
+      // error, which already resolves to data:null without throwing) must
+      // never take the whole session down with it — the user stays
+      // authenticated with profile:null rather than stuck loading forever.
+      return null
+    }
   }
 
   // OAuth signups can't carry the role toggle through the provider redirect,
@@ -67,33 +81,56 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     let active = true
+    // Bumped on every auth event; an in-flight sync() only commits its
+    // result if it's still the most recent one when it resolves. Without
+    // this, a slow profile fetch started by an old event (e.g. the initial
+    // SIGNED_IN restore) can resolve *after* a subsequent SIGNED_OUT has
+    // already cleared state, and silently resurrect a signed-out user.
+    let generation = 0
 
-    const sync = async (session) => {
-      if (!active) return
+    const sync = async (session, myGeneration) => {
+      if (!active || myGeneration !== generation) return
       if (!session?.user) {
         setState({ user: null, session: null, profile: null, loading: false })
         return
       }
       let profile = await loadProfile(session.user.id)
       profile = await applyPendingRole(session.user, profile)
-      if (!active) return
+      if (!active || myGeneration !== generation) return
       setState({ user: session.user, session, profile, loading: false })
       if (profile) loadPreferredLanguage(profile)
     }
 
-    supabase.auth.getSession().then(({ data }) => sync(data.session))
-
+    // A single subscription drives both the initial-load hydration and
+    // every later event. supabase-js guarantees INITIAL_SESSION fires
+    // exactly once per subscriber right after the client's own startup
+    // work resolves — calling supabase.auth.getSession() separately here
+    // as well (as this used to) duplicated that same profile fetch on
+    // every cold load for no benefit.
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
-        if (event === 'SIGNED_IN' && session?.user) {
-          sync(session)
-          showWelcome(session.user)
-        } else if (event === 'TOKEN_REFRESHED' && session) {
-          sync(session)
-        } else if (event === 'SIGNED_OUT') {
+        generation += 1
+        const myGeneration = generation
+        const decision = classifyAuthEvent(event, session)
+
+        if ('passwordRecovery' in decision) setPasswordRecovery(decision.passwordRecovery)
+
+        if (decision.action === 'clear') {
           setState({ user: null, session: null, profile: null, loading: false })
-        } else if (event === 'INITIAL_SESSION') {
-          sync(session)
+        } else if (decision.action === 'sync' || decision.action === 'sync-welcome') {
+          sync(session, myGeneration)
+          if (decision.action === 'sync-welcome') {
+            // Only a genuine OAuth sign-in sets this flag right before the
+            // redirect (password/OTP call showWelcome directly on success
+            // instead) — a restored session replaying SIGNED_IN on page
+            // load never has it set, so it's a no-op there.
+            try {
+              if (sessionStorage.getItem('fho_pending_welcome')) {
+                sessionStorage.removeItem('fho_pending_welcome')
+                showWelcome(session.user)
+              }
+            } catch { /* ignore */ }
+          }
         }
       },
     )
@@ -184,6 +221,7 @@ export function AuthProvider({ children }) {
   }
 
   const signInWithProvider = async (provider) => {
+    try { sessionStorage.setItem('fho_pending_welcome', '1') } catch { /* ignore */ }
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
       options: {
@@ -205,6 +243,16 @@ export function AuthProvider({ children }) {
     return { error }
   }
 
+  // Completes the recovery flow the PASSWORD_RECOVERY branch above started.
+  // Only meaningful while passwordRecovery is true — the recovery link's own
+  // session is what authorizes this updateUser() call, same as any other
+  // authenticated request.
+  const updatePassword = async (newPassword) => {
+    const { error } = await supabase.auth.updateUser({ password: newPassword })
+    if (!error) setPasswordRecovery(false)
+    return { error }
+  }
+
   const signOut = async () => {
     await supabase.auth.signOut()
     setState({ user: null, session: null, profile: null, loading: false })
@@ -217,6 +265,8 @@ export function AuthProvider({ children }) {
     loading: state.loading,
     isClient: state.profile?.role === 'client' || state.profile?.role === 'buyer',
     isAgent: state.profile?.role === 'agent',
+    passwordRecovery,
+    updatePassword,
     welcomeName,
     clearWelcome: () => setWelcomeName(null),
     signUp,

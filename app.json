@@ -11,7 +11,10 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.shtepiaime.app",
-      "usesAppleSignIn": true
+      "usesAppleSignIn": true,
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "package": "com.shtepiaime.app",
@@ -22,7 +25,10 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "web": {
       "output": "static",
@@ -43,11 +49,23 @@
           }
         }
       ],
-      "expo-localization"
+      "expo-localization",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Shtëpia.ime needs access to your photos so you can add them to a listing."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "ed500f91-752b-49d7-a3f7-51fadaedce3b"
+      }
     }
   }
 }

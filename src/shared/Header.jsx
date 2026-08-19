@@ -11,14 +11,14 @@ import Avatar from './Avatar'
 import '../styles/header.css'
 
 const LANGUAGES = [
-  { code: 'sq', name: 'Shqip' },
-  { code: 'en', name: 'English' },
-  { code: 'de', name: 'Deutsch' },
-  { code: 'it', name: 'Italiano' },
-  { code: 'es', name: 'Español' },
-  { code: 'pl', name: 'Polski' },
-  { code: 'ru', name: 'Русский' },
-  { code: 'fr', name: 'Français' },
+  { code: 'sq', name: 'Shqip', flag: '🇦🇱' },
+  { code: 'en', name: 'English', flag: '🇬🇧' },
+  { code: 'de', name: 'Deutsch', flag: '🇩🇪' },
+  { code: 'it', name: 'Italiano', flag: '🇮🇹' },
+  { code: 'es', name: 'Español', flag: '🇪🇸' },
+  { code: 'pl', name: 'Polski', flag: '🇵🇱' },
+  { code: 'ru', name: 'Русский', flag: '🇷🇺' },
+  { code: 'fr', name: 'Français', flag: '🇫🇷' },
 ]
 
 export default function Header() {
@@ -76,7 +76,7 @@ export default function Header() {
       <div className="header-actions">
         <div className="lang-switcher" ref={langRef}>
           <button className="lang-btn" onClick={() => setLangOpen(!langOpen)}>
-            <span className="lang-code">{currentLang.code}</span>
+            <span className="lang-flag" aria-hidden="true">{currentLang.flag}</span>
             <span className="lang-label">{currentLang.name}</span>
             <ChevronDown size={14} className={`lang-chevron ${langOpen ? 'open' : ''}`} />
           </button>
@@ -84,7 +84,7 @@ export default function Header() {
             <div className="lang-dropdown">
               {LANGUAGES.map(lang => (
                 <button key={lang.code} className={`lang-option ${lang.code === i18n.language ? 'active' : ''}`} onClick={() => changeLanguage(lang.code)}>
-                  <span className="lang-code">{lang.code}</span>
+                  <span className="lang-flag" aria-hidden="true">{lang.flag}</span>
                   <span>{lang.name}</span>
                 </button>
               ))}

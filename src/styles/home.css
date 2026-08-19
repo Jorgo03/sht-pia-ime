@@ -297,48 +297,6 @@
   gap: 3px;
 }
 
-/* Neighborhood grid */
-
-.neighborhood-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  padding: 0 1.25rem 24px;
-}
-
-.neighborhood-card {
-  padding: 18px 16px;
-  border-radius: var(--r-lg);
-  cursor: pointer;
-  transition: transform 150ms var(--ease-out);
-  position: relative;
-}
-
-.neighborhood-card:active { transform: scale(0.98); }
-
-.neighborhood-name {
-  display: block;
-  font-family: var(--font-serif);
-  font-size: 16px;
-  font-weight: 500;
-  color: var(--fho-text);
-  margin-bottom: 2px;
-}
-
-.neighborhood-sub {
-  display: block;
-  font-size: 12px;
-  color: var(--fho-text-muted);
-  margin-bottom: 10px;
-}
-
-.neighborhood-count {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.05em;
-}
-
 /* Mini card (legacy grid fallback) */
 
 .mini-card {
