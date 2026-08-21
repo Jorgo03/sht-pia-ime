@@ -15,6 +15,20 @@ import { Platform } from 'react-native';
 import { signInWithAppleNative } from '@/lib/apple-auth';
 import { supabase } from '@/lib/supabase';
 
+// Dev-only OAuth tracing (Metro console). Never logs token/credential
+// values — only the shape of what happened (redirect URI, whether a code
+// came back, exchange success). Confirmed live: Supabase's /authorize
+// endpoint 302s straight to Google for web, the native shtepia-ime://
+// scheme, AND an exp://<lan-ip>:8081/--/... Expo Go URL alike — it does not
+// reject an unrecognized redirect_to upfront. So a redirect failure, if
+// that's the cause, only surfaces after Google hands control back to
+// Supabase's own callback — a step this app can only observe from here,
+// not simulate, hence this trace instead of a guessed fix.
+function oauthDebug(label: string, data?: Record<string, unknown>) {
+  if (!__DEV__) return;
+  console.log(`[oauth] ${label}`, data ?? '');
+}
+
 type Role = 'buyer' | 'agent';
 
 interface SignUpOptions {
@@ -206,7 +220,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return { error: error as Error | null };
     }
 
+    // Stable across builds (Linking.createURL adapts automatically): a real
+    // dev-client/production build gets the app.json `scheme` — shtepia-ime://
+    // auth/callback — while Expo Go can't open that scheme back into itself,
+    // so it substitutes its own LAN proxy address instead
+    // (exp://<lan-ip>:8081/--/auth/callback), which changes whenever the
+    // dev machine's IP does. Both need their own entry in Supabase's
+    // Authentication → URL Configuration → Redirect URLs allow-list —
+    // shtepia-ime://auth/callback for the former, and a wildcard host/port
+    // (e.g. exp://*/--/auth/callback) for the latter, since the exact IP
+    // can't be pinned in advance. This file can't read or write that
+    // Dashboard config, so a rejection there is invisible to the app beyond
+    // the browser session never completing — see oauthDebug below.
     const redirectTo = Linking.createURL('auth/callback');
+    oauthDebug('starting', { platform: Platform.OS, provider, redirectTo });
 
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider,
@@ -216,31 +243,52 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       },
     });
 
-    if (error) return { error: error as Error | null };
+    if (error) {
+      oauthDebug('signInWithOAuth rejected before opening browser', { message: error.message });
+      return { error: error as Error | null };
+    }
 
     const result = await WebBrowser.openAuthSessionAsync(
       data.url,
       redirectTo,
     );
+    oauthDebug('browser session ended', { type: result.type });
 
     if (result.type !== 'success') {
-      return { error: new Error('Authentication was cancelled or the provider is not configured') };
+      // The session ended without ever handing back a URL matching
+      // redirectTo's scheme. This is genuinely ambiguous from this API
+      // alone: the user tapping Cancel and Supabase's callback rejecting an
+      // unlisted redirect_to (its own error page never matches our scheme,
+      // so the OS has nothing to capture) look identical here. Treated as a
+      // plain cancellation — no alarming error for what's usually a real
+      // cancel — but the trace above still records it for a dev to
+      // correlate against the Supabase Auth Logs timestamp if it wasn't.
+      return { error: null };
     }
 
     const url = new URL(result.url);
     const code = url.searchParams.get('code');
+    const oauthError = url.searchParams.get('error');
     const errorDescription = url.searchParams.get('error_description');
+    oauthDebug('callback received', { hasCode: !!code, oauthError, errorDescription });
+
+    if (oauthError) {
+      // Reuses friendlyAuthError's existing 'provider is not enabled' /
+      // 'Unsupported provider' matches (profile.tsx) — no new copy needed.
+      return { error: new Error(errorDescription || oauthError) };
+    }
 
     if (!code) {
       return {
         error: new Error(
-          errorDescription ?? 'No authorization code received — check that the provider is enabled in Supabase Dashboard',
+          'No authorization code received — check that the provider is enabled in Supabase Dashboard',
         ),
       };
     }
 
     const { error: exchangeError } =
       await supabase.auth.exchangeCodeForSession(code);
+    oauthDebug('session exchange', { success: !exchangeError, message: exchangeError?.message });
 
     return { error: exchangeError as Error | null };
   };
