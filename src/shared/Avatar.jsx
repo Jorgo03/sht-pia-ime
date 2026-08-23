@@ -22,6 +22,8 @@ export default function Avatar({ src, name, email, size = 36, className = '' }) 
           src={src}
           alt=""
           className="h-full w-full object-cover"
+          loading="lazy"
+          decoding="async"
           onError={() => setImgError(true)}
         />
       ) : initial ? (

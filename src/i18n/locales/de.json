@@ -84,14 +84,14 @@
     "greetingMorning": "Guten Morgen",
     "greetingAfternoon": "Guten Tag",
     "greetingEvening": "Guten Abend",
-    "matchesToday": "{{count}} neue Treffer heute.",
+    "matchesToday_one": "{{count}} neuer Treffer heute.",
+    "matchesToday_other": "{{count}} neue Treffer heute.",
     "featured": "Diese Woche empfohlen",
     "editorsPick": "REDAKTIONSTIPP",
     "matched": "Passend zu Ihrem Geschmack",
     "seeAll": "Alle anzeigen →",
     "searchPlaceholder": "Stadt, Stadtteil, PLZ...",
-    "country": "Albanien",
-    "homesCount": "{{count}} Immobilien"
+    "country": "Albanien"
   },
   "search": {
     "title": "Immobilien suchen",
@@ -135,7 +135,8 @@
     "sortedByRelevance": "Nach Relevanz sortiert",
     "mapView": "Kartenansicht",
     "filtersTitle": "Filter",
-    "showHomes": "{{count}} Immobilien anzeigen",
+    "showHomes_one": "{{count}} Immobilie anzeigen",
+    "showHomes_other": "{{count}} Immobilien anzeigen",
     "aiPlaceholder": "Versuch: Wohnung mit 2 Zimmern in Tirana unter 100.000 €",
     "aiButton": "Intelligente Suche",
     "aiApplied": "Filter aus deiner Suche übernommen",
@@ -163,7 +164,8 @@
     "loginPrompt": "Melde dich an, um deine Favoriten zu sehen",
     "loginCta": "Anmelden",
     "remove": "Entfernen",
-    "savedCount": "{{count}} gespeichert · für dich sortiert",
+    "savedCount_one": "{{count}} gespeichert · für dich sortiert",
+    "savedCount_other": "{{count}} gespeichert · für dich sortiert",
     "headlineEm": "Favoritenliste",
     "backToProfile": "← Zurück zum Profil",
     "kicker": "FAVORITEN",
@@ -205,7 +207,8 @@
     "subtitle": "Gespräche mit Maklern",
     "comingSoon": "WhatsApp-Chat — demnächst",
     "client": {
-      "kicker": "{{count}} Gespräche · {{unread}} ungelesen",
+      "kicker_one": "{{count}} Gespräch · {{unread}} ungelesen",
+      "kicker_other": "{{count}} Gespräche · {{unread}} ungelesen",
       "headlineEm": "mit Maklern",
       "headlinePre": "Nachrichten"
     },

@@ -33,12 +33,10 @@ test('every locale file is valid JSON with a non-empty top level', () => {
   }
 })
 
-// Scoped to this task's actual changes rather than a repo-wide "every key
-// matches" sweep — that broader check surfaced two real but unrelated
-// pre-existing gaps (missing home.* keys in pl.json, an empty string in
-// sq.json's favourites.headlinePre) that predate this change and belong to
-// screens outside auth. Flagged separately rather than fixed here or left
-// silently failing this PR's test run for an out-of-scope reason.
+// Repo-wide keyset parity lives in localePlurals.test.mjs, which compares on
+// suffix-stripped base keys — plural categories legitimately differ per
+// language (pl carries _few, en does not), so a naive identical-keyset check
+// would fail by design.
 test('the new password-recovery keys exist in every locale', () => {
   const required = ['auth.recoveryTitle', 'auth.recoverySubtitle', 'auth.newPassword', 'auth.updatePassword', 'auth.recoverySuccess']
   for (const lang of LANGS) {
@@ -66,4 +64,18 @@ test('none of the auth/errors keys touched by this change are empty strings', ()
       }
     }
   }
+})
+
+test('no locale string is empty anywhere', () => {
+  // An empty value is not a harmless no-op: these files feed two-part
+  // headlines rendered as `{pre} <em>{em}</em>`, and React Native (unlike
+  // HTML) does not collapse the literal space between them — sq's empty
+  // favourites.headlinePre shipped a stray leading space on mobile.
+  const empties = []
+  for (const lang of LANGS) {
+    for (const [key, value] of flattenKeys(locales[lang]).map((k) => [k, k.split('.').reduce((o, p) => o?.[p], locales[lang])])) {
+      if (typeof value === 'string' && value.trim() === '') empties.push(`${lang}.json: "${key}"`)
+    }
+  }
+  assert.deepEqual(empties, [], `\n${empties.join('\n')}\n`)
 })

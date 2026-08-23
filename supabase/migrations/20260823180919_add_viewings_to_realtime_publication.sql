@@ -1,0 +1,16 @@
+-- The viewings notification bell (useUpcomingViewings) refreshed itself on a
+-- 5-minute setInterval, which violates the project's non-negotiable Supabase
+-- rule: "no polling, use realtime subscriptions or one-shot fetches".
+--
+-- Converting that hook to postgres_changes requires the table to actually be
+-- in the publication first. Verified live before this migration: the
+-- supabase_realtime publication contained only `conversations` and `messages`
+-- (both added by 20260702_tighten_properties_select_fix_signup_trigger.sql),
+-- so a subscription on `viewings` would have silently received nothing and
+-- the bell would have stopped updating entirely — worse than the poll.
+--
+-- Safe to publish: public.viewings has RLS enabled with a "Participants view
+-- viewings" SELECT policy scoping rows to client_id, agent_id, or the
+-- property's owner/agent. Realtime applies that same policy per subscriber,
+-- so this exposes nothing a participant could not already SELECT.
+alter publication supabase_realtime add table public.viewings;

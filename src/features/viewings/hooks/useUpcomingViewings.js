@@ -15,7 +15,12 @@ function readSeenAt() {
 
 // Upcoming viewings for the header bell: anything requested/confirmed in the
 // next 48h where the user is a participant (RLS scopes rows — no explicit
-// user filter needed). Refreshed on mount and every 5 minutes.
+// user filter needed). Fetched once on mount, then kept current by a realtime
+// subscription rather than a timer — the project's Supabase rules rule out
+// polling, and this previously re-ran the query every 5 minutes for the whole
+// session. public.viewings had to be added to the supabase_realtime
+// publication for this to fire at all (migration 20260823180919); it was
+// absent, which is why the poll existed.
 //
 // Unread is tracked client-side against a "last opened the bell" timestamp
 // in localStorage rather than a DB column: there is no notifications table,
@@ -46,8 +51,14 @@ export function useUpcomingViewings() {
     }
 
     load()
-    const id = setInterval(load, 5 * 60 * 1000)
-    return () => { active = false; clearInterval(id) }
+    // Channel name is per-user so two sessions in one browser profile can't
+    // collide on a shared topic, matching useUnreadCount's 'unread-nav'.
+    const channel = supabase
+      .channel(`viewings-bell-${user.id}`)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'viewings' }, load)
+      .subscribe()
+
+    return () => { active = false; supabase.removeChannel(channel) }
   }, [user?.id])
 
   // Anything created since the last time the bell was opened counts as

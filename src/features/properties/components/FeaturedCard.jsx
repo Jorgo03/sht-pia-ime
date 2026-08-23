@@ -34,7 +34,7 @@ function FeaturedCard({ property }) {
     <div className="featured-card" role="button" tabIndex={0} onClick={open} onKeyDown={keyOpen}>
       <div className="featured-card__img">
         {hasImage ? (
-          <img className="featured-card__img-bg" src={property.image_urls[0]} alt={title} decoding="async" onError={() => setImgBroken(true)} />
+          <img className="featured-card__img-bg" src={property.image_urls[0]} alt={title} loading="lazy" decoding="async" onError={() => setImgBroken(true)} />
         ) : (
           <div className="featured-card__img-placeholder" style={{ background: imageFor(property) }} />
         )}

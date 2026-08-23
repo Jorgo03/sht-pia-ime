@@ -136,14 +136,14 @@
     "greetingMorning": "Good morning",
     "greetingAfternoon": "Good afternoon",
     "greetingEvening": "Good evening",
-    "matchesToday": "{{count}} new matches today.",
+    "matchesToday_one": "{{count}} new match today.",
+    "matchesToday_other": "{{count}} new matches today.",
     "featured": "Featured this week",
     "editorsPick": "Editor's pick",
     "matched": "Matched to your taste",
     "seeAll": "See all →",
     "searchPlaceholder": "City, neighborhood, postcode…",
-    "country": "Albania",
-    "homesCount": "{{count}} homes"
+    "country": "Albania"
   },
   "search": {
     "title": "Search properties",
@@ -187,7 +187,8 @@
     "sortedByRelevance": "Sorted by relevance",
     "mapView": "Map view",
     "filtersTitle": "Filters",
-    "showHomes": "Show {{count}} homes",
+    "showHomes_one": "Show {{count}} home",
+    "showHomes_other": "Show {{count}} homes",
     "aiPlaceholder": "Try: apartament me 2 dhoma në Tiranë nën 100,000 €",
     "aiButton": "Smart search",
     "aiApplied": "Filters applied from your search",
@@ -225,7 +226,8 @@
   "favourites": {
     "title": "Favorites",
     "subtitle": "Properties you saved",
-    "savedCount": "{{count}} saved · organized for you",
+    "savedCount_one": "{{count}} saved · organized for you",
+    "savedCount_other": "{{count}} saved · organized for you",
     "headlineEm": "shortlist",
     "backToProfile": "← Back to profile",
     "empty": "No favorites yet. Tap the heart icon on a property to save it.",
@@ -240,7 +242,8 @@
     "subtitle": "Conversations with agents",
     "comingSoon": "WhatsApp chat — coming soon",
     "client": {
-      "kicker": "{{count}} conversations · {{unread}} unread",
+      "kicker_one": "{{count}} conversation · {{unread}} unread",
+      "kicker_other": "{{count}} conversations · {{unread}} unread",
       "headlineEm": "with agents",
       "headlinePre": "Messages"
     },

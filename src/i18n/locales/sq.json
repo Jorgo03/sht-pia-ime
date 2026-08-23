@@ -84,14 +84,14 @@
     "greetingMorning": "Mirëmëngjes",
     "greetingAfternoon": "Mirëdita",
     "greetingEvening": "Mirëmbrëma",
-    "matchesToday": "{{count}} përputhje të reja sot.",
+    "matchesToday_one": "{{count}} përputhje e re sot.",
+    "matchesToday_other": "{{count}} përputhje të reja sot.",
     "featured": "Të zgjedhura këtë javë",
     "editorsPick": "ZGJEDHJA E REDAKSISË",
     "matched": "Sipas shijes suaj",
     "seeAll": "Shiko të gjitha →",
     "searchPlaceholder": "Qytet, lagje, kod postar...",
-    "country": "Shqipëri",
-    "homesCount": "{{count}} prona"
+    "country": "Shqipëri"
   },
   "search": {
     "title": "Kërko pronë",
@@ -135,7 +135,8 @@
     "sortedByRelevance": "Renditur sipas rëndësisë",
     "mapView": "Pamja e hartës",
     "filtersTitle": "Filtrat",
-    "showHomes": "Shfaq {{count}} prona",
+    "showHomes_one": "Shfaq {{count}} pronë",
+    "showHomes_other": "Shfaq {{count}} prona",
     "aiPlaceholder": "Provo: apartament me 2 dhoma në Tiranë nën 100,000 €",
     "aiButton": "Kërkim i zgjuar",
     "aiApplied": "Filtrat u vendosën nga kërkimi yt",
@@ -163,11 +164,12 @@
     "loginPrompt": "Hyr në llogari për të parë të preferuarat",
     "loginCta": "Hyr në llogari",
     "remove": "Hiq",
-    "savedCount": "{{count}} të ruajtura · të organizuara për ty",
-    "headlineEm": "Lista jote",
+    "savedCount_one": "{{count}} e ruajtur · e organizuar për ty",
+    "savedCount_other": "{{count}} të ruajtura · të organizuara për ty",
+    "headlineEm": "jote",
     "backToProfile": "← Kthehu te profili",
     "kicker": "TË PREFERUARAT",
-    "headlinePre": ""
+    "headlinePre": "Lista"
   },
   "property": {
     "beds": "dhoma",
@@ -205,7 +207,8 @@
     "subtitle": "Bisedat me agjentët",
     "comingSoon": "Chat me WhatsApp — së shpejti",
     "client": {
-      "kicker": "{{count}} biseda · {{unread}} pa lexuar",
+      "kicker_one": "{{count}} bisedë · {{unread}} pa lexuar",
+      "kicker_other": "{{count}} biseda · {{unread}} pa lexuar",
       "headlineEm": "me agjentët",
       "headlinePre": "Mesazhet"
     },

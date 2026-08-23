@@ -186,7 +186,11 @@ export function MapScreenContent() {
             <ActivityIndicator size="small" color={colors.accent} />
           ) : (
             <Text style={styles.count}>
-              {t('search.results_other', { count: properties.length })}
+              {/* Base key, not the `_other` variant — naming a plural suffix
+                  directly bypasses i18next's plural resolution, so a single
+                  result rendered as "1 properties" and Slavic locales never
+                  reached their `few`/`many` forms. */}
+              {t('search.results', { count: properties.length })}
               {properties.length === MAP_MARKER_LIMIT ? '+' : ''}
             </Text>
           )}
