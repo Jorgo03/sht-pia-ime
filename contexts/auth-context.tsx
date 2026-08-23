@@ -16,6 +16,15 @@ import Constants, { ExecutionEnvironment } from 'expo-constants';
 
 import { signInWithAppleNative } from '@/lib/apple-auth';
 import { supabase } from '@/lib/supabase';
+// Same classifier the web AuthContext uses, imported rather than re-written:
+// it is a pure function with no imports of its own, so it costs the mobile
+// bundle nothing, and a mirrored copy would be free to drift. Mobile already
+// reaches into src/ this way for the shared locale JSON (see i18n/index.ts).
+// Its 8 unit tests in tests/authEvents.test.mjs now cover both apps.
+import { classifyAuthEvent } from '../src/lib/authEvents.js';
+
+/** If no auth event has arrived by now, stop blocking the splash screen. */
+const AUTH_INIT_TIMEOUT_MS = 8000;
 
 /**
  * True inside Expo Go (as opposed to a dev-client or store build).
@@ -143,9 +152,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     let active = true;
+    // Bumped on every auth event; an in-flight sync() only commits if it is
+    // still the most recent when it resolves. Without this, a slow profile
+    // fetch started by an earlier event can land *after* a later SIGNED_OUT
+    // has cleared state and silently resurrect a signed-out user. Web's
+    // AuthContext has carried this guard for a while; mobile did not.
+    let generation = 0;
 
-    const sync = async (s: Session | null) => {
-      if (!active) return;
+    const sync = async (s: Session | null, myGeneration: number) => {
+      if (!active || myGeneration !== generation) return;
       if (!s?.user) {
         setSession(null);
         setProfile(null);
@@ -154,36 +169,50 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
       let p = await loadProfile(s.user.id);
       p = await applyPendingRole(s.user, p);
-      if (!active) return;
+      if (!active || myGeneration !== generation) return;
       setSession(s);
       setProfile(p);
       setLoading(false);
     };
 
-    supabase.auth
-      .getSession()
-      .then(({ data: { session: s } }) => sync(s))
-      .catch((err) => {
-        // getSession() can reject on a genuine network failure (it may hit
-        // the network to refresh an expired token) — on a bad connection
-        // that's not a hypothetical. Without this catch, `loading` would
-        // never flip to false and the app would sit behind the splash
-        // screen forever, since AppGate (app/_layout.tsx) now waits on it.
-        // Degrade to signed-out rather than hang.
-        console.error('Session restore failed, continuing signed-out:', err);
-        if (!active) return;
+    // A single subscription drives both initial hydration and every later
+    // event: supabase-js fires INITIAL_SESSION exactly once per subscriber
+    // after its own startup work resolves. This previously *also* called
+    // getSession() separately, so a cold start ran two concurrent profile
+    // fetches racing each other — and, because applyPendingRole consumes the
+    // one-shot `fho_pending_role` key, which of the two saw it was undefined.
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, s) => {
+      generation += 1;
+      const myGeneration = generation;
+      const decision = classifyAuthEvent(event, s);
+
+      if (decision.action === 'clear') {
         setSession(null);
         setProfile(null);
         setLoading(false);
-      });
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, s) => {
-      sync(s);
+      } else if (decision.action === 'sync' || decision.action === 'sync-welcome') {
+        // 'sync-welcome' is web's toast case; mobile has no welcome toast, so
+        // both land here. TOKEN_REFRESHED with no session is a no-op, which
+        // stops the hourly refresh from re-fetching the profile for nothing.
+        sync(s, myGeneration);
+      }
     });
 
+    // Belt-and-braces for the case the removed getSession().catch() covered:
+    // AppGate (app/_layout.tsx) holds the splash screen until `loading` is
+    // false, so if INITIAL_SESSION never arrives — a wedged socket on a bad
+    // connection — the app would sit behind the splash indefinitely. Degrade
+    // to signed-out instead of hanging. Cleared as soon as any event lands.
+    const initTimeout = setTimeout(() => {
+      if (!active || generation > 0) return;
+      console.warn('No auth event within %dms; continuing signed-out.', AUTH_INIT_TIMEOUT_MS);
+      setLoading(false);
+    }, AUTH_INIT_TIMEOUT_MS);
+
     return () => {
+      clearTimeout(initTimeout);
       active = false;
       subscription.unsubscribe();
     };

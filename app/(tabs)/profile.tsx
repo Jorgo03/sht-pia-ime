@@ -121,6 +121,13 @@ export default function ProfileScreen() {
   const [otpStep, setOtpStep] = useState(false);
   const [otpCode, setOtpCode] = useState('');
   const [otpVerifying, setOtpVerifying] = useState(false);
+  // Which kind of code the entry step is currently collecting. Supabase
+  // rejects a verify whose `type` does not match how the code was issued, so
+  // a password signup's confirmation code must be verified as 'signup', not
+  // 'email'. This was hardcoded to 'email', which left email+password signup
+  // a dead end on mobile: the confirmation code arrived with nowhere in the
+  // app to enter it. Mirrors web's Profile.jsx `otpType`.
+  const [otpType, setOtpType] = useState<'email' | 'signup'>('email');
   // Reddens the six boxes together after a rejected code, cleared on the next
   // keystroke — same signal web gives via `.otp-digit.error`.
   const [otpError, setOtpError] = useState(false);
@@ -203,6 +210,14 @@ export default function ProfileScreen() {
       if (error) {
         Alert.alert(t('common.error'), friendlyAuthError(error, t));
       } else {
+        // Straight to code entry, same as web: the confirmation email carries
+        // a 6-digit code, and previously this only showed an alert and left
+        // the user on the signup form with no way to enter it.
+        setOtpType('signup');
+        setOtpCode('');
+        setOtpError(false);
+        setCooldown(RESEND_COOLDOWN_S);
+        setOtpStep(true);
         Alert.alert('OK', t('auth.checkEmail'));
       }
     } else {
@@ -238,6 +253,7 @@ export default function ProfileScreen() {
       Alert.alert(t('common.error'), friendlyAuthError(error, t));
       return;
     }
+    setOtpType('email');
     setOtpCode('');
     setOtpError(false);
     setCooldown(RESEND_COOLDOWN_S);
@@ -251,7 +267,7 @@ export default function ProfileScreen() {
   const handleResendOtp = async () => {
     if (cooldown > 0 || otpSending) return;
     setOtpSending(true);
-    const { error } = await resendCode(email, 'email');
+    const { error } = await resendCode(email, otpType);
     setOtpSending(false);
     if (error) {
       Alert.alert(t('common.error'), friendlyAuthError(error, t));
@@ -266,7 +282,7 @@ export default function ProfileScreen() {
   const handleVerifyOtp = async (code: string) => {
     if (code.length < OTP_LENGTH) return;
     setOtpVerifying(true);
-    const { error } = await verifyOtp(email, code, 'email');
+    const { error } = await verifyOtp(email, code, otpType);
     setOtpVerifying(false);
     if (error) {
       Alert.alert(t('common.error'), friendlyAuthError(error, t));

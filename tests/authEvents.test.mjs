@@ -6,6 +6,10 @@
 // event-routing *decision* it acts on is this pure function, extracted
 // specifically so it's testable without a live Supabase client or a
 // React render.
+//
+// Covers BOTH apps: contexts/auth-context.tsx (mobile) imports this same
+// module rather than mirroring it, so these cases guard the mobile auth
+// state machine too.
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { classifyAuthEvent } from '../src/lib/authEvents.js'
