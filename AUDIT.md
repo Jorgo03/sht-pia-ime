@@ -1,5 +1,77 @@
 # Pre-Launch Audit — Shtëpia.ime (Vite web app)
 
+## ═══ PASS 9 — 2026-08-22: FULL-APP AUDIT (i18n, crash safety, realtime) ═══
+
+Whole-application sweep, both apps. Everything below was reproduced before
+being changed, and every fix re-verified afterwards — the new tests were each
+run against the *un*fixed code first to confirm they actually fail.
+
+### Corrects an earlier mistaken finding
+
+Pass 7's notes recorded "missing `home.*` keys in `pl.json`" as an unrelated
+locale gap. That reading was backwards. `pl.json`/`ru.json` were the only two
+files that were **correct**: they carried the `_one`/`_few`/`_many` categories
+Polish and Russian require. The other six locales were the broken ones — they
+had a single bare key and no plural variants at all.
+
+### Fixed
+
+| Sev | Problem | Fix |
+|---|---|---|
+| P2 | `search.results` had no `_few`/`_many` in pl/ru, so those counts fell through `fallbackLng: 'sq'` and rendered **Albanian** ("5 prona") to Polish and Russian users | Added the missing categories to both locales |
+| P2 | `components/map/map-screen-content.tsx` called `t('search.results_other', {count})` — naming a plural suffix pins one category regardless of count and never reaches `few`/`many` | Switched to the base key. Note the two are coupled: fixing only this would have *surfaced* the Albanian fallback above |
+| P2 | No React error boundary anywhere in the web app — any uncaught render error unmounted the tree to a blank white page | `src/shared/ErrorBoundary.jsx`, wired in `main.jsx`. Verified with a real injected render throw |
+| P2 | Mobile relied on expo-router's built-in fallback, which renders `Error: {error.message}` with no `__DEV__` guard — raw internal error text shown to production users, in English | `components/ui/error-boundary.tsx`, exported as `ErrorBoundary` from `app/_layout.tsx` |
+| P2 | `useUpcomingViewings` polled every 5 min, against the repo's own "no polling" rule | Converted to `postgres_changes`. **`public.viewings` was not in the `supabase_realtime` publication** — a naive conversion would have silently killed the bell, so migration `20260823180919` adds it first |
+| P2 | `lib/supabase.ts` used `!` non-null assertions on env vars, so a missing value surfaced as an opaque failure inside supabase-js | Explicit check naming both vars, matching what `src/lib/supabase.js` already did |
+| P3 | `home.matchesToday`, `favourites.savedCount`, `messages.client.kicker`, `search.showHomes` had no plural forms → "1 new matches today.", "Show 1 homes" | Plural categories added per language, read from i18next's own `pluralResolver` rather than hardcoded |
+| P3 | `search.homesInView` and `property.beds`/`baths` — same bug in a shape the first sweep missed: the number is a separate styled node, so the string never contains `{{count}}` → "1 homes in view", "1 beds" | `count` still selects the category. `beds`/`baths` also double as **form labels**, so they got separate `bedsCount`/`bathsCount` keys rather than being converted in place |
+| P3 | `sq.favourites.headlinePre` was the only empty string across all 8 locales; RN does not collapse the literal space in `{pre} <em>{em}</em>`, so Albanian shipped a stray leading space | Split "Lista jote" into `Lista` + `jote` |
+| P3 | `FeaturedCard`/`Avatar` images missing `loading="lazy"`/`decoding="async"` that `PropertyCard` already set | Added |
+| P3 | `home.homesCount` — zero references repo-wide | Removed (recoverable from git) |
+
+### New regression tests (`tests/localePlurals.test.mjs`, +`localeSync.test.mjs`)
+
+Required plural categories per language · no cross-language fallback at
+runtime · no `t()` call naming a plural suffix · base-keyset parity with
+suffixes normalised · no empty string in any locale. Each was confirmed to
+fail against the pre-fix code.
+
+### Checked and found sound (no action)
+
+`ai_usage` RLS-with-no-policy is correct — it is written only by Edge
+Functions via the service role, which bypasses RLS · no secrets in client
+code (Edge Functions read `SUPABASE_SERVICE_ROLE_KEY` from `Deno.env`) ·
+only `.env.example` is tracked · the two remaining `setInterval`s are OTP
+resend countdowns, not polling · empty `catch {}` blocks are legitimate
+`localStorage` guards · `PropertyCard`/`FeaturedCard` are `React.memo`'d ·
+auth guards redirect correctly and `/404` renders · zero console errors on
+load · the `zona`/`id-referenca` TODOs are honest, documented blockers on a
+missing `zone` column, and the UI correctly does not offer a dead control.
+
+### Verification
+
+`npm test` 43/43 · `npx tsc --noEmit` clean · `npm run build` clean ·
+`npm run lint` 0 errors / 16 pre-existing warnings (unchanged) ·
+`npx expo-doctor` 17/18 (the one known app.json-vs-prebuild drift) ·
+Metro bundle HTTP 200 on both `ios` and `android` · live browser: plural
+output confirmed through the app's real i18n instance in 6 languages, and
+the crash screen confirmed rendering localised in both English and Albanian.
+
+### Not fixed, deliberately
+
+- `messages.agent.kicker` interpolates **two** quantities (`{{leads}}`,
+  `{{newToday}}`); i18next can only pluralise on one, so "1 active leads"
+  remains. Needs a copy rewrite, not a code fix.
+- `app/listing/create.tsx` (1136 lines) is unreachable by navigation — only
+  `listing/new.tsx` is linked — but it is still registered in `_layout.tsx`
+  and its own comments say it is deliberately retained. Flagged, not deleted.
+- Unindexed FKs / unused indexes from the performance advisor: the unused
+  ones simply reflect low traffic, and a prior migration deliberately indexed
+  only *verified* query patterns. Removing or adding blindly would be worse.
+- Root-level `test-*.cjs` / `test-*.png` scratch files are untracked; deleting
+  untracked files is unrecoverable, so they were left alone.
+
 ## ═══ PASS 8 — 2026-08-19: EXPO SDK 54 → 57 UPGRADE — REVERTED ═══
 
 Attempted to fix "app stuck on Expo, wants an update" by upgrading SDK 54 →

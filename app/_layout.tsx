@@ -39,6 +39,12 @@ export const unstable_settings = {
   anchor: '(tabs)',
 };
 
+// expo-router picks up a named `ErrorBoundary` export from a route and wraps
+// that route in it. Without this, its built-in fallback renders
+// `Error: {error.message}` with no __DEV__ guard — raw internal error text,
+// in English, shown to production users. Mirrors web's src/shared/ErrorBoundary.
+export { AppErrorBoundary as ErrorBoundary } from '@/components/ui/error-boundary';
+
 // Keeps the native splash screen up until fonts are ready, below. Guarded
 // because Fast Refresh can re-run this module-scope call more than once in
 // dev, which throws "already prevented" — a known-benign duplicate-call

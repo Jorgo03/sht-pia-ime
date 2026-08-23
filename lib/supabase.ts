@@ -1,8 +1,22 @@
 import { createClient } from '@supabase/supabase-js';
 import { Platform } from 'react-native';
 
-const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL!;
-const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY!;
+const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
+const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
+
+// These were non-null assertions, which only silence the type checker — at
+// runtime a missing value reached createClient() and surfaced as an opaque
+// failure from inside supabase-js, far from the actual cause. The web client
+// (src/lib/supabase.js) already fails loudly and by name; this matches it.
+// EXPO_PUBLIC_ is the prefix that makes the value reach the bundle at all, so
+// a var set without it is silently undefined here — worth naming explicitly.
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error(
+    'Missing Supabase env vars (EXPO_PUBLIC_SUPABASE_URL / EXPO_PUBLIC_SUPABASE_ANON_KEY). ' +
+      'Copy .env.example to .env and fill both in, then restart Metro with a cleared cache ' +
+      '(npx expo start --clear) — the bundler inlines these at build time.',
+  );
+}
 
 const isSSR = typeof window === 'undefined';
 
