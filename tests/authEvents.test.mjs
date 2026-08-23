@@ -54,6 +54,16 @@ test('TOKEN_REFRESHED with no session is a no-op', () => {
   assert.deepEqual(classifyAuthEvent('TOKEN_REFRESHED', null), { action: 'none' })
 })
 
+test('USER_UPDATED syncs so the rotated session/user replaces the superseded one', () => {
+  // updateUser() (password change) rotates tokens; leaving this unhandled
+  // kept a stale session object in context.
+  assert.equal(classifyAuthEvent('USER_UPDATED', session).action, 'sync')
+})
+
+test('USER_UPDATED with no session is a no-op rather than clearing state', () => {
+  assert.deepEqual(classifyAuthEvent('USER_UPDATED', null), { action: 'none' })
+})
+
 test('SIGNED_OUT clears state and turns off recovery mode, regardless of any session argument', () => {
   assert.deepEqual(classifyAuthEvent('SIGNED_OUT', session), { action: 'clear', passwordRecovery: false })
   assert.deepEqual(classifyAuthEvent('SIGNED_OUT', null), { action: 'clear', passwordRecovery: false })

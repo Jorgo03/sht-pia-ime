@@ -1,5 +1,49 @@
 # Pre-Launch Audit — Shtëpia.ime (Vite web app)
 
+## ═══ PASS 10 — 2026-08-22: AUTH RE-AUDIT (logout races, event coverage) ═══
+
+Follow-up to Pass 9, scoped to authentication. The database foundation and
+the mobile fixes from the previous pass were re-checked and left alone.
+
+### `npx tsc --noEmit` does NOT cover the web app — use `npm run lint`
+
+Worth correcting, because several earlier passes (including Pass 9) reported
+"tsc clean" as though it validated both apps. `tsconfig.json`'s `include` is
+`**/*.ts` / `**/*.tsx` only, and the entire Vite app is `.jsx`. Proven
+empirically: deleting `useRef` from `AuthContext.jsx`'s import left
+`tsc --noEmit` completely silent, while `npm run lint` failed with
+`'useRef' is not defined  no-undef`.
+
+**`tsc` gates mobile. `npm run lint` gates web. Both must be run.**
+
+### Fixed
+
+| Sev | Problem | Fix |
+|---|---|---|
+| P2 | **Logout could resurrect the signed-out user, in both apps.** `generation` lived inside the auth `useEffect` closure, so `signOut()` could not bump it. A profile fetch already in flight still matched the current generation and committed on top of the cleared state — the user reappeared until `SIGNED_OUT` arrived and cleared it a second time | `generation` is now a `useRef` at component scope; `signOut()` bumps it *before* clearing, invalidating in-flight work |
+| P2 | Mobile `signOut()` cleared state **only** via the `SIGNED_OUT` event, unlike web which also cleared directly | Clears synchronously as well, so sign-out no longer depends on event delivery |
+| P3 | Both apps discarded `signOut()`'s error entirely | Returned to the caller. The local session is dropped regardless, so callers surface it without blocking |
+| P3 | `USER_UPDATED` was unhandled by the shared classifier, so after `updateUser()` (password change, which rotates tokens) the context kept the superseded session object | Classified as `sync`. No call site reads `session.access_token` directly — everything goes through the supabase client, which tracks the new token itself — so nothing was breaking today, but it would the moment an email change is added |
+
+### Email delivery — precise diagnosis
+
+`over_email_send_rate_limit` is **GoTrue's own per-hour limiter**, applied
+*before* any SMTP handoff. That is why configuring Resend did not clear it.
+Supabase's docs confirm the built-in service carries an hourly cap; the
+governing setting is **Authentication → Rate Limits → "Rate limit for
+sending emails"**, which is separate from the SMTP provider config and stays
+low by default even once Custom SMTP is enabled.
+
+Not an application bug — no code change made, and none is appropriate.
+`auth_logs` could not be consulted: `query_logs` has returned a Supabase-side
+`Backend error!` on every attempt across three separate sessions.
+
+### Verification
+
+`npm test` 45/45 (2 new `USER_UPDATED` cases) · `npm run lint` 0 errors ·
+`npx tsc --noEmit` clean · `npm run build` clean · iOS Metro bundle 200 ·
+live browser: fresh load of `/profile`, zero console errors.
+
 ## ═══ PASS 9 — 2026-08-22: FULL-APP AUDIT (i18n, crash safety, realtime) ═══
 
 Whole-application sweep, both apps. Everything below was reproduced before

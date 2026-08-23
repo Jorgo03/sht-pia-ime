@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useContext, useEffect, useRef, useState } from 'react'
 import i18n from '../../i18n/index.js'
 import { supabase } from '../../lib/supabase'
 import { classifyAuthEvent } from '../../lib/authEvents'
@@ -18,6 +18,18 @@ export function AuthProvider({ children }) {
   // form instead of the ordinary signed-in dashboard, even though the
   // recovery session is itself a real, valid session.
   const [passwordRecovery, setPasswordRecovery] = useState(false)
+  // Bumped on every auth event; an in-flight sync() only commits its result
+  // if it's still the most recent one when it resolves. Without this, a slow
+  // profile fetch started by an old event (e.g. the initial SIGNED_IN
+  // restore) can resolve *after* a subsequent SIGNED_OUT has already cleared
+  // state, and silently resurrect a signed-out user.
+  //
+  // A ref rather than an effect-local `let` specifically so signOut() can
+  // invalidate in-flight work too: it clears state synchronously, but a
+  // profile fetch already in flight still matched the then-current
+  // generation and would commit on top of the cleared state, re-showing the
+  // signed-out user until SIGNED_OUT arrived and cleared it a second time.
+  const generation = useRef(0)
 
   const showWelcome = (user) => {
     if (!user) return
@@ -81,22 +93,16 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     let active = true
-    // Bumped on every auth event; an in-flight sync() only commits its
-    // result if it's still the most recent one when it resolves. Without
-    // this, a slow profile fetch started by an old event (e.g. the initial
-    // SIGNED_IN restore) can resolve *after* a subsequent SIGNED_OUT has
-    // already cleared state, and silently resurrect a signed-out user.
-    let generation = 0
 
     const sync = async (session, myGeneration) => {
-      if (!active || myGeneration !== generation) return
+      if (!active || myGeneration !== generation.current) return
       if (!session?.user) {
         setState({ user: null, session: null, profile: null, loading: false })
         return
       }
       let profile = await loadProfile(session.user.id)
       profile = await applyPendingRole(session.user, profile)
-      if (!active || myGeneration !== generation) return
+      if (!active || myGeneration !== generation.current) return
       setState({ user: session.user, session, profile, loading: false })
       if (profile) loadPreferredLanguage(profile)
     }
@@ -109,8 +115,8 @@ export function AuthProvider({ children }) {
     // every cold load for no benefit.
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
-        generation += 1
-        const myGeneration = generation
+        generation.current += 1
+        const myGeneration = generation.current
         const decision = classifyAuthEvent(event, session)
 
         if ('passwordRecovery' in decision) setPasswordRecovery(decision.passwordRecovery)
@@ -254,8 +260,19 @@ export function AuthProvider({ children }) {
   }
 
   const signOut = async () => {
-    await supabase.auth.signOut()
+    // Invalidate first: any profile fetch already in flight is now stale, and
+    // without this bump it would still match the current generation and
+    // commit on top of the cleared state below.
+    generation.current += 1
+    const { error } = await supabase.auth.signOut()
+    // supabase-js clears the local session even when the server call fails
+    // (an expired/already-revoked token is the common case), and the
+    // SIGNED_OUT event still fires — so the user is signed out locally
+    // regardless. Clearing here as well keeps it synchronous rather than
+    // waiting on the event, and the error is surfaced instead of swallowed.
     setState({ user: null, session: null, profile: null, loading: false })
+    setPasswordRecovery(false)
+    return { error }
   }
 
   const value = {

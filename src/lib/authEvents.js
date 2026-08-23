@@ -32,6 +32,16 @@ export function classifyAuthEvent(event, session) {
       return session?.user ? { action: 'sync-welcome' } : { action: 'none' }
     case 'TOKEN_REFRESHED':
       return session ? { action: 'sync' } : { action: 'none' }
+    case 'USER_UPDATED':
+      // Fires after supabase.auth.updateUser() — today only the
+      // password-recovery completion path calls that, and changing a
+      // password rotates the session's tokens. Previously this fell through
+      // to 'none', so the context kept the superseded session object. No
+      // call site reads session.access_token directly (everything goes
+      // through the supabase client, which tracks the new token itself), so
+      // nothing broke — but the context's own `user`/`session` were stale,
+      // and would be visibly wrong the moment an email change is added.
+      return session ? { action: 'sync' } : { action: 'none' }
     case 'SIGNED_OUT':
       return { action: 'clear', passwordRecovery: false }
     case 'INITIAL_SESSION':

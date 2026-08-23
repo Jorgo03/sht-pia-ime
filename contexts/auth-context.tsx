@@ -8,6 +8,7 @@ import {
   ReactNode,
   useContext,
   useEffect,
+  useRef,
   useState,
 } from 'react';
 import { Platform } from 'react-native';
@@ -104,7 +105,9 @@ interface AuthContextValue {
     type?: 'email' | 'signup',
   ) => Promise<{ error: Error | null }>;
   resetPassword: (email: string) => Promise<{ error: Error | null }>;
-  signOut: () => Promise<void>;
+  /** Resolves with the sign-out error, if any. The local session is dropped
+   *  regardless — callers may surface the error but must not block on it. */
+  signOut: () => Promise<{ error: Error | null }>;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -113,6 +116,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
+  // Bumped on every auth event; an in-flight sync() only commits if it is
+  // still the most recent when it resolves. Without this, a slow profile
+  // fetch started by an earlier event can land *after* a later SIGNED_OUT
+  // has cleared state and silently resurrect a signed-out user.
+  //
+  // A ref rather than an effect-local `let` so signOut() can invalidate
+  // in-flight work too — it clears state synchronously, but a fetch already
+  // running still matched the then-current generation and would commit over
+  // the cleared state, re-showing the signed-out user until SIGNED_OUT
+  // arrived. Mirrors web's AuthContext.
+  const generation = useRef(0);
 
   const loadProfile = async (userId: string): Promise<Profile | null> => {
     const { data } = await supabase.from('profiles').select('*').eq('id', userId).single();
@@ -152,15 +166,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     let active = true;
-    // Bumped on every auth event; an in-flight sync() only commits if it is
-    // still the most recent when it resolves. Without this, a slow profile
-    // fetch started by an earlier event can land *after* a later SIGNED_OUT
-    // has cleared state and silently resurrect a signed-out user. Web's
-    // AuthContext has carried this guard for a while; mobile did not.
-    let generation = 0;
 
     const sync = async (s: Session | null, myGeneration: number) => {
-      if (!active || myGeneration !== generation) return;
+      if (!active || myGeneration !== generation.current) return;
       if (!s?.user) {
         setSession(null);
         setProfile(null);
@@ -169,7 +177,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
       let p = await loadProfile(s.user.id);
       p = await applyPendingRole(s.user, p);
-      if (!active || myGeneration !== generation) return;
+      if (!active || myGeneration !== generation.current) return;
       setSession(s);
       setProfile(p);
       setLoading(false);
@@ -184,8 +192,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, s) => {
-      generation += 1;
-      const myGeneration = generation;
+      generation.current += 1;
+      const myGeneration = generation.current;
       const decision = classifyAuthEvent(event, s);
 
       if (decision.action === 'clear') {
@@ -206,7 +214,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // connection — the app would sit behind the splash indefinitely. Degrade
     // to signed-out instead of hanging. Cleared as soon as any event lands.
     const initTimeout = setTimeout(() => {
-      if (!active || generation > 0) return;
+      if (!active || generation.current > 0) return;
       console.warn('No auth event within %dms; continuing signed-out.', AUTH_INIT_TIMEOUT_MS);
       setLoading(false);
     }, AUTH_INIT_TIMEOUT_MS);
@@ -388,7 +396,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    // Invalidate first: a profile fetch already in flight is now stale and
+    // would otherwise still match the current generation and commit.
+    generation.current += 1;
+    const { error } = await supabase.auth.signOut();
+    // This previously relied solely on the SIGNED_OUT event to clear state.
+    // supabase-js drops the local session even when the server call fails
+    // (an already-revoked token is the common case), so clearing here makes
+    // sign-out synchronous rather than event-dependent — and surfaces the
+    // error instead of discarding it, matching web.
+    setSession(null);
+    setProfile(null);
+    setLoading(false);
+    return { error: error as Error | null };
   };
 
   return (
