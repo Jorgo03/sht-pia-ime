@@ -237,6 +237,7 @@
     "generic": "Ndodhi një gabim. Provo përsëri.",
     "authFailed": "Identifikimi dështoi.",
     "providerNotConfigured": "Ky shërbim nuk është konfiguruar.",
+    "oauthExpoGo": "Hyrja me Google nuk funksionon në Expo Go. Përdor aplikacionin e instaluar të zhvillimit, ose hyr me kod nga emaili.",
     "fillFields": "Plotëso emailin dhe fjalëkalimin.",
     "invalidEmail": "Shkruaj një adresë emaili të vlefshme.",
     "passwordRequired": "Ju lutemi shkruani fjalëkalimin tuaj.",

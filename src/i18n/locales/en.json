@@ -289,6 +289,7 @@
     "generic": "Something went wrong. Please try again.",
     "authFailed": "Authentication failed.",
     "providerNotConfigured": "This provider is not configured.",
+    "oauthExpoGo": "Google sign-in doesn't work in Expo Go. Use the installed development build, or sign in with an email code.",
     "fillFields": "Please fill in email and password.",
     "invalidEmail": "Please enter a valid email address.",
     "passwordRequired": "Please enter your password.",

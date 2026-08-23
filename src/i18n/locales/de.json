@@ -244,6 +244,7 @@
     "generic": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
     "authFailed": "Authentifizierung fehlgeschlagen.",
     "providerNotConfigured": "Dieser Anbieter ist nicht konfiguriert.",
+    "oauthExpoGo": "Die Google-Anmeldung funktioniert nicht in Expo Go. Nutze den installierten Development-Build oder melde dich mit einem E-Mail-Code an.",
     "fillFields": "Bitte fülle E-Mail und Passwort aus.",
     "invalidEmail": "Bitte gib eine gültige E-Mail-Adresse ein.",
     "passwordRequired": "Bitte gib dein Passwort ein.",

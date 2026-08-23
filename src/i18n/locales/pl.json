@@ -260,6 +260,7 @@
     "generic": "Coś poszło nie tak. Spróbuj ponownie.",
     "authFailed": "Uwierzytelnianie nie powiodło się.",
     "providerNotConfigured": "Ten dostawca nie jest skonfigurowany.",
+    "oauthExpoGo": "Logowanie przez Google nie działa w Expo Go. Użyj zainstalowanej kompilacji deweloperskiej lub zaloguj się kodem e-mail.",
     "fillFields": "Wypełnij e-mail i hasło.",
     "invalidEmail": "Podaj prawidłowy adres e-mail.",
     "passwordRequired": "Proszę wpisać hasło.",

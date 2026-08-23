@@ -252,6 +252,7 @@
     "generic": "Une erreur est survenue. Veuillez réessayer.",
     "authFailed": "Échec de l'authentification.",
     "providerNotConfigured": "Ce fournisseur n'est pas configuré.",
+    "oauthExpoGo": "La connexion Google ne fonctionne pas dans Expo Go. Utilisez la build de développement installée, ou connectez-vous avec un code par e-mail.",
     "fillFields": "Veuillez remplir l'e-mail et le mot de passe.",
     "invalidEmail": "Veuillez entrer une adresse e-mail valide.",
     "passwordRequired": "Veuillez saisir votre mot de passe.",

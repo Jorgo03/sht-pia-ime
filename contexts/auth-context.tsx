@@ -12,8 +12,24 @@ import {
 } from 'react';
 import { Platform } from 'react-native';
 
+import Constants, { ExecutionEnvironment } from 'expo-constants';
+
 import { signInWithAppleNative } from '@/lib/apple-auth';
 import { supabase } from '@/lib/supabase';
+
+/**
+ * True inside Expo Go (as opposed to a dev-client or store build).
+ *
+ * Expo Go owns the `exp://` scheme that Linking.createURL produces there, so
+ * when Supabase redirects the OAuth callback back, iOS/Android hand it to Expo
+ * Go's own generic "open a project" deep-link handler rather than routing it
+ * to this app's pending openAuthSessionAsync promise. The promise therefore
+ * never resolves with the code — confirmed on both platforms — and no amount
+ * of app-side code can reclaim that scheme. A dev-client build owns
+ * `shtepia-ime://` (app.json `scheme`, already registered in the Android
+ * manifest) and does not have this problem.
+ */
+const IS_EXPO_GO = Constants.executionEnvironment === ExecutionEnvironment.StoreClient;
 
 // Dev-only OAuth tracing (Metro console). Never logs token/credential
 // values — only the shape of what happened (redirect URI, whether a code
@@ -233,7 +249,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Dashboard config, so a rejection there is invisible to the app beyond
     // the browser session never completing — see oauthDebug below.
     const redirectTo = Linking.createURL('auth/callback');
-    oauthDebug('starting', { platform: Platform.OS, provider, redirectTo });
+    oauthDebug('starting', {
+      platform: Platform.OS,
+      provider,
+      redirectTo,
+      expoGo: IS_EXPO_GO,
+    });
 
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider,
@@ -255,14 +276,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     oauthDebug('browser session ended', { type: result.type });
 
     if (result.type !== 'success') {
-      // The session ended without ever handing back a URL matching
-      // redirectTo's scheme. This is genuinely ambiguous from this API
-      // alone: the user tapping Cancel and Supabase's callback rejecting an
-      // unlisted redirect_to (its own error page never matches our scheme,
-      // so the OS has nothing to capture) look identical here. Treated as a
-      // plain cancellation — no alarming error for what's usually a real
-      // cancel — but the trace above still records it for a dev to
-      // correlate against the Supabase Auth Logs timestamp if it wasn't.
+      // In Expo Go this is not a user cancellation — the callback physically
+      // cannot come back (see IS_EXPO_GO above), so the session always ends
+      // this way even after a successful Google login. Saying so beats the
+      // previous behaviour, where the browser closed and the screen simply
+      // sat there with no explanation.
+      if (IS_EXPO_GO) {
+        return { error: new Error('EXPO_GO_OAUTH_UNSUPPORTED') };
+      }
+      // Outside Expo Go this is genuinely ambiguous from this API alone: a
+      // real cancel and a Supabase callback rejecting an unlisted
+      // redirect_to (its error page never matches our scheme, so the OS has
+      // nothing to capture) look identical. Treated as a plain cancellation
+      // — no alarming error for what is usually a real cancel — with the
+      // trace above left for correlating against Supabase's Auth Logs.
       return { error: null };
     }
 

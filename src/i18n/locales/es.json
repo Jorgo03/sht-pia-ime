@@ -252,6 +252,7 @@
     "generic": "Algo salió mal. Inténtalo de nuevo.",
     "authFailed": "Error de autenticación.",
     "providerNotConfigured": "Este proveedor no está configurado.",
+    "oauthExpoGo": "El inicio de sesión con Google no funciona en Expo Go. Usa la compilación de desarrollo instalada o accede con un código por correo.",
     "fillFields": "Completa el correo y la contraseña.",
     "invalidEmail": "Introduce una dirección de correo válida.",
     "passwordRequired": "Por favor, introduce tu contraseña.",

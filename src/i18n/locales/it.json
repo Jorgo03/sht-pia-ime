@@ -252,6 +252,7 @@
     "generic": "Qualcosa è andato storto. Riprova.",
     "authFailed": "Autenticazione fallita.",
     "providerNotConfigured": "Questo provider non è configurato.",
+    "oauthExpoGo": "L'accesso con Google non funziona in Expo Go. Usa la build di sviluppo installata oppure accedi con un codice via email.",
     "fillFields": "Inserisci email e password.",
     "invalidEmail": "Inserisci un indirizzo email valido.",
     "passwordRequired": "Inserisci la tua password.",
