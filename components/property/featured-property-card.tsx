@@ -106,12 +106,12 @@ function FeaturedPropertyCardBase({
           {!!property.beds && property.beds > 0 && (
             <View style={styles.statChip}>
               <MaterialIcons name="bed" size={14} color={colors.accent} />
-              <Text style={styles.statText}>{property.beds} {t('property.beds')}</Text>
+              <Text style={styles.statText}>{property.beds} {t('property.bedsCount', { count: property.beds })}</Text>
             </View>
           )}
           <View style={styles.statChip}>
             <MaterialIcons name="bathtub" size={14} color={colors.accent} />
-            <Text style={styles.statText}>{property.baths} {t('property.baths')}</Text>
+            <Text style={styles.statText}>{property.baths} {t('property.bathsCount', { count: property.baths })}</Text>
           </View>
           <View style={styles.statChip}>
             <MaterialIcons name="square-foot" size={14} color={colors.accent} />

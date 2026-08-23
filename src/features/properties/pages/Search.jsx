@@ -184,7 +184,9 @@ export default function Search() {
       </div>
 
       <div className="result-count">
-        <span><strong>{totalCount}</strong> {t('search.homesInView')}</span>
+        {/* count drives i18next's plural choice even though the string itself
+            doesn't interpolate it — the number stays a separate bold span. */}
+        <span><strong>{totalCount}</strong> {t('search.homesInView', { count: totalCount })}</span>
         <span className="mono-eyebrow">{viewMode === 'map' ? t('search.mapView') : t('search.sortedByRelevance')}</span>
       </div>
 

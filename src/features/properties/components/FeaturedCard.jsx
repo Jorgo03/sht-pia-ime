@@ -49,8 +49,12 @@ function FeaturedCard({ property }) {
           <MapPin size={14} /> {property.city || property.address}
         </div>
         <div className="featured-card__stats">
-          {property.beds > 0 && <span className="stat-chip"><Bed size={14} /> {property.beds} {t('property.beds')}</span>}
-          <span className="stat-chip"><Bath size={14} /> {property.baths} {t('property.baths')}</span>
+          {/* *Count keys, not the bare property.beds/baths — those are the
+              form-field labels and carry no plural forms, so a 1-bed listing
+              read "1 beds". The number stays its own node; count only drives
+              i18next's category choice. */}
+          {property.beds > 0 && <span className="stat-chip"><Bed size={14} /> {property.beds} {t('property.bedsCount', { count: property.beds })}</span>}
+          <span className="stat-chip"><Bath size={14} /> {property.baths} {t('property.bathsCount', { count: property.baths })}</span>
           <span className="stat-chip"><Ruler size={14} /> {property.sqft}{t('property.sqft')}</span>
         </div>
         <div className="featured-card__price">{price}{suffix}</div>

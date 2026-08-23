@@ -262,7 +262,10 @@ export default function ExploreScreen() {
               <View style={styles.countRow}>
                 <Text style={styles.count}>
                   <Text style={styles.countStrong}>{total}</Text>{' '}
-                  {t('search.homesInView')}
+                  {/* count drives i18next's plural choice even though the
+                      string itself doesn't interpolate it — the number stays
+                      a separate bold <Text>. */}
+                  {t('search.homesInView', { count: total })}
                 </Text>
                 {/* Web switches this to "Map view" when the map is showing,
                     but this header only renders inside the list branch, so

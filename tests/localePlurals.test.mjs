@@ -46,11 +46,18 @@ const requiredSuffixes = Object.fromEntries(
   LANGS.map((l) => [l, i18next.services.pluralResolver.getSuffixes(l).map((s) => s.replace(/^_/, ''))]),
 )
 
-/** Base keys (plural suffix stripped) that interpolate {{count}} in any locale. */
+/** Base keys that are pluralised: either they interpolate {{count}}, or some
+ *  locale already carries a plural variant of them. The second case matters —
+ *  `search.homesInView` is a bare noun phrase ("homes in view") rendered
+ *  beside a separately-styled bold number, so it never contains {{count}}
+ *  even though i18next still picks its category from the count option. */
 const countKeys = new Set()
 for (const l of LANGS) {
   for (const [key, value] of Object.entries(flat[l])) {
     if (typeof value === 'string' && value.includes('{{count}}')) {
+      countKeys.add(key.replace(PLURAL_SUFFIX_RE, ''))
+    }
+    if (PLURAL_SUFFIX_RE.test(key)) {
       countKeys.add(key.replace(PLURAL_SUFFIX_RE, ''))
     }
   }

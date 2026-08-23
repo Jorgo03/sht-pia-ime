@@ -237,8 +237,10 @@ export default function PropertyDetailScreen() {
   const pricePerSqm = property.sqft && property.sqft > 0 ? Math.round(property.price / property.sqft) : null;
 
   const amenities = [
-    { id: 'bed', name: `${property.beds ?? 0} ${t('property.beds')}`, icon: 'bed' },
-    { id: 'bath', name: `${property.baths ?? 0} ${t('property.baths')}`, icon: 'bathtub' },
+    // *Count keys: property.beds/baths are the form-field labels and have no
+    // plural forms, so a 1-bed listing read "1 beds" here too.
+    { id: 'bed', name: `${property.beds ?? 0} ${t('property.bedsCount', { count: property.beds ?? 0 })}`, icon: 'bed' },
+    { id: 'bath', name: `${property.baths ?? 0} ${t('property.bathsCount', { count: property.baths ?? 0 })}`, icon: 'bathtub' },
     { id: 'sqft', name: `${property.sqft ?? '-'} ${t('property.sqft')}`, icon: 'square-foot' },
     { id: 'type', name: property.property_type ?? 'N/A', icon: 'home' },
     ...(property.year_built
