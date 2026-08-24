@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../../../lib/supabase";
 import LoadingScreen from "../../../shared/LoadingScreen";
@@ -33,18 +33,18 @@ const RELAY_SCHEMES = ['exp:', 'shtepia-ime:'];
  * The same mechanism Expo's retired auth proxy used, hosted on our own domain
  * rather than a third party's.
  */
-function relayToNativeApp() {
+function buildRelayTarget() {
   const params = new URLSearchParams(window.location.search);
   const target = params.get('rt');
-  if (!target) return false;
+  if (!target) return null;
 
   let parsed;
   try {
     parsed = new URL(target);
   } catch {
-    return false; // unparseable — treat as a normal web callback
+    return null; // unparseable — treat as a normal web callback
   }
-  if (!RELAY_SCHEMES.includes(parsed.protocol)) return false;
+  if (!RELAY_SCHEMES.includes(parsed.protocol)) return null;
 
   // Carry over everything Supabase returned (code, or error/error_description)
   // except our own routing parameter, so the app sees exactly what it would
@@ -56,22 +56,34 @@ function relayToNativeApp() {
     parsed.hash = window.location.hash;
   }
 
-  window.location.replace(parsed.toString());
-  return true;
+  return parsed.toString();
 }
 
 export default function AuthCallback() {
   const navigate = useNavigate();
   const settled = useRef(false);
+  // Set when this callback belongs to the mobile app. Rendering a real link
+  // matters: browsers commonly block a *scripted* navigation to a custom
+  // scheme with no user gesture, and when that happens silently the user is
+  // simply stranded on this page — which is exactly the "it ends up on the
+  // web app" symptom. The automatic attempt below still runs and usually
+  // wins; this is the visible fallback for when it does not.
+  const [relayTarget, setRelayTarget] = useState(null);
 
   useEffect(() => {
     let mounted = true;
 
-    // Before doing anything session-related: if this callback belongs to the
-    // mobile app, hand it straight back and do not establish a web session
-    // for a sign-in that happened on someone's phone.
-    if (relayToNativeApp()) {
+    // Before anything session-related: if this callback belongs to the mobile
+    // app, hand it straight back rather than establishing a web session for a
+    // sign-in that happened on someone's phone.
+    const target = buildRelayTarget();
+    if (target) {
       settled.current = true;
+      setRelayTarget(target);
+      // location.href rather than replace(): replace() is more likely to be
+      // suppressed for a custom scheme, and there is no history entry worth
+      // preserving here anyway.
+      window.location.href = target;
       return;
     }
 
@@ -137,6 +149,49 @@ export default function AuthCallback() {
       subscription.unsubscribe();
     };
   }, [navigate]);
+
+  if (relayTarget) {
+    return (
+      <div
+        style={{
+          minHeight: '100vh',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: 20,
+          padding: 24,
+          textAlign: 'center',
+          background: 'var(--fho-bg, #16120f)',
+          color: 'var(--fho-text, #f5f0e8)',
+        }}
+      >
+        <p style={{ fontSize: 15, opacity: 0.75, margin: 0 }}>Returning you to the app…</p>
+        {/* A genuine anchor, not a button calling location.href: a user tap on
+            a real link is the navigation browsers reliably allow through to a
+            custom scheme. */}
+        <a
+          href={relayTarget}
+          style={{
+            display: 'inline-block',
+            padding: '14px 30px',
+            borderRadius: 999,
+            fontWeight: 700,
+            fontSize: 15,
+            color: '#fff',
+            textDecoration: 'none',
+            background:
+              'linear-gradient(135deg, var(--fho-orange-1, #ff7d1a), var(--fho-orange-2, #e85d00))',
+          }}
+        >
+          Open the app
+        </a>
+        <p style={{ fontSize: 12, opacity: 0.5, margin: 0, maxWidth: 320 }}>
+          If nothing happened automatically, tap the button above.
+        </p>
+      </div>
+    );
+  }
 
   return <LoadingScreen />;
 }
