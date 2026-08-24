@@ -298,8 +298,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // session ends with no callback. That failure is indistinguishable from
     // a user cancelling, which is exactly why the exact value is logged
     // below rather than guessed at.
-    const redirectTo = makeRedirectUri({ path: 'auth/callback' });
-    oauthDebug('redirectUri', { redirectTo });
+    const appRedirect = makeRedirectUri({ path: 'auth/callback' });
+
+    // Expo Go's address cannot be allow-listed. Verified against the live
+    // project by binding a redirect_to to an OAuth state and replaying the
+    // callback: exp://<host>:<port>/--/auth/callback is refused, and so is a
+    // broad `exp://**`, while shtepia-ime://auth/callback is honored. So the
+    // scheme itself is fine — Supabase's matcher will not accept a host:port
+    // authority on a non-http scheme.
+    //
+    // The web callback IS allow-listed, and Supabase preserves extra query
+    // parameters through the redirect (also verified). So under Expo Go the
+    // OAuth result is routed through the web callback, which forwards it to
+    // this app — see relayToNativeApp in src/features/auth/pages/AuthCallback.jsx,
+    // where the permitted target schemes are constrained to prevent an open
+    // redirect leaking the authorization code.
+    //
+    // A dev-client or store build owns shtepia-ime:// and is allow-listed
+    // directly, so it skips the relay entirely — the detour is Expo Go's
+    // problem alone and disappears with it.
+    const webOrigin = process.env.EXPO_PUBLIC_WEB_ORIGIN ?? 'https://real-estate-app-hazel-seven.vercel.app';
+    const redirectTo = IS_EXPO_GO
+      ? `${webOrigin}/auth/callback?rt=${encodeURIComponent(appRedirect)}`
+      : appRedirect;
+
+    oauthDebug('redirectUri', { appRedirect, redirectTo, viaRelay: IS_EXPO_GO });
     oauthDebug('env', { platform: Platform.OS, provider, expoGo: IS_EXPO_GO });
 
     const { data, error } = await supabase.auth.signInWithOAuth({
@@ -318,7 +341,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Host only — the full URL carries state/PKCE parameters.
     oauthDebug('authorizationUrl', { host: data.url ? new URL(data.url).host : null });
 
-    const result = await WebBrowser.openAuthSessionAsync(data.url, redirectTo);
+    // Second argument is appRedirect, NOT redirectTo: it tells the auth
+    // session which URL ends the flow, and that is always this app's own
+    // address. Under the relay, redirectTo is an https page the browser
+    // merely passes through on its way here — waiting for that instead would
+    // end the session one hop early, before the code reached the app.
+    const result = await WebBrowser.openAuthSessionAsync(data.url, appRedirect);
     oauthDebug('result', { type: result.type });
 
     if (result.type !== 'success') {
