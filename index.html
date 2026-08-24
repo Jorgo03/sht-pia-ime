@@ -13,6 +13,50 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
       integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
       crossorigin="" />
+    <!--
+      Mobile OAuth relay — deliberately a classic inline script, not a module,
+      and placed before the app bundle.
+
+      Expo Go's callback address (exp://<host>:<port>/--/...) cannot be added
+      to Supabase's redirect allow-list — verified against the live project,
+      including a wildcard. This origin's /auth/callback IS allow-listed and
+      Supabase preserves extra query parameters, so the mobile app sends its
+      own address along as ?rt= and this page hands the result straight back.
+
+      Why it cannot live in React: ES imports are hoisted, so by the time any
+      component runs, src/lib/supabase.js has already been evaluated — and
+      that client is configured with detectSessionInUrl + flowType 'pkce', so
+      it inspects the URL on construction, finds the ?code=, and tries to
+      redeem it. It cannot succeed (the PKCE verifier is on the phone), but it
+      touches a single-use code that belongs to the mobile app. Running here,
+      before the bundle loads, means the browser leaves for exp:// before the
+      Supabase client is ever constructed.
+
+      The scheme check is a security boundary: forwarding to an arbitrary ?rt=
+      would be an open redirect, and an open redirect carrying an
+      authorization code hands over the account. http/https are excluded on
+      purpose — a web target is precisely the case that would leak the code to
+      another origin.
+    -->
+    <script>
+      (function () {
+        try {
+          var params = new URLSearchParams(window.location.search);
+          var target = params.get('rt');
+          if (!target) return;
+          var parsed = new URL(target);
+          if (parsed.protocol !== 'exp:' && parsed.protocol !== 'shtepia-ime:') return;
+          params.delete('rt');
+          params.forEach(function (value, key) { parsed.searchParams.set(key, value); });
+          if (window.location.hash && window.location.hash.length > 1) {
+            parsed.hash = window.location.hash;
+          }
+          window.location.replace(parsed.toString());
+        } catch (e) {
+          /* fall through to the React relay, which renders a tappable link */
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
