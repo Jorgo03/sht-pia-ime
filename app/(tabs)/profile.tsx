@@ -266,14 +266,33 @@ export default function ProfileScreen() {
   // resendCode keeps the two platforms on one path.
   const handleResendOtp = async () => {
     if (cooldown > 0 || otpSending) return;
+    // Same guard web has: `email` can be blank if the screen re-rendered
+    // between steps, and resending with an empty address 400s.
+    if (!EMAIL_RE.test(email.trim())) {
+      Alert.alert(t('common.error'), t('errors.invalidEmail'));
+      return;
+    }
     setOtpSending(true);
-    const { error } = await resendCode(email, otpType);
+    const { error } = await resendCode(email.trim(), otpType);
     setOtpSending(false);
     if (error) {
       Alert.alert(t('common.error'), friendlyAuthError(error, t));
       return;
     }
+    // Success was previously silent — the only signal was the link text
+    // switching to "Resend in 30s", which is easy to miss while waiting on an
+    // e-mail, so a working resend read as a broken one. Web already confirmed
+    // via auth.otpSent; this brings mobile in line.
+    //
+    // The stale digits are cleared too: a resend invalidates the previous
+    // code, so leaving the old (often wrong) ones on screen invites the user
+    // to submit a code that can no longer succeed.
+    setOtpCode('');
+    setOtpError(false);
     setCooldown(RESEND_COOLDOWN_S);
+    // Single-argument alert: auth.checkEmail is signup-specific wording
+    // ("...to confirm your account") and would be wrong as a title here.
+    Alert.alert(t('auth.otpSent'));
   };
 
   // Takes the code as an argument rather than reading `otpCode` — the
