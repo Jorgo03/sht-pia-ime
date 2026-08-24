@@ -1,8 +1,13 @@
 import { Provider } from '@supabase/supabase-js';
 import { Session, User } from '@supabase/supabase-js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as Linking from 'expo-linking';
+import { makeRedirectUri } from 'expo-auth-session';
 import * as WebBrowser from 'expo-web-browser';
+
+// Dismisses a lingering auth session left over from a previous attempt (a
+// reload mid-flow, a backgrounded browser). Documented as required for
+// expo-auth-session flows; a no-op when there is nothing pending.
+WebBrowser.maybeCompleteAuthSession();
 import {
   createContext,
   ReactNode,
@@ -278,25 +283,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return { error: error as Error | null };
     }
 
-    // Stable across builds (Linking.createURL adapts automatically): a real
-    // dev-client/production build gets the app.json `scheme` — shtepia-ime://
-    // auth/callback — while Expo Go can't open that scheme back into itself,
-    // so it substitutes its own LAN proxy address instead
-    // (exp://<lan-ip>:8081/--/auth/callback), which changes whenever the
-    // dev machine's IP does. Both need their own entry in Supabase's
-    // Authentication → URL Configuration → Redirect URLs allow-list —
-    // shtepia-ime://auth/callback for the former, and a wildcard host/port
-    // (e.g. exp://*/--/auth/callback) for the latter, since the exact IP
-    // can't be pinned in advance. This file can't read or write that
-    // Dashboard config, so a rejection there is invisible to the app beyond
-    // the browser session never completing — see oauthDebug below.
-    const redirectTo = Linking.createURL('auth/callback');
-    oauthDebug('starting', {
-      platform: Platform.OS,
-      provider,
-      redirectTo,
-      expoGo: IS_EXPO_GO,
-    });
+    // makeRedirectUri() rather than Linking.createURL(): it is the API
+    // expo-auth-session builds its own flows on, and it resolves per
+    // environment without the caller choosing — Expo Go gets
+    // exp://<lan-host>/--/auth/callback, a dev-client or store build gets the
+    // app.json scheme (shtepia-ime://auth/callback). One call, three
+    // environments, and the web branch above never reaches here.
+    //
+    // Whatever it returns must be present in Supabase's
+    // Authentication → URL Configuration → Redirect URLs. If it is not,
+    // Supabase refuses the redirect_to *after* Google has already
+    // authenticated the user and sends the browser to its own error page
+    // instead — an https URL that can never match this scheme, so the auth
+    // session ends with no callback. That failure is indistinguishable from
+    // a user cancelling, which is exactly why the exact value is logged
+    // below rather than guessed at.
+    const redirectTo = makeRedirectUri({ path: 'auth/callback' });
+    oauthDebug('redirectUri', { redirectTo });
+    oauthDebug('env', { platform: Platform.OS, provider, expoGo: IS_EXPO_GO });
 
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider,
@@ -311,27 +315,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return { error: error as Error | null };
     }
 
-    const result = await WebBrowser.openAuthSessionAsync(
-      data.url,
-      redirectTo,
-    );
-    oauthDebug('browser session ended', { type: result.type });
+    // Host only — the full URL carries state/PKCE parameters.
+    oauthDebug('authorizationUrl', { host: data.url ? new URL(data.url).host : null });
+
+    const result = await WebBrowser.openAuthSessionAsync(data.url, redirectTo);
+    oauthDebug('result', { type: result.type });
 
     if (result.type !== 'success') {
-      // In Expo Go this is not a user cancellation — the callback physically
-      // cannot come back (see IS_EXPO_GO above), so the session always ends
-      // this way even after a successful Google login. Saying so beats the
-      // previous behaviour, where the browser closed and the screen simply
-      // sat there with no explanation.
-      if (IS_EXPO_GO) {
-        return { error: new Error('EXPO_GO_OAUTH_UNSUPPORTED') };
-      }
-      // Outside Expo Go this is genuinely ambiguous from this API alone: a
-      // real cancel and a Supabase callback rejecting an unlisted
-      // redirect_to (its error page never matches our scheme, so the OS has
-      // nothing to capture) look identical. Treated as a plain cancellation
-      // — no alarming error for what is usually a real cancel — with the
-      // trace above left for correlating against Supabase's Auth Logs.
+      // 'cancel' means the auth session closed without a URL matching
+      // redirectTo. Two very different causes produce it: the user dismissed
+      // the browser, or Supabase rejected redirectTo and sent the browser
+      // somewhere this scheme can never match. The API cannot tell them
+      // apart, so this returns no error (a real cancel must not look like a
+      // failure) and leans on the logged redirectUri above to distinguish
+      // them: if it is absent from the Supabase allow-list, that is the
+      // cause.
       return { error: null };
     }
 
@@ -347,19 +345,41 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return { error: new Error(errorDescription || oauthError) };
     }
 
-    if (!code) {
-      return {
-        error: new Error(
-          'No authorization code received — check that the provider is enabled in Supabase Dashboard',
-        ),
-      };
+    if (code) {
+      const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
+      oauthDebug('session exchange (pkce)', {
+        success: !exchangeError,
+        message: exchangeError?.message,
+      });
+      return { error: exchangeError as Error | null };
     }
 
-    const { error: exchangeError } =
-      await supabase.auth.exchangeCodeForSession(code);
-    oauthDebug('session exchange', { success: !exchangeError, message: exchangeError?.message });
+    // Not assuming PKCE: this client sets flowType 'pkce', so a `?code=` is
+    // expected — but if the instance ever answers with the implicit flow the
+    // tokens arrive in the URL *fragment*, which searchParams cannot see.
+    // Handling both means a change in Supabase's response shape degrades to a
+    // working sign-in rather than a silent "no code received".
+    const fragment = new URLSearchParams(url.hash.replace(/^#/, ''));
+    const accessToken = fragment.get('access_token');
+    const refreshToken = fragment.get('refresh_token');
+    if (accessToken && refreshToken) {
+      const { error: setErr } = await supabase.auth.setSession({
+        access_token: accessToken,
+        refresh_token: refreshToken,
+      });
+      oauthDebug('session set (implicit)', { success: !setErr, message: setErr?.message });
+      return { error: setErr as Error | null };
+    }
 
-    return { error: exchangeError as Error | null };
+    oauthDebug('callback carried neither code nor tokens', {
+      hasQuery: url.search.length > 1,
+      hasFragment: url.hash.length > 1,
+    });
+    return {
+      error: new Error(
+        'No authorization code received — check that the provider is enabled in Supabase Dashboard',
+      ),
+    };
   };
 
   // Mirrors web's AuthContext.sendOtp/verifyOtp so the email-code flow behaves

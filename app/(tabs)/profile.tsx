@@ -54,10 +54,6 @@ function friendlyAuthError(
 ): string {
   if (!err?.message) return t('errors.generic');
   if (err.code === 'email_address_invalid') return t('errors.invalidEmail');
-  // Sentinel raised by signInWithProvider when running under Expo Go, where
-  // the OAuth callback can never reach the app. Matched before the substring
-  // map below so it can't be shadowed by a generic phrase.
-  if (err.message === 'EXPO_GO_OAUTH_UNSUPPORTED') return t('errors.oauthExpoGo');
   const map: Record<string, string> = {
     'Invalid login credentials': 'errors.invalidCredentials',
     'User already registered': 'errors.userExists',
