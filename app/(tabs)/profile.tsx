@@ -91,6 +91,8 @@ export default function ProfileScreen() {
     verifyOtp,
     resendCode,
     resetPassword,
+    verifyRecoveryCode,
+    updatePassword,
     loading: authLoading,
   } = useAuth();
   const { colors } = useTheme();
@@ -136,6 +138,12 @@ export default function ProfileScreen() {
   const [cooldown, setCooldown] = useState(0);
   const [resetSending, setResetSending] = useState(false);
   const [signOutOpen, setSignOutOpen] = useState(false);
+  // Password recovery, completed in-app: null → 'code' (enter the 6 digits
+  // from the e-mail) → 'password' (choose a new one). Mirrors the web flow,
+  // which reaches the same two steps via the PASSWORD_RECOVERY event.
+  const [recoveryStep, setRecoveryStep] = useState<'code' | 'password' | null>(null);
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmNewPassword, setConfirmNewPassword] = useState('');
 
   // Resend cooldown ticker. Guarded on `cooldown > 0` rather than `cooldown`
   // so it schedules one interval for the whole countdown instead of tearing
@@ -314,23 +322,84 @@ export default function ProfileScreen() {
     setOtpStep(false);
   };
 
-  // Mirrors web's handleForgotPassword. The emailed link lands on the web app
-  // (see resetPassword in auth-context) — there's no in-app recovery screen —
-  // so the copy stays "check your email", which is true on both platforms.
+  // Recovery now completes in-app. The e-mail carries a 6-digit code as well
+  // as a link, so verifying that code with type 'recovery' yields a real
+  // session and the new password can be set here — no deep link, and no
+  // sending the user to the web app to finish, which was a dead end for
+  // anyone who only has the app installed.
   const handleForgotPassword = async () => {
     const cleanEmail = email.trim();
-    if (!cleanEmail) {
-      Alert.alert(t('common.error'), t('auth.enterEmail'));
+    if (!EMAIL_RE.test(cleanEmail)) {
+      Alert.alert(t('common.error'), t('errors.invalidEmail'));
       return;
     }
     setEmail(cleanEmail);
     setResetSending(true);
     const { error } = await resetPassword(cleanEmail);
     setResetSending(false);
-    Alert.alert(
-      error ? t('common.error') : t('auth.checkEmail'),
-      error ? friendlyAuthError(error, t) : t('auth.resetSent'),
-    );
+    if (error) {
+      Alert.alert(t('common.error'), friendlyAuthError(error, t));
+      return;
+    }
+    setOtpCode('');
+    setOtpError(false);
+    setCooldown(RESEND_COOLDOWN_S);
+    setRecoveryStep('code');
+    Alert.alert(t('auth.checkEmail'), t('auth.resetSent'));
+  };
+
+  const handleVerifyRecovery = async (code: string) => {
+    if (code.length < OTP_LENGTH || otpVerifying) return;
+    setOtpVerifying(true);
+    const { error } = await verifyRecoveryCode(email.trim(), code);
+    setOtpVerifying(false);
+    if (error) {
+      setOtpCode('');
+      setOtpError(true);
+      Alert.alert(t('common.error'), friendlyAuthError(error, t));
+      return;
+    }
+    // The recovery session is live from here; move to setting the password.
+    setRecoveryStep('password');
+  };
+
+  const handleSetNewPassword = async () => {
+    if (newPassword.length < 8) {
+      Alert.alert(t('common.error'), t('errors.passwordMin'));
+      return;
+    }
+    if (newPassword !== confirmNewPassword) {
+      Alert.alert(t('common.error'), t('errors.passwordMismatch'));
+      return;
+    }
+    setLoading(true);
+    const { error } = await updatePassword(newPassword);
+    setLoading(false);
+    if (error) {
+      Alert.alert(t('common.error'), friendlyAuthError(error, t));
+      return;
+    }
+    // verifyOtp already signed the user in, so there is nothing further to do
+    // — clear the recovery UI and the signed-in dashboard renders itself.
+    setNewPassword('');
+    setConfirmNewPassword('');
+    setRecoveryStep(null);
+    Alert.alert(t('auth.recoverySuccess'));
+  };
+
+  const handleResendRecovery = async () => {
+    if (cooldown > 0 || resetSending) return;
+    setResetSending(true);
+    const { error } = await resetPassword(email.trim());
+    setResetSending(false);
+    if (error) {
+      Alert.alert(t('common.error'), friendlyAuthError(error, t));
+      return;
+    }
+    setOtpCode('');
+    setOtpError(false);
+    setCooldown(RESEND_COOLDOWN_S);
+    Alert.alert(t('auth.otpSent'));
   };
 
   const handleProvider = async (provider: Provider) => {
@@ -598,7 +667,86 @@ export default function ProfileScreen() {
                 </TouchableOpacity>
               </View>
 
-              {otpStep ? (
+              {recoveryStep === 'code' ? (
+                /* Password recovery, step 1: the 6-digit code from the
+                   recovery e-mail. Verified as type 'recovery', which yields
+                   a real session — no deep link needed. */
+                <>
+                  <Text style={styles.otpTitle}>{t('auth.enterCode')}</Text>
+                  <Text style={styles.otpSubtitle}>{t('auth.codeSentTo', { email })}</Text>
+                  <OtpInput
+                    value={otpCode}
+                    error={otpError}
+                    editable={!otpVerifying}
+                    onChange={(next) => {
+                      setOtpCode(next);
+                      if (otpError) setOtpError(false);
+                    }}
+                    onComplete={handleVerifyRecovery}
+                  />
+                  {otpVerifying && <Text style={styles.otpSubtitle}>{t('common.loading')}</Text>}
+                  <TouchableOpacity
+                    onPress={handleResendRecovery}
+                    style={styles.linkButton}
+                    disabled={cooldown > 0 || resetSending}>
+                    <Text style={[styles.linkButtonText, cooldown > 0 && styles.linkButtonTextMuted]}>
+                      {cooldown > 0 ? t('auth.resendIn', { s: cooldown }) : t('auth.resendCode')}
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={() => setRecoveryStep(null)} style={styles.linkButton}>
+                    <Text style={styles.linkButtonText}>{t('common.back')}</Text>
+                  </TouchableOpacity>
+                </>
+              ) : recoveryStep === 'password' ? (
+                /* Password recovery, step 2: the recovery session is live, so
+                   updateUser() is authorized to change the password. */
+                <>
+                  <Text style={styles.otpTitle}>{t('auth.recoveryTitle')}</Text>
+                  <Text style={styles.otpSubtitle}>{t('auth.recoverySubtitle')}</Text>
+
+                  <View style={styles.fieldRow}>
+                    <MaterialIcons name="lock-outline" size={18} color="rgba(255,255,255,0.35)" style={styles.fieldIcon} />
+                    <TextInput
+                      style={styles.fieldInput}
+                      placeholder={t('auth.newPassword')}
+                      placeholderTextColor="rgba(255,255,255,0.35)"
+                      value={newPassword}
+                      onChangeText={setNewPassword}
+                      secureTextEntry={!showPassword}
+                      editable={!loading}
+                    />
+                    <TouchableOpacity style={styles.fieldEye} onPress={() => setShowPassword((v) => !v)} hitSlop={8}>
+                      <MaterialIcons
+                        name={showPassword ? 'visibility-off' : 'visibility'}
+                        size={18}
+                        color="rgba(255,255,255,0.35)"
+                      />
+                    </TouchableOpacity>
+                  </View>
+
+                  <View style={styles.fieldRow}>
+                    <MaterialIcons name="lock-outline" size={18} color="rgba(255,255,255,0.35)" style={styles.fieldIcon} />
+                    <TextInput
+                      style={styles.fieldInput}
+                      placeholder={t('auth.confirmPassword')}
+                      placeholderTextColor="rgba(255,255,255,0.35)"
+                      value={confirmNewPassword}
+                      onChangeText={setConfirmNewPassword}
+                      secureTextEntry={!showPassword}
+                      editable={!loading}
+                    />
+                  </View>
+
+                  <TouchableOpacity onPress={handleSetNewPassword} activeOpacity={0.85} disabled={loading}>
+                    <LinearGradient colors={[colors.accent, colors.accentEnd]} style={styles.ctaPill}>
+                      <Text style={styles.ctaPillText}>
+                        {loading ? t('common.loading') : t('auth.updatePassword')}
+                      </Text>
+                      <MaterialIcons name="arrow-forward" size={18} color="#fff" />
+                    </LinearGradient>
+                  </TouchableOpacity>
+                </>
+              ) : otpStep ? (
                 /* Email-code step — mirrors web's 'enter-code' otpStep: the
                    card swaps to code entry rather than navigating away, and
                    verification fires automatically once 6 digits land (web

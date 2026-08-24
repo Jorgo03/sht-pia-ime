@@ -105,6 +105,11 @@ interface AuthContextValue {
     type?: 'email' | 'signup',
   ) => Promise<{ error: Error | null }>;
   resetPassword: (email: string) => Promise<{ error: Error | null }>;
+  /** Verifies the 6-digit code from the recovery e-mail, establishing a
+   *  recovery session so the password can be changed in-app. */
+  verifyRecoveryCode: (email: string, token: string) => Promise<{ error: Error | null }>;
+  /** Sets a new password on the active (recovery) session. */
+  updatePassword: (newPassword: string) => Promise<{ error: Error | null }>;
   /** Resolves with the sign-out error, if any. The local session is dropped
    *  regardless — callers may surface the error but must not block on it. */
   signOut: () => Promise<{ error: Error | null }>;
@@ -395,6 +400,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { error: error as Error | null };
   };
 
+  /**
+   * Completes password recovery without leaving the app.
+   *
+   * The recovery e-mail carries a 6-digit code as well as a link, so mobile
+   * does not need a deep link at all: verifying the code with type
+   * 'recovery' establishes a real session, and updateUser then changes the
+   * password on that session's authority.
+   *
+   * This replaces sending mobile users to the web app to finish — a genuine
+   * dead end for anyone who only has the app installed.
+   */
+  const verifyRecoveryCode = async (email: string, token: string) => {
+    const { error } = await supabase.auth.verifyOtp({ email, token, type: 'recovery' });
+    return { error: error as Error | null };
+  };
+
+  /** Only meaningful while a recovery session is active — that session is what
+   *  authorizes the change, exactly as on web. */
+  const updatePassword = async (newPassword: string) => {
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+    return { error: error as Error | null };
+  };
+
   const signOut = async () => {
     // Invalidate first: a profile fetch already in flight is now stale and
     // would otherwise still match the current generation and commit.
@@ -428,6 +456,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         verifyOtp,
         resendCode,
         resetPassword,
+        verifyRecoveryCode,
+        updatePassword,
         signOut,
       }}>
       {children}
