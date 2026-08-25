@@ -336,6 +336,56 @@
   border-color: transparent;
 }
 
+/* A language that already holds text, so the agent can see at a glance which
+   of the eight are filled without clicking through them. */
+.nl-lang-tab.filled {
+  border-color: var(--fho-orange-soft);
+}
+
+.nl-lang-tab:disabled {
+  cursor: default;
+  opacity: 0.7;
+}
+
+/* Translation bar — the language tabs plus the one status line under them. */
+
+.nl-translation-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.nl-translation-status {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--fho-text-muted);
+  /* Reserves the row's height whether or not it has content, so the input
+     below does not jump as the status appears and clears. */
+  min-height: 18px;
+}
+
+/* Same red as .nl-error above — this file has no error custom property. */
+.nl-translation-status--error {
+  color: #e74c3c;
+}
+
+.nl-translation-action {
+  padding: 0;
+  border: none;
+  background: none;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--fho-orange-2);
+  cursor: pointer;
+}
+
+.nl-translation-action:hover {
+  text-decoration: underline;
+}
+
 /* Chips */
 
 .nl-chips {

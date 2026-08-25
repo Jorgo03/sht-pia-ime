@@ -17,7 +17,7 @@ or at runtime `localStorage.setItem('fho_flags', JSON.stringify({ aiSearch: fals
 | A | AI listing generator | `claude-sonnet-5` | `supabase/functions/ai-generate-listing` | `aiListingGenerator` / `VITE_FLAG_AI_LISTING_GENERATOR` | 20/h/user |
 | B | Natural-language search | `claude-haiku-4-5-20251001` | `supabase/functions/ai-parse-search` | `aiSearch` / `VITE_FLAG_AI_SEARCH` | 60/h/key |
 | C | Listing buyer assistant | `claude-haiku-4-5-20251001` | `supabase/functions/ai-listing-assistant` | `aiAssistant` / `VITE_FLAG_AI_ASSISTANT` | 30/h/key |
-| E | Auto-translate listings | Google + DeepL (no Anthropic) | `supabase/functions/translate-property` (pre-existing) | `autoTranslate` / `VITE_FLAG_AUTO_TRANSLATE` | n/a |
+| E | Auto-translate listings | `claude-sonnet-5` | `supabase/functions/translate-property` | `autoTranslate` / `VITE_FLAG_AUTO_TRANSLATE` | 60/h/user |
 
 ## A — AI listing generator (flagship)
 
@@ -43,8 +43,11 @@ or at runtime `localStorage.setItem('fho_flags', JSON.stringify({ aiSearch: fals
 
 ## E — Auto-translate listings (write once, publish in 8 languages)
 
-- **What**: "Translate to all languages" button under the wizard's description field ([AutoTranslateButton.jsx](src/components/AutoTranslateButton.jsx), previously dead code — rewritten with i18n + wired in). Translates the Albanian title + description into all 8 locales via the pre-existing Google→DeepL pipeline and merges into `title_i18n`/`description_i18n`, never overwriting anything the agent typed manually and never touching `sq`.
-- **Status**: wiring verified; the pipeline currently fails because the stored `GOOGLE_TRANSLATE_KEY` is invalid — see DECISIONS.md §0c. Costs are Google/DeepL, not Anthropic.
+- **What**: **selecting a language IS the translate action.** One language bar sits above the wizard's title and description ([TranslationBar](src/features/listings/components/TranslationBar.jsx) on web, [translation-bar.tsx](components/listing/translation-bar.tsx) on mobile); tapping EN/DE/IT/ES/PL/RU/FR translates *both* fields from Albanian in a single request and shows the result in the inputs, ready to edit. The separate "Translate to all languages" button is gone — a language tab that showed an empty box next to a button somewhere below that filled it was two ways to do one thing.
+- **How it decides**: [translationCore.js](src/lib/translationCore.js) fingerprints the Albanian title+description; [useListingTranslation.ts](src/features/listings/hooks/useListingTranslation.ts) is the shared state machine both apps run. A language is re-translated only when it is missing or its fingerprint no longer matches; a translation an agent edited by hand is pinned and never regenerated without an explicit **Translate again**. Provenance lives in `properties.translation_meta`.
+- **Why Anthropic and not Google/DeepL**: neither takes an instruction, and both got the listings in this DB wrong in the ways that matter — "Apartament 2+1 në **Bllok**" (a Tirana neighbourhood) came back as "in Block", and the `2+1` room notation, m2 values and bullet layout were all fair game for reformatting. The prompt pins proper nouns, numeric notation and formatting explicitly.
+- **Status**: live. This also retires the `GOOGLE_TRANSLATE_KEY` / `DEEPL_API_KEY` dependency that had auto-translate down entirely — see DECISIONS.md §0c.
+- **Est. cost/call**: one call per language per listing, title+description together, cached thereafter.
 
 ## Not built (deliberately)
 

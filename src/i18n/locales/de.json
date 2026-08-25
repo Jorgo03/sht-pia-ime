@@ -458,12 +458,15 @@
     "errorUnavailable": "KI ist gerade nicht verfügbar — bitte manuell schreiben.",
     "errorRateLimited": "Zu viele Anfragen — bitte später erneut versuchen.",
     "errorGeneric": "Etwas ist schiefgelaufen. Bitte erneut versuchen.",
-    "translateAll": "In alle Sprachen übersetzen",
     "translating": "Übersetzt…",
-    "translated": "Übersetzt — prüfe jede Sprache.",
     "translateFirst": "Schreibe zuerst Titel und Beschreibung auf Albanisch",
     "generateTitle": "Mit KI erstellen",
-    "titleNeedsFields": "Immobilientyp und Stadt angeben, um einen Titel zu generieren"
+    "titleNeedsFields": "Immobilientyp und Stadt angeben, um einen Titel zu generieren",
+    "translationAuto": "Automatische Übersetzung",
+    "translationStale": "Der albanische Text hat sich geändert — dies wird neu übersetzt",
+    "translationManual": "Manuell bearbeitet",
+    "regenerateTranslation": "Erneut übersetzen",
+    "translationFailed": "Übersetzung fehlgeschlagen. Bitte erneut versuchen."
   },
   "assistant": {
     "title": "Inserats-Assistent",

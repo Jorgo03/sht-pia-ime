@@ -23,8 +23,8 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { LocationPicker } from '@/components/listing/location-picker';
+import { TranslationBar } from '@/components/listing/translation-bar';
 import { AiTitleButton } from '@/components/ui/ai-title-button';
-import { AutoTranslateButton } from '@/components/ui/auto-translate-button';
 import { GhostBtn, PrimaryCTA } from '@/components/ui/buttons';
 import { Chip, SectionLabel } from '@/components/ui/chip';
 import { Field } from '@/components/ui/field';
@@ -35,7 +35,9 @@ import { Fonts, Radii, Spacing, type AtticoPalette } from '@/constants/theme';
 import { useAuth } from '@/contexts/auth-context';
 import { useTheme } from '@/contexts/theme-context';
 import { supabase } from '@/lib/supabase';
-import { SUPPORTED_LANGS, type I18nMap } from '@/lib/translate';
+import { translatePropertyContent, type I18nMap } from '@/lib/translate';
+import { useListingTranslation } from '@/src/features/listings/hooks/useListingTranslation';
+import type { TranslationMeta } from '@/src/lib/translationCore';
 import {
   MAX_IMAGES,
   MAX_VIDEO_MB,
@@ -158,6 +160,12 @@ interface ListingForm {
   property_type: PropertyType;
   title_i18n: I18nMap;
   description_i18n: I18nMap;
+  /**
+   * Per-language provenance for the two maps above — which Albanian source a
+   * translation came from, and whether a human has since edited it. Persisted
+   * to properties.translation_meta so the distinction survives a reload.
+   */
+  translation_meta: TranslationMeta;
   address: string;
   city: string;
   /** Null until the agent taps the map; such rows are excluded from the map tab. */
@@ -182,6 +190,7 @@ const INITIAL_FORM: ListingForm = {
   property_type: 'apartment',
   title_i18n: { sq: '' },
   description_i18n: { sq: '' },
+  translation_meta: {},
   address: '',
   city: '',
   latitude: null,
@@ -212,8 +221,6 @@ export default function NewListingWizard() {
   const [form, setForm] = useState<ListingForm>(INITIAL_FORM);
   const [images, setImages] = useState<PickedImage[]>([]);
   const [video, setVideo] = useState<PickedVideo | null>(null);
-  const [titleLang, setTitleLang] = useState('sq');
-  const [descLang, setDescLang] = useState('sq');
   const [errors, setErrors] = useState<FormErrors>({});
   const [submitting, setSubmitting] = useState(false);
   const [uploadProgress, setUploadProgress] = useState<{ done: number; total: number } | null>(null);
@@ -273,6 +280,16 @@ export default function NewListingWizard() {
 
   const updateI18n = (field: 'title_i18n' | 'description_i18n', lang: string, value: string) =>
     setForm((prev) => ({ ...prev, [field]: { ...prev[field], [lang]: value } }));
+
+  // Owns the language selection for BOTH text fields, plus everything that
+  // makes selecting one safe: the per-language cache, staleness against the
+  // Albanian source, protection for hand-edited translations, and discarding
+  // superseded responses. Shared verbatim with web's NewListing.jsx.
+  const translation = useListingTranslation<ListingForm>({
+    form,
+    setForm,
+    translate: translatePropertyContent,
+  });
 
   const clearError = (key: keyof FormErrors) =>
     setErrors((prev) => (prev[key] ? { ...prev, [key]: undefined } : prev));
@@ -426,6 +443,10 @@ export default function NewListingWizard() {
         description_i18n: form.description_i18n,
         // This form authors in Albanian and translates outward from it.
         source_language: 'sq',
+        // Carries which languages are machine-translated and which an agent
+        // edited, so reopening the listing later does not re-translate over
+        // their corrections or re-bill for work already done.
+        translation_meta: form.translation_meta,
         listing_type: form.listing_type,
         property_type: form.property_type,
         city: form.city || null,
@@ -537,66 +558,65 @@ export default function NewListingWizard() {
             }}
             onResult={(title) => {
               updateI18n('title_i18n', 'sq', title);
-              setTitleLang('sq');
+              translation.selectLanguage('sq');
               clearError('title');
             }}
           />
         </View>
-        <LangTabs styles={styles} active={titleLang} onSelect={setTitleLang} map={form.title_i18n} />
+
+        {/* One selector for both fields: tapping a language translates the
+            title and description together, in a single request. */}
+        <TranslationBar
+          activeLang={translation.activeLang}
+          onSelect={translation.selectLanguage}
+          filled={(lang) =>
+            !!form.title_i18n[lang]?.trim() || !!form.description_i18n[lang]?.trim()
+          }
+          pendingLangs={translation.pendingLangs}
+          state={translation.state}
+          translating={translation.translating}
+          error={translation.error}
+          onRegenerate={translation.regenerate}
+          onRetry={translation.retry}
+          canRegenerate={translation.canRegenerate}
+        />
+
         <TextInput
           style={styles.input}
           placeholder={
-            titleLang === 'sq'
+            translation.activeLang === 'sq'
               ? t('listing.titlePlaceholder')
-              : `${t('listing.title')} (${titleLang.toUpperCase()})`
+              : `${t('listing.title')} (${translation.activeLang.toUpperCase()})`
           }
           placeholderTextColor={colors.textSecondary}
-          value={form.title_i18n[titleLang] ?? ''}
+          value={translation.title}
           onChangeText={(val) => {
-            updateI18n('title_i18n', titleLang, val);
+            translation.editTitle(val);
             clearError('title');
           }}
         />
         {errors.title ? <Text style={styles.errorText}>{errors.title}</Text> : null}
-        <AutoTranslateButton
-          sourceText={form.title_i18n.sq ?? ''}
-          fieldLabel="Title"
-          onResult={(r) =>
-            setForm((prev) => ({ ...prev, title_i18n: { ...prev.title_i18n, ...r } }))
-          }
-        />
       </View>
 
       <View style={styles.fieldBlock}>
         <Text style={styles.fieldLabel}>{t('listing.description')}</Text>
-        <LangTabs styles={styles} active={descLang} onSelect={setDescLang} map={form.description_i18n} />
         <TextInput
           style={[styles.input, styles.textArea]}
           placeholder={
-            descLang === 'sq'
+            translation.activeLang === 'sq'
               ? t('listing.descriptionPlaceholder')
-              : `${t('listing.description')} (${descLang.toUpperCase()})`
+              : `${t('listing.description')} (${translation.activeLang.toUpperCase()})`
           }
           placeholderTextColor={colors.textSecondary}
-          value={form.description_i18n[descLang] ?? ''}
+          value={translation.description}
           onChangeText={(val) => {
-            updateI18n('description_i18n', descLang, val);
+            translation.editDescription(val);
             clearError('description');
           }}
           multiline
           textAlignVertical="top"
         />
         {errors.description ? <Text style={styles.errorText}>{errors.description}</Text> : null}
-        <AutoTranslateButton
-          sourceText={form.description_i18n.sq ?? ''}
-          fieldLabel="Description"
-          onResult={(r) =>
-            setForm((prev) => ({
-              ...prev,
-              description_i18n: { ...prev.description_i18n, ...r },
-            }))
-          }
-        />
       </View>
     </>
   );
@@ -1085,47 +1105,11 @@ export default function NewListingWizard() {
 }
 
 /**
- * These three live at module scope on purpose. Declared inside the wizard they
- * would get a fresh function identity on every keystroke, React would treat
- * each render as a different component type, and the TextInput underneath
- * would remount and drop focus mid-typing.
+ * These live at module scope on purpose. Declared inside the wizard they would
+ * get a fresh function identity on every keystroke, React would treat each
+ * render as a different component type, and the TextInput underneath would
+ * remount and drop focus mid-typing.
  */
-function LangTabs({
-  styles,
-  active,
-  onSelect,
-  map,
-}: {
-  styles: ReturnType<typeof createStyles>;
-  active: string;
-  onSelect: (lang: string) => void;
-  map: I18nMap;
-}) {
-  return (
-    <View style={styles.langTabs}>
-      {SUPPORTED_LANGS.map((lang) => {
-        const filled = !!map[lang]?.trim();
-        return (
-          <Pressable
-            key={lang}
-            onPress={() => onSelect(lang)}
-            accessibilityRole="button"
-            accessibilityState={{ selected: active === lang }}
-            style={[
-              styles.langTab,
-              filled && active !== lang && styles.langTabFilled,
-              active === lang && styles.langTabActive,
-            ]}>
-            <Text style={[styles.langTabText, active === lang && styles.langTabTextActive]}>
-              {lang.toUpperCase()}
-            </Text>
-          </Pressable>
-        );
-      })}
-    </View>
-  );
-}
-
 function Labeled({
   styles,
   label,

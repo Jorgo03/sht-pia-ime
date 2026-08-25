@@ -20,15 +20,17 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 
 import { LocationPicker } from '@/components/listing/location-picker';
+import { TranslationBar } from '@/components/listing/translation-bar';
 import { ActionButton } from '@/components/ui/action-button';
 import { AiTitleButton } from '@/components/ui/ai-title-button';
-import { AutoTranslateButton } from '@/components/ui/auto-translate-button';
 import { GradientBackground } from '@/components/ui/gradient-background';
 import { type AtticoPalette, Fonts } from '@/constants/theme';
 import { useAuth } from '@/contexts/auth-context';
 import { useTheme } from '@/contexts/theme-context';
 import { supabase } from '@/lib/supabase';
-import { SUPPORTED_LANGS, type I18nMap } from '@/lib/translate';
+import { translatePropertyContent, type I18nMap } from '@/lib/translate';
+import { useListingTranslation } from '@/src/features/listings/hooks/useListingTranslation';
+import type { TranslationMeta } from '@/src/lib/translationCore';
 import {
   MAX_IMAGES,
   MIN_IMAGES,
@@ -125,6 +127,8 @@ interface ListingForm {
   property_type: PropertyType;
   title_i18n: I18nMap;
   description_i18n: I18nMap;
+  /** Per-language provenance — see properties.translation_meta. */
+  translation_meta: TranslationMeta;
   address: string;
   city: string;
   /** Null until the agent taps the map; excluded from the map tab if unset. */
@@ -150,6 +154,7 @@ const INITIAL_FORM: ListingForm = {
   property_type: 'apartment',
   title_i18n: { sq: '' },
   description_i18n: { sq: '' },
+  translation_meta: {},
   address: '',
   city: '',
   latitude: null,
@@ -177,8 +182,6 @@ export default function CreateListingScreen() {
   const styles = useMemo(() => createStyles(colors), [colors]);
   const queryClient = useQueryClient();
   const [form, setForm] = useState<ListingForm>(INITIAL_FORM);
-  const [titleLang, setTitleLang] = useState('sq');
-  const [descLang, setDescLang] = useState('sq');
   const [submitting, setSubmitting] = useState(false);
   const [images, setImages] = useState<PickedImage[]>([]);
   const [imagesError, setImagesError] = useState<string | null>(null);
@@ -208,18 +211,20 @@ export default function CreateListingScreen() {
       [field]: { ...prev[field], [lang]: value },
     }));
 
+  // One language selection driving both text fields, with caching, staleness
+  // and manual-edit protection — shared with the wizard and with web.
+  const translation = useListingTranslation<ListingForm>({
+    form,
+    setForm,
+    translate: translatePropertyContent,
+  });
+
   const toggleFeature = (feature: string) =>
     setForm((prev) => ({
       ...prev,
       features: prev.features.includes(feature)
         ? prev.features.filter((f) => f !== feature)
         : [...prev.features, feature],
-    }));
-
-  const handleTranslateResult = (field: 'title_i18n' | 'description_i18n', result: I18nMap) =>
-    setForm((prev) => ({
-      ...prev,
-      [field]: { ...prev[field], ...result },
     }));
 
   // Mirrors web NewListing.jsx's validate(): the full set of required/range
@@ -305,6 +310,9 @@ export default function CreateListingScreen() {
         // This form authors in Albanian and translates outward from it, so sq
         // is the human-written version; every other i18n key is a translation.
         source_language: 'sq',
+        // Records which of those keys are machine output and which an agent
+        // corrected by hand, so a later edit does not overwrite their work.
+        translation_meta: form.translation_meta,
         beds: form.beds ? Number(form.beds) : null,
         baths: form.baths ? Number(form.baths) : null,
         sqft: form.sqft ? Number(form.sqft) : null,
@@ -352,37 +360,6 @@ export default function CreateListingScreen() {
       setSubmitting(false);
     }
   };
-
-  const renderLangTabs = (
-    activeLang: string,
-    onSelect: (lang: string) => void,
-    i18nMap: I18nMap,
-  ) => (
-    <View style={styles.langTabs}>
-      {SUPPORTED_LANGS.map((lang) => {
-        const hasContent = !!i18nMap[lang]?.trim();
-        return (
-          <TouchableOpacity
-            key={lang}
-            style={[
-              styles.langTab,
-              activeLang === lang && styles.langTabActive,
-              hasContent && activeLang !== lang && styles.langTabFilled,
-            ]}
-            onPress={() => onSelect(lang)}
-            activeOpacity={0.7}>
-            <Text
-              style={[
-                styles.langTabText,
-                activeLang === lang && styles.langTabTextActive,
-              ]}>
-              {lang.toUpperCase()}
-            </Text>
-          </TouchableOpacity>
-        );
-      })}
-    </View>
-  );
 
   // Matches web's .nl-section-label — a dash + mono-uppercase label, not a
   // bordered card header. NewListing.jsx has no card chrome around its
@@ -488,40 +465,51 @@ export default function CreateListingScreen() {
                   }}
                   onResult={(title) => {
                     updateI18n('title_i18n', 'sq', title);
-                    setTitleLang('sq');
+                    translation.selectLanguage('sq');
                   }}
                 />
               </View>
-              {renderLangTabs(titleLang, setTitleLang, form.title_i18n)}
+
+              {/* One selector for both fields — selecting a language translates
+                  the title and description together, in a single request. */}
+              <TranslationBar
+                activeLang={translation.activeLang}
+                onSelect={translation.selectLanguage}
+                filled={(lang) =>
+                  !!form.title_i18n[lang]?.trim() || !!form.description_i18n[lang]?.trim()
+                }
+                pendingLangs={translation.pendingLangs}
+                state={translation.state}
+                translating={translation.translating}
+                error={translation.error}
+                onRegenerate={translation.regenerate}
+                onRetry={translation.retry}
+                canRegenerate={translation.canRegenerate}
+              />
+
               <TextInput
                 style={styles.input}
-                placeholder={titleLang === 'sq' ? t('listing.titlePlaceholder') : `${t('listing.title')} (${titleLang.toUpperCase()})`}
+                placeholder={translation.activeLang === 'sq' ? t('listing.titlePlaceholder') : `${t('listing.title')} (${translation.activeLang.toUpperCase()})`}
                 placeholderTextColor={colors.textSecondary}
-                value={form.title_i18n[titleLang] ?? ''}
+                value={translation.title}
                 onChangeText={(val) => {
-                  updateI18n('title_i18n', titleLang, val);
+                  translation.editTitle(val);
                   if (errors.title) setErrors((prev) => ({ ...prev, title: undefined }));
                 }}
               />
               {errors.title && <Text style={styles.errorText}>{errors.title}</Text>}
-              <AutoTranslateButton
-                sourceText={form.title_i18n.sq ?? ''}
-                fieldLabel="Title"
-                onResult={(r) => handleTranslateResult('title_i18n', r)}
-              />
             </View>
 
             {/* Description i18n */}
             <View style={styles.field}>
               <Text style={styles.fieldLabel}>{t('listing.description')}</Text>
-              {renderLangTabs(descLang, setDescLang, form.description_i18n)}
               <TextInput
                 style={[styles.input, styles.textArea]}
-                placeholder={descLang === 'sq' ? t('listing.descriptionPlaceholder') : `${t('listing.description')} (${descLang.toUpperCase()})`}
+                placeholder={translation.activeLang === 'sq' ? t('listing.descriptionPlaceholder') : `${t('listing.description')} (${translation.activeLang.toUpperCase()})`}
                 placeholderTextColor={colors.textSecondary}
-                value={form.description_i18n[descLang] ?? ''}
+                value={translation.description}
                 onChangeText={(val) => {
-                  updateI18n('description_i18n', descLang, val);
+                  translation.editDescription(val);
                   if (errors.description) setErrors((prev) => ({ ...prev, description: undefined }));
                 }}
                 multiline
@@ -529,11 +517,6 @@ export default function CreateListingScreen() {
                 textAlignVertical="top"
               />
               {errors.description && <Text style={styles.errorText}>{errors.description}</Text>}
-              <AutoTranslateButton
-                sourceText={form.description_i18n.sq ?? ''}
-                fieldLabel="Description"
-                onResult={(r) => handleTranslateResult('description_i18n', r)}
-              />
             </View>
 
             {/* Location */}

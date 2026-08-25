@@ -474,12 +474,15 @@
     "errorUnavailable": "AI jest teraz niedostępne — napisz ręcznie.",
     "errorRateLimited": "Zbyt wiele żądań — spróbuj później.",
     "errorGeneric": "Coś poszło nie tak. Spróbuj ponownie.",
-    "translateAll": "Przetłumacz na wszystkie języki",
     "translating": "Tłumaczenie…",
-    "translated": "Przetłumaczono — sprawdź każdy język.",
     "translateFirst": "Najpierw napisz tytuł i opis po albańsku",
     "generateTitle": "Generuj z AI",
-    "titleNeedsFields": "Podaj typ nieruchomości i miasto, aby wygenerować tytuł"
+    "titleNeedsFields": "Podaj typ nieruchomości i miasto, aby wygenerować tytuł",
+    "translationAuto": "Tłumaczenie automatyczne",
+    "translationStale": "Tekst albański się zmienił — zostanie przetłumaczony ponownie",
+    "translationManual": "Edytowane ręcznie",
+    "regenerateTranslation": "Przetłumacz ponownie",
+    "translationFailed": "Tłumaczenie nie powiodło się. Spróbuj ponownie."
   },
   "assistant": {
     "title": "Asystent ogłoszenia",

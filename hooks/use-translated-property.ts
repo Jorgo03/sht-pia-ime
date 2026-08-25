@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 
 import { Property } from '@/data/types';
-import { translateAll } from '@/lib/translate';
+import { translatePropertyContent, type LangCode } from '@/lib/translate';
 
 const cache: Record<string, { title: string; description: string }> = {};
 
@@ -86,15 +86,19 @@ export function useTranslatedProperty(
       return;
     }
 
-    Promise.all([
-      origTitle ? translateAll(origTitle, 'sq') : Promise.resolve<Record<string, string>>({}),
-      origDesc ? translateAll(origDesc, 'sq') : Promise.resolve<Record<string, string>>({}),
-    ])
-      .then(([titleMap, descMap]) => {
+    // One request for both fields in the viewer's language only. This used to
+    // be two calls that each fanned out to all seven languages and threw six
+    // away — eight translations billed to render one.
+    translatePropertyContent({
+      title: origTitle,
+      description: origDesc,
+      targetLanguage: language as LangCode,
+    })
+      .then((result) => {
         if (!activeRef.current) return;
 
-        const translatedTitle = origTitle ? titleMap[language] || origTitle : '';
-        const translatedDesc = origDesc ? descMap[language] || origDesc : '';
+        const translatedTitle = origTitle ? result.title || origTitle : '';
+        const translatedDesc = origDesc ? result.description || origDesc : '';
 
         cache[key] = { title: translatedTitle, description: translatedDesc };
         setTitle(translatedTitle);
@@ -103,6 +107,8 @@ export function useTranslatedProperty(
         setTranslating(false);
       })
       .catch(() => {
+        // The original text is already on screen from the setState above, so a
+        // failure degrades to untranslated rather than to an empty card.
         if (!activeRef.current) return;
         setTranslating(false);
       });

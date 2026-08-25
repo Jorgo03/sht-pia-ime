@@ -458,12 +458,15 @@
     "errorUnavailable": "AI nuk është i disponueshëm tani — shkruaje manualisht.",
     "errorRateLimited": "Shumë kërkesa — provo përsëri më vonë.",
     "errorGeneric": "Diçka shkoi keq. Provo përsëri.",
-    "translateAll": "Përkthe në të gjitha gjuhët",
     "translating": "Duke përkthyer…",
-    "translated": "U përkthye — kontrollo çdo gjuhë.",
     "translateFirst": "Shkruaj fillimisht titullin dhe përshkrimin në shqip",
     "generateTitle": "Gjenero me AI",
-    "titleNeedsFields": "Plotëso tipin dhe qytetin për të gjeneruar titullin"
+    "titleNeedsFields": "Plotëso tipin dhe qytetin për të gjeneruar titullin",
+    "translationAuto": "Përkthim automatik",
+    "translationStale": "Teksti në shqip ka ndryshuar — do të përkthehet sërish",
+    "translationManual": "Redaktuar manualisht",
+    "regenerateTranslation": "Përkthe sërish",
+    "translationFailed": "Përkthimi dështoi. Provo përsëri."
   },
   "assistant": {
     "title": "Asistenti i shpalljes",

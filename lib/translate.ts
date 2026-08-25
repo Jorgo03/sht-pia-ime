@@ -1,23 +1,102 @@
 import { supabase } from '@/lib/supabase';
+import {
+  SOURCE_LANG,
+  SUPPORTED_LANGS,
+  sanitizeTranslationResponse,
+  type I18nMap,
+  type LangCode,
+} from '@/src/lib/translationCore';
 
-export const SUPPORTED_LANGS = ['sq', 'en', 'de', 'it', 'es', 'pl', 'ru', 'fr'] as const;
-export type LangCode = (typeof SUPPORTED_LANGS)[number];
-export type I18nMap = Record<string, string>;
+// Re-exported so screens keep importing language constants and types from
+// '@/lib/translate' as they always have, while the definitions themselves live
+// in the one module the web app shares (see src/lib/translationCore.js for why
+// that has to be a single copy).
+export { SOURCE_LANG, SUPPORTED_LANGS };
+export type { I18nMap, LangCode };
 
-export async function translateAll(
-  text: string,
-  source: LangCode = 'sq',
-): Promise<I18nMap> {
-  if (!text?.trim()) return {};
+/** Error codes translate-property can return, plus the transport failures. */
+export type TranslationErrorCode =
+  | 'unavailable'
+  | 'rate_limited'
+  | 'unauthorized'
+  | 'empty_content'
+  | 'invalid_response'
+  | 'network';
+
+export class TranslationError extends Error {
+  code: TranslationErrorCode;
+  constructor(code: TranslationErrorCode, message?: string) {
+    super(message ?? code);
+    this.name = 'TranslationError';
+    this.code = code;
+  }
+}
+
+/**
+ * supabase-js reports any non-2xx as a FunctionsHttpError whose message is a
+ * generic "non-2xx status code" — the body carrying the real reason is only
+ * reachable through error.context. Without this the UI could not tell "you are
+ * out of quota" from "the server has no API key", and would show one vague
+ * failure for both.
+ */
+async function classify(error: unknown): Promise<TranslationErrorCode> {
+  const context = (error as { context?: Response })?.context;
+  if (!context || typeof context.json !== 'function') return 'network';
+  try {
+    const body = await context.json();
+    const code = typeof body?.error === 'string' ? body.error : '';
+    if (code === 'rate_limited') return 'rate_limited';
+    if (code === 'unauthorized') return 'unauthorized';
+    if (code === 'empty_content') return 'empty_content';
+    if (code.startsWith('unsupported_') || code === 'target_equals_source') return 'invalid_response';
+    return 'unavailable';
+  } catch {
+    return 'unavailable';
+  }
+}
+
+export interface TranslatePropertyArgs {
+  title: string;
+  description: string;
+  targetLanguage: LangCode;
+  sourceLanguage?: LangCode;
+}
+
+/**
+ * Translates a listing's title and description into one target language.
+ *
+ * One call for both fields, by design: it is a single upstream request instead
+ * of two, and the model reads them together, which is what lets it tell a
+ * neighbourhood name in the title from an ordinary noun.
+ *
+ * Whichever field is blank stays blank — the caller passes both, and only the
+ * non-empty ones are required to come back filled.
+ */
+export async function translatePropertyContent({
+  title,
+  description,
+  targetLanguage,
+  sourceLanguage = SOURCE_LANG,
+}: TranslatePropertyArgs): Promise<{ title: string; description: string }> {
+  const wantTitle = !!title?.trim();
+  const wantDescription = !!description?.trim();
+
+  // Nothing to translate never becomes a request — the caller is expected to
+  // check too, but this is the boundary that actually guarantees it.
+  if (!wantTitle && !wantDescription) return { title: '', description: '' };
 
   const { data, error } = await supabase.functions.invoke('translate-property', {
-    body: { text, source },
+    body: {
+      title: title ?? '',
+      description: description ?? '',
+      sourceLanguage,
+      targetLanguage,
+    },
   });
 
-  if (error) {
-    console.error('Translation failed:', error);
-    throw new Error('Translation service unavailable. Please try again.');
-  }
+  if (error) throw new TranslationError(await classify(error));
 
-  return (data as I18nMap) ?? {};
+  const clean = sanitizeTranslationResponse(data, { wantTitle, wantDescription });
+  if (!clean) throw new TranslationError('invalid_response');
+  return clean;
 }

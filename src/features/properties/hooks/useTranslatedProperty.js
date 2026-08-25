@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { supabase } from '../../../lib/supabase'
+import { translatePropertyContent } from '../../../lib/translate'
 
 const cache = {}
 
@@ -64,34 +64,32 @@ export function useTranslatedProperty(property, language) {
       return
     }
 
-    // translate-property takes ONE string and returns it in all 8 supported
-    // languages ({ sq, en, de, ... }) — not a batch-of-texts-to-one-target
-    // API. Title and description each need their own call; we keep only the
-    // language actually being viewed and let the rest of the response go
-    // unused. Matches how AutoTranslateButton already calls this function.
-    Promise.all([
-      origTitle
-        ? supabase.functions.invoke('translate-property', { body: { text: origTitle, source: 'sq' } })
-        : Promise.resolve({ data: {}, error: null }),
-      origDesc
-        ? supabase.functions.invoke('translate-property', { body: { text: origDesc, source: 'sq' } })
-        : Promise.resolve({ data: {}, error: null }),
-    ]).then(([titleRes, descRes]) => {
-      if (!activeRef.current) return
-      if (titleRes.error || descRes.error) {
-        setTranslating(false)
-        return
-      }
-
-      const translatedTitle = origTitle ? (titleRes.data?.[language] || origTitle) : ''
-      const translatedDesc = origDesc ? (descRes.data?.[language] || origDesc) : ''
-
-      cache[key] = { title: translatedTitle, description: translatedDesc }
-      setTitle(translatedTitle)
-      setDescription(translatedDesc)
-      setIsTranslated(true)
-      setTranslating(false)
+    // One request for both fields, into the viewer's language only. This was
+    // two calls that each fanned out to all eight languages and discarded
+    // seven — eight translations billed to render one card.
+    translatePropertyContent({
+      title: origTitle,
+      description: origDesc,
+      targetLanguage: language,
     })
+      .then((result) => {
+        if (!activeRef.current) return
+
+        const translatedTitle = origTitle ? result.title || origTitle : ''
+        const translatedDesc = origDesc ? result.description || origDesc : ''
+
+        cache[key] = { title: translatedTitle, description: translatedDesc }
+        setTitle(translatedTitle)
+        setDescription(translatedDesc)
+        setIsTranslated(true)
+        setTranslating(false)
+      })
+      .catch(() => {
+        // The original text is already on screen from the setState above, so a
+        // failure degrades to untranslated rather than to an empty card.
+        if (!activeRef.current) return
+        setTranslating(false)
+      })
   }, [property?.id, language])
 
   return { title, description, translating, isTranslated }

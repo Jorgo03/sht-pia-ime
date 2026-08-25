@@ -285,20 +285,25 @@ is my proposal), (b) minimum comparable count before showing anything (I'd say
 their own listings. The Zillow-style "estimate, not advice" framing from
 CLAUDE.md applies. Say go and I'll build it behind `VITE_FLAG_PRICE_INSIGHT`.
 
-## 0c. GOOGLE_TRANSLATE_KEY is INVALID — auto-translate is down
+## 0c. GOOGLE_TRANSLATE_KEY is INVALID — auto-translate is down — RESOLVED 2026-08-25
 
-Verified live: `translate-property` returns 500 with Google's
-"API key not valid". This breaks BOTH the new wizard translate button
-(Feature E) and the pre-existing `translate-description` fallback. The app
-degrades gracefully (stored `title_i18n` translations still display), but no
-NEW translations can be produced until you replace the secret:
+~~Verified live: `translate-property` returns 500 with Google's "API key not
+valid". No NEW translations can be produced until you replace the secret.~~
 
-```bash
-supabase secrets set GOOGLE_TRANSLATE_KEY=<valid key> --project-ref xzzzhlwmzotibrxdqmcm
-```
+**Resolved by removing the dependency rather than replacing the key.**
+`translate-property` now runs on the Anthropic integration the other three AI
+functions already use (`ANTHROPIC_API_KEY`, verified present and working on
+2026-08-25), so `GOOGLE_TRANSLATE_KEY` and `DEEPL_API_KEY` are no longer read
+by anything in this project and can be deleted from the secrets.
 
-Check `DEEPL_API_KEY` while you're there — it's untested because the pipeline
-fails at the Google (sq→en) step first. I do not create or rotate keys.
+That was the right trade regardless of the broken key: neither Google nor
+DeepL takes an instruction, and this catalogue is full of text they get
+wrong — "Apartament 2+1 në **Bllok**" (a Tirana neighbourhood) translated to
+"in Block", plus the `2+1` room notation, m2 values and bullet structure all
+open to reformatting. A prompted model can be told to leave them alone.
+
+Still outstanding, and not something I can do: nothing. No key needs creating
+or rotating for translation to work.
 
 ## 0d. Test account created for verification (dev DB)
 

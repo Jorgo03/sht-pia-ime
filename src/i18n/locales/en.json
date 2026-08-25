@@ -458,12 +458,15 @@
     "errorUnavailable": "AI is unavailable right now — please write manually.",
     "errorRateLimited": "Too many generations — try again in a while.",
     "errorGeneric": "Something went wrong. Please try again.",
-    "translateAll": "Translate to all languages",
     "translating": "Translating…",
-    "translated": "Translated — check each language tab.",
     "translateFirst": "Write the Albanian title and description first",
     "generateTitle": "Generate with AI",
-    "titleNeedsFields": "Fill in property type and city to generate a title"
+    "titleNeedsFields": "Fill in property type and city to generate a title",
+    "translationAuto": "Automatic translation",
+    "translationStale": "The Albanian text changed — this will be translated again",
+    "translationManual": "Edited manually",
+    "regenerateTranslation": "Translate again",
+    "translationFailed": "Translation failed. Please try again."
   },
   "assistant": {
     "title": "Listing assistant",

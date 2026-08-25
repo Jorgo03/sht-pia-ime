@@ -466,12 +466,15 @@
     "errorUnavailable": "L'IA non è disponibile al momento — scrivi manualmente.",
     "errorRateLimited": "Troppe richieste — riprova più tardi.",
     "errorGeneric": "Qualcosa è andato storto. Riprova.",
-    "translateAll": "Traduci in tutte le lingue",
     "translating": "Traduzione…",
-    "translated": "Tradotto — controlla ogni lingua.",
     "translateFirst": "Scrivi prima titolo e descrizione in albanese",
     "generateTitle": "Genera con IA",
-    "titleNeedsFields": "Inserisci tipologia e città per generare un titolo"
+    "titleNeedsFields": "Inserisci tipologia e città per generare un titolo",
+    "translationAuto": "Traduzione automatica",
+    "translationStale": "Il testo albanese è cambiato — verrà tradotto di nuovo",
+    "translationManual": "Modificato manualmente",
+    "regenerateTranslation": "Traduci di nuovo",
+    "translationFailed": "Traduzione non riuscita. Riprova."
   },
   "assistant": {
     "title": "Assistente dell'annuncio",

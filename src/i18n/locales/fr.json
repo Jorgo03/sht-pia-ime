@@ -466,12 +466,15 @@
     "errorUnavailable": "L'IA est indisponible pour le moment — rédigez manuellement.",
     "errorRateLimited": "Trop de demandes — réessayez plus tard.",
     "errorGeneric": "Une erreur s'est produite. Veuillez réessayer.",
-    "translateAll": "Traduire dans toutes les langues",
     "translating": "Traduction…",
-    "translated": "Traduit — vérifiez chaque langue.",
     "translateFirst": "Écrivez d'abord le titre et la description en albanais",
     "generateTitle": "Générer avec IA",
-    "titleNeedsFields": "Renseignez le type et la ville pour générer un titre"
+    "titleNeedsFields": "Renseignez le type et la ville pour générer un titre",
+    "translationAuto": "Traduction automatique",
+    "translationStale": "Le texte albanais a changé — la traduction sera refaite",
+    "translationManual": "Modifié manuellement",
+    "regenerateTranslation": "Traduire à nouveau",
+    "translationFailed": "Échec de la traduction. Veuillez réessayer."
   },
   "assistant": {
     "title": "Assistant de l'annonce",

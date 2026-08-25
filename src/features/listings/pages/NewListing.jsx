@@ -9,7 +9,9 @@ import { isEnabled } from '../../../lib/flags'
 import { generateListing } from '../../../lib/ai'
 import { getMarkerIcon } from '../../properties/components/MapMarker'
 import AiListingPanel from '../components/AiListingPanel'
-import { AutoTranslateButton } from '../components/AutoTranslateButton'
+import { TranslationBar } from '../components/TranslationBar'
+import { useListingTranslation } from '../hooks/useListingTranslation'
+import { translatePropertyContent } from '../../../lib/translate'
 import '../../../styles/map.css'
 import '../../../styles/new-listing.css'
 
@@ -43,23 +45,13 @@ function compressImage(file, maxWidth = 1600, quality = 0.8) {
   })
 }
 
-// Fill only languages the agent hasn't written manually; sq stays untouched.
-function mergeTranslations(existing, translated) {
-  const out = { ...existing }
-  for (const [lang, text] of Object.entries(translated || {})) {
-    if (lang !== 'sq' && text && !out[lang]?.trim()) out[lang] = text
-  }
-  return out
-}
-
-const STEPS = ['basics', 'location', 'details', 'media', 'publish']
+const STEPS =['basics', 'location', 'details', 'media', 'publish']
 const PROPERTY_TYPES = ['apartment', 'villa', 'house', 'land', 'commercial', 'office', 'garage']
 // daily_rent removed from creation (owner decision 2026-07-14); display
 // helpers in lib/format keep supporting it in case legacy rows ever exist.
 const LISTING_TYPES = ['sale', 'rent']
 const CITIES = ['Tiranë', 'Durrës', 'Vlorë', 'Shkodër', 'Elbasan', 'Korçë', 'Fier', 'Berat', 'Lushnjë', 'Pogradec', 'Kavajë', 'Gjirokastër', 'Sarandë']
 const FEATURES_LIST = ['balcony', 'parking', 'elevator', 'garden', 'pool', 'furnished', 'airConditioning', 'heating', 'security', 'storage']
-const LANGS = ['sq', 'en', 'de', 'it', 'es', 'pl', 'ru', 'fr']
 
 // properties.sqft/beds/floor/total_floors/year_built are Postgres `integer`
 // (±2.14B). Without a client-side bound, a fat-fingered value sails through
@@ -101,6 +93,8 @@ const INITIAL_FORM = {
   property_type: 'apartment',
   title_i18n: { sq: '' },
   description_i18n: { sq: '' },
+  // Per-language provenance — see properties.translation_meta.
+  translation_meta: {},
   city: 'Tiranë',
   address: '',
   latitude: null,
@@ -149,11 +143,22 @@ export default function NewListing() {
   const [step, setStep] = useState(draft?.step ?? 0)
   const [submitting, setSubmitting] = useState(false)
   const [errors, setErrors] = useState({})
-  const [titleLang, setTitleLang] = useState('sq')
-  const [descLang, setDescLang] = useState('sq')
   const [draftRestored, setDraftRestored] = useState(Boolean(draft))
 
   const [form, setForm] = useState(draft?.form ? { ...INITIAL_FORM, ...draft.form } : INITIAL_FORM)
+
+  // Owns the language selection for BOTH text fields, plus the per-language
+  // cache, staleness against the Albanian source, protection for hand-edited
+  // translations, and discarding superseded responses. Shared verbatim with
+  // the Expo wizard (app/listing/new.tsx).
+  const translation = useListingTranslation({
+    form,
+    setForm,
+    translate: translatePropertyContent,
+    // Flag off => the tabs still switch and stay editable, they just never
+    // call out. Manual multi-language entry, exactly as before Feature E.
+    enabled: isEnabled('autoTranslate'),
+  })
 
   const [images, setImages] = useState([])
   // Native video upload (replaces the old YouTube-URL text field). Like the
@@ -272,7 +277,9 @@ export default function NewListing() {
         notes: form.description_i18n.sq || '',
       }, 'sq')
       updateI18n('title_i18n', 'sq', result.title)
-      setTitleLang('sq')
+      // AI writes the Albanian source, so show it — otherwise the agent stays
+      // on a translated tab and cannot see what was just generated.
+      translation.selectLanguage('sq')
     } catch (err) {
       setErrors(prev => ({
         ...prev,
@@ -373,6 +380,9 @@ export default function NewListing() {
         title_i18n: form.title_i18n,
         description: form.description_i18n.sq || '',
         description_i18n: form.description_i18n,
+        // Which languages are machine output and which an agent corrected by
+        // hand, so a later edit does not regenerate over their work.
+        translation_meta: form.translation_meta,
         listing_type: form.listing_type,
         property_type: form.property_type,
         city: form.city,
@@ -463,8 +473,9 @@ export default function NewListing() {
                 onApply={({ title, description }) => {
                   updateI18n('title_i18n', 'sq', title)
                   updateI18n('description_i18n', 'sq', description)
-                  setTitleLang('sq')
-                  setDescLang('sq')
+                  // The panel writes the Albanian source; show it rather than
+                  // leaving the agent on a now-stale translated tab.
+                  translation.selectLanguage('sq')
                   setErrors(prev => ({ ...prev, title: undefined, description: undefined }))
                 }}
               />
@@ -501,47 +512,46 @@ export default function NewListing() {
                   </button>
                 )}
               </label>
-              <div className="nl-lang-tabs">
-                {LANGS.map(l => (
-                  <button key={l} className={`nl-lang-tab ${titleLang === l ? 'active' : ''}`} onClick={() => setTitleLang(l)}>{l.toUpperCase()}</button>
-                ))}
-              </div>
+              {/* One selector for both fields: picking a language translates
+                  the title and description together, in a single request. */}
+              <TranslationBar
+                activeLang={translation.activeLang}
+                onSelect={translation.selectLanguage}
+                filled={lang =>
+                  Boolean(form.title_i18n[lang]?.trim() || form.description_i18n[lang]?.trim())
+                }
+                pendingLangs={translation.pendingLangs}
+                state={translation.state}
+                translating={translation.translating}
+                error={translation.error}
+                onRegenerate={translation.regenerate}
+                onRetry={translation.retry}
+                canRegenerate={translation.canRegenerate}
+              />
               <input
                 type="text"
-                value={form.title_i18n[titleLang] || ''}
-                onChange={e => updateI18n('title_i18n', titleLang, e.target.value)}
+                value={translation.title}
+                onChange={e => {
+                  translation.editTitle(e.target.value)
+                  if (errors.title) setErrors(prev => ({ ...prev, title: undefined }))
+                }}
                 placeholder={t('listing.titlePlaceholder')}
               />
               {errors.title && <span className="nl-error">{errors.title}</span>}
             </div>
             <div className="nl-field">
               <label>{t('listing.description')}</label>
-              <div className="nl-lang-tabs">
-                {LANGS.map(l => (
-                  <button key={l} className={`nl-lang-tab ${descLang === l ? 'active' : ''}`} onClick={() => setDescLang(l)}>{l.toUpperCase()}</button>
-                ))}
-              </div>
               <textarea
                 rows={4}
-                value={form.description_i18n[descLang] || ''}
-                onChange={e => updateI18n('description_i18n', descLang, e.target.value)}
+                value={translation.description}
+                onChange={e => {
+                  translation.editDescription(e.target.value)
+                  if (errors.description) setErrors(prev => ({ ...prev, description: undefined }))
+                }}
                 placeholder={t('listing.descriptionPlaceholder')}
               />
               {errors.description && <span className="nl-error">{errors.description}</span>}
             </div>
-            {isEnabled('autoTranslate') && (
-              <AutoTranslateButton
-                title={form.title_i18n.sq}
-                description={form.description_i18n.sq}
-                onResult={({ titleMap, descriptionMap }) => {
-                  setForm(prev => ({
-                    ...prev,
-                    title_i18n: mergeTranslations(prev.title_i18n, titleMap),
-                    description_i18n: mergeTranslations(prev.description_i18n, descriptionMap),
-                  }))
-                }}
-              />
-            )}
           </>
         )}
 
