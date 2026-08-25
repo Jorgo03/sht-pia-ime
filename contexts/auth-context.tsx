@@ -46,15 +46,17 @@ const AUTH_INIT_TIMEOUT_MS = 8000;
  */
 const IS_EXPO_GO = Constants.executionEnvironment === ExecutionEnvironment.StoreClient;
 
-// Dev-only OAuth tracing (Metro console). Never logs token/credential
-// values — only the shape of what happened (redirect URI, whether a code
-// came back, exchange success). Confirmed live: Supabase's /authorize
-// endpoint 302s straight to Google for web, the native shtepia-ime://
-// scheme, AND an exp://<lan-ip>:8081/--/... Expo Go URL alike — it does not
-// reject an unrecognized redirect_to upfront. So a redirect failure, if
-// that's the cause, only surfaces after Google hands control back to
-// Supabase's own callback — a step this app can only observe from here,
-// not simulate, hence this trace instead of a guessed fix.
+// Dev-only OAuth diagnostics (Metro console), on failure paths only — the
+// happy path is silent. Never logs token/credential values, only the shape
+// of what failed.
+//
+// Kept rather than deleted because of what was confirmed live: Supabase's
+// /authorize endpoint 302s straight to Google for web, the native
+// shtepia-ime:// scheme, AND an exp://<lan-ip>:8081/--/... Expo Go URL
+// alike — it does not reject an unrecognized redirect_to upfront. A bad
+// redirect therefore surfaces only after Google hands control back, as a
+// silent 'cancel' indistinguishable from the user closing the browser.
+// Without these the next such failure is invisible.
 function oauthDebug(label: string, data?: Record<string, unknown>) {
   if (!__DEV__) return;
   console.log(`[oauth] ${label}`, data ?? '');
@@ -322,9 +324,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       ? `${webOrigin}/auth/callback?rt=${encodeURIComponent(appRedirect)}`
       : appRedirect;
 
-    oauthDebug('redirectUri', { appRedirect, redirectTo, viaRelay: IS_EXPO_GO });
-    oauthDebug('env', { platform: Platform.OS, provider, expoGo: IS_EXPO_GO });
-
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider,
       options: {
@@ -338,26 +337,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return { error: error as Error | null };
     }
 
-    // Host only — the full URL carries state/PKCE parameters.
-    oauthDebug('authorizationUrl', { host: data.url ? new URL(data.url).host : null });
-
     // Second argument is appRedirect, NOT redirectTo: it tells the auth
     // session which URL ends the flow, and that is always this app's own
     // address. Under the relay, redirectTo is an https page the browser
     // merely passes through on its way here — waiting for that instead would
     // end the session one hop early, before the code reached the app.
     const result = await WebBrowser.openAuthSessionAsync(data.url, appRedirect);
-    oauthDebug('result', { type: result.type });
 
     if (result.type !== 'success') {
       // 'cancel' means the auth session closed without a URL matching
-      // redirectTo. Two very different causes produce it: the user dismissed
+      // appRedirect. Two very different causes produce it: the user dismissed
       // the browser, or Supabase rejected redirectTo and sent the browser
       // somewhere this scheme can never match. The API cannot tell them
       // apart, so this returns no error (a real cancel must not look like a
-      // failure) and leans on the logged redirectUri above to distinguish
-      // them: if it is absent from the Supabase allow-list, that is the
-      // cause.
+      // failure) and logs the two redirect URIs instead — if redirectTo is
+      // absent from the Supabase allow-list, that is the cause.
+      oauthDebug('auth session closed without reaching the app', {
+        type: result.type,
+        appRedirect,
+        redirectTo,
+        viaRelay: IS_EXPO_GO,
+      });
       return { error: null };
     }
 
@@ -365,7 +365,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const code = url.searchParams.get('code');
     const oauthError = url.searchParams.get('error');
     const errorDescription = url.searchParams.get('error_description');
-    oauthDebug('callback received', { hasCode: !!code, oauthError, errorDescription });
 
     if (oauthError) {
       // Reuses friendlyAuthError's existing 'provider is not enabled' /
@@ -375,10 +374,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     if (code) {
       const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code);
-      oauthDebug('session exchange (pkce)', {
-        success: !exchangeError,
-        message: exchangeError?.message,
-      });
+      if (exchangeError) {
+        oauthDebug('session exchange (pkce) failed', { message: exchangeError.message });
+      }
       return { error: exchangeError as Error | null };
     }
 
@@ -395,7 +393,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         access_token: accessToken,
         refresh_token: refreshToken,
       });
-      oauthDebug('session set (implicit)', { success: !setErr, message: setErr?.message });
+      if (setErr) {
+        oauthDebug('session set (implicit) failed', { message: setErr.message });
+      }
       return { error: setErr as Error | null };
     }
 
