@@ -36,11 +36,13 @@ Storage: `property-images`, `avatars` — both public buckets, folder-scoped
 
 | Function | Purpose | Model / backend |
 |---|---|---|
-| `translate-property` | text → 8 languages | Google Translate + DeepL |
-| `translate-description` | on-the-fly listing translation fallback | Google + DeepL |
-| `ai-generate-listing` | Feature A: wizard copy generation | claude-sonnet-5 |
+| `translate-property` | Feature E: listing title+description → one target language, real-estate-tuned prompt | claude-sonnet-5 |
 | `ai-parse-search` | Feature B: NL query → filters | claude-haiku-4-5 |
 | `ai-listing-assistant` | Feature C: grounded per-listing chat | claude-haiku-4-5 |
+
+Retired: `ai-generate-listing` (Feature A, wizard copy generation — removed
+2026-08-25, stubbed `410 Gone`) and `translate-description` (unreferenced by
+any client code — see DECISIONS.md for both).
 
 AI functions require the `ANTHROPIC_API_KEY` secret (see DECISIONS.md); until
 set they return `503 ai_unavailable` and the client falls back to non-AI paths.

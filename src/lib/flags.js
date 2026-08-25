@@ -4,14 +4,12 @@
 // or at build time in .env.local: VITE_FLAG_AI_SEARCH=false
 
 const DEFAULTS = {
-  aiListingGenerator: true, // Feature A — wizard copy generation
   aiSearch: true,           // Feature B — natural-language search parsing
   aiAssistant: true,        // Feature C — per-listing buyer chat
-  autoTranslate: true,      // Feature E — one-click 8-language listing translation
+  autoTranslate: true,      // Feature E — language-tab listing translation
 }
 
 const ENV_NAMES = {
-  aiListingGenerator: 'VITE_FLAG_AI_LISTING_GENERATOR',
   aiSearch: 'VITE_FLAG_AI_SEARCH',
   aiAssistant: 'VITE_FLAG_AI_ASSISTANT',
   autoTranslate: 'VITE_FLAG_AUTO_TRANSLATE',

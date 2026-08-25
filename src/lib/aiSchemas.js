@@ -37,20 +37,3 @@ export function sanitizeSearchFilters(raw) {
 
   return Object.keys(out).length > 0 ? out : null
 }
-
-// Raw model output -> { title, description } ready to drop into the wizard
-// inputs. Highlights are folded into the description as plain lines.
-export function sanitizeGeneratedListing(raw) {
-  if (!raw || typeof raw !== 'object') return null
-  const title = typeof raw.title === 'string' ? raw.title.trim().slice(0, 120) : ''
-  let description = typeof raw.description === 'string' ? raw.description.trim().slice(0, 4000) : ''
-  if (!title || !description) return null
-
-  const highlights = (Array.isArray(raw.highlights) ? raw.highlights : [])
-    .filter((h) => typeof h === 'string' && h.trim())
-    .slice(0, 5)
-    .map((h) => `• ${h.trim().slice(0, 120)}`)
-  if (highlights.length > 0) description = `${description}\n\n${highlights.join('\n')}`
-
-  return { title, description }
-}

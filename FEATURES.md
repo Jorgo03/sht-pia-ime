@@ -14,18 +14,11 @@ or at runtime `localStorage.setItem('fho_flags', JSON.stringify({ aiSearch: fals
 
 | # | Feature | Model | Edge function | Flag | Rate limit |
 |---|---|---|---|---|---|
-| A | AI listing generator | `claude-sonnet-5` | `supabase/functions/ai-generate-listing` | `aiListingGenerator` / `VITE_FLAG_AI_LISTING_GENERATOR` | 20/h/user |
 | B | Natural-language search | `claude-haiku-4-5-20251001` | `supabase/functions/ai-parse-search` | `aiSearch` / `VITE_FLAG_AI_SEARCH` | 60/h/key |
 | C | Listing buyer assistant | `claude-haiku-4-5-20251001` | `supabase/functions/ai-listing-assistant` | `aiAssistant` / `VITE_FLAG_AI_ASSISTANT` | 30/h/key |
 | E | Auto-translate listings | `claude-sonnet-5` | `supabase/functions/translate-property` | `autoTranslate` / `VITE_FLAG_AUTO_TRANSLATE` | 60/h/user |
 
-## A — AI listing generator (flagship)
-
-- **What**: panel at the top of the wizard's Basics step ([AiListingPanel.jsx](src/components/AiListingPanel.jsx)). Agent types free-form notes; Sonnet writes an Albanian title, 70–130-word description, and 3–5 highlight bullets (folded into the description). Output lands in the normal editable inputs — nothing publishes without human review ("review before publishing" hint shown).
-- **Grounding**: the function whitelists exactly the structured fields + capped notes; the system prompt forbids invented amenities/claims; structured output enforced via tool-use.
-- **Auth**: signed-in users only (401 otherwise).
-- **Fallback**: on 503/timeout the panel shows "AI unavailable — write manually"; the wizard is unaffected.
-- **Est. cost/call**: ~600 in / ~450 out tokens ≈ **$0.008–0.01** at Sonnet-class pricing (~$3/$15 per MTok). At 20/h cap: worst case ~$0.20/user/hour.
+**Retired — Feature A, AI listing generator ("Gjenero me AI"), removed 2026-08-25.** It wrote a brand-new Albanian title/description from property facts — a different feature from translation (E), which never touched it. Removed at the owner's request rather than kept alongside the translation-bar rework, to leave one unambiguous way to fill the title field. `supabase/functions/ai-generate-listing` is stubbed to `410 Gone` (this project's tooling has no function-delete operation — delete it for real from the Supabase Dashboard when convenient); `AiTitleButton`/`AiListingPanel`, `generateListing()`, `sanitizeGeneratedListing()` and its tests, and the `aiListingGenerator` flag are deleted from the repo.
 
 ## B — Natural-language search
 

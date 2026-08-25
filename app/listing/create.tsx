@@ -22,7 +22,6 @@ import { useTranslation } from 'react-i18next';
 import { LocationPicker } from '@/components/listing/location-picker';
 import { TranslationBar } from '@/components/listing/translation-bar';
 import { ActionButton } from '@/components/ui/action-button';
-import { AiTitleButton } from '@/components/ui/ai-title-button';
 import { GradientBackground } from '@/components/ui/gradient-background';
 import { type AtticoPalette, Fonts } from '@/constants/theme';
 import { useAuth } from '@/contexts/auth-context';
@@ -204,12 +203,6 @@ export default function CreateListingScreen() {
 
   const updateField = <K extends keyof ListingForm>(key: K, value: ListingForm[K]) =>
     setForm((prev) => ({ ...prev, [key]: value }));
-
-  const updateI18n = (field: 'title_i18n' | 'description_i18n', lang: string, value: string) =>
-    setForm((prev) => ({
-      ...prev,
-      [field]: { ...prev[field], [lang]: value },
-    }));
 
   // One language selection driving both text fields, with caching, staleness
   // and manual-edit protection — shared with the wizard and with web.
@@ -449,26 +442,7 @@ export default function CreateListingScreen() {
 
             {/* Title i18n */}
             <View style={styles.field}>
-              <View style={styles.fieldLabelRow}>
-                <Text style={styles.fieldLabel}>{t('listing.title')}</Text>
-                <AiTitleButton
-                  details={{
-                    listing_type: form.listing_type,
-                    property_type: form.property_type,
-                    city: form.city,
-                    address: form.address,
-                    price: form.price,
-                    sqft: form.sqft,
-                    beds: form.beds,
-                    baths: form.baths,
-                    notes: form.description_i18n.sq ?? '',
-                  }}
-                  onResult={(title) => {
-                    updateI18n('title_i18n', 'sq', title);
-                    translation.selectLanguage('sq');
-                  }}
-                />
-              </View>
+              <Text style={styles.fieldLabel}>{t('listing.title')}</Text>
 
               {/* One selector for both fields — selecting a language translates
                   the title and description together, in a single request. */}

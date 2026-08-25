@@ -32,8 +32,7 @@ import { type Property } from '@/data/types';
  * allowed, 30/hr rate limit).
  *
  * Web gates this behind `isEnabled('aiAssistant')` (lib/flags.js); mobile has
- * no equivalent flags module — AiTitleButton and AutoTranslateButton already
- * ship unconditionally here, so this follows the same convention rather than
+ * no equivalent flags module, so this ships unconditionally rather than
  * inventing a mobile-only flag system for one component.
  *
  * Unlike web, this screen is a top-level Stack route, not a Tabs screen, so
@@ -79,8 +78,7 @@ export function ListingAssistant({ property }: { property: Property | null }) {
     setText('');
     setThinking(true);
     // i18n.language is a plain string at the type level, but this app only
-    // ever sets it to one of the 8 supported codes via changeLanguage — same
-    // assumption AiTitleButton's `language` prop already relies on.
+    // ever sets it to one of the 8 supported codes via changeLanguage.
     const reply = await askListingAssistant(property.id, history, i18n.language as LangCode);
     setThinking(false);
     setMessages((prev) => [

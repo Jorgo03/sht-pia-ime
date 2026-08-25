@@ -24,7 +24,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { LocationPicker } from '@/components/listing/location-picker';
 import { TranslationBar } from '@/components/listing/translation-bar';
-import { AiTitleButton } from '@/components/ui/ai-title-button';
 import { GhostBtn, PrimaryCTA } from '@/components/ui/buttons';
 import { Chip, SectionLabel } from '@/components/ui/chip';
 import { Field } from '@/components/ui/field';
@@ -277,9 +276,6 @@ export default function NewListingWizard() {
 
   const update = <K extends keyof ListingForm>(key: K, value: ListingForm[K]) =>
     setForm((prev) => ({ ...prev, [key]: value }));
-
-  const updateI18n = (field: 'title_i18n' | 'description_i18n', lang: string, value: string) =>
-    setForm((prev) => ({ ...prev, [field]: { ...prev[field], [lang]: value } }));
 
   // Owns the language selection for BOTH text fields, plus everything that
   // makes selecting one safe: the per-language cache, staleness against the
@@ -542,27 +538,7 @@ export default function NewListingWizard() {
       </Labeled>
 
       <View style={styles.fieldBlock}>
-        <View style={styles.labelRow}>
-          <Text style={styles.fieldLabel}>{t('listing.title')}</Text>
-          <AiTitleButton
-            details={{
-              listing_type: form.listing_type,
-              property_type: form.property_type,
-              city: form.city,
-              address: form.address,
-              price: form.price,
-              sqft: form.sqft,
-              beds: form.beds,
-              baths: form.baths,
-              notes: form.description_i18n.sq ?? '',
-            }}
-            onResult={(title) => {
-              updateI18n('title_i18n', 'sq', title);
-              translation.selectLanguage('sq');
-              clearError('title');
-            }}
-          />
-        </View>
+        <Text style={styles.fieldLabel}>{t('listing.title')}</Text>
 
         {/* One selector for both fields: tapping a language translates the
             title and description together, in a single request. */}
@@ -1259,12 +1235,6 @@ const createStyles = (colors: AtticoPalette) =>
 
     fieldBlock: { gap: 8 },
     row: { flexDirection: 'row', gap: 12 },
-    labelRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      gap: 8,
-    },
     fieldLabel: {
       fontFamily: Fonts?.sansSemiBold,
       fontSize: 13,

@@ -2,13 +2,11 @@ import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet'
-import { ArrowLeft, ArrowRight, Upload, X, Film, Sparkles, Loader2, Check } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Upload, X, Film, Check } from 'lucide-react'
 import { useAuth } from '../../auth/AuthContext'
 import { supabase } from '../../../lib/supabase'
 import { isEnabled } from '../../../lib/flags'
-import { generateListing } from '../../../lib/ai'
 import { getMarkerIcon } from '../../properties/components/MapMarker'
-import AiListingPanel from '../components/AiListingPanel'
 import { TranslationBar } from '../components/TranslationBar'
 import { useListingTranslation } from '../hooks/useListingTranslation'
 import { translatePropertyContent } from '../../../lib/translate'
@@ -164,7 +162,6 @@ export default function NewListing() {
   // Native video upload (replaces the old YouTube-URL text field). Like the
   // photos, a File can't be draft-persisted — re-added after a restore.
   const [video, setVideo] = useState(null)
-  const [aiTitleBusy, setAiTitleBusy] = useState(false)
 
   // Persist progress on every change; cleared on successful submit/discard.
   useEffect(() => {
@@ -185,13 +182,6 @@ export default function NewListing() {
   const update = (key, value) => {
     setForm(prev => ({ ...prev, [key]: value }))
     setErrors(prev => ({ ...prev, [key]: undefined }))
-  }
-
-  const updateI18n = (field, lang, value) => {
-    setForm(prev => ({
-      ...prev,
-      [field]: { ...prev[field], [lang]: value },
-    }))
   }
 
   const toggleFeature = (feat) => {
@@ -253,41 +243,6 @@ export default function NewListing() {
       if (prev) URL.revokeObjectURL(prev.preview)
       return null
     })
-  }
-
-  // Item 1: title-only AI generation — reuses the existing
-  // ai-generate-listing Edge Function (same grounding/rate limits as the
-  // full panel) and applies just the title, leaving the description alone.
-  const handleAiTitle = async () => {
-    if (aiTitleBusy) return
-    setAiTitleBusy(true)
-    setErrors(prev => ({ ...prev, title: undefined }))
-    try {
-      const result = await generateListing({
-        listing_type: form.listing_type,
-        property_type: form.property_type,
-        city: form.city,
-        address: form.address,
-        price: form.price,
-        currency: form.currency,
-        sqft: form.sqft,
-        beds: form.beds,
-        baths: form.baths,
-        features: form.features,
-        notes: form.description_i18n.sq || '',
-      }, 'sq')
-      updateI18n('title_i18n', 'sq', result.title)
-      // AI writes the Albanian source, so show it — otherwise the agent stays
-      // on a translated tab and cannot see what was just generated.
-      translation.selectLanguage('sq')
-    } catch (err) {
-      setErrors(prev => ({
-        ...prev,
-        title: err?.code === 'rate_limited' ? t('ai.errorRateLimited') : t('ai.errorUnavailable'),
-      }))
-    } finally {
-      setAiTitleBusy(false)
-    }
   }
 
   const validate = () => {
@@ -467,19 +422,6 @@ export default function NewListing() {
       <div className="nl-form">
         {step === 0 && (
           <>
-            {isEnabled('aiListingGenerator') && (
-              <AiListingPanel
-                form={form}
-                onApply={({ title, description }) => {
-                  updateI18n('title_i18n', 'sq', title)
-                  updateI18n('description_i18n', 'sq', description)
-                  // The panel writes the Albanian source; show it rather than
-                  // leaving the agent on a now-stale translated tab.
-                  translation.selectLanguage('sq')
-                  setErrors(prev => ({ ...prev, title: undefined, description: undefined }))
-                }}
-              />
-            )}
             <div className="nl-field">
               <label>{t('listing.listingType')}</label>
               <div className="nl-radio-group">
@@ -497,21 +439,7 @@ export default function NewListing() {
               </select>
             </div>
             <div className="nl-field">
-              <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
-                {t('listing.title')}
-                {isEnabled('aiListingGenerator') && (
-                  <button
-                    type="button"
-                    className="ai-panel__btn"
-                    style={{ padding: '5px 10px', fontSize: 12 }}
-                    onClick={handleAiTitle}
-                    disabled={aiTitleBusy}
-                  >
-                    {aiTitleBusy ? <Loader2 size={13} className="animate-spin" /> : <Sparkles size={13} />}
-                    {aiTitleBusy ? t('ai.generating') : t('ai.generateTitle')}
-                  </button>
-                )}
-              </label>
+              <label>{t('listing.title')}</label>
               {/* One selector for both fields: picking a language translates
                   the title and description together, in a single request. */}
               <TranslationBar

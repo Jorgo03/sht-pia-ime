@@ -526,3 +526,40 @@ exchanges the code inline after the in-app browser session closes, with no
 shared callback screen between platforms. Nothing to add to either dashboard
 list above for this to work; it's a separate flow by design, already
 verified correct in code.
+
+## 12. "Gjenero me AI" (Feature A, AI listing generator) retired — 2026-08-25
+
+Removed at your request, distinct from the translation-bar rework the same
+session shipped. This was a different feature from translation and was
+never broken by it: `AiTitleButton` (mobile) and `AiListingPanel` (web) wrote
+a brand-new Albanian title/description from property facts (city, price,
+type, notes) via `ai-generate-listing`; the translation bar (Feature E)
+translates existing Albanian text into other languages via
+`translate-property`. Neither called the other.
+
+Deleted from the repo: `components/ui/ai-title-button.tsx`,
+`src/features/listings/components/AiListingPanel.jsx`, `generateListing()`
+from both `lib/ai.ts`/`src/lib/ai.js`, `sanitizeGeneratedListing()` from
+`src/lib/aiSchemas.js` plus its 4 dedicated tests (now fully unused — kept
+`sanitizeSearchFilters`, still live for Feature B), the `aiListingGenerator`
+flag from `src/lib/flags.js`, the `.ai-panel*` CSS block, and the
+`ai.panelTitle` / `notesPlaceholder` / `generate` / `generating` /
+`regenerate` / `reviewHint` / `errorGeneric` / `generateTitle` /
+`titleNeedsFields` locale keys (all 8 languages) — `errorUnavailable` /
+`errorRateLimited` are kept, still used by the translation bar.
+
+**Not deleted, only disabled**: `supabase/functions/ai-generate-listing`.
+The Supabase tooling available to me exposes deploy/get/list for Edge
+Functions but no delete operation, so I stubbed it to `410 Gone` rather than
+leave a working, callable AI-generation endpoint with no client reference.
+Delete it for real from the Dashboard (Edge Functions) or
+`supabase functions delete ai-generate-listing` when convenient.
+
+Two more deployed functions are in the same state — referenced by no client
+code, left alone because deleting a deployed function isn't reversible and I
+wasn't asked to:
+- `translate-description` — an on-the-fly translation fallback, superseded
+  by `translate-property`; no code calls it.
+- `clerk-link-profile` — left over from the reverted Clerk migration
+  (see §11-adjacent history); deployed with `verify_jwt: false`, i.e. an
+  unauthenticated public endpoint. Worth prioritizing over the other two.

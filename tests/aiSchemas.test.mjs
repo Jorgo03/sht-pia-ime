@@ -2,7 +2,7 @@
 // model output and the app. Run with: npm test
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { sanitizeSearchFilters, sanitizeGeneratedListing } from '../src/lib/aiSchemas.js'
+import { sanitizeSearchFilters } from '../src/lib/aiSchemas.js'
 
 // ---------- sanitizeSearchFilters ----------
 
@@ -47,39 +47,3 @@ test('truncates absurdly long city strings', () => {
   assert.equal(out.city.length, 60)
 })
 
-// ---------- sanitizeGeneratedListing ----------
-
-test('folds highlights into the description', () => {
-  const out = sanitizeGeneratedListing({
-    title: 'Apartament modern në Bllok',
-    description: 'Përshkrim i gjatë i pronës.',
-    highlights: ['85 m²', '2 dhoma gjumi'],
-  })
-  assert.equal(out.title, 'Apartament modern në Bllok')
-  assert.ok(out.description.includes('• 85 m²'))
-  assert.ok(out.description.includes('• 2 dhoma gjumi'))
-})
-
-test('rejects output missing title or description', () => {
-  assert.equal(sanitizeGeneratedListing({ title: 'X' }), null)
-  assert.equal(sanitizeGeneratedListing({ description: 'Y' }), null)
-  assert.equal(sanitizeGeneratedListing({ title: '  ', description: 'Y' }), null)
-  assert.equal(sanitizeGeneratedListing(null), null)
-})
-
-test('caps title length and highlight count', () => {
-  const out = sanitizeGeneratedListing({
-    title: 't'.repeat(300),
-    description: 'desc',
-    highlights: ['a', 'b', 'c', 'd', 'e', 'f', 'g'],
-  })
-  assert.equal(out.title.length, 120)
-  assert.equal((out.description.match(/•/g) || []).length, 5)
-})
-
-test('ignores non-string highlights', () => {
-  const out = sanitizeGeneratedListing({
-    title: 'T', description: 'D', highlights: [42, null, { x: 1 }, 'valid'],
-  })
-  assert.equal((out.description.match(/•/g) || []).length, 1)
-})
