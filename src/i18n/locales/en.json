@@ -458,7 +458,8 @@
     "translationManual": "Edited manually",
     "regenerateTranslation": "Translate again",
     "translationFailed": "Translation failed. Please try again.",
-    "translationNotConfigured": "Translation is not configured on the server. Contact the administrator."
+    "translationNotConfigured": "Translation is not configured on the server. Contact the administrator.",
+    "translationBasic": "Basic translation — check it before publishing"
   },
   "assistant": {
     "title": "Listing assistant",

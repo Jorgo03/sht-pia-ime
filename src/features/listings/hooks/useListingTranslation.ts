@@ -39,7 +39,7 @@ export type TranslateFn = (args: {
   description: string
   targetLanguage: LangCode
   sourceLanguage?: LangCode
-}) => Promise<{ title: string; description: string }>
+}) => Promise<{ title: string; description: string; provider?: string }>
 
 export interface UseListingTranslationArgs<F extends TranslatableForm> {
   form: F
@@ -84,6 +84,12 @@ export interface UseListingTranslationResult {
   pendingLangs: ReadonlySet<LangCode>
   /** Error code for the active language, or null. */
   error: string | null
+  /**
+   * Which engine produced the active language's text, when this session
+   * generated it. 'mymemory' is the free fallback and is rougher, which the
+   * agent needs to know before publishing in a language they cannot read.
+   */
+  provider: string | null
   /** Classification of the active language: current, stale, manual, ... */
   state: TranslationStateValue
   /** Fingerprint of the Albanian source; '' when there is nothing to translate. */
@@ -101,6 +107,7 @@ export function useListingTranslation<F extends TranslatableForm>({
   const [activeLang, setActiveLang] = useState<LangCode>(SOURCE_LANG)
   const [pendingLangs, setPendingLangs] = useState<ReadonlySet<LangCode>>(() => new Set())
   const [errors, setErrors] = useState<Record<string, string>>({})
+  const [providers, setProviders] = useState<Record<string, string>>({})
 
   const sourceTitle = form.title_i18n?.[SOURCE_LANG] ?? ''
   const sourceDescription = form.description_i18n?.[SOURCE_LANG] ?? ''
@@ -199,6 +206,10 @@ export function useListingTranslation<F extends TranslatableForm>({
         // Superseded while in flight — by a newer run for this language, or by
         // the agent typing into this language's field. Drop it silently.
         if (latestRunRef.current.get(lang) !== runId) return
+
+        if (result.provider) {
+          setProviders((prev) => ({ ...prev, [lang]: result.provider as string }))
+        }
 
         setForm((prev) => ({
           ...prev,
@@ -314,6 +325,7 @@ export function useListingTranslation<F extends TranslatableForm>({
     translating: pendingLangs.has(activeLang),
     pendingLangs,
     error: errors[activeLang] ?? null,
+    provider: providers[activeLang] ?? null,
     state,
     fingerprint,
     canRegenerate:

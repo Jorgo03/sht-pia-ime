@@ -23,6 +23,7 @@ export function TranslationBar({
   state,
   translating,
   error,
+  provider,
   onRegenerate,
   onRetry,
   canRegenerate,
@@ -35,7 +36,11 @@ export function TranslationBar({
       : state === TranslationState.STALE
         ? t('ai.translationStale')
         : state === TranslationState.CURRENT
-          ? t('ai.translationAuto')
+          ? // The free engine is visibly rougher than the prompted model, so
+            // say which one produced this rather than calling both the same.
+            provider === 'mymemory'
+            ? t('ai.translationBasic')
+            : t('ai.translationAuto')
           : null
 
   const StatusIcon =

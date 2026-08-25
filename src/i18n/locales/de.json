@@ -458,7 +458,8 @@
     "translationManual": "Manuell bearbeitet",
     "regenerateTranslation": "Erneut übersetzen",
     "translationFailed": "Übersetzung fehlgeschlagen. Bitte erneut versuchen.",
-    "translationNotConfigured": "Die Übersetzung ist auf dem Server nicht konfiguriert. Bitte kontaktiere den Administrator."
+    "translationNotConfigured": "Die Übersetzung ist auf dem Server nicht konfiguriert. Bitte kontaktiere den Administrator.",
+    "translationBasic": "Einfache Übersetzung — vor dem Veröffentlichen prüfen"
   },
   "assistant": {
     "title": "Inserats-Assistent",

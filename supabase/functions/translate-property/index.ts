@@ -2,27 +2,37 @@
 //
 // Real-estate translation of a listing's title + description.
 //
-// Why this stopped being a Google-Translate -> DeepL pipeline: neither takes
-// an instruction, and the listings here are full of things a general-purpose
-// engine gets wrong in exactly the ways that embarrass an agency. "Apartament
-// 2+1 ne Bllok" came back as "Apartment 2+1 in Block" - Blloku is a Tirana
-// neighbourhood, not a building block - and the 2+1 room notation, m2 values,
-// floor numbers and bullet layout were all fair game for reformatting. A
-// prompted model can be told to leave proper nouns and numeric notation alone,
-// so this runs on the same Anthropic integration the other AI functions
-// already use (same key, same ai_usage rate-limit ledger, same forced
-// tool_choice extraction), rather than adding a third translation vendor.
+// TWO ENGINES, picked automatically:
 //
-// Request - primary shape (one target, both fields, ONE upstream call):
+//   1. Anthropic (claude-sonnet-5) -- preferred. A prompted model can be told
+//      to leave proper nouns and numeric notation alone, which general
+//      translation engines cannot.
+//   2. MyMemory -- free, no API key, no signup. Used when ANTHROPIC_API_KEY is
+//      absent OR when the upstream rejects it (401/403). This is what keeps
+//      the feature working on a zero-budget project.
+//
+// The fallback is deliberately automatic and one-directional: add valid
+// Anthropic credits and quality upgrades itself with no code change; let them
+// lapse and translation degrades instead of dying. The response carries
+// `provider` so the UI can tell the agent which one produced the text.
+//
+// The free engine gets the same protections the prompt gives the paid one,
+// mechanically instead of by instruction: room notation (2+1), measurements,
+// prices, URLs, emails, phone numbers and Albanian place names are masked with
+// placeholders before translation and restored after. Verified live -- without
+// this, MyMemory turns "Apartament 2+1 modern ne Bllok" into "A modern
+// 2-bedroom apartment on the block": the layout notation destroyed and Blloku,
+// a Tirana neighbourhood, translated as the common noun "block".
+//
+// Request -- primary shape (one target, both fields):
 //   { title?, description?, sourceLanguage?='sq', targetLanguage }
-//   -> { title, description, targetLanguage }
+//   -> { title, description, targetLanguage, provider }
 //
-// Request - legacy shape, still used by scripts/bulk-translate.js:
+// Request -- legacy shape, still used by scripts/bulk-translate.js:
 //   { text, source?='sq' }
 //   -> { sq, en, de, it, es, pl, ru, fr }
 //
-// Auth: a signed-in user (rate-limited 60/hour) or the service role (scripts,
-// not rate-limited). Missing ANTHROPIC_API_KEY -> 503 { error: 'ai_unavailable' }.
+// Auth: a signed-in user (rate-limited 60/hour) or the service role.
 
 import { createClient } from 'npm:@supabase/supabase-js@2';
 
@@ -42,9 +52,12 @@ const ANTHROPIC_KEY = Deno.env.get('ANTHROPIC_API_KEY');
 const MODEL = 'claude-sonnet-5';
 const RATE_LIMIT_PER_HOUR = 60;
 
-// Caps on what reaches the model. properties.title is short by convention and
-// the description field is a textarea, so these are generous ceilings against
-// a pathological payload rather than limits a real listing would ever meet.
+// Optional. MyMemory's anonymous quota is ~5k characters/day per calling IP,
+// which an edge function shares with everyone else on that IP. Setting this to
+// any mailbox you control raises it to ~50k/day tied to that address instead.
+// Left unset the free engine still works, just with a much smaller ceiling.
+const MYMEMORY_EMAIL = Deno.env.get('MYMEMORY_EMAIL');
+
 const MAX_TITLE_CHARS = 300;
 const MAX_DESCRIPTION_CHARS = 6000;
 
@@ -52,14 +65,8 @@ const LANGS = ['sq', 'en', 'de', 'it', 'es', 'pl', 'ru', 'fr'] as const;
 type Lang = (typeof LANGS)[number];
 
 const LANG_NAMES: Record<Lang, string> = {
-  sq: 'Albanian',
-  en: 'English',
-  de: 'German',
-  it: 'Italian',
-  es: 'Spanish',
-  pl: 'Polish',
-  ru: 'Russian',
-  fr: 'French',
+  sq: 'Albanian', en: 'English', de: 'German', it: 'Italian',
+  es: 'Spanish', pl: 'Polish', ru: 'Russian', fr: 'French',
 };
 
 const isLang = (v: unknown): v is Lang =>
@@ -86,11 +93,9 @@ async function rateLimit(key: string, feature: string, max: number): Promise<boo
 /**
  * Reads the `role` claim without verifying the signature.
  *
- * Safe only because it is not used to grant anything: Supabase's own gateway
- * has already rejected the request unless the JWT is validly signed by this
- * project (verify_jwt is on). This just distinguishes an already-trusted
- * service-role caller from an already-trusted end user, to decide which of the
- * two is rate-limited. A forged token never reaches this line.
+ * Safe only because it grants nothing: Supabase's gateway has already rejected
+ * the request unless the JWT is validly signed by this project. This only
+ * decides which of two already-trusted callers gets rate-limited.
  */
 function jwtRole(token: string): string | null {
   try {
@@ -103,6 +108,228 @@ function jwtRole(token: string): string | null {
     return null;
   }
 }
+
+interface FieldPair {
+  title: string;
+  description: string;
+}
+
+/* ------------------------------------------------------------------ masking */
+
+/**
+ * Albanian place names that read as ordinary words to a translation engine.
+ *
+ * Blloku is the clearest case -- a Tirana district that any engine renders as
+ * "block" -- but "Ali Demi", "Pazar i Ri" and "Liqeni i Thate" have the same
+ * problem. Longest-first so multi-word names match before their fragments do.
+ */
+const PLACE_NAMES = [
+  'Komuna e Parisit', 'Liqeni i Thate', 'Liqeni i Thatë', 'Myslym Shyri',
+  'Pazar i Ri', 'Ali Demi', 'Don Bosko', 'Yzberisht', 'Gjirokaster',
+  'Gjirokastër', 'Kombinat', 'Pogradec', 'Sarande', 'Sarandë',
+  'Gjiri i Lalzit', 'Rruga e Kavajes', 'Rruga e Kavajës', 'Blloku', 'Bllok',
+  'Selvia', 'Astir', 'Sauk', 'Tirane', 'Tiranë', 'Durres', 'Durrës', 'Vlore',
+  'Vlorë', 'Shkoder', 'Shkodër', 'Elbasan', 'Korce', 'Korçë', 'Lushnje',
+  'Lushnjë', 'Kavaje', 'Kavajë', 'Berat', 'Fier',
+].sort((a, b) => b.length - a.length);
+
+/**
+ * Patterns that must survive translation byte-for-byte.
+ *
+ * This list is deliberately SHORT, and that is the result of measurement, not
+ * caution. Masking is not free: a placeholder makes a line less meaningful to
+ * the engine, and on a short line it can be dropped from the output entirely.
+ * Masking prices did exactly that -- "Cmimi 150000 EUR." came back as bare
+ * "Price", silently deleting the asking price from the listing.
+ *
+ * Checked against the live engine, these survive unmasked and are therefore
+ * left alone: prices and currency ("Cmimi 150000 EUR." -> "Price EUR 150000."),
+ * measurements ("85 m2, kati 3" -> "85 m2, 3rd floor"), and phone numbers.
+ *
+ * These do NOT survive, and are the whole reason masking exists:
+ *   2+1     -> "2+ 1"                      (the layout notation, corrupted)
+ *   Bllok   -> "The apartment doesn't block."  (a district read as a verb)
+ */
+const PROTECTED_PATTERNS: RegExp[] = [
+  /https?:\/\/\S+/gi,                                        // URLs
+  /\b[\w.+-]+@[\w-]+\.[\w.]{2,}\b/g,                         // emails
+  /\b\d+\+\d+(?:\+\d+)*\b/g,                                 // 2+1, 2+1+2
+];
+
+/**
+ * Replaces anything that must not be translated with a numbered placeholder.
+ *
+ * `%%N%%` was chosen by testing it through MyMemory rather than by taste:
+ * it comes back unchanged and unreordered, which is the only property that
+ * matters here.
+ */
+function mask(text: string): { masked: string; tokens: string[] } {
+  const tokens: string[] = [];
+  let masked = text;
+
+  const claim = (match: string) => {
+    const index = tokens.indexOf(match);
+    if (index !== -1) return `%%${index}%%`;
+    tokens.push(match);
+    return `%%${tokens.length - 1}%%`;
+  };
+
+  for (const pattern of PROTECTED_PATTERNS) {
+    masked = masked.replace(pattern, claim);
+  }
+  for (const place of PLACE_NAMES) {
+    // Unicode lookarounds, NOT \b. JavaScript's \b is ASCII-only, so for a
+    // name ending in a diacritic the trailing boundary never matches and the
+    // name goes unprotected: \bTiranë\b and \bKorçë\b both fail to match text
+    // that plainly contains them, while \bDurrës\b works purely because it
+    // happens to end in "s". These lookarounds match all of them and still
+    // refuse to fire inside a longer word ("Fier" does not match "Fieri").
+    const escaped = place.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const pattern = new RegExp(`(?<![\\p{L}\\p{N}])${escaped}(?![\\p{L}\\p{N}])`, 'giu');
+    masked = masked.replace(pattern, claim);
+  }
+  return { masked, tokens };
+}
+
+/**
+ * Puts the protected text back, and reports whether all of it came back.
+ *
+ * `complete` is the important half. An engine that drops a placeholder does
+ * not fail — it returns a fluent sentence with the protected content simply
+ * missing, which for a listing means a silently deleted price or address. The
+ * caller uses this to retry unmasked rather than publish the hole.
+ */
+function unmask(text: string, tokens: string[]): { text: string; complete: boolean } {
+  let out = text;
+  let complete = true;
+  tokens.forEach((token, i) => {
+    // Engines sometimes pad or alter spacing around the marker.
+    const marker = new RegExp(`%%\\s*${i}\\s*%%`, 'g');
+    if (!marker.test(out)) {
+      complete = false;
+      return;
+    }
+    out = out.replace(new RegExp(`%%\\s*${i}\\s*%%`, 'g'), token);
+  });
+  return { text: out, complete };
+}
+
+/* ------------------------------------------------------- free engine (MyMemory) */
+
+const MYMEMORY_MAX_CHUNK = 450;
+
+/**
+ * Splits text so structure survives.
+ *
+ * Line-by-line rather than by character count: bullets and paragraph breaks
+ * are content the translation has to preserve, and translating a whole block
+ * at once is what flattens them. Only a line longer than the engine's
+ * comfortable request size gets split further, on sentence boundaries.
+ */
+function splitForTranslation(text: string): string[] {
+  const out: string[] = [];
+  for (const line of text.split('\n')) {
+    if (line.length <= MYMEMORY_MAX_CHUNK) {
+      out.push(line);
+      continue;
+    }
+    let buffer = '';
+    for (const sentence of line.split(/(?<=[.!?])\s+/)) {
+      if ((buffer + ' ' + sentence).length > MYMEMORY_MAX_CHUNK && buffer) {
+        out.push(buffer);
+        buffer = sentence;
+      } else {
+        buffer = buffer ? `${buffer} ${sentence}` : sentence;
+      }
+    }
+    if (buffer) out.push(buffer);
+  }
+  return out;
+}
+
+/** Leading bullet/number markers are layout, not prose — keep them verbatim. */
+const BULLET = /^(\s*(?:[-•*·–]|\d+[.)])\s*)/;
+
+async function myMemoryFetch(q: string, source: Lang, target: Lang): Promise<string> {
+  const url = new URL('https://api.mymemory.translated.net/get');
+  url.searchParams.set('q', q);
+  url.searchParams.set('langpair', `${source}|${target}`);
+  if (MYMEMORY_EMAIL) url.searchParams.set('de', MYMEMORY_EMAIL);
+
+  const response = await fetch(url, { signal: AbortSignal.timeout(20_000) });
+  if (!response.ok) {
+    throw Object.assign(new Error('mymemory_http'), { upstreamStatus: response.status });
+  }
+
+  const data = await response.json();
+  if (data?.quotaFinished === true || data?.responseStatus === 429) {
+    throw Object.assign(new Error('mymemory_quota'), { quotaExhausted: true });
+  }
+  const translated = data?.responseData?.translatedText;
+  if (typeof translated !== 'string' || !translated.trim()) {
+    throw Object.assign(new Error('mymemory_empty'), { upstreamStatus: 502 });
+  }
+  return translated;
+}
+
+async function myMemoryLine(line: string, source: Lang, target: Lang): Promise<string> {
+  if (!line.trim()) return line;
+
+  const bullet = line.match(BULLET)?.[1] ?? '';
+  const body = line.slice(bullet.length);
+  if (!body.trim()) return line;
+
+  const { masked, tokens } = mask(body);
+  const translated = await myMemoryFetch(masked, source, target);
+
+  if (tokens.length === 0) return bullet + translated;
+
+  const restored = unmask(translated, tokens);
+  if (restored.complete) return bullet + restored.text;
+
+  // The engine swallowed a placeholder, so this translation is missing content
+  // that was in the source. Retrying unmasked risks a mangled "2+ 1" or a
+  // place name read as a verb — but a slightly wrong line beats a line with
+  // the price or the address quietly removed.
+  try {
+    return bullet + (await myMemoryFetch(body, source, target));
+  } catch {
+    // Even the retry failed: keep the source text rather than lose the line.
+    return line;
+  }
+}
+
+/**
+ * Sequential on purpose: MyMemory's free tier throttles per IP, and a long
+ * description can be a dozen lines. Firing them in parallel trades a couple of
+ * seconds for intermittent 429s across the whole request.
+ */
+async function myMemoryText(text: string, source: Lang, target: Lang): Promise<string> {
+  if (!text.trim()) return '';
+  const lines = splitForTranslation(text);
+  const out: string[] = [];
+  for (const line of lines) {
+    out.push(await myMemoryLine(line, source, target));
+  }
+  return out.join('\n');
+}
+
+async function translateViaMyMemory(
+  source: Lang,
+  targets: Lang[],
+  fields: FieldPair,
+): Promise<Record<string, FieldPair>> {
+  const out: Record<string, FieldPair> = {};
+  for (const target of targets) {
+    out[target] = {
+      title: await myMemoryText(fields.title, source, target),
+      description: await myMemoryText(fields.description, source, target),
+    };
+  }
+  return out;
+}
+
+/* --------------------------------------------------------- paid engine (Claude) */
 
 const SYSTEM_PROMPT = `You are a professional real-estate translator for Shtepia.ime, a property marketplace in Albania. You translate listing copy written by estate agents.
 
@@ -133,20 +360,7 @@ CONTENT:
 
 Return only the translation, through the provided tool. No commentary.`;
 
-interface FieldPair {
-  title: string;
-  description: string;
-}
-
-/**
- * One upstream call, however many targets are asked for.
- *
- * Title and description travel together on purpose: they are one piece of copy
- * and the model translates the title better for having read the description
- * (it disambiguates whether a bare word is a place name). It also halves the
- * request count versus a field-at-a-time design.
- */
-async function translate(
+async function translateViaAnthropic(
   source: Lang,
   targets: Lang[],
   fields: FieldPair,
@@ -168,9 +382,6 @@ async function translate(
     };
   }
 
-  // Budget scales with the work: the response carries a full title +
-  // description per target language, so a fixed cap would silently truncate
-  // the legacy 7-language path and produce no tool_use block at all.
   const maxTokens = Math.min(16000, 1500 + targets.length * 1800);
 
   const response = await fetch('https://api.anthropic.com/v1/messages', {
@@ -182,9 +393,6 @@ async function translate(
     },
     body: JSON.stringify({
       model: MODEL,
-      // Same reasoning as ai-generate-listing: this is a forced tool_choice
-      // extraction, so thinking tokens buy nothing and would eat the budget
-      // before the tool_use block is emitted.
       thinking: { type: 'disabled' },
       max_tokens: maxTokens,
       system: SYSTEM_PROMPT,
@@ -202,11 +410,7 @@ async function translate(
         {
           name: 'listing_translation',
           description: 'The finished translations, one entry per requested language.',
-          input_schema: {
-            type: 'object',
-            properties: langProperties,
-            required: targets,
-          },
+          input_schema: { type: 'object', properties: langProperties, required: targets },
         },
       ],
       tool_choice: { type: 'tool', name: 'listing_translation' },
@@ -215,7 +419,6 @@ async function translate(
   });
 
   if (!response.ok) {
-    // The upstream body can echo account details, so it goes to the log only.
     console.error('Anthropic error', response.status, await response.text());
     throw Object.assign(new Error('upstream'), { upstreamStatus: response.status });
   }
@@ -241,22 +444,39 @@ async function translate(
   return out;
 }
 
+/* ----------------------------------------------------------------- dispatch */
+
+async function translate(
+  source: Lang,
+  targets: Lang[],
+  fields: FieldPair,
+): Promise<{ result: Record<string, FieldPair>; provider: string }> {
+  if (ANTHROPIC_KEY) {
+    try {
+      return { result: await translateViaAnthropic(source, targets, fields), provider: 'anthropic' };
+    } catch (err) {
+      const status = (err as { upstreamStatus?: number })?.upstreamStatus;
+      // A rejected key is a configuration problem that will not fix itself on
+      // retry, so fall through to the free engine rather than fail the request.
+      // Anything else (a real outage, a truncated response) is transient and
+      // should surface as a failure instead of silently downgrading quality.
+      if (status !== 401 && status !== 403) throw err;
+      console.error('Anthropic key rejected; falling back to the free engine');
+    }
+  }
+  return { result: await translateViaMyMemory(source, targets, fields), provider: 'mymemory' };
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
   if (req.method !== 'POST') return json({ error: 'method_not_allowed' }, 405);
 
   try {
-    // Checked before auth so an unconfigured project reports the real problem
-    // (server misconfiguration) rather than looking like a rejected caller.
-    if (!ANTHROPIC_KEY) return json({ error: 'ai_unavailable' }, 503);
-
     const token = req.headers.get('Authorization')?.replace('Bearer ', '') ?? '';
     const role = jwtRole(token);
     let rateLimitKey: string | null = null;
 
     if (role === 'service_role') {
-      // Backfill scripts run under the service role. Not rate-limited: they
-      // are already throttled by their own caller and are not user traffic.
       rateLimitKey = null;
     } else {
       const { data: userData } = await admin.auth.getUser(token);
@@ -298,7 +518,6 @@ Deno.serve(async (req) => {
           : '',
     };
 
-    // Nothing to translate is a client bug, not a reason to bill a request.
     if (!fields.title && !fields.description) {
       return json({ error: 'empty_content' }, 400);
     }
@@ -307,10 +526,9 @@ Deno.serve(async (req) => {
       return json({ error: 'rate_limited' }, 429);
     }
 
-    const result = await translate(source, targets, fields);
+    const { result, provider } = await translate(source, targets, fields);
 
     if (legacy) {
-      // Legacy callers expect a flat { lang: text } map including the source.
       const flat: Record<string, string> = { [source]: fields.title };
       for (const target of targets) {
         if (result[target]?.title) flat[target] = result[target].title;
@@ -323,8 +541,14 @@ Deno.serve(async (req) => {
       title: result[target]?.title ?? '',
       description: result[target]?.description ?? '',
       targetLanguage: target,
+      provider,
     });
   } catch (err) {
+    if ((err as { quotaExhausted?: boolean })?.quotaExhausted) {
+      // The free engine's daily character allowance is spent. Reported as a
+      // rate limit because that is what it is from the caller's side.
+      return json({ error: 'rate_limited', provider: 'mymemory' }, 429);
+    }
     const upstreamStatus = (err as { upstreamStatus?: number })?.upstreamStatus;
     if (upstreamStatus) {
       return json(

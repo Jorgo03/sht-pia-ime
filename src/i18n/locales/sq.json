@@ -458,7 +458,8 @@
     "translationManual": "Redaktuar manualisht",
     "regenerateTranslation": "Përkthe sërish",
     "translationFailed": "Përkthimi dështoi. Provo përsëri.",
-    "translationNotConfigured": "Përkthimi nuk është i konfiguruar në server. Kontakto administratorin."
+    "translationNotConfigured": "Përkthimi nuk është i konfiguruar në server. Kontakto administratorin.",
+    "translationBasic": "Përkthim bazë — kontrolloje para publikimit"
   },
   "assistant": {
     "title": "Asistenti i shpalljes",

@@ -615,3 +615,58 @@ Related UI fix from the same investigation: selecting a language with no
 translation yet used to leave both inputs blank, so a failed translation and
 an untranslated language looked identical. The Albanian source now shows as
 the placeholder in that state.
+
+## 14. Free translation engine added — no API key required — 2026-08-25
+
+Owner has no budget for Anthropic credits, so translation now works without
+them. `translate-property` picks its engine automatically:
+
+| | Engine | Needs | Quality |
+|---|---|---|---|
+| Preferred | Anthropic `claude-sonnet-5` | valid `ANTHROPIC_API_KEY` | prompted; preserves proper nouns, layout notation, formatting |
+| Fallback | MyMemory | nothing — no key, no signup | usable, visibly rougher |
+
+The fallback triggers when the key is absent OR when the upstream rejects it
+(401/403), which is the situation described in §13. Add valid credits later
+and quality upgrades itself with no code change. A genuine outage (500/529)
+still fails loudly rather than silently downgrading.
+
+### The free engine needed protection the prompt gives the paid one
+
+Measured against the live API, not assumed:
+
+```
+"Apartament 2+1 modern ne Bllok"
+  raw       -> "A modern 2-bedroom apartment on the block"
+  protected -> "Apartment 2+1 modern in Bllok"
+```
+
+So room notation (`2+1`) and Albanian place names are masked with `%%N%%`
+placeholders before translation and restored after. `%%N%%` was chosen by
+testing that it survives the engine unchanged, not by taste.
+
+**Over-masking is its own bug, and cost more than under-masking.** Masking
+prices produced `"Cmimi 150000 EUR."` -> bare `"Price"`: the engine dropped
+the placeholder and the asking price silently vanished. Prices, measurements
+and phone numbers survive unmasked and are therefore left alone. When a
+placeholder does go missing the line is retried unmasked rather than
+published with a hole in it.
+
+One residual weakness, not fixable by masking: short fragments lose context.
+`"• 2 Dhoma gjumi"` translates correctly to German and Italian but comes back
+as `"• Bedrooms"` in English — the count dropped. This is why the UI labels
+free-engine output "Basic translation — check it before publishing" instead
+of calling it the same thing as the prompted output.
+
+### Optional: raise the free quota
+
+MyMemory allows ~5k characters/day per calling IP anonymously, and an edge
+function shares that IP with others. Setting a secret raises it to ~50k/day
+tied to your address:
+
+```bash
+supabase secrets set MYMEMORY_EMAIL=<a mailbox you control> --project-ref xzzzhlwmzotibrxdqmcm
+```
+
+Not set by anything automatically — I will not put your address into a
+third-party service on your behalf.

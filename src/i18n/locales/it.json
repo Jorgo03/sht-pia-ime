@@ -466,7 +466,8 @@
     "translationManual": "Modificato manualmente",
     "regenerateTranslation": "Traduci di nuovo",
     "translationFailed": "Traduzione non riuscita. Riprova.",
-    "translationNotConfigured": "La traduzione non è configurata sul server. Contatta l’amministratore."
+    "translationNotConfigured": "La traduzione non è configurata sul server. Contatta l’amministratore.",
+    "translationBasic": "Traduzione di base — controllala prima di pubblicare"
   },
   "assistant": {
     "title": "Assistente dell'annuncio",

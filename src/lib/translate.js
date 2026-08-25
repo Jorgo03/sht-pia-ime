@@ -58,8 +58,12 @@ export class TranslationError extends Error {
  * model reads them together, which is what lets it tell a neighbourhood name
  * in the title from an ordinary noun.
  *
+ * `provider` reports which engine answered: 'anthropic' (prompted, preserves
+ * proper nouns and layout notation) or 'mymemory' (the free fallback, visibly
+ * rougher). The UI surfaces it rather than passing both off as equivalent.
+ *
  * @param {{ title: string, description: string, targetLanguage: string, sourceLanguage?: string }} args
- * @returns {Promise<{ title: string, description: string }>}
+ * @returns {Promise<{ title: string, description: string, provider: 'anthropic'|'mymemory'|'unknown' }>}
  */
 export async function translatePropertyContent({
   title,
@@ -71,7 +75,9 @@ export async function translatePropertyContent({
   const wantDescription = !!description?.trim()
 
   // Nothing to translate never becomes a request.
-  if (!wantTitle && !wantDescription) return { title: '', description: '' }
+  if (!wantTitle && !wantDescription) {
+    return { title: '', description: '', provider: 'unknown' }
+  }
 
   const { data, error } = await supabase.functions.invoke('translate-property', {
     body: {
@@ -86,5 +92,9 @@ export async function translatePropertyContent({
 
   const clean = sanitizeTranslationResponse(data, { wantTitle, wantDescription })
   if (!clean) throw new TranslationError('invalid_response')
-  return clean
+
+  const raw = data?.provider
+  const provider = raw === 'anthropic' || raw === 'mymemory' ? raw : 'unknown'
+
+  return { ...clean, provider }
 }

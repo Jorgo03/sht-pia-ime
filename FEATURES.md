@@ -1,8 +1,10 @@
 # FEATURES.md — AI features
 
 > ⚠️ **2026-08-25: `ANTHROPIC_API_KEY` is currently INVALID** — the upstream
-> API returns 401 `invalid x-api-key` on every call. Every feature below is
-> down until the secret is replaced. See DECISIONS.md §13.
+> API returns 401 `invalid x-api-key` on every call (DECISIONS.md §13).
+> **Translation (E) still works**: it falls back to a free engine needing no
+> key (§14), at lower quality. B and C have no such fallback and are down
+> until the secret is replaced.
 
 Architecture shared by every feature: the Anthropic key lives ONLY as a
 Supabase Edge Function secret (`ANTHROPIC_API_KEY`, see DECISIONS.md §0 to set
@@ -20,7 +22,7 @@ or at runtime `localStorage.setItem('fho_flags', JSON.stringify({ aiSearch: fals
 |---|---|---|---|---|---|
 | B | Natural-language search | `claude-haiku-4-5-20251001` | `supabase/functions/ai-parse-search` | `aiSearch` / `VITE_FLAG_AI_SEARCH` | 60/h/key |
 | C | Listing buyer assistant | `claude-haiku-4-5-20251001` | `supabase/functions/ai-listing-assistant` | `aiAssistant` / `VITE_FLAG_AI_ASSISTANT` | 30/h/key |
-| E | Auto-translate listings | `claude-sonnet-5` | `supabase/functions/translate-property` | `autoTranslate` / `VITE_FLAG_AUTO_TRANSLATE` | 60/h/user |
+| E | Auto-translate listings | `claude-sonnet-5`, falling back to MyMemory (free, keyless) | `supabase/functions/translate-property` | `autoTranslate` / `VITE_FLAG_AUTO_TRANSLATE` | 60/h/user |
 
 **Retired — Feature A, AI listing generator ("Gjenero me AI"), removed 2026-08-25.** It wrote a brand-new Albanian title/description from property facts — a different feature from translation (E), which never touched it. Removed at the owner's request rather than kept alongside the translation-bar rework, to leave one unambiguous way to fill the title field. `supabase/functions/ai-generate-listing` is stubbed to `410 Gone` (this project's tooling has no function-delete operation — delete it for real from the Supabase Dashboard when convenient); `AiTitleButton`/`AiListingPanel`, `generateListing()`, `sanitizeGeneratedListing()` and its tests, and the `aiListingGenerator` flag are deleted from the repo.
 

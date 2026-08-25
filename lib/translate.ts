@@ -66,6 +66,16 @@ async function classify(error: unknown): Promise<TranslationErrorCode> {
   }
 }
 
+/**
+ * Which engine produced a translation.
+ *
+ * `mymemory` is the free fallback and is visibly rougher than the prompted
+ * model, so the UI surfaces it rather than passing both off as equivalent —
+ * an agent publishing in a language they do not read deserves to know which
+ * one they are looking at.
+ */
+export type TranslationProvider = 'anthropic' | 'mymemory' | 'unknown';
+
 export interface TranslatePropertyArgs {
   title: string;
   description: string;
@@ -88,13 +98,19 @@ export async function translatePropertyContent({
   description,
   targetLanguage,
   sourceLanguage = SOURCE_LANG,
-}: TranslatePropertyArgs): Promise<{ title: string; description: string }> {
+}: TranslatePropertyArgs): Promise<{
+  title: string;
+  description: string;
+  provider: TranslationProvider;
+}> {
   const wantTitle = !!title?.trim();
   const wantDescription = !!description?.trim();
 
   // Nothing to translate never becomes a request — the caller is expected to
   // check too, but this is the boundary that actually guarantees it.
-  if (!wantTitle && !wantDescription) return { title: '', description: '' };
+  if (!wantTitle && !wantDescription) {
+    return { title: '', description: '', provider: 'unknown' };
+  }
 
   const { data, error } = await supabase.functions.invoke('translate-property', {
     body: {
@@ -109,5 +125,10 @@ export async function translatePropertyContent({
 
   const clean = sanitizeTranslationResponse(data, { wantTitle, wantDescription });
   if (!clean) throw new TranslationError('invalid_response');
-  return clean;
+
+  const raw = (data as { provider?: unknown })?.provider;
+  const provider: TranslationProvider =
+    raw === 'anthropic' || raw === 'mymemory' ? raw : 'unknown';
+
+  return { ...clean, provider };
 }

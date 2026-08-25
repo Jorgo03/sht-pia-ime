@@ -456,6 +456,7 @@ export default function CreateListingScreen() {
                 state={translation.state}
                 translating={translation.translating}
                 error={translation.error}
+                provider={translation.provider}
                 onRegenerate={translation.regenerate}
                 onRetry={translation.retry}
                 canRegenerate={translation.canRegenerate}
