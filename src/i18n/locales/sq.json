@@ -457,7 +457,8 @@
     "translationStale": "Teksti në shqip ka ndryshuar — do të përkthehet sërish",
     "translationManual": "Redaktuar manualisht",
     "regenerateTranslation": "Përkthe sërish",
-    "translationFailed": "Përkthimi dështoi. Provo përsëri."
+    "translationFailed": "Përkthimi dështoi. Provo përsëri.",
+    "translationNotConfigured": "Përkthimi nuk është i konfiguruar në server. Kontakto administratorin."
   },
   "assistant": {
     "title": "Asistenti i shpalljes",

@@ -14,9 +14,16 @@ export { SOURCE_LANG, SUPPORTED_LANGS } from './translationCore'
  * supabase-js collapses every non-2xx into a FunctionsHttpError whose message
  * is a generic "non-2xx status code"; the body with the real reason is only
  * reachable via error.context. Without this the UI shows one vague failure for
- * "out of quota" and "server has no API key" alike.
+ * "out of quota" and "the server's key is rejected" alike.
  *
- * @returns {Promise<'unavailable'|'rate_limited'|'unauthorized'|'empty_content'|'invalid_response'|'network'>}
+ * The `upstream_status` split is not cosmetic. A rejected API key produced the
+ * exact same "unavailable, try again later" message as a transient outage,
+ * which is advice that can never work — the key had been invalid the whole
+ * time, and finding that out took reading the edge function's stderr. An
+ * upstream 401/403 is a server misconfiguration only the owner can fix, and
+ * the UI has to say so instead of telling people to retry forever.
+ *
+ * @returns {Promise<'unavailable'|'not_configured'|'rate_limited'|'unauthorized'|'empty_content'|'invalid_response'|'network'>}
  */
 async function classify(error) {
   const context = error?.context
@@ -28,6 +35,8 @@ async function classify(error) {
     if (code === 'unauthorized') return 'unauthorized'
     if (code === 'empty_content') return 'empty_content'
     if (code.startsWith('unsupported_') || code === 'target_equals_source') return 'invalid_response'
+    const upstream = body?.upstream_status
+    if (upstream === 401 || upstream === 403) return 'not_configured'
     return 'unavailable'
   } catch {
     return 'unavailable'

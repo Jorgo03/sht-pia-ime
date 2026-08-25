@@ -473,7 +473,8 @@
     "translationStale": "Tekst albański się zmienił — zostanie przetłumaczony ponownie",
     "translationManual": "Edytowane ręcznie",
     "regenerateTranslation": "Przetłumacz ponownie",
-    "translationFailed": "Tłumaczenie nie powiodło się. Spróbuj ponownie."
+    "translationFailed": "Tłumaczenie nie powiodło się. Spróbuj ponownie.",
+    "translationNotConfigured": "Tłumaczenie nie jest skonfigurowane na serwerze. Skontaktuj się z administratorem."
   },
   "assistant": {
     "title": "Asystent ogłoszenia",

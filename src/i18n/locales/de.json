@@ -457,7 +457,8 @@
     "translationStale": "Der albanische Text hat sich geändert — dies wird neu übersetzt",
     "translationManual": "Manuell bearbeitet",
     "regenerateTranslation": "Erneut übersetzen",
-    "translationFailed": "Übersetzung fehlgeschlagen. Bitte erneut versuchen."
+    "translationFailed": "Übersetzung fehlgeschlagen. Bitte erneut versuchen.",
+    "translationNotConfigured": "Die Übersetzung ist auf dem Server nicht konfiguriert. Bitte kontaktiere den Administrator."
   },
   "assistant": {
     "title": "Inserats-Assistent",

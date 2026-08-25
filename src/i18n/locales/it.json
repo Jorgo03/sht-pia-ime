@@ -465,7 +465,8 @@
     "translationStale": "Il testo albanese è cambiato — verrà tradotto di nuovo",
     "translationManual": "Modificato manualmente",
     "regenerateTranslation": "Traduci di nuovo",
-    "translationFailed": "Traduzione non riuscita. Riprova."
+    "translationFailed": "Traduzione non riuscita. Riprova.",
+    "translationNotConfigured": "La traduzione non è configurata sul server. Contatta l’amministratore."
   },
   "assistant": {
     "title": "Assistente dell'annuncio",

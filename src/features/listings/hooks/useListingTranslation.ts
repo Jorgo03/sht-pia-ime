@@ -68,6 +68,16 @@ export interface UseListingTranslationResult {
   /** Text currently shown in the two inputs, for the active language. */
   title: string
   description: string
+  /**
+   * The Albanian source, regardless of which language is active.
+   *
+   * Exposed so a form can show it as the placeholder when the active language
+   * has no text yet. Otherwise selecting an untranslated language empties both
+   * inputs, and an agent looking at two blank boxes cannot tell a failed
+   * translation from one that simply has not run.
+   */
+  sourceTitle: string
+  sourceDescription: string
   /** True while the active language is being translated. */
   translating: boolean
   /** Any language currently in flight — drives per-tab spinners. */
@@ -299,6 +309,8 @@ export function useListingTranslation<F extends TranslatableForm>({
     editDescription,
     title: form.title_i18n?.[activeLang] ?? '',
     description: form.description_i18n?.[activeLang] ?? '',
+    sourceTitle,
+    sourceDescription,
     translating: pendingLangs.has(activeLang),
     pendingLangs,
     error: errors[activeLang] ?? null,

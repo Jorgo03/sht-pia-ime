@@ -292,9 +292,14 @@ valid". No NEW translations can be produced until you replace the secret.~~
 
 **Resolved by removing the dependency rather than replacing the key.**
 `translate-property` now runs on the Anthropic integration the other three AI
-functions already use (`ANTHROPIC_API_KEY`, verified present and working on
-2026-08-25), so `GOOGLE_TRANSLATE_KEY` and `DEEPL_API_KEY` are no longer read
-by anything in this project and can be deleted from the secrets.
+functions already use, so `GOOGLE_TRANSLATE_KEY` and `DEEPL_API_KEY` are no
+longer read by anything in this project and can be deleted from the secrets.
+
+⚠️ **But it traded one invalid key for another — see §13.** I wrote here that
+`ANTHROPIC_API_KEY` was "verified present and working". It was verified
+*present* and nothing more: the probe used checks `if (!ANTHROPIC_KEY)`, which
+only tests for a non-empty string. The key is in fact **rejected** by the
+Anthropic API.
 
 That was the right trade regardless of the broken key: neither Google nor
 DeepL takes an instruction, and this catalogue is full of text they get
@@ -563,3 +568,50 @@ wasn't asked to:
 - `clerk-link-profile` — left over from the reverted Clerk migration
   (see §11-adjacent history); deployed with `verify_jwt: false`, i.e. an
   unauthenticated public endpoint. Worth prioritizing over the other two.
+
+## 13. ANTHROPIC_API_KEY is INVALID — every AI feature is down — 2026-08-25
+
+**This is the actual reason listing translation does nothing.** Not a code
+bug. Confirmed from the edge function's own stderr (`function_logs`), for
+both of the owner's real taps on a language button:
+
+```
+21:08:46  Anthropic error 401 {"type":"authentication_error",
+                               "message":"invalid x-api-key"}
+21:08:52  Anthropic error 401 {"type":"authentication_error",
+                               "message":"invalid x-api-key"}
+```
+
+The whole chain up to that point is healthy, and the evidence rules out every
+other link: the `ai_usage` table has matching `translate-property` rows for
+both taps, and those rows are only written *after* auth passes and the payload
+validates. So the client called, the JWT was accepted, the body parsed, the
+target language was valid — and then Anthropic rejected the key.
+
+**What you need to do:** replace the secret. This affects translation
+(Feature E) *and* `ai-parse-search` (B) and `ai-listing-assistant` (C), which
+share the key — expect those to be silently degraded too.
+
+```bash
+supabase secrets set ANTHROPIC_API_KEY=<valid key> --project-ref xzzzhlwmzotibrxdqmcm
+```
+
+Or Dashboard → Edge Functions → Secrets. I don't create or rotate keys.
+
+### Why this took log forensics, and what changed so it won't again
+
+The UI mapped *every* 503 to "AI unavailable — write it manually", so a
+permanently rejected key was indistinguishable from a transient outage, and
+the suggested action (retry) could never work. The edge function was already
+returning `upstream_status` in the 503 body; the client was discarding it.
+
+Now: upstream 401/403 classifies as `not_configured` and renders
+`ai.translationNotConfigured` ("Translation is not configured on the server.
+Contact the administrator.") with **no retry button**, since retrying cannot
+help until a secret changes. Locked in by regression tests in
+`tests/listingTranslation.test.mjs`.
+
+Related UI fix from the same investigation: selecting a language with no
+translation yet used to leave both inputs blank, so a failed translation and
+an untranslated language looked identical. The Albanian source now shows as
+the placeholder in that state.

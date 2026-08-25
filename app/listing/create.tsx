@@ -463,7 +463,9 @@ export default function CreateListingScreen() {
 
               <TextInput
                 style={styles.input}
-                placeholder={translation.activeLang === 'sq' ? t('listing.titlePlaceholder') : `${t('listing.title')} (${translation.activeLang.toUpperCase()})`}
+                // On a non-source language with nothing translated yet, the
+                // Albanian itself is the most useful placeholder.
+                placeholder={translation.activeLang === 'sq' ? t('listing.titlePlaceholder') : (translation.sourceTitle || `${t('listing.title')} (${translation.activeLang.toUpperCase()})`)}
                 placeholderTextColor={colors.textSecondary}
                 value={translation.title}
                 onChangeText={(val) => {
@@ -479,7 +481,7 @@ export default function CreateListingScreen() {
               <Text style={styles.fieldLabel}>{t('listing.description')}</Text>
               <TextInput
                 style={[styles.input, styles.textArea]}
-                placeholder={translation.activeLang === 'sq' ? t('listing.descriptionPlaceholder') : `${t('listing.description')} (${translation.activeLang.toUpperCase()})`}
+                placeholder={translation.activeLang === 'sq' ? t('listing.descriptionPlaceholder') : (translation.sourceDescription || `${t('listing.description')} (${translation.activeLang.toUpperCase()})`)}
                 placeholderTextColor={colors.textSecondary}
                 value={translation.description}
                 onChangeText={(val) => {

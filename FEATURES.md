@@ -1,5 +1,9 @@
 # FEATURES.md — AI features
 
+> ⚠️ **2026-08-25: `ANTHROPIC_API_KEY` is currently INVALID** — the upstream
+> API returns 401 `invalid x-api-key` on every call. Every feature below is
+> down until the secret is replaced. See DECISIONS.md §13.
+
 Architecture shared by every feature: the Anthropic key lives ONLY as a
 Supabase Edge Function secret (`ANTHROPIC_API_KEY`, see DECISIONS.md §0 to set
 it). Every function rate-limits per user-or-IP via the `ai_usage` table,
@@ -39,7 +43,7 @@ or at runtime `localStorage.setItem('fho_flags', JSON.stringify({ aiSearch: fals
 - **What**: **selecting a language IS the translate action.** One language bar sits above the wizard's title and description ([TranslationBar](src/features/listings/components/TranslationBar.jsx) on web, [translation-bar.tsx](components/listing/translation-bar.tsx) on mobile); tapping EN/DE/IT/ES/PL/RU/FR translates *both* fields from Albanian in a single request and shows the result in the inputs, ready to edit. The separate "Translate to all languages" button is gone — a language tab that showed an empty box next to a button somewhere below that filled it was two ways to do one thing.
 - **How it decides**: [translationCore.js](src/lib/translationCore.js) fingerprints the Albanian title+description; [useListingTranslation.ts](src/features/listings/hooks/useListingTranslation.ts) is the shared state machine both apps run. A language is re-translated only when it is missing or its fingerprint no longer matches; a translation an agent edited by hand is pinned and never regenerated without an explicit **Translate again**. Provenance lives in `properties.translation_meta`.
 - **Why Anthropic and not Google/DeepL**: neither takes an instruction, and both got the listings in this DB wrong in the ways that matter — "Apartament 2+1 në **Bllok**" (a Tirana neighbourhood) came back as "in Block", and the `2+1` room notation, m2 values and bullet layout were all fair game for reformatting. The prompt pins proper nouns, numeric notation and formatting explicitly.
-- **Status**: live. This also retires the `GOOGLE_TRANSLATE_KEY` / `DEEPL_API_KEY` dependency that had auto-translate down entirely — see DECISIONS.md §0c.
+- **Status**: code complete and verified; **blocked in production by an invalid `ANTHROPIC_API_KEY`** — the upstream API returns 401 `invalid x-api-key` on every call, so no translation can succeed until the secret is replaced. See DECISIONS.md §13. This did retire the `GOOGLE_TRANSLATE_KEY` / `DEEPL_API_KEY` dependency (§0c), but the same class of failure moved to the new key.
 - **Est. cost/call**: one call per language per listing, title+description together, cached thereafter.
 
 ## Not built (deliberately)

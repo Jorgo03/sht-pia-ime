@@ -559,10 +559,14 @@ export default function NewListingWizard() {
 
         <TextInput
           style={styles.input}
+          // On a non-source language with nothing translated yet, the Albanian
+          // itself is the most useful placeholder — it shows what is about to
+          // be translated instead of leaving a blank box.
           placeholder={
             translation.activeLang === 'sq'
               ? t('listing.titlePlaceholder')
-              : `${t('listing.title')} (${translation.activeLang.toUpperCase()})`
+              : translation.sourceTitle ||
+                `${t('listing.title')} (${translation.activeLang.toUpperCase()})`
           }
           placeholderTextColor={colors.textSecondary}
           value={translation.title}
@@ -581,7 +585,8 @@ export default function NewListingWizard() {
           placeholder={
             translation.activeLang === 'sq'
               ? t('listing.descriptionPlaceholder')
-              : `${t('listing.description')} (${translation.activeLang.toUpperCase()})`
+              : translation.sourceDescription ||
+                `${t('listing.description')} (${translation.activeLang.toUpperCase()})`
           }
           placeholderTextColor={colors.textSecondary}
           value={translation.description}

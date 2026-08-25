@@ -463,7 +463,14 @@ export default function NewListing() {
                   translation.editTitle(e.target.value)
                   if (errors.title) setErrors(prev => ({ ...prev, title: undefined }))
                 }}
-                placeholder={t('listing.titlePlaceholder')}
+                // On a non-source language with nothing translated yet, the
+                // Albanian itself is the most useful placeholder — it shows
+                // what is about to be translated instead of a blank box.
+                placeholder={
+                  translation.activeLang === 'sq'
+                    ? t('listing.titlePlaceholder')
+                    : translation.sourceTitle || t('listing.titlePlaceholder')
+                }
               />
               {errors.title && <span className="nl-error">{errors.title}</span>}
             </div>
@@ -476,7 +483,11 @@ export default function NewListing() {
                   translation.editDescription(e.target.value)
                   if (errors.description) setErrors(prev => ({ ...prev, description: undefined }))
                 }}
-                placeholder={t('listing.descriptionPlaceholder')}
+                placeholder={
+                  translation.activeLang === 'sq'
+                    ? t('listing.descriptionPlaceholder')
+                    : translation.sourceDescription || t('listing.descriptionPlaceholder')
+                }
               />
               {errors.description && <span className="nl-error">{errors.description}</span>}
             </div>

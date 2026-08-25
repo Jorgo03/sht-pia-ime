@@ -353,3 +353,53 @@ test('journey: title-only and description-only listings each translate the field
   // Neither -> never.
   assert.equal(shouldTranslate({ lang: 'en', meta: {}, fingerprint: sourceFingerprint('', '') }), false)
 })
+
+// ---------- Error classification ----------
+//
+// Regression guard for a real incident: ANTHROPIC_API_KEY was rejected by the
+// upstream API (401 invalid x-api-key) on every single request, and the UI
+// reported it as the generic "unavailable, try again later". That advice could
+// never work — the key was invalid the whole time — and diagnosing it required
+// reading the edge function's stderr. A rejected key must be distinguishable
+// from a transient outage at the point where the UI picks its message.
+//
+// classify() itself lives in the two platform clients (they each need their own
+// Supabase singleton), so this tests the shared contract they both implement:
+// the edge function's 503 body carries `upstream_status`, and 401/403 there
+// means "server misconfigured", not "retry".
+
+/** Mirrors the classify() branch order in lib/translate.ts + src/lib/translate.js. */
+function classifyBody(body) {
+  const code = typeof body?.error === 'string' ? body.error : ''
+  if (code === 'rate_limited') return 'rate_limited'
+  if (code === 'unauthorized') return 'unauthorized'
+  if (code === 'empty_content') return 'empty_content'
+  if (code.startsWith('unsupported_') || code === 'target_equals_source') return 'invalid_response'
+  const upstream = body?.upstream_status
+  if (upstream === 401 || upstream === 403) return 'not_configured'
+  return 'unavailable'
+}
+
+test('a rejected upstream API key is not reported as a transient outage', () => {
+  // Exactly what translate-property returned during the incident.
+  assert.equal(
+    classifyBody({ error: 'ai_unavailable', upstream_status: 401, stop_reason: null }),
+    'not_configured',
+  )
+  assert.equal(classifyBody({ error: 'ai_unavailable', upstream_status: 403 }), 'not_configured')
+})
+
+test('a genuine upstream outage still reads as retryable', () => {
+  assert.equal(classifyBody({ error: 'ai_unavailable', upstream_status: 500 }), 'unavailable')
+  assert.equal(classifyBody({ error: 'ai_unavailable', upstream_status: 529 }), 'unavailable')
+  assert.equal(classifyBody({ error: 'ai_unavailable' }), 'unavailable')
+})
+
+test('quota, auth and bad-input failures keep their own distinct codes', () => {
+  // upstream_status must never override a more specific error code.
+  assert.equal(classifyBody({ error: 'rate_limited' }), 'rate_limited')
+  assert.equal(classifyBody({ error: 'unauthorized' }), 'unauthorized')
+  assert.equal(classifyBody({ error: 'empty_content' }), 'empty_content')
+  assert.equal(classifyBody({ error: 'unsupported_target_language' }), 'invalid_response')
+  assert.equal(classifyBody({ error: 'target_equals_source' }), 'invalid_response')
+})

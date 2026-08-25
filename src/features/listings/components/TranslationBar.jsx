@@ -48,9 +48,11 @@ export function TranslationBar({
   const errorLabel =
     error === 'rate_limited'
       ? t('ai.errorRateLimited')
-      : error === 'unavailable'
-        ? t('ai.errorUnavailable')
-        : t('ai.translationFailed')
+      : error === 'not_configured'
+        ? t('ai.translationNotConfigured')
+        : error === 'unavailable'
+          ? t('ai.errorUnavailable')
+          : t('ai.translationFailed')
 
   return (
     <div className="nl-translation-bar">
@@ -90,9 +92,14 @@ export function TranslationBar({
           <>
             <AlertCircle size={13} className="nl-translation-status--error" />
             <span className="nl-translation-status--error">{errorLabel}</span>
-            <button type="button" className="nl-translation-action" onClick={onRetry}>
-              {t('common.retry')}
-            </button>
+            {/* No retry for a rejected server key: the request cannot start
+                succeeding until someone changes a secret, so offering "try
+                again" would just loop. */}
+            {error !== 'not_configured' && (
+              <button type="button" className="nl-translation-action" onClick={onRetry}>
+                {t('common.retry')}
+              </button>
+            )}
           </>
         ) : statusLabel ? (
           <>

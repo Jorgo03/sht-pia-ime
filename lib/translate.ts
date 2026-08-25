@@ -17,6 +17,8 @@ export type { I18nMap, LangCode };
 /** Error codes translate-property can return, plus the transport failures. */
 export type TranslationErrorCode =
   | 'unavailable'
+  /** The server's ANTHROPIC_API_KEY is missing or rejected — owner must fix. */
+  | 'not_configured'
   | 'rate_limited'
   | 'unauthorized'
   | 'empty_content'
@@ -36,8 +38,15 @@ export class TranslationError extends Error {
  * supabase-js reports any non-2xx as a FunctionsHttpError whose message is a
  * generic "non-2xx status code" — the body carrying the real reason is only
  * reachable through error.context. Without this the UI could not tell "you are
- * out of quota" from "the server has no API key", and would show one vague
+ * out of quota" from "the server's key is rejected", and would show one vague
  * failure for both.
+ *
+ * The `upstream_status` split is not cosmetic. A rejected API key produced the
+ * exact same "unavailable, try again later" message as a transient outage,
+ * which is advice that can never work — the key had been invalid the whole
+ * time, and finding that out took reading the edge function's stderr. An
+ * upstream 401/403 is a server misconfiguration only the owner can fix, and
+ * the UI has to say so instead of telling people to retry forever.
  */
 async function classify(error: unknown): Promise<TranslationErrorCode> {
   const context = (error as { context?: Response })?.context;
@@ -49,6 +58,8 @@ async function classify(error: unknown): Promise<TranslationErrorCode> {
     if (code === 'unauthorized') return 'unauthorized';
     if (code === 'empty_content') return 'empty_content';
     if (code.startsWith('unsupported_') || code === 'target_equals_source') return 'invalid_response';
+    const upstream = body?.upstream_status;
+    if (upstream === 401 || upstream === 403) return 'not_configured';
     return 'unavailable';
   } catch {
     return 'unavailable';

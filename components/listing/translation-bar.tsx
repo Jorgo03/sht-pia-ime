@@ -112,13 +112,20 @@ export function TranslationBar({
           <Text style={[styles.statusText, styles.statusError]}>
             {error === 'rate_limited'
               ? t('ai.errorRateLimited')
-              : error === 'unavailable'
-                ? t('ai.errorUnavailable')
-                : t('ai.translationFailed')}
+              : error === 'not_configured'
+                ? t('ai.translationNotConfigured')
+                : error === 'unavailable'
+                  ? t('ai.errorUnavailable')
+                  : t('ai.translationFailed')}
           </Text>
-          <Pressable onPress={onRetry} hitSlop={8} accessibilityRole="button">
-            <Text style={styles.action}>{t('common.retry')}</Text>
-          </Pressable>
+          {/* No retry for a rejected server key: the request cannot start
+              succeeding until someone changes a secret, so offering "try
+              again" would just loop. */}
+          {error !== 'not_configured' ? (
+            <Pressable onPress={onRetry} hitSlop={8} accessibilityRole="button">
+              <Text style={styles.action}>{t('common.retry')}</Text>
+            </Pressable>
+          ) : null}
         </View>
       ) : statusLabel ? (
         <View style={styles.statusRow}>
