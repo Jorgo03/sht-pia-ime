@@ -53,7 +53,8 @@ export default function PropertyDetail() {
   }, [title, property?.city])
 
   if (loading) return <div className="page">{t('common.loading')}</div>
-  if (error) return <div className="page" style={{ color: '#c0392b' }}>{t('common.error')}: {error}</div>
+  // A localized message, never the driver's own text — see useProperty().
+  if (error) return <div className="page" style={{ color: '#c0392b' }}>{t('errors.generic')}</div>
   if (!property) return <div className="page">{t('search.empty')}</div>
 
   const saved = isFavorite(property.id)

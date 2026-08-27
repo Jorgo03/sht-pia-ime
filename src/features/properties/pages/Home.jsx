@@ -62,7 +62,7 @@ export default function Home() {
 
       {error && (
         <div className="placeholder-card" style={{ margin: '0 1.25rem' }}>
-          {t('common.error')}: {error}
+          {t('errors.generic')}
         </div>
       )}
 

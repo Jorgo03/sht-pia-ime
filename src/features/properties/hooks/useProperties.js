@@ -73,8 +73,13 @@ export function useProperties({ filter = 'all', listingType = null, city = null,
 
     limited.then(({ data, error: err }) => {
       if (!active) return
-      if (err) setError(err.message)
-      else {
+      if (err) {
+        // Same rule as useProperty(): the driver's text describes our schema
+        // and is English-only, so it stays in the console for debugging and
+        // the UI shows a localized message instead.
+        console.error('useProperties failed:', err.message)
+        setError(true)
+      } else {
         setProperties(data || [])
         setHasMore(paginate && (data || []).length === PAGE_SIZE)
       }
@@ -148,11 +153,24 @@ export function useProperty(id) {
       .from('properties')
       .select('*, agent:profiles(id, full_name, phone, agency_name, avatar_url)')
       .eq('id', id)
-      .single()
+      // maybeSingle, not single: a listing that was deleted, or an id that
+      // never existed, is a normal "not found" — not a failure. single()
+      // rejects with PostgREST's PGRST116 there, which the page then rendered
+      // verbatim as "Error: Cannot coerce the result to a single JSON object".
+      // Anyone opening a stale or shared link to a removed listing saw raw
+      // driver text, in English regardless of their language.
+      .maybeSingle()
       .then(({ data, error: err }) => {
         if (!active) return
-        if (err) setError(err.message)
-        else setProperty(data)
+        if (err) {
+          // The real message stays available for debugging, but never reaches
+          // the UI: it is untranslated and describes our database, not
+          // anything the visitor can act on.
+          console.error('useProperty failed:', err.message)
+          setError(true)
+        } else {
+          setProperty(data)
+        }
         setLoading(false)
       })
 
