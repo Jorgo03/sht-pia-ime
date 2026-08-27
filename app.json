@@ -50,7 +50,8 @@
       [
         "expo-image-picker",
         {
-          "photosPermission": "Shtëpia.ime needs access to your photos so you can add them to a listing."
+          "photosPermission": "Shtëpia.ime needs access to your photos so you can add them to a listing.",
+          "microphonePermission": false
         }
       ]
     ],
