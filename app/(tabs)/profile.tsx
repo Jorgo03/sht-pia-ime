@@ -60,11 +60,22 @@ function friendlyAuthError(
     'Email not confirmed': 'errors.emailNotConfirmed',
     'Token has expired or is invalid': 'errors.invalidCode',
     'is invalid': 'errors.invalidEmail',
+    // Supabase rejects a malformed address with code `validation_failed` and
+    // this text, matching none of the other patterns. Mirrors the web fix.
+    'Unable to validate email address': 'errors.invalidEmail',
+    // Server-side password policy, if ever set stricter than the client rule.
+    'Password should be at least': 'errors.passwordMin',
     'For security purposes, you can only request this after': 'errors.rateLimited',
     // Distinct from the per-identity cooldown above: Supabase's project-wide
     // email-sending quota (code: over_email_send_rate_limit), confirmed live
     // in production. Mirrors the web fix in src/lib/authErrors.js.
     'email rate limit exceeded': 'errors.rateLimited',
+    // The SMTP provider refused the message, so GoTrue fails the whole
+    // request (500) and NO account is created. Matched on the shared prefix
+    // so confirmation, recovery, magic-link and invite mails all land here.
+    // Must not fall through to errors.generic ("try again") — retrying cannot
+    // succeed until server configuration changes. Mirrors src/lib/authErrors.js.
+    'Error sending': 'errors.emailSendFailed',
     'provider is not enabled': 'errors.providerNotConfigured',
     'Unsupported provider': 'errors.providerNotConfigured',
   };
@@ -189,6 +200,10 @@ export default function ProfileScreen() {
   };
 
   const handleAuth = async () => {
+    // Same re-entry guard as web: the button's `disabled` covers taps, but a
+    // guard here is what actually makes a second submit impossible regardless
+    // of how it was triggered.
+    if (loading) return;
     if (!validateAuth()) return;
     const cleanEmail = email.trim();
     setEmail(cleanEmail);
@@ -205,7 +220,7 @@ export default function ProfileScreen() {
       } catch {
         /* ignore */
       }
-      const { error } = await signUp(cleanEmail, password, {
+      const { error, needsConfirmation } = await signUp(cleanEmail, password, {
         role,
         full_name: fullName.trim() || undefined,
         agency_name: role === 'agent' ? agencyName.trim() || undefined : undefined,
@@ -213,7 +228,7 @@ export default function ProfileScreen() {
       setLoading(false);
       if (error) {
         Alert.alert(t('common.error'), friendlyAuthError(error, t));
-      } else {
+      } else if (needsConfirmation) {
         // Straight to code entry, same as web: the confirmation email carries
         // a 6-digit code, and previously this only showed an alert and left
         // the user on the signup form with no way to enter it.
@@ -224,6 +239,10 @@ export default function ProfileScreen() {
         setOtpStep(true);
         Alert.alert('OK', t('auth.checkEmail'));
       }
+      // Otherwise email confirmation is off and signUp already returned a
+      // session: the auth listener swaps this screen to the signed-in profile
+      // on its own. Showing the code entry here would strand a registered,
+      // signed-in user waiting for a mail that is never sent.
     } else {
       const { error } = await signIn(cleanEmail, password);
       setLoading(false);

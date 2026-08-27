@@ -184,7 +184,17 @@ export function AuthProvider({ children }) {
         })
         .eq('id', data.user.id)
     }
-    return { error }
+    // Whether the caller must collect a confirmation code, decided by what
+    // Supabase actually returned rather than assumed.
+    //
+    // With "Confirm email" ON, signUp returns a user and NO session, and the
+    // 6-digit code arrives by email. With it OFF, signUp returns a session and
+    // the user is already signed in — there is no code and no email will ever
+    // arrive. The form used to send everyone to the code screen regardless,
+    // which strands a successfully registered, already-signed-in user on a
+    // dead end. That setting is a dashboard toggle the app cannot see, so the
+    // session is the only reliable signal.
+    return { error, needsConfirmation: !error && !data?.session }
   }
 
   const signIn = async (email, password) => {

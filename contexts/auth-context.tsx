@@ -92,7 +92,12 @@ interface AuthContextValue {
     email: string,
     password: string,
     options?: SignUpOptions,
-  ) => Promise<{ error: Error | null }>;
+    /**
+     * `needsConfirmation` is false when Supabase returned a session, i.e. the
+     * project has "Confirm email" off and the account is already signed in —
+     * the caller must NOT send that user to the code-entry screen.
+     */
+  ) => Promise<{ error: Error | null; needsConfirmation: boolean }>;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signInWithProvider: (provider: Provider) => Promise<{ error: Error | null }>;
   /** Email-code (OTP) sign-in, same flow as web's AuthContext.sendOtp. */
@@ -249,7 +254,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     password: string,
     options?: SignUpOptions,
   ) => {
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -260,7 +265,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         },
       },
     });
-    return { error: error as Error | null };
+    // Whether the caller must collect a confirmation code, decided by what
+    // Supabase actually returned rather than assumed. With "Confirm email" ON
+    // there is a user but no session and a code arrives by email; with it OFF
+    // there is a session and no mail is ever sent. Sending everyone to the
+    // code screen strands an already-signed-in user on a dead end.
+    // Mirrors src/features/auth/AuthContext.jsx.
+    return {
+      error: error as Error | null,
+      needsConfirmation: !error && !data?.session,
+    };
   };
 
   const signIn = async (email: string, password: string) => {

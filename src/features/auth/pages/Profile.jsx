@@ -107,6 +107,10 @@ export default function Profile() {
   }
 
   const handleAuth = async () => {
+    // The CTA is disabled while loading, but the password inputs are not, and
+    // both call this from onKeyDown Enter — so holding Enter fired a second
+    // signup over the first. A disabled button only stops the mouse.
+    if (loading) return
     setMessage('')
     if (!validate()) return
     const cleanEmail = email.trim()
@@ -114,13 +118,13 @@ export default function Profile() {
     setLoading(true)
     try {
       if (isSignUp) {
-        const { error } = await signUp(cleanEmail, password, {
+        const { error, needsConfirmation } = await signUp(cleanEmail, password, {
           role,
           full_name: fullName.trim(),
           agency_name: role === 'agent' ? agencyName.trim() || undefined : undefined,
         })
         if (error) setMessage(friendlyError(error, t))
-        else {
+        else if (needsConfirmation) {
           // Confirmation email carries a 6-digit code — take the user
           // straight to the code entry (type 'signup' so verify/resend match).
           setOtpEmail(cleanEmail)
@@ -130,6 +134,11 @@ export default function Profile() {
           setOtpStep('enter-code')
           setCooldown(30)
           setMessage(t('auth.checkEmail'))
+        } else {
+          // Email confirmation is off: signUp already returned a session, so
+          // the account exists and is signed in. Sending this user to the code
+          // screen would strand them waiting for a mail that is never sent.
+          setPendingRedirect(location.state?.from || '/')
         }
       } else {
         const { error } = await signIn(cleanEmail, password)

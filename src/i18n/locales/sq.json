@@ -257,7 +257,8 @@
     "oauthFailed": "Kyçja me ofruesin dështoi — provo përsëri",
     "invalidCode": "Kodi është i pasaktë ose ka skaduar",
     "videoInvalidType": "Lejohen vetëm video MP4 ose MOV",
-    "videoTooLarge": "Video është shumë e madhe (maks. {{max}} MB)"
+    "videoTooLarge": "Video është shumë e madhe (maks. {{max}} MB)",
+    "emailSendFailed": "Nuk arritëm të dërgojmë emailin e konfirmimit. Është një problem konfigurimi i serverit, jo i llogarisë sate — kontakto administratorin."
   },
   "agentDashboard": {
     "title": "Paneli i Agjentit",

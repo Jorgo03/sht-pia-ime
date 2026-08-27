@@ -670,3 +670,70 @@ supabase secrets set MYMEMORY_EMAIL=<a mailbox you control> --project-ref xzzzhl
 
 Not set by anything automatically — I will not put your address into a
 third-party service on your behalf.
+
+## 15. SIGNUP IS BROKEN FOR EVERY USER BUT YOU — SMTP — 2026-08-27
+
+**Reproduced live against production**, not inferred. `POST /auth/v1/signup`
+with a fresh address returns **500**, and the auth log gives the reason:
+
+```
+"Error sending confirmation email"
+550 "You can only send testing emails to your own email address
+     (jorgo.dhaskali@gmail.com). To send emails to other recipients,
+     please verify a domain at resend.com/domains, and change the
+     `from` address to an email using this domain."
+```
+
+Resend refuses every recipient except the account owner. GoTrue treats an
+SMTP failure as fatal and aborts the whole request, so **no account is
+created at all** — confirmed: zero rows in `auth.users` for the probe. This
+is not "the email is slow" or "check spam". Signup is impossible for
+everyone except you.
+
+It also explains the history: `adela`, `ronaldo` and `s.martiri` all signed
+up by email successfully *before* custom SMTP was configured, on Supabase's
+built-in mailer. Configuring Resend without a verified domain is what broke
+it.
+
+### Fix — pick one. The first is free and takes one click.
+
+**A. Turn OFF email confirmation** (free, instant, no domain needed)
+Dashboard → Authentication → Providers → Email → disable **Confirm email**.
+Signup then completes immediately and returns a session; no mail is sent, so
+Resend is never involved. Trade-off: addresses are unverified. Best choice
+pre-launch, and reversible the moment a domain exists.
+
+**B. Remove the custom SMTP** (free, keeps verification)
+Dashboard → Authentication → Emails → SMTP Settings → disable custom SMTP.
+Falls back to Supabase's built-in mailer, which delivers to *any* address —
+this is what worked before. Trade-off: roughly 2–4 emails/hour project-wide
+and Supabase label it unsuitable for production, so it suits low signup
+volume only.
+
+**C. Verify a domain in Resend** (costs money — the real production answer)
+resend.com/domains, add SPF/DKIM, then change the `from` address off
+`onboarding@resend.dev`. Do this before real launch regardless.
+
+I cannot do any of these: they are dashboard settings, and I do not change
+another party's auth configuration on my own initiative.
+
+### What was fixed in code
+
+The app now works correctly **whichever option you choose**, which it did
+not before:
+
+- **`needsConfirmation` is now derived from the response, not assumed.** On
+  success the form used to send *everyone* to the 6-digit code screen. With
+  option A that strands a registered, already-signed-in user waiting for a
+  mail that is never sent. `signUp` now reports whether Supabase returned a
+  session, and the form redirects instead of asking for a code.
+- **The SMTP failure no longer reads as "try again".** It fell through to
+  `errors.generic` ("Something went wrong. Try again.") — advice that can
+  never succeed. It now maps to `errors.emailSendFailed`, which names it as
+  a server configuration problem.
+- **Duplicate signup requests are actually prevented.** The submit button was
+  disabled while loading, but the password inputs were not and both call
+  `handleAuth` on Enter — holding Enter fired a second signup over the first.
+  Both platforms now guard on re-entry.
+- Two real Supabase texts that matched no pattern are mapped: `Unable to
+  validate email address` and `Password should be at least`.

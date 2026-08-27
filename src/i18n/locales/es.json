@@ -272,7 +272,8 @@
     "oauthFailed": "El inicio de sesión con el proveedor falló — inténtalo de nuevo",
     "invalidCode": "El código es incorrecto o ha caducado",
     "videoInvalidType": "Solo se permiten vídeos MP4 o MOV",
-    "videoTooLarge": "El vídeo es demasiado grande (máx. {{max}} MB)"
+    "videoTooLarge": "El vídeo es demasiado grande (máx. {{max}} MB)",
+    "emailSendFailed": "No hemos podido enviar el correo de confirmación. Es un problema de configuración del servidor, no de tu cuenta: contacta con el administrador."
   },
   "agentDashboard": {
     "title": "Panel del Agente",

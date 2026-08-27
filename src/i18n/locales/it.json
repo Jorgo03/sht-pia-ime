@@ -272,7 +272,8 @@
     "oauthFailed": "Accesso con il provider non riuscito — riprova",
     "invalidCode": "Il codice è errato o scaduto",
     "videoInvalidType": "Sono consentiti solo video MP4 o MOV",
-    "videoTooLarge": "Video troppo grande (max {{max}} MB)"
+    "videoTooLarge": "Video troppo grande (max {{max}} MB)",
+    "emailSendFailed": "Non siamo riusciti a inviare l’email di conferma. È un problema di configurazione del server, non del tuo account — contatta l’amministratore."
   },
   "agentDashboard": {
     "title": "Dashboard Agente",

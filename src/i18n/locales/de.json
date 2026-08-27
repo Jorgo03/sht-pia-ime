@@ -264,7 +264,8 @@
     "oauthFailed": "Anmeldung über den Anbieter fehlgeschlagen — bitte erneut versuchen",
     "invalidCode": "Der Code ist falsch oder abgelaufen",
     "videoInvalidType": "Nur MP4- oder MOV-Videos sind erlaubt",
-    "videoTooLarge": "Video ist zu groß (max. {{max}} MB)"
+    "videoTooLarge": "Video ist zu groß (max. {{max}} MB)",
+    "emailSendFailed": "Die Bestätigungs-E-Mail konnte nicht gesendet werden. Das ist ein Serverkonfigurationsproblem, nicht ein Problem mit deinem Konto — bitte kontaktiere den Administrator."
   },
   "agentDashboard": {
     "title": "Makler-Dashboard",

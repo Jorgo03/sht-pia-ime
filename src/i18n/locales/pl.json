@@ -280,7 +280,8 @@
     "oauthFailed": "Logowanie przez dostawcę nie powiodło się — spróbuj ponownie",
     "invalidCode": "Kod jest nieprawidłowy lub wygasł",
     "videoInvalidType": "Dozwolone są tylko filmy MP4 lub MOV",
-    "videoTooLarge": "Wideo jest za duże (maks. {{max}} MB)"
+    "videoTooLarge": "Wideo jest za duże (maks. {{max}} MB)",
+    "emailSendFailed": "Nie udało się wysłać e-maila potwierdzającego. To problem z konfiguracją serwera, nie z Twoim kontem — skontaktuj się z administratorem."
   },
   "agentDashboard": {
     "title": "Panel Agenta",

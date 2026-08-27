@@ -309,7 +309,8 @@
     "oauthFailed": "Sign-in with the provider failed — try again",
     "invalidCode": "The code is wrong or has expired",
     "videoInvalidType": "Only MP4 or MOV videos are allowed",
-    "videoTooLarge": "Video is too large (max {{max}} MB)"
+    "videoTooLarge": "Video is too large (max {{max}} MB)",
+    "emailSendFailed": "We could not send the confirmation email. This is a server configuration problem, not a problem with your account — please contact the administrator."
   },
   "agentDashboard": {
     "title": "Agent Dashboard",

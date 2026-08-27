@@ -272,7 +272,8 @@
     "oauthFailed": "La connexion via le fournisseur a échoué — réessayez",
     "invalidCode": "Le code est incorrect ou a expiré",
     "videoInvalidType": "Seules les vidéos MP4 ou MOV sont autorisées",
-    "videoTooLarge": "Vidéo trop volumineuse (max {{max}} Mo)"
+    "videoTooLarge": "Vidéo trop volumineuse (max {{max}} Mo)",
+    "emailSendFailed": "Nous n’avons pas pu envoyer l’e-mail de confirmation. Il s’agit d’un problème de configuration du serveur, pas de votre compte — contactez l’administrateur."
   },
   "agentDashboard": {
     "title": "Tableau de bord Agent",
