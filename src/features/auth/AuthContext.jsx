@@ -5,6 +5,30 @@ import { classifyAuthEvent } from '../../lib/authEvents'
 
 const AuthContext = createContext(null)
 
+/**
+ * How long the first paint may wait on the profile fetch.
+ *
+ * AppShell renders <LoadingScreen state="splash" /> while `loading` is true,
+ * so anything awaited before that clears can strand the user on a splash
+ * screen. supabase-js puts no timeout on a query, so a half-open socket never
+ * settles and the app never renders. Mirrors contexts/auth-context.tsx.
+ */
+const PROFILE_FETCH_TIMEOUT_MS = 4000
+
+/** Absolute ceiling on how long anything may hold the splash screen. */
+const AUTH_INIT_TIMEOUT_MS = 8000
+
+/** Resolves with `timedOut` if `promise` has not settled within `ms`. Never rejects. */
+const timedOut = Symbol('timedOut')
+function withTimeout(promise, ms) {
+  return new Promise((resolve) => {
+    const timer = setTimeout(() => resolve(timedOut), ms)
+    promise
+      .then((value) => { clearTimeout(timer); resolve(value) })
+      .catch(() => { clearTimeout(timer); resolve(timedOut) })
+  })
+}
+
 export function AuthProvider({ children }) {
   const [state, setState] = useState({
     user: null,
@@ -100,11 +124,29 @@ export function AuthProvider({ children }) {
         setState({ user: null, session: null, profile: null, loading: false })
         return
       }
-      let profile = await loadProfile(session.user.id)
-      profile = await applyPendingRole(session.user, profile)
+      // Started once, awaited with a ceiling, and still honoured if it lands
+      // late — so a slow network delays the profile, never the whole app.
+      const user = session.user
+      const profilePromise = loadProfile(user.id)
+        .then((p) => applyPendingRole(user, p))
+        .catch(() => null)
+
+      const result = await withTimeout(profilePromise, PROFILE_FETCH_TIMEOUT_MS)
       if (!active || myGeneration !== generation.current) return
-      setState({ user: session.user, session, profile, loading: false })
+
+      const profile = result === timedOut ? null : result
+      setState({ user, session, profile, loading: false })
       if (profile) loadPreferredLanguage(profile)
+
+      // Too slow to block on, but still wanted: apply it whenever it arrives,
+      // unless a newer auth event has superseded this one.
+      if (result === timedOut) {
+        profilePromise.then((late) => {
+          if (!active || myGeneration !== generation.current) return
+          setState((s) => ({ ...s, profile: late }))
+          if (late) loadPreferredLanguage(late)
+        })
+      }
     }
 
     // A single subscription drives both the initial-load hydration and
@@ -115,9 +157,16 @@ export function AuthProvider({ children }) {
     // every cold load for no benefit.
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
+        const decision = classifyAuthEvent(event, session)
+
+        // A 'none' event carries nothing actionable, so it must not touch the
+        // generation counter. Bumping it invalidated any sync() already
+        // awaiting a profile: that sync then returned at its generation check
+        // without setting state or clearing `loading`, stranding the splash.
+        if (decision.action === 'none') return
+
         generation.current += 1
         const myGeneration = generation.current
-        const decision = classifyAuthEvent(event, session)
 
         if ('passwordRecovery' in decision) setPasswordRecovery(decision.passwordRecovery)
 
@@ -141,7 +190,20 @@ export function AuthProvider({ children }) {
       },
     )
 
-    return () => { active = false; subscription.unsubscribe() }
+    // Unconditional last resort. AppShell renders a full-screen splash while
+    // `loading` is true, and web previously had no ceiling at all: if
+    // INITIAL_SESSION never arrived — offline, or a wedged socket — the app
+    // sat on that splash forever. If startup already finished this is a no-op.
+    const initTimeout = setTimeout(() => {
+      if (!active) return
+      setState((s) => {
+        if (!s.loading) return s
+        console.warn(`Auth init exceeded ${AUTH_INIT_TIMEOUT_MS}ms; rendering anyway.`)
+        return { ...s, loading: false }
+      })
+    }, AUTH_INIT_TIMEOUT_MS)
+
+    return () => { clearTimeout(initTimeout); active = false; subscription.unsubscribe() }
   }, [])
 
   const refreshProfile = async () => {

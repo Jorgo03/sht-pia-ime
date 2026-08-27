@@ -263,9 +263,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, s) => {
+      const decision = classifyAuthEvent(event, s);
+
+      // A 'none' event carries nothing actionable, so it must not touch the
+      // generation counter. Bumping it here invalidated any sync() already
+      // awaiting a profile: that sync then returned at its generation check
+      // WITHOUT setting session or clearing `loading`, and nothing else would
+      // either — leaving the splash up until the 8s failsafe, which then
+      // opened the app signed-OUT despite a perfectly valid session.
+      // TOKEN_REFRESHED/SIGNED_IN/USER_UPDATED all classify as 'none' when
+      // they arrive without a session, which is exactly when a flaky
+      // connection is most likely to produce one mid-startup.
+      if (decision.action === 'none') return;
+
       generation.current += 1;
       const myGeneration = generation.current;
-      const decision = classifyAuthEvent(event, s);
 
       if (decision.action === 'clear') {
         setSession(null);
