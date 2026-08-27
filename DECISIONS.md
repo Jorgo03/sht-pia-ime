@@ -737,3 +737,63 @@ not before:
   Both platforms now guard on re-entry.
 - Two real Supabase texts that matched no pattern are mapped: `Unable to
   validate email address` and `Password should be at least`.
+
+## 16. Security audit — two real bugs found and fixed — 2026-08-27
+
+Full cross-user penetration test against production with two throwaway
+accounts (created, attacked with, deleted). **24/24 authorization checks
+passed** — RLS is genuinely sound. Attempts that were correctly denied:
+modifying another user's profile, self-promoting to agent via a direct
+`profiles.role` UPDATE (403), inserting a favourite with a spoofed
+`user_id` (403), reading/deleting another user's favourites, editing or
+deleting someone else's property, creating a property with a spoofed
+`owner_id` (403), bulk-reading seven user-owned tables, and every anon
+read of private tables. Anon sees exactly 7 profile rows = exactly the 7
+agents; all 11 buyer profiles stay private, and column grants expose only
+`id, full_name, avatar_url, agency_name, phone` (`role`, `bio`, `email`,
+`preferred_language`, `created_at` all denied).
+
+`claim_role` rejected `admin`, `super_admin`, `superuser`, `service_role`
+and a SQL-injection payload (all 400), and rejected anon (401).
+
+### Bug 1 — video upload was impossible, and it broke publishing
+
+`property-images` allowed image MIME types only, capped at 10MB. Both
+listing forms upload the optional tour video into that same bucket, and
+`lib/upload.ts` accepts MP4/MOV up to 50MB. Verified live:
+
+```
+video/mp4  -> 415 invalid_mime_type
+image/jpeg -> 200   (control, same bucket, same auth)
+```
+
+Because both forms treat photos+video as one all-or-nothing unit, a
+failed video **rolled back the photos and aborted the whole publish** —
+so any agent attaching a video simply could not create a listing. Fixed
+by aligning the bucket to the contract the client already enforces:
+added `video/mp4` + `video/quicktime`, raised the limit to 50MB. The
+allowlist stays restrictive — `application/x-msdownload`, `text/html`,
+`application/javascript` and `application/pdf` are all still rejected
+(400, re-verified after the change).
+
+### Bug 2 — nobody could delete their own files (storage leak)
+
+`storage.objects` had INSERT, UPDATE and DELETE policies for both
+buckets but **no SELECT policy at all**. Storage resolves the object row
+before deleting it, so an owner deleting their own file got 403 "Access
+denied" and the bulk-remove API returned `200 []` — a silent no-op.
+
+Two consequences: an agent could not remove a photo from their own
+listing, and `removeUploadedImages()` — the rollback both forms run when
+the properties INSERT fails after photos are uploaded — never deleted
+anything, leaking the images permanently on every failed publish.
+
+Fixed in `20260827230000_add_storage_select_policies.sql`, scoped to the
+caller's own folder. This grants no new read access in practice (both
+buckets are already `public = true`, so objects are fetchable via their
+CDN URL regardless); it only lets a user enumerate, and therefore delete,
+their own objects. Re-verified after the change: owner delete removed 2
+objects, while user A still deletes 0 of B's files and sees 0 files in
+B's folder.
+
+No new security advisories were introduced.
