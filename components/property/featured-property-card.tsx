@@ -70,6 +70,9 @@ function FeaturedPropertyCardBase({
       <View style={styles.imageWrap}>
         <Image
           source={{ uri: property.image_urls[0] }}
+          // Ties the loaded image to this listing, so a FlatList row reused
+          // for a different property cannot flash the previous one.
+          recyclingKey={property.id}
           style={styles.image}
           contentFit="cover"
           transition={300}

@@ -29,8 +29,45 @@ import { supabase } from '@/lib/supabase';
 // Its 8 unit tests in tests/authEvents.test.mjs now cover both apps.
 import { classifyAuthEvent } from '../src/lib/authEvents.js';
 
-/** If no auth event has arrived by now, stop blocking the splash screen. */
+/** Hard ceiling on how long anything may hold the splash screen. */
 const AUTH_INIT_TIMEOUT_MS = 8000;
+
+/**
+ * How long the first paint may wait on the profile fetch.
+ *
+ * The profile is not needed to render the first screen — only the session is.
+ * Waiting on it unbounded is what let a slow or half-open connection hold the
+ * splash screen open forever: supabase-js puts no timeout on a query, so a
+ * stalled socket never rejects, `setLoading(false)` never ran, and the app
+ * simply never opened. That failed on exactly the phones and networks the
+ * developer's own device never reproduced.
+ *
+ * On timeout the app renders signed-in with `profile: null` and the fetch is
+ * left running — whatever it eventually returns is still applied.
+ */
+const PROFILE_FETCH_TIMEOUT_MS = 4000;
+
+/**
+ * Resolves with `timedOut` if `promise` has not settled within `ms`.
+ *
+ * Deliberately never rejects: every caller here wants "carry on without it",
+ * not an error path.
+ */
+const timedOut = Symbol('timedOut');
+function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T | typeof timedOut> {
+  return new Promise((resolve) => {
+    const timer = setTimeout(() => resolve(timedOut), ms);
+    promise
+      .then((value) => {
+        clearTimeout(timer);
+        resolve(value);
+      })
+      .catch(() => {
+        clearTimeout(timer);
+        resolve(timedOut);
+      });
+  });
+}
 
 /**
  * True inside Expo Go (as opposed to a dev-client or store build).
@@ -192,12 +229,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setLoading(false);
         return;
       }
-      let p = await loadProfile(s.user.id);
-      p = await applyPendingRole(s.user, p);
+
+      // Started once, awaited with a ceiling, and still honoured if it lands
+      // late — so a slow network delays the profile, never the whole app.
+      const user = s.user;
+      const profilePromise = loadProfile(user.id)
+        .then((p) => applyPendingRole(user, p))
+        .catch(() => null);
+
+      const result = await withTimeout(profilePromise, PROFILE_FETCH_TIMEOUT_MS);
       if (!active || myGeneration !== generation.current) return;
+
       setSession(s);
-      setProfile(p);
+      if (result !== timedOut) setProfile(result);
       setLoading(false);
+
+      // Took too long to block on, but the answer is still wanted: apply it
+      // whenever it arrives, unless a newer auth event has superseded it.
+      if (result === timedOut) {
+        profilePromise.then((late) => {
+          if (!active || myGeneration !== generation.current) return;
+          setProfile(late);
+        });
+      }
     };
 
     // A single subscription drives both initial hydration and every later
@@ -225,15 +279,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     });
 
-    // Belt-and-braces for the case the removed getSession().catch() covered:
-    // AppGate (app/_layout.tsx) holds the splash screen until `loading` is
-    // false, so if INITIAL_SESSION never arrives — a wedged socket on a bad
-    // connection — the app would sit behind the splash indefinitely. Degrade
-    // to signed-out instead of hanging. Cleared as soon as any event lands.
+    // Unconditional last resort. AppGate (app/_layout.tsx) holds the splash
+    // screen while `loading` is true, so anything that can stall before it is
+    // cleared can strand the user on a splash screen forever.
+    //
+    // This used to bail out on `generation.current > 0`, which disarmed it the
+    // instant INITIAL_SESSION fired — i.e. before the profile fetch had even
+    // started, leaving the slowest step of startup with no ceiling at all. It
+    // now fires regardless; if startup already finished, `loading` is false
+    // and the setState is a no-op.
     const initTimeout = setTimeout(() => {
-      if (!active || generation.current > 0) return;
-      console.warn('No auth event within %dms; continuing signed-out.', AUTH_INIT_TIMEOUT_MS);
-      setLoading(false);
+      if (!active) return;
+      setLoading((current) => {
+        if (current) {
+          console.warn('Auth init exceeded %dms; opening the app anyway.', AUTH_INIT_TIMEOUT_MS);
+        }
+        return false;
+      });
     }, AUTH_INIT_TIMEOUT_MS);
 
     return () => {

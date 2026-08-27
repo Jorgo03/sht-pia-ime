@@ -70,6 +70,9 @@ function PropertyCardBase({ property, onPress, variant = 'grid' }: PropertyCardP
         <View>
           <Image
             source={{ uri: property.image_urls[0] }}
+            // Ties the loaded image to this listing, so a FlatList row reused
+            // for a different property cannot flash the previous one.
+            recyclingKey={property.id}
             style={styles.compactImage}
             contentFit="cover"
             transition={300}
@@ -132,6 +135,9 @@ function PropertyCardBase({ property, onPress, variant = 'grid' }: PropertyCardP
       <View style={styles.imageWrap}>
         <Image
           source={{ uri: property.image_urls[0] }}
+          // Ties the loaded image to this listing, so a FlatList row reused
+          // for a different property cannot flash the previous one.
+          recyclingKey={property.id}
           style={styles.image}
           contentFit="cover"
           transition={300}
