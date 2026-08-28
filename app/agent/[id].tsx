@@ -31,6 +31,7 @@ export default function AgentProfileScreen() {
   const [agent, setAgent] = useState<AgentProfile | null>(null);
   const [properties, setProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
   // Same shape as the web app's AgentProfile.jsx — the profiles select is
   // scoped to the anon SELECT grant (id, full_name, phone, agency_name,
@@ -39,14 +40,31 @@ export default function AgentProfileScreen() {
     if (!id) return;
     let active = true;
     setLoading(true);
+    setError(false);
 
     Promise.all([
-      supabase.from('profiles').select('id, full_name, phone, agency_name').eq('id', id).single(),
+      // maybeSingle, not single: a removed agent or an id that never existed is
+      // a normal "not found", not a failure. single() rejects with PGRST116
+      // there, which left `agent` null and rendered a bare word, "Error".
+      supabase.from('profiles').select('id, full_name, phone, agency_name').eq('id', id).maybeSingle(),
       supabase.from('properties').select('*').eq('agent_id', id).eq('status', 'active').order('created_at', { ascending: false }),
     ]).then(([profileRes, propsRes]) => {
       if (!active) return;
-      if (profileRes.data) setAgent(profileRes.data);
-      if (propsRes.data) setProperties(propsRes.data);
+      // Both errors were previously discarded, so a network failure or an RLS
+      // denial was indistinguishable from "this agent does not exist".
+      if (profileRes.error) {
+        console.error('AgentProfile: profile fetch failed:', profileRes.error.message);
+        setError(true);
+      } else {
+        setAgent(profileRes.data);
+      }
+      if (propsRes.error) {
+        // Non-fatal: the agent still renders, just with no listings. Logged so
+        // an empty portfolio caused by a failed query is not read as "no homes".
+        console.error('AgentProfile: listings fetch failed:', propsRes.error.message);
+      } else {
+        setProperties(propsRes.data || []);
+      }
       setLoading(false);
     });
 
@@ -66,9 +84,15 @@ export default function AgentProfileScreen() {
           <View style={styles.center}>
             <ActivityIndicator size="large" color={colors.accent} />
           </View>
-        ) : !agent ? (
+        ) : error ? (
           <View style={styles.center}>
-            <Text style={styles.description}>{t('common.error')}</Text>
+            <Text style={styles.description}>{t('errors.generic')}</Text>
+          </View>
+        ) : !agent ? (
+          // A failed fetch and a missing agent are different things and now
+          // read differently. AppHeader's back arrow is the way out of both.
+          <View style={styles.center}>
+            <Text style={styles.description}>{t('notFound.title')}</Text>
           </View>
         ) : (
           <FlatList

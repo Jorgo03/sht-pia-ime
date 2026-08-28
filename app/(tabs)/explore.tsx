@@ -61,6 +61,8 @@ export default function ExploreScreen() {
     data,
     isLoading: loading,
     isFetchingNextPage: loadingMore,
+    isError,
+    refetch,
     hasNextPage,
     fetchNextPage,
   } = useInfinitePropertiesQuery(queryFilters);
@@ -234,6 +236,19 @@ export default function ExploreScreen() {
         ) : loading ? (
           <View style={styles.loader}>
             <ActivityIndicator size="large" color={colors.accent} />
+          </View>
+        ) : isError ? (
+          /* Must come before the list: a failed query also yields zero rows, so
+             without this the ListEmptyComponent told the visitor their filters
+             matched nothing ("Try adjusting your search filters") when the
+             fetch had actually failed. Mirrors the web Search fix. */
+          <View style={styles.empty}>
+            <MaterialIcons name="error-outline" size={40} color={colors.textSecondary} />
+            <Text style={styles.emptyTitle}>{t('errors.generic')}</Text>
+            <Pressable style={styles.emptyResetButton} onPress={() => refetch()}>
+              <MaterialIcons name="restart-alt" size={14} color={colors.accent} />
+              <Text style={styles.emptyResetText}>{t('common.retry')}</Text>
+            </Pressable>
           </View>
         ) : (
           <FlatList

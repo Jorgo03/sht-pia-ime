@@ -1,5 +1,88 @@
 # Pre-Launch Audit — Shtëpia.ime (Vite web app)
 
+## ═══ PASS 11 — 2026-08-28: QUALITY PASS (silent failures, error states) ═══
+
+Run against `QUALITY-PASS.md`. Not a redesign pass: no page was restyled, no
+schema/RLS/auth config was touched, no working logic was rewritten.
+
+### Two handed-over specs were deliberately NOT applied
+
+`IMPLEMENTATION.md` and `WAVE-2-HOME.md` were provided alongside
+`QUALITY-PASS.md`. Both are stale against this repo and applying them verbatim
+would have broken the app:
+
+- **`IMPLEMENTATION.md`** is Wave 1, already shipped in better form. Its REPLACE
+  targets (`src/pages/Profile.jsx`, `src/components/BottomNav.jsx`,
+  `src/contexts/AddSheetContext.jsx`, …) no longer exist — the repo moved to
+  feature-first. Its `App.jsx` imports `./pages/Home` and `./contexts/AuthContext`
+  (neither exists → white screen), drops `ProtectedRoute` from 8 routes (making
+  `/new-listing`, `/my-listings`, `/agent-dashboard` public — an auth bypass),
+  and deletes `/auth/callback` (breaking Google sign-in). Its `theme.css` drops
+  the `@layer base` wrapper and 9 tokens with **74 live `var()` references**.
+- **`WAVE-2-HOME.md`** states in its own §3 that it was written without sight of
+  `Home.jsx`. Its chips + 2-col-grid design contradicts `CLAUDE_CODE_BRIEF.md`
+  §3.2, which is what is actually built.
+
+### Phase 0 — route status (signed-out sweep, 430×920)
+
+| Route | Renders | Notes |
+|---|---|---|
+| `/` | ok | editorial head, featured, carousels |
+| `/search` | ok | 3 homes, filter sheet, map toggle |
+| `/favorites` `/messages` `/profile` | ok | gate to auth |
+| `/agent-dashboard` `/my-listings` `/new-listing` `/viewings` `/saved-searches` | ok | gate to auth via `ProtectedRoute` |
+| `/property/:id` | ok | valid-but-missing id → "No properties found" |
+| `/agent/:id` | **was broken** | see below |
+| unknown route | ok | 404 page |
+
+### Fixed
+
+| Sev | Problem | Fix |
+|---|---|---|
+| Blocks | **Search silently lied when the query failed.** `Search.jsx` destructured everything from `useProperties` *except* `error`, so a failed fetch left `properties` empty and rendered the *empty* state — "No properties found / Try adjusting your search filters". The visitor retunes filters forever against a database error. Proven by forcing a 500 on `/rest/v1/properties` | Destructure `error`; render an error branch **before** the empty branch, reusing the existing `.empty-state` shell + `errors.generic` + `common.retry` (both already in all 8 locales). No new CSS |
+| Blocks | Same bug on mobile: `app/(tabs)/explore.tsx` ignored react-query's `isError` | Destructure `isError`/`refetch`, error branch before the list, mirroring the web fix and the existing `app/(tabs)/index.tsx` error card |
+| Degrades | **`/agent/:id` rendered a bare word: "Error".** `.single()` on a user-supplied id rejects with PGRST116 for a removed/nonexistent agent, leaving `agent` null → `t('common.error')`. Both query errors were also discarded, so a network failure and "no such agent" were indistinguishable. No way out of the dead end | `.maybeSingle()`; separate error vs not-found states; `notFound.*` (already in all 8 locales) for not-found and `errors.generic` for real failures; `BackButton to="/search"` on both — this page is reachable from a shared link with no in-app history |
+| Degrades | `app/agent/[id].tsx` had the identical defect (its own comment says "Same shape as the web app's AgentProfile.jsx") | Same fix, for parity |
+| Degrades | `app/messages/index.tsx` discarded the conversations fetch error → an agent whose leads failed to load was told they had no conversations | Capture the error, dedicated error state + retry reusing the home screen's `retryText` treatment |
+| Degrades | `t('listing.priceLabel')` printed the literal string **"listing.priceLabel"** above the price on every mobile property detail page, in all 8 languages. Key never existed (`listing.price` does). Also required by `CLAUDE_CODE_BRIEF.md` §5 | Added to all 8 locales |
+| Degrades | `t('auth.signIn')` printed **"auth.signIn"** on the sign-in Alert button. The `auth` namespace has `signInTitle`/`signInWith`/`signInWithEmail`, never a bare `signIn` | Call site → `common.signIn`, already translated in all 8. No duplicate key added |
+| Cosmetic | `listing.latitude`, `listing.longitude`, `map.webUnavailableTitle`, `map.webUnavailableHint` shipped hardcoded English defaults, so non-English users read "Latitude" | Translated into all 8 locales |
+
+### Verified clean (no action)
+
+- **i18n parity**: 448 leaf keys × 7 non-English locales — **0 missing, 0 empty**.
+  The apparent "orphans" in `pl`/`ru`/`it` are CLDR plural forms (`_few`, `_many`)
+  those languages require and English cannot have — **do not delete them**. The
+  two `fr` strings identical to English ("Conversations", "Notifications") are
+  genuinely the same word in French.
+- No raw i18n key leaks in any route × {en, sq} after the fixes.
+- No horizontal scroll on any route at 430×920 (`scrollWidth === clientWidth`).
+- `console.log` in `contexts/auth-context.tsx` is `__DEV__`-gated — not a violation.
+- Every `<img>` in `src/` has `alt`.
+- Remaining 12 `.single()` calls are `INSERT…select().single()` (row always
+  exists) or already guarded — checked individually, not pattern-matched.
+
+### Flagged, deliberately not fixed
+
+- `PropertyDashboard.jsx` has no error state — a failed analytics fetch renders
+  as zeroed charts. Lower stakes than the list surfaces above; own-listing
+  analytics sub-page. Left for a follow-up rather than widening this diff.
+- Unused imports: `useState` in `Home.jsx`, `Phone`/`MessageCircle` in
+  `PropertyDetail.jsx` (lint warnings, not user-visible).
+- Signed-in flows were **not** exercised — that needs real credentials, which
+  this pass does not have. Everything above is signed-out or static.
+- A listing titled "Apartament 1+1 **me qera**" (for rent) is tagged FOR SALE at
+  €150,000. Data-entry issue in the row, not a code bug — unchanged from earlier
+  passes.
+
+### Verification
+
+`npm test` 93/93 · `npx tsc --noEmit` clean (gates mobile) · `npm run lint`
+0 errors / 15 pre-existing warnings (gates web) · browser sweep of 13 routes
+with a forced-failure test on the Search fix.
+
+---
+
 ## ═══ PASS 10 — 2026-08-22: AUTH RE-AUDIT (logout races, event coverage) ═══
 
 Follow-up to Pass 9, scoped to authentication. The database foundation and

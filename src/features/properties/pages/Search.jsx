@@ -66,7 +66,7 @@ export default function Search() {
 
   const rangesValid = !priceInvalid && !areaInvalid
 
-  const { properties, loading, loadingMore, hasMore, loadMore, totalCount } = useProperties({
+  const { properties, loading, loadingMore, error, hasMore, loadMore, totalCount } = useProperties({
     filter: propertyType || 'all',
     listingType: listingType || null,
     city: debouncedSearch || city || null,
@@ -193,6 +193,18 @@ export default function Search() {
       {loading ? (
         <div className="property-grid" style={{ padding: '0 1.25rem' }}>
           {Array.from({ length: 6 }, (_, i) => <SkeletonCard key={i} />)}
+        </div>
+      ) : error ? (
+        /* Must come before the empty branch: a failed query also leaves
+           `properties` empty, so without this the page told the visitor their
+           filters matched nothing ("Try adjusting your search filters") when
+           the fetch had actually failed — they would tune filters forever. */
+        <div className="empty-state">
+          <AlertCircle size={40} className="empty-state-icon" />
+          <div className="empty-state-title">{t('errors.generic')}</div>
+          <button className="empty-reset-btn" onClick={() => window.location.reload()}>
+            <RotateCcw size={14} /> {t('common.retry')}
+          </button>
         </div>
       ) : properties.length === 0 ? (
         <div className="empty-state">

@@ -46,6 +46,7 @@ export default function MessagesInboxScreen() {
   const [profiles, setProfiles] = useState<Record<string, OtherProfile>>({});
   const [properties, setProperties] = useState<Record<string, PropertyStub>>({});
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
   // Mirrors the web app's Messages.jsx loadConversations() exactly — same
   // query, same batched profile/property lookups for the list preview.
@@ -55,11 +56,21 @@ export default function MessagesInboxScreen() {
       setLoading(false);
       return;
     }
-    const { data } = await supabase
+    setError(false);
+    const { data, error: convoError } = await supabase
       .from('conversations')
       .select('*')
       .or(`client_id.eq.${user.id},agent_id.eq.${user.id}`)
       .order('last_message_at', { ascending: false });
+    // The error was previously discarded, so a failed fetch fell through to the
+    // empty state — an agent whose leads failed to load was told they had no
+    // conversations at all.
+    if (convoError) {
+      console.error('Messages: conversation fetch failed:', convoError.message);
+      setError(true);
+      setLoading(false);
+      return;
+    }
     const convos = data ?? [];
     setConversations(convos);
 
@@ -139,6 +150,16 @@ export default function MessagesInboxScreen() {
         {loading ? (
           <View style={styles.center}>
             <ActivityIndicator size="large" color={colors.accent} />
+          </View>
+        ) : error ? (
+          <View style={styles.center}>
+            <View style={styles.emptyIcon}>
+              <MaterialIcons name="error-outline" size={40} color={colors.accent} />
+            </View>
+            <Text style={styles.subtitle}>{t('errors.generic')}</Text>
+            <TouchableOpacity onPress={loadConversations} activeOpacity={0.7}>
+              <Text style={styles.retryText}>{t('common.retry')}</Text>
+            </TouchableOpacity>
           </View>
         ) : conversations.length === 0 ? (
           <View style={styles.center}>
@@ -257,6 +278,14 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     fontSize: 14,
     color: colors.textSecondary,
     textAlign: 'center',
+  },
+  // Matches the home screen's retry affordance so the two error states read
+  // as the same control.
+  retryText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: colors.accent,
+    marginTop: 12,
   },
   list: {
     paddingHorizontal: 16,
