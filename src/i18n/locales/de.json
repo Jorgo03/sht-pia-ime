@@ -311,6 +311,7 @@
     "address": "Adresse",
     "addressPlaceholder": "Straßenname und Hausnummer",
     "price": "Preis",
+    "priceLabel": "Preis",
     "currency": "Währung",
     "surface": "Fläche",
     "floor": "Etage",
@@ -363,6 +364,8 @@
     "draftRestored": "Entwurf wiederhergestellt — mach weiter, wo du warst. Fotos bitte erneut hinzufügen.",
     "discardDraft": "Neu beginnen",
     "pinLocation": "Standort auf der Karte setzen",
+    "latitude": "Breitengrad",
+    "longitude": "Längengrad",
     "mapHint": "Tippe auf die Karte, um den Standort festzulegen",
     "videoUpload": "Objektvideo",
     "dropVideo": "Video hierher ziehen oder klicken (MP4 oder MOV)"
@@ -380,6 +383,8 @@
   "map": {
     "openInMaps": "In Google Maps öffnen",
     "mapView": "Karte",
+    "webUnavailableTitle": "Kartenansicht",
+    "webUnavailableHint": "Die interaktive Karte ist in der mobilen App verfügbar. Durchsuchen Sie die Angebote stattdessen als Liste.",
     "gridView": "Raster"
   },
   "floorPlan": {

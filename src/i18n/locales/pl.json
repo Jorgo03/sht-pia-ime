@@ -327,6 +327,7 @@
     "address": "Adres",
     "addressPlaceholder": "Ulica i numer",
     "price": "Cena",
+    "priceLabel": "Cena",
     "currency": "Waluta",
     "surface": "Powierzchnia",
     "floor": "Piętro",
@@ -379,6 +380,8 @@
     "draftRestored": "Przywrócono szkic — kontynuuj od miejsca, w którym skończyłeś. Zdjęcia trzeba dodać ponownie.",
     "discardDraft": "Zacznij od nowa",
     "pinLocation": "Zaznacz lokalizację",
+    "latitude": "Szerokość geograficzna",
+    "longitude": "Długość geograficzna",
     "mapHint": "Dotknij mapy, aby ustawić lokalizację",
     "videoUpload": "Wideo nieruchomości",
     "dropVideo": "Przeciągnij wideo tutaj lub kliknij (MP4 lub MOV)"
@@ -396,6 +399,8 @@
   "map": {
     "openInMaps": "Otwórz w Google Maps",
     "mapView": "Mapa",
+    "webUnavailableTitle": "Widok mapy",
+    "webUnavailableHint": "Interaktywna mapa jest dostępna w aplikacji mobilnej. Przeglądaj oferty jako listę.",
     "gridView": "Siatka"
   },
   "floorPlan": {

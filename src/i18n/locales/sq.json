@@ -363,6 +363,7 @@
     "address": "Adresa",
     "addressPlaceholder": "Emri i rrugës dhe numri",
     "price": "Çmimi",
+    "priceLabel": "Çmimi",
     "currency": "Monedha",
     "surface": "Sipërfaqja",
     "floor": "Kati",
@@ -415,6 +416,8 @@
     "draftRestored": "Drafti u rikthye — vazhdo aty ku e le. Fotot duhen shtuar sërish.",
     "discardDraft": "Fillo nga e para",
     "pinLocation": "Vendos pikën në hartë",
+    "latitude": "Gjerësia gjeografike",
+    "longitude": "Gjatësia gjeografike",
     "mapHint": "Prek hartën për të vendosur vendndodhjen e pronës",
     "videoUpload": "Video e pronës",
     "dropVideo": "Tërhiq një video këtu ose kliko (MP4 ose MOV)"
@@ -432,6 +435,8 @@
   "map": {
     "openInMaps": "Hap në Google Maps",
     "mapView": "Harta",
+    "webUnavailableTitle": "Pamja e hartës",
+    "webUnavailableHint": "Harta interaktive është e disponueshme në aplikacionin celular. Shfletoni listimet si listë.",
     "gridView": "Rrjeta"
   },
   "floorPlan": {

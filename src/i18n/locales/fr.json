@@ -319,6 +319,7 @@
     "address": "Adresse",
     "addressPlaceholder": "Nom de rue et numéro",
     "price": "Prix",
+    "priceLabel": "Prix",
     "currency": "Devise",
     "surface": "Surface",
     "floor": "Étage",
@@ -371,6 +372,8 @@
     "draftRestored": "Brouillon restauré — reprenez où vous en étiez. Les photos sont à rajouter.",
     "discardDraft": "Repartir de zéro",
     "pinLocation": "Placer le repère",
+    "latitude": "Latitude",
+    "longitude": "Longitude",
     "mapHint": "Touchez la carte pour définir l'emplacement",
     "videoUpload": "Vidéo du bien",
     "dropVideo": "Glissez une vidéo ici ou cliquez (MP4 ou MOV)"
@@ -388,6 +391,8 @@
   "map": {
     "openInMaps": "Ouvrir dans Google Maps",
     "mapView": "Carte",
+    "webUnavailableTitle": "Vue carte",
+    "webUnavailableHint": "La carte interactive est disponible dans l'application mobile. Parcourez les annonces sous forme de liste.",
     "gridView": "Grille"
   },
   "floorPlan": {

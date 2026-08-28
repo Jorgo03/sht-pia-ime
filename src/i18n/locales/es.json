@@ -319,6 +319,7 @@
     "address": "Dirección",
     "addressPlaceholder": "Calle y número",
     "price": "Precio",
+    "priceLabel": "Precio",
     "currency": "Moneda",
     "surface": "Superficie",
     "floor": "Planta",
@@ -371,6 +372,8 @@
     "draftRestored": "Borrador restaurado — continúa donde lo dejaste. Las fotos deben añadirse de nuevo.",
     "discardDraft": "Empezar de nuevo",
     "pinLocation": "Marca la ubicación",
+    "latitude": "Latitud",
+    "longitude": "Longitud",
     "mapHint": "Toca el mapa para fijar la ubicación",
     "videoUpload": "Vídeo de la propiedad",
     "dropVideo": "Arrastra un vídeo aquí o haz clic (MP4 o MOV)"
@@ -388,6 +391,8 @@
   "map": {
     "openInMaps": "Abrir en Google Maps",
     "mapView": "Mapa",
+    "webUnavailableTitle": "Vista de mapa",
+    "webUnavailableHint": "El mapa interactivo está disponible en la aplicación móvil. Explora los anuncios como lista.",
     "gridView": "Cuadrícula"
   },
   "floorPlan": {

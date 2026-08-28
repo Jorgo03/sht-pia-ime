@@ -363,6 +363,7 @@
     "address": "Address",
     "addressPlaceholder": "Street name and number",
     "price": "Price",
+    "priceLabel": "Price",
     "currency": "Currency",
     "surface": "Surface area",
     "floor": "Floor",
@@ -415,6 +416,8 @@
     "draftRestored": "Draft restored — continue where you left off. Photos need re-adding.",
     "discardDraft": "Start fresh",
     "pinLocation": "Pin the location",
+    "latitude": "Latitude",
+    "longitude": "Longitude",
     "mapHint": "Tap the map to set the property location",
     "videoUpload": "Property video",
     "dropVideo": "Drag a video here or click (MP4 or MOV)"
@@ -432,6 +435,8 @@
   "map": {
     "openInMaps": "Open in Google Maps",
     "mapView": "Map",
+    "webUnavailableTitle": "Map view",
+    "webUnavailableHint": "Interactive map is available in the mobile app. Browse listings as a list instead.",
     "gridView": "Grid"
   },
   "floorPlan": {

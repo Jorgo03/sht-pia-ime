@@ -319,6 +319,7 @@
     "address": "Indirizzo",
     "addressPlaceholder": "Via e numero civico",
     "price": "Prezzo",
+    "priceLabel": "Prezzo",
     "currency": "Valuta",
     "surface": "Superficie",
     "floor": "Piano",
@@ -371,6 +372,8 @@
     "draftRestored": "Bozza ripristinata — continua da dove eri. Le foto vanno riaggiunte.",
     "discardDraft": "Ricomincia da capo",
     "pinLocation": "Posiziona il segnaposto",
+    "latitude": "Latitudine",
+    "longitude": "Longitudine",
     "mapHint": "Tocca la mappa per impostare la posizione",
     "videoUpload": "Video dell’immobile",
     "dropVideo": "Trascina un video qui o clicca (MP4 o MOV)"
@@ -388,6 +391,8 @@
   "map": {
     "openInMaps": "Apri in Google Maps",
     "mapView": "Mappa",
+    "webUnavailableTitle": "Vista mappa",
+    "webUnavailableHint": "La mappa interattiva è disponibile nell'app mobile. Sfoglia gli annunci come elenco.",
     "gridView": "Griglia"
   },
   "floorPlan": {

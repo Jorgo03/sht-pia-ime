@@ -327,6 +327,7 @@
     "address": "Адрес",
     "addressPlaceholder": "Улица и номер дома",
     "price": "Цена",
+    "priceLabel": "Цена",
     "currency": "Валюта",
     "surface": "Площадь",
     "floor": "Этаж",
@@ -379,6 +380,8 @@
     "draftRestored": "Черновик восстановлен — продолжайте с того места. Фото нужно добавить заново.",
     "discardDraft": "Начать заново",
     "pinLocation": "Отметьте место на карте",
+    "latitude": "Широта",
+    "longitude": "Долгота",
     "mapHint": "Нажмите на карту, чтобы указать местоположение",
     "videoUpload": "Видео объекта",
     "dropVideo": "Перетащите видео сюда или нажмите (MP4 или MOV)"
@@ -396,6 +399,8 @@
   "map": {
     "openInMaps": "Открыть в Google Maps",
     "mapView": "Карта",
+    "webUnavailableTitle": "Карта",
+    "webUnavailableHint": "Интерактивная карта доступна в мобильном приложении. Просматривайте объявления списком.",
     "gridView": "Сетка"
   },
   "floorPlan": {
