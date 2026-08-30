@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { Search as SearchIcon } from 'lucide-react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
@@ -33,6 +32,11 @@ export default function Home() {
 
   const featured = properties[0]
   const matched = properties.slice(1, 7)
+  // Everything past the featured card and the carousel. useProperties fetches
+  // 24; before this only 7 were ever rendered, so 17 rows were fetched, parsed
+  // and dropped on every visit. DESIGN_INSTALL.md's Home renders the remainder
+  // as a "Near you" grid — same data, no extra query.
+  const rest = properties.slice(7)
 
   return (
     <div className="home-screen">
@@ -63,6 +67,15 @@ export default function Home() {
       {error && (
         <div className="placeholder-card" style={{ margin: '0 1.25rem' }}>
           {t('errors.generic')}
+        </div>
+      )}
+
+      {/* Home had no empty state: with zero listings it rendered the greeting
+          and then nothing at all. Distinct from the error branch above, which
+          means the fetch failed rather than genuinely returning no homes. */}
+      {!loading && !error && properties.length === 0 && (
+        <div className="placeholder-card" style={{ margin: '0 1.25rem' }}>
+          {t('search.empty')}
         </div>
       )}
 
@@ -99,9 +112,26 @@ export default function Home() {
         </section>
       )}
 
+      {!loading && rest.length > 0 && (
+        <section>
+          <header className="section-title">
+            <h2>{t('common.nearYou')}</h2>
+            <Link to="/search">{t('home.seeAll')}</Link>
+          </header>
+          <div style={{ padding: '0 1.25rem' }}>
+            <div className="property-grid" style={{ padding: 0 }}>
+              {rest.map(p => <PropertyCard key={p.id} property={p} />)}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* "Trending neighborhoods" removed per owner request 2026-07-14; the
           removal was confirmed permanent 2026-08-18, so its CSS (home.css,
-          polish.css) and `home.neighborhoods` i18n keys are gone too. */}
+          polish.css) and `home.neighborhoods` i18n keys are gone too.
+          DESIGN_INSTALL.md re-specifies it as an `.area-grid` derived from real
+          city counts — still not re-added here, because the owner decision is
+          newer than the spec and was reaffirmed in this session. */}
     </div>
   )
 }

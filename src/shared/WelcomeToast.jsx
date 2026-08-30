@@ -10,6 +10,9 @@ export default function WelcomeToast() {
     if (!user || !session || !welcomeName) return
     const id = setTimeout(clearWelcome, 3500)
     return () => clearTimeout(id)
+  // user/session are read only as guards; depending on their object identity
+  // would restart the dismiss timer every time Supabase refreshes the session.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id, welcomeName, clearWelcome])
 
   if (!user || !session || !welcomeName) return null

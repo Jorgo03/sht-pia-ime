@@ -339,7 +339,11 @@
   "account": {
     "welcomeBack": "Welcome back, {{name}} 👋",
     "myListings": "My Listings",
-    "settings": "Settings"
+    "settings": "Settings",
+    "deleteAccount": "Delete account",
+    "deleteConfirmBody": "This permanently deletes your profile, listings, photos, favourites, saved searches and messages. This cannot be undone.",
+    "deleteConfirmCta": "Delete permanently",
+    "deleteFailed": "Could not delete your account. Please try again."
   },
   "listing": {
     "newListing": "New Listing",
@@ -536,5 +540,9 @@
   "wanted": {
     "describePlaceholder": "Describe what you want… e.g. \"2-bed apartment in Tirana up to €150k\"",
     "matchesNow": "Listings matching right now: {{n}}"
+  },
+  "legal": {
+    "privacyPolicy": "Privacy Policy",
+    "termsOfService": "Terms of Service"
   }
 }

@@ -160,7 +160,7 @@ export function MapScreenContent() {
         350,
       );
     },
-    [region, router],
+    [region],
   );
 
   return (

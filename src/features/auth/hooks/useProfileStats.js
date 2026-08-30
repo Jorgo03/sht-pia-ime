@@ -48,6 +48,10 @@ export function useProfileStats() {
     })
 
     return () => { active = false }
+  // Depends on the stable user?.id, not the user object: Supabase hands back
+  // a new object identity on every refresh, which would re-run this effect
+  // (and re-open the realtime channel) for no reason.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id, isAgent])
 
   return stats

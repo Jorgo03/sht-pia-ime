@@ -61,8 +61,6 @@ export default function ThreadScreen() {
   // kept fresh by the effect underneath.
   const conversationRef = useRef<ConversationInfo | null>(null);
 
-  const meIsClient = conversation?.client_id === user?.id;
-
   useEffect(() => {
     conversationRef.current = conversation;
   }, [conversation]);

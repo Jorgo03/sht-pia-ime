@@ -2,12 +2,16 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Provider } from '@supabase/supabase-js';
+
+import { hasLegalUrls, PRIVACY_POLICY_URL, TERMS_URL } from '@/lib/legal';
+import { supabase } from '@/lib/supabase';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter, type Href } from 'expo-router';
 import { useEffect, useMemo, useState } from 'react';
 import {
   Alert,
   KeyboardAvoidingView,
+  Linking,
   Platform,
   ScrollView,
   StyleSheet,
@@ -145,6 +149,35 @@ export default function ProfileScreen() {
   const [cooldown, setCooldown] = useState(0);
   const [resetSending, setResetSending] = useState(false);
   const [signOutOpen, setSignOutOpen] = useState(false);
+  // Local copies so TypeScript keeps the null-narrowing inside the onPress
+  // closures below — narrowing of an imported binding does not survive one.
+  const privacyUrl = PRIVACY_POLICY_URL;
+  const termsUrl = TERMS_URL;
+  // Account deletion is mandatory for store approval (Apple 5.1.1(v), Google
+  // Play data-deletion policy) when an app lets users create accounts.
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState(false);
+
+  const handleDeleteAccount = async () => {
+    if (deleting) return;
+    setDeleting(true);
+    setDeleteError(false);
+    try {
+      // The Edge Function derives the account from the caller's verified
+      // access token — nothing identifying is sent in the body.
+      const { error } = await supabase.functions.invoke('delete-account', { body: {} });
+      if (error) throw error;
+      setDeleteOpen(false);
+      // The auth user is gone; clear the local session so the app returns to
+      // the signed-out state rather than holding a token for a deleted user.
+      await signOut();
+    } catch {
+      setDeleteError(true);
+    } finally {
+      setDeleting(false);
+    }
+  };
   // Password recovery, completed in-app: null → 'code' (enter the 6 digits
   // from the e-mail) → 'password' (choose a new one). Mirrors the web flow,
   // which reaches the same two steps via the PASSWORD_RECOVERY event.
@@ -577,6 +610,39 @@ export default function ProfileScreen() {
               <MaterialIcons name="logout" size={18} color="#dc3545" />
               <Text style={styles.signOutText}>{t('common.signOut')}</Text>
             </TouchableOpacity>
+
+            {/* Store-required: the user must be able to start account deletion
+                from inside the app. Deliberately the last item, plain text
+                rather than a button, so it reads as deliberate and is hard to
+                hit by accident — it is irreversible. */}
+            <TouchableOpacity
+              style={styles.deleteAccountButton}
+              onPress={() => { setDeleteError(false); setDeleteOpen(true); }}
+              activeOpacity={0.7}>
+              <Text style={styles.deleteAccountText}>{t('account.deleteAccount')}</Text>
+            </TouchableOpacity>
+
+            {/* Both stores expect a reachable Privacy Policy. Rendered only
+                when a real https URL is configured — a link that 404s in front
+                of a reviewer is worse than no link. See lib/legal.ts. */}
+            {hasLegalUrls() && (
+              <View style={styles.legalRow}>
+                {/* Captured into locals: TypeScript does not carry narrowing
+                    of an *imported* binding into a closure, so referencing
+                    the import directly inside onPress is `string | null`. */}
+                {privacyUrl && (
+                  <Text style={styles.legalLink} onPress={() => Linking.openURL(privacyUrl)}>
+                    {t('legal.privacyPolicy')}
+                  </Text>
+                )}
+                {privacyUrl && termsUrl && <Text style={styles.legalDot}>·</Text>}
+                {termsUrl && (
+                  <Text style={styles.legalLink} onPress={() => Linking.openURL(termsUrl)}>
+                    {t('legal.termsOfService')}
+                  </Text>
+                )}
+              </View>
+            )}
           </ScrollView>
         </SafeAreaView>
 
@@ -599,6 +665,31 @@ export default function ProfileScreen() {
               }}
             />
             <GhostBtn label={t('common.cancel')} onPress={() => setSignOutOpen(false)} />
+          </View>
+        </BottomSheet>
+
+        <BottomSheet
+          visible={deleteOpen}
+          onClose={() => !deleting && setDeleteOpen(false)}
+          heightRatio={0.42}>
+          <View style={styles.confirmBody}>
+            <View style={styles.confirmIcon}>
+              <MaterialIcons name="delete-forever" size={22} color="#dc3545" />
+            </View>
+            <Text style={styles.confirmTitle}>{t('account.deleteAccount')}</Text>
+            <Text style={styles.confirmText}>{t('account.deleteConfirmBody')}</Text>
+            {deleteError && (
+              <Text style={styles.deleteErrorText}>{t('account.deleteFailed')}</Text>
+            )}
+            <PrimaryCTA
+              label={deleting ? t('common.loading') : t('account.deleteConfirmCta')}
+              icon={null}
+              onPress={handleDeleteAccount}
+            />
+            <GhostBtn
+              label={t('common.cancel')}
+              onPress={() => !deleting && setDeleteOpen(false)}
+            />
           </View>
         </BottomSheet>
       </GradientBackground>
@@ -1171,6 +1262,40 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     fontSize: 15,
     fontWeight: '600',
     color: '#dc3545',
+  },
+  // Deliberately quieter than Sign out: a plain, unboxed text link at the very
+  // bottom. Deleting an account is irreversible, so it should take intent to
+  // find rather than sitting there as a second red button to mis-tap.
+  deleteAccountButton: {
+    alignSelf: 'center',
+    paddingVertical: 16,
+    paddingHorizontal: 24,
+  },
+  deleteAccountText: {
+    fontSize: 13,
+    color: colors.textSecondary,
+    textDecorationLine: 'underline',
+  },
+  deleteErrorText: {
+    fontSize: 13,
+    color: '#dc3545',
+    textAlign: 'center',
+  },
+  legalRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 8,
+    paddingBottom: 8,
+  },
+  legalLink: {
+    fontSize: 12,
+    color: colors.textSecondary,
+    textDecorationLine: 'underline',
+  },
+  legalDot: {
+    fontSize: 12,
+    color: colors.textFaint,
   },
 
   // ─── Auth (signed-out) screen — matches web's .auth-screen family ───

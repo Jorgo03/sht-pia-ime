@@ -295,7 +295,11 @@
   "account": {
     "welcomeBack": "Bon retour, {{name}} 👋",
     "myListings": "Mes annonces",
-    "settings": "Paramètres"
+    "settings": "Paramètres",
+    "deleteAccount": "Supprimer le compte",
+    "deleteConfirmBody": "Cela supprime définitivement votre profil, vos annonces, photos, favoris, recherches enregistrées et messages. Cette action est irréversible.",
+    "deleteConfirmCta": "Supprimer définitivement",
+    "deleteFailed": "Impossible de supprimer votre compte. Veuillez réessayer."
   },
   "listing": {
     "newListing": "Nouvelle annonce",
@@ -544,5 +548,9 @@
   "wanted": {
     "describePlaceholder": "Décrivez ce que vous cherchez… p. ex. « appartement 2 pièces à Tirana jusqu'à 150 000 € »",
     "matchesNow": "Annonces correspondantes actuellement : {{n}}"
+  },
+  "legal": {
+    "privacyPolicy": "Politique de confidentialité",
+    "termsOfService": "Conditions d'utilisation"
   }
 }

@@ -13,6 +13,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 
+import { AppHeader } from '@/components/ui/app-header';
 import { GradientBackground } from '@/components/ui/gradient-background';
 import { type AtticoPalette, Fonts } from '@/constants/theme';
 import { useFavorites } from '@/contexts/favorites-context';
@@ -35,13 +36,14 @@ export default function FavoritesScreen() {
   return (
     <GradientBackground>
       <SafeAreaView style={styles.container} edges={['top']}>
-        <TouchableOpacity
-          style={styles.backLink}
-          onPress={() => router.push('/(tabs)/profile' as Href)}
-          hitSlop={8}>
-          <MaterialIcons name="chevron-left" size={16} color={colors.textSecondary} />
-          <Text style={styles.backLinkText}>{t('favourites.backToProfile').replace('← ', '')}</Text>
-        </TouchableOpacity>
+        {/* Was a bare "‹ Kthehu te profili" text link floating above the
+            kicker, which read as loose body copy rather than chrome. Now the
+            same AppHeader every other pushed screen uses (Messages, Viewings,
+            My Listings): chevron, centred wordmark, language + theme.
+            Still targets /profile explicitly rather than router.back() — this
+            screen is reachable from a deep link, where there is no history
+            entry to go back to. */}
+        <AppHeader onBack={() => router.push('/(tabs)/profile' as Href)} />
 
         <View style={styles.heroBlock}>
           <View style={styles.kickerRow}>
@@ -144,21 +146,13 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   container: {
     flex: 1,
   },
-  backLink: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    alignSelf: 'flex-start',
-    paddingHorizontal: 20,
-    paddingTop: 12,
-  },
-  backLinkText: {
-    fontSize: 13,
-    color: colors.textSecondary,
-  },
-  // Matches web's .screen-kicker / .screen-headline exactly.
+  // Matches web's .screen-kicker / .screen-headline exactly. Slightly more
+  // top padding than before: the old text back-link sat directly above this
+  // and supplied some of the gap; AppHeader has its own bottom border, so the
+  // hero needs to clear it on its own.
   heroBlock: {
     paddingHorizontal: 20,
-    paddingTop: 12,
+    paddingTop: 18,
     paddingBottom: 20,
   },
   kickerRow: {

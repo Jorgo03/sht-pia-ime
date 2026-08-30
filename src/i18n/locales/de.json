@@ -287,7 +287,11 @@
   "account": {
     "welcomeBack": "Willkommen zurück, {{name}} 👋",
     "myListings": "Meine Inserate",
-    "settings": "Einstellungen"
+    "settings": "Einstellungen",
+    "deleteAccount": "Konto löschen",
+    "deleteConfirmBody": "Dadurch werden Ihr Profil, Ihre Inserate, Fotos, Favoriten, gespeicherten Suchen und Nachrichten dauerhaft gelöscht. Dies kann nicht rückgängig gemacht werden.",
+    "deleteConfirmCta": "Endgültig löschen",
+    "deleteFailed": "Ihr Konto konnte nicht gelöscht werden. Bitte versuchen Sie es erneut."
   },
   "listing": {
     "newListing": "Neues Inserat",
@@ -536,5 +540,9 @@
   "wanted": {
     "describePlaceholder": "Beschreibe, was du suchst … z. B. „2-Zimmer-Wohnung in Tirana bis 150.000 €\"",
     "matchesNow": "Passende Inserate aktuell: {{n}}"
+  },
+  "legal": {
+    "privacyPolicy": "Datenschutzerklärung",
+    "termsOfService": "Nutzungsbedingungen"
   }
 }

@@ -1,4 +1,4 @@
-import { Heart, LogIn, MapPin, ArrowLeft } from 'lucide-react'
+import { Heart, LogIn, MapPin } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../auth/AuthContext'

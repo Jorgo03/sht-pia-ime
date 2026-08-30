@@ -117,6 +117,12 @@ export function usePropertiesByIds(ids = []) {
   const [properties, setProperties] = useState([])
   const [loading, setLoading] = useState(true)
 
+  // Callers pass a fresh array literal every render, so depending on `ids`
+  // directly would refetch on every render. Keying on the serialized contents
+  // is the intent; naming it also lets the linter check the dependency
+  // statically instead of flagging an inline expression.
+  const idsKey = JSON.stringify(ids)
+
   useEffect(() => {
     if (!ids.length) { setProperties([]); setLoading(false); return }
     let active = true
@@ -134,7 +140,9 @@ export function usePropertiesByIds(ids = []) {
       })
 
     return () => { active = false }
-  }, [JSON.stringify(ids)])
+    // `ids` itself is intentionally absent: idsKey above is its value-identity.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [idsKey])
 
   return { properties, loading }
 }

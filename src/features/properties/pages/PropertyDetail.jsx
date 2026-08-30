@@ -1,7 +1,7 @@
 import { useEffect, useState, lazy, Suspense } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { ChevronLeft, Heart, Share2, MapPin, Phone, MessageCircle, ExternalLink, ChevronRight as ChevRight, Globe, ArrowRight } from 'lucide-react'
+import { ChevronLeft, Heart, Share2, MapPin, ExternalLink, ChevronRight as ChevRight, Globe, ArrowRight } from 'lucide-react'
 import { useProperty, useProperties } from '../hooks/useProperties'
 import { useTranslatedProperty } from '../hooks/useTranslatedProperty'
 import { formatPrice, imageFor, listingBadgeKey, priceSuffixKey } from '../../../lib/format'

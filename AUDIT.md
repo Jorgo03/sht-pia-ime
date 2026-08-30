@@ -1,5 +1,118 @@
 # Pre-Launch Audit — Shtëpia.ime (Vite web app)
 
+## ═══ PASS 12 — 2026-08-29: QUALITY PASS II (ergonomics, flagged items) ═══
+
+Second run of `QUALITY-PASS.md`, scoped to what Pass 11 under-covered plus the
+items it explicitly left flagged. Also covers the nav change applied from
+`IMPLEMENTATION.md` §1 in the same session.
+
+### Categories re-audited and found already sound (no action)
+
+Worth recording so a third pass does not re-litigate them:
+
+- **Fragile / double-submit** — `Profile.jsx` guards with an explicit
+  `if (loading) return` *inside* the handler, with a comment noting that a
+  disabled CTA only stops the mouse while the password inputs still fire the
+  same handler from `onKeyDown` Enter. AddSheet's three submit paths all hold a
+  `loading` flag.
+- **Enter-to-submit** — the web app has no `<form>` elements at all, which
+  looked like a gap; it is wired per-input via `onKeyDown`, including the OTP
+  screen and the password-recovery screen.
+- **Incomplete / focus states** — `polish.css` §5 sets one `:focus-visible`
+  ring (`--fho-ring`, 2px, offset 2px) across button/a/input/textarea/select/
+  `[role=button]`, with a tighter offset for text fields.
+- **Alt text** — every `<img>` in `src/` has one (re-confirmed).
+
+### Fixed
+
+| Sev | Problem | Fix |
+|---|---|---|
+| Degrades | **`PropertyDashboard` dropped its query error.** `.then(({ data }))` discarded `error`, so a failed fetch left `activity` empty and rendered a *real-looking* dashboard reading zero views, zero calls, zero leads. An agent would conclude their listing was getting no interest rather than that the query broke — the same silent-failure class as Pass 11's Search bug, on the one screen where the number *is* the product | Capture the error, dedicated error card + retry (`errors.generic` / `common.retry`, both already in all 8 locales) |
+| Cosmetic | Touch targets below the 44px minimum, measured at 375px: `.heart-mini` 24×24 (search), `.compact-card__heart` 30×30 (home carousel), `.field-eye` 26×26, `.auth-forgot` 47×19. Favouriting is a primary action | `polish.css` §11: centred `::after` at `max(100%, 44px)`, so the hit area grows and **nothing moves or repaints**. Verified by hit-testing points 18px off-centre and by confirming no neighbouring control loses its own centre |
+| Cosmetic | 3 unused imports (`useState` in `Home.jsx`, `Phone`/`MessageCircle` in `PropertyDetail.jsx`) | Removed. Lint warnings 15 → 12 |
+
+### Regression I introduced and caught
+
+The first version of the touch-target rule set `position: relative` on all four
+selectors. Three of them (`.heart-mini`, `.compact-card__heart`, `.field-eye`)
+are already `position: absolute` with `top`/`right` pinning, and `polish.css`
+is imported last — so it won the tie and **knocked every card heart out of its
+corner into normal flow at the top-left**. Caught on the screenshot, not by
+reasoning. An absolutely-positioned element already establishes a containing
+block for its `::after`, so the line was unnecessary as well as wrong; it now
+applies only to `.auth-forgot`. Re-verified: hearts back at 6px/6px from the
+card's top-right, hit area still expanded.
+
+### Theme tokens from IMPLEMENTATION.md §1 (values only)
+
+The spec's `theme.css` is a whole-file REPLACE that would drop `@layer base`
+and 9 tokens carrying 74 live `var()` references, so only its **values** were
+taken, into the existing structure:
+
+- Dark theme is now a warm dusk rather than near-neutral charcoal —
+  `--fho-bg #141210 → #0e0b09`, surface `#1e1b18 → #1a1612`, surface-2
+  `#252220 → #221d18`, text `#f0ece6 → #faf6ef`, and muted/faint moved from a
+  neutral to a warm cast (`rgba(255,235,210,…)`).
+- Status palette moved from the saturated web-safe set to the spec's earthy one
+  (`--fho-status-active #27ae60 → #5b8a5a`, paused `#f39c12 → #d4a23a`, rented
+  `#8e44ad → #8a4d80`, draft `#7f8c8d → #7f7a72`).
+- Added `--fho-danger` and `--fho-text-on-dark-dim`; `--fho-input-bg` /
+  `--fho-input-border` now take literal values instead of aliasing surface-2 /
+  border-strong; Newsreader is loaded on its `opsz` axis with 700 available.
+
+**Contrast measured before/after, both themes** (the reason for taking values
+rather than trusting them): dark *improved* — text/bg 18.21, text-muted/bg
+**5.53** (passes AA), orange-1/bg 7.66.
+
+Two spec omissions deliberately not followed:
+- The spec's dark block does not override `--fho-orange-tint`, which would let
+  the light `#fff1e6` bleed through — a near-white chip on a near-black ground.
+  The existing `rgba(255,125,26,0.12)` override was kept.
+- The spec defines status colours only under `:root`. The app's separate,
+  brighter dark-theme variants were kept; inventing warm dark equivalents would
+  breach CLAUDE_CODE_BRIEF's "never invent design tokens".
+
+### Nav change from IMPLEMENTATION.md §1 (same session)
+
+`liquid-nav.css` was replaced with the spec's version — the one §1 file whose
+selectors match what `BottomNav.jsx` actually renders. Active item is now a
+filled orange gradient pill with a white glyph; the `[+]` gained a 4px
+surface-coloured ring. Two integrations the spec could not know about:
+
+- The old active indicator was a 4px dot in `polish.css` drawn in
+  `currentColor` — white once the pill landed, so it read as a speck inside the
+  pill. Removed, along with its now-orphaned `navDotIn` keyframes.
+- **The spec contains a specificity bug.** Its
+  `[data-theme="dark"] .nav-item { color: rgba(255,255,255,0.55) }` ties
+  `.nav-item.active` at (0,2,0) and comes later, so in dark mode the active
+  glyph rendered at 55% white on an orange pill. Measured, then fixed with an
+  explicit `[data-theme="dark"] .nav-item.active { color: #fff }`.
+
+### Still flagged, deliberately untouched
+
+- Signed-in routes (`/my-listings`, `/my-listings/:id/dashboard`,
+  `/agent-dashboard`, `/new-listing`, `/viewings`, `/saved-searches`) remain
+  **statically reviewed only** — exercising them needs real credentials this
+  pass does not have. The `PropertyDashboard` fix above is therefore verified by
+  build/lint/type-check, not by seeing it render.
+- `.theme-btn` (34×34) and `.featured-card__heart` (38×38) are under 44px but
+  are sizes `CLAUDE_CODE_BRIEF.md` §3.7 / §3.2 specify outright — design
+  decisions, left alone.
+- The "me qera" listing tagged FOR SALE is still a data-entry issue, not code.
+- **Pre-existing, not introduced here:** light-theme `--fho-text-muted` on
+  `--fho-bg` measures **3.8:1**, under the 4.5:1 AA floor for body text (dark is
+  fine at 5.53). Those two light values are byte-identical before and after this
+  pass. Fixing it means darkening a token the spec does not change — a design
+  call, flagged rather than taken.
+
+### Verification
+
+`npm test` 93/93 · `npx tsc --noEmit` clean · `npm run lint` 0 errors /
+12 warnings (was 15) · `npm run build` clean · nav and hearts screenshotted in
+both themes at 375px.
+
+---
+
 ## ═══ PASS 11 — 2026-08-28: QUALITY PASS (silent failures, error states) ═══
 
 Run against `QUALITY-PASS.md`. Not a redesign pass: no page was restyled, no

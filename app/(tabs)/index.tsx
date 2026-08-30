@@ -73,6 +73,11 @@ export default function HomeScreen() {
 
   const featured = listings[0] ?? null;
   const matched = listings.slice(1, 7);
+  // Everything past the featured card and the carousel. HOME_LIMIT fetches 24;
+  // before this only 7 were ever rendered, so 17 rows were fetched, parsed and
+  // dropped on every visit. Same "Near you" grid the web Home now renders — no
+  // extra query, and it keeps the two apps structurally identical.
+  const rest = listings.slice(7);
 
   const headline = firstName ? `${greeting}, ${firstName}.` : `${greeting}.`;
 
@@ -102,6 +107,14 @@ export default function HomeScreen() {
               <TouchableOpacity onPress={() => refetch()} activeOpacity={0.7}>
                 <Text style={styles.retryText}>{t('common.retry')}</Text>
               </TouchableOpacity>
+            </View>
+          ) : listings.length === 0 ? (
+            /* Home had no empty state: with zero listings it rendered the
+               greeting and then nothing at all. Distinct from the error branch
+               above, which means the fetch failed rather than genuinely
+               returning no homes. Mirrors the web Home. */
+            <View style={styles.errorCard}>
+              <Text style={styles.errorText}>{t('search.empty')}</Text>
             </View>
           ) : (
             <>
@@ -161,6 +174,26 @@ export default function HomeScreen() {
                   </ScrollView>
                 </View>
               )}
+
+              {rest.length > 0 && (
+                <View style={styles.section}>
+                  <View style={styles.sectionHeader}>
+                    <Text style={styles.sectionTitle}>{t('common.nearYou')}</Text>
+                    <TouchableOpacity
+                      onPress={() => router.push('/(tabs)/explore' as Href)}
+                      activeOpacity={0.7}>
+                      <Text style={styles.seeAll}>{t('home.seeAll')}</Text>
+                    </TouchableOpacity>
+                  </View>
+                  <View style={styles.nearYouGrid}>
+                    {rest.map((item, i) => (
+                      <RiseIn key={item.id} index={i}>
+                        <PropertyCard property={item} />
+                      </RiseIn>
+                    ))}
+                  </View>
+                </View>
+              )}
             </>
           )}
         </ScrollView>
@@ -174,9 +207,22 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     flex: 1,
   },
   scroll: {
+    // The featured block is a bare fragment, not wrapped in `section`
+    // (marginTop: 28) like every other section, so the first heading sat
+    // directly under the search bar with only SearchHeader's own 4px below it.
+    // 24 here + that 4 = the same 28 gap the page uses between every other
+    // section, rather than an arbitrary number.
+    paddingTop: 24,
     paddingBottom: 24,
   },
   skeletonGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    paddingHorizontal: 14,
+  },
+  // Same two-up wrap the skeletons use, so the loading placeholders and the
+  // real "Near you" cards occupy the identical footprint (no layout jump).
+  nearYouGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     paddingHorizontal: 14,

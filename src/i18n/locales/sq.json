@@ -339,7 +339,11 @@
   "account": {
     "welcomeBack": "Mirë se erdhe, {{name}} 👋",
     "myListings": "Listat e mia",
-    "settings": "Cilësimet"
+    "settings": "Cilësimet",
+    "deleteAccount": "Fshi llogarinë",
+    "deleteConfirmBody": "Kjo fshin përgjithmonë profilin, listimet, fotot, të preferuarat, kërkimet e ruajtura dhe mesazhet tuaja. Nuk mund të zhbëhet.",
+    "deleteConfirmCta": "Fshi përgjithmonë",
+    "deleteFailed": "Llogaria nuk u fshi dot. Provoni përsëri."
   },
   "listing": {
     "newListing": "Listim i ri",
@@ -536,5 +540,9 @@
   "wanted": {
     "describePlaceholder": "Përshkruaj çfarë kërkon… p.sh. \"apartament 2+1 në Tiranë deri në 150 mijë euro\"",
     "matchesNow": "Prona që përputhen tani: {{n}}"
+  },
+  "legal": {
+    "privacyPolicy": "Politika e privatësisë",
+    "termsOfService": "Kushtet e shërbimit"
   }
 }

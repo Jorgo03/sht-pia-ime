@@ -531,4 +531,83 @@
   justify-content: center;
 }
 
+/* --- Account deletion (store-required) --- */
+
+/* Quieter than .profile-signout on purpose: a plain underlined link, last on
+   the page. Irreversible actions should take intent to find, not sit beside
+   Sign out as a second red button to mis-click. */
+.profile-delete-account {
+  display: block;
+  margin: 8px auto 0;
+  padding: 14px 24px;
+  background: none;
+  border: none;
+  color: var(--fho-text-muted);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.profile-delete-account:hover { color: var(--fho-danger); }
+
+.delete-account-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  background: rgba(10, 8, 7, 0.5);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.delete-account-dialog {
+  width: 100%;
+  max-width: 380px;
+  background: var(--fho-surface);
+  border: 1px solid var(--fho-border);
+  border-radius: var(--r-lg);
+  padding: 22px;
+  box-shadow: var(--fho-card-shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.delete-account-dialog h2 {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-size: 20px;
+  color: var(--fho-text);
+}
+
+.delete-account-dialog p {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--fho-text-muted);
+}
+
+/* Privacy Policy / Terms — store-required links, shown only when real URLs
+   are configured (src/lib/legal.js). */
+.profile-legal {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0 8px;
+  font-size: 12px;
+  color: var(--fho-text-faint);
+}
+
+.profile-legal a {
+  color: var(--fho-text-muted);
+  text-decoration: underline;
+}
+
+.profile-legal a:hover { color: var(--fho-orange-2); }
+
 }

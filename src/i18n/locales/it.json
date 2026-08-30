@@ -295,7 +295,11 @@
   "account": {
     "welcomeBack": "Bentornato, {{name}} 👋",
     "myListings": "I miei annunci",
-    "settings": "Impostazioni"
+    "settings": "Impostazioni",
+    "deleteAccount": "Elimina account",
+    "deleteConfirmBody": "Questa operazione elimina definitivamente il tuo profilo, gli annunci, le foto, i preferiti, le ricerche salvate e i messaggi. Non è reversibile.",
+    "deleteConfirmCta": "Elimina definitivamente",
+    "deleteFailed": "Impossibile eliminare l'account. Riprova."
   },
   "listing": {
     "newListing": "Nuovo annuncio",
@@ -544,5 +548,9 @@
   "wanted": {
     "describePlaceholder": "Descrivi cosa cerchi… es. \"bilocale a Tirana fino a 150.000 €\"",
     "matchesNow": "Annunci corrispondenti ora: {{n}}"
+  },
+  "legal": {
+    "privacyPolicy": "Informativa sulla privacy",
+    "termsOfService": "Termini di servizio"
   }
 }

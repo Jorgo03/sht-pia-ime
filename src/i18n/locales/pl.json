@@ -303,7 +303,11 @@
   "account": {
     "welcomeBack": "Witaj ponownie, {{name}} 👋",
     "myListings": "Moje ogłoszenia",
-    "settings": "Ustawienia"
+    "settings": "Ustawienia",
+    "deleteAccount": "Usuń konto",
+    "deleteConfirmBody": "Spowoduje to trwałe usunięcie profilu, ogłoszeń, zdjęć, ulubionych, zapisanych wyszukiwań i wiadomości. Tej operacji nie można cofnąć.",
+    "deleteConfirmCta": "Usuń trwale",
+    "deleteFailed": "Nie udało się usunąć konta. Spróbuj ponownie."
   },
   "listing": {
     "newListing": "Nowe ogłoszenie",
@@ -552,5 +556,9 @@
   "wanted": {
     "describePlaceholder": "Opisz, czego szukasz… np. „mieszkanie 2-pokojowe w Tiranie do 150 tys. euro\"",
     "matchesNow": "Pasujące ogłoszenia teraz: {{n}}"
+  },
+  "legal": {
+    "privacyPolicy": "Polityka prywatności",
+    "termsOfService": "Regulamin"
   }
 }

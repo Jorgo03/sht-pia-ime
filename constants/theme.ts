@@ -33,8 +33,8 @@ export type AtticoPalette = typeof AtticoColorsDark;
 // web app's canonical dark palette (see CLAUDE.md: accent #ff7d1a) — so both
 // apps render the same brand colors, not a native-only approximation of them.
 export const AtticoColorsDark = {
-  primary: '#141210', // --fho-bg (dark)
-  primaryLight: '#1e1b18', // --fho-surface (dark)
+  primary: '#0e0b09', // --fho-bg (dark)
+  primaryLight: '#1a1612', // --fho-surface (dark)
   accent: '#ff6b00', // ShtepiaColors.orange (design handoff §4)
   accentEnd: '#e85d00', // --fho-orange-2 — the gradient's end stop + accent text
   accentDeep: '#cc5200', // --fho-orange-deep
@@ -42,7 +42,7 @@ export const AtticoColorsDark = {
   accentLight: '#ffb380', // --fho-orange-soft
   accentGlow: 'rgba(255,107,0,0.35)',
   surface: '#FFFFFF',
-  surface2: '#252220', // --fho-surface-2 (dark) — inputs / deepest cards
+  surface2: '#221d18', // --fho-surface-2 (dark) — inputs / deepest cards
   surfaceAlt: '#F5F5F5',
   // ShtepiaColors.glassBg/glassBorder/cream100 (§4) — the auth hero's
   // translucent form card, which is dark-on-dark in both themes.
@@ -50,12 +50,16 @@ export const AtticoColorsDark = {
   glassOnDarkBorder: 'rgba(255,255,255,0.12)',
   cream100: '#faf6ef',
   glass: 'rgba(255,255,255,0.06)',
-  glassBorder: 'rgba(255,255,255,0.10)', // matches --fho-glass-border (dark) exactly — for actual translucent/blurred surfaces only (e.g. liquid-tab-bar's BlurView), NOT a general-purpose border color
+  glassBorder: 'rgba(255,255,255,0.08)', // matches --fho-glass-border (dark) exactly — for actual translucent/blurred surfaces only (e.g. liquid-tab-bar's BlurView), NOT a general-purpose border color
   border: 'rgba(255,255,255,0.08)', // --fho-border (dark) — the general card/chip/input border
-  borderStrong: 'rgba(255,255,255,0.14)', // --fho-border-strong (dark)
-  textPrimary: '#f0ece6', // --fho-text (dark)
-  textSecondary: '#8d8a86', // --fho-text-muted (dark) flattened from rgba to a solid native color
-  textFaint: '#5c5955', // --fho-text-faint (dark) flattened
+  borderStrong: 'rgba(255,255,255,0.18)', // --fho-border-strong (dark)
+  textPrimary: '#faf6ef', // --fho-text (dark)
+  // --fho-text-muted / --fho-text-faint (dark) flattened from rgba to solid
+  // native colors. Both are now a WARM cast — rgba(255,235,210,·) rather than
+  // the old neutral rgba(240,236,230,·) — composited over the new #0e0b09
+  // ground, so they track the web dusk palette instead of the charcoal one.
+  textSecondary: '#938678',
+  textFaint: '#6e6559',
   textDark: '#1A1A1A',
   // Listing/viewing status colors. Web reads these from --fho-status-* which
   // swap per theme; RN screens used to hardcode the LIGHT values in both
@@ -104,13 +108,15 @@ export const AtticoColorsLight: AtticoPalette = {
   textSecondary: '#7b7773', // --fho-text-muted (light) flattened
   textFaint: '#96928d', // --fho-text-faint (light) flattened
   textDark: '#1A1A1A',
-  // --fho-status-* (light) — see the dark palette's note above.
-  statusActive: '#27ae60',
-  statusPaused: '#f39c12',
+  // --fho-status-* (light) — see the dark palette's note above. Now the earthy
+  // set from IMPLEMENTATION.md §1, muted to sit with the warm cream ground
+  // rather than the saturated web-safe values these replace.
+  statusActive: '#5b8a5a',
+  statusPaused: '#d4a23a',
   statusSold: '#c0392b',
-  statusRented: '#8e44ad',
+  statusRented: '#8a4d80',
   ok: '#5b8a5a', // ShtepiaColors.ok (§4)
-  statusDraft: '#7f8c8d',
+  statusDraft: '#7f7a72',
   error: '#d63a3a', // ShtepiaColors.danger (§4)
   gradientStart: '#faf6ef',
   gradientEnd: '#f1ede6',

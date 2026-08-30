@@ -1,5 +1,15 @@
 /* @layered */
 @layer components {
+/* ─────────────────────────────────────────────────────────────────────
+   Liquid bottom nav — Home · Search · [+] · Messages · Profile
+   The center + is elevated above the bar and opens AddSheet.
+
+   Values from IMPLEMENTATION.md §1. Kept inside `@layer components` (the
+   spec's file is unlayered) because index.html pins the cascade order
+   theme < base < components < utilities — an unlayered block here would
+   outrank Tailwind utilities and let preflight clobber component CSS.
+   ───────────────────────────────────────────────────────────────────── */
+
 .liquid-nav {
   position: fixed;
   bottom: 18px;
@@ -7,7 +17,7 @@
   transform: translateX(-50%);
   width: calc(100% - 32px);
   max-width: 448px;
-  height: 62px;
+  height: 68px;
   z-index: 50;
 
   display: flex;
@@ -15,101 +25,117 @@
   justify-content: space-around;
   padding: 0 8px;
 
-  background: rgba(250, 246, 239, 0.65);
-  backdrop-filter: blur(28px) saturate(200%);
-  -webkit-backdrop-filter: blur(28px) saturate(200%);
+  background: rgba(250, 246, 239, 0.92);
+  backdrop-filter: blur(28px) saturate(180%);
+  -webkit-backdrop-filter: blur(28px) saturate(180%);
 
   border-radius: var(--r-pill);
-  border: 1px solid rgba(255, 255, 255, 0.6);
+  border: 1px solid var(--fho-border);
 
-  box-shadow: var(--fho-nav-shadow);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.6),
+    var(--fho-nav-shadow);
 }
 
 .nav-item {
-  width: 46px;
-  height: 46px;
+  position: relative;
+  width: 48px;
+  height: 48px;
   border: none;
   background: transparent;
-  border-radius: 14px;
-  color: var(--fho-text-faint);
+  border-radius: 999px;
+  color: rgba(26, 23, 20, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 150ms var(--ease-out);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   padding: 0;
-  position: relative;
   text-decoration: none;
 }
 
-.nav-item:hover {
-  color: var(--fho-text);
-}
+.nav-item:hover { color: var(--fho-text); }
 
+/* Active is a filled gradient pill with a white glyph. This replaces the
+   previous treatment (orange glyph + a 4px dot under it, which lived in
+   polish.css); the dot rendered as a white speck inside the pill once the
+   fill landed, so it was removed rather than kept alongside. */
 .nav-item.active {
-  color: var(--fho-orange-1);
-}
-
-.nav-add {
-  width: 58px;
-  height: 58px;
-  border-radius: 50%;
-  border: none;
-  background: linear-gradient(135deg, var(--fho-orange-1), var(--fho-orange-2));
   color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  margin-top: -22px;
-  box-shadow: var(--fho-cta-shadow);
-  transition: transform 150ms var(--ease-out), box-shadow 150ms var(--ease-out);
+  background: linear-gradient(135deg, var(--fho-orange-1), var(--fho-orange-2));
+  box-shadow:
+    0 6px 14px -4px rgba(232, 93, 44, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
-.nav-add:hover {
-  transform: scale(1.06);
-}
-
-.nav-add:active {
-  transform: scale(0.96);
-}
-
+/* Unread badge */
 .nav-badge {
   position: absolute;
   top: 4px;
   right: 4px;
-  min-width: 16px;
-  height: 16px;
-  border-radius: 8px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
   background: var(--fho-orange-1);
   color: #fff;
-  font-size: 10px;
+  font-family: var(--font-sans);
+  font-size: 10.5px;
   font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0 4px;
+  display: grid;
+  place-items: center;
+  border: 2px solid var(--fho-surface);
+  line-height: 1;
+}
+.nav-item.active .nav-badge {
+  background: #fff;
+  color: var(--fho-orange-2);
+  border-color: var(--fho-orange-2);
 }
 
+/* Center + — elevated FAB-style */
+.nav-add {
+  flex: none;
+  width: 58px;
+  height: 58px;
+  margin-top: -22px;
+  border-radius: 999px;
+  border: 4px solid var(--fho-surface);
+  cursor: pointer;
+  background: linear-gradient(180deg, var(--fho-orange-1) 0%, var(--fho-orange-2) 100%);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  box-shadow:
+    0 14px 30px -10px rgba(255, 107, 0, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  transition: transform 0.15s;
+  font-family: inherit;
+}
+.nav-add:hover { transform: translateY(-1px); }
+.nav-add:active { transform: scale(0.94); }
+
+/* Fallback when backdrop-filter unsupported */
 @supports not (backdrop-filter: blur(20px)) {
-  .liquid-nav { background: rgba(250, 246, 239, 0.94); }
+  .liquid-nav { background: var(--fho-surface); }
 }
 
+/* Dark theme */
 [data-theme="dark"] .liquid-nav {
-  background: rgba(20, 18, 16, 0.65);
-  border-color: rgba(255, 255, 255, 0.08);
+  background: rgba(26, 22, 18, 0.85);
+  border-color: var(--fho-glass-border);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    var(--fho-nav-shadow);
 }
-
-[data-theme="dark"] .nav-item {
-  color: var(--fho-text-faint);
-}
-
-[data-theme="dark"] .nav-item:hover {
-  color: var(--fho-text);
-}
-
-[data-theme="dark"] .nav-item.active {
-  color: var(--fho-orange-soft);
-}
+[data-theme="dark"] .nav-item { color: rgba(255, 255, 255, 0.55); }
+[data-theme="dark"] .nav-item:hover { color: rgba(255, 255, 255, 0.9); }
+/* Must be restated for dark: `[data-theme="dark"] .nav-item` and
+   `.nav-item.active` have equal specificity (0,2,0), so the dark rule above
+   wins on order and left the active glyph at 55% white on an orange pill.
+   The spec has this same ordering bug; measured, not assumed. */
+[data-theme="dark"] .nav-item.active { color: #fff; }
+[data-theme="dark"] .nav-add { border-color: var(--fho-surface); }
+[data-theme="dark"] .nav-badge { border-color: var(--fho-surface); }
 
 }

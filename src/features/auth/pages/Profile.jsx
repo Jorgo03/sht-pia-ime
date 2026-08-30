@@ -6,6 +6,8 @@ import { useAuth } from '../AuthContext'
 import { useProfileStats } from '../hooks/useProfileStats'
 import DuskHero from '../components/DuskHero'
 import { EMAIL_RE, friendlyError } from '../../../lib/authErrors'
+import { supabase } from '../../../lib/supabase'
+import { hasLegalUrls, PRIVACY_POLICY_URL, TERMS_URL } from '../../../lib/legal'
 import '../../../styles/profile.css'
 
 export default function Profile() {
@@ -14,6 +16,30 @@ export default function Profile() {
   const location = useLocation()
   const { user, profile, isAgent, signIn, signUp, signInWithProvider, sendOtp, verifyOtp, resendCode, signOut, resetPassword, passwordRecovery, updatePassword, loading: authLoading } = useAuth()
   const stats = useProfileStats()
+
+  // Account deletion — store-mandated (Apple 5.1.1(v), Google Play data
+  // deletion). Same delete-account Edge Function the mobile app calls.
+  const [deleteOpen, setDeleteOpen] = useState(false)
+  const [deleting, setDeleting] = useState(false)
+  const [deleteError, setDeleteError] = useState(false)
+
+  const handleDeleteAccount = async () => {
+    if (deleting) return
+    setDeleting(true)
+    setDeleteError(false)
+    try {
+      // Identity comes from the caller's verified access token, not the body.
+      const { error } = await supabase.functions.invoke('delete-account', { body: {} })
+      if (error) throw error
+      setDeleteOpen(false)
+      await signOut()
+      navigate('/')
+    } catch {
+      setDeleteError(true)
+    } finally {
+      setDeleting(false)
+    }
+  }
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -69,12 +95,15 @@ export default function Profile() {
   const [cooldown, setCooldown] = useState(0)
   const otpRefs = useRef([])
 
-  // Resend cooldown ticker
+  // Resend cooldown ticker. Keyed on whether a countdown is running, not on
+  // the value: depending on `cooldown` itself would clear and recreate the
+  // interval on every tick. Named so the linter can check it statically.
+  const isCoolingDown = cooldown > 0
   useEffect(() => {
-    if (cooldown <= 0) return
+    if (!isCoolingDown) return
     const id = setInterval(() => setCooldown((s) => (s > 1 ? s - 1 : 0)), 1000)
     return () => clearInterval(id)
-  }, [cooldown > 0])
+  }, [isCoolingDown])
 
   const validate = () => {
     if (!EMAIL_RE.test(email.trim())) {
@@ -402,6 +431,51 @@ export default function Profile() {
           <LogOut size={18} />
           {t('common.signOut')}
         </button>
+
+        {/* Google Play's data-deletion policy wants deletion reachable on the
+            web too, not only in the app binary. Quiet, plain-text, and last —
+            it is irreversible, so it should take intent to find. */}
+        <button
+          className="profile-delete-account"
+          onClick={() => { setDeleteError(false); setDeleteOpen(true) }}
+        >
+          {t('account.deleteAccount')}
+        </button>
+
+        {/* Both stores expect a reachable Privacy Policy. Rendered only when a
+            real https URL is configured — a link that 404s in front of a
+            reviewer is worse than no link at all. See src/lib/legal.js. */}
+        {hasLegalUrls() && (
+          <div className="profile-legal">
+            {PRIVACY_POLICY_URL && (
+              <a href={PRIVACY_POLICY_URL} target="_blank" rel="noopener noreferrer">
+                {t('legal.privacyPolicy')}
+              </a>
+            )}
+            {PRIVACY_POLICY_URL && TERMS_URL && <span aria-hidden="true">·</span>}
+            {TERMS_URL && (
+              <a href={TERMS_URL} target="_blank" rel="noopener noreferrer">
+                {t('legal.termsOfService')}
+              </a>
+            )}
+          </div>
+        )}
+
+        {deleteOpen && (
+          <div className="delete-account-backdrop" onClick={() => !deleting && setDeleteOpen(false)}>
+            <div className="delete-account-dialog" role="dialog" aria-modal="true" onClick={e => e.stopPropagation()}>
+              <h2>{t('account.deleteAccount')}</h2>
+              <p>{t('account.deleteConfirmBody')}</p>
+              {deleteError && <div className="auth-message">{t('account.deleteFailed')}</div>}
+              <button className="profile-signout" disabled={deleting} onClick={handleDeleteAccount}>
+                {deleting ? t('common.loading') : t('account.deleteConfirmCta')}
+              </button>
+              <button className="ghost-btn" disabled={deleting} onClick={() => setDeleteOpen(false)}>
+                {t('common.cancel')}
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     )
   }

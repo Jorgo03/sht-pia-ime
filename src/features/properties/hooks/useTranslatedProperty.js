@@ -90,6 +90,10 @@ export function useTranslatedProperty(property, language) {
         if (!activeRef.current) return
         setTranslating(false)
       })
+    // Keyed on property?.id, not the property object: the row is re-fetched
+    // into a new object identity on every list refresh, which would re-trigger
+    // a translation request for text that has not changed.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [property?.id, language])
 
   return { title, description, translating, isTranslated }

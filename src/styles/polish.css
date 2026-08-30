@@ -19,11 +19,6 @@
   100% { transform: scale(1); }
 }
 
-@keyframes navDotIn {
-  from { transform: translateX(-50%) scale(0); }
-  to   { transform: translateX(-50%) scale(1); }
-}
-
 /* ---------- 2. Entrance motion ---------- */
 
 /* Screen heads and hero blocks rise in once per mount. */
@@ -190,27 +185,54 @@ input:focus-visible, textarea:focus-visible, select:focus-visible {
   .app-header { background: var(--fho-surface); }
 }
 
-/* ---------- 10. Bottom nav: active dot + FAB idle glow ---------- */
+/* ---------- 10. Bottom nav: FAB idle glow ---------- */
 
-.nav-item.active::after {
-  content: '';
-  position: absolute;
-  bottom: 5px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 4px;
-  height: 4px;
-  border-radius: 999px;
-  background: currentColor;
-  animation: navDotIn var(--t-med) var(--ease-spring);
+/* The active-item dot that used to live here is gone: the nav's active state
+   is now a filled orange pill (liquid-nav.css, per IMPLEMENTATION.md §1), and
+   the dot drew itself in `currentColor` — white once the pill landed — so it
+   read as a speck of dirt inside the pill rather than an indicator. */
+
+/* ---------- 11. Touch targets — hit area without visual change ---------- */
+
+/* Measured at 375px: the favourite hearts render 24x24 (search) and 30x30
+ * (home carousel), the password eye 26x26, and "Forgot?" is 19px tall — all
+ * well under the 44px minimum for a thumb, and favouriting is a primary
+ * action here. These expand only the *hit* area via a centred pseudo-element,
+ * so every one of them looks exactly the same as before.
+ *
+ * Deliberately NOT touched: .theme-btn (34x34) and .featured-card__heart
+ * (38x38) are sizes CLAUDE_CODE_BRIEF.md section 3.7 / 3.2 specify outright —
+ * those are design decisions, not oversights.
+ */
+/* Only .auth-forgot needs a containing block established. The three hearts and
+ * the eye are already `position: absolute` (top/right pinned to their card or
+ * field); setting `position: relative` on them overrode that and dropped them
+ * out of their corner into normal flow at the top-left of the card. */
+.auth-forgot {
+  position: relative;
 }
 
-/* ---------- 11. Reduced motion — collapse everything ---------- */
+.mini-img .heart-mini::after,
+.compact-card__heart::after,
+.field-eye::after,
+.auth-forgot::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: max(100%, 44px);
+  height: max(100%, 44px);
+  /* purely a touch surface — never paints, never intercepts hover styling */
+  background: transparent;
+}
+
+/* ---------- 12. Reduced motion — collapse everything ---------- */
 
 @media (prefers-reduced-motion: reduce) {
   .screen-head, .detail-title, .home-search-bar, .search-head, .profile-card,
   .nl-header, .property-grid > *, .h-scroll > *, .fav-list > *, .msg-list > *,
-  .featured-card, .nav-item.active::after,
+  .featured-card,
   .featured-card__heart.saved svg, .compact-card__heart.saved svg,
   .heart-mini.saved svg, .round-btn.saved svg, .fav-row__heart svg,
   .filter-sheet, .addsheet-panel, .filter-backdrop, .cookie-banner,
