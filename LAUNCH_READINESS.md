@@ -18,6 +18,63 @@ without it.
 
 ---
 
+## Release execution pass — 2026-08-31
+
+The production build surfaced a blocker that no amount of static checking could
+have found, and which invalidated the earlier "GO WITH WARNINGS".
+
+### 🔴 Production builds shipped without Supabase credentials — FIXED
+
+**Evidence:** the first EAS build printed *"No environment variables with
+visibility Plain text and Sensitive found for the production environment"*.
+Confirmed three ways:
+
+1. `eas env:list --environment production` → **"No variables found."**
+2. `eas.json`'s production profile is `{"autoIncrement": true}` — **no `env` block**.
+3. `.env` is gitignored (`.env`, `.env.local`, `.env*`), so it is **not** in the
+   archive EAS builds from.
+
+`EXPO_PUBLIC_SUPABASE_URL` and `EXPO_PUBLIC_SUPABASE_ANON_KEY` were therefore
+`undefined` at bundle time — and `lib/supabase.ts` **throws at module load**
+when either is missing. The build would have *succeeded* and produced an app
+that crashes on first launch, before any screen renders.
+
+Invisible to every other check, because Expo Go and `npm run dev` read `.env`
+from the developer's machine. **The pre-existing build `103f0fd0` (16 Aug,
+versionCode 2) has the same defect and must not be submitted.**
+
+**Fix:** both variables set on the EAS `production` environment (scope:
+project, visibility: plaintext — correct, since the anon key is public by
+design and already ships in every client bundle; its JWT payload is
+`"role":"anon"`, never service_role).
+
+**Build history this pass:**
+
+| Build | versionCode | Outcome |
+|---|---|---|
+| `0357feed` | 3 | started before the fix — **cancelled**, would have crashed |
+| `581f1498` | 4 | started after the fix; **no env warning emitted** — the first evidence the fix took. Outcome not yet observed at time of writing; check `eas build:view 581f1498` |
+
+**Verify before trusting the artefact:** a successful build is not proof the fix
+worked, because the failure is at runtime. Confirm the Supabase URL string is
+actually present in the bundle, or simply launch it — a crash on the splash
+screen is the symptom of this exact defect returning.
+
+### ⚠️ Anon key format has diverged between the two apps
+
+Not fixed — flagged, because changing it while fixing the blocker above would
+have confounded two variables:
+
+| File | Variable | Format |
+|---|---|---|
+| `.env` (Expo) | `EXPO_PUBLIC_SUPABASE_ANON_KEY` | **legacy JWT** (`eyJhbGci…`) |
+| `.env.local` (Vite) | `VITE_SUPABASE_ANON_KEY` | **new** (`sb_publishable_…`) |
+
+Both are valid and both work. The EAS variable was set to the **legacy JWT**,
+matching what the mobile app is currently verified working with. Worth
+unifying on the `sb_publishable_` format later as a deliberate, separately
+tested change.
+
 ## Fixed
 
 - **Account deletion** — Edge Function (`ACTIVE`, `verify_jwt: true`) plus UI on
@@ -136,6 +193,79 @@ npm audit:                 WARN — build toolchain only, not shipped
 4. **`npm audit` reports 1 critical / 15 high**, all Expo CLI / Metro / PostCSS.
    Not shipped to users, but they are real on a developer machine and in CI.
    Do **not** run `npm audit fix --force`.
+
+## Real-device test plan
+
+Run against the **production artefact**, not Expo Go. Expo Go and a signed
+release build differ in exactly the places most likely to fail: OAuth
+redirects, deep links, native modules, and the release manifest's permissions.
+
+### Android
+
+```
+[ ] Fresh install of the .aab/.apk (uninstall any previous build first)
+[ ] First launch — no crash, splash is cream #f1ede6 (not white), no flash
+[ ] Sign up (email/password)
+[ ] Log out, log back in
+[ ] Google sign-in — including: cancel mid-flow, back button, repeat login
+[ ] Apple / LinkedIn if enabled for Android
+[ ] Search · filters · reset filters · no-results state
+[ ] Open a property · images load · share
+[ ] Favourite, then force-close and reopen — favourite persists
+[ ] Agent profile opens (this is the path the RPC guard could have broken)
+[ ] Create/edit a listing, upload a photo
+[ ] Privacy Policy + Terms links open (once URLs are configured)
+[ ] Delete account → app returns to signed-out state
+[ ] Verify in Supabase: profile row, listings, and the storage folder are gone
+[ ] Airplane mode: error states appear, no infinite spinners
+[ ] Restart app — session restored correctly
+```
+
+### iOS
+
+Same list, plus: safe areas around the notch and home indicator, keyboard
+avoidance on the auth form, Sign in with Apple, and deep-link return from OAuth.
+
+### The one that matters most
+
+**Account deletion**, because it is irreversible and a reviewer will try it.
+Check the Supabase Storage browser afterwards, not just the app — storage has
+no FK cascade, so it is the part most likely to silently half-work.
+
+## Store submission checklist — OWNER
+
+Nothing below can be produced from the codebase; none of it is invented here.
+
+### Google Play
+```
+[ ] App name · short description · full description
+[ ] Icon · feature graphic · phone + tablet screenshots
+[ ] Category · content rating questionnaire
+[ ] Data Safety form  (use the data table in SECURITY_AUDIT.md)
+[ ] Privacy Policy URL · Terms URL
+[ ] Support contact · app access instructions
+[ ] Reviewer/demo account with AGENT role
+```
+
+### Apple App Store
+```
+[ ] App name · subtitle · description · keywords
+[ ] Screenshots per device class · app icon
+[ ] Category · age rating
+[ ] App Privacy answers  (same data table)
+[ ] Privacy Policy URL · Terms URL
+[ ] Review notes · demo account
+```
+
+### Data declarations — factual basis
+
+The app collects: email, full name, phone, agency name, avatar, bio, role,
+language preference, listings, listing photos/video, favourites, saved
+searches, messages, viewings, wanted homes, and property-view analytics.
+
+**No advertising, attribution, or third-party analytics SDK is present** —
+verified. iOS App Tracking Transparency does **not** apply. Do not declare
+tracking on either form.
 
 ## Exact Next Steps
 

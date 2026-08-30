@@ -117,6 +117,45 @@ Not silenced blindly. Three categories:
   `useUnreadCount` and `useUpcomingViewings` would tear down and re-open a
   realtime channel each time. Each suppression carries the reason inline.
 
+## R1 — Production builds had no Supabase credentials (release execution pass, 2026-08-31)
+
+| Field | Value |
+|---|---|
+| Severity | 🔴 Critical — app would crash on first launch |
+| Fix type | Configuration (EAS project), not code |
+| Implemented | **Yes** |
+| Verification | Replacement build emitted no "no environment variables" warning |
+
+Found only by running an actual production build. `eas env:list --environment
+production` returned **"No variables found"**, `eas.json`'s production profile
+has no `env` block, and `.env` is gitignored so it never reaches the EAS
+archive. `lib/supabase.ts` throws at module load when the URL or anon key is
+missing — so the build would have succeeded and shipped an app that dies before
+rendering anything.
+
+Undetectable locally: Expo Go and `npm run dev` read `.env` from the developer's
+machine, so every prior check passed while the cloud build had nothing.
+
+**The pre-existing build `103f0fd0` (16 Aug, versionCode 2) carries the same
+defect.** There has never been a working production artefact.
+
+Fixed by setting `EXPO_PUBLIC_SUPABASE_URL` and `EXPO_PUBLIC_SUPABASE_ANON_KEY`
+on the EAS `production` environment. Both are public by design — the anon key's
+JWT payload is `"role":"anon"` and it already ships in every client bundle — so
+plaintext visibility is correct and no secret was introduced.
+
+Build `0357feed` (started pre-fix) was **cancelled** rather than left to produce
+a crashing artefact. Replacement is `581f1498`, versionCode 4, same keystore.
+
+## R2 — Anon key format diverged between apps (flagged, not changed)
+
+`.env` (Expo) holds the **legacy JWT** key; `.env.local` (Vite) holds the
+**new `sb_publishable_`** key. Both valid, both working.
+
+The EAS variable was set to the legacy JWT — matching what mobile is currently
+verified against. Switching key format while fixing R1 would have confounded
+two changes in one build. Worth unifying later as its own tested step.
+
 ## Verified clean, no change needed
 
 - **Secrets** — rebuilt bundle contains no `sb_secret_`, `SERVICE_ROLE`, or
