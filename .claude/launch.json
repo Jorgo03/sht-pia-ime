@@ -14,6 +14,13 @@
       "runtimeArgs": ["run", "expo:lan"],
       "port": 8081,
       "autoPort": false
+    },
+    {
+      "name": "mobile-tunnel",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "expo:tunnel"],
+      "port": 8081,
+      "autoPort": false
     }
   ]
 }
