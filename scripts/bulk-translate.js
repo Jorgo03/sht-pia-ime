@@ -1,13 +1,37 @@
 // scripts/bulk-translate.js
 //
-// One-time backfill: translate all properties that only have `sq` filled.
+// Backfill: fill in every listing translation the listing wizard never
+// produced. The wizard only translates the language whose tab an agent
+// actually opens (useListingTranslation.ts), so a listing published without
+// opening all eight tabs reaches the site with only a couple of languages
+// stored. Card surfaces resolve titles synchronously through
+// getLocalizedText(), which falls back to English on a miss and never asks
+// anyone to translate — so those listings show an English title no matter
+// which language the visitor picks. This script closes that gap in the data,
+// which is the only place it can be closed without making every card fire a
+// network request.
+//
 // Usage:
-//   node scripts/bulk-translate.js               (translate everything missing)
+//   node scripts/bulk-translate.js               (fill everything missing)
 //   node scripts/bulk-translate.js --limit=10    (only first 10 — good for testing)
 //   node scripts/bulk-translate.js --dry-run     (show what would happen, don't write)
+//
+// Reads SUPABASE_URL (or VITE_SUPABASE_URL) and SUPABASE_SERVICE_ROLE_KEY.
+// The service role is what lets this bypass the per-caller rate limit that
+// exists to bound interactive use; a backfill is not interactive.
 
 import { createClient } from '@supabase/supabase-js';
 import 'dotenv/config';
+
+import {
+  SOURCE_LANG,
+  SUPPORTED_LANGS,
+  markGenerated,
+  mergeTranslation,
+  sanitizeTranslationResponse,
+  shouldTranslate,
+  sourceFingerprint,
+} from '../src/lib/translationCore.js';
 
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -24,63 +48,118 @@ const args = process.argv.slice(2);
 const limitArg = args.find(a => a.startsWith('--limit='));
 const LIMIT = limitArg ? parseInt(limitArg.split('=')[1], 10) : null;
 const DRY_RUN = args.includes('--dry-run');
-const SLEEP_MS = 1500; // throttle: 1.5 s between calls (DeepL free is 500k chars/mo)
+const SLEEP_MS = 1500; // throttle: 1.5 s between calls, to be polite to the upstream engine
 
 const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 
-async function callEdgeFunction(text, source = 'sq') {
+/**
+ * One language at a time, rather than the legacy `{ text }` shape that returns
+ * every language at once. The legacy shape carries no description and no
+ * provenance, and its response replaces the whole i18n map — which is how a
+ * hand-written translation gets silently overwritten. Per-language keeps each
+ * write additive and lets the result be recorded in translation_meta.
+ */
+async function translateOne({ title, description, targetLanguage, sourceLanguage }) {
   const { data, error } = await supabase.functions.invoke('translate-property', {
-    body: { text, source },
+    body: { title, description, targetLanguage, sourceLanguage },
   });
   if (error) throw error;
-  return data;
-}
-
-function needsTranslation(field) {
-  if (!field || typeof field !== 'object') return true;
-  const keys = Object.keys(field);
-  return keys.length < 4;
+  return sanitizeTranslationResponse(data, {
+    wantTitle: Boolean(title),
+    wantDescription: Boolean(description),
+  });
 }
 
 async function processProperty(p) {
-  const updates = {};
+  const sourceLang = p.source_language || SOURCE_LANG;
+  const title = p.title_i18n?.[sourceLang] || p.title || '';
+  const description = p.description_i18n?.[sourceLang] || p.description || '';
+  const fingerprint = sourceFingerprint(title, description);
 
-  if (p.title_i18n?.sq && needsTranslation(p.title_i18n)) {
-    console.log(`  📝 Translating title: "${p.title_i18n.sq.slice(0, 60)}..."`);
-    if (!DRY_RUN) {
-      updates.title_i18n = await callEdgeFunction(p.title_i18n.sq, 'sq');
-      await sleep(SLEEP_MS);
-    }
+  if (!fingerprint) {
+    console.log('  ⏭️  No source text to translate from, skipping.');
+    return false;
   }
 
-  if (p.description_i18n?.sq && needsTranslation(p.description_i18n)) {
-    console.log(`  📝 Translating description: "${p.description_i18n.sq.slice(0, 60)}..."`);
-    if (!DRY_RUN) {
-      updates.description_i18n = await callEdgeFunction(p.description_i18n.sq, 'sq');
-      await sleep(SLEEP_MS);
+  let titleMap = p.title_i18n && typeof p.title_i18n === 'object' ? { ...p.title_i18n } : {};
+  let descriptionMap =
+    p.description_i18n && typeof p.description_i18n === 'object' ? { ...p.description_i18n } : {};
+  let meta = p.translation_meta && typeof p.translation_meta === 'object' ? { ...p.translation_meta } : {};
+
+  // The source language is stored like any other so getLocalizedText() can
+  // find it; a listing whose map is missing its own language shows English.
+  if (!titleMap[sourceLang] && title) titleMap[sourceLang] = title;
+  if (!descriptionMap[sourceLang] && description) descriptionMap[sourceLang] = description;
+
+  const targets = SUPPORTED_LANGS.filter((lang) => lang !== sourceLang);
+  const filled = [];
+
+  for (const lang of targets) {
+    // shouldTranslate() is the wizard's own rule, reused verbatim: it answers
+    // no for a translation that is already current AND for one a human wrote
+    // (including the text-without-metadata case the core treats as manual).
+    // A backfill must never overwrite an agent's own words.
+    const needed = shouldTranslate({
+      lang,
+      title: titleMap[lang],
+      description: descriptionMap[lang],
+      meta,
+      fingerprint,
+    });
+    if (!needed) continue;
+
+    if (DRY_RUN) {
+      filled.push(lang);
+      continue;
     }
+
+    try {
+      const result = await translateOne({
+        title,
+        description,
+        targetLanguage: lang,
+        sourceLanguage: sourceLang,
+      });
+      if (!result) {
+        console.log(`  ⚠️  ${lang}: engine returned nothing usable, leaving as is`);
+        continue;
+      }
+      titleMap = mergeTranslation(titleMap, lang, result.title);
+      descriptionMap = mergeTranslation(descriptionMap, lang, result.description);
+      meta = markGenerated(meta, lang, fingerprint);
+      filled.push(lang);
+    } catch (err) {
+      // One language failing is not a reason to abandon the other six, or to
+      // lose the ones already translated in this pass — they are written below.
+      console.error(`  ❌ ${lang}: ${err.message}`);
+    }
+    await sleep(SLEEP_MS);
   }
 
-  if (Object.keys(updates).length === 0) {
-    console.log('  ⏭️  Already translated, skipping.');
+  if (filled.length === 0) {
+    console.log('  ⏭️  Every language already current or manually written, skipping.');
     return false;
   }
 
   if (DRY_RUN) {
-    console.log('  💡 [DRY RUN] Would update with:', Object.keys(updates).join(', '));
+    console.log(`  💡 [DRY RUN] Would fill: ${filled.join(', ')}`);
     return true;
   }
 
   const { error } = await supabase
     .from('properties')
-    .update(updates)
+    .update({
+      title_i18n: titleMap,
+      description_i18n: descriptionMap,
+      translation_meta: meta,
+    })
     .eq('id', p.id);
 
   if (error) {
     console.error(`  ❌ Update failed for ${p.id}:`, error.message);
     return false;
   }
-  console.log(`  ✅ Updated property ${p.id}`);
+  console.log(`  ✅ Filled ${filled.join(', ')}`);
   return true;
 }
 
@@ -91,7 +170,7 @@ async function main() {
 
   let query = supabase
     .from('properties')
-    .select('id, title_i18n, description_i18n')
+    .select('id, title, description, title_i18n, description_i18n, translation_meta, source_language')
     .order('created_at', { ascending: false });
 
   if (LIMIT) query = query.limit(LIMIT);
