@@ -32,7 +32,8 @@
 //   { text, source?='sq' }
 //   -> { sq, en, de, it, es, pl, ru, fr }
 //
-// Auth: a signed-in user (rate-limited 60/hour) or the service role.
+// Auth: a signed-in user (rate-limited 60/hour per account), a signed-out
+// visitor (20/hour per IP) or the service role (unlimited).
 
 import { createClient } from 'npm:@supabase/supabase-js@2';
 
@@ -51,6 +52,13 @@ const json = (body: unknown, status = 200) =>
 const ANTHROPIC_KEY = Deno.env.get('ANTHROPIC_API_KEY');
 const MODEL = 'claude-sonnet-5';
 const RATE_LIMIT_PER_HOUR = 60;
+
+// Signed-out visitors get a smaller hourly budget, keyed by IP rather than by
+// user id. Deliberately lower than the signed-in ceiling: an IP is a much weaker
+// identity than an account — shared by everyone behind one NAT, and trivially
+// rotated — so this buys availability for ordinary browsing without turning the
+// endpoint into a free unauthenticated translation API.
+const ANON_RATE_LIMIT_PER_HOUR = 20;
 
 // Optional. MyMemory's anonymous quota is ~5k characters/day per calling IP,
 // which an edge function shares with everyone else on that IP. Setting this to
@@ -91,11 +99,28 @@ async function rateLimit(key: string, feature: string, max: number): Promise<boo
 }
 
 /**
+ * Best-effort caller IP, used only as a rate-limit bucket for signed-out callers.
+ *
+ * x-forwarded-for is client-controlled, so this cannot be trusted to identify
+ * anyone — a determined caller spoofs it and gets a fresh bucket. That is
+ * acceptable for what it guards: a spend ceiling on translating text the visitor
+ * can already read on the page. It is not, and must not become, an authorization
+ * check. The leftmost entry is the original client where the platform appends
+ * rather than replaces, and the fixed fallback means a request arriving with no
+ * forwarding header shares one bucket instead of escaping the limit entirely.
+ */
+function clientIp(req: Request): string {
+  const forwarded = req.headers.get('x-forwarded-for') ?? '';
+  const first = forwarded.split(',')[0]?.trim();
+  return `ip:${first || req.headers.get('cf-connecting-ip')?.trim() || 'unknown'}`;
+}
+
+/**
  * Reads the `role` claim without verifying the signature.
  *
  * Safe only because it grants nothing: Supabase's gateway has already rejected
  * the request unless the JWT is validly signed by this project. This only
- * decides which of two already-trusted callers gets rate-limited.
+ * decides which already-trusted caller gets rate-limited, and how hard.
  */
 function jwtRole(token: string): string | null {
   try {
@@ -475,14 +500,31 @@ Deno.serve(async (req) => {
     const token = req.headers.get('Authorization')?.replace('Bearer ', '') ?? '';
     const role = jwtRole(token);
     let rateLimitKey: string | null = null;
+    let rateLimitMax = RATE_LIMIT_PER_HOUR;
 
     if (role === 'service_role') {
       rateLimitKey = null;
     } else {
       const { data: userData } = await admin.auth.getUser(token);
       const user = userData?.user;
-      if (!user) return json({ error: 'unauthorized' }, 401);
-      rateLimitKey = user.id;
+      if (user) {
+        rateLimitKey = user.id;
+      } else if (role === 'anon') {
+        // Reading a listing is the one thing this marketplace has to do for a
+        // visitor with no account, and a listing nobody can read is not browsable.
+        // Rejecting the anon key here left every signed-out property page showing
+        // untranslated Albanian in all eight languages — silently, because the
+        // callers degrade to the original text rather than surfacing an error.
+        //
+        // The anon key is not a weaker *signature* than a user's: the gateway has
+        // already rejected anything not signed by this project, which is what makes
+        // branching on the unverified role claim safe at all. It is a weaker
+        // *identity*, so it is billed against the caller's IP instead of an account.
+        rateLimitKey = clientIp(req);
+        rateLimitMax = ANON_RATE_LIMIT_PER_HOUR;
+      } else {
+        return json({ error: 'unauthorized' }, 401);
+      }
     }
 
     let body: Record<string, unknown>;
@@ -522,7 +564,7 @@ Deno.serve(async (req) => {
       return json({ error: 'empty_content' }, 400);
     }
 
-    if (rateLimitKey && !(await rateLimit(rateLimitKey, 'translate-property', RATE_LIMIT_PER_HOUR))) {
+    if (rateLimitKey && !(await rateLimit(rateLimitKey, 'translate-property', rateLimitMax))) {
       return json({ error: 'rate_limited' }, 429);
     }
 
