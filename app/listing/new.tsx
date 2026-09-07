@@ -428,21 +428,29 @@ export default function NewListingWizard() {
         .single();
       const isAgent = profile?.role === 'agent';
 
+      // Fill every language the agent did not open a tab for. Without this a
+      // listing reaches the site with only the languages they happened to
+      // click, and card surfaces — which resolve titles synchronously and
+      // never fetch — show the fallback language to every visitor regardless
+      // of what they select. Returns the maps it produced, because setForm has
+      // not landed by the time this insert runs.
+      const translated = await translation.translateAll();
+
       const { error } = await supabase.from('properties').insert({
         // RLS requires owner_id = auth.uid() on insert.
         owner_id: user.id,
         agent_id: isAgent ? user.id : null,
         owner_type: isAgent ? 'agent' : 'client',
-        title: form.title_i18n.sq || '',
-        title_i18n: form.title_i18n,
-        description: form.description_i18n.sq || '',
-        description_i18n: form.description_i18n,
+        title: translated.title_i18n.sq || '',
+        title_i18n: translated.title_i18n,
+        description: translated.description_i18n.sq || '',
+        description_i18n: translated.description_i18n,
         // This form authors in Albanian and translates outward from it.
         source_language: 'sq',
         // Carries which languages are machine-translated and which an agent
         // edited, so reopening the listing later does not re-translate over
         // their corrections or re-bill for work already done.
-        translation_meta: form.translation_meta,
+        translation_meta: translated.translation_meta,
         listing_type: form.listing_type,
         property_type: form.property_type,
         city: form.city || null,

@@ -327,17 +327,24 @@ export default function NewListing() {
 
       const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single()
 
+      // Fill every language whose tab the agent never opened. Card surfaces
+      // resolve titles synchronously and never fetch, so a listing published
+      // with only a couple of languages shows the fallback one to every
+      // visitor no matter which they pick. The returned maps are used rather
+      // than form state, which has not updated yet at this point.
+      const translated = await translation.translateAll()
+
       const { error } = await supabase.from('properties').insert({
         owner_id: user.id,
         agent_id: profile?.role === 'agent' ? user.id : null,
         owner_type: profile?.role === 'agent' ? 'agent' : 'client',
-        title: form.title_i18n.sq || '',
-        title_i18n: form.title_i18n,
-        description: form.description_i18n.sq || '',
-        description_i18n: form.description_i18n,
+        title: translated.title_i18n.sq || '',
+        title_i18n: translated.title_i18n,
+        description: translated.description_i18n.sq || '',
+        description_i18n: translated.description_i18n,
         // Which languages are machine output and which an agent corrected by
         // hand, so a later edit does not regenerate over their work.
-        translation_meta: form.translation_meta,
+        translation_meta: translated.translation_meta,
         listing_type: form.listing_type,
         property_type: form.property_type,
         city: form.city,

@@ -285,15 +285,22 @@ export default function CreateListingScreen() {
         setUploadProgress(null);
       }
 
+      // Same publish-time fill as the wizard: without it this screen ships a
+      // listing carrying only the languages whose tabs were opened, and every
+      // card then reads the fallback language regardless of the visitor's
+      // choice. Uses the returned maps, since setForm has not landed yet.
+      const translated = await translation.translateAll();
+
       const { error } = await supabase.from('properties').insert({
         // RLS requires owner_id = auth.uid() on insert; agent_id alone isn't
         // enough — every publish from this screen was rejected without it.
         owner_id: user.id,
         agent_id: user.id,
-        title: form.title_i18n.sq,
-        title_i18n: form.title_i18n,
-        description: form.description_i18n.sq || null,
-        description_i18n: Object.keys(form.description_i18n).length > 0 ? form.description_i18n : null,
+        title: translated.title_i18n.sq,
+        title_i18n: translated.title_i18n,
+        description: translated.description_i18n.sq || null,
+        description_i18n:
+          Object.keys(translated.description_i18n).length > 0 ? translated.description_i18n : null,
         price: Number(form.price),
         currency: form.currency,
         address: form.address,
@@ -305,7 +312,7 @@ export default function CreateListingScreen() {
         source_language: 'sq',
         // Records which of those keys are machine output and which an agent
         // corrected by hand, so a later edit does not overwrite their work.
-        translation_meta: form.translation_meta,
+        translation_meta: translated.translation_meta,
         beds: form.beds ? Number(form.beds) : null,
         baths: form.baths ? Number(form.baths) : null,
         sqft: form.sqft ? Number(form.sqft) : null,

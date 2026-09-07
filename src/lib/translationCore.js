@@ -220,3 +220,27 @@ export function sanitizeTranslationResponse(raw, { wantTitle, wantDescription })
     description: wantDescription ? description : '',
   }
 }
+
+/**
+ * Which languages a publish-time pass should fill.
+ *
+ * Split out from the hook so the decision can be tested without a React
+ * renderer, and so there is exactly one answer to "what does publishing
+ * translate" rather than a loop in the hook that quietly drifts from
+ * shouldTranslate().
+ *
+ * Returns them in SUPPORTED_LANGS order, which is the order the tabs render
+ * in — so a progress display and the work itself agree.
+ */
+export function languagesNeedingTranslation({ titles, descriptions, meta, fingerprint }) {
+  if (!fingerprint) return []
+  return SUPPORTED_LANGS.filter((lang) =>
+    shouldTranslate({
+      lang,
+      title: titles?.[lang],
+      description: descriptions?.[lang],
+      meta,
+      fingerprint,
+    }),
+  )
+}

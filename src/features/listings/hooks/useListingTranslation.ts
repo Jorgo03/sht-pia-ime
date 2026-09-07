@@ -3,6 +3,7 @@ import { useCallback, useMemo, useRef, useState } from 'react'
 import {
   SOURCE_LANG,
   TranslationState,
+  languagesNeedingTranslation,
   markGenerated,
   markManual,
   mergeTranslation,
@@ -96,6 +97,28 @@ export interface UseListingTranslationResult {
   fingerprint: string
   /** True when the active language may be regenerated (has source, not sq). */
   canRegenerate: boolean
+  /**
+   * Fills every language that still needs one. Call this before publishing.
+   *
+   * Selecting a language is the only thing that has ever triggered a
+   * translation, so a listing published without opening all eight tabs reaches
+   * the site with a couple of languages stored. Card surfaces resolve titles
+   * synchronously through getLocalizedText() and fall back on a miss — they
+   * never fetch — so those listings show the fallback language on every card,
+   * no matter what the visitor selects. Switching language then appears to do
+   * nothing, while the detail screen (which does translate on demand) shows the
+   * right text: the exact split that makes this look like a rendering bug.
+   *
+   * Resolves with what happened, so a caller can publish anyway and report
+   * honestly rather than blocking on a language that failed.
+   */
+  translateAll: () => Promise<{
+    filled: LangCode[]
+    failed: LangCode[]
+    title_i18n: I18nMap
+    description_i18n: I18nMap
+    translation_meta: TranslationMeta
+  }>
 }
 
 export function useListingTranslation<F extends TranslatableForm>({
@@ -270,6 +293,109 @@ export function useListingTranslation<F extends TranslatableForm>({
     void run(activeLang, true)
   }, [activeLang, run])
 
+  /**
+   * Fill every language that still needs one — the publish-time pass.
+   *
+   * Sequential, not parallel. Each language is one Edge Function call, the
+   * function rate-limits per account, and seven simultaneous requests from a
+   * phone on hotel wifi is how you get a partial fill with no way to tell which
+   * half failed. Publishing is already a deliberate, one-off action, so the few
+   * extra seconds buy a result that is either complete or precisely reported.
+   *
+   * `force` stays false throughout, which is the whole safety story: run()
+   * defers to shouldTranslate(), so a language an agent wrote by hand is left
+   * alone, and one already current costs nothing. Re-running is therefore free
+   * and safe.
+   *
+   * Failures are collected rather than thrown. A language the engine could not
+   * produce must not cost the agent their listing — the caller publishes what
+   * it has and says which languages are missing.
+   */
+  const translateAll = useCallback(async () => {
+    const filled: LangCode[] = []
+    const failed: LangCode[] = []
+    let titles: I18nMap = form.title_i18n ?? {}
+    let descriptions: I18nMap = form.description_i18n ?? {}
+    let meta: TranslationMeta = form.translation_meta ?? {}
+
+    const done = () => ({
+      filled,
+      failed,
+      title_i18n: titles,
+      description_i18n: descriptions,
+      translation_meta: meta,
+    })
+
+    if (!enabled || !fingerprint) return done()
+
+    // The single answer to "what does publishing translate", shared with the
+    // tests. Anything current is skipped for free, and anything an agent wrote
+    // by hand is pinned — publishing must never be what destroys their words.
+    const targets = languagesNeedingTranslation({
+      titles,
+      descriptions,
+      meta,
+      fingerprint,
+    })
+
+    for (const lang of targets) {
+      // Invalidate any run still in flight for this language, so a response
+      // from a tab the agent opened a moment ago cannot land after this pass
+      // and overwrite it.
+      runIdRef.current += 1
+      latestRunRef.current.set(lang, runIdRef.current)
+      inFlightRef.current.delete(lang)
+      setPending(lang, true)
+
+      try {
+        const result = await translate({
+          title: sourceTitle,
+          description: sourceDescription,
+          targetLanguage: lang,
+          sourceLanguage: SOURCE_LANG,
+        })
+        titles = mergeTranslation(titles, lang, result.title)
+        descriptions = mergeTranslation(descriptions, lang, result.description)
+        meta = markGenerated(meta, lang, fingerprint)
+        filled.push(lang)
+      } catch (err) {
+        // A language the engine could not produce must not cost the agent
+        // their listing. Record it and carry on; the caller publishes what it
+        // has and reports what is missing.
+        const code = (err as { code?: string })?.code ?? 'unavailable'
+        setErrors((prev) => ({ ...prev, [lang]: code }))
+        failed.push(lang)
+      } finally {
+        setPending(lang, false)
+      }
+    }
+
+    // One write at the end rather than seven: the form is being submitted, so
+    // there is nothing to see mid-pass, and a single update cannot interleave
+    // with the caller reading state.
+    if (filled.length) {
+      setForm((prev) => ({
+        ...prev,
+        title_i18n: { ...(prev.title_i18n ?? {}), ...titles },
+        description_i18n: { ...(prev.description_i18n ?? {}), ...descriptions },
+        translation_meta: { ...(prev.translation_meta ?? {}), ...meta },
+      }))
+    }
+
+    return done()
+  }, [
+    enabled,
+    fingerprint,
+    form.title_i18n,
+    form.description_i18n,
+    form.translation_meta,
+    sourceTitle,
+    sourceDescription,
+    translate,
+    setForm,
+    setPending,
+  ])
+
   const editField = useCallback(
     (field: 'title_i18n' | 'description_i18n', value: string) => {
       const lang = activeLang
@@ -333,5 +459,6 @@ export function useListingTranslation<F extends TranslatableForm>({
       activeLang !== SOURCE_LANG &&
       !!fingerprint &&
       state !== TranslationState.NO_SOURCE,
+    translateAll,
   }
 }
