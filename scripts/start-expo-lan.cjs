@@ -44,6 +44,16 @@ function findLanAddress() {
   return (preferred ?? candidates[0]) ?? null;
 }
 
+// Exported so scripts/expo-qr.cjs advertises the exact address this script
+// hands Metro. Two copies of this detection would be free to disagree, and a
+// QR pointing at a different interface than the running server is precisely
+// the failure this file exists to prevent.
+module.exports = { findLanAddress };
+
+// Everything below runs only when this file is the entry point, so requiring
+// it for findLanAddress() does not spawn a second Metro.
+if (require.main !== module) return;
+
 const found = findLanAddress();
 
 if (!found) {

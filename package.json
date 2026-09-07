@@ -12,6 +12,7 @@
     "expo:start": "expo start",
     "expo:lan": "node scripts/start-expo-lan.cjs",
     "expo:go": "node scripts/start-expo-lan.cjs --go",
+    "expo:qr": "node scripts/expo-qr.cjs",
     "expo:tunnel": "expo start --tunnel",
     "expo:ios": "expo start --ios",
     "expo:android": "expo start --android",
