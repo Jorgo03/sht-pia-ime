@@ -12,6 +12,12 @@ import type { LocationPickerProps } from './location-picker.types';
  * target, so tap-to-pin isn't available here. Coordinates stay settable
  * (not silently dropped) via plain numeric fields, same precision and same
  * onChange contract as the native picker.
+ *
+ * `focus` is accepted and ignored: it exists to move a camera, and there is no
+ * camera here. Nothing is prefilled from it either — a road's midpoint is not
+ * the property, and writing it into these boxes would publish that guess as
+ * the address. This is the Expo-web fallback; the Vite web app has its own
+ * Leaflet picker.
  */
 export function LocationPicker({ latitude, longitude, onChange }: LocationPickerProps) {
   const { t } = useTranslation();

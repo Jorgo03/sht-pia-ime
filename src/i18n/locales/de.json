@@ -372,7 +372,12 @@
     "longitude": "Längengrad",
     "mapHint": "Tippe auf die Karte, um den Standort festzulegen",
     "videoUpload": "Objektvideo",
-    "dropVideo": "Video hierher ziehen oder klicken (MP4 oder MOV)"
+    "dropVideo": "Video hierher ziehen oder klicken (MP4 oder MOV)",
+    "roadNeedsCity": "Wählen Sie eine Stadt, um deren Straßen zu sehen.",
+    "roadNoResults": "Keine Straße gefunden. Sie können sie selbst eingeben.",
+    "dragMarker": "Marker ziehen",
+    "pinOrderHint": "Wählen Sie zuerst die Straße, tippen Sie dann auf die Karte, um den Marker zu setzen.",
+    "pinAdjustHint": "Ziehen Sie den Marker an die genaue Lage der Immobilie."
   },
   "dashboard": {
     "title": "Immobilien-Dashboard",

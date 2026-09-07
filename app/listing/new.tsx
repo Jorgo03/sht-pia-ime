@@ -23,6 +23,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { LocationPicker } from '@/components/listing/location-picker';
+import { RoadField } from '@/components/listing/road-field';
 import { TranslationBar } from '@/components/listing/translation-bar';
 import { GhostBtn, PrimaryCTA } from '@/components/ui/buttons';
 import { Chip, SectionLabel } from '@/components/ui/chip';
@@ -35,6 +36,7 @@ import { useAuth } from '@/contexts/auth-context';
 import { useTheme } from '@/contexts/theme-context';
 import { supabase } from '@/lib/supabase';
 import { translatePropertyContent, type I18nMap } from '@/lib/translate';
+import { geocodeCity, type RoadSuggestion } from '@/src/lib/roadSearch';
 import { useListingTranslation } from '@/src/features/listings/hooks/useListingTranslation';
 import type { TranslationMeta } from '@/src/lib/translationCore';
 import {
@@ -276,6 +278,14 @@ export default function NewListingWizard() {
 
   const update = <K extends keyof ListingForm>(key: K, value: ListingForm[K]) =>
     setForm((prev) => ({ ...prev, [key]: value }));
+
+  /**
+   * Where the map should look: the selected road, or the city centre.
+   *
+   * Kept out of `form` on purpose — it is view state, never persisted, and
+   * must not be mistaken for the property's coordinates.
+   */
+  const [mapFocus, setMapFocus] = useState<{ latitude: number; longitude: number } | null>(null);
 
   // Owns the language selection for BOTH text fields, plus everything that
   // makes selecting one safe: the per-language cache, staleness against the
@@ -620,18 +630,40 @@ export default function NewListingWizard() {
           placeholder={t('listing.city')}
           icon="location-city"
           onChange={(v) => {
-            update('city', v);
+            if (v === form.city) return;
+            // A new city invalidates everything downstream of it. Leaving the
+            // old road would keep a street that does not exist here, and
+            // leaving the pin would publish a property in the previous city —
+            // the kind of stale coordinate nobody notices until it is on a map.
+            setForm((prev) => ({
+              ...prev,
+              city: v,
+              address: '',
+              latitude: null,
+              longitude: null,
+            }));
             clearError('city');
+            setMapFocus(null);
+            // Move the map to the new city so the next pin starts from
+            // somewhere plausible rather than from wherever it was left.
+            void geocodeCity({ city: v }).then((centre) => {
+              if (centre) setMapFocus(centre);
+            });
           }}
         />
       </Labeled>
 
       <Labeled styles={styles} label={t('listing.address')}>
-        <Field
-          icon="place"
-          placeholder={t('listing.addressPlaceholder')}
+        <RoadField
+          city={form.city}
           value={form.address}
+          placeholder={t('listing.addressPlaceholder')}
           onChangeText={(val) => update('address', val)}
+          // Picking a road frames the map; it never sets the property's
+          // position. That still comes from the marker.
+          onSelectRoad={(road: RoadSuggestion) =>
+            setMapFocus({ latitude: road.latitude, longitude: road.longitude })
+          }
         />
       </Labeled>
 
@@ -642,6 +674,7 @@ export default function NewListingWizard() {
         <LocationPicker
           latitude={form.latitude}
           longitude={form.longitude}
+          focus={mapFocus}
           onChange={(lat, lng) => setForm((prev) => ({ ...prev, latitude: lat, longitude: lng }))}
         />
         <Text style={styles.hint}>

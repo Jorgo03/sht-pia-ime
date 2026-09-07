@@ -380,7 +380,12 @@
     "longitude": "Longitud",
     "mapHint": "Toca el mapa para fijar la ubicación",
     "videoUpload": "Vídeo de la propiedad",
-    "dropVideo": "Arrastra un vídeo aquí o haz clic (MP4 o MOV)"
+    "dropVideo": "Arrastra un vídeo aquí o haz clic (MP4 o MOV)",
+    "roadNeedsCity": "Selecciona una ciudad para ver sus calles.",
+    "roadNoResults": "No se encontraron calles. Puedes escribirla tú.",
+    "dragMarker": "Arrastra el marcador",
+    "pinOrderHint": "Selecciona primero la calle y luego toca el mapa para colocar el marcador.",
+    "pinAdjustHint": "Arrastra el marcador hasta la ubicación exacta del inmueble."
   },
   "dashboard": {
     "title": "Dashboard de propiedad",

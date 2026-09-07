@@ -424,7 +424,12 @@
     "longitude": "Longitude",
     "mapHint": "Tap the map to set the property location",
     "videoUpload": "Property video",
-    "dropVideo": "Drag a video here or click (MP4 or MOV)"
+    "dropVideo": "Drag a video here or click (MP4 or MOV)",
+    "roadNeedsCity": "Select a city to see its roads.",
+    "roadNoResults": "No roads found. You can type your own.",
+    "dragMarker": "Drag the marker",
+    "pinOrderHint": "Select the road first, then tap the map to place the marker.",
+    "pinAdjustHint": "Drag the marker to the exact location of the property."
   },
   "dashboard": {
     "title": "Property Dashboard",
