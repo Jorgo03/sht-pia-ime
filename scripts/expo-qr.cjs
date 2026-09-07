@@ -55,7 +55,17 @@ if (!detected) {
   process.exit(1);
 }
 
-const url = `exp://${detected.address}:${port}`;
+/**
+ * A tunnel host already carries its port in the subdomain.
+ *
+ * `npm run expo:tunnel` publishes the dev server as
+ * <slug>-<user>-<port>.exp.direct, reached over ordinary 443. Appending :8081
+ * to that sends Expo Go to a port the tunnel does not listen on, and the
+ * connection fails with no useful message. Only a bare IPv4 literal — the LAN
+ * case — takes an explicit port.
+ */
+const isIpv4 = /^\d{1,3}(\.\d{1,3}){3}$/.test(detected.address);
+const url = isIpv4 ? `exp://${detected.address}:${port}` : `exp://${detected.address}`;
 
 /**
  * Renders the QR as inline SVG.
