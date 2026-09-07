@@ -29,9 +29,47 @@
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
+const http = require('http');
 const { spawn } = require('child_process');
 
 const { findLanAddress } = require('./start-expo-lan.cjs');
+
+/**
+ * Is a dev server actually listening on this port?
+ *
+ * Metro answers /status with the literal string `packager-status:running`, and
+ * has for years — it is what the Expo and React Native CLIs probe themselves.
+ *
+ * This check exists because of a real afternoon lost to its absence. A QR is
+ * just an address; printing one while nothing is running produces a code that
+ * scans perfectly and then fails on the phone. Over a tunnel the phone reports
+ * `ERR_NGROK_3200 — the endpoint is offline`, which reads like a broken URL or
+ * a bad QR and sends you looking in the wrong place entirely. The truthful
+ * message is "nothing is listening yet", and it belongs here, before the code
+ * is ever generated.
+ *
+ * Localhost is the right thing to probe even for a tunnel: the tunnel is only
+ * a forwarder, so if the local server is down the public endpoint is dead too.
+ */
+function devServerRunning(port) {
+  return new Promise((resolve) => {
+    const req = http.get(
+      { host: '127.0.0.1', port, path: '/status', timeout: 2000 },
+      (res) => {
+        let body = '';
+        res.on('data', (c) => {
+          body += c;
+        });
+        res.on('end', () => resolve(body.includes('packager-status:running')));
+      },
+    );
+    req.on('error', () => resolve(false));
+    req.on('timeout', () => {
+      req.destroy();
+      resolve(false);
+    });
+  });
+}
 
 function argValue(name) {
   const hit = process.argv.slice(2).find((a) => a.startsWith(`--${name}=`));
@@ -144,21 +182,40 @@ const html = `<!doctype html>
 </body></html>
 `;
 
-fs.writeFileSync(outFile, html, 'utf8');
+async function main() {
+  if (!(await devServerRunning(port))) {
+    console.error(
+      `[expo:qr] No Expo dev server is listening on port ${port}, so this QR would\n` +
+        '          scan correctly and then fail on the phone — over a tunnel that\n' +
+        '          arrives as "ERR_NGROK_3200: the endpoint is offline".\n\n' +
+        '          Start the server first, in its own terminal, and leave it running:\n\n' +
+        '            npm run expo:tunnel:go     (phone on mobile data, or a network\n' +
+        '                                        that blocks phone-to-computer traffic)\n' +
+        '            npm run expo:go            (phone on the same Wi-Fi)\n\n' +
+        '          Wait for it to report that it is ready, then run this again.\n' +
+        '          A tunnel takes 10-30 seconds to come up.',
+    );
+    process.exit(1);
+  }
 
-console.log(`[expo:qr] ${url}  (from "${detected.name}")`);
-console.log(`[expo:qr] Opening ${outFile}`);
+  fs.writeFileSync(outFile, html, 'utf8');
 
-// `start` needs an empty title argument first, or it treats the path as one.
-const opener =
-  process.platform === 'win32'
-    ? `start "" "${outFile}"`
-    : process.platform === 'darwin'
-      ? `open "${outFile}"`
-      : `xdg-open "${outFile}"`;
+  console.log(`[expo:qr] ${url}  (from "${detected.name}")`);
+  console.log(`[expo:qr] Opening ${outFile}`);
 
-const child = spawn(opener, { stdio: 'ignore', shell: true, detached: true });
-child.on('error', () => {
-  console.log('[expo:qr] Could not open a browser automatically — open the file above by hand.');
-});
-child.unref();
+  // `start` needs an empty title argument first, or it treats the path as one.
+  const opener =
+    process.platform === 'win32'
+      ? `start "" "${outFile}"`
+      : process.platform === 'darwin'
+        ? `open "${outFile}"`
+        : `xdg-open "${outFile}"`;
+
+  const child = spawn(opener, { stdio: 'ignore', shell: true, detached: true });
+  child.on('error', () => {
+    console.log('[expo:qr] Could not open a browser automatically — open the file above by hand.');
+  });
+  child.unref();
+}
+
+main();
