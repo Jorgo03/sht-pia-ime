@@ -14,6 +14,7 @@
     "expo:go": "node scripts/start-expo-lan.cjs --go",
     "expo:qr": "node scripts/expo-qr.cjs",
     "expo:go:qr": "node scripts/expo-go-qr.cjs",
+    "expo:tunnel:qr": "node scripts/expo-tunnel-qr.cjs",
     "expo:tunnel": "expo start --tunnel",
     "expo:tunnel:go": "expo start --tunnel --go",
     "expo:ios": "expo start --ios",
