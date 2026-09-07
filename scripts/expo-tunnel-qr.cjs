@@ -75,6 +75,31 @@ function localServerUp() {
 }
 
 /**
+ * Decides whether a response from the tunnel host means it is really serving.
+ *
+ * Split out from the request so it can be tested without a live tunnel, which
+ * matters because this is the judgement the whole script turns on: get it wrong
+ * in the permissive direction and it hands over a QR that fails on the phone,
+ * which is the exact failure it exists to prevent.
+ *
+ * ngrok answers 404 with an ERR_NGROK_3200 body when the hostname is registered
+ * but no agent is connected. That is a well-formed HTTP response, so status
+ * alone is not enough — a 200 carrying that error would still be a dead tunnel.
+ * Both signals are checked.
+ *
+ * @param {{ status: number|null, body: string }} response
+ * @returns {{ ok: boolean, reason: string }}
+ */
+function classifyTunnelResponse({ status, body }) {
+  if (status == null) return { ok: false, reason: 'no response' };
+  if (String(body ?? '').includes('ERR_NGROK_3200')) {
+    return { ok: false, reason: 'tunnel registered but nothing is connected behind it' };
+  }
+  if (status >= 400) return { ok: false, reason: `tunnel responded ${status}` };
+  return { ok: true, reason: `serving (${status})` };
+}
+
+/**
  * Is the public tunnel actually serving?
  *
  * ngrok answers with 404 and an ERR_NGROK_3200 body when the hostname is
@@ -92,9 +117,10 @@ function tunnelUp(hostname) {
           body += c;
           if (body.length > 4096) req.destroy();
         });
-        res.on('end', () =>
-          resolve({ ok: res.statusCode < 400 && !body.includes('ERR_NGROK_3200'), status: res.statusCode }),
-        );
+        res.on('end', () => {
+          const verdict = classifyTunnelResponse({ status: res.statusCode, body });
+          resolve({ ...verdict, status: res.statusCode });
+        });
       },
     );
     req.on('error', (err) => resolve({ ok: false, status: null, error: err.message }));
@@ -130,6 +156,11 @@ async function tunnelHostname() {
 }
 
 /* ------------------------------------------------------------------- run */
+
+// Exported for tests. Everything below is the CLI, and must not run on require.
+module.exports = { classifyTunnelResponse, tunnelHostname };
+
+if (require.main !== module) return;
 
 const metro = spawn(process.execPath, [
   path.join(__dirname, '..', 'node_modules', '@expo', 'cli', 'build', 'bin', 'cli'),

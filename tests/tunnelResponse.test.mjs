@@ -1,0 +1,65 @@
+import assert from 'node:assert/strict'
+import { createRequire } from 'node:module'
+import test from 'node:test'
+
+const require = createRequire(import.meta.url)
+const { classifyTunnelResponse } = require('../scripts/expo-tunnel-qr.cjs')
+
+/**
+ * scripts/expo-tunnel-qr.cjs refuses to draw a QR until the public tunnel host
+ * is genuinely serving. This is that judgement, and it is the only thing
+ * standing between the developer and a code that scans perfectly then fails on
+ * the phone — so a permissive mistake here reintroduces exactly the bug the
+ * script was written to remove.
+ *
+ * The case that matters is ngrok's "registered but nothing connected" reply:
+ * a well-formed HTTP response carrying ERR_NGROK_3200. Status alone cannot
+ * catch it, which is why the body is inspected too.
+ */
+
+test('a serving tunnel is accepted', () => {
+  const { ok } = classifyTunnelResponse({ status: 200, body: '{"id":"manifest"}' })
+  assert.equal(ok, true)
+})
+
+test('ngrok ERR_NGROK_3200 is rejected even though it is a valid response', () => {
+  const body =
+    '<html><body><h2>The endpoint ffuyfm8-jorgo03-8081.exp.direct is offline.</h2>' +
+    '<p>ERR_NGROK_3200</p></body></html>'
+  const verdict = classifyTunnelResponse({ status: 404, body })
+  assert.equal(verdict.ok, false)
+  assert.match(verdict.reason, /nothing is connected/)
+})
+
+test('ERR_NGROK_3200 is rejected even when served with a 200', () => {
+  // Defensive: the check must not rest on the status code alone, since a proxy
+  // or captive portal can rewrite the status while preserving the body.
+  const { ok } = classifyTunnelResponse({ status: 200, body: 'ERR_NGROK_3200' })
+  assert.equal(ok, false)
+})
+
+test('no response at all is rejected', () => {
+  const verdict = classifyTunnelResponse({ status: null, body: '' })
+  assert.equal(verdict.ok, false)
+  assert.equal(verdict.reason, 'no response')
+})
+
+test('other server errors are rejected and reported with their status', () => {
+  const verdict = classifyTunnelResponse({ status: 502, body: 'bad gateway' })
+  assert.equal(verdict.ok, false)
+  assert.match(verdict.reason, /502/)
+})
+
+test('a missing body does not throw', () => {
+  // res.on('data') may never fire; the classifier must still return a verdict
+  // rather than crashing the poll loop.
+  assert.equal(classifyTunnelResponse({ status: 200, body: undefined }).ok, true)
+})
+
+test('requiring the script does not start a dev server', () => {
+  // The CLI half is guarded behind require.main. If that guard regressed,
+  // importing this module would spawn Expo — and the test run would hang.
+  const mod = require('../scripts/expo-tunnel-qr.cjs')
+  assert.equal(typeof mod.classifyTunnelResponse, 'function')
+  assert.equal(typeof mod.tunnelHostname, 'function')
+})
