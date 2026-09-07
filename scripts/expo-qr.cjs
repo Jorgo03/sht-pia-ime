@@ -191,6 +191,22 @@ const escapeHtml = (s) =>
 const targetLabel = target === 'go' ? 'Expo Go' : 'development build';
 const outFile = path.join(os.tmpdir(), `shtepia-expo-qr-${target}.html`);
 
+/**
+ * The address the page polls to show whether this QR is still live.
+ *
+ * A dev QR encodes a machine address, and machine addresses expire: DHCP hands
+ * out a different one after a reconnect, and the server stops when the terminal
+ * is closed. A page left open then shows a code that looks perfectly valid and
+ * silently is not — which is the failure that wastes the most time, because
+ * nothing on screen admits it.
+ */
+// Built by the same UrlCreator, so it points at the same server the QR does —
+// for a dev-client target too, whose URL wraps the manifest address rather than
+// being it, and for a tunnel, where the port lives in the subdomain.
+const probeUrl =
+  urlCreator.constructUrl({ scheme: hostType === 'tunnel' ? 'https' : 'http', hostType }) +
+  '/status';
+
 // Typography and colour follow the app's own tokens (Newsreader / Manrope and
 // the --fho accent ramp) so this reads as part of the project rather than a
 // stray tool page. Fonts degrade to system faces when offline; the QR itself
@@ -218,18 +234,69 @@ const html = `<!doctype html>
   code{display:block;margin-top:20px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
        font-size:12px;color:var(--accent);font-weight:600;word-break:break-all;line-height:1.5}
   p{margin:18px 0 0;font-size:13px;color:var(--soft);line-height:1.6}
+  .live{display:inline-flex;align-items:center;gap:8px;margin-top:16px;padding:7px 13px;
+        border-radius:999px;border:1px solid var(--line);font-size:12.5px;font-weight:600}
+  .dot{width:8px;height:8px;border-radius:50%;flex:0 0 auto;background:var(--soft)}
+  .live[data-state="up"]{border-color:#2C6B4E44;color:#2C6B4E}
+  .live[data-state="up"] .dot{background:#2C6B4E}
+  .live[data-state="down"]{border-color:#A81E1444;color:#A81E14}
+  .live[data-state="down"] .dot{background:#A81E14}
+  @media (prefers-color-scheme:dark){
+    .live[data-state="up"]{color:#6FC098} .live[data-state="up"] .dot{background:#6FC098}
+    .live[data-state="down"]{color:#F0857C} .live[data-state="down"] .dot{background:#F0857C}
+  }
 </style></head>
 <body><main class="card">
   <div class="eyebrow">${escapeHtml(exp.name)}</div>
   <h1>Scan to open in ${targetLabel}</h1>
   <div class="plate">${qrSvg(url, 280)}</div>
   <code>${escapeHtml(url)}</code>
+  <div class="live" id="live" data-state="checking"><span class="dot"></span><span id="liveText">Checking the server…</span></div>
   <p>${
     target === 'go'
       ? 'Android: scan from inside the Expo Go app. iOS: use the system Camera.'
       : 'Scan with the camera on a device that has the development build installed.'
   }<br>The dev server must stay running${hostType === 'tunnel' ? '.' : ', and the phone must be on this same network.'}</p>
-</main></body></html>
+</main>
+<script>
+  // Whether this code is still worth scanning.
+  //
+  // Metro sends no CORS headers, so an ordinary fetch from a file:// page is
+  // blocked before it can be read. mode:'no-cors' gives back an opaque response
+  // instead, which is enough here: it resolves when something answered and
+  // rejects on a network failure, and "did anything answer" is the whole
+  // question. Nothing is read from the body.
+  //
+  // The point is that a stale QR should say so. The address is your machine's,
+  // and machines change address -- a page left open from yesterday looks
+  // identical to one that works.
+  (function () {
+    var el = document.getElementById('live');
+    var text = document.getElementById('liveText');
+    var probe = ${JSON.stringify(probeUrl)};
+    var failures = 0;
+
+    function set(state, message) {
+      el.setAttribute('data-state', state);
+      text.textContent = message;
+    }
+
+    async function check() {
+      try {
+        await fetch(probe, { mode: 'no-cors', cache: 'no-store' });
+        failures = 0;
+        set('up', 'Server is running — scan now');
+      } catch (e) {
+        // One miss is usually a hiccup; two in a row is a stopped server.
+        if (++failures >= 2) set('down', 'Server not reachable — rerun npm start');
+      }
+    }
+
+    check();
+    setInterval(check, 4000);
+  })();
+</script>
+</body></html>
 `;
 
 /* -------------------------------------------------------------- liveness */
