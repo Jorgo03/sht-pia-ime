@@ -63,6 +63,13 @@ const MIN_FLOOR = -10
 const MAX_FLOOR = 200
 const MIN_YEAR = 1800
 const MAX_YEAR = new Date().getFullYear() + 2
+// One photo, not three. A listing with a single good photo is worth
+// publishing; the earlier floor turned agents away at the media step, and a
+// listing that never gets posted helps nobody. Named rather than inlined
+// because the number also appears in the error message, and the two drifting
+// apart is how a form ends up demanding three while saying it needs one.
+// lib/upload.ts holds the Expo twin — keep them in step.
+const MIN_IMAGES = 1
 
 // Storage-side validation: the file picker's accept="image/*" is only a
 // hint — anything can be dropped in. Enforce type + size before upload.
@@ -268,7 +275,7 @@ export default function NewListing() {
       if (outOfRange(form.year_built, MIN_YEAR, MAX_YEAR)) errs.year_built = t('listing.valueOutOfRange', { min: MIN_YEAR, max: MAX_YEAR })
     }
     if (step === 3) {
-      if (images.length < 3) errs.images = t('listing.minImages')
+      if (images.length < MIN_IMAGES) errs.images = t('listing.minImages', { min: MIN_IMAGES })
     }
     if (step === 4) {
       if (!form.contact_phone?.trim()) errs.phone = t('listing.required')
@@ -628,7 +635,7 @@ export default function NewListing() {
               <div className="nl-upload-zone" onClick={() => fileInputRef.current?.click()}>
                 <Upload size={24} />
                 <div>{t('listing.dropImages')}</div>
-                <div style={{ fontSize: 11, color: 'var(--fho-text-muted)' }}>{t('listing.minImages')}</div>
+                <div style={{ fontSize: 11, color: 'var(--fho-text-muted)' }}>{t('listing.minImages', { min: MIN_IMAGES })}</div>
               </div>
               <input ref={fileInputRef} type="file" accept="image/*" multiple hidden onChange={handleImages} />
               {errors.images && <span className="nl-error">{errors.images}</span>}

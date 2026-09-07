@@ -357,7 +357,7 @@
     "activate": "Aktivizo",
     "delete": "Fshi",
     "required": "Kjo fushë është e detyrueshme",
-    "minImages": "Minimum 3 foto të nevojshme",
+    "minImages": "Nevojitet të paktën {{min}} foto",
     "listingType": "Lloji i listimit",
     "title": "Titulli",
     "titlePlaceholder": "p.sh. Apartament 2+1 modern në Bllok",

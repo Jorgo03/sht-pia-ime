@@ -347,7 +347,7 @@ export default function NewListingWizard() {
       }
     }
     if (step === 3) {
-      if (images.length < MIN_IMAGES) errs.images = t('listing.minImages');
+      if (images.length < MIN_IMAGES) errs.images = t('listing.minImages', { min: MIN_IMAGES });
     }
     if (step === 4) {
       if (!form.contact_phone?.trim()) errs.phone = t('listing.required');
@@ -844,7 +844,7 @@ export default function NewListingWizard() {
             </Pressable>
           )}
         </View>
-        <Text style={styles.hint}>{t('listing.minImages')}</Text>
+        <Text style={styles.hint}>{t('listing.minImages', { min: MIN_IMAGES })}</Text>
         {errors.images ? <Text style={styles.errorText}>{errors.images}</Text> : null}
       </View>
 

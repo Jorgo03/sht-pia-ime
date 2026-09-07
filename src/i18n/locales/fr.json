@@ -313,7 +313,7 @@
     "activate": "Activer",
     "delete": "Supprimer",
     "required": "Champ obligatoire",
-    "minImages": "Minimum 3 images requises",
+    "minImages": "Au moins {{min}} photo requise",
     "listingType": "Type d'annonce",
     "title": "Titre",
     "titlePlaceholder": "ex. Appartement 2+1 moderne à Blloku",

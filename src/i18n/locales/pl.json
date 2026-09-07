@@ -321,7 +321,7 @@
     "activate": "Aktywuj",
     "delete": "Usuń",
     "required": "Pole wymagane",
-    "minImages": "Wymagane minimum 3 zdjęcia",
+    "minImages": "Wymagane co najmniej {{min}} zdjęcie",
     "listingType": "Typ ogłoszenia",
     "title": "Tytuł",
     "titlePlaceholder": "np. Nowoczesne mieszkanie 2+1 w Blloku",

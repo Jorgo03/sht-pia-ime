@@ -256,7 +256,7 @@ export default function CreateListingScreen() {
     setErrors(errs);
 
     const imagesOk = images.length >= MIN_IMAGES;
-    setImagesError(imagesOk ? null : t('listing.minImages'));
+    setImagesError(imagesOk ? null : t('listing.minImages', { min: MIN_IMAGES }));
 
     return Object.keys(errs).length === 0 && imagesOk;
   };
@@ -580,7 +580,7 @@ export default function CreateListingScreen() {
                   </TouchableOpacity>
                 )}
               </View>
-              <Text style={styles.photoHint}>{t('listing.minImages')}</Text>
+              <Text style={styles.photoHint}>{t('listing.minImages', { min: MIN_IMAGES })}</Text>
               {imagesError && <Text style={styles.errorText}>{imagesError}</Text>}
               {uploadProgress && (
                 <View style={styles.uploadProgressRow}>

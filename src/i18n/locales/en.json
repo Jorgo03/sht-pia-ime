@@ -357,7 +357,7 @@
     "activate": "Activate",
     "delete": "Delete",
     "required": "This field is required",
-    "minImages": "Minimum 3 images required",
+    "minImages": "At least {{min}} photo required",
     "listingType": "Listing type",
     "title": "Title",
     "titlePlaceholder": "e.g. Modern 2+1 apartment in Blloku",

@@ -9,7 +9,11 @@ const { ImageManipulator, SaveFormat } = ImageManipulatorModule;
 // same bucket, same path convention, same min/max/size limits, same
 // compression target, so a listing looks identical regardless of which app
 // created it.
-export const MIN_IMAGES = 3;
+// One photo, not three. A listing with a single good photo is worth publishing
+// — the earlier floor turned agents away at the last step of the wizard, and a
+// listing that never gets posted helps nobody. MAX still guards the upload
+// cost. Web's NewListing.jsx holds the same number; keep the two in step.
+export const MIN_IMAGES = 1;
 export const MAX_IMAGES = 20;
 export const MAX_IMAGE_MB = 10;
 export const MAX_VIDEO_MB = 50;

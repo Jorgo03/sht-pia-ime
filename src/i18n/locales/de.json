@@ -305,7 +305,7 @@
     "activate": "Aktivieren",
     "delete": "Löschen",
     "required": "Pflichtfeld",
-    "minImages": "Mindestens 3 Bilder erforderlich",
+    "minImages": "Mindestens {{min}} Foto erforderlich",
     "listingType": "Angebotstyp",
     "title": "Titel",
     "titlePlaceholder": "z.B. Moderne 2+1 Wohnung im Blloku",
