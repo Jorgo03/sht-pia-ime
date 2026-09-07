@@ -131,6 +131,63 @@ function tunnelUp(hostname) {
   });
 }
 
+/**
+ * Extracts the live public hostname from the ngrok agent's own API payload.
+ *
+ * This is the authoritative answer, and it is better than deriving the name
+ * ourselves: it is what ngrok actually registered, so it stays correct even if
+ * the derivation is wrong, the project's stored randomness was reset after a
+ * collision, or the account name is not what we expect. If it returns a
+ * hostname, a tunnel genuinely exists.
+ *
+ * @param {string} json raw body from GET /api/tunnels
+ * @returns {string|null} hostname, or null when no https tunnel is registered
+ */
+function parseNgrokTunnels(json) {
+  let parsed;
+  try {
+    parsed = JSON.parse(json);
+  } catch {
+    return null;
+  }
+  const tunnels = Array.isArray(parsed?.tunnels) ? parsed.tunnels : [];
+  // Prefer https: ngrok registers both, and the http entry is a redirect.
+  // Deliberately not named `https` — that is the module required above, and
+  // shadowing it here would be a live grenade for whoever edits this next.
+  const secure = tunnels.find(
+    (t) => typeof t?.public_url === 'string' && t.public_url.startsWith('https://'),
+  );
+  const anyTunnel = tunnels.find((t) => typeof t?.public_url === 'string');
+  const url = (secure ?? anyTunnel)?.public_url;
+  if (!url) return null;
+  try {
+    return new URL(url).hostname;
+  } catch {
+    return null;
+  }
+}
+
+/** Ask the running ngrok agent what it published. Null when it is not up. */
+function ngrokPublicHostname(webPort = 4040) {
+  return new Promise((resolve) => {
+    const req = http.get(
+      { host: '127.0.0.1', port: webPort, path: '/api/tunnels', timeout: 2000 },
+      (res) => {
+        let body = '';
+        res.on('data', (c) => {
+          body += c;
+        });
+        res.on('end', () => resolve(parseNgrokTunnels(body)));
+      },
+    );
+    req.on('error', () => resolve(null));
+    req.on('timeout', () => {
+      req.destroy();
+      resolve(null);
+    });
+  });
+}
+
 /** The same three segments AsyncNgrok joins, read from the same sources. */
 async function tunnelHostname() {
   const settings = await ProjectSettings.readAsync(process.cwd());
@@ -158,7 +215,7 @@ async function tunnelHostname() {
 /* ------------------------------------------------------------------- run */
 
 // Exported for tests. Everything below is the CLI, and must not run on require.
-module.exports = { classifyTunnelResponse, tunnelHostname };
+module.exports = { classifyTunnelResponse, parseNgrokTunnels, tunnelHostname };
 
 if (require.main !== module) return;
 
@@ -198,7 +255,7 @@ process.on('SIGTERM', () => metro.kill('SIGTERM'));
     process.exitCode = 1;
     return;
   }
-  const { hostname } = resolved;
+  const derivedHostname = resolved.hostname;
   const deadline = Date.now() + READY_TIMEOUT_MS;
   let announcedLocal = false;
 
@@ -211,8 +268,13 @@ process.on('SIGTERM', () => metro.kill('SIGTERM'));
     }
     if (!announcedLocal) {
       announcedLocal = true;
-      console.log(`\n[expo:tunnel:qr] Local server up. Waiting for ${hostname} to answer…`);
+      console.log(`\n[expo:tunnel:qr] Local server up. Waiting for the tunnel…`);
     }
+
+    // The agent's own answer wins over the derived name: it reports what ngrok
+    // actually registered, so it stays right even if the stored randomness was
+    // reset after a collision and the derived name has gone stale.
+    const hostname = (await ngrokPublicHostname()) ?? derivedHostname;
 
     const probe = await tunnelUp(hostname);
     if (probe.ok) {
@@ -228,7 +290,7 @@ process.on('SIGTERM', () => metro.kill('SIGTERM'));
   }
 
   console.error(
-    `\n[expo:tunnel:qr] ${hostname} never began serving within ${READY_TIMEOUT_MS / 1000}s.\n` +
+    `\n[expo:tunnel:qr] The tunnel never began serving within ${READY_TIMEOUT_MS / 1000}s.\n` +
       '                 No QR was produced, because one would fail on the phone with\n' +
       '                 ERR_NGROK_3200 and tell you nothing about why.\n' +
       '                 The dev server itself is fine — it is the tunnel that did not\n' +

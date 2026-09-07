@@ -63,3 +63,39 @@ test('requiring the script does not start a dev server', () => {
   assert.equal(typeof mod.classifyTunnelResponse, 'function')
   assert.equal(typeof mod.tunnelHostname, 'function')
 })
+
+const { parseNgrokTunnels } = require('../scripts/expo-tunnel-qr.cjs')
+
+/**
+ * The ngrok agent's own API is the authoritative source for the live tunnel
+ * address — better than deriving it from the project's stored randomness and
+ * the account name, which goes stale if that randomness is reset after a
+ * collision. These cover the shapes the agent actually returns.
+ */
+
+test('prefers the https tunnel over the http one', () => {
+  const json = JSON.stringify({
+    tunnels: [
+      { public_url: 'http://ffuyfm8-jorgo03-8081.exp.direct' },
+      { public_url: 'https://ffuyfm8-jorgo03-8081.exp.direct' },
+    ],
+  })
+  assert.equal(parseNgrokTunnels(json), 'ffuyfm8-jorgo03-8081.exp.direct')
+})
+
+test('falls back to a non-https tunnel rather than reporting none', () => {
+  const json = JSON.stringify({ tunnels: [{ public_url: 'http://abc-user-8081.exp.direct' }] })
+  assert.equal(parseNgrokTunnels(json), 'abc-user-8081.exp.direct')
+})
+
+test('an agent with no tunnels registered yields null', () => {
+  assert.equal(parseNgrokTunnels(JSON.stringify({ tunnels: [] })), null)
+})
+
+test('malformed or non-JSON bodies yield null rather than throwing', () => {
+  // The poll loop must survive a half-written response or an HTML error page.
+  assert.equal(parseNgrokTunnels('<html>not json</html>'), null)
+  assert.equal(parseNgrokTunnels(''), null)
+  assert.equal(parseNgrokTunnels(JSON.stringify({ tunnels: 'nope' })), null)
+  assert.equal(parseNgrokTunnels(JSON.stringify({ tunnels: [{ public_url: 'not a url' }] })), null)
+})
