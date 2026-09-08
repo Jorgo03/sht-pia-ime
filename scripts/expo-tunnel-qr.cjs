@@ -43,8 +43,19 @@ const path = require('path');
 const { spawn } = require('child_process');
 
 const slugify = require('slugify');
-const { ProjectSettings } = require('@expo/cli/build/src/start/project/settings');
-const { getUserAsync, getActorDisplayName } = require('@expo/cli/build/src/api/user/user');
+// Resolved through the shared helper rather than by a bare require: these are
+// Expo's own internals, and the SDK 57 bump moved a sibling package out of the
+// top level, breaking exactly this pattern in expo-qr.cjs.
+const { requireFromExpo } = require('./require-from-expo.cjs');
+
+const { ProjectSettings } = requireFromExpo(
+  '@expo/cli/build/src/start/project/settings',
+  'expo:tunnel:qr',
+);
+const { getUserAsync, getActorDisplayName } = requireFromExpo(
+  '@expo/cli/build/src/api/user/user',
+  'expo:tunnel:qr',
+);
 
 const argv = process.argv.slice(2);
 const portArg = argv.find((a) => a.startsWith('--port='));

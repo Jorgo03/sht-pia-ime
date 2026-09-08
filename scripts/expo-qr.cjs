@@ -53,8 +53,10 @@ const path = require('path');
 const http = require('http');
 const { spawn } = require('child_process');
 
-const { UrlCreator } = require('@expo/cli/build/src/start/server/UrlCreator');
-const { getConfig } = require('@expo/config');
+const { requireFromExpo } = require('./require-from-expo.cjs');
+
+const { UrlCreator } = requireFromExpo('@expo/cli/build/src/start/server/UrlCreator', 'expo:qr');
+const { getConfig } = requireFromExpo('@expo/config', 'expo:qr');
 
 /* ------------------------------------------------------------------- args */
 
