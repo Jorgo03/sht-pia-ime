@@ -1,9 +1,23 @@
 #!/usr/bin/env node
 
 /**
- * Wraps `expo start --lan` with a freshly auto-detected LAN IPv4 address on
- * every run, instead of the one-time hardcoded REACT_NATIVE_PACKAGER_HOSTNAME
- * that used to live in .env.
+ * The single place this project starts an Expo dev server.
+ *
+ * Two connection modes, chosen by the caller:
+ *   (default)   `expo start --lan`    — fast, needs the phone on the same
+ *                                       subnet with client isolation off
+ *   `--tunnel`  `expo start --tunnel` — works from any network, at the cost
+ *                                       of routing through ngrok
+ *
+ * Everything funnels through here rather than calling `expo start` directly,
+ * because the rules below (the freshly detected LAN address, and the Expo Go
+ * redirect-page rule) have to hold for every mode. A second spawn site is free
+ * to forget one of them, and that is exactly how the tunnel QR ended up
+ * opening a browser while the LAN QR opened Expo Go.
+ *
+ * In LAN mode it wraps `expo start --lan` with a freshly auto-detected LAN
+ * IPv4 address on every run, instead of the one-time hardcoded
+ * REACT_NATIVE_PACKAGER_HOSTNAME that used to live in .env.
  *
  * Why this exists: this machine has virtual network adapters (Hyper-V
  * vEthernet, Bluetooth PAN, etc.) alongside the real Wi-Fi adapter, and
@@ -54,9 +68,26 @@ module.exports = { findLanAddress };
 // it for findLanAddress() does not spawn a second Metro.
 if (require.main !== module) return;
 
-const found = findLanAddress();
+const rawArgs = process.argv.slice(2);
+const tunnelMode = rawArgs.includes('--tunnel');
 
-if (!found) {
+// --tunnel is consumed here, not forwarded: it selects the base command rather
+// than being an extra flag on top of --lan, and `expo start --lan --tunnel`
+// asks for two different host types at once.
+const extraArgs = rawArgs.filter((a) => a !== '--tunnel');
+const command = [
+  tunnelMode ? 'npx expo start --tunnel' : 'npx expo start --lan',
+  ...extraArgs,
+].join(' ');
+
+// In tunnel mode the address the phone dials is ngrok's, not this machine's,
+// so detecting a LAN IP would be noise — and pinning
+// REACT_NATIVE_PACKAGER_HOSTNAME would describe a host the phone never uses.
+const found = tunnelMode ? null : findLanAddress();
+
+if (tunnelMode) {
+  console.log('[expo:tunnel] Starting a tunnelled dev server (works from any network).');
+} else if (!found) {
   console.warn(
     '[expo:lan] Could not auto-detect a LAN IPv4 address on this machine — ' +
       "falling back to Expo's own network detection. If the phone can't connect, " +
@@ -73,8 +104,6 @@ if (!found) {
 // `npm run expo:lan -- --go` to force Expo-Go-compatible mode instead of
 // this project's default development-build target) straight through to the
 // underlying `expo start` call.
-const extraArgs = process.argv.slice(2);
-const command = ['npx expo start --lan', ...extraArgs].join(' ');
 
 /**
  * In Expo Go mode, suppress Expo's runtime-picker interstitial.

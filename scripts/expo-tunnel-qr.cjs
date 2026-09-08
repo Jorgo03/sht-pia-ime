@@ -219,13 +219,17 @@ module.exports = { classifyTunnelResponse, parseNgrokTunnels, tunnelHostname };
 
 if (require.main !== module) return;
 
-const metro = spawn(process.execPath, [
-  path.join(__dirname, '..', 'node_modules', '@expo', 'cli', 'build', 'bin', 'cli'),
-  'start',
-  '--tunnel',
-  '--go',
-  `--port=${port}`,
-], { stdio: 'inherit', env: { ...process.env } });
+// Through start-expo-lan.cjs rather than @expo/cli directly, the same way
+// expo-go-qr.cjs does. That wrapper is where the Expo Go redirect-page rule
+// lives, and spawning the CLI straight from here bypassed it: the tunnel QR
+// then encoded http://HOST/_expo/loading and opened the phone's browser
+// instead of Expo Go, while the LAN QR — which did go through the wrapper —
+// worked. One spawn site, one set of rules.
+const metro = spawn(
+  process.execPath,
+  [path.join(__dirname, 'start-expo-lan.cjs'), '--tunnel', '--go', `--port=${port}`],
+  { stdio: 'inherit', env: { ...process.env } },
+);
 
 let metroExited = false;
 metro.on('exit', (code) => {
