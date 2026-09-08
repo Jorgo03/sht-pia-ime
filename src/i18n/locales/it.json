@@ -378,13 +378,12 @@
     "pinLocation": "Posiziona il segnaposto",
     "latitude": "Latitudine",
     "longitude": "Longitudine",
-    "mapHint": "Tocca la mappa per impostare la posizione",
     "videoUpload": "Video dell’immobile",
     "dropVideo": "Trascina un video qui o clicca (MP4 o MOV)",
     "roadNeedsCity": "Seleziona una città per vedere le sue strade.",
     "roadNoResults": "Nessuna strada trovata. Puoi scriverla tu.",
     "dragMarker": "Trascina il segnaposto",
-    "pinOrderHint": "Seleziona prima la strada, poi tocca la mappa per posizionare il segnaposto.",
+    "pinOrderHint": "Seleziona prima la strada, poi posiziona il segnaposto sulla mappa.",
     "pinAdjustHint": "Trascina il segnaposto sulla posizione esatta dell’immobile."
   },
   "dashboard": {

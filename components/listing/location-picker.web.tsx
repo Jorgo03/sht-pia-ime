@@ -59,11 +59,14 @@ export function LocationPicker({ latitude, longitude, onChange }: LocationPicker
           />
         </View>
       </View>
-      <Text style={styles.hint}>
-        {hasPin
-          ? `${(latitude as number).toFixed(5)}, ${(longitude as number).toFixed(5)}`
-          : t('listing.mapHint')}
-      </Text>
+      {/* Readout only. The old fallback here told the reader to tap the map —
+          on the one variant that has no map to tap. With the boxes empty they
+          are their own instruction. */}
+      {hasPin && (
+        <Text style={styles.hint}>
+          {(latitude as number).toFixed(5)}, {(longitude as number).toFixed(5)}
+        </Text>
+      )}
     </View>
   );
 }

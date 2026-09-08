@@ -1,15 +1,17 @@
 import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet'
-import { ArrowLeft, ArrowRight, Upload, X, Film, Check } from 'lucide-react'
+import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-leaflet'
+import { ArrowLeft, ArrowRight, Upload, X, Film, Check, Move } from 'lucide-react'
 import { useAuth } from '../../auth/AuthContext'
 import { supabase } from '../../../lib/supabase'
 import { isEnabled } from '../../../lib/flags'
 import { getMarkerIcon } from '../../properties/components/MapMarker'
+import { RoadField } from '../components/RoadField'
 import { TranslationBar } from '../components/TranslationBar'
 import { useListingTranslation } from '../hooks/useListingTranslation'
 import { translatePropertyContent } from '../../../lib/translate'
+import { geocodeCity } from '../../../lib/roadSearch'
 import '../../../styles/map.css'
 import '../../../styles/new-listing.css'
 
@@ -20,6 +22,36 @@ function MapClickPicker({ onPick }) {
   useMapEvents({
     click(e) { onPick(e.latlng) },
   })
+  return null
+}
+
+/** Roughly a few blocks across — close enough to pick out a building, wide
+ *  enough that a road's midpoint still shows the street it belongs to. */
+const STREET_ZOOM = 17
+
+/**
+ * Flies the camera to a chosen road or city centre.
+ *
+ * Deliberately does not touch the marker. Framing the map and claiming the
+ * property's position are different things: a road's coordinate is the
+ * midpoint of a line that can run for a kilometre, and a city centre is not a
+ * building at all. If this dropped a pin, an agent who never touched the map
+ * would publish that approximation as their address.
+ *
+ * Keyed on the coordinates rather than on object identity, so a parent
+ * re-render that rebuilds an equal object does not yank the camera back while
+ * the agent is panning to fine-tune the marker.
+ */
+function MapFocus({ focus }) {
+  const map = useMap()
+  const lat = focus?.latitude
+  const lng = focus?.longitude
+
+  useEffect(() => {
+    if (lat == null || lng == null) return
+    map.flyTo([lat, lng], STREET_ZOOM, { duration: 0.65 })
+  }, [map, lat, lng])
+
   return null
 }
 
@@ -152,6 +184,11 @@ export default function NewListing() {
 
   const [form, setForm] = useState(draft?.form ? { ...INITIAL_FORM, ...draft.form } : INITIAL_FORM)
 
+  // Where the map should look: the selected road, or the city centre. Not
+  // persisted with the draft — it is a camera position, not listing data, and
+  // a restored draft should show the pin it saved rather than fly somewhere.
+  const [mapFocus, setMapFocus] = useState(null)
+
   // Owns the language selection for BOTH text fields, plus the per-language
   // cache, staleness against the Albanian source, protection for hand-edited
   // translations, and discarding superseded responses. Shared verbatim with
@@ -189,6 +226,23 @@ export default function NewListing() {
   const update = (key, value) => {
     setForm(prev => ({ ...prev, [key]: value }))
     setErrors(prev => ({ ...prev, [key]: undefined }))
+  }
+
+  /**
+   * A new city invalidates everything downstream of it.
+   *
+   * Keeping the old road would leave a street that does not exist here, and
+   * keeping the pin would publish a property in the previous city — the kind
+   * of stale coordinate nobody notices until it is on a map.
+   */
+  const selectCity = (city) => {
+    if (city === form.city) return
+    setForm(prev => ({ ...prev, city, address: '', latitude: null, longitude: null }))
+    setErrors(prev => ({ ...prev, city: undefined }))
+    setMapFocus(null)
+    // Move the map to the new city so the next pin starts somewhere plausible
+    // rather than wherever it was left.
+    geocodeCity({ city }).then(centre => { if (centre) setMapFocus(centre) })
   }
 
   const toggleFeature = (feat) => {
@@ -513,14 +567,22 @@ export default function NewListing() {
           <>
             <div className="nl-field">
               <label>{t('listing.city')}</label>
-              <select value={form.city} onChange={e => update('city', e.target.value)}>
+              <select value={form.city} onChange={e => selectCity(e.target.value)}>
                 {CITIES.map(c => <option key={c} value={c}>{c}</option>)}
               </select>
               {errors.city && <span className="nl-error">{errors.city}</span>}
             </div>
             <div className="nl-field">
               <label>{t('listing.address')}</label>
-              <input type="text" value={form.address} onChange={e => update('address', e.target.value)} placeholder={t('listing.addressPlaceholder')} />
+              <RoadField
+                city={form.city}
+                value={form.address}
+                placeholder={t('listing.addressPlaceholder')}
+                onChange={val => update('address', val)}
+                // Picking a road frames the map; it never sets the property's
+                // position. That still comes from the marker.
+                onSelectRoad={road => setMapFocus({ latitude: road.latitude, longitude: road.longitude })}
+              />
             </div>
             <div className="nl-field">
               <label>{t('listing.pinLocation')}</label>
@@ -535,6 +597,7 @@ export default function NewListing() {
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                   />
+                  <MapFocus focus={mapFocus} />
                   <MapClickPicker onPick={({ lat, lng }) => {
                     update('latitude', Number(lat.toFixed(6)))
                     update('longitude', Number(lng.toFixed(6)))
@@ -554,12 +617,31 @@ export default function NewListing() {
                     />
                   )}
                 </MapContainer>
+
+                {/* The drag affordance. A pin that happens to be draggable
+                    looks exactly like one that is not, and an agent who never
+                    discovers it publishes wherever the first click landed. */}
+                {form.latitude != null && form.longitude != null && (
+                  <div className="pointer-events-none absolute bottom-2 left-2 z-[500] flex items-center gap-1.5 rounded-fho-pill border border-fho-border bg-fho-surface px-2.5 py-1.5 text-[11px] font-semibold text-fho-text">
+                    <Move size={12} aria-hidden="true" className="text-fho-orange-2" />
+                    {t('listing.dragMarker')}
+                  </div>
+                )}
               </div>
-              <span style={{ fontSize: 12, color: 'var(--fho-text-muted)' }}>
+
+              <span className="mt-2 block text-xs leading-relaxed text-fho-text-muted">
                 {form.latitude != null && form.longitude != null
-                  ? `${form.latitude}, ${form.longitude}`
-                  : t('listing.mapHint')}
+                  ? t('listing.pinAdjustHint')
+                  : t('listing.pinOrderHint')}
               </span>
+              {/* Coordinate readout only — with no pin there is nothing to
+                  read out, and the instruction above has already said what to
+                  do. Two lines of advice read as one confused one. */}
+              {form.latitude != null && form.longitude != null && (
+                <span className="mt-1 block font-fho-mono text-xs text-fho-text-muted">
+                  {form.latitude}, {form.longitude}
+                </span>
+              )}
             </div>
           </>
         )}

@@ -677,11 +677,6 @@ export default function NewListingWizard() {
           focus={mapFocus}
           onChange={(lat, lng) => setForm((prev) => ({ ...prev, latitude: lat, longitude: lng }))}
         />
-        <Text style={styles.hint}>
-          {form.latitude != null && form.longitude != null
-            ? `${form.latitude}, ${form.longitude}`
-            : t('listing.mapHint')}
-        </Text>
       </View>
     </>
   );

@@ -422,13 +422,12 @@
     "pinLocation": "Vendos pikën në hartë",
     "latitude": "Gjerësia gjeografike",
     "longitude": "Gjatësia gjeografike",
-    "mapHint": "Prek hartën për të vendosur vendndodhjen e pronës",
     "videoUpload": "Video e pronës",
     "dropVideo": "Tërhiq një video këtu ose kliko (MP4 ose MOV)",
     "roadNeedsCity": "Zgjidhni qytetin që të shfaqen rrugët.",
     "roadNoResults": "Nuk u gjet asnjë rrugë. Mund ta shkruani vetë.",
     "dragMarker": "Tërhiqe shënuesin",
-    "pinOrderHint": "Zgjidhni fillimisht rrugën, pastaj prekni hartën për të vendosur shënuesin.",
+    "pinOrderHint": "Zgjidhni fillimisht rrugën, pastaj vendosni shënuesin në hartë.",
     "pinAdjustHint": "Tërhiqeni shënuesin te vendndodhja e saktë e pronës."
   },
   "dashboard": {

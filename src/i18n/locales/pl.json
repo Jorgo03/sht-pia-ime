@@ -386,13 +386,12 @@
     "pinLocation": "Zaznacz lokalizację",
     "latitude": "Szerokość geograficzna",
     "longitude": "Długość geograficzna",
-    "mapHint": "Dotknij mapy, aby ustawić lokalizację",
     "videoUpload": "Wideo nieruchomości",
     "dropVideo": "Przeciągnij wideo tutaj lub kliknij (MP4 lub MOV)",
     "roadNeedsCity": "Wybierz miasto, aby zobaczyć jego ulice.",
     "roadNoResults": "Nie znaleziono ulic. Możesz wpisać własną.",
     "dragMarker": "Przeciągnij znacznik",
-    "pinOrderHint": "Najpierw wybierz ulicę, potem dotknij mapy, aby ustawić znacznik.",
+    "pinOrderHint": "Najpierw wybierz ulicę, potem umieść znacznik na mapie.",
     "pinAdjustHint": "Przeciągnij znacznik na dokładną lokalizację nieruchomości."
   },
   "dashboard": {

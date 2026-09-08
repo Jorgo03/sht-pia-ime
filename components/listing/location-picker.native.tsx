@@ -122,11 +122,14 @@ export function LocationPicker({ latitude, longitude, onChange, focus }: Locatio
         {hasPin ? t('listing.pinAdjustHint') : t('listing.pinOrderHint')}
       </Text>
 
-      <Text style={styles.hint}>
-        {hasPin
-          ? `${(latitude as number).toFixed(5)}, ${(longitude as number).toFixed(5)}`
-          : t('listing.mapHint')}
-      </Text>
+      {/* Coordinate readout only — with no pin there is nothing to read out,
+          and the instruction above has already said what to do. Two lines of
+          advice read as one confused one. */}
+      {hasPin && (
+        <Text style={styles.hint}>
+          {(latitude as number).toFixed(5)}, {(longitude as number).toFixed(5)}
+        </Text>
+      )}
     </View>
   );
 }

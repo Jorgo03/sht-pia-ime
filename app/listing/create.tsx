@@ -20,6 +20,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 
 import { LocationPicker } from '@/components/listing/location-picker';
+import { RoadField } from '@/components/listing/road-field';
 import { TranslationBar } from '@/components/listing/translation-bar';
 import { ActionButton } from '@/components/ui/action-button';
 import { GradientBackground } from '@/components/ui/gradient-background';
@@ -29,6 +30,7 @@ import { useTheme } from '@/contexts/theme-context';
 import { supabase } from '@/lib/supabase';
 import { translatePropertyContent, type I18nMap } from '@/lib/translate';
 import { useListingTranslation } from '@/src/features/listings/hooks/useListingTranslation';
+import { geocodeCity, type RoadSuggestion } from '@/src/lib/roadSearch';
 import type { TranslationMeta } from '@/src/lib/translationCore';
 import {
   MAX_IMAGES,
@@ -182,6 +184,15 @@ export default function CreateListingScreen() {
   const queryClient = useQueryClient();
   const [form, setForm] = useState<ListingForm>(INITIAL_FORM);
   const [submitting, setSubmitting] = useState(false);
+  /**
+   * Where the map should look: the selected road, or the city centre.
+   *
+   * Deliberately not the pin. Framing the map and claiming the property's
+   * position are two different things — a road's coordinate is the midpoint of
+   * a line that can run for a kilometre. The pin still comes from a tap or a
+   * drag, and this only moves the camera there.
+   */
+  const [mapFocus, setMapFocus] = useState<{ latitude: number; longitude: number } | null>(null);
   const [images, setImages] = useState<PickedImage[]>([]);
   const [imagesError, setImagesError] = useState<string | null>(null);
   const [uploadProgress, setUploadProgress] = useState<{ done: number; total: number } | null>(null);
@@ -505,19 +516,13 @@ export default function CreateListingScreen() {
 
             {/* Location */}
             <View style={styles.field}>
-              <SectionLabel>{t('listing.address')}</SectionLabel>
-              <TextInput
-                style={styles.input}
-                placeholder={t('listing.addressPlaceholder')}
-                placeholderTextColor={colors.textSecondary}
-                value={form.address}
-                onChangeText={(val) => updateField('address', val)}
-              />
               {/* City is a required facet (map/search filter by exact city
                   match), so it's a picker off the same source list as
                   filter-sheet.tsx rather than free text — same convention,
-                  and it removes the typo risk web's own <select> avoids. */}
-              <Text style={styles.fieldLabel}>{t('listing.city')}</Text>
+                  and it removes the typo risk web's own <select> avoids.
+                  It comes before the road because it is the road's search
+                  context: without it there is nothing to search within. */}
+              <SectionLabel>{t('listing.city')}</SectionLabel>
               <ScrollView
                 horizontal
                 showsHorizontalScrollIndicator={false}
@@ -527,8 +532,26 @@ export default function CreateListingScreen() {
                     key={city}
                     style={[styles.chip, form.city === city && styles.chipActive]}
                     onPress={() => {
-                      updateField('city', city);
+                      if (city === form.city) return;
+                      // A new city invalidates everything downstream of it.
+                      // Keeping the old road would leave a street that does not
+                      // exist here, and keeping the pin would publish a property
+                      // in the previous city — a stale coordinate nobody notices
+                      // until it is on a map.
+                      setForm((prev) => ({
+                        ...prev,
+                        city,
+                        address: '',
+                        latitude: null,
+                        longitude: null,
+                      }));
                       if (errors.city) setErrors((prev) => ({ ...prev, city: undefined }));
+                      setMapFocus(null);
+                      // Move the map to the new city so the next pin starts
+                      // somewhere plausible rather than where it was left.
+                      void geocodeCity({ city }).then((centre) => {
+                        if (centre) setMapFocus(centre);
+                      });
                     }}
                     activeOpacity={0.7}>
                     <Text style={[styles.chipText, form.city === city && styles.chipTextActive]}>
@@ -538,11 +561,26 @@ export default function CreateListingScreen() {
                 ))}
               </ScrollView>
               {errors.city && <Text style={styles.errorText}>{errors.city}</Text>}
+
+              <Text style={styles.fieldLabel}>{t('listing.address')}</Text>
+              <RoadField
+                city={form.city}
+                value={form.address}
+                placeholder={t('listing.addressPlaceholder')}
+                onChangeText={(val) => updateField('address', val)}
+                // Picking a road frames the map; it never sets the property's
+                // position. That still comes from the marker.
+                onSelectRoad={(road: RoadSuggestion) =>
+                  setMapFocus({ latitude: road.latitude, longitude: road.longitude })
+                }
+              />
+
               {/* Without a pin the listing is invisible on the map tab, since
                   map queries exclude rows with null coordinates. */}
               <LocationPicker
                 latitude={form.latitude}
                 longitude={form.longitude}
+                focus={mapFocus}
                 onChange={(lat, lng) =>
                   setForm((prev) => ({ ...prev, latitude: lat, longitude: lng }))
                 }
