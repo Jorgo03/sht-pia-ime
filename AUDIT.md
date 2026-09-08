@@ -312,6 +312,72 @@ the crash screen confirmed rendering localised in both English and Albanian.
 - Root-level `test-*.cjs` / `test-*.png` scratch files are untracked; deleting
   untracked files is unrecoverable, so they were left alone.
 
+## ═══ PASS 10 — 2026-09-08: PRODUCTION-READINESS AUDIT (live DB + codebase) ═══
+
+FIXED — anonymous data destruction via RPC. `public.prune_property_activity`
+is SECURITY DEFINER and DELETEs from property_activity, and its ACL carried a
+grant to PUBLIC (the leading `=X/postgres` entry), which includes anon and
+authenticated. PostgREST exposes every public-schema function as an RPC, so any
+anonymous caller on the internet could POST
+/rest/v1/rpc/prune_property_activity and destroy activity history. The
+retain_days >= 30 guard caps the blast radius but does not prevent it:
+prune_property_activity(30) still deletes everything older than 30 days. No
+client code calls this function -- it is administrative, run as service_role.
+EXECUTE revoked from PUBLIC, anon and authenticated; service_role retained.
+Verified after: has_function_privilege says anon=false, authenticated=false,
+service_role=true, and the advisor no longer reports it.
+
+FIXED — three foreign keys had no covering index (messages.sender_id,
+property_activity.user_id, property_views.user_id). Postgres does not create
+one for the referencing side, so each was a sequential scan on columns the app
+filters by. Indexes added.
+
+NO ACTION REQUIRED — verified rather than assumed, and deliberately not
+"fixed":
+- `claim_role(text)` is flagged as an authenticated-callable SECURITY DEFINER
+  function, which looks like privilege escalation and is not: it whitelists
+  the role to agent/buyer, takes a row lock, and refuses if the profile is
+  older than 5 minutes. An established session cannot promote itself.
+- `buyer_has_open_wanted_home(uuid)` returns false for non-agents and
+  anonymous callers regardless of target_id, so it is not an information
+  oracle despite being anon-callable.
+- `current_user_is_agent()` reports on the caller only; anon gets false.
+- `ai_usage` has RLS enabled with zero policies, which the linter reports as
+  INFO. That is deny-all to clients and correct: only Edge Functions touch it,
+  through a service_role admin client that bypasses RLS.
+- ~15 "unused index" notices were NOT acted on. They cover city, price and the
+  i18n columns; they are unused because the project has 15 listings and little
+  traffic, not because they are useless. Dropping them would sabotage search
+  at the scale this product is aimed at.
+
+CONFIGURATION REQUIRED (cannot be done from code) — Supabase Auth's leaked
+password protection (HaveIBeenPwned check) is disabled. It is a dashboard
+setting: Authentication > Policies > Password strength. Worth enabling before
+public launch.
+
+VERIFIED CLEAN — secrets hygiene (.env* gitignored, .env.example placeholders
+only, no JWT or sk_live/sk_test committed anywhere; the four regex hits were
+the literal word "service_role" in code and docs). RLS enabled on all 12
+public tables. The single-policy tables were read in full rather than counted:
+leads and saved_searches scope by ownership, messages by conversation
+participation with sender_id enforced on INSERT, property_activity restricts
+INSERT to a type whitelist on an existing property and SELECT to the owner or
+agent. Upload validation enforces MIME type and a size ceiling client-side
+before the request (MAX_IMAGE_MB 10, MAX_VIDEO_MB 50, MP4/MOV only for video).
+Translation is a real Anthropic call (claude-sonnet-5, api.anthropic.com/v1/
+messages, all 8 languages, Albanian source) -- not a placeholder and not a copy
+of the source text. The empty catch blocks flagged by the sweep are all
+localStorage access, which genuinely throws in private mode, and each has a
+defined fallback.
+
+NOT TESTED — signup, login, logout, password reset, OAuth, protected routes,
+property create/edit/delete, image upload, search and filters were NOT
+exercised end to end. This environment's egress policy blocks supabase.co, so
+no live auth or query can run from here. Everything above about the database
+was established through the Supabase management connection (advisors, pg_proc,
+pg_policies) rather than by signing in as a user. Those flows still need a
+manual pass on a real device.
+
 ## ═══ PASS 9 — 2026-09-08: SDK 54 → 57 REAPPLIED (Pass 8's revert undone) ═══
 
 Owner hit the wall Pass 8 predicted: Expo Go on their iPhone reported
