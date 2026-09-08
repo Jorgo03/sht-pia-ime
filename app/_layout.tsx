@@ -16,9 +16,10 @@ import {
   Newsreader_500Medium_Italic,
   Newsreader_600SemiBold,
 } from '@expo-google-fonts/newsreader';
-import { DarkTheme, DefaultTheme, ThemeProvider as NavigationThemeProvider } from '@react-navigation/native';
 import { QueryClientProvider } from '@tanstack/react-query';
-import { Stack } from 'expo-router';
+// As of SDK 56, expo-router no longer allows importing @react-navigation/*
+// directly (Metro throws) — it re-exports what's still needed itself.
+import { DarkTheme, DefaultTheme, Stack, ThemeProvider as NavigationThemeProvider } from 'expo-router';
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';

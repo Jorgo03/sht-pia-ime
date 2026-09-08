@@ -98,7 +98,7 @@ export function ListingAssistant({ property }: { property: Property | null }) {
           colors={[colors.accent, colors.accentEnd]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
-          style={StyleSheet.absoluteFillObject}
+          style={StyleSheet.absoluteFill}
         />
         <MaterialIcons name="auto-awesome" size={18} color="#fff" />
         <Text style={styles.fabLabel}>{t('assistant.fabLabel')}</Text>
@@ -174,7 +174,7 @@ export function ListingAssistant({ property }: { property: Property | null }) {
               colors={[colors.accent, colors.accentEnd]}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
-              style={StyleSheet.absoluteFillObject}
+              style={StyleSheet.absoluteFill}
             />
             <MaterialIcons name="send" size={14} color="#fff" />
           </Pressable>

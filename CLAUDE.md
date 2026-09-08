@@ -24,7 +24,7 @@ Shtëpia.ime ("My Home") is a multilingual real estate marketplace built by **Fu
 One `package.json`, two independently-shipping frontends against the **same** Supabase project (`xzzzhlwmzotibrxdqmcm`) — no mock data, no second backend, no forked schema:
 
 - **Web** (deployed to Vercel) — Vite + React 19 + React Router DOM v7, feature-first under `src/`.
-- **Mobile** (Expo, targeting an installed dev-client on Android/iOS, not a legacy prototype) — Expo SDK 54, React Native 0.81.5, `expo-router` (file-based, typed routes) at the repo root: `app/`, `components/`, `contexts/`, `hooks/`, `constants/`, `data/`, `lib/format.ts` + `lib/supabase.ts`.
+- **Mobile** (Expo, targeting an installed dev-client on Android/iOS, not a legacy prototype) — Expo SDK 57, React Native 0.86.2, `expo-router` (file-based, typed routes) at the repo root: `app/`, `components/`, `contexts/`, `hooks/`, `constants/`, `data/`, `lib/format.ts` + `lib/supabase.ts`.
 
 Web is the design source of truth; mobile is expected to reach and hold visual/functional parity with it, adapted only where touch/native platform mechanics require it (see `CLAUDE_CODE_BRIEF.md` if present for the full parity spec). i18n locale files are **shared** — `src/i18n/locales/*.json` is imported directly by both `src/i18n/index.js` (web) and `i18n/index.ts` (mobile); never fork them per-platform.
 
@@ -51,7 +51,7 @@ Mobile:
 - **A QR that opens the browser instead of Expo Go is the interstitial, not a bad code.** `expo-dev-client` is a dependency here, and `--go` does not clear `isDevClient` — only `--dev-client` does — so `BundlerDevServer.isRedirectPageEnabled()` stays true and Metro's terminal QR is built from `interstitialPageUrl ?? nativeRuntimeUrl`. That interstitial is `http://HOST:8081/_expo/loading`, an ordinary web address, which a phone camera hands to the default browser. `start-expo-lan.cjs` sets `EXPO_NO_REDIRECT_PAGE=1` in `--go` mode so the QR falls through to `exp://HOST:8081`, the scheme Expo Go registers. Leave the picker on for development builds, where it is the right thing to show
 - **`ERR_NGROK_3200` on the phone always means the same thing**: the `.exp.direct` name resolved but nothing was connected behind it — the server was not running, the tunnel never came up, or it has since stopped. It never means the QR is wrong. `expo:tunnel:qr` exists to catch that before you scan
 - `npm run android` / `npm run ios` — `expo run:android` / `expo run:ios`, local native build. `ios` needs macOS + Xcode; not available on Windows — use EAS Build instead (`eas.json` already has a `development` profile: `developmentClient: true, distribution: internal`). Building an iOS dev-client via EAS requires a paid Apple Developer Program account — no free/local workaround exists once native modules or config plugins are involved (Expo Go remains free but drops any capability outside its fixed SDK, e.g. Apple Sign-In)
-- `npx expo-doctor` — SDK/config compatibility checks; one persistent known-failure is expected (app.json native-config fields not syncing under EAS Build now that `android/` exists — see AUDIT.md)
+- `npx expo-doctor` — SDK/config compatibility checks; 21 checks, all passing offline-independent ones. There are no `android/`/`ios/` directories: this is a CNG project, so native config comes from app.json at build time and there is nothing to regenerate after an SDK bump
 
 Shared:
 - `npx tsc --noEmit` — type-checks both apps from one `tsconfig.json`
@@ -59,9 +59,12 @@ Shared:
 
 ## Tech Stack — Ground Truth
 
+> **The SDK is pinned to whatever Expo Go currently ships, and that is not a preference.** iOS Expo Go installs only the newest SDK and Apple offers no way to install an older build, so a project one SDK behind cannot be opened on an iPhone at all — it fails at the runtime check with "Project is incompatible with this version of Expo Go", before any of our code runs. SDK 54 was upgraded to 57 for exactly this reason (2026-08-19, reverted, then reapplied 2026-09-08 — see AUDIT.md Pass 8). Falling behind again re-breaks iPhone testing, so treat an Expo Go release as a deadline, not an option. The escape hatch, if the SDK must lag, is a development build rather than Expo Go — which on iOS needs a paid Apple Developer account.
+
+
 | Layer | Web | Mobile |
 |---|---|---|
-| Frontend | Vite + React 19 + React Router DOM v7 | Expo SDK 54 + React Native 0.81.5 + expo-router |
+| Frontend | Vite + React 19 + React Router DOM v7 | Expo SDK 57 + React Native 0.86.2 + expo-router |
 | Styling | Tailwind CSS | `StyleSheet` + `constants/theme.ts` tokens, hand-ported 1:1 from web's `--fho-*` CSS custom properties — update both when a token changes |
 | Typography | `@import` Newsreader/Manrope/JetBrains Mono in `src/styles/theme.css` | Same three families via `@expo-google-fonts/*`, loaded in `app/_layout.tsx`'s `useFonts()` and gated behind the splash screen; family-name strings live in `constants/theme.ts`'s `Fonts` export. These are static per-weight font files, not variable fonts — pick the matching weight constant (`Fonts.sansBold`, etc.) rather than layering a `fontWeight` override on top |
 | Backend | Supabase — Postgres, Auth, Storage, Edge Functions (shared by both apps) | same |

@@ -128,7 +128,7 @@ export function RoleToggle<T extends string>({
             colors={[colors.accent, colors.accentEnd]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
-            style={[StyleSheet.absoluteFillObject, { borderRadius: Radii.pill }]}
+            style={[StyleSheet.absoluteFill, { borderRadius: Radii.pill }]}
           />
         </Animated.View>
       )}

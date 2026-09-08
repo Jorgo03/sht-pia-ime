@@ -312,6 +312,53 @@ the crash screen confirmed rendering localised in both English and Albanian.
 - Root-level `test-*.cjs` / `test-*.png` scratch files are untracked; deleting
   untracked files is unrecoverable, so they were left alone.
 
+## ═══ PASS 9 — 2026-09-08: SDK 54 → 57 REAPPLIED (Pass 8's revert undone) ═══
+
+Owner hit the wall Pass 8 predicted: Expo Go on their iPhone reported
+"Project is incompatible with this version of Expo Go — installed Expo Go is
+for SDK 57.0.0, the project uses SDK 54". That check runs before any of our
+code, and iOS offers no way to install an older Expo Go, so SDK 54 could not
+be opened on an iPhone by any means.
+
+Reapplied by reverting the revert (`git revert d5590ca`) rather than redoing
+the upgrade from scratch, so Pass 8's already-solved breaking-change fixes came
+back verbatim: absoluteFillObject -> absoluteFill, expo-router's own
+re-exports instead of direct @react-navigation/* imports (those three direct
+deps removed), tsconfig baseUrl dropped, four unused scaffold files deleted
+(re-verified as still unreferenced today, not assumed).
+
+Four conflicts, resolved deliberately rather than by taking a side:
+- app.json — kept the current file and removed only newArchEnabled and
+  android.edgeToEdgeEnabled. Pass 8's version also carried a RECORD_AUDIO
+  permission, which was NOT taken: current config sets
+  expo-image-picker's microphonePermission to false, and reinstating that
+  permission would have been a silent privacy regression.
+- package.json — kept today's package list, then applied Pass 8's version set
+  rather than hand-picking. `expo install --fix` could not run (it resolves
+  bundled native versions through api.expo.dev, blocked here), so the two
+  packages added since August (expo-auth-session, expo-crypto) had their 57.x
+  versions resolved from the npm registry directly, and expo-router was bumped
+  by hand because expo.install.exclude keeps it out of --fix.
+- package-lock.json — regenerated, never hand-merged.
+- AUDIT.md — this entry.
+
+Verified: iOS bundle 200 (12.9 MB) and Android bundle 200 (13.3 MB) from a
+running dev server, both real JS rather than error payloads; the manifest now
+advertises runtimeVersion exposdk:57.0.0 / sdkVersion 57.0.0, which is exactly
+what the phone's Expo Go 57.0.0 demands. tsc 0 errors on TS 6.0.3, suite
+120/120, Vite web build clean, `expo config --type prebuild` resolves with no
+plugin errors, expo-doctor 19/21 (the two failures are this sandbox's blocked
+egress to api.expo.dev and reactnative.directory, not project state).
+
+KNOWN, NOT FIXED HERE: `npm run lint` now reports 54 errors, all from four
+rules that did not exist before — set-state-in-effect (32), refs (11),
+immutability (7), static-components (4). eslint-config-expo 57 pulls
+eslint-plugin-react-hooks 7.1.1, up from 5.x, and those are its new React
+Compiler rules. No application code changed to cause them. Fixing them is a
+real piece of work touching contexts, screens and effects; doing it inside an
+SDK major bump would make it impossible to tell which change caused a
+regression, so it is deliberately left for its own pass.
+
 ## ═══ PASS 8 — 2026-08-19: EXPO SDK 54 → 57 UPGRADE — REVERTED ═══
 
 Attempted to fix "app stuck on Expo, wants an update" by upgrading SDK 54 →
