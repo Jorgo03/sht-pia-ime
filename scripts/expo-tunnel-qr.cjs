@@ -230,36 +230,83 @@ module.exports = { classifyTunnelResponse, parseNgrokTunnels, tunnelHostname };
 
 if (require.main !== module) return;
 
+/**
+ * Check the Expo login before starting anything.
+ *
+ * A tunnel address embeds the account name, so without a login there is no
+ * hostname and ngrok cannot start. That was already detected — but only after
+ * Metro had booted and the tunnel wait had run down, which is three minutes
+ * spent learning something knowable in two seconds.
+ *
+ * The advice matters as much as the timing. `npx expo login` has to reach
+ * expo.dev, and the networks where a tunnel is needed are exactly the networks
+ * liable to block it — so being told to log in, here, on that network, can be
+ * advice you cannot take. Log in once from a network that works and the
+ * credential persists.
+ */
+async function assertLoggedIn() {
+  let user = null;
+  try {
+    user = await getUserAsync();
+  } catch {
+    // Treated as logged out: the message below covers both cases.
+  }
+  if (user) return;
+
+  console.error(
+    '\n[expo:tunnel:qr] Not logged in to Expo, so no tunnel can be started —\n' +
+      '                 the tunnel address embeds your account name.\n\n' +
+      '                   npx expo login\n\n' +
+      '                 If that command itself fails here, this network is also\n' +
+      '                 blocking expo.dev. Run it once on a network that works\n' +
+      '                 (home Wi-Fi, or your phone hotspot) — the login persists,\n' +
+      '                 so you only need to do it once, not per network.\n',
+  );
+  process.exit(1);
+}
+
+// Awaited before Metro is spawned, so a missing login costs seconds.
+// Started only after the login check passes (below), so a logged-out run does
+// not boot a dev server it is about to abandon. CommonJS has no top-level
+// await, hence the lazy handle rather than a bare spawn here.
+let metro = null;
+let metroExited = false;
+
 // Through start-expo-lan.cjs rather than @expo/cli directly, the same way
 // expo-go-qr.cjs does. That wrapper is where the Expo Go redirect-page rule
 // lives, and spawning the CLI straight from here bypassed it: the tunnel QR
 // then encoded http://HOST/_expo/loading and opened the phone's browser
 // instead of Expo Go, while the LAN QR — which did go through the wrapper —
 // worked. One spawn site, one set of rules.
-const metro = spawn(
-  process.execPath,
-  [path.join(__dirname, 'start-expo-lan.cjs'), '--tunnel', '--go', `--port=${port}`],
-  { stdio: 'inherit', env: { ...process.env } },
-);
+function startMetro() {
+  metro = spawn(
+    process.execPath,
+    [path.join(__dirname, 'start-expo-lan.cjs'), '--tunnel', '--go', `--port=${port}`],
+    { stdio: 'inherit', env: { ...process.env } },
+  );
 
-let metroExited = false;
-metro.on('exit', (code) => {
-  metroExited = true;
-  if (code) {
-    console.error(
-      '\n[expo:tunnel:qr] The dev server exited before the tunnel was ready.\n' +
-        '                 Read its output above. If it says "ngrok tunnel took too long\n' +
-        '                 to connect", this network blocks ngrok — Expo does not fall back\n' +
-        '                 to LAN, it stops, which is why the phone then reports an offline\n' +
-        '                 endpoint. On such a network use: npm run expo:go:qr\n',
-    );
-  }
-  process.exit(code ?? 0);
-});
-process.on('SIGINT', () => metro.kill('SIGINT'));
-process.on('SIGTERM', () => metro.kill('SIGTERM'));
+  metro.on('exit', (code) => {
+    metroExited = true;
+    if (code) {
+      console.error(
+        '\n[expo:tunnel:qr] The dev server exited before the tunnel was ready.\n' +
+          '                 Read its output above. If it says "ngrok tunnel took too long\n' +
+          '                 to connect", this network blocks ngrok — Expo does not fall back\n' +
+          '                 to LAN, it stops, which is why the phone then reports an offline\n' +
+          '                 endpoint. On such a network use: npm run expo:go:qr\n',
+      );
+    }
+    process.exit(code ?? 0);
+  });
+}
+
+process.on('SIGINT', () => metro?.kill('SIGINT'));
+process.on('SIGTERM', () => metro?.kill('SIGTERM'));
 
 (async () => {
+  await assertLoggedIn();
+  startMetro();
+
   const resolved = await tunnelHostname();
   if (resolved.error) {
     console.error(`\n[expo:tunnel:qr] ${resolved.error}\n`);
