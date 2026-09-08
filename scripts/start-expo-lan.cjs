@@ -76,6 +76,34 @@ if (!found) {
 const extraArgs = process.argv.slice(2);
 const command = ['npx expo start --lan', ...extraArgs].join(' ');
 
+/**
+ * In Expo Go mode, suppress Expo's runtime-picker interstitial.
+ *
+ * The CLI decides this in BundlerDevServer.isRedirectPageEnabled():
+ *
+ *   !env.EXPO_NO_REDIRECT_PAGE && !this.isDevClient
+ *     && !!resolveFrom.silent(projectRoot, 'expo-dev-client')
+ *
+ * expo-dev-client is a dependency of this project, and `--go` does NOT set
+ * isDevClient — only `--dev-client` does. So the interstitial stays on even
+ * when we have explicitly asked for Expo Go, and the terminal QR is then
+ * built from it:
+ *
+ *   printQRCode(interstitialPageUrl ?? nativeRuntimeUrl)   [interactiveActions]
+ *
+ * That URL is http://HOST:8081/_expo/loading — an ordinary web address. A
+ * phone camera hands it to the default browser, so scanning Metro's own QR
+ * opens Brave/Safari on a "choose an app" page instead of opening Expo Go.
+ * It looks like a broken QR and is not: the code is read perfectly, it just
+ * points at a web page.
+ *
+ * Turning the redirect page off makes getRedirectUrl() return null, so the
+ * terminal QR falls through to nativeRuntimeUrl — exp://HOST:8081 — which is
+ * the scheme Expo Go registers. Only in --go mode: with a development build
+ * the picker is the right thing to show.
+ */
+const goMode = extraArgs.includes('--go');
+
 // Passed as a single command string (not `spawn('npx', [...])`) — with
 // shell:true, Node only skips its args-escaping deprecation warning when
 // there's no separate args array to (not) escape. Nothing here is
@@ -88,6 +116,10 @@ const child = spawn(command, {
   env: {
     ...process.env,
     ...(found ? { REACT_NATIVE_PACKAGER_HOSTNAME: found.address } : {}),
+    // Respect an explicit setting from the caller; only default it in --go.
+    ...(goMode && process.env.EXPO_NO_REDIRECT_PAGE == null
+      ? { EXPO_NO_REDIRECT_PAGE: '1' }
+      : {}),
   },
 });
 

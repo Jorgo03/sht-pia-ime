@@ -133,11 +133,17 @@ if (printOnly) {
 /**
  * Renders the QR as inline SVG.
  *
- * The encoder is the one qrcode-terminal already vendors, which Expo's CLI
- * installs -- so this adds nothing to package.json and, more to the point,
- * needs no network. An earlier version of this script fetched a QR library
- * from a CDN and produced a blank page on any machine that could not reach it:
- * the same silent failure the script exists to remove.
+ * The encoder is the one qrcode-terminal vendors -- no network, which matters:
+ * an earlier version of this script fetched a QR library from a CDN and
+ * produced a blank page on any machine that could not reach it, the same
+ * silent failure the script exists to remove.
+ *
+ * qrcode-terminal is a declared devDependency. It used to be treated as free
+ * because @expo/cli depends on it, and that was wrong: a transitive dependency
+ * is only importable while npm happens to hoist it to the top level. On an
+ * install where it stayed nested this threw MODULE_NOT_FOUND at the moment the
+ * QR was about to be drawn -- after Metro had started, which is the worst
+ * possible time to discover a missing package.
  *
  * Error correction is H (~30% recoverable). A development URL is short, so the
  * extra modules cost nothing in practice, and the redundancy is what keeps the
@@ -150,9 +156,48 @@ if (printOnly) {
  * with no resampling. shape-rendering=crispEdges stops module boundaries being
  * antialiased to grey, which is what makes a scaled SVG QR fail to scan.
  */
+/**
+ * Loads the vendored encoder, looking beside @expo/cli as well as in the
+ * project's own node_modules.
+ *
+ * The second path is what makes this work on an install that has not been
+ * refreshed since qrcode-terminal was declared: npm may have placed it under
+ * @expo/cli/node_modules rather than at the top level, where a bare require
+ * cannot see it. If neither resolves, say what to run -- a MODULE_NOT_FOUND
+ * stack trace tells a developer nothing about which package to install.
+ */
+function loadEncoder() {
+  const roots = [__dirname];
+  try {
+    roots.push(path.dirname(require.resolve('@expo/cli/package.json', { paths: [process.cwd()] })));
+  } catch {
+    // @expo/cli missing entirely is a broken install; the error below covers it.
+  }
+
+  for (const root of roots) {
+    try {
+      const base = require.resolve('qrcode-terminal/vendor/QRCode', { paths: [root] });
+      return {
+        QRCode: require(base),
+        ErrorCorrectLevel: require(require.resolve('qrcode-terminal/vendor/QRCode/QRErrorCorrectLevel', { paths: [root] })),
+      };
+    } catch {
+      // Try the next root.
+    }
+  }
+
+  console.error(
+    '[expo:qr] The QR encoder (qrcode-terminal) is not installed, so no code\n' +
+      '          can be drawn. It is a devDependency of this project:\n\n' +
+      '            npm install\n\n' +
+      '          Then run this again. Metro itself is unaffected — if a dev\n' +
+      '          server is already running you can keep using it.',
+  );
+  process.exit(1);
+}
+
 function qrSvg(text, pixels) {
-  const QRCode = require('qrcode-terminal/vendor/QRCode');
-  const ErrorCorrectLevel = require('qrcode-terminal/vendor/QRCode/QRErrorCorrectLevel');
+  const { QRCode, ErrorCorrectLevel } = loadEncoder();
 
   const qr = new QRCode(-1, ErrorCorrectLevel.H);
   qr.addData(text);
