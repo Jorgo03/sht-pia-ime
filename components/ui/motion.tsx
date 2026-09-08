@@ -108,9 +108,11 @@ export function usePressScale(target: number = Motion.pressScaleCard) {
   return {
     pressStyle,
     onPressIn: () => {
+      // eslint-disable-next-line react-hooks/immutability -- Reanimated SharedValue: assigning .value IS its API, and it is a worklet value, not React state. The compiler rule does not model SharedValue.
       scale.value = withTiming(target, { duration: Motion.fast, easing: easeOut });
     },
     onPressOut: () => {
+      // eslint-disable-next-line react-hooks/immutability -- Reanimated SharedValue: assigning .value IS its API, and it is a worklet value, not React state. The compiler rule does not model SharedValue.
       scale.value = withTiming(1, { duration: Motion.fast, easing: easeOut });
     },
   };

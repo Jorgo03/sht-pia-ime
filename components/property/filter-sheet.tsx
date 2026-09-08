@@ -186,10 +186,12 @@ export function FilterSheet({
 
   const panGesture = Gesture.Pan()
     .onUpdate((e) => {
+      // eslint-disable-next-line react-hooks/immutability -- Reanimated SharedValue: assigning .value IS its API, and it is a worklet value, not React state. The compiler rule does not model SharedValue.
       translateY.value = Math.max(0, e.translationY);
     })
     .onEnd((e) => {
       if (translateY.value > 120 || e.velocityY > 800) {
+        // eslint-disable-next-line react-hooks/immutability -- Reanimated SharedValue: assigning .value IS its API, and it is a worklet value, not React state. The compiler rule does not model SharedValue.
         translateY.value = withTiming(800, { duration: 200 }, () => {
           runOnJS(closeSheet)();
         });

@@ -175,6 +175,31 @@ const INITIAL_FORM: ListingForm = {
   status: 'active',
 };
 
+/**
+ * Matches web's .nl-section-label — a dash + mono-uppercase label, not a
+ * bordered card header. NewListing.jsx has no card chrome around its field
+ * groups at all; this is the flat equivalent.
+ *
+ * At module scope, taking `styles` as a prop the way app/listing/new.tsx's
+ * Labeled does. Declared inside the screen it closed over `styles` for free,
+ * but React then saw a brand-new component type on every render and remounted
+ * every label instead of updating it.
+ */
+function SectionLabel({
+  children,
+  styles,
+}: {
+  children: string;
+  styles: ReturnType<typeof createStyles>;
+}) {
+  return (
+    <View style={styles.sectionLabelRow}>
+      <View style={styles.sectionLabelDash} />
+      <Text style={styles.sectionLabelText}>{children.toUpperCase()}</Text>
+    </View>
+  );
+}
+
 export default function CreateListingScreen() {
   const router = useRouter();
   const { t } = useTranslation();
@@ -372,16 +397,6 @@ export default function CreateListingScreen() {
     }
   };
 
-  // Matches web's .nl-section-label — a dash + mono-uppercase label, not a
-  // bordered card header. NewListing.jsx has no card chrome around its
-  // field groups at all; this is the flat equivalent.
-  const SectionLabel = ({ children }: { children: string }) => (
-    <View style={styles.sectionLabelRow}>
-      <View style={styles.sectionLabelDash} />
-      <Text style={styles.sectionLabelText}>{children.toUpperCase()}</Text>
-    </View>
-  );
-
   return (
     <GradientBackground>
       <SafeAreaView style={styles.container} edges={['top']}>
@@ -406,7 +421,7 @@ export default function CreateListingScreen() {
 
             {/* Listing Type */}
             <View style={styles.field}>
-              <SectionLabel>{t('listing.listingType')}</SectionLabel>
+              <SectionLabel styles={styles}>{t('listing.listingType')}</SectionLabel>
               <View style={styles.radioGroup}>
                 {(['sale', 'rent'] as const).map((type) => (
                   <TouchableOpacity
@@ -433,7 +448,7 @@ export default function CreateListingScreen() {
 
             {/* Property Type */}
             <View style={styles.field}>
-              <SectionLabel>{t('search.propertyType')}</SectionLabel>
+              <SectionLabel styles={styles}>{t('search.propertyType')}</SectionLabel>
               <View style={styles.chipRow}>
                 {PROPERTY_TYPES.map((pt) => (
                   <TouchableOpacity
@@ -522,7 +537,7 @@ export default function CreateListingScreen() {
                   and it removes the typo risk web's own <select> avoids.
                   It comes before the road because it is the road's search
                   context: without it there is nothing to search within. */}
-              <SectionLabel>{t('listing.city')}</SectionLabel>
+              <SectionLabel styles={styles}>{t('listing.city')}</SectionLabel>
               <ScrollView
                 horizontal
                 showsHorizontalScrollIndicator={false}
@@ -789,7 +804,7 @@ export default function CreateListingScreen() {
 
             {/* Contact */}
             <View style={styles.field}>
-              <SectionLabel>{t('listing.contactInfo')}</SectionLabel>
+              <SectionLabel styles={styles}>{t('listing.contactInfo')}</SectionLabel>
               <Text style={styles.fieldLabel}>{t('listing.phone')}</Text>
               <TextInput
                 style={styles.input}

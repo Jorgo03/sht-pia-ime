@@ -55,6 +55,10 @@ export default function Header() {
 
   const changeLanguage = async (code) => {
     await i18n.changeLanguage(code)
+    // Sets the <html lang> attribute, which screen readers and hyphenation
+    // depend on. A DOM write, not React state, and it has to happen for the
+    // document to be correct.
+    // eslint-disable-next-line react-hooks/immutability -- DOM attribute, not state
     document.documentElement.lang = code
     localStorage.setItem('fho_lang', code)
     setLangOpen(false)
