@@ -1,5 +1,56 @@
 # Pre-Launch Audit — Shtëpia.ime (Vite web app)
 
+## ═══ PASS 13 — 2026-10-07: npm audit, 34 → 17, every fixable one fixed ═══
+
+`npm audit` reported 34 (1 critical, 20 high, 13 moderate). They come down to
+14 root packages; 11 are fixed, and the 17 entries left are all parents of the
+other 3.
+
+**Fixed:**
+- Lockfile-only, in range: shell-quote 1.12.0 (the critical), compression,
+  http-cache-semantics, source-map-js, brace-expansion 1.1.21/5.0.12, metro
+  chain.
+- Expo SDK 57 patch line: expo 57.0.20 → 57.0.27, which `npm audit fix`
+  pulled in. The 17 native modules it then expected were aligned with
+  `expo install --fix` (0 mismatches against `bundledNativeModules.json`).
+  That also auto-added `expo-image` and `expo-web-browser` to app.json's
+  plugins, which was reverted. The expo-image plugin only writes its own
+  default (`disable-libdav1d=false`), and a stale node_modules turns that
+  entry into the `PluginError: Unable to resolve a valid config plugin for
+  expo-image` that blocked the owner's `npm start`. expo-router was bumped by
+  hand to ~57.0.25 (it is in `expo.install.exclude`).
+- vite 5.4 → 6.4.4, which also takes esbuild 0.21 → 0.25. It closes
+  `server.fs.deny` bypass on Windows alternate paths, `.map` path traversal,
+  and launch-editor UNC hash disclosure. The dev server is `host: true`, so on
+  the owner's Windows machine these were reachable from anyone on the same
+  Wi-Fi. @vitejs/plugin-react 4.7 and @tailwindcss/vite 4.3 both accept
+  vite 6, and the config needed no change.
+- `overrides.uuid ^11.1.1`. Its only consumers, @expo/ngrok and xcode, call
+  just `require('uuid').v4()`, which v11's CJS build keeps.
+
+**Not fixable today (left, not masked):**
+- **braces ≤3.0.3** (via micromatch in Metro's file map) and **node-forge ≤1.4.0**
+  (via @expo/cli code signing). Every published version is affected; no patch
+  exists. Both are dev-tooling only, absent from the app bundle, and fed by
+  our own config rather than untrusted input.
+- **decode-uri-component ≤0.4.2** (via expo-router → query-string 7). This one
+  *is* in the app bundle. The only patch, 0.5.0, is ESM-only. query-string 7
+  `require()`s it and calls the result, so overriding would replace deep-link
+  parsing with a `TypeError`. The impact is a hang on a crafted link. It
+  clears with expo-router 58 (SDK 58), which Expo Go will force anyway.
+- **Never run `npm audit fix --force`.** It "fixes" these by installing
+  expo@44 and react-native@0.72, which is a downgrade of 13 SDKs, not a patch.
+
+**Verified:**
+- tsc: 0 errors.
+- Tests: 120/120.
+- Lint: 0 errors, 32 warnings, all set-state-in-effect, same as before.
+- Vite build: clean.
+- `expo config`: resolves.
+- `expo export` for ios and android: both bundles build.
+- `npm start`: serves a manifest with `sdkVersion 57.0.0` and an iOS dev
+  bundle (HTTP 200, 12.9 MB).
+
 ## ═══ PASS 12 — 2026-08-29: QUALITY PASS II (ergonomics, flagged items) ═══
 
 Second run of `QUALITY-PASS.md`, scoped to what Pass 11 under-covered plus the
