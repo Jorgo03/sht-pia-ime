@@ -123,4 +123,4 @@ function checkSupabaseEnv(projectRoot = path.resolve(__dirname, '..')) {
   }
 }
 
-module.exports = { checkSupabaseEnv, projectRef, EXPECTED_REF };
+module.exports = { checkSupabaseEnv, projectRef, jwtClaims, EXPECTED_REF };
