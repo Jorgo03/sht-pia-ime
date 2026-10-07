@@ -1,5 +1,5 @@
 import { useFocusEffect, useRouter, type Href } from 'expo-router';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import {
   ScrollView,
   StyleSheet,
@@ -13,6 +13,8 @@ import { useTranslation } from 'react-i18next';
 import { useTabBarClearance } from '@/components/liquid-tab-bar';
 import { FeaturedPropertyCard } from '@/components/property/featured-property-card';
 import { PropertyCard, getCompactCardSnapInterval } from '@/components/property/property-card';
+import { PropertyRow } from '@/components/property/property-row';
+import { Chip } from '@/components/ui/chip';
 import { GradientBackground } from '@/components/ui/gradient-background';
 import { RiseIn } from '@/components/ui/motion';
 import { AppHeader } from '@/components/ui/app-header';
@@ -20,16 +22,25 @@ import { SearchHeader } from '@/components/ui/search-header';
 import { SkeletonCard } from '@/components/ui/skeleton-card';
 import { Fonts, type AtticoPalette } from '@/constants/theme';
 import { useAuth } from '@/contexts/auth-context';
+import { useFilters } from '@/contexts/filters-context';
 import { useTheme } from '@/contexts/theme-context';
 import { useResponsive } from '@/hooks/use-responsive';
 import { usePropertiesByIdsQuery, usePropertiesQuery } from '@/hooks/use-property-queries';
 import { useRecentlyViewed } from '@/hooks/use-recently-viewed';
+import { type Property } from '@/data/types';
 
 // Mirrors web's Home.jsx exactly: one query, sorted newest-first (the
 // default sort), featured = properties[0], matched = properties.slice(1, 7)
 // — NOT a separate "highest price" query, which is what this screen used to
 // do before this pass (a real behavioral mismatch vs. the browser).
 const HOME_LIMIT = 24;
+
+/** Rows shown before the "see all" button hands over to Explore. */
+const NEWEST_VISIBLE = 8;
+
+type ListingType = Property['listing_type'];
+// Sale first, then the rentals: the order buyers in this market look in.
+const LISTING_TYPE_ORDER: ListingType[] = ['sale', 'rent', 'daily_rent'];
 
 // Device-local hour, not UTC — 6-12 morning, 12-19 afternoon, else evening.
 // The previous version only split morning/evening (hour < 12), which
@@ -47,6 +58,8 @@ export default function HomeScreen() {
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const { recentIds, reload: reloadRecent } = useRecentlyViewed();
+  const { setFilter } = useFilters();
+  const [newestType, setNewestType] = useState<ListingType | null>(null);
 
   // react-query cache means Home <-> Property Detail <-> back within the
   // 60s staleTime shows the same list instantly with zero network calls,
@@ -75,9 +88,30 @@ export default function HomeScreen() {
   const matched = listings.slice(1, 7);
   // Everything past the featured card and the carousel. HOME_LIMIT fetches 24;
   // before this only 7 were ever rendered, so 17 rows were fetched, parsed and
-  // dropped on every visit. Same "Near you" grid the web Home now renders — no
-  // extra query, and it keeps the two apps structurally identical.
+  // dropped on every visit — no extra query is needed to fill this section.
   const rest = listings.slice(7);
+
+  // This section used to be titled "Near you", but nothing in it was ever
+  // sorted by distance (there is no location permission in the app): it is
+  // the newest listings after the carousel, so it now says exactly that.
+  // The chips filter it in place by listing type, offering only types that
+  // are actually present, each with its count.
+  const typeCounts = useMemo(() => {
+    const counts = new Map<ListingType, number>();
+    for (const p of rest) counts.set(p.listing_type, (counts.get(p.listing_type) ?? 0) + 1);
+    return LISTING_TYPE_ORDER.filter((type) => counts.has(type)).map((type) => ({
+      type,
+      count: counts.get(type) as number,
+    }));
+  }, [rest]);
+  const newest = newestType ? rest.filter((p) => p.listing_type === newestType) : rest;
+
+  // Hands the chosen type over to Explore, so "see all rentals" opens on
+  // rentals instead of on everything.
+  const openExplore = (listingType: ListingType | null) => {
+    setFilter('listingType', listingType);
+    router.push('/(tabs)/explore' as Href);
+  };
 
   const headline = firstName ? `${greeting}, ${firstName}.` : `${greeting}.`;
 
@@ -178,20 +212,48 @@ export default function HomeScreen() {
               {rest.length > 0 && (
                 <View style={styles.section}>
                   <View style={styles.sectionHeader}>
-                    <Text style={styles.sectionTitle}>{t('common.nearYou')}</Text>
-                    <TouchableOpacity
-                      onPress={() => router.push('/(tabs)/explore' as Href)}
-                      activeOpacity={0.7}>
+                    <Text style={styles.sectionTitle}>{t('search.sort.newest')}</Text>
+                    <TouchableOpacity onPress={() => openExplore(newestType)} activeOpacity={0.7}>
                       <Text style={styles.seeAll}>{t('home.seeAll')}</Text>
                     </TouchableOpacity>
                   </View>
-                  <View style={styles.nearYouGrid}>
-                    {rest.map((item, i) => (
+
+                  {typeCounts.length > 1 && (
+                    <ScrollView
+                      horizontal
+                      showsHorizontalScrollIndicator={false}
+                      contentContainerStyle={styles.chips}>
+                      <Chip
+                        label={`${t('common.all')} · ${rest.length}`}
+                        on={newestType === null}
+                        onPress={() => setNewestType(null)}
+                      />
+                      {typeCounts.map(({ type, count }) => (
+                        <Chip
+                          key={type}
+                          label={`${t(`search.${type}`)} · ${count}`}
+                          on={newestType === type}
+                          onPress={() => setNewestType(type)}
+                        />
+                      ))}
+                    </ScrollView>
+                  )}
+
+                  <View style={styles.rows}>
+                    {newest.slice(0, NEWEST_VISIBLE).map((item, i) => (
                       <RiseIn key={item.id} index={i}>
-                        <PropertyCard property={item} />
+                        <PropertyRow property={item} />
                       </RiseIn>
                     ))}
                   </View>
+
+                  <TouchableOpacity
+                    style={styles.moreButton}
+                    onPress={() => openExplore(newestType)}
+                    activeOpacity={0.8}
+                    accessibilityRole="button">
+                    <Text style={styles.moreButtonText}>{t('home.seeAll')}</Text>
+                  </TouchableOpacity>
                 </View>
               )}
             </>
@@ -220,12 +282,30 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     flexWrap: 'wrap',
     paddingHorizontal: 14,
   },
-  // Same two-up wrap the skeletons use, so the loading placeholders and the
-  // real "Near you" cards occupy the identical footprint (no layout jump).
-  nearYouGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    paddingHorizontal: 14,
+  chips: {
+    paddingHorizontal: 20,
+    gap: 8,
+    paddingBottom: 14,
+  },
+  rows: {
+    paddingHorizontal: 16,
+    gap: 12,
+  },
+  moreButton: {
+    marginHorizontal: 16,
+    marginTop: 16,
+    minHeight: 48,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: colors.glass,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  moreButtonText: {
+    fontFamily: Fonts?.sansSemiBold,
+    fontSize: 14,
+    color: colors.textPrimary,
   },
   errorCard: {
     marginHorizontal: 20,
