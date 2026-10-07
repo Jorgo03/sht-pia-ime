@@ -788,7 +788,7 @@ listing, and `removeUploadedImages()` — the rollback both forms run when
 the properties INSERT fails after photos are uploaded — never deleted
 anything, leaking the images permanently on every failed publish.
 
-Fixed in `20260827230000_add_storage_select_policies.sql`, scoped to the
+Fixed in `20260827215959_add_storage_select_policies.sql`, scoped to the
 caller's own folder. This grants no new read access in practice (both
 buckets are already `public = true`, so objects are fetchable via their
 CDN URL regardless); it only lets a user enumerate, and therefore delete,

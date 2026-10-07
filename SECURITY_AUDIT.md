@@ -72,7 +72,7 @@ for JWT and key material: it contains only the project ref and an
 **Severity:** Medium (integrity / business logic; no data disclosure)
 **Affected area:** `public.property_activity` INSERT policy
 **Status:** Fixed and verified in this pass —
-`supabase/migrations/20260830160000_constrain_property_activity_insert.sql`
+`supabase/migrations/20260830154939_constrain_property_activity_insert.sql`
 
 **Finding:** `property_activity`'s INSERT policy was `WITH CHECK (true)` — the
 only permissive policy in the entire schema — and `anon` holds the INSERT grant.

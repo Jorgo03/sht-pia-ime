@@ -67,11 +67,11 @@
 --  * public.ai_usage is deliberately left empty: it is the rate-limit ledger for
 --    the edge functions, and seeded rows would count against the quota.
 --  * Nothing is written to saved_searches, leads, wanted_homes, viewings,
---    conversations, messages or property_views. No migration creates those tables
---    (they were made out-of-band in the dashboard), so their DDL is unknowable
---    from this repo and `supabase db reset` currently fails before reaching them.
---    If your local DB stops mid-migration, that missing DDL is the cause — not
---    this file.
+--    conversations, messages or property_views. Those tables were made by hand
+--    in the dashboard rather than by a migration; they are now created on a
+--    fresh database by 20260702000000_recreate_tables_missing_from_history,
+--    whose DDL was verified against production on 2026-10-07. This file simply
+--    does not seed them.
 -- =============================================================================
 
 -- crypt()/gen_salt() live in the `extensions` schema on Supabase, in `public`
