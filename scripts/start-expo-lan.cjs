@@ -100,6 +100,8 @@ if (tunnelMode) {
   console.log(`[expo:lan] Advertising Metro at ${found.address} (auto-detected from "${found.name}")`);
 }
 
+require('./check-supabase-env.cjs').checkSupabaseEnv();
+
 // Forwards anything after `--` on the npm invocation (e.g.
 // `npm run expo:lan -- --go` to force Expo-Go-compatible mode instead of
 // this project's default development-build target) straight through to the
