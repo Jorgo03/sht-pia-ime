@@ -86,7 +86,19 @@ function checkSupabaseEnv(projectRoot = path.resolve(__dirname, '..')) {
   // the owner hit on 2026-10-07 — URL correct, key from a different project.
   // A legacy anon key is a JWT whose payload names its project, so compare.
   const keyName = 'EXPO_PUBLIC_SUPABASE_ANON_KEY';
-  const claims = jwtClaims(merged[keyName]);
+  // A key copied from a display that masks secrets arrives as its first few
+  // characters plus placeholders, which become '?' once saved as ASCII. Real
+  // keys are base64url JWTs or sb_publishable_…, so any other character means
+  // the key was damaged in transit.
+  const key = merged[keyName] ?? '';
+  if (key && !/^[A-Za-z0-9_\-.]+$/.test(key)) {
+    console.warn(
+      `[supabase] WARNING: ${keyName} (from ${sourceOf(keyName, files, expoEnv)}) contains ` +
+        'characters no Supabase key has (e.g. "?") — it was likely copied from a screen that ' +
+        'masks secrets. Copy it again from Dashboard > Project Settings > API Keys.',
+    );
+  }
+  const claims = jwtClaims(key);
   if (claims && ref && claims.ref !== ref) {
     console.warn(
       `[supabase] WARNING: ${keyName} (from ${sourceOf(keyName, files, expoEnv)}) belongs to ` +
