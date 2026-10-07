@@ -26,6 +26,17 @@ function projectRef(url) {
   return match ? match[1] : null;
 }
 
+/** Payload of a legacy JWT API key, or null (unset, or an sb_publishable_ key). */
+function jwtClaims(key) {
+  const payload = (key ?? '').split('.')[1];
+  if (!payload) return null;
+  try {
+    return JSON.parse(Buffer.from(payload, 'base64url').toString('utf8'));
+  } catch {
+    return null;
+  }
+}
+
 /** First file (in Expo's precedence order) that defines `key`, or the shell. */
 function sourceOf(key, files, expoEnv) {
   if (process.env[key] != null) return 'shell environment';
@@ -67,6 +78,27 @@ function checkSupabaseEnv(projectRoot = path.resolve(__dirname, '..')) {
         'If listings never load, this is why: the app is reading a different — possibly ' +
         `paused or empty — database. Fix EXPO_PUBLIC_SUPABASE_URL and ` +
         `EXPO_PUBLIC_SUPABASE_ANON_KEY in ${source}, then run npm start again.`,
+    );
+  }
+
+  // The right URL with another project's key looks identical from the phone:
+  // every request comes back 401 UNAUTHORIZED_INVALID_API_KEY. That is what
+  // the owner hit on 2026-10-07 — URL correct, key from a different project.
+  // A legacy anon key is a JWT whose payload names its project, so compare.
+  const keyName = 'EXPO_PUBLIC_SUPABASE_ANON_KEY';
+  const claims = jwtClaims(merged[keyName]);
+  if (claims && ref && claims.ref !== ref) {
+    console.warn(
+      `[supabase] WARNING: ${keyName} (from ${sourceOf(keyName, files, expoEnv)}) belongs to ` +
+        `project ${claims.ref}, not ${ref}. Supabase will reject every request with ` +
+        '"Invalid API key" and no listings will load. Copy the anon key for ' +
+        `${ref} from Dashboard > Project Settings > API Keys.`,
+    );
+  }
+  if (claims && claims.role === 'service_role') {
+    console.warn(
+      `[supabase] DANGER: ${keyName} is a service_role key. It bypasses Row Level Security ` +
+        'and must never be in an app bundle. Replace it with the anon key and rotate it.',
     );
   }
 
