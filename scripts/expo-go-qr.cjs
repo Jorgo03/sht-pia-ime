@@ -60,7 +60,15 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 // around it would let the QR and the server disagree about the address.
 const metro = spawn(
   process.execPath,
-  [path.join(__dirname, 'start-expo-lan.cjs'), '--go', `--port=${port}`],
+  // `npm start -- --clear` forwards --clear: EXPO_PUBLIC_* values are inlined
+  // at transform time, so a corrected .env file only reaches the phone once
+  // Metro's cache is dropped.
+  [
+    path.join(__dirname, 'start-expo-lan.cjs'),
+    '--go',
+    `--port=${port}`,
+    ...(argv.includes('--clear') ? ['--clear'] : []),
+  ],
   { stdio: 'inherit', env: { ...process.env } },
 );
 
