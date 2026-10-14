@@ -213,7 +213,11 @@
     "area": "Superficie",
     "year": "Anno",
     "chatInApp": "Chatta",
-    "share": "Condividi"
+    "share": "Condividi",
+    "owner": "Proprietario",
+    "linkCopied": "Link copiato",
+    "unavailable": "Questo annuncio non è più disponibile",
+    "unavailableHint": "Potrebbe essere stato venduto, affittato o rimosso dall'agente."
   },
   "messages": {
     "subtitle": "Conversazioni con agenti",

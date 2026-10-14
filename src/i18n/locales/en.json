@@ -222,7 +222,11 @@
     "area": "Area",
     "year": "Year",
     "chatInApp": "Chat",
-    "share": "Share"
+    "share": "Share",
+    "owner": "Owner",
+    "linkCopied": "Link copied",
+    "unavailable": "This listing is no longer available",
+    "unavailableHint": "It may have been sold, rented out or removed by the agent."
   },
   "favourites": {
     "title": "Favorites",

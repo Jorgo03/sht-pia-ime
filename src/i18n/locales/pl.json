@@ -220,7 +220,11 @@
     "area": "Powierzchnia",
     "year": "Rok",
     "chatInApp": "Czat",
-    "share": "Udostępnij"
+    "share": "Udostępnij",
+    "owner": "Właściciel",
+    "linkCopied": "Link skopiowany",
+    "unavailable": "To ogłoszenie nie jest już dostępne",
+    "unavailableHint": "Mogło zostać sprzedane, wynajęte lub usunięte przez agenta."
   },
   "messages": {
     "subtitle": "Rozmowy z agentami",

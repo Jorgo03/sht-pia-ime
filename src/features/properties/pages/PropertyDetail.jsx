@@ -1,10 +1,10 @@
 import { useEffect, useState, lazy, Suspense } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { ChevronLeft, Heart, Share2, MapPin, ExternalLink, ChevronRight as ChevRight, Globe, ArrowRight } from 'lucide-react'
+import { ChevronLeft, Heart, Share2, MapPin, ExternalLink, ChevronRight as ChevRight, Globe, ArrowRight, Phone } from 'lucide-react'
 import { useProperty, useProperties } from '../hooks/useProperties'
 import { useTranslatedProperty } from '../hooks/useTranslatedProperty'
-import { formatPrice, imageFor, listingBadgeKey, priceSuffixKey } from '../../../lib/format'
+import { formatPrice, imageFor, listingBadgeKey, priceSuffixKey, telUrl, whatsappUrl } from '../../../lib/format'
 import { useFavorites } from '../../favorites/FavoritesContext'
 import { useAuth } from '../../auth/AuthContext'
 import { supabase } from '../../../lib/supabase'
@@ -34,6 +34,7 @@ export default function PropertyDetail() {
   const [viewingSheet, setViewingSheet] = useState(false)
   const [viewingToast, setViewingToast] = useState(false)
   const [brokenImages, setBrokenImages] = useState(new Set())
+  const [shareToast, setShareToast] = useState(false)
   const { title, description, translating, isTranslated } = useTranslatedProperty(property, i18n.language)
   const { properties: similar } = useProperties({ filter: property?.property_type || 'all', city: property?.city || null, limit: 8 })
   const similarProperties = similar.filter(p => p.id !== id).slice(0, 4)
@@ -55,7 +56,18 @@ export default function PropertyDetail() {
   if (loading) return <div className="page">{t('common.loading')}</div>
   // A localized message, never the driver's own text — see useProperty().
   if (error) return <div className="page" style={{ color: '#c0392b' }}>{t('errors.generic')}</div>
-  if (!property) return <div className="page">{t('search.empty')}</div>
+  // A deleted, sold-and-removed or mistyped listing: say so and offer a way on,
+  // rather than a bare line of text with nowhere to go.
+  if (!property) return (
+    <div className="page mx-auto flex max-w-[420px] flex-col items-center px-5 pt-20 text-center">
+      <h1 className="font-fho-serif text-2xl font-medium text-fho-text">{t('detail.unavailable')}</h1>
+      <p className="mt-2 text-[15px] text-fho-text-muted">{t('detail.unavailableHint')}</p>
+      <div className="mt-6 flex gap-3">
+        <button className="pill-btn" onClick={() => navigate('/search')}>{t('common.search')}</button>
+        <button className="pill-btn" onClick={() => navigate('/')}>{t('common.home')}</button>
+      </div>
+    </div>
+  )
 
   const saved = isFavorite(property.id)
   const hasMultiple = images.length > 1
@@ -65,7 +77,6 @@ export default function PropertyDetail() {
   const suffix = suffixKey ? t(suffixKey) : ''
   const badge = t(listingBadgeKey(property.listing_type))
   const phone = property.contact_phone?.replace(/\s/g, '') || property.agent?.phone?.replace(/\s/g, '') || null
-  const waMsg = encodeURIComponent(t('property.whatsappMessage', { title }))
   const features = property.features || []
   const pricePerSqm = property.sqft > 0 ? Math.round(property.price / property.sqft) : null
   const propertyTypeLabel = property.property_type ? t(`search.${property.property_type}`) : ''
@@ -101,8 +112,12 @@ export default function PropertyDetail() {
 
   const handleShare = async () => {
     const url = window.location.href
-    if (navigator.share) navigator.share({ title, url }).catch(() => {})
-    else await navigator.clipboard.writeText(url)
+    if (navigator.share) { navigator.share({ title, url }).catch(() => {}); return }
+    try {
+      await navigator.clipboard.writeText(url)
+      setShareToast(true)
+      setTimeout(() => setShareToast(false), 2500)
+    } catch { /* clipboard blocked (insecure context, permission) — nothing to confirm */ }
   }
 
   const handleFavorite = (e) => {
@@ -202,22 +217,47 @@ export default function PropertyDetail() {
         </section>
       )}
 
-      {/* Agent */}
-      {property.agent && (
-        <section className="agent-strip" onClick={() => navigate(`/agent/${property.agent.id}`)}>
-          <div className="agent-initial">{property.agent.full_name?.[0] || 'A'}</div>
-          <div style={{ flex: 1 }}>
-            <div className="agent-name">{property.agent.full_name}</div>
-            <div className="agent-agency">{property.agent.agency_name}</div>
-          </div>
-          <button className="pill-btn" onClick={e => { e.stopPropagation(); startChat() }}>
-            {t('detail.chatInApp')}
-          </button>
-          {phone && (
-            <button className="pill-btn" onClick={e => { e.stopPropagation(); logActivity(property.id, 'message'); window.open(`https://wa.me/${phone}?text=${waMsg}`, '_blank') }}>
-              {t('detail.message')}
+      {/* Contact — the agent, or the owner on a listing posted without one.
+          Owner listings used to render nothing here, leaving no way to reach
+          them. The strip itself isn't clickable: only the agent's name links
+          to the profile, so no button sits inside another interactive element. */}
+      {(property.agent || phone) && (
+        <section className="agent-strip">
+          {property.agent ? (
+            <button type="button" className="agent-strip__who" onClick={() => navigate(`/agent/${property.agent.id}`)}>
+              <span className="agent-initial">{property.agent.full_name?.[0] || 'A'}</span>
+              <span style={{ flex: 1, minWidth: 0 }}>
+                <span className="agent-name">{property.agent.full_name}</span>
+                <span className="agent-agency">{property.agent.agency_name}</span>
+              </span>
             </button>
+          ) : (
+            <div className="agent-strip__who">
+              <span className="agent-initial">{t('detail.owner')[0]}</span>
+              <span className="agent-name" style={{ flex: 1 }}>{t('detail.owner')}</span>
+            </div>
           )}
+          <div className="agent-strip__actions">
+            <button className="pill-btn" onClick={startChat}>
+              {t('detail.chatInApp')}
+            </button>
+            {phone && (
+              <a className="pill-btn" href={telUrl(phone)} aria-label={t('property.call')} onClick={() => logActivity(property.id, 'call')}>
+                <Phone size={14} aria-hidden="true" />
+              </a>
+            )}
+            {phone && (
+              <a
+                className="pill-btn"
+                href={whatsappUrl(phone, t('property.whatsappMessage', { title }))}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => logActivity(property.id, 'message')}
+              >
+                {t('detail.message')}
+              </a>
+            )}
+          </div>
         </section>
       )}
 
@@ -272,6 +312,10 @@ export default function PropertyDetail() {
 
       {viewingToast && (
         <div className="addsheet-toast" role="status" onClick={() => setViewingToast(false)}>{t('viewings.requestSuccess')}</div>
+      )}
+
+      {shareToast && (
+        <div className="addsheet-toast" role="status" onClick={() => setShareToast(false)}>{t('detail.linkCopied')}</div>
       )}
 
       {loginToast && (

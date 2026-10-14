@@ -213,7 +213,11 @@
     "area": "Surface",
     "year": "Année",
     "chatInApp": "Discuter",
-    "share": "Partager"
+    "share": "Partager",
+    "owner": "Propriétaire",
+    "linkCopied": "Lien copié",
+    "unavailable": "Cette annonce n'est plus disponible",
+    "unavailableHint": "Il a peut-être été vendu, loué ou retiré par l'agent."
   },
   "messages": {
     "subtitle": "Conversations avec les agents",

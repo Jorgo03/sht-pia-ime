@@ -206,7 +206,11 @@
     "area": "Sipërfaqja",
     "year": "Viti",
     "chatInApp": "Bisedo",
-    "share": "Ndaj"
+    "share": "Ndaj",
+    "owner": "Pronari",
+    "linkCopied": "Lidhja u kopjua",
+    "unavailable": "Kjo pronë nuk është më e disponueshme",
+    "unavailableHint": "Mund të jetë shitur, dhënë me qera ose hequr nga agjenti."
   },
   "messages": {
     "subtitle": "Bisedat me agjentët",

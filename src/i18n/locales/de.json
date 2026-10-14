@@ -206,7 +206,11 @@
     "area": "Fläche",
     "year": "Baujahr",
     "chatInApp": "Chat",
-    "share": "Teilen"
+    "share": "Teilen",
+    "owner": "Eigentümer",
+    "linkCopied": "Link kopiert",
+    "unavailable": "Dieses Inserat ist nicht mehr verfügbar",
+    "unavailableHint": "Es wurde möglicherweise verkauft, vermietet oder vom Makler entfernt."
   },
   "messages": {
     "subtitle": "Gespräche mit Maklern",

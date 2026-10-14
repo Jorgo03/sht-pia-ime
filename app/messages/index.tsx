@@ -6,6 +6,7 @@ import { ActivityIndicator, FlatList, StyleSheet, Text, TouchableOpacity, View }
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 
+import { ActionButton } from '@/components/ui/action-button';
 import { AppHeader } from '@/components/ui/app-header';
 import { GradientBackground } from '@/components/ui/gradient-background';
 import { type AtticoPalette, Fonts } from '@/constants/theme';
@@ -117,6 +118,11 @@ export default function MessagesInboxScreen() {
           <AppHeader onBack={() => router.back()} />
           <View style={styles.center}>
             <Text style={styles.description}>{t('messages.loginPrompt')}</Text>
+            {/* Sign-in lives on the Profile tab; without this the screen was
+                a dead end with only a back arrow. */}
+            <View style={styles.signInButton}>
+              <ActionButton title={t('common.signIn')} onPress={() => router.push('/(tabs)/profile' as Href)} />
+            </View>
           </View>
         </SafeAreaView>
       </GradientBackground>
@@ -278,6 +284,10 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     fontSize: 14,
     color: colors.textSecondary,
     textAlign: 'center',
+  },
+  signInButton: {
+    alignSelf: 'stretch',
+    marginTop: 12,
   },
   // Matches the home screen's retry affordance so the two error states read
   // as the same control.

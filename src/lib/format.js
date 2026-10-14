@@ -95,15 +95,31 @@ export function slugify(s) {
     .replace(/(^-|-$)/g, '')
 }
 
-export function whatsappUrl(phone, message) {
+/**
+ * A phone number as international digits only — the country code and no '+',
+ * '00' or leading 0 — which is what both wa.me and a `tel:+` link need.
+ */
+export function internationalPhone(phone) {
   let clean = phone?.replace(/[^0-9]/g, '') || ''
   // wa.me requires full international format with no leading 0. Agents
   // enter local Albanian numbers (e.g. "069 602 0791"), so assume Albania's
   // country code (355) whenever one isn't already present.
-  if (clean.startsWith('0')) {
-    clean = `355${clean.slice(1)}`
-  } else if (!clean.startsWith('355')) {
-    clean = `355${clean}`
+  // A number already written internationally ("+39 …", "0039 …") keeps its
+  // own country code: diaspora owners list Italian and German phones.
+  const international = /^\s*\+\s*[1-9]/.test(phone || '')
+  if (clean.startsWith('00')) {
+    clean = clean.slice(2)
+  } else if (!international) {
+    if (clean.startsWith('0')) clean = `355${clean.slice(1)}`
+    else if (!clean.startsWith('355')) clean = `355${clean}`
   }
-  return `https://wa.me/${clean}?text=${encodeURIComponent(message)}`
+  return clean
+}
+
+export function telUrl(phone) {
+  return `tel:+${internationalPhone(phone)}`
+}
+
+export function whatsappUrl(phone, message) {
+  return `https://wa.me/${internationalPhone(phone)}?text=${encodeURIComponent(message)}`
 }

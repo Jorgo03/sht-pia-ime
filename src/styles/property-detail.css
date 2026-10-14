@@ -269,12 +269,36 @@
   background: var(--fho-surface);
   border: 1px solid var(--fho-border);
   border-radius: var(--r-lg);
-  cursor: pointer;
-  transition: background 150ms;
+  flex-wrap: wrap;
 }
 
-.agent-strip:hover {
-  background: var(--fho-bg);
+.agent-strip__who {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1 1 180px;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  text-align: left;
+  color: inherit;
+}
+
+button.agent-strip__who {
+  cursor: pointer;
+}
+
+button.agent-strip__who:hover .agent-name {
+  color: var(--fho-orange-2);
+}
+
+.agent-strip__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 .agent-initial {
@@ -293,18 +317,25 @@
 }
 
 .agent-name {
+  display: block;
   font-size: 15px;
   font-weight: 600;
   color: var(--fho-text);
 }
 
 .agent-agency {
+  display: block;
   font-size: 12px;
   color: var(--fho-text-muted);
 }
 
 .pill-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
   padding: 8px 18px;
+  text-decoration: none;
   border-radius: var(--r-pill);
   border: 1px solid var(--fho-border-strong);
   background: transparent;

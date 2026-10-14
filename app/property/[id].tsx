@@ -32,7 +32,7 @@ import { PrimaryCTA } from '@/components/ui/buttons';
 import { ListingAssistant } from '@/components/property/listing-assistant';
 import { LocationPreviewMap } from '@/components/property/location-preview-map';
 import { PropertyCard } from '@/components/property/property-card';
-import { type AtticoPalette } from '@/constants/theme';
+import { Fonts, type AtticoPalette } from '@/constants/theme';
 import { useAuth } from '@/contexts/auth-context';
 import { useFavorites } from '@/contexts/favorites-context';
 import { useTheme } from '@/contexts/theme-context';
@@ -41,8 +41,9 @@ import { addRecentlyViewed } from '@/hooks/use-recently-viewed';
 import { useResponsive } from '@/hooks/use-responsive';
 import { useTranslatedProperty } from '@/hooks/use-translated-property';
 import { logActivity } from '@/lib/activity';
+import { propertyUrl } from '@/lib/site';
 import { supabase } from '@/lib/supabase';
-import { formatPrice, listingBadgeKey, priceSuffixKey, whatsappUrl } from '@/lib/format';
+import { formatPrice, listingBadgeKey, priceSuffixKey, telUrl, whatsappUrl } from '@/lib/format';
 
 // Rounds "now + 1h" to the next half hour — same default the web app's
 // ViewingRequestSheet uses.
@@ -154,7 +155,11 @@ export default function PropertyDetailScreen() {
 
   const handleShare = () => {
     if (!property) return;
-    Share.share({ message: title, url: `https://shtepia.ime/property/${property.id}` }).catch(() => {});
+    // shtepia.ime is not a registered domain, so the old link led nowhere.
+    // Android's share sheet ignores `url`, so the link has to ride in `message`
+    // there or the recipient gets the title alone.
+    const url = propertyUrl(property.id);
+    Share.share(Platform.OS === 'ios' ? { message: title, url } : { message: `${title}\n${url}` }).catch(() => {});
   };
 
   // Listing-level contact override wins over the agent's own profile phone —
@@ -162,7 +167,9 @@ export default function PropertyDetailScreen() {
   const contactPhone = property?.contact_phone?.replace(/\s/g, '') || property?.agent?.phone?.replace(/\s/g, '') || null;
 
   const handleCall = () => {
-    if (contactPhone) Linking.openURL(`tel:${contactPhone}`);
+    if (!property || !contactPhone) return;
+    logActivity(property.id, 'call');
+    Linking.openURL(telUrl(contactPhone));
   };
 
   const handleWhatsApp = () => {
@@ -212,10 +219,18 @@ export default function PropertyDetailScreen() {
   }
 
   if (!property) {
+    // Deleted, sold-and-removed, or a stale deep link: explain and offer a way
+    // out, since a deep link may have opened this screen with nothing beneath it.
     return (
-      <View style={styles.errorContainer}>
-        <Text style={styles.errorText}>{t('search.empty')}</Text>
-      </View>
+      <SafeAreaView style={styles.errorContainer}>
+        <MaterialIcons name="search-off" size={40} color={colors.textSecondary} />
+        <Text style={styles.errorText}>{t('detail.unavailable')}</Text>
+        <Text style={styles.errorHint}>{t('detail.unavailableHint')}</Text>
+        <View style={styles.errorActions}>
+          <ActionButton title={t('common.search')} onPress={() => router.replace('/(tabs)/explore' as Href)} />
+          <ActionButton title={t('common.home')} variant="secondary" onPress={() => router.replace('/(tabs)' as Href)} />
+        </View>
+      </SafeAreaView>
     );
   }
 
@@ -647,11 +662,28 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    paddingHorizontal: 32,
     backgroundColor: colors.primary,
   },
   errorText: {
-    fontSize: 16,
+    fontSize: 18,
     color: colors.textPrimary,
+    fontFamily: Fonts.serif,
+    textAlign: 'center',
+    marginTop: 12,
+  },
+  errorHint: {
+    fontSize: 14,
+    color: colors.textSecondary,
+    fontFamily: Fonts.sans,
+    textAlign: 'center',
+    marginTop: 6,
+    lineHeight: 20,
+  },
+  errorActions: {
+    alignSelf: 'stretch',
+    gap: 10,
+    marginTop: 24,
   },
   imageContainer: {
     // height is computed per-render (imageHeight) so it responds to
