@@ -79,7 +79,7 @@ export default function Header() {
       </div>
       <div className="header-actions">
         <div className="lang-switcher" ref={langRef}>
-          <button className="lang-btn" onClick={() => setLangOpen(!langOpen)}>
+          <button className="lang-btn" onClick={() => setLangOpen(!langOpen)} aria-label={currentLang.name} aria-haspopup="true" aria-expanded={langOpen}>
             <span className="lang-flag" aria-hidden="true">{currentLang.flag}</span>
             <span className="lang-label">{currentLang.name}</span>
             <ChevronDown size={14} className={`lang-chevron ${langOpen ? 'open' : ''}`} />
