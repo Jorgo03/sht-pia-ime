@@ -140,7 +140,7 @@ There is no `/godmode` skill file in this repo despite earlier documentation ref
 
 ## Open Questions — Flag, Don't Guess
 
-- Monetization model (listing fees vs. subscriptions vs. boosts)
+- Monetization: **decided 2026-10-14** — per-listing promotion + monthly agency plans, posting free (DECISIONS.md M1). Still open: payment provider, in-app vs web checkout, prices
 - Full scope of the agency-admin role
 - Whether Outlook/Microsoft OAuth is in scope
 - Whether/when to pursue the paid Apple Developer Program account (blocks an installed iOS dev-client and any eventual App Store submission)

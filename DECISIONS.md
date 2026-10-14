@@ -5,6 +5,18 @@ AUDIT.md was fixed; see the final report for the change log.
 
 ---
 
+## ═══ MONETISATION — 2026-10-14 ═══
+
+### M1. Paid products: listing promotion AND agency monthly plans (DECIDED by owner)
+
+Resolves the "Monetization model" open question in CLAUDE.md. Posting stays
+free for owners and agents; revenue comes from promoting a listing (per
+listing, fixed days, no auto-renew) and monthly agency plans (higher listing
+cap, promotion credits, verified badge, analytics). Design:
+`replica/payments-plan.md`. Still open: payment provider (depends on where
+FHO is registered), in-app purchase vs web-only checkout, and the prices,
+caps and credits (`/replica-launch`). Schema not applied — awaits approval.
+
 ## ═══ AUTH INCIDENT REMEDIATION — 2026-08-19 ═══
 
 Full findings in `AUTH_AUDIT.md`; fixes on branch `fix/auth-recovery-and-validation`.

@@ -1,8 +1,8 @@
 feature,area,priority,original,clone,notes
 Free listings posted by owners (private sellers),listings,must,yes,yes,"DuaShpi: 'publish free ads ... by owners and real estate agencies' (its own site, via search). Ours: app/listing/new.tsx saves owner_type 'client'"
 Free listings posted by agents and agencies,listings,must,yes,yes,Ours: owner_type 'agent' with agent_id set
-Paid promotion of a single listing (Premium label),monetization,must,yes,no,"DuaShpi shows a 'Premium' label on listings; what it costs and includes is not public in any source reached. No payment code exists in our repo"
-Paid plans for agencies (monthly),monetization,should,unknown,no,"Requested by the owner 2026-10-14. No DuaShpi agency pricing found in any source reached"
+Paid promotion of a single listing (Premium label),monetization,must,yes,no,"Owner decided 2026-10-14 to build it (replica/payments-plan.md). DuaShpi shows a 'Premium' label on listings; what it costs and includes is not public in any source reached. No payment code exists in our repo"
+Paid plans for agencies (monthly),monetization,must,unknown,no,"Owner decided 2026-10-14 to build it (replica/payments-plan.md). No DuaShpi agency pricing found in any source reached"
 Saved searches,search,should,yes,yes,"DuaShpi App Store description lists saved searches. Ours: app/saved-searches"
 Real-time alerts for new matching listings,search,should,yes,partial,"DuaShpi App Store description lists real-time alerts. Ours stores last_match_count; no push alert verified"
 Agency CRM integration,agents,could,yes,no,"DuaShpi describes a partnership with a real-estate CRM provider"
