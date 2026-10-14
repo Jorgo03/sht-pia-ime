@@ -58,12 +58,16 @@ the UI.
 - **Feed**: promoted listings first + "Premium" badge, web and mobile.
 - All strings through `t()`, keys added to all 8 locale files.
 
-## Open decisions (owner)
+## Decided 2026-10-14
 
-1. **Payment provider** depends on where the company is registered. Sources
-   suggest an Albania-registered company cannot open a standard Stripe account
-   (not confirmed against Stripe's own list).
-2. **Paying from the phone app**: Apple and Google require their in-app
-   purchase (15-30% fee) for digital goods bought inside the app. Selling on
-   the website only avoids the fee; the app then shows status, not a buy button.
-3. **Prices, caps, credits**: set in `/replica-launch`.
+- **Company: Albania.** Provider shortlist: Paddle (merchant of record, lists
+  Albania; confirm it onboards an Albania-registered seller) or a bank virtual
+  POS (Raiffeisen raiAccept, BKT, Credins). The schema is provider-neutral.
+- **Checkout: website only.** The apps show status; no in-app purchase.
+- **Schema:** `supabase/pending/20261014120000_add_payments_foundation.sql`,
+  tested (`payments_foundation.test.mjs`, 21/21). Awaiting the owner's review.
+
+## Still open
+
+- Which provider (needs the owner to contact Paddle and/or their bank).
+- Prices, caps and credits (`/replica-launch`).

@@ -17,6 +17,14 @@ cap, promotion credits, verified badge, analytics). Design:
 FHO is registered), in-app purchase vs web-only checkout, and the prices,
 caps and credits (`/replica-launch`). Schema not applied — awaits approval.
 
+Answered the same day: **company registered in Albania**, so no standard
+Stripe account; candidates are Paddle (merchant of record, lists Albania;
+seller eligibility unconfirmed) or a bank virtual POS such as Raiffeisen
+raiAccept (supports recurring). **Checkout is website-only**: the phone apps
+show plan and promotion status, with no in-app purchase and no Apple/Google
+fee. Schema drafted in `supabase/pending/` (21/21 tests), **not applied:
+owner asked to review it first**.
+
 ## ═══ AUTH INCIDENT REMEDIATION — 2026-08-19 ═══
 
 Full findings in `AUTH_AUDIT.md`; fixes on branch `fix/auth-recovery-and-validation`.
