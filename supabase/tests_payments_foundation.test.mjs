@@ -4,7 +4,10 @@ const db = new PGlite();
 // Usage: npx -y -p @electric-sql/pglite@0.2.17 node supabase/tests_payments_foundation.test.mjs
 // Runs the migration in an in-process Postgres with a minimal Supabase stand-in;
 // never touches a real database.
-const MIG = fs.readFileSync(process.argv[2] ?? new URL('./migrations/20261014214726_add_payments_foundation.sql', import.meta.url), 'utf8');
+const MIG = (process.argv.length > 2 ? process.argv.slice(2).map((p) => new URL(p, 'file://' + process.cwd() + '/')) : [
+  new URL('./migrations/20261014214726_add_payments_foundation.sql', import.meta.url),
+  new URL('./pending/plans_by_period_months.sql', import.meta.url),
+]).map((u) => fs.readFileSync(u, 'utf8')).join('\n');
 const A = '11111111-1111-1111-1111-111111111111', B = '22222222-2222-2222-2222-222222222222';
 // Minimal stand-in for Supabase: roles, auth.uid(), default grants, the two
 // referenced tables and the properties update policy as in production.
@@ -27,9 +30,9 @@ await db.exec(`
   insert into public.properties (id, owner_id, title) values ('aaaaaaaa-0000-0000-0000-000000000001','${A}','A home');
 `);
 await db.exec(MIG);
-await db.exec(`insert into public.plans (id, kind, price_cents, duration_days) values ('promote_7d','promotion',500,7);
-  insert into public.plans (id, kind, price_cents, billing_interval, listing_cap, promotion_credits) values ('agency_pro','agency_subscription',2900,'month',50,3);
-  insert into public.plans (id, kind, price_cents, duration_days, active) values ('old','promotion',100,3,false);`);
+await db.exec(`insert into public.plans (id, kind, tier, period_months, price_cents) values ('promote_7d','promotion','promote',1,500);
+  insert into public.plans (id, kind, tier, period_months, price_cents, listing_cap, promotion_credits) values ('agency_pro','agency_subscription','pro',1,2900,50,3);
+  insert into public.plans (id, kind, tier, period_months, price_cents, active) values ('old','promotion','promote',3,100,false);`);
 
 let pass = 0, fail = 0;
 const as = async (role, uid, sql) => {
@@ -55,11 +58,13 @@ r = await as('authenticated', A, `update public.agency_subscriptions set status=
 r = await as('authenticated', A, `select count(*)::int c from public.agency_subscriptions`); check('agent sees their own subscription', r.ok && r.rows[0].c === 1, r);
 r = await as('authenticated', B, `select count(*)::int c from public.agency_subscriptions`); check("another user sees none of it", r.ok && r.rows[0].c === 0, r);
 r = await as('anon', null, `select string_agg(id, ',' order by id) ids from public.plans`); check('price list is public, inactive plans hidden', r.ok && r.rows[0].ids === 'agency_pro,promote_7d', r);
-r = await as('authenticated', A, `insert into public.plans (id,kind,price_cents,duration_days) values ('free','promotion',0,365)`); check('users cannot create plans', !r.ok, r);
+r = await as('authenticated', A, `insert into public.plans (id,kind,tier,period_months,price_cents) values ('free','promotion','promote',12,0)`); check('users cannot create plans', !r.ok, r);
 r = await as('authenticated', A, `update public.plans set price_cents=0`); check('users cannot change prices', r.ok && r.n === 0, r);
 r = await as('service_role', null, `insert into public.payment_events (provider,event_id,event_type,payload) values ('paddle','evt_1','paid','{}')`); check('server records an event', r.ok, r);
 r = await as('service_role', null, `insert into public.payment_events (provider,event_id,event_type,payload) values ('paddle','evt_1','paid','{}')`); check('a retried event is rejected (idempotency)', !r.ok && r.code === '23505', r);
 r = await as('authenticated', A, `select count(*)::int c from public.payment_events`); check('payment events are invisible to users', r.ok && r.rows[0].c === 0, r);
-r = await as('service_role', null, `insert into public.plans (id,kind,price_cents,billing_interval,duration_days) values ('bad','promotion',1,'month',7)`); check('plan shape is enforced', !r.ok && r.code === '23514', r);
+r = await as('service_role', null, `insert into public.plans (id,kind,tier,period_months,price_cents) values ('bad','promotion','promote',2,1)`); check('only 1/3/6/12-month periods allowed', !r.ok && r.code === '23514', r);
+r = await as('service_role', null, `insert into public.plans (id,kind,tier,period_months,price_cents) values ('dup','agency_subscription','pro',1,1)`); check('one price per tier and period', !r.ok && r.code === '23505', r);
+r = await as('service_role', null, `insert into public.plans (id,kind,tier,period_months,price_cents,listing_cap,promotion_credits) values ('pro_12','agency_subscription','pro',12,29000,50,3)`); check('same tier at another period is fine', r.ok, r);
 r = await as('service_role', null, `insert into public.listing_promotions (property_id,buyer_id,plan_id,starts_at,ends_at,provider,provider_ref) values (${P},'${A}','promote_7d',now(),now()-interval '1 day','paddle','o1')`); check('promotion window must end after it starts', !r.ok && r.code === '23514', r);
 console.log(`\n${pass} passed, ${fail} failed`); process.exit(fail ? 1 : 0);
