@@ -547,6 +547,8 @@
   },
   "legal": {
     "privacyPolicy": "Privacy Policy",
-    "termsOfService": "Terms of Service"
+    "termsOfService": "Terms of Service",
+    "lastUpdated": "Last updated {{date}}",
+    "languageNote": "This document is available in Albanian and English. The English version is shown below; the Albanian version prevails."
   }
 }

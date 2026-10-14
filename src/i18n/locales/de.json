@@ -547,6 +547,8 @@
   },
   "legal": {
     "privacyPolicy": "Datenschutzerklärung",
-    "termsOfService": "Nutzungsbedingungen"
+    "termsOfService": "Nutzungsbedingungen",
+    "lastUpdated": "Zuletzt aktualisiert am {{date}}",
+    "languageNote": "Dieses Dokument liegt auf Albanisch und Englisch vor. Unten steht die englische Fassung; maßgeblich ist die albanische."
   }
 }

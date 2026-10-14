@@ -22,3 +22,20 @@ export const PRIVACY_POLICY_URL = clean(import.meta.env.VITE_PRIVACY_POLICY_URL)
 export const TERMS_URL = clean(import.meta.env.VITE_TERMS_URL)
 
 export const hasLegalUrls = () => Boolean(PRIVACY_POLICY_URL || TERMS_URL)
+
+/**
+ * Contact address printed on /privacy and /terms. The pages themselves now live
+ * in this web app (src/features/legal), so the web links to them by route and
+ * never needs the URLs above; those remain for the Expo app, which opens them
+ * in a browser.
+ *
+ *   VITE_LEGAL_CONTACT_EMAIL=privacy@yourdomain
+ *
+ * Unset, the pages point people to the in-app Profile controls instead of
+ * printing an address nobody reads.
+ */
+const email = (v) => {
+  const s = (v ?? '').trim()
+  return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(s) ? s : null
+}
+export const LEGAL_CONTACT_EMAIL = email(import.meta.env.VITE_LEGAL_CONTACT_EMAIL)

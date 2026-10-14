@@ -563,6 +563,8 @@
   },
   "legal": {
     "privacyPolicy": "Polityka prywatności",
-    "termsOfService": "Regulamin"
+    "termsOfService": "Regulamin",
+    "lastUpdated": "Ostatnia aktualizacja: {{date}}",
+    "languageNote": "Ten dokument jest dostępny po albańsku i angielsku. Poniżej znajduje się wersja angielska; rozstrzygająca jest wersja albańska."
   }
 }

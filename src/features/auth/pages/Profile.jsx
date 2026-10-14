@@ -7,7 +7,7 @@ import { useProfileStats } from '../hooks/useProfileStats'
 import DuskHero from '../components/DuskHero'
 import { EMAIL_RE, friendlyError } from '../../../lib/authErrors'
 import { supabase } from '../../../lib/supabase'
-import { hasLegalUrls, PRIVACY_POLICY_URL, TERMS_URL } from '../../../lib/legal'
+import LegalLinks from '../../../shared/LegalLinks'
 import '../../../styles/profile.css'
 
 export default function Profile() {
@@ -442,24 +442,9 @@ export default function Profile() {
           {t('account.deleteAccount')}
         </button>
 
-        {/* Both stores expect a reachable Privacy Policy. Rendered only when a
-            real https URL is configured — a link that 404s in front of a
-            reviewer is worse than no link at all. See src/lib/legal.js. */}
-        {hasLegalUrls() && (
-          <div className="profile-legal">
-            {PRIVACY_POLICY_URL && (
-              <a href={PRIVACY_POLICY_URL} target="_blank" rel="noopener noreferrer">
-                {t('legal.privacyPolicy')}
-              </a>
-            )}
-            {PRIVACY_POLICY_URL && TERMS_URL && <span aria-hidden="true">·</span>}
-            {TERMS_URL && (
-              <a href={TERMS_URL} target="_blank" rel="noopener noreferrer">
-                {t('legal.termsOfService')}
-              </a>
-            )}
-          </div>
-        )}
+        {/* Both stores expect a reachable Privacy Policy; the pages are part
+            of this web app (src/features/legal), so the links always work. */}
+        <LegalLinks className="profile-legal" />
 
         {deleteOpen && (
           <div className="delete-account-backdrop" onClick={() => !deleting && setDeleteOpen(false)}>

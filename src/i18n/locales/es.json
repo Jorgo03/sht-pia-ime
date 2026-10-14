@@ -555,6 +555,8 @@
   },
   "legal": {
     "privacyPolicy": "Política de privacidad",
-    "termsOfService": "Términos del servicio"
+    "termsOfService": "Términos del servicio",
+    "lastUpdated": "Última actualización: {{date}}",
+    "languageNote": "Este documento está disponible en albanés e inglés. A continuación se muestra la versión en inglés; prevalece la versión en albanés."
   }
 }

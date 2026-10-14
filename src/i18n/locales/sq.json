@@ -547,6 +547,8 @@
   },
   "legal": {
     "privacyPolicy": "Politika e privatësisë",
-    "termsOfService": "Kushtet e shërbimit"
+    "termsOfService": "Kushtet e shërbimit",
+    "lastUpdated": "Përditësuar më {{date}}",
+    "languageNote": "Ky dokument është i disponueshëm në shqip dhe anglisht. Më poshtë është versioni në anglisht; versioni në shqip mbizotëron."
   }
 }

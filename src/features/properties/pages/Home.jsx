@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import FeaturedCard from '../components/FeaturedCard'
 import PropertyCard from '../components/PropertyCard'
 import SkeletonCard from '../../../shared/SkeletonCard'
+import LegalLinks from '../../../shared/LegalLinks'
 import { useProperties, usePropertiesByIds } from '../hooks/useProperties'
 import { useRecentlyViewed } from '../hooks/useRecentlyViewed'
 import { useAuth } from '../../auth/AuthContext'
@@ -132,6 +133,8 @@ export default function Home() {
           DESIGN_INSTALL.md re-specifies it as an `.area-grid` derived from real
           city counts — still not re-added here, because the owner decision is
           newer than the spec and was reaffirmed in this session. */}
+
+      <LegalLinks className="mt-8 mb-4" />
     </div>
   )
 }
