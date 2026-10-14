@@ -50,7 +50,11 @@ jobs:
 
   e2e:
     name: End-to-end (Playwright)
-    runs-on: ubuntu-latest
+    # Pinned, not ubuntu-latest: `playwright install --with-deps` installs
+    # system packages from a per-release list, so a new Ubuntu can break it
+    # before Playwright supports it. ubuntu-latest moves to 26 on 2026-10-19.
+    # Bump this together with @playwright/test.
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v7
