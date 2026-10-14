@@ -22,8 +22,9 @@ Stripe account; candidates are Paddle (merchant of record, lists Albania;
 seller eligibility unconfirmed) or a bank virtual POS such as Raiffeisen
 raiAccept (supports recurring). **Checkout is website-only**: the phone apps
 show plan and promotion status, with no in-app purchase and no Apple/Google
-fee. Schema drafted in `supabase/pending/` (21/21 tests), **not applied:
-owner asked to review it first**.
+fee. Schema **applied 2026-10-14** after the owner's review
+(`20261014214726_add_payments_foundation`); 14/14 live checks as agent,
+client, signed out and payment server, in a rolled-back transaction.
 
 ## ═══ AUTH INCIDENT REMEDIATION — 2026-08-19 ═══
 

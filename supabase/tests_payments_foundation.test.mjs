@@ -1,10 +1,10 @@
 import { PGlite } from '@electric-sql/pglite';
 import fs from 'node:fs';
 const db = new PGlite();
-// Usage: npx -y -p @electric-sql/pglite@0.2.17 node supabase/pending/payments_foundation.test.mjs
+// Usage: npx -y -p @electric-sql/pglite@0.2.17 node supabase/tests_payments_foundation.test.mjs
 // Runs the migration in an in-process Postgres with a minimal Supabase stand-in;
 // never touches a real database.
-const MIG = fs.readFileSync(process.argv[2] ?? new URL('./20261014120000_add_payments_foundation.sql', import.meta.url), 'utf8');
+const MIG = fs.readFileSync(process.argv[2] ?? new URL('./migrations/20261014214726_add_payments_foundation.sql', import.meta.url), 'utf8');
 const A = '11111111-1111-1111-1111-111111111111', B = '22222222-2222-2222-2222-222222222222';
 // Minimal stand-in for Supabase: roles, auth.uid(), default grants, the two
 // referenced tables and the properties update policy as in production.

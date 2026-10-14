@@ -3,9 +3,8 @@
 Decided by the owner, 2026-10-14: **both** paid products. Posting stays free
 for owners and agents (DuaShpi's model, and what keeps listings coming in).
 
-Nothing here is built yet. The schema needs the owner's approval before it
-touches the live database, and the provider-specific parts wait on where
-FHO's company is registered.
+The database part is live (2026-10-14). Checkout, the webhook and the app
+screens wait on the provider choice and the prices.
 
 ## The two products
 
@@ -64,8 +63,8 @@ the UI.
   Albania; confirm it onboards an Albania-registered seller) or a bank virtual
   POS (Raiffeisen raiAccept, BKT, Credins). The schema is provider-neutral.
 - **Checkout: website only.** The apps show status; no in-app purchase.
-- **Schema:** `supabase/pending/20261014120000_add_payments_foundation.sql`,
-  tested (`payments_foundation.test.mjs`, 21/21). Awaiting the owner's review.
+- **Schema: applied** (`supabase/migrations/20261014214726_add_payments_foundation.sql`),
+  21/21 offline, 14/14 live. Tables are empty until prices are set.
 
 ## Still open
 

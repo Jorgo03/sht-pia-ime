@@ -1,11 +1,11 @@
 -- Payments foundation: listing promotion + monthly agency plans.
 -- Design: replica/payments-plan.md. Decision: DECISIONS.md M1.
 --
--- NOT YET APPLIED to production. The owner asked to see it first
--- (2026-10-14). It lives in supabase/pending/ so nothing can apply it by
--- accident; on approval, move it to supabase/migrations/ and apply it.
--- Tested: supabase/pending/payments_foundation.test.mjs, 21/21, and 3 fail
--- with the promoted_until guard removed (the hole it closes is real).
+-- Applied to production 2026-10-14 after the owner reviewed and approved it
+-- (recorded version 20261014214726). Tested first in PGlite
+-- (supabase/tests_payments_foundation.test.mjs: 21/21, and 3 fail with the
+-- promoted_until guard removed), then live as an agent, a client, signed out
+-- and as the payment server, inside a rolled-back transaction: 14/14.
 --
 -- Provider-neutral on purpose: FHO is registered in Albania, where a standard
 -- Stripe account is reportedly unavailable, and the provider (Paddle, a bank
