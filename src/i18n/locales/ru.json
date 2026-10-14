@@ -78,7 +78,9 @@
     "heroSignUpPre": "Начните",
     "heroSignUpEm": "искать дом",
     "heroSignUpPost": "уже сегодня.",
-    "resendIn": "Отправить снова через {{s}} с"
+    "resendIn": "Отправить снова через {{s}} с",
+    "showPassword": "Показать пароль",
+    "hidePassword": "Скрыть пароль"
   },
   "home": {
     "greetingMorning": "Доброе утро",

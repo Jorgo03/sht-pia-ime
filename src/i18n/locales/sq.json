@@ -78,7 +78,9 @@
     "heroSignUpPre": "Fillo të",
     "heroSignUpEm": "gjesh shtëpinë",
     "heroSignUpPost": "që sot.",
-    "resendIn": "Ridërgo pas {{s}}s"
+    "resendIn": "Ridërgo pas {{s}}s",
+    "showPassword": "Shfaq fjalëkalimin",
+    "hidePassword": "Fshih fjalëkalimin"
   },
   "home": {
     "greetingMorning": "Mirëmëngjes",

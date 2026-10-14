@@ -70,6 +70,15 @@ export default defineConfig([
     },
   },
   {
-    ignores: ["dist/*"],
+    // Playwright fixtures receive a callback conventionally named `use`, which
+    // the React hooks rule mistakes for React's `use()`. Nothing in e2e/ is
+    // React code.
+    files: ['e2e/**'],
+    rules: {
+      'react-hooks/rules-of-hooks': 'off',
+    },
+  },
+  {
+    ignores: ["dist/*", "dist-e2e/*", "playwright-report/*", "test-results/*"],
   },
 ]);

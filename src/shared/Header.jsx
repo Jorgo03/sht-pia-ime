@@ -54,12 +54,8 @@ export default function Header() {
   }, [])
 
   const changeLanguage = async (code) => {
+    // Also updates <html lang> (src/i18n/index.js listens for the change).
     await i18n.changeLanguage(code)
-    // Sets the <html lang> attribute, which screen readers and hyphenation
-    // depend on. A DOM write, not React state, and it has to happen for the
-    // document to be correct.
-    // eslint-disable-next-line react-hooks/immutability -- DOM attribute, not state
-    document.documentElement.lang = code
     localStorage.setItem('fho_lang', code)
     setLangOpen(false)
     if (user) {
@@ -168,7 +164,7 @@ export default function Header() {
               )}
             </>
           ) : (
-            <button className="account-signin-btn" onClick={() => navigate('/profile')}><User size={18} /></button>
+            <button className="account-signin-btn" onClick={() => navigate('/profile')} aria-label={t('common.signIn')}><User size={18} aria-hidden="true" /></button>
           )}
         </div>
       </div>

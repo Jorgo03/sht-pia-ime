@@ -351,7 +351,7 @@ export default function Profile() {
                     onKeyDown={(e) => e.key === 'Enter' && handleUpdatePassword()}
                     autoFocus
                   />
-                  <button className="field-eye" onClick={() => setShowNewPw(!showNewPw)} type="button">{showNewPw ? <EyeOff size={18} /> : <Eye size={18} />}</button>
+                  <button className="field-eye" onClick={() => setShowNewPw(!showNewPw)} type="button" aria-label={showNewPw ? t('auth.hidePassword') : t('auth.showPassword')} aria-pressed={showNewPw}>{showNewPw ? <EyeOff size={18} /> : <Eye size={18} />}</button>
                 </div>
                 <div className="field-row">
                   <Lock size={18} className="field-icon" />
@@ -451,7 +451,7 @@ export default function Profile() {
             <div className="delete-account-dialog" role="dialog" aria-modal="true" onClick={e => e.stopPropagation()}>
               <h2>{t('account.deleteAccount')}</h2>
               <p>{t('account.deleteConfirmBody')}</p>
-              {deleteError && <div className="auth-message">{t('account.deleteFailed')}</div>}
+              {deleteError && <div className="auth-message" role="alert">{t('account.deleteFailed')}</div>}
               <button className="profile-signout" disabled={deleting} onClick={handleDeleteAccount}>
                 {deleting ? t('common.loading') : t('account.deleteConfirmCta')}
               </button>
@@ -478,7 +478,7 @@ export default function Profile() {
             <p className="auth-subtitle">{t('auth.otpSubtitle')}</p>
             <div className="field-row"><Mail size={18} className="field-icon" /><input type="email" className="form-input" placeholder={t('auth.email')} value={otpEmail} onChange={(e) => setOtpEmail(e.target.value)} autoFocus onKeyDown={(e) => e.key === 'Enter' && handleSendOtp()} /></div>
             <button className="cta-pill" onClick={handleSendOtp} disabled={loading}>{loading ? t('common.loading') : t('auth.sendCode')}</button>
-            {message && <div className="auth-message">{message}</div>}
+            {message && <div className="auth-message" role="status">{message}</div>}
           </div>
         </div>
       </div>
@@ -543,7 +543,7 @@ export default function Profile() {
           <div className="field-row">
             <Lock size={18} className="field-icon" />
             <input type={showPw ? 'text' : 'password'} className="form-input" placeholder={t('auth.password')} value={password} onChange={(e) => setPassword(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleAuth()} />
-            <button className="field-eye" onClick={() => setShowPw(!showPw)} type="button">{showPw ? <EyeOff size={18} /> : <Eye size={18} />}</button>
+            <button className="field-eye" onClick={() => setShowPw(!showPw)} type="button" aria-label={showPw ? t('auth.hidePassword') : t('auth.showPassword')} aria-pressed={showPw}>{showPw ? <EyeOff size={18} /> : <Eye size={18} />}</button>
           </div>
 
           {isSignUp && (
@@ -574,7 +574,7 @@ export default function Profile() {
             <ArrowRight size={18} />
           </button>
 
-          {message && <div className="auth-message">{message}</div>}
+          {message && <div className="auth-message" role="status">{message}</div>}
 
           <div className="divider"><span>{t('auth.signInWith')}</span></div>
 

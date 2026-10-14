@@ -78,7 +78,9 @@
     "heroSignUpPre": "Start",
     "heroSignUpEm": "finding home",
     "heroSignUpPost": "today.",
-    "resendIn": "Resend in {{s}}s"
+    "resendIn": "Resend in {{s}}s",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password"
   },
   "addSheet": {
     "openLabel": "Create new",

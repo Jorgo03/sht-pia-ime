@@ -28,3 +28,9 @@ test-*.cjs
 .agents/
 .vercel
 .env*
+
+# Playwright end-to-end output (npm run test:e2e)
+dist-e2e/
+test-results/
+playwright-report/
+blob-report/

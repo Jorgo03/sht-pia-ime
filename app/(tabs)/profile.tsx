@@ -821,7 +821,12 @@ export default function ProfileScreen() {
                       secureTextEntry={!showPassword}
                       editable={!loading}
                     />
-                    <TouchableOpacity style={styles.fieldEye} onPress={() => setShowPassword((v) => !v)} hitSlop={8}>
+                    <TouchableOpacity
+                      style={styles.fieldEye}
+                      onPress={() => setShowPassword((v) => !v)}
+                      hitSlop={8}
+                      accessibilityRole="button"
+                      accessibilityLabel={showPassword ? t('auth.hidePassword') : t('auth.showPassword')}>
                       <MaterialIcons
                         name={showPassword ? 'visibility-off' : 'visibility'}
                         size={18}
@@ -925,7 +930,12 @@ export default function ProfileScreen() {
                   onChangeText={setPassword}
                   secureTextEntry={!showPassword}
                 />
-                <TouchableOpacity style={styles.fieldEye} onPress={() => setShowPassword((v) => !v)} hitSlop={8}>
+                <TouchableOpacity
+                  style={styles.fieldEye}
+                  onPress={() => setShowPassword((v) => !v)}
+                  hitSlop={8}
+                  accessibilityRole="button"
+                  accessibilityLabel={showPassword ? t('auth.hidePassword') : t('auth.showPassword')}>
                   <MaterialIcons
                     name={showPassword ? 'visibility-off' : 'visibility'}
                     size={18}

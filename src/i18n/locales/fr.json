@@ -78,7 +78,9 @@
     "heroSignUpPre": "Commencez à",
     "heroSignUpEm": "trouver votre chez-vous",
     "heroSignUpPost": "dès aujourd'hui.",
-    "resendIn": "Renvoyer dans {{s}}s"
+    "resendIn": "Renvoyer dans {{s}}s",
+    "showPassword": "Afficher le mot de passe",
+    "hidePassword": "Masquer le mot de passe"
   },
   "home": {
     "greetingMorning": "Bonjour",
