@@ -3,7 +3,7 @@ import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Provider } from '@supabase/supabase-js';
 
-import { hasLegalUrls, PRIVACY_POLICY_URL, TERMS_URL } from '@/lib/legal';
+import { PRIVACY_POLICY_URL, TERMS_URL } from '@/lib/legal';
 import { supabase } from '@/lib/supabase';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter, type Href } from 'expo-router';
@@ -151,8 +151,6 @@ export default function ProfileScreen() {
   const [signOutOpen, setSignOutOpen] = useState(false);
   // Local copies so TypeScript keeps the null-narrowing inside the onPress
   // closures below — narrowing of an imported binding does not survive one.
-  const privacyUrl = PRIVACY_POLICY_URL;
-  const termsUrl = TERMS_URL;
   // Account deletion is mandatory for store approval (Apple 5.1.1(v), Google
   // Play data-deletion policy) when an app lets users create accounts.
   const [deleteOpen, setDeleteOpen] = useState(false);
@@ -622,27 +620,17 @@ export default function ProfileScreen() {
               <Text style={styles.deleteAccountText}>{t('account.deleteAccount')}</Text>
             </TouchableOpacity>
 
-            {/* Both stores expect a reachable Privacy Policy. Rendered only
-                when a real https URL is configured — a link that 404s in front
-                of a reviewer is worse than no link. See lib/legal.ts. */}
-            {hasLegalUrls() && (
-              <View style={styles.legalRow}>
-                {/* Captured into locals: TypeScript does not carry narrowing
-                    of an *imported* binding into a closure, so referencing
-                    the import directly inside onPress is `string | null`. */}
-                {privacyUrl && (
-                  <Text style={styles.legalLink} onPress={() => Linking.openURL(privacyUrl)}>
-                    {t('legal.privacyPolicy')}
-                  </Text>
-                )}
-                {privacyUrl && termsUrl && <Text style={styles.legalDot}>·</Text>}
-                {termsUrl && (
-                  <Text style={styles.legalLink} onPress={() => Linking.openURL(termsUrl)}>
-                    {t('legal.termsOfService')}
-                  </Text>
-                )}
-              </View>
-            )}
+            {/* Both stores require the Privacy Policy to be reachable from
+                inside the app. The pages live on the website (lib/legal.ts). */}
+            <View style={styles.legalRow}>
+              <Text style={styles.legalLink} accessibilityRole="link" onPress={() => Linking.openURL(PRIVACY_POLICY_URL)}>
+                {t('legal.privacyPolicy')}
+              </Text>
+              <Text style={styles.legalDot}>·</Text>
+              <Text style={styles.legalLink} accessibilityRole="link" onPress={() => Linking.openURL(TERMS_URL)}>
+                {t('legal.termsOfService')}
+              </Text>
+            </View>
           </ScrollView>
         </SafeAreaView>
 
@@ -1099,6 +1087,18 @@ export default function ProfileScreen() {
                   </Text>
                 </Text>
               </TouchableOpacity>
+
+              {/* Reachable before signing up too: this is where people
+                  decide whether to hand over their details. */}
+              <View style={[styles.legalRow, styles.legalRowAuth]}>
+                <Text style={[styles.legalLink, styles.legalLinkAuth]} accessibilityRole="link" onPress={() => Linking.openURL(PRIVACY_POLICY_URL)}>
+                  {t('legal.privacyPolicy')}
+                </Text>
+                <Text style={[styles.legalDot, styles.legalLinkAuth]}>·</Text>
+                <Text style={[styles.legalLink, styles.legalLinkAuth]} accessibilityRole="link" onPress={() => Linking.openURL(TERMS_URL)}>
+                  {t('legal.termsOfService')}
+                </Text>
+              </View>
                 </>
               )}
             </View>
@@ -1306,6 +1306,14 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   legalDot: {
     fontSize: 12,
     color: colors.textFaint,
+  },
+  // The signed-out card is dark glass in both themes, like linkButtonText.
+  legalRowAuth: {
+    paddingTop: 12,
+    paddingBottom: 0,
+  },
+  legalLinkAuth: {
+    color: 'rgba(255,255,255,0.5)',
   },
 
   // ─── Auth (signed-out) screen — matches web's .auth-screen family ───
