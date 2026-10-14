@@ -4,6 +4,9 @@ Found by `/replica-test` on 2026-10-14. Every bug below was reproduced, either
 in Chromium against a production build or by a failing unit test. Suspicions
 that were not reproduced are under "To check" at the bottom.
 
+Since c64b1e2 most of this is automated: `npm run test:e2e` (see
+`test-plan.md`). BUG-012 to BUG-014 were found by that suite.
+
 Test setup: web = Vite production build; mobile = `expo export -p web` of the
 phone app (same code as the phone, rendered in a browser). Both were served
 locally against a replayed copy of the 15 real listings from production, so
@@ -24,6 +27,9 @@ that were rolled back.
 | BUG-009 | S4 | Phone app: listing images have no text alternative | open |
 | BUG-010 | S4 | Web: Share on desktop copies the link silently | fixed in ae5a93e |
 | BUG-011 | S3 | Call link invalid for an owner number typed as "+ 069…" | fixed in ae5a93e |
+| BUG-012 | S3 | Show/hide password buttons have no accessible name (web and phone app) | fixed in c64b1e2 |
+| BUG-013 | S4 | After a reload in another language the page still says it is Albanian | fixed in c64b1e2 |
+| BUG-014 | S4 | Sign-in errors are not announced to screen readers | fixed in c64b1e2 |
 
 ---
 
@@ -138,7 +144,8 @@ Actual (axe-core):
 - `nested-interactive`, phone app (web export): property cards.
 
 Status: partly fixed.
-- Fixed: the language button now has `aria-label` and `aria-expanded`.
+- Fixed in 074c17a and c64b1e2: the language button now has `aria-label` and
+  `aria-expanded`, and the signed-out person icon now has a name.
 - Fixed in ae5a93e: the agent strip is no longer clickable as a whole. Only the
   agent's name links to the profile, and axe now reports `[]` on the strip.
 - Open: the cards. The fix is to make the card's title the link, stretched
@@ -207,6 +214,54 @@ bug in `handleCall`.
 Status: fixed in ae5a93e. New `internationalPhone()` and `telUrl()` helpers in
 both apps are shared by Call and WhatsApp. There is a test in
 `tests/phoneLinks.test.mjs`.
+
+### BUG-012: Show/hide password buttons have no name
+
+- Severity: S3
+- Screen: web `/profile` sign-in form and new-password form; phone app Profile
+- Found by: `e2e/a11y.spec.ts` (axe `button-name` on `.field-eye`)
+
+Steps
+1. Open Profile while signed out and move a screen reader to the eye icon
+   next to the password.
+
+Expected: "Show password" (or "Hide password").
+Actual: "button", with no name.
+Status: fixed in c64b1e2. New `auth.showPassword` and `auth.hidePassword`
+keys in all 8 locales. The web button also reports `aria-pressed`, and the
+phone app's toggles have an `accessibilityLabel`.
+
+### BUG-013: Page language not restored after a reload
+
+- Severity: S4
+- Screen: web, every page
+- Found by: `e2e/settings.spec.ts`, F08-H1
+
+Steps
+1. Switch the site to English and reload.
+
+Expected: `<html lang="en">`
+Actual: `<html lang="sq">`. Only clicking a language set the attribute, so on
+every later visit screen readers read English text with Albanian
+pronunciation, and browsers offered to translate the page "from Albanian".
+Status: fixed in c64b1e2. `src/i18n/index.js` sets it on every language
+change, including the language restored on load.
+
+### BUG-014: Sign-in errors are not announced
+
+- Severity: S4
+- Screen: web `/profile`, the email sign-in, magic-link and delete-account
+  messages
+- Found by: `e2e/access.spec.ts`, F04-N2
+
+Steps
+1. Sign in with a wrong password.
+
+Expected: the error "Email ose fjalëkalim i gabuar." is shown and announced.
+Actual: it was shown, but in a plain `div`, so a screen reader user heard
+nothing.
+Status: fixed in c64b1e2 with `role="status"`, and `role="alert"` for the
+delete-account failure.
 
 ---
 

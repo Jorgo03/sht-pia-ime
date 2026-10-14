@@ -36,6 +36,7 @@ Web:
 - `npm run dev` — Vite dev server, http://localhost:5173
 - `npm run build` — production build to `dist/`
 - `npm test` — Node's built-in test runner over `tests/**/*.test.mjs`; run a single file with `npm test -- tests/aiSchemas.test.mjs`
+- `npm run test:e2e` — Playwright end-to-end suite (`e2e/`, `playwright.config.ts`), phone + desktop Chromium. Builds the web app to `dist-e2e/` against a fake Supabase host; `e2e/support/backend.ts` answers every backend call in the browser, so it runs offline and never touches production. Every test fails on a page error, console error or 5xx; `e2e/a11y.spec.ts` runs axe-core, with open accessibility bugs listed by rule in `KNOWN` (remove one when it is fixed). First run on a machine: `npm run test:e2e:install`. `PW_CHROMIUM_PATH=<chrome>` reuses an existing Chromium instead
 
 Mobile:
 - `npm run expo:lan` — start Metro; auto-detects the machine's real Wi-Fi LAN IP (`scripts/start-expo-lan.cjs`) instead of trusting Expo's own detection, which can pick a virtual adapter (Hyper-V, Bluetooth PAN) on this environment and hand the phone an unreachable address
