@@ -3,5 +3,19 @@
     "commit": "",
     "pr": ""
   },
-  "includeCoAuthoredBy": false
+  "includeCoAuthoredBy": false,
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/require-pushed.sh\"",
+            "timeout": 30,
+            "statusMessage": "Checking every change is on GitHub"
+          }
+        ]
+      }
+    ]
+  }
 }
