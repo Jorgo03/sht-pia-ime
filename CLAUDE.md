@@ -57,6 +57,7 @@ Mobile:
 - `npx expo-doctor` — SDK/config compatibility checks; 21 checks, all passing offline-independent ones. There are no `android/`/`ios/` directories: this is a CNG project, so native config comes from app.json at build time and there is nothing to regenerate after an SDK bump
 
 Shared:
+- **CI** — `.github/workflows/ci.yml` runs on every push and PR: job `checks` (lint, `tsc`, `npm test`, web build) and job `e2e` (`npm run test:e2e`; on failure the Playwright report is uploaded as the `playwright-report` artifact). Uses no secrets and never reaches Supabase. Keep it green: run the same commands locally before pushing
 - `npx tsc --noEmit` — type-checks both apps from one `tsconfig.json`
 - `npm run lint` — runs `expo lint` (ESLint) across the whole repo, not a web-only linter
 

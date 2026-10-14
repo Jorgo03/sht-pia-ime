@@ -18,7 +18,7 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: 0,
-  reporter: process.env.CI ? 'line' : [['list'], ['html', { open: 'never' }]],
+  reporter: [[process.env.CI ? 'line' : 'list'], ['html', { open: 'never' }]],
   use: {
     baseURL: `http://localhost:${PORT}`,
     trace: 'retain-on-failure',
