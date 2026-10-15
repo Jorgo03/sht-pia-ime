@@ -25,7 +25,8 @@
     "toggleTheme": "Сменить тему",
     "previous": "Назад",
     "next": "Далее",
-    "retry": "Повторить"
+    "retry": "Повторить",
+    "done": "Готово"
   },
   "auth": {
     "roleClient": "Клиент",

@@ -24,6 +24,7 @@ import { RoadField } from '@/components/listing/road-field';
 import { TranslationBar } from '@/components/listing/translation-bar';
 import { ActionButton } from '@/components/ui/action-button';
 import { GradientBackground } from '@/components/ui/gradient-background';
+import { KEYBOARD_DONE_ID, KeyboardDoneBar } from '@/components/ui/keyboard-done-bar';
 import { type AtticoPalette, Fonts } from '@/constants/theme';
 import { useAuth } from '@/contexts/auth-context';
 import { useTheme } from '@/contexts/theme-context';
@@ -417,6 +418,7 @@ export default function CreateListingScreen() {
           <ScrollView
             contentContainerStyle={styles.scrollContent}
             showsVerticalScrollIndicator={false}
+            keyboardDismissMode={Platform.OS === 'ios' ? 'interactive' : 'on-drag'}
             keyboardShouldPersistTaps="handled">
 
             {/* Listing Type */}
@@ -496,6 +498,7 @@ export default function CreateListingScreen() {
               />
 
               <TextInput
+                inputAccessoryViewID={KEYBOARD_DONE_ID}
                 style={styles.input}
                 // On a non-source language with nothing translated yet, the
                 // Albanian itself is the most useful placeholder.
@@ -514,6 +517,7 @@ export default function CreateListingScreen() {
             <View style={styles.field}>
               <Text style={styles.fieldLabel}>{t('listing.description')}</Text>
               <TextInput
+                inputAccessoryViewID={KEYBOARD_DONE_ID}
                 style={[styles.input, styles.textArea]}
                 placeholder={translation.activeLang === 'sq' ? t('listing.descriptionPlaceholder') : (translation.sourceDescription || `${t('listing.description')} (${translation.activeLang.toUpperCase()})`)}
                 placeholderTextColor={colors.textSecondary}
@@ -650,6 +654,7 @@ export default function CreateListingScreen() {
               <View style={[styles.field, styles.flex2]}>
                 <Text style={styles.fieldLabel}>{t('listing.price')}</Text>
                 <TextInput
+                  inputAccessoryViewID={KEYBOARD_DONE_ID}
                   style={styles.input}
                   placeholder={form.listing_type === 'rent' ? `${t('listing.price')} (${t('property.perMonth')})` : t('listing.price')}
                   placeholderTextColor={colors.textSecondary}
@@ -684,6 +689,7 @@ export default function CreateListingScreen() {
             <View style={styles.field}>
               <Text style={styles.fieldLabel}>{t('listing.surface')} (m²)</Text>
               <TextInput
+                inputAccessoryViewID={KEYBOARD_DONE_ID}
                 style={styles.input}
                 placeholder="0"
                 placeholderTextColor={colors.textSecondary}
@@ -702,6 +708,7 @@ export default function CreateListingScreen() {
               <View style={styles.field}>
                 <Text style={styles.fieldLabel}>{t('property.beds')}</Text>
                 <TextInput
+                  inputAccessoryViewID={KEYBOARD_DONE_ID}
                   style={styles.input}
                   placeholder="0"
                   placeholderTextColor={colors.textSecondary}
@@ -717,6 +724,7 @@ export default function CreateListingScreen() {
               <View style={styles.field}>
                 <Text style={styles.fieldLabel}>{t('property.baths')}</Text>
                 <TextInput
+                  inputAccessoryViewID={KEYBOARD_DONE_ID}
                   style={styles.input}
                   placeholder="0"
                   placeholderTextColor={colors.textSecondary}
@@ -736,6 +744,7 @@ export default function CreateListingScreen() {
               <View style={styles.field}>
                 <Text style={styles.fieldLabel}>{t('listing.floor')}</Text>
                 <TextInput
+                  inputAccessoryViewID={KEYBOARD_DONE_ID}
                   style={styles.input}
                   placeholder="0"
                   placeholderTextColor={colors.textSecondary}
@@ -751,6 +760,7 @@ export default function CreateListingScreen() {
               <View style={styles.field}>
                 <Text style={styles.fieldLabel}>{t('listing.totalFloors')}</Text>
                 <TextInput
+                  inputAccessoryViewID={KEYBOARD_DONE_ID}
                   style={styles.input}
                   placeholder="0"
                   placeholderTextColor={colors.textSecondary}
@@ -766,6 +776,7 @@ export default function CreateListingScreen() {
               <View style={styles.field}>
                 <Text style={styles.fieldLabel}>{t('listing.yearBuilt')}</Text>
                 <TextInput
+                  inputAccessoryViewID={KEYBOARD_DONE_ID}
                   style={styles.input}
                   placeholder="2024"
                   placeholderTextColor={colors.textSecondary}
@@ -807,6 +818,7 @@ export default function CreateListingScreen() {
               <SectionLabel styles={styles}>{t('listing.contactInfo')}</SectionLabel>
               <Text style={styles.fieldLabel}>{t('listing.phone')}</Text>
               <TextInput
+                inputAccessoryViewID={KEYBOARD_DONE_ID}
                 style={styles.input}
                 placeholder="+355 69..."
                 placeholderTextColor={colors.textSecondary}
@@ -832,6 +844,7 @@ export default function CreateListingScreen() {
               </TouchableOpacity>
               <Text style={styles.fieldLabel}>{t('listing.email')}</Text>
               <TextInput
+                inputAccessoryViewID={KEYBOARD_DONE_ID}
                 style={styles.input}
                 placeholder="john.doe@gmail.com"
                 placeholderTextColor={colors.textSecondary}
@@ -859,6 +872,7 @@ export default function CreateListingScreen() {
               />
             </View>
           </ScrollView>
+          <KeyboardDoneBar />
         </KeyboardAvoidingView>
       </SafeAreaView>
     </GradientBackground>

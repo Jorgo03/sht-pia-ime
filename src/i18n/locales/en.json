@@ -25,7 +25,8 @@
     "toggleTheme": "Toggle theme",
     "previous": "Previous",
     "next": "Next",
-    "retry": "Retry"
+    "retry": "Retry",
+    "done": "Done"
   },
   "auth": {
     "roleClient": "Client",

@@ -25,7 +25,8 @@
     "toggleTheme": "Ndrysho temën",
     "previous": "E mëparshme",
     "next": "Tjetra",
-    "retry": "Provo përsëri"
+    "retry": "Provo përsëri",
+    "done": "U krye"
   },
   "auth": {
     "roleClient": "Klient",

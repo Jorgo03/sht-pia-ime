@@ -25,7 +25,8 @@
     "toggleTheme": "Zmień motyw",
     "previous": "Poprzedni",
     "next": "Dalej",
-    "retry": "Spróbuj ponownie"
+    "retry": "Spróbuj ponownie",
+    "done": "Gotowe"
   },
   "auth": {
     "roleClient": "Klient",

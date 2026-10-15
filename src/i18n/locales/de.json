@@ -25,7 +25,8 @@
     "toggleTheme": "Design wechseln",
     "previous": "Zurück",
     "next": "Weiter",
-    "retry": "Erneut versuchen"
+    "retry": "Erneut versuchen",
+    "done": "Fertig"
   },
   "auth": {
     "roleClient": "Kunde",

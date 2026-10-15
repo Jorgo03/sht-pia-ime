@@ -31,6 +31,7 @@ import { Field } from '@/components/ui/field';
 import { GradientBackground } from '@/components/ui/gradient-background';
 import { RiseIn } from '@/components/ui/motion';
 import { SelectField } from '@/components/ui/select-field';
+import { KEYBOARD_DONE_ID, KeyboardDoneBar } from '@/components/ui/keyboard-done-bar';
 import { Fonts, Radii, Spacing, type AtticoPalette } from '@/constants/theme';
 import { useAuth } from '@/contexts/auth-context';
 import { useTheme } from '@/contexts/theme-context';
@@ -577,6 +578,7 @@ export default function NewListingWizard() {
         />
 
         <TextInput
+          inputAccessoryViewID={KEYBOARD_DONE_ID}
           style={styles.input}
           // On a non-source language with nothing translated yet, the Albanian
           // itself is the most useful placeholder — it shows what is about to
@@ -600,6 +602,7 @@ export default function NewListingWizard() {
       <View style={styles.fieldBlock}>
         <Text style={styles.fieldLabel}>{t('listing.description')}</Text>
         <TextInput
+          inputAccessoryViewID={KEYBOARD_DONE_ID}
           style={[styles.input, styles.textArea]}
           placeholder={
             translation.activeLang === 'sq'
@@ -686,6 +689,7 @@ export default function NewListingWizard() {
       <View style={styles.row}>
         <Labeled styles={styles} label={t('listing.price')} error={errors.price} style={styles.flex2}>
           <Field
+            inputAccessoryViewID={KEYBOARD_DONE_ID}
             icon="euro"
             placeholder="0"
             keyboardType="numeric"
@@ -709,6 +713,7 @@ export default function NewListingWizard() {
 
       <Labeled styles={styles} label={`${t('listing.surface')} (m²)`} error={errors.sqft}>
         <Field
+          inputAccessoryViewID={KEYBOARD_DONE_ID}
           icon="straighten"
           placeholder="0"
           keyboardType="numeric"
@@ -723,6 +728,7 @@ export default function NewListingWizard() {
       <View style={styles.row}>
         <Labeled styles={styles} label={t('property.beds')} error={errors.beds} style={styles.flex1}>
           <Field
+            inputAccessoryViewID={KEYBOARD_DONE_ID}
             icon="king-bed"
             placeholder="0"
             keyboardType="numeric"
@@ -735,6 +741,7 @@ export default function NewListingWizard() {
         </Labeled>
         <Labeled styles={styles} label={t('property.baths')} error={errors.baths} style={styles.flex1}>
           <Field
+            inputAccessoryViewID={KEYBOARD_DONE_ID}
             icon="bathtub"
             placeholder="0"
             keyboardType="numeric"
@@ -750,6 +757,7 @@ export default function NewListingWizard() {
       <View style={styles.row}>
         <Labeled styles={styles} label={t('listing.floor')} error={errors.floor} style={styles.flex1}>
           <Field
+            inputAccessoryViewID={KEYBOARD_DONE_ID}
             icon="stairs"
             placeholder="0"
             keyboardType="numeric"
@@ -762,6 +770,7 @@ export default function NewListingWizard() {
         </Labeled>
         <Labeled styles={styles} label={t('listing.totalFloors')} error={errors.total_floors} style={styles.flex1}>
           <Field
+            inputAccessoryViewID={KEYBOARD_DONE_ID}
             icon="layers"
             placeholder="0"
             keyboardType="numeric"
@@ -776,6 +785,7 @@ export default function NewListingWizard() {
 
       <Labeled styles={styles} label={t('listing.yearBuilt')} error={errors.year_built}>
         <Field
+          inputAccessoryViewID={KEYBOARD_DONE_ID}
           icon="event"
           placeholder="2024"
           keyboardType="numeric"
@@ -894,6 +904,7 @@ export default function NewListingWizard() {
 
       <Labeled styles={styles} label={t('listing.phone')} error={errors.phone}>
         <Field
+          inputAccessoryViewID={KEYBOARD_DONE_ID}
           icon="phone"
           placeholder="+355 69..."
           keyboardType="phone-pad"
@@ -921,6 +932,7 @@ export default function NewListingWizard() {
 
       <Labeled styles={styles} label={t('listing.email')}>
         <Field
+          inputAccessoryViewID={KEYBOARD_DONE_ID}
           icon="mail"
           placeholder="john.doe@gmail.com"
           keyboardType="email-address"
@@ -1079,11 +1091,14 @@ export default function NewListingWizard() {
           <ScrollView
             contentContainerStyle={styles.scrollContent}
             showsVerticalScrollIndicator={false}
+            // Dragging the form down closes the keyboard, on both platforms.
+            keyboardDismissMode={Platform.OS === 'ios' ? 'interactive' : 'on-drag'}
             keyboardShouldPersistTaps="handled">
             {/* Keyed on the step so each one animates in rather than swapping
                 content underneath a static frame. */}
             <RiseIn key={step}>{stepBody()}</RiseIn>
           </ScrollView>
+          <KeyboardDoneBar />
         </KeyboardAvoidingView>
 
         <View style={styles.footer}>

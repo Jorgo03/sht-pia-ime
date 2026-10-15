@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next';
 import { AppHeader } from '@/components/ui/app-header';
 import { PrimaryCTA } from '@/components/ui/buttons';
 import { GradientBackground } from '@/components/ui/gradient-background';
+import { KEYBOARD_DONE_ID, KeyboardDoneBar } from '@/components/ui/keyboard-done-bar';
 import { type AtticoPalette, Fonts } from '@/constants/theme';
 import { useAuth } from '@/contexts/auth-context';
 import { useFilters } from '@/contexts/filters-context';
@@ -441,6 +442,7 @@ export default function SavedSearchesScreen() {
                   />
                 </View>
                 <TextInput
+                  inputAccessoryViewID={KEYBOARD_DONE_ID}
                   style={[styles.input, styles.textArea]}
                   placeholder={t('addSheet.notes')}
                   placeholderTextColor={colors.textSecondary}
@@ -461,6 +463,7 @@ export default function SavedSearchesScreen() {
             )}
           </View>
         </View>
+        <KeyboardDoneBar />
       </Modal>
     </GradientBackground>
   );
