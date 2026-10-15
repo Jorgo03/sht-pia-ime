@@ -1,5 +1,150 @@
 # Pre-Launch Audit — Shtëpia.ime (Vite web app)
 
+## ═══ PASS 14 — 2026-10-15: PRODUCTION-READINESS AUDIT (score, backlog, 30/60/90) ═══
+
+Read-only pass: **no application code and no database object was changed.**
+Evidence comes from the repository at `7b07b42`, the live project
+`xzzzhlwmzotibrxdqmcm` (SQL as read-only queries, security and performance
+advisors, deployed Edge Function sources), CI on GitHub Actions, and today's
+browser runs of both apps. Where something was not verifiable from here, it says so.
+
+### Score: 56 / 100. Not releasable yet.
+
+The weights below are a rubric chosen for this audit, not an industry
+standard. A high score would not override a blocker: the release gate is the
+P0 list, not the number.
+
+| Area | Weight | Score | Evidence |
+| --- | ---: | ---: | --- |
+| Security & privacy | 20 | 14 | RLS on all 16 public tables (live check); RLS behaviour tested live (22+ checks earlier, 18/18 for report/block today); no secrets in the tree or git history; storage buckets enforce MIME types and size limits with per-user folder policies; account deletion exists. **Minus:** an orphan AI function anyone can call (S-1), leaked-password protection off (S-3), two SECURITY DEFINER helpers callable while signed out (S-4) |
+| Backend & data | 15 | 8 | Schema and migration history clean; pagination of 24; payments foundation schema tested (PGlite 23/23). **Minus:** free plan (pauses, no downloadable backups); default SMTP only mails team members, so email sign-up fails for real users; 12 of 15 listings are demo data |
+| Client journeys | 15 | 11 | Browse, search, AI search with fallback, favourites, call/WhatsApp/share, viewings, wanted homes, realtime chat, 8 languages, dark mode; web journeys covered by 36 e2e tests. **Minus:** saved-search alerts are stored but never sent; no push notifications; no report/block |
+| Agent workflows | 10 | 5 | 5-step listing wizard with photos, video and auto-translation; pause/activate/delete; per-listing dashboard; leads; viewings. **Minus: no way to edit a listing, no "mark sold/rented" action** (statuses exist, no UI), agents cannot edit their own phone or avatar (column grants) |
+| Mobile readiness | 10 | 5 | Expo SDK 57 runs in Expo Go; recent UX fixes (keyboard, spacing, glass nav). **Minus:** no EAS production build has ever been made; Sign in with Apple never exercised; Android Maps key missing; icon is a placeholder until the owner's logo |
+| Payments & subscriptions | 10 | 2 | Tables `plans`, `agency_subscriptions`, `listing_promotions`, `payment_events` and the `promoted_until` guard exist and are tested. **Minus:** no provider, no webhook, no entitlement or listing-limit enforcement, no purchase UI, `plans` empty, prices undecided |
+| Quality, tests, monitoring | 10 | 6 | CI on every push: lint, tsc, 127 unit tests, 72 e2e runs, web build, all green. **Minus:** the payments PGlite test is outside the CI glob; no automated tests for the phone app; no crash reporting; no product analytics |
+| Store compliance & legal | 5 | 2 | Privacy and Terms pages, linked in both apps; account deletion; Sign in with Apple present. **Minus:** no report/block (Apple 1.2); no reviewer account; privacy forms not filled; no contact mailbox |
+| Performance & accessibility | 5 | 3 | Images compressed to 1600px on the phone, lazy on the web; paginated queries. **Minus:** BUG-006/008/009 accessibility items open; 27 unused indexes (harmless at this size) |
+| **Total** | **100** | **56** | |
+
+### Security findings
+
+| ID | Severity | Finding | Evidence | Fix |
+| --- | --- | --- | --- | --- |
+| S-1 | **High** | Edge Function `translate-description` (v4) is deployed but absent from the repo. It accepts any valid project JWT, including the public anon key shipped in every app bundle, has no rate limit, and calls Anthropic with the project's key. Anyone can spend the Anthropic budget. It also returns raw error text. | `list_edge_functions`: `verify_jwt: true`; source read today: no auth.getUser, no ai_usage check | Delete it (Dashboard → Edge Functions, or `supabase functions delete translate-description`). Nothing in either app calls it. Set a monthly spend limit in the Anthropic console regardless. |
+| S-2 | Low | Edge Function `clerk-link-profile` is deployed with `verify_jwt: false`. It verifies Clerk tokens itself, but the RPC it calls (`link_clerk_profile`) no longer exists, and the app uses Supabase Auth, not Clerk. | Source read today; `pg_proc` has no `link_clerk_profile` | Delete it (dead attack surface), and remove the Clerk secrets if set. |
+| S-3 | Medium | Leaked-password protection is off; it needs the Pro plan. | Security advisor | Turn it on after the Pro upgrade. |
+| S-4 | Low | `current_user_is_agent()` and `buyer_has_open_wanted_home()` are SECURITY DEFINER and executable by `anon`. They answer only yes/no about the caller. | `has_function_privilege` | Revoke EXECUTE from anon if no anon policy needs them (check first: a policy evaluated for anon that calls them would then fail). |
+| S-5 | Info | `ai_usage` and `payment_events` have RLS and no policies, by design (service role only). | Advisor INFO | None. |
+| S-6 | Info | 17 npm audit findings, all in Expo's dev tooling (Metro, CLI). The only "fix" downgrades Expo to 44. | Pass 13 | Clears with the next Expo SDK; never run `npm audit fix --force`. |
+
+No secrets: `git grep` and full-history `git log -p` found no Anthropic, service-role or JWT keys; only `.env.example` is tracked.
+
+### Feature matrix (verified in code; "manual" means not yet run on a real device)
+
+| Capability | Web | iOS | Android | Notes |
+| --- | --- | --- | --- | --- |
+| Browse, search, filters, map | ✅ | ✅ | ⚠️ manual | Android map needs the Maps key in a real build |
+| Listing detail, contact (call/WhatsApp/chat/share) | ✅ e2e | ✅ | ✅ | |
+| Favourites, viewing requests, wanted homes | ✅ | ✅ | ✅ | |
+| Realtime messages | ✅ | ✅ | ✅ | No push notifications when the app is closed |
+| Report listing / block user | ❌ | ❌ | ❌ | DB part written and tested, `supabase/pending/report_and_block.sql` |
+| Sign-in: Google | ✅ | ✅ | ✅ | |
+| Sign-in: email code/password | ⚠️ | ⚠️ | ⚠️ | Blocked for real users until custom SMTP |
+| Sign-in: Apple | n/a | ⚠️ untested | n/a | Needs Apple Developer account and a real build |
+| Agent: create listing | ✅ | ✅ | ✅ | |
+| Agent: **edit** listing | ❌ | ❌ | ❌ | Only pause/activate/delete exist |
+| Agent: mark sold / rented | ❌ | ❌ | ❌ | Statuses exist in the DB and in the UI colours |
+| Agent: leads, viewings, analytics | ✅ | ✅ | ✅ | |
+| Agent: edit phone / avatar | ❌ | ❌ | ❌ | `profiles` column grants allow only name, agency name, language |
+| Saved searches | ✅ saved | ✅ saved | ✅ saved | Alerts never sent: no sender, cron or email service |
+| Plans, limits, payments | ❌ | ❌ | ❌ | Schema only |
+| Account deletion | ✅ | ✅ | ✅ | Apple 5.1.1(v) |
+| Privacy / Terms | ✅ | ✅ | ✅ | |
+| 8 languages, dark mode | ✅ | ✅ | ✅ | |
+
+### Payments plan for Albania (recommendation)
+
+1. **One entitlement system, server-authoritative.** `agency_subscriptions` / `listing_promotions` are written only by a payment webhook (service role). A redirect saying "success" grants nothing. `payment_events` gives idempotency (unique provider event id). This is already the design of the applied foundation migration.
+2. **Website checkout first, prepaid periods (1/3/6/12 months).** The owner already chose these periods (`supabase/pending/plans_by_period_months.sql`). Prepaid needs no stored card or automatic renewal, which suits a market where recurring card payments are uncommon, and works with any gateway that confirms a single payment.
+3. **Provider shortlist, to confirm in writing:**
+   - Paysera Albania: a licensed e-money institution with an e-store gateway. Recurring and tokenised billing for Albanian merchants is unconfirmed.
+   - An Albanian bank e-commerce acquirer (e.g. raiAccept).
+   - Paddle as merchant of record, only if it accepts an Albanian seller.
+
+   A standard Stripe account for an Albanian company is not established by anything found. Albania appears only in Stripe payout lists, so check Stripe's sign-up page directly.
+4. **Apps at launch: no purchasing.** The apps show plan status and limits, and buying happens on the website. Before any purchase button, price or checkout link appears in the apps, confirm against Apple guideline 3.1.1/3.1.3 and Google's Payments policy. Selling inside the apps means IAP and Play Billing (15–30%).
+5. **Plans to validate with 10–20 agents before building limits.** Starting hypothesis from the owner's roadmap: Free (3 active listings), Agent Pro (≈2,490 ALL/month, 30 listings), Agency (≈7,990 ALL/month, 5 seats). These are unvalidated prices. Agency seats need the planned agency-admin role, which is not built.
+
+### Prioritised backlog
+
+**P0: release blockers.** Each one is either a security or financial risk, a store rejection, or a core journey that fails.
+
+| # | Item | Owner | Verify by |
+| --- | --- | --- | --- |
+| P0-1 | Delete `translate-description` and `clerk-link-profile` (S-1, S-2); set an Anthropic spend limit | Owner (dashboard), or Claude via CLI with a token | `list_edge_functions` shows neither |
+| P0-2 | Supabase Pro; then leaked-password protection on | Owner | Billing shows Pro; advisor clear |
+| P0-3 | Custom SMTP + own domain | Owner, with Claude on config | A new address receives the sign-up code |
+| P0-4 | Apply report/block migration, then build UI in both apps | Claude, after owner "go" | 18/18 live checks; e2e for report; manual block test |
+| P0-5 | **Edit listing** (wizard in edit mode) and **mark sold/rented**, both apps | Claude | e2e: edit the price and see it on the listing page; RLS: a non-owner cannot update |
+| P0-6 | Remove the 12 demo listings and 2 test accounts | Claude, after owner "go" | Count of seed rows is 0 |
+| P0-7 | Real builds: EAS production iOS and Android, TestFlight and Play internal; Android Maps key; owner's logo | Owner + Claude | Builds install; the 20 manual tests in the tracker pass |
+| P0-8 | Store accounts as an organization (D-U-N-S), reviewer account, privacy forms, contact mailbox | Owner | Accounts active; forms saved |
+
+**P1: needed for the business model and a healthy launch.**
+
+| # | Item |
+| --- | --- |
+| P1-1 | Crash reporting (Sentry free tier) in both apps. Needs approval to add the library |
+| P1-2 | Push notifications for new messages and viewing requests (expo-notifications + an Edge Function) |
+| P1-3 | Agent profile editing (phone, avatar): extend the column grants deliberately, plus UI |
+| P1-4 | Plans → entitlements → **server-side listing-limit enforcement** (trigger or RLS check on insert/activate) |
+| P1-5 | Payment provider integration on the website + webhook Edge Function + `payment_events` idempotency + receipts |
+| P1-6 | Saved-search alerts (scheduled function + email via the SMTP provider) |
+| P1-7 | Put `supabase/tests_payments_foundation.test.mjs` in CI; add RLS regression tests to CI |
+| P1-8 | Store listing text and screenshots (sq/en), age rating |
+
+**P2: polish.** BUG-006/008/009 accessibility items; S-4 revoke; per-listing link previews for the web (needs server rendering or an edge function); drop unused indexes once real traffic shows which ones are needed.
+
+### Release checklist
+
+- [ ] P0-1 … P0-8 done and verified
+- [ ] 20 manual device tests pass on the TestFlight and Play builds (tracker: https://claude.ai/artifact/2iwP9xo9hG7x3vkAt8khbr)
+- [ ] Reviewer account with real listings; notes for Apple/Google
+- [ ] Apple App Privacy and Google Data safety saved; Privacy URL and support URL live on own domain
+- [ ] CI green on the release commit; crash reporting receiving events
+- [ ] Rollback: previous build kept in TestFlight/Play; DB migrations additive; Supabase Pro daily backups on
+
+### 30 / 60 / 90 days (planning estimates)
+
+- **Days 1–30, stabilise and unblock:**
+  - P0-1 to P0-6;
+  - start the D-U-N-S request, Apple and Google enrollment, and the Paysera/bank application (onboarding reportedly takes about a month);
+  - first EAS builds and internal testing;
+  - interview agents on plans and prices.
+- **Days 31–60, business model and beta:**
+  - finalise plans;
+  - apply the periods migration;
+  - entitlements and listing limits;
+  - website checkout with the chosen provider and the webhook;
+  - push notifications and crash reporting;
+  - store listings and privacy forms;
+  - closed beta with real agents.
+- **Days 61–90, launch:**
+  - fix beta feedback;
+  - submit to both stores;
+  - staged rollout;
+  - track paying agents, MRR, conversion and payment failures;
+  - decide whether in-app purchasing is worth the store fee.
+
+### Not verified from here
+
+- Device behaviour of real builds: none exist yet.
+- The Vercel production env (whether its anon key is correct).
+- Supabase Auth settings: email confirmation, OTP expiry, redirect URLs. These are not readable through the tools available.
+- Provider terms for Paysera and the banks.
+- Whether Apple's 3.1.3 exceptions cover agent plans bought on the web.
+
 ## ═══ PASS 13 — 2026-10-07: npm audit, 34 → 17, every fixable one fixed ═══
 
 `npm audit` reported 34 (1 critical, 20 high, 13 moderate). They come down to
