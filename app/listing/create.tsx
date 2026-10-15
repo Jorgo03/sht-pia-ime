@@ -86,7 +86,8 @@ const FEATURES_LIST = [
   'pool',
   'furnished',
   'airConditioning',
-  'heating',
+  // 'heating' is no longer offered (owner's call, 2026-10-15). Listings that
+  // already have it still show it: listing.feature.heating stays in the locales.
   'security',
   'storage',
 ] as const;

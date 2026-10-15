@@ -115,7 +115,8 @@ const FEATURES_LIST = [
   'pool',
   'furnished',
   'airConditioning',
-  'heating',
+  // 'heating' is no longer offered (owner's call, 2026-10-15). Listings that
+  // already have it still show it: listing.feature.heating stays in the locales.
   'security',
   'storage',
 ] as const;
@@ -1096,7 +1097,7 @@ export default function NewListingWizard() {
             keyboardShouldPersistTaps="handled">
             {/* Keyed on the step so each one animates in rather than swapping
                 content underneath a static frame. */}
-            <RiseIn key={step}>{stepBody()}</RiseIn>
+            <RiseIn key={step} style={styles.stepBody}>{stepBody()}</RiseIn>
           </ScrollView>
           <KeyboardDoneBar />
         </KeyboardAvoidingView>
@@ -1290,6 +1291,10 @@ const createStyles = (colors: AtticoPalette) =>
       gap: Spacing.md,
     },
 
+    // Space between fields. It has to live here: the scroll view's own gap
+    // only separates its direct children, and the whole step is one RiseIn,
+    // so without this every label sat flush against the box above it.
+    stepBody: { gap: Spacing.lg },
     fieldBlock: { gap: 8 },
     row: { flexDirection: 'row', gap: 12 },
     fieldLabel: {

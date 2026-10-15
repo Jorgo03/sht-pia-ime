@@ -81,7 +81,8 @@ const PROPERTY_TYPES = ['apartment', 'villa', 'house', 'land', 'commercial', 'of
 // helpers in lib/format keep supporting it in case legacy rows ever exist.
 const LISTING_TYPES = ['sale', 'rent']
 const CITIES = ['Tiranë', 'Durrës', 'Vlorë', 'Shkodër', 'Elbasan', 'Korçë', 'Fier', 'Berat', 'Lushnjë', 'Pogradec', 'Kavajë', 'Gjirokastër', 'Sarandë']
-const FEATURES_LIST = ['balcony', 'parking', 'elevator', 'garden', 'pool', 'furnished', 'airConditioning', 'heating', 'security', 'storage']
+// 'heating' is no longer offered; existing listings with it still display it.
+const FEATURES_LIST = ['balcony', 'parking', 'elevator', 'garden', 'pool', 'furnished', 'airConditioning', 'security', 'storage']
 
 // properties.sqft/beds/floor/total_floors/year_built are Postgres `integer`
 // (±2.14B). Without a client-side bound, a fat-fingered value sails through
