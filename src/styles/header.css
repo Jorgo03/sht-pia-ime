@@ -151,6 +151,34 @@
   border-color: var(--fho-border-strong);
 }
 
+/* Light/dark swap: the incoming icon spins in and grows, the button springs
+   and an accent ring ripples out. Same motion as the phone app's
+   ThemeToggleButton. Only after a tap (.is-swapping), never on page load. */
+.theme-btn { position: relative; }
+.theme-btn__icon { display: inline-flex; }
+.theme-btn.is-swapping .theme-btn__icon { animation: theme-icon-in 500ms cubic-bezier(0.2, 0.7, 0.3, 1); }
+.theme-btn__ripple {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1.5px solid var(--fho-orange-1);
+  pointer-events: none;
+  animation: theme-ripple 600ms cubic-bezier(0.2, 0.7, 0.3, 1) forwards;
+}
+@keyframes theme-icon-in {
+  from { opacity: 0; transform: rotate(-120deg) scale(0.4); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes theme-ripple {
+  from { opacity: 0.45; transform: scale(0.7); }
+  to { opacity: 0; transform: scale(1.6); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .theme-btn.is-swapping .theme-btn__icon { animation: theme-fade 150ms ease-out; }
+  .theme-btn__ripple { display: none; }
+}
+@keyframes theme-fade { from { opacity: 0; } to { opacity: 1; } }
+
 /* New listing button */
 
 .new-listing-btn {

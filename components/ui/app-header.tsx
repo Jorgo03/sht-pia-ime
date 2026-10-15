@@ -5,6 +5,7 @@ import { useMemo, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 
+import { ThemeToggleButton } from '@/components/ui/theme-toggle-button';
 import { Fonts, Radii, Shadows, type AtticoPalette } from '@/constants/theme';
 import { useAuth } from '@/contexts/auth-context';
 import { useTheme } from '@/contexts/theme-context';
@@ -76,7 +77,7 @@ export function AppHeader({
 }) {
   const { t, i18n } = useTranslation();
   const { user } = useAuth();
-  const { theme, colors, toggle: toggleTheme } = useTheme();
+  const { theme, colors } = useTheme();
   const styles = useMemo(
     () => createStyles(colors, onDark || floating, !!onBack, floating),
     [colors, onDark, onBack, floating],
@@ -169,17 +170,7 @@ export function AppHeader({
               <MaterialIcons name="expand-more" size={14} color={styles.langCode.color} />
             </Pressable>
 
-            <Pressable
-              style={styles.iconBtn}
-              onPress={toggleTheme}
-              accessibilityRole="button"
-              accessibilityLabel={t('common.toggleTheme')}>
-              <MaterialIcons
-                name={theme === 'dark' ? 'light-mode' : 'dark-mode'}
-                size={17}
-                color={styles.langCode.color}
-              />
-            </Pressable>
+            <ThemeToggleButton style={styles.iconBtn} iconColor={styles.langCode.color} />
           </>
         )}
 

@@ -24,6 +24,7 @@ const LANGUAGES = [
 export default function Header() {
   const { t, i18n } = useTranslation()
   const { theme, toggle } = useTheme()
+  const [themeSwaps, setThemeSwaps] = useState(0)
   const { user, profile, signOut, refreshProfile } = useAuth()
   const navigate = useNavigate()
   const [langOpen, setLangOpen] = useState(false)
@@ -134,8 +135,17 @@ export default function Header() {
             )}
           </div>
         )}
-        <button className="theme-btn" onClick={toggle} aria-label={t('common.toggleTheme')}>
-          {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+        <button
+          className={`theme-btn ${themeSwaps ? 'is-swapping' : ''}`}
+          onClick={() => { setThemeSwaps(n => n + 1); toggle() }}
+          aria-label={t('common.toggleTheme')}
+        >
+          {/* Re-keyed on every tap so the swap animation replays; not keyed on
+              first render, so the icon doesn't spin on page load. */}
+          <span key={themeSwaps} className="theme-btn__icon" aria-hidden="true">
+            {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+          </span>
+          {themeSwaps > 0 && <span key={`ripple-${themeSwaps}`} className="theme-btn__ripple" aria-hidden="true" />}
         </button>
         <div className="account-switcher" ref={accountRef}>
           {user ? (
