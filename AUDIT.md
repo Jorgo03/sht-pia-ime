@@ -1,5 +1,231 @@
 # Pre-Launch Audit — Shtëpia.ime (Vite web app)
 
+## ═══ PASS 15 — 2026-10-15: FULL AUDIT & PRODUCTION ROADMAP (A–K) ═══
+
+Builds on Pass 14 (same day) instead of repeating it: every Pass 14 number was
+re-checked, and the new evidence is below. Code changed in this pass: none
+beyond `4b76071` (edit listing, mark sold/rented, shipped just before it).
+Database changed: **nothing**. Three new security findings and one broken
+button were reproduced live inside transactions that were rolled back, and
+their fix is written and tested the same way, waiting for the owner's approval
+(`supabase/pending/ownership_guards.sql`).
+
+Areas inspected: repository (both apps, Edge Functions, migrations, CI),
+live database (policies, column grants, triggers, constraints, advisors, row
+counts, deployed functions), commands below, App Store guidelines (official
+page, read today), Google Play and Albanian payment providers (secondary
+sources only; play.google.com is unreachable from this sandbox).
+
+### A. Executive summary
+
+The product works end to end for its core job: browse, search, contact,
+message, book a viewing, publish, **and now edit and close** a listing, in 8
+languages, on the web and the phone. It is **not ready for public release**.
+Three things block it, in order:
+
+1. **Trust and security (fix ready, needs your "go")**: anyone signed in can
+   publish a listing under a real agent's name (S-7), move a conversation and
+   its history to a third person (S-8), or confirm their own viewing (S-9).
+   The orphan function `translate-description` still lets anyone spend the
+   Anthropic budget (S-1). Report/block is still missing (Apple 1.2).
+2. **Accounts for real people**: email sign-up only reaches team members
+   until custom SMTP is set; there has never been a production phone build;
+   Apple sign-in is untested.
+3. **Money**: payments exist only as tables. Apple's guideline 3.1.3(g)
+   names paid "boosts" explicitly as In-App Purchase, which changes the plan
+   in Pass 14 (see F).
+
+### B. Score: 58 / 100 (11 areas)
+
+Rubric chosen for this audit, not a standard. The release gate is the P0
+list in E/G, not the number.
+
+| # | Area | Weight | Score | Why |
+| ---: | --- | ---: | ---: | --- |
+| 1 | Security & privacy | 15 | 8 | RLS on 16/16 tables, no secrets anywhere, storage limits. **Minus:** S-7 (High), S-1 (High), S-8, S-9, leaked-password check off |
+| 2 | Backend & data | 10 | 6 | 40 clean migrations, 15 MB, pagination. **Minus:** free plan (pauses, no backups), 12 of 15 listings demo, `plans` empty, BUG-015 constraint |
+| 3 | Architecture & code quality | 8 | 6 | Feature-first web, shared locales and helpers (`listingForm.js`, `roadSearch.js`), one client per app, tsc clean, 0 lint errors. **Minus:** two phone listing forms (`create.tsx` unused but routable), 32 lint warnings, 29 direct `from('properties')` call sites |
+| 4 | Client journeys | 12 | 9 | Browse, filters, AI search with fallback, map, favourites, contact, chat, viewings, wanted homes. **Minus:** saved-search alerts never sent, no push, no report/block, zone and reference-ID filters missing (9 TODOs) |
+| 5 | Agent workflows | 10 | 6 | Wizard with photos, video, auto-translation; **edit and mark sold/rented (new)**; leads; dashboard. **Minus:** Decline is broken (BUG-015), agents cannot edit phone/avatar, removed photos stay in storage |
+| 6 | i18n, UX & design | 7 | 6 | 8 languages from one set of files, dark mode, motion with Reduce Motion, keyboard Done bar. **Minus:** placeholder logo, a11y items BUG-006/008/009 |
+| 7 | Mobile readiness | 10 | 5 | SDK 57 runs in Expo Go; `eas.json` has a production profile; bundle IDs set. **Minus:** no EAS production build ever, Android Maps key missing, Apple sign-in untested |
+| 8 | Payments | 10 | 2 | Schema and promotion guard tested. **Minus:** no provider, no webhook, no entitlements, no UI, no prices |
+| 9 | Testing & CI | 8 | 6 | CI on every push; 134 unit tests; 80 e2e runs (40 cases on phone and desktop) incl. signed-in flows (new). **Minus:** no phone-app tests, payments PGlite test outside the CI glob, RLS tests are manual |
+| 10 | Monitoring & operations | 5 | 1 | Debug util is a no-op in production. **Minus:** no crash reporting, no analytics, no uptime alert, no backups on free plan |
+| 11 | Store compliance & legal | 5 | 3 | Privacy, Terms, account deletion, Apple sign-in present. **Minus:** report/block, reviewer account, privacy questionnaires, support mailbox |
+| | **Total** | **100** | **58** | Pass 14 scored 56 on a 9-area rubric; the areas differ, so compare the P0 lists, not the totals |
+
+### C. Feature status (verified in code and, where marked, live)
+
+| Status | Feature |
+| --- | --- |
+| **Complete** | Browse/search/filters/map (web; phone manual), listing detail, call/WhatsApp/share, favourites, realtime chat, viewing request + client cancel, wanted homes, AI search with keyword fallback, listing wizard (5 steps, photos, video, translation to 8 languages with manual-edit protection), **edit listing**, **mark sold/rented**, pause/activate/delete, per-listing dashboard, leads, account deletion, Google sign-in, privacy/terms, SEO (sitemap, robots, OG), dark mode, 8 locales |
+| **Partial** | Email sign-in (works only for team addresses until SMTP), Apple sign-in (code present, never run), Android map (needs key), saved searches (stored, never alerted), payments (schema only), agent profile (name/agency only) |
+| **Broken** | Agent **Decline** of a viewing (BUG-015, both apps), any trust that the agent shown on a listing is that agent (S-7) |
+| **Missing** | Report/block, push notifications, saved-search alerts, crash reporting, analytics, purchase flow and entitlements, listing limits per plan, moderation queue (`pending_review` unused), zone and reference-ID filters, phone/avatar editing, admin role |
+
+### D. Testing report (commands run today, in this sandbox)
+
+| Command | Result |
+| --- | --- |
+| `npm run lint` | 0 errors, 32 warnings (all pre-existing, mostly `react-hooks/set-state-in-effect`; the edit feature added none) |
+| `npx tsc --noEmit` | Pass, both apps |
+| `npm test` | 134 / 134 pass (incl. 7 new `listingForm` tests) |
+| `npm run test:e2e` (`PW_CHROMIUM_PATH=/opt/pw-browsers/chromium`) | 79 passed, 1 skipped (phone + desktop Chromium). New: `e2e/my-listings.spec.ts` F09-H1/N1/H2/H3, signed in |
+| `npm run build` | Pass (7 s); a chunk-size warning only |
+| `npm audit` / `--omit=dev` | 17 (3 moderate, 14 high), all in Expo tooling; unchanged since Pass 13 (S-6) |
+| `npx expo-doctor` | 19 / 21; the 2 failures need exp.host, which this sandbox cannot reach. Run it on the laptop |
+| Live RLS probes (rolled back) | S-7: foreign `agent_id` insert **allowed**, owner reassignment **allowed**; S-8: client moves conversation to another agent **allowed**; S-9: client updates own viewing status **allowed**; BUG-015: agent decline **fails 23514** |
+| Pending fix, applied then rolled back | `ownership_guards.sql`: **15 / 15** checks pass (P1–P15 below); afterwards 0 guard triggers, 0 guard functions, 0 probe rows remain |
+| Not run (cannot from here) | Real iOS/Android devices, EAS builds, Apple sign-in, email delivery, payments, push. Never reported as passing |
+
+Pending-fix checks: P1 foreign agent insert denied · P2 agent lists as self ·
+P3 buyer lists with no agent · P4 owner change denied · P5 edit title/price/photos ·
+P6 mark sold · P7 conversation move denied · P8 mark read · P9 send message
+(its trigger updates the conversation) · P10 agent declines · P11 client
+self-confirm denied · P12 client cancels · P13 viewing move denied ·
+P14 dashboard/service role can still reassign · P15 agent sets requested/completed.
+
+### E. Security and database findings (new; S-1 to S-6 stand as in Pass 14)
+
+| ID | Sev. | Finding | Evidence | Fix |
+| --- | --- | --- | --- | --- |
+| S-7 | **High** | The `properties` INSERT policy checks only `owner_id = auth.uid()`; `agent_id` is free. Anyone signed in can publish a listing under any real agent's name and contact, which that agent can then edit or delete. The UPDATE policy also lets an owner rewrite `owner_id`/`agent_id`. | Live probe, rolled back | `guard_property_ownership` trigger: `agent_id` must be null or yourself; owner, agent and `owner_type` immutable from the apps |
+| S-8 | Medium | Either party can change a conversation's `client_id`/`agent_id`/`property_id` (UPDATE has no WITH CHECK, all columns granted), moving the other side's messages to a third person. | Live probe, rolled back | `guard_conversation_parties` trigger |
+| S-9 | Low–Med | A client can set their own viewing to any status (incl. `confirmed`, `completed`) and move it to another agent or listing. | Live probe, rolled back | `guard_viewing_update` trigger: the client may only cancel |
+| BUG-015 | S2 | Decline sends `declined`, which the constraint rejects; 4 buttons fail. | Live probe, rolled back | Add `declined` to `viewings_status_check` (same file) |
+| S-1 | **High** | `translate-description` v4 still deployed, still unauthenticated spend. | `list_edge_functions` today | Owner deletes it in the dashboard |
+| S-2 | Low | `clerk-link-profile` still deployed, dead. | same | Owner deletes it |
+| S-3/S-4 | Med/Low | Leaked-password protection off; two SECURITY DEFINER helpers callable by `anon`. | Advisors today, unchanged | As Pass 14 |
+
+Checked and sound: `favorites`, `saved_searches`, `wanted_homes`, `leads`
+pin rows to `auth.uid()`; `messages` INSERT requires being a participant;
+`profiles` UPDATE limited by column grants to name, agency, language;
+`property_activity` insert validated; `promoted_until` guarded by trigger.
+
+### F. Payments plan for Albania (revised)
+
+**What changed:** Apple's guidelines (read today) say "Digital purchases for
+content that is experienced or consumed in an app, including buying
+advertisements to display in the same app (such as sales of 'boosts' for
+posts in a social media app) must use in-app purchase" (3.1.3(g)), and
+subscriptions that unlock features must use IAP (3.1.1). Outside the US, an
+app may not link or point to a web checkout (3.1.1(a), 3.1.3). Two exceptions
+matter here: **3.1.3(c) Enterprise** (services sold to organisations for their
+staff may be paid outside IAP) and **3.1.3(f)** (a free companion app with no
+purchasing and no calls to action). Google Play likewise requires Play Billing
+for digital goods sold in the app, outside programmes that do not cover
+Albania (secondary sources; confirm on Google's Payments policy page).
+
+**Recommended structure**
+
+| Product | Who | Where it is sold | Rail |
+| --- | --- | --- | --- |
+| Free | everyone | — | — |
+| Agency plan (monthly/annual, seats for its agents) | agencies (B2B) | website and invoice only | Paysera checkout, or bank transfer / invoice; Apple 3.1.3(c) |
+| Agent Pro (individual) | single agents | **phase 1: website only, and not mentioned in the apps**; phase 2: also as IAP / Play Billing | Paysera (web); StoreKit + Play Billing (apps) |
+| Listing boost (7/30 days) | anyone listing | phase 1: website only; phase 2: IAP consumable | same |
+
+Phase 1 keeps the apps free of any purchase, price or link to one: the apps
+only *read* entitlements (`agency_subscriptions`, `promoted_until`). Phase 2
+adds store billing for Agent Pro and boosts when the volume justifies the
+15–30% fee and the integration work. Prices in ALL (Pass 14 proposal: Agent
+Pro 2,490 ALL, Agency 7,990 ALL) remain **your decision**; nothing is set.
+
+**Provider (needs your calls, not code):** Paysera Albania holds a Bank of
+Albania EMI licence and offers an e-store gateway; merchants report about a
+month to go live with a registered business and a working website. Whether
+it can **charge a saved card monthly** for Albanian merchants is unconfirmed
+(sources conflict), so plan prepaid 1/3/6/12-month periods
+(`supabase/pending/plans_by_period_months.sql`) and treat auto-renewal as a
+later upgrade. POKpay (Albanian) advertises merchant APIs; unverified. Local
+bank acquiring (card e-commerce through an Albanian bank) is the fallback.
+
+**Architecture (unchanged in principle):** checkout is created by an Edge
+Function; the provider's signed webhook writes `payment_events`
+(idempotent on the provider's event id) and then the entitlement row; the apps
+never write entitlements; limits (listings per plan, boosts) are enforced in
+the database, not in the client. Store receipts (phase 2) go through the same
+`payment_events` path.
+
+### G. Roadmap (in order; each step unblocks the next)
+
+1. **Your approvals (minutes):** "go guards" (`ownership_guards.sql`), "go
+   report/block", "go demo data", delete `translate-description` and
+   `clerk-link-profile`, set an Anthropic spend limit.
+2. **Accounts for real people:** custom SMTP (Resend or similar), then a
+   support mailbox; Supabase Pro (backups, no pausing, leaked-password check).
+3. **Report/block UI** on top of the approved tables (both apps).
+4. **First production builds:** EAS iOS + Android, Android Maps key, Apple
+   sign-in tested on a device, reviewer account, privacy questionnaires,
+   your logo.
+5. **Operations:** crash reporting and minimal analytics (needs your choice of
+   service; nothing installed without asking).
+6. **Real content:** onboard 3–5 agencies, replace demo listings.
+7. **Payments phase 1:** Paysera merchant account, prices, checkout + webhook
+   Edge Functions, entitlements, listing limits; website only.
+8. **Retention:** saved-search alerts (email first), push notifications.
+9. **Payments phase 2:** IAP / Play Billing for Agent Pro and boosts.
+
+### H. Task table
+
+| ID | Pri | Task | Files / objects | Depends on | Acceptance | Effort |
+| --- | --- | --- | --- | --- | --- | --- |
+| T1 | P0 | Apply ownership guards + `declined` | `supabase/pending/ownership_guards.sql` → migration | your "go" | P1–P15 pass live; Decline works in both apps | S (applied in minutes) |
+| T2 | P0 | Delete orphan functions | Dashboard → Edge Functions | you | `list_edge_functions` shows neither | S (you) |
+| T3 | P0 | Report/block DB + UI | `supabase/pending/report_and_block.sql`; property detail, chat, both apps | your "go" | 18/18 DB checks; report and block from listing and chat; e2e | M |
+| T4 | P0 | Custom SMTP | Supabase Auth settings | you: provider account | A non-team address receives sign-up mail | S |
+| T5 | P0 | Remove demo data | 12 listings, 2 test accounts | your "go" | Only real listings remain | S |
+| T6 | P0 | EAS production builds | `eas.json`, `app.json` | Apple Developer account, Maps key, logo | Both builds install and pass the manual checklist | M |
+| T7 | P0 | Apple sign-in on a device | `contexts/auth-context.tsx` | T6 | Sign-in, sign-out, delete account on iPhone | S |
+| T8 | P1 | Crash reporting | both apps | your choice of service | A forced crash appears in the dashboard | S |
+| T9 | P1 | Supabase Pro | billing | you | Backups on, leaked-password check on | S (you) |
+| T10 | P1 | Agent phone/avatar editing | `profiles` grants (schema), profile screens | your approval | Agent edits phone and avatar; nobody else's | M |
+| T11 | P1 | Payments phase 1 | new Edge Functions, `plans`, `agency_subscriptions`, pricing page | Paysera account, prices, T9 | Paid plan activates via webhook only; replayed webhook is a no-op | L |
+| T12 | P2 | Saved-search alerts | new scheduled Edge Function | T4 | Matching new listing emails the saver once | M |
+| T13 | P2 | Push notifications | `expo-notifications` (not installed: new dependency) + push tokens table | T6, your approval | Message/viewing push on a device | M |
+| T14 | P2 | Remove or redirect `app/listing/create.tsx` | `app/listing/create.tsx`, `_layout.tsx` | — | One phone listing form | S |
+| T15 | P2 | Clean storage on photo removal | edit save path, both apps | T1 | Removed photos deleted after a successful save | S |
+| T16 | P3 | Zone and reference-ID filters | schema + filters (9 TODOs) | your approval | Filters work, both apps | M |
+| T17 | P3 | Payments phase 2 (IAP / Play Billing) | both apps, receipt-validation function | T11, store accounts | Sandbox purchase grants the entitlement | L |
+
+### I. 30 / 60 / 90 days (planning estimates)
+
+- **Days 1–30:** T1–T9. Exit: production builds in TestFlight and Play
+  internal testing, real sign-ups, report/block live, no demo data.
+- **Days 31–60:** T10, T11, T14, T15; store submission; 3–5 agencies live.
+  Exit: first paid agency on the website.
+- **Days 61–90:** T12, T13, T16; decide on phase 2 billing from real numbers.
+
+### J. Production checklists
+
+**Web (Vercel):** custom domain + `VITE_SITE_URL` · SMTP · Pro plan ·
+orphan functions deleted · guards and report/block applied · demo data gone ·
+sitemap regenerated on deploy · crash reporting · privacy/terms reviewed by
+a lawyer for Albanian/EU (GDPR) use.
+
+**App Store:** paid Apple Developer account · production build · your logo
+(1024 px, no transparency) · Sign in with Apple tested · report/block +
+moderation contact (1.2) · account deletion (present) · reviewer account with
+sample data · privacy nutrition labels · no prices or purchase links in the
+app in phase 1 (3.1.1(a)) · support URL and mailbox.
+
+**Google Play:** developer account · production AAB · Maps key · Data safety
+form · content rating · reviewer access · target API level per current Play
+requirement · no in-app purchase or link in phase 1 · closed testing period
+if the account is new (Google requires one for new personal accounts; check
+the current rule).
+
+### K. The single most important next task
+
+**Say "go guards".** It closes the only High finding I can fix myself
+(listings can be published under a real agent's name), repairs the broken
+Decline button, and is already written and verified 15/15 against the live
+database. Right after it: delete `translate-description` in the dashboard (the
+other High, which only you can do).
+
+---
+
 ## ═══ PASS 14 — 2026-10-15: PRODUCTION-READINESS AUDIT (score, backlog, 30/60/90) ═══
 
 Read-only pass: **no application code and no database object was changed.**
@@ -53,8 +279,8 @@ No secrets: `git grep` and full-history `git log -p` found no Anthropic, service
 | Sign-in: email code/password | ⚠️ | ⚠️ | ⚠️ | Blocked for real users until custom SMTP |
 | Sign-in: Apple | n/a | ⚠️ untested | n/a | Needs Apple Developer account and a real build |
 | Agent: create listing | ✅ | ✅ | ✅ | |
-| Agent: **edit** listing | ✅ | ✅ not yet tried on a device | ✅ | Fixed 2026-10-15: the wizard opens on a saved listing (`/my-listings/:id/edit`, `/listing/[id]/edit`); e2e F09-H1/N1/H2. Photos removed in an edit stay in storage (orphans, no cleanup yet) |
-| Agent: mark sold / rented | ✅ | ✅ not yet tried on a device | ✅ | Fixed 2026-10-15: a sale becomes `sold`, a rental `rented`; Play reactivates; e2e F09-H3 |
+| Agent: **edit** listing | ✅ | ✅ manual | ✅ manual | Fixed 2026-10-15: the wizard opens on a saved listing (`/my-listings/:id/edit`, `/listing/[id]/edit`); e2e F09-H1/N1/H2. Photos removed in an edit stay in storage (orphans, no cleanup yet) |
+| Agent: mark sold / rented | ✅ | ✅ manual | ✅ manual | Fixed 2026-10-15: a sale becomes `sold`, a rental `rented`; Play reactivates; e2e F09-H3 |
 | Agent: leads, viewings, analytics | ✅ | ✅ | ✅ | |
 | Agent: edit phone / avatar | ❌ | ❌ | ❌ | `profiles` column grants allow only name, agency name, language |
 | Saved searches | ✅ saved | ✅ saved | ✅ saved | Alerts never sent: no sender, cron or email service |

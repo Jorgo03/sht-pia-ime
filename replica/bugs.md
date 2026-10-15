@@ -265,6 +265,27 @@ delete-account failure.
 
 ---
 
+### BUG-015: Agents cannot decline a viewing request
+
+- Severity: S2
+- Screen: web `/viewings` and `/agent-dashboard`; phone Viewings and Agent
+  dashboard (4 "Decline" buttons)
+- Found by: AUDIT.md Pass 15, reproduced live as the agent in a transaction
+  that was rolled back
+
+Steps
+1. Sign in as an agent with a viewing request in "requested".
+2. Tap "Refuzo" (Decline).
+
+Expected: the request shows as declined.
+Actual: the update fails with Postgres 23514 (`viewings_status_check` allows
+requested, confirmed, cancelled, completed, no_show; not `declined`) and the
+app shows "update failed".
+Status: open. The fix adds `declined` to the constraint, in
+`supabase/pending/ownership_guards.sql`, waiting for the owner's approval.
+
+---
+
 ## To check (not reproduced as a user-visible bug)
 
 - `messages` has no UPDATE policy, so `read_at` can never be set. Today the app
