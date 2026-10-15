@@ -399,7 +399,13 @@
     "roadNoResults": "Nie znaleziono ulic. Możesz wpisać własną.",
     "dragMarker": "Przeciągnij znacznik",
     "pinOrderHint": "Najpierw wybierz ulicę, potem umieść znacznik na mapie.",
-    "pinAdjustHint": "Przeciągnij znacznik na dokładną lokalizację nieruchomości."
+    "pinAdjustHint": "Przeciągnij znacznik na dokładną lokalizację nieruchomości.",
+    "edit": "Edytuj",
+    "editListing": "Edytuj ogłoszenie",
+    "saveChanges": "Zapisz zmiany",
+    "currentVideo": "Obecne wideo",
+    "markSold": "Oznacz jako sprzedane",
+    "markRented": "Oznacz jako wynajęte"
   },
   "dashboard": {
     "title": "Dashboard nieruchomości",

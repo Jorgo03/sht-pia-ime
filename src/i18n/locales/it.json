@@ -391,7 +391,13 @@
     "roadNoResults": "Nessuna strada trovata. Puoi scriverla tu.",
     "dragMarker": "Trascina il segnaposto",
     "pinOrderHint": "Seleziona prima la strada, poi posiziona il segnaposto sulla mappa.",
-    "pinAdjustHint": "Trascina il segnaposto sulla posizione esatta dell’immobile."
+    "pinAdjustHint": "Trascina il segnaposto sulla posizione esatta dell’immobile.",
+    "edit": "Modifica",
+    "editListing": "Modifica annuncio",
+    "saveChanges": "Salva modifiche",
+    "currentVideo": "Video attuale",
+    "markSold": "Segna come venduto",
+    "markRented": "Segna come affittato"
   },
   "dashboard": {
     "title": "Dashboard immobile",

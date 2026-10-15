@@ -391,7 +391,13 @@
     "roadNoResults": "No se encontraron calles. Puedes escribirla tú.",
     "dragMarker": "Arrastra el marcador",
     "pinOrderHint": "Selecciona primero la calle y luego coloca el marcador en el mapa.",
-    "pinAdjustHint": "Arrastra el marcador hasta la ubicación exacta del inmueble."
+    "pinAdjustHint": "Arrastra el marcador hasta la ubicación exacta del inmueble.",
+    "edit": "Editar",
+    "editListing": "Editar anuncio",
+    "saveChanges": "Guardar cambios",
+    "currentVideo": "Vídeo actual",
+    "markSold": "Marcar como vendido",
+    "markRented": "Marcar como alquilado"
   },
   "dashboard": {
     "title": "Dashboard de propiedad",

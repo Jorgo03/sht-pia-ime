@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-leaflet'
 import { ArrowLeft, ArrowRight, Upload, X, Film, Check, Move } from 'lucide-react'
@@ -12,6 +12,7 @@ import { TranslationBar } from '../components/TranslationBar'
 import { useListingTranslation } from '../hooks/useListingTranslation'
 import { translatePropertyContent } from '../../../lib/translate'
 import { geocodeCity } from '../../../lib/roadSearch'
+import { formToColumns, propertyToForm } from '../lib/listingForm'
 import '../../../styles/map.css'
 import '../../../styles/new-listing.css'
 
@@ -170,6 +171,16 @@ function loadDraft() {
   }
 }
 
+/** The listing to edit, if this user may edit it. */
+async function fetchEditableListing(id, userId) {
+  const { data, error } = await supabase.from('properties').select('*').eq('id', id).maybeSingle()
+  if (error) return { state: 'error' }
+  // RLS already hides other people's drafts; this also covers active listings
+  // someone else owns, which everyone can read but only the owner may edit.
+  if (!data || (data.owner_id !== userId && data.agent_id !== userId)) return { state: 'forbidden' }
+  return { state: 'ready', row: data }
+}
+
 export default function NewListing() {
   const { t } = useTranslation()
   const { user } = useAuth()
@@ -177,7 +188,14 @@ export default function NewListing() {
   const fileInputRef = useRef(null)
   const videoInputRef = useRef(null)
 
-  const [draft] = useState(loadDraft)
+  // /my-listings/:id/edit opens the same wizard on a saved listing.
+  const { id: editId } = useParams()
+  const isEdit = Boolean(editId)
+  // 'loading' | 'ready' | 'error' | 'forbidden' while editing; always 'ready' when creating.
+  const [editState, setEditState] = useState(isEdit ? 'loading' : 'ready')
+
+  // Editing never reads or overwrites the new-listing draft.
+  const [draft] = useState(() => (isEdit ? null : loadDraft()))
   const [step, setStep] = useState(draft?.step ?? 0)
   const [submitting, setSubmitting] = useState(false)
   const [errors, setErrors] = useState({})
@@ -210,10 +228,34 @@ export default function NewListing() {
 
   // Persist progress on every change; cleared on successful submit/discard.
   useEffect(() => {
+    if (isEdit) return
     try {
       localStorage.setItem(DRAFT_KEY, JSON.stringify({ form, step, savedAt: Date.now() }))
     } catch { /* storage full/blocked — wizard still works, just unsaved */ }
-  }, [form, step])
+  }, [form, step, isEdit])
+
+  // Load the listing being edited. Photos and video already uploaded join the
+  // same lists as new ones, flagged `existing`, so ordering, the cover photo
+  // and removal behave exactly as when creating.
+  const applyLoaded = (result) => {
+    if (result.state !== 'ready') { setEditState(result.state); return }
+    const { row } = result
+    setForm({ ...INITIAL_FORM, ...propertyToForm(row), status: row.status })
+    setImages((row.image_urls ?? []).map(url => ({ url, preview: url, existing: true })))
+    setVideo(row.video_url ? { url: row.video_url, existing: true } : null)
+    setEditState('ready')
+  }
+  const userId = user?.id
+  useEffect(() => {
+    if (!editId || !userId) return
+    let cancelled = false
+    fetchEditableListing(editId, userId).then(result => { if (!cancelled) applyLoaded(result) })
+    return () => { cancelled = true }
+  }, [editId, userId])
+  const retryLoad = () => {
+    setEditState('loading')
+    fetchEditableListing(editId, userId).then(applyLoaded)
+  }
 
   const discardDraft = () => {
     try { localStorage.removeItem(DRAFT_KEY) } catch { /* ignore */ }
@@ -276,7 +318,7 @@ export default function NewListing() {
 
   const removeImage = (idx) => {
     setImages(prev => {
-      URL.revokeObjectURL(prev[idx].preview)
+      if (!prev[idx].existing) URL.revokeObjectURL(prev[idx].preview)
       return prev.filter((_, i) => i !== idx)
     })
   }
@@ -349,6 +391,8 @@ export default function NewListing() {
     const urls = []
     const paths = []
     for (const img of images) {
+      // Already in storage (editing): keep its place in the order.
+      if (img.existing) { urls.push(img.url); continue }
       const ext = img.file.name.split('.').pop()
       const path = `${user.id}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
       const { error } = await supabase.storage.from('property-images').upload(path, img.file)
@@ -374,8 +418,8 @@ export default function NewListing() {
 
       // Video rides the same all-or-nothing rule as the photos: a failed
       // upload aborts the submit and removes everything already uploaded.
-      let videoUrl = null
-      if (video) {
+      let videoUrl = video?.existing ? video.url : null
+      if (video && !video.existing) {
         const ext = video.file.name.split('.').pop()
         const path = `${user.id}/video-${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
         const { error: vErr } = await supabase.storage.from('property-images').upload(path, video.file)
@@ -387,51 +431,32 @@ export default function NewListing() {
         videoUrl = supabase.storage.from('property-images').getPublicUrl(path).data.publicUrl
       }
 
-      const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single()
-
       // Fill every language whose tab the agent never opened. Card surfaces
       // resolve titles synchronously and never fetch, so a listing published
       // with only a couple of languages shows the fallback one to every
       // visitor no matter which they pick. The returned maps are used rather
       // than form state, which has not updated yet at this point.
       const translated = await translation.translateAll()
+      const columns = { ...formToColumns(form, translated), image_urls: imageUrls, video_url: videoUrl }
 
-      const { error } = await supabase.from('properties').insert({
-        owner_id: user.id,
-        agent_id: profile?.role === 'agent' ? user.id : null,
-        owner_type: profile?.role === 'agent' ? 'agent' : 'client',
-        title: translated.title_i18n.sq || '',
-        title_i18n: translated.title_i18n,
-        description: translated.description_i18n.sq || '',
-        description_i18n: translated.description_i18n,
-        // Which languages are machine output and which an agent corrected by
-        // hand, so a later edit does not regenerate over their work.
-        translation_meta: translated.translation_meta,
-        listing_type: form.listing_type,
-        property_type: form.property_type,
-        city: form.city,
-        address: form.address,
-        latitude: form.latitude,
-        longitude: form.longitude,
-        price: Number(form.price) || 0,
-        currency: form.currency,
-        sqft: Number(form.sqft) || 0,
-        beds: Number(form.beds) || 0,
-        baths: Number(form.baths) || 0,
-        floor: form.floor ? Number(form.floor) : null,
-        total_floors: form.total_floors ? Number(form.total_floors) : null,
-        year_built: form.year_built ? Number(form.year_built) : null,
-        features: form.features,
-        video_url: videoUrl,
-        image_urls: imageUrls,
-        contact_phone: form.contact_phone,
-        whatsapp_enabled: form.whatsapp_enabled,
-        contact_email: form.contact_email,
-        status: asDraft ? 'draft' : 'active',
-      })
+      let error
+      if (isEdit) {
+        // Ownership and status are never part of an edit: status has its own
+        // actions on My Listings (pause, mark sold/rented).
+        ;({ error } = await supabase.from('properties').update(columns).eq('id', editId))
+      } else {
+        const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single()
+        ;({ error } = await supabase.from('properties').insert({
+          ...columns,
+          owner_id: user.id,
+          agent_id: profile?.role === 'agent' ? user.id : null,
+          owner_type: profile?.role === 'agent' ? 'agent' : 'client',
+          status: asDraft ? 'draft' : 'active',
+        }))
+      }
 
       if (error) throw error
-      try { localStorage.removeItem(DRAFT_KEY) } catch { /* ignore */ }
+      if (!isEdit) { try { localStorage.removeItem(DRAFT_KEY) } catch { /* ignore */ } }
       navigate('/my-listings')
     } catch (err) {
       // Insert failed after upload succeeded — remove the now-orphaned files.
@@ -447,11 +472,29 @@ export default function NewListing() {
   // Route is wrapped in ProtectedRoute; this only covers the sign-out-while-open race.
   if (!user) return null
 
+  if (editState === 'loading') return <div className="page">{t('common.loading')}</div>
+  if (editState === 'error') {
+    return (
+      <div className="page">
+        <p role="alert">{t('errors.generic')}</p>
+        <button className="nl-btn nl-btn-secondary mt-3" onClick={retryLoad}>{t('common.retry')}</button>
+      </div>
+    )
+  }
+  if (editState === 'forbidden') {
+    return (
+      <div className="page">
+        <h1 className="page-title">{t('detail.unavailable')}</h1>
+        <button className="nl-btn nl-btn-secondary mt-3" onClick={() => navigate('/my-listings')}>{t('listing.myListings')}</button>
+      </div>
+    )
+  }
+
   return (
     <div className="page new-listing-page">
       <div className="nl-header">
         <button onClick={() => (step > 0 ? prev() : navigate(-1))} className="nl-back" aria-label={t('common.back')}><ArrowLeft size={18} /></button>
-        <h1 className="page-title" style={{ margin: 0 }}>{t('listing.newListing')}</h1>
+        <h1 className="page-title" style={{ margin: 0 }}>{isEdit ? t('listing.editListing') : t('listing.newListing')}</h1>
       </div>
 
       {draftRestored && (
@@ -740,8 +783,8 @@ export default function NewListing() {
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 14px', border: '1px solid var(--fho-border)', borderRadius: 'var(--r-md)', background: 'var(--fho-surface-2)' }}>
                   <Film size={18} style={{ color: 'var(--fho-orange-1)', flexShrink: 0 }} />
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--fho-text)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{video.file.name}</div>
-                    <div style={{ fontSize: 11, color: 'var(--fho-text-muted)' }}>{(video.file.size / (1024 * 1024)).toFixed(1)} MB</div>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--fho-text)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{video.existing ? t('listing.currentVideo') : video.file.name}</div>
+                    {!video.existing && <div style={{ fontSize: 11, color: 'var(--fho-text-muted)' }}>{(video.file.size / (1024 * 1024)).toFixed(1)} MB</div>}
                   </div>
                   <button className="nl-image-remove" style={{ position: 'static' }} onClick={removeVideo} aria-label={t('common.close')}><X size={12} /></button>
                 </div>
@@ -825,9 +868,9 @@ export default function NewListing() {
         <div className="nl-actions">
           <button className="nl-btn nl-btn-secondary" onClick={prev}><ArrowLeft size={16} /> {t('listing.back')}</button>
           <div style={{ flex: 1 }} />
-          <button className="nl-btn nl-btn-secondary" onClick={() => submit(true)} disabled={submitting}>{t('listing.saveDraft')}</button>
+          {!isEdit && <button className="nl-btn nl-btn-secondary" onClick={() => submit(true)} disabled={submitting}>{t('listing.saveDraft')}</button>}
           <button className="nl-btn nl-btn-primary" onClick={() => submit(false)} disabled={submitting}>
-            {submitting ? t('common.loading') : t('listing.publish')}
+            {submitting ? t('common.loading') : isEdit ? t('listing.saveChanges') : t('listing.publish')}
           </button>
         </div>
       )}

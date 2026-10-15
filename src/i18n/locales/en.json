@@ -435,7 +435,13 @@
     "roadNoResults": "No roads found. You can type your own.",
     "dragMarker": "Drag the marker",
     "pinOrderHint": "Select the road first, then place the marker on the map.",
-    "pinAdjustHint": "Drag the marker to the exact location of the property."
+    "pinAdjustHint": "Drag the marker to the exact location of the property.",
+    "edit": "Edit",
+    "editListing": "Edit listing",
+    "saveChanges": "Save changes",
+    "currentVideo": "Current video",
+    "markSold": "Mark as sold",
+    "markRented": "Mark as rented"
   },
   "dashboard": {
     "title": "Property Dashboard",

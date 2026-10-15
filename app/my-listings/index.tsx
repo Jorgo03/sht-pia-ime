@@ -16,6 +16,7 @@ import { useTheme } from '@/contexts/theme-context';
 import { supabase } from '@/lib/supabase';
 import { formatPrice, getLocalizedText } from '@/lib/format';
 import { Property } from '@/data/types';
+import { closedStatusFor } from '@/src/features/listings/lib/listingForm';
 
 // Reads the theme's status tokens rather than hardcoding the light-theme
 // hexes — web pulls these from --fho-status-*, which swap in dark mode, so a
@@ -65,20 +66,23 @@ export default function MyListingsScreen() {
     load();
   }, [load]);
 
-  const toggleStatus = async (id: string, current: string) => {
-    const next = current === 'active' ? 'paused' : 'active';
+  const setStatus = async (id: string, next: Property['status']) => {
     const { error } = await supabase.from('properties').update({ status: next }).eq('id', id);
     if (error) {
       flashError();
       return;
     }
-    setListings((prev) => prev.map((p) => (p.id === id ? { ...p, status: next as Property['status'] } : p)));
+    setListings((prev) => prev.map((p) => (p.id === id ? { ...p, status: next } : p)));
     // A paused listing must disappear from Explore/Home/Map's cached
     // results (and a re-activated one must reappear) — without this, those
     // screens would keep showing the pre-mutation cached list for up to
     // staleTime.
     queryClient.invalidateQueries({ queryKey: ['properties'] });
   };
+
+  // Pause <-> activate. A sold or rented listing reactivates the same way.
+  const toggleStatus = (id: string, current: string) =>
+    setStatus(id, current === 'active' ? 'paused' : 'active');
 
   const confirmDelete = (id: string) => {
     Alert.alert(t('listing.confirmDelete'), '', [
@@ -163,18 +167,32 @@ export default function MyListingsScreen() {
                       <TouchableOpacity
                         style={styles.iconButton}
                         onPress={() => router.push(`/property/${item.id}` as Href)}
+                        accessibilityRole="button"
+                        accessibilityLabel={t('listing.viewPublic')}
                         activeOpacity={0.7}>
                         <MaterialIcons name="visibility" size={16} color={colors.textPrimary} />
                       </TouchableOpacity>
                       <TouchableOpacity
                         style={styles.iconButton}
+                        onPress={() => router.push(`/listing/${item.id}/edit` as Href)}
+                        accessibilityRole="button"
+                        accessibilityLabel={t('listing.edit')}
+                        activeOpacity={0.7}>
+                        <MaterialIcons name="edit" size={16} color={colors.textPrimary} />
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={styles.iconButton}
                         onPress={() => router.push(`/listing/${item.id}/analytics` as Href)}
+                        accessibilityRole="button"
+                        accessibilityLabel={t('listing.viewDashboard')}
                         activeOpacity={0.7}>
                         <MaterialIcons name="bar-chart" size={16} color={colors.textPrimary} />
                       </TouchableOpacity>
                       <TouchableOpacity
                         style={styles.iconButton}
                         onPress={() => toggleStatus(item.id, item.status)}
+                        accessibilityRole="button"
+                        accessibilityLabel={item.status === 'active' ? t('listing.pause') : t('listing.activate')}
                         activeOpacity={0.7}>
                         <MaterialIcons
                           name={item.status === 'active' ? 'pause' : 'play-arrow'}
@@ -182,9 +200,28 @@ export default function MyListingsScreen() {
                           color={colors.textPrimary}
                         />
                       </TouchableOpacity>
+                      {/* Sale -> Sold, rental -> Rented. Closed listings leave
+                          search (only active ones are public) and come back
+                          with the play button. */}
+                      {(item.status === 'active' || item.status === 'paused') && (
+                        <TouchableOpacity
+                          style={styles.iconButton}
+                          onPress={() => setStatus(item.id, closedStatusFor(item.listing_type))}
+                          accessibilityRole="button"
+                          accessibilityLabel={
+                            closedStatusFor(item.listing_type) === 'sold'
+                              ? t('listing.markSold')
+                              : t('listing.markRented')
+                          }
+                          activeOpacity={0.7}>
+                          <MaterialIcons name="check-circle-outline" size={16} color={colors.textPrimary} />
+                        </TouchableOpacity>
+                      )}
                       <TouchableOpacity
                         style={styles.iconButton}
                         onPress={() => confirmDelete(item.id)}
+                        accessibilityRole="button"
+                        accessibilityLabel={t('listing.delete')}
                         activeOpacity={0.7}>
                         <MaterialIcons name="delete-outline" size={16} color="#e74c3c" />
                       </TouchableOpacity>

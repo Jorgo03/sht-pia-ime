@@ -76,6 +76,7 @@ function AppShell() {
           <Route path="/my-listings" element={<ProtectedRoute><MyListings /></ProtectedRoute>} />
           <Route path="/my-listings/:id/dashboard" element={<ProtectedRoute><PropertyDashboard /></ProtectedRoute>} />
           <Route path="/new-listing" element={<ProtectedRoute><NewListing /></ProtectedRoute>} />
+          <Route path="/my-listings/:id/edit" element={<ProtectedRoute><NewListing /></ProtectedRoute>} />
           <Route path="/viewings" element={<ProtectedRoute><Viewings /></ProtectedRoute>} />
           <Route path="/saved-searches" element={<ProtectedRoute><SavedSearches /></ProtectedRoute>} />
           <Route path="/auth/callback" element={<AuthCallback />} />

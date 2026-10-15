@@ -383,7 +383,13 @@
     "roadNoResults": "Keine Straße gefunden. Sie können sie selbst eingeben.",
     "dragMarker": "Marker ziehen",
     "pinOrderHint": "Wählen Sie zuerst die Straße, dann setzen Sie den Marker auf der Karte.",
-    "pinAdjustHint": "Ziehen Sie den Marker an die genaue Lage der Immobilie."
+    "pinAdjustHint": "Ziehen Sie den Marker an die genaue Lage der Immobilie.",
+    "edit": "Bearbeiten",
+    "editListing": "Inserat bearbeiten",
+    "saveChanges": "Änderungen speichern",
+    "currentVideo": "Aktuelles Video",
+    "markSold": "Als verkauft markieren",
+    "markRented": "Als vermietet markieren"
   },
   "dashboard": {
     "title": "Immobilien-Dashboard",

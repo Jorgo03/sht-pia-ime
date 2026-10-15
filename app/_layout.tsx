@@ -77,6 +77,10 @@ function ThemedNavigation() {
           options={{ headerShown: false, presentation: 'card' }}
         />
         <Stack.Screen
+          name="listing/[id]/edit"
+          options={{ headerShown: false, presentation: 'card' }}
+        />
+        <Stack.Screen
           name="favorites/index"
           options={{ headerShown: false, presentation: 'card' }}
         />

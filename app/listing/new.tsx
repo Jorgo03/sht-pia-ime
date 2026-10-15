@@ -3,8 +3,8 @@ import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useQueryClient } from '@tanstack/react-query';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useRouter } from 'expo-router';
-import { useEffect, useMemo, useState } from 'react';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   ActivityIndicator,
@@ -39,6 +39,7 @@ import { supabase } from '@/lib/supabase';
 import { translatePropertyContent, type I18nMap } from '@/lib/translate';
 import { geocodeCity, type RoadSuggestion } from '@/src/lib/roadSearch';
 import { useListingTranslation } from '@/src/features/listings/hooks/useListingTranslation';
+import { formToColumns, propertyToForm } from '@/src/features/listings/lib/listingForm';
 import type { TranslationMeta } from '@/src/lib/translationCore';
 import {
   MAX_IMAGES,
@@ -135,6 +136,30 @@ const MAX_YEAR = new Date().getFullYear() + 2;
 
 const DRAFT_KEY = 'fho_listing_draft_v1';
 
+/**
+ * Photos and video in the wizard. When editing, the ones already in storage
+ * join the same lists flagged `existing` (their `uri` is the public URL), so
+ * ordering, the cover photo and removal work exactly as when creating.
+ */
+type WizardImage = PickedImage & { existing?: boolean };
+type WizardVideo = PickedVideo & { existing?: boolean };
+
+type EditState = 'loading' | 'ready' | 'error' | 'forbidden';
+
+type LoadedListing =
+  | { state: 'ready'; row: Record<string, any> }
+  | { state: 'error' | 'forbidden' };
+
+/** The listing to edit, if this user may edit it. */
+async function fetchEditableListing(id: string, userId: string): Promise<LoadedListing> {
+  const { data, error } = await supabase.from('properties').select('*').eq('id', id).maybeSingle();
+  if (error) return { state: 'error' };
+  // RLS already hides other people's drafts; this also covers active listings
+  // someone else owns, which everyone can read but only the owner may edit.
+  if (!data || (data.owner_id !== userId && data.agent_id !== userId)) return { state: 'forbidden' };
+  return { state: 'ready', row: data };
+}
+
 function outOfRange(raw: string, min: number, max: number): boolean {
   if (!raw) return false;
   const n = Number(raw);
@@ -212,7 +237,19 @@ const INITIAL_FORM: ListingForm = {
   contact_email: '',
 };
 
+/** /listing/new: a blank wizard, with draft restore. */
 export default function NewListingWizard() {
+  return <ListingWizard />;
+}
+
+/** /listing/[id]/edit: the same wizard opened on a saved listing. */
+export function EditListingWizard() {
+  const { id } = useLocalSearchParams<{ id: string }>();
+  return <ListingWizard editId={id} />;
+}
+
+function ListingWizard({ editId }: { editId?: string }) {
+  const isEdit = Boolean(editId);
   const router = useRouter();
   const { t } = useTranslation();
   const { user } = useAuth();
@@ -222,17 +259,63 @@ export default function NewListingWizard() {
 
   const [step, setStep] = useState(0);
   const [form, setForm] = useState<ListingForm>(INITIAL_FORM);
-  const [images, setImages] = useState<PickedImage[]>([]);
-  const [video, setVideo] = useState<PickedVideo | null>(null);
+  const [images, setImages] = useState<WizardImage[]>([]);
+  const [video, setVideo] = useState<WizardVideo | null>(null);
+  const [editState, setEditState] = useState<EditState>(isEdit ? 'loading' : 'ready');
   const [errors, setErrors] = useState<FormErrors>({});
   const [submitting, setSubmitting] = useState(false);
   const [uploadProgress, setUploadProgress] = useState<{ done: number; total: number } | null>(null);
   const [draftRestored, setDraftRestored] = useState(false);
   // First paint waits on the draft read so a restore can never land on top of
   // something the agent already typed. It's one AsyncStorage get.
-  const [hydrated, setHydrated] = useState(false);
+  // Editing has no draft to read, so it is hydrated from the start.
+  const [hydrated, setHydrated] = useState(isEdit);
+
+  // Load the listing being edited. Editing never reads or writes the
+  // new-listing draft, so an unfinished draft survives an edit untouched.
+  const applyLoaded = useCallback((result: LoadedListing) => {
+    if (result.state !== 'ready') {
+      setEditState(result.state);
+      return;
+    }
+    const { row } = result;
+    setForm({ ...INITIAL_FORM, ...(propertyToForm(row) as Partial<ListingForm>) });
+    setImages(
+      ((row.image_urls ?? []) as string[]).map((url) => ({
+        uri: url,
+        fileName: url.split('/').pop() ?? 'photo.jpg',
+        mimeType: 'image/jpeg',
+        existing: true,
+      })),
+    );
+    setVideo(
+      row.video_url
+        ? { uri: row.video_url, fileName: '', mimeType: 'video/mp4', size: 0, existing: true }
+        : null,
+    );
+    setEditState('ready');
+  }, []);
+
+  const userId = user?.id;
+  useEffect(() => {
+    if (!editId || !userId) return;
+    let cancelled = false;
+    void fetchEditableListing(editId, userId).then((result) => {
+      if (!cancelled) applyLoaded(result);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [editId, userId, applyLoaded]);
+
+  const retryLoad = () => {
+    if (!editId || !userId) return;
+    setEditState('loading');
+    void fetchEditableListing(editId, userId).then(applyLoaded);
+  };
 
   useEffect(() => {
+    if (isEdit) return;
     let cancelled = false;
     (async () => {
       try {
@@ -254,19 +337,19 @@ export default function NewListingWizard() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [isEdit]);
 
   // Persist progress on every change. Photos and video hold local file URIs
   // that don't survive a restart, so — exactly like web — only the form and
   // the step are saved and media is re-added after a restore.
   useEffect(() => {
-    if (!hydrated) return;
+    if (!hydrated || isEdit) return;
     AsyncStorage.setItem(DRAFT_KEY, JSON.stringify({ form, step, savedAt: Date.now() })).catch(
       () => {
         /* storage full/blocked — the wizard still works, just unsaved */
       },
     );
-  }, [form, step, hydrated]);
+  }, [form, step, hydrated, isEdit]);
 
   const discardDraft = () => {
     AsyncStorage.removeItem(DRAFT_KEY).catch(() => {});
@@ -407,19 +490,24 @@ export default function NewListingWizard() {
     let uploadedPaths: string[] = [];
 
     try {
-      let imageUrls: string[] = [];
-      if (images.length > 0) {
-        setUploadProgress({ done: 0, total: images.length });
-        const { urls, paths } = await uploadPropertyImages(images, user.id, (done, total) =>
+      // Only photos added in this session are uploaded; ones already in
+      // storage (editing) keep their URL and their place in the order.
+      const fresh = images.filter((img) => !img.existing);
+      let freshUrls: string[] = [];
+      if (fresh.length > 0) {
+        setUploadProgress({ done: 0, total: fresh.length });
+        const { urls, paths } = await uploadPropertyImages(fresh, user.id, (done, total) =>
           setUploadProgress({ done, total }),
         );
-        imageUrls = urls;
+        freshUrls = urls;
         uploadedPaths = paths;
       }
+      let nextFresh = 0;
+      const imageUrls = images.map((img) => (img.existing ? img.uri : freshUrls[nextFresh++]));
 
       // Video rides the same all-or-nothing rule as the photos.
-      let videoUrl: string | null = null;
-      if (video) {
+      let videoUrl: string | null = video?.existing ? video.uri : null;
+      if (video && !video.existing) {
         try {
           const uploaded = await uploadPropertyVideo(video, user.id);
           videoUrl = uploaded.url;
@@ -431,60 +519,44 @@ export default function NewListingWizard() {
       }
       setUploadProgress(null);
 
-      // Only an agent's own listing carries an agent_id — a client-posted one
-      // must not claim agent attribution (same rule as web).
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', user.id)
-        .single();
-      const isAgent = profile?.role === 'agent';
-
       // Fill every language the agent did not open a tab for. Without this a
       // listing reaches the site with only the languages they happened to
       // click, and card surfaces — which resolve titles synchronously and
       // never fetch — show the fallback language to every visitor regardless
       // of what they select. Returns the maps it produced, because setForm has
-      // not landed by the time this insert runs.
+      // not landed by the time this save runs.
       const translated = await translation.translateAll();
 
-      const { error } = await supabase.from('properties').insert({
-        // RLS requires owner_id = auth.uid() on insert.
-        owner_id: user.id,
-        agent_id: isAgent ? user.id : null,
-        owner_type: isAgent ? 'agent' : 'client',
-        title: translated.title_i18n.sq || '',
-        title_i18n: translated.title_i18n,
-        description: translated.description_i18n.sq || '',
-        description_i18n: translated.description_i18n,
-        // This form authors in Albanian and translates outward from it.
-        source_language: 'sq',
-        // Carries which languages are machine-translated and which an agent
-        // edited, so reopening the listing later does not re-translate over
-        // their corrections or re-bill for work already done.
-        translation_meta: translated.translation_meta,
-        listing_type: form.listing_type,
-        property_type: form.property_type,
-        city: form.city || null,
-        address: form.address,
-        latitude: form.latitude,
-        longitude: form.longitude,
-        price: Number(form.price) || 0,
-        currency: form.currency,
-        sqft: Number(form.sqft) || 0,
-        beds: Number(form.beds) || 0,
-        baths: Number(form.baths) || 0,
-        floor: form.floor ? Number(form.floor) : null,
-        total_floors: form.total_floors ? Number(form.total_floors) : null,
-        year_built: form.year_built ? Number(form.year_built) : null,
-        features: form.features,
-        video_url: videoUrl,
+      // Same columns as web, from the shared helper, for insert and update.
+      const columns = {
+        ...formToColumns(form, translated),
         image_urls: imageUrls,
-        contact_phone: form.contact_phone || null,
-        whatsapp_enabled: form.whatsapp_enabled,
-        contact_email: form.contact_email || null,
-        status,
-      });
+        video_url: videoUrl,
+      };
+
+      let error;
+      if (isEdit) {
+        // Ownership and status are never part of an edit: status has its own
+        // actions on My Listings (pause, mark sold/rented).
+        ({ error } = await supabase.from('properties').update(columns).eq('id', editId!));
+      } else {
+        // Only an agent's own listing carries an agent_id — a client-posted
+        // one must not claim agent attribution (same rule as web).
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', user.id)
+          .single();
+        const isAgent = profile?.role === 'agent';
+        ({ error } = await supabase.from('properties').insert({
+          ...columns,
+          // RLS requires owner_id = auth.uid() on insert.
+          owner_id: user.id,
+          agent_id: isAgent ? user.id : null,
+          owner_type: isAgent ? 'agent' : 'client',
+          status,
+        }));
+      }
 
       // Insert failed after upload succeeded — don't leave orphaned files.
       if (error) {
@@ -492,7 +564,7 @@ export default function NewListingWizard() {
         throw error;
       }
 
-      await AsyncStorage.removeItem(DRAFT_KEY).catch(() => {});
+      if (!isEdit) await AsyncStorage.removeItem(DRAFT_KEY).catch(() => {});
       // The new listing must appear in Explore/Home/Map immediately, not once
       // their cache's staleTime quietly expires.
       queryClient.invalidateQueries({ queryKey: ['properties'] });
@@ -861,9 +933,11 @@ export default function NewListingWizard() {
             <MaterialIcons name="movie" size={18} color={colors.accent} />
             <View style={styles.videoMeta}>
               <Text style={styles.videoName} numberOfLines={1}>
-                {video.fileName}
+                {video.existing ? t('listing.currentVideo') : video.fileName}
               </Text>
-              <Text style={styles.hint}>{(video.size / (1024 * 1024)).toFixed(1)} MB</Text>
+              {!video.existing && (
+                <Text style={styles.hint}>{(video.size / (1024 * 1024)).toFixed(1)} MB</Text>
+              )}
             </View>
             <Pressable
               onPress={() => setVideo(null)}
@@ -986,11 +1060,32 @@ export default function NewListingWizard() {
   const stepBody = [renderBasics, renderLocation, renderDetails, renderMedia, renderPublish][step];
   const isLast = step === STEPS.length - 1;
 
-  if (!hydrated) {
+  if (!hydrated || editState === 'loading') {
     return (
       <GradientBackground>
         <SafeAreaView style={styles.centered}>
           <ActivityIndicator size="large" color={colors.accent} />
+        </SafeAreaView>
+      </GradientBackground>
+    );
+  }
+
+  if (editState === 'error' || editState === 'forbidden') {
+    return (
+      <GradientBackground>
+        <SafeAreaView style={[styles.centered, styles.editMessage]}>
+          <Text style={styles.editMessageText}>
+            {editState === 'error' ? t('errors.generic') : t('detail.unavailable')}
+          </Text>
+          {editState === 'error' ? (
+            <PrimaryCTA label={t('common.retry')} icon="refresh" onPress={retryLoad} />
+          ) : (
+            <GhostBtn
+              label={t('listing.myListings')}
+              icon="arrow-back"
+              onPress={() => router.replace('/my-listings')}
+            />
+          )}
         </SafeAreaView>
       </GradientBackground>
     );
@@ -1013,7 +1108,7 @@ export default function NewListingWizard() {
             {`${t('listing.step.' + STEPS[step])} ${step + 1}/${STEPS.length}`.toUpperCase()}
           </Text>
           <Text style={styles.stepName} numberOfLines={1}>
-            {t('listing.newListing')}
+            {isEdit ? t('listing.editListing') : t('listing.newListing')}
           </Text>
         </View>
 
@@ -1103,7 +1198,7 @@ export default function NewListingWizard() {
         </KeyboardAvoidingView>
 
         <View style={styles.footer}>
-          {isLast && (
+          {isLast && !isEdit && (
             <Pressable
               onPress={() => submit('draft')}
               disabled={submitting}
@@ -1123,7 +1218,9 @@ export default function NewListingWizard() {
                 submitting
                   ? t('common.loading')
                   : isLast
-                    ? t('listing.publish')
+                    ? isEdit
+                      ? t('listing.saveChanges')
+                      : t('listing.publish')
                     : t('listing.next')
               }
               icon={isLast ? 'check' : 'arrow-forward'}
@@ -1189,6 +1286,13 @@ const createStyles = (colors: AtticoPalette) =>
   StyleSheet.create({
     container: { flex: 1 },
     centered: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+    editMessage: { gap: Spacing.lg, paddingHorizontal: Spacing.xl },
+    editMessageText: {
+      fontFamily: Fonts.sansSemiBold,
+      fontSize: 16,
+      color: colors.textPrimary,
+      textAlign: 'center',
+    },
     flex1: { flex: 1 },
     flex2: { flex: 2 },
 

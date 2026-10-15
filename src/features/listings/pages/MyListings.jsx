@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Plus, BarChart3, Eye, Pause, Play, Trash2 } from 'lucide-react'
+import { Plus, BarChart3, Eye, Pause, Play, Trash2, Pencil, CircleCheck } from 'lucide-react'
 import { useAuth } from '../../auth/AuthContext'
 import BackButton from '../../../shared/BackButton'
 import { supabase } from '../../../lib/supabase'
 import { formatPrice, imageFor, getLocalizedText } from '../../../lib/format'
+import { closedStatusFor } from '../lib/listingForm'
 
 const STATUS_COLORS = {
   active: 'var(--fho-status-active, #27ae60)',
@@ -44,12 +45,14 @@ export default function MyListings() {
       })
   }, [user])
 
-  const toggleStatus = async (id, current) => {
-    const next = current === 'active' ? 'paused' : 'active'
+  const setStatus = async (id, next) => {
     const { error } = await supabase.from('properties').update({ status: next }).eq('id', id)
     if (error) { flashError(); return }
     setListings(prev => prev.map(p => p.id === id ? { ...p, status: next } : p))
   }
+
+  // Pause <-> activate. A sold or rented listing reactivates the same way.
+  const toggleStatus = (id, current) => setStatus(id, current === 'active' ? 'paused' : 'active')
 
   const deleteListing = async (id) => {
     if (!confirm(t('listing.confirmDelete'))) return
@@ -120,12 +123,23 @@ export default function MyListings() {
                     </div>
                   </div>
                   <div className="mt-1.5 flex gap-1.5">
-                    <button onClick={() => navigate(`/property/${p.id}`)} title={t('listing.viewPublic')} className={iconBtn}><Eye size={14} /></button>
-                    <button onClick={() => navigate(`/my-listings/${p.id}/dashboard`)} title={t('listing.viewDashboard')} className={iconBtn}><BarChart3 size={14} /></button>
-                    <button onClick={() => toggleStatus(p.id, p.status)} title={p.status === 'active' ? t('listing.pause') : t('listing.activate')} className={iconBtn}>
+                    <button onClick={() => navigate(`/property/${p.id}`)} title={t('listing.viewPublic')} aria-label={t('listing.viewPublic')} className={iconBtn}><Eye size={14} /></button>
+                    <button onClick={() => navigate(`/my-listings/${p.id}/edit`)} title={t('listing.edit')} aria-label={t('listing.edit')} className={iconBtn}><Pencil size={14} /></button>
+                    <button onClick={() => navigate(`/my-listings/${p.id}/dashboard`)} title={t('listing.viewDashboard')} aria-label={t('listing.viewDashboard')} className={iconBtn}><BarChart3 size={14} /></button>
+                    <button onClick={() => toggleStatus(p.id, p.status)} title={p.status === 'active' ? t('listing.pause') : t('listing.activate')} aria-label={p.status === 'active' ? t('listing.pause') : t('listing.activate')} className={iconBtn}>
                       {p.status === 'active' ? <Pause size={14} /> : <Play size={14} />}
                     </button>
-                    <button onClick={() => deleteListing(p.id)} title={t('listing.delete')} className={`${iconBtn} text-[#e74c3c]`}><Trash2 size={14} /></button>
+                    {(p.status === 'active' || p.status === 'paused') && (() => {
+                      // Sale -> Sold, rental -> Rented. Closed listings leave search
+                      // (only active ones are public) and can be reactivated with Play.
+                      const label = closedStatusFor(p.listing_type) === 'sold' ? t('listing.markSold') : t('listing.markRented')
+                      return (
+                        <button onClick={() => setStatus(p.id, closedStatusFor(p.listing_type))} title={label} aria-label={label} className={iconBtn}>
+                          <CircleCheck size={14} />
+                        </button>
+                      )
+                    })()}
+                    <button onClick={() => deleteListing(p.id)} title={t('listing.delete')} aria-label={t('listing.delete')} className={`${iconBtn} text-[#e74c3c]`}><Trash2 size={14} /></button>
                   </div>
                 </div>
               </div>

@@ -1,6 +1,6 @@
 import type { Page, Route } from '@playwright/test';
 
-import { LISTINGS, type Listing } from './fixtures';
+import { AGENT, LISTINGS, type Listing } from './fixtures';
 
 // A stand-in for Supabase, served from inside the browser. The app under test
 // is built against https://e2e.supabase.co, which does not exist, and every
@@ -45,9 +45,17 @@ function json(route: Route, status: number, body: unknown, headers: Record<strin
   return route.fulfill({ status, contentType: 'application/json', headers: { ...CORS, ...headers }, body: JSON.stringify(body) });
 }
 
-async function properties(route: Route, url: URL) {
+async function properties(route: Route, url: URL, store: Listing[], writes: Write[]) {
   const req = route.request();
-  const rows = filter(LISTINGS, url.searchParams);
+  const rows = filter(store, url.searchParams);
+  if (req.method() === 'PATCH') {
+    // An update changes this page's copy of the rows, so the app sees its own
+    // edit on the next read. Tests read what was sent from `writes`.
+    const body = req.postDataJSON() as Record<string, unknown>;
+    writes.push({ table: 'properties', method: 'PATCH', query: url.search, body });
+    for (const row of rows) Object.assign(row, body);
+    return route.fulfill({ status: 204, headers: CORS, body: '' });
+  }
   if (req.method() === 'HEAD') return route.fulfill({ status: 200, headers: { ...CORS, 'content-range': `*/${rows.length}` }, body: '' });
 
   const offset = Number(url.searchParams.get('offset') ?? 0);
@@ -70,7 +78,50 @@ async function profiles(route: Route, url: URL) {
   return json(route, 200, row ? [row] : []);
 }
 
-export async function mockBackend(page: Page) {
+/** A write the app sent to the fake backend. */
+export type Write = { table: string; method: string; query: string; body: Record<string, unknown> };
+
+/**
+ * The signed-in user, when a test signs in: the fixtures' agent, who owns the
+ * agent listings. The session goes into localStorage before the app starts,
+ * where supabase-js looks for it, so no sign-in request is ever made.
+ */
+export const SIGNED_IN_USER = {
+  id: AGENT.id,
+  aud: 'authenticated',
+  role: 'authenticated',
+  email: 'agent@example.com',
+  user_metadata: { full_name: AGENT.full_name },
+  app_metadata: { provider: 'email' },
+  created_at: '2026-01-01T00:00:00Z',
+};
+
+const base64url = (value: object) => btoa(JSON.stringify(value)).replace(/=+$/, '').replace(/\+/g, '-').replace(/\//g, '_');
+
+export function fakeSession() {
+  const expiresAt = Math.floor(Date.now() / 1000) + 3600 * 24;
+  const accessToken = [
+    base64url({ alg: 'HS256', typ: 'JWT' }),
+    base64url({ sub: SIGNED_IN_USER.id, role: 'authenticated', aud: 'authenticated', exp: expiresAt }),
+    'e2e-signature',
+  ].join('.');
+  return {
+    access_token: accessToken,
+    refresh_token: 'e2e-refresh',
+    token_type: 'bearer',
+    expires_in: 3600 * 24,
+    expires_at: expiresAt,
+    user: SIGNED_IN_USER,
+  };
+}
+
+/** Where supabase-js keeps the session for https://e2e.supabase.co. */
+export const SESSION_STORAGE_KEY = 'sb-e2e-auth-token';
+
+export async function mockBackend(page: Page, { signedIn = false, writes = [] as Write[] } = {}) {
+  // Each page edits its own copy, so one test's writes never leak into another.
+  const store: Listing[] = LISTINGS.map((l) => ({ ...l }));
+
   // Realtime: accept the socket and stay silent, rather than letting the
   // client log a failed connection on every page.
   await page.routeWebSocket(/supabase\.co/, () => {});
@@ -85,11 +136,13 @@ export async function mockBackend(page: Page) {
 
     if (url.hostname === SUPABASE_HOST) {
       if (url.pathname.startsWith('/storage/')) return route.fulfill(IMAGE);
-      if (url.pathname.startsWith('/rest/v1/properties')) return properties(route, url);
+      if (url.pathname.startsWith('/rest/v1/properties')) return properties(route, url, store, writes);
       if (url.pathname.startsWith('/rest/v1/profiles')) return profiles(route, url);
       if (url.pathname.startsWith('/rest/v1/')) return method === 'GET' ? json(route, 200, []) : route.fulfill({ status: 201, headers: CORS, body: '' });
       // Signed out: there is no session, and every sign-in attempt fails.
-      if (url.pathname.startsWith('/auth/v1/user')) return json(route, 401, { msg: 'no session' });
+      if (url.pathname.startsWith('/auth/v1/user')) {
+        return signedIn ? json(route, 200, SIGNED_IN_USER) : json(route, 401, { msg: 'no session' });
+      }
       if (url.pathname.startsWith('/auth/v1/')) return json(route, 400, { error: 'invalid_grant', error_description: 'Invalid login credentials' });
       // The AI and translation functions are "down": the app must degrade,
       // not break. Tests ignore console noise from these on purpose.

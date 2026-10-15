@@ -435,7 +435,13 @@
     "roadNoResults": "Nuk u gjet asnjë rrugë. Mund ta shkruani vetë.",
     "dragMarker": "Tërhiqe shënuesin",
     "pinOrderHint": "Zgjidhni fillimisht rrugën, pastaj vendosni shënuesin në hartë.",
-    "pinAdjustHint": "Tërhiqeni shënuesin te vendndodhja e saktë e pronës."
+    "pinAdjustHint": "Tërhiqeni shënuesin te vendndodhja e saktë e pronës.",
+    "edit": "Ndrysho",
+    "editListing": "Ndrysho shpalljen",
+    "saveChanges": "Ruaj ndryshimet",
+    "currentVideo": "Videoja aktuale",
+    "markSold": "Shëno si të shitur",
+    "markRented": "Shëno si të dhënë me qira"
   },
   "dashboard": {
     "title": "Paneli i pronës",

@@ -19,7 +19,7 @@ P0 list, not the number.
 | Security & privacy | 20 | 14 | RLS on all 16 public tables (live check); RLS behaviour tested live (22+ checks earlier, 18/18 for report/block today); no secrets in the tree or git history; storage buckets enforce MIME types and size limits with per-user folder policies; account deletion exists. **Minus:** an orphan AI function anyone can call (S-1), leaked-password protection off (S-3), two SECURITY DEFINER helpers callable while signed out (S-4) |
 | Backend & data | 15 | 8 | Schema and migration history clean; pagination of 24; payments foundation schema tested (PGlite 23/23). **Minus:** free plan (pauses, no downloadable backups); default SMTP only mails team members, so email sign-up fails for real users; 12 of 15 listings are demo data |
 | Client journeys | 15 | 11 | Browse, search, AI search with fallback, favourites, call/WhatsApp/share, viewings, wanted homes, realtime chat, 8 languages, dark mode; web journeys covered by 36 e2e tests. **Minus:** saved-search alerts are stored but never sent; no push notifications; no report/block |
-| Agent workflows | 10 | 5 | 5-step listing wizard with photos, video and auto-translation; pause/activate/delete; per-listing dashboard; leads; viewings. **Minus: no way to edit a listing, no "mark sold/rented" action** (statuses exist, no UI), agents cannot edit their own phone or avatar (column grants) |
+| Agent workflows | 10 | 5 | 5-step listing wizard with photos, video and auto-translation; pause/activate/delete; per-listing dashboard; leads; viewings. Edit listing and mark sold/rented added 2026-10-15 (P0-5). **Minus:** agents cannot edit their own phone or avatar (column grants) |
 | Mobile readiness | 10 | 5 | Expo SDK 57 runs in Expo Go; recent UX fixes (keyboard, spacing, glass nav). **Minus:** no EAS production build has ever been made; Sign in with Apple never exercised; Android Maps key missing; icon is a placeholder until the owner's logo |
 | Payments & subscriptions | 10 | 2 | Tables `plans`, `agency_subscriptions`, `listing_promotions`, `payment_events` and the `promoted_until` guard exist and are tested. **Minus:** no provider, no webhook, no entitlement or listing-limit enforcement, no purchase UI, `plans` empty, prices undecided |
 | Quality, tests, monitoring | 10 | 6 | CI on every push: lint, tsc, 127 unit tests, 72 e2e runs, web build, all green. **Minus:** the payments PGlite test is outside the CI glob; no automated tests for the phone app; no crash reporting; no product analytics |
@@ -53,8 +53,8 @@ No secrets: `git grep` and full-history `git log -p` found no Anthropic, service
 | Sign-in: email code/password | ⚠️ | ⚠️ | ⚠️ | Blocked for real users until custom SMTP |
 | Sign-in: Apple | n/a | ⚠️ untested | n/a | Needs Apple Developer account and a real build |
 | Agent: create listing | ✅ | ✅ | ✅ | |
-| Agent: **edit** listing | ❌ | ❌ | ❌ | Only pause/activate/delete exist |
-| Agent: mark sold / rented | ❌ | ❌ | ❌ | Statuses exist in the DB and in the UI colours |
+| Agent: **edit** listing | ✅ | ✅ not yet tried on a device | ✅ | Fixed 2026-10-15: the wizard opens on a saved listing (`/my-listings/:id/edit`, `/listing/[id]/edit`); e2e F09-H1/N1/H2. Photos removed in an edit stay in storage (orphans, no cleanup yet) |
+| Agent: mark sold / rented | ✅ | ✅ not yet tried on a device | ✅ | Fixed 2026-10-15: a sale becomes `sold`, a rental `rented`; Play reactivates; e2e F09-H3 |
 | Agent: leads, viewings, analytics | ✅ | ✅ | ✅ | |
 | Agent: edit phone / avatar | ❌ | ❌ | ❌ | `profiles` column grants allow only name, agency name, language |
 | Saved searches | ✅ saved | ✅ saved | ✅ saved | Alerts never sent: no sender, cron or email service |
@@ -86,7 +86,7 @@ No secrets: `git grep` and full-history `git log -p` found no Anthropic, service
 | P0-2 | Supabase Pro; then leaked-password protection on | Owner | Billing shows Pro; advisor clear |
 | P0-3 | Custom SMTP + own domain | Owner, with Claude on config | A new address receives the sign-up code |
 | P0-4 | Apply report/block migration, then build UI in both apps | Claude, after owner "go" | 18/18 live checks; e2e for report; manual block test |
-| P0-5 | **Edit listing** (wizard in edit mode) and **mark sold/rented**, both apps | Claude | e2e: edit the price and see it on the listing page; RLS: a non-owner cannot update |
+| P0-5 | ✅ DONE 2026-10-15 — **Edit listing** (wizard in edit mode) and **mark sold/rented**, both apps | Claude | e2e: edit the price and see it on the listing page; RLS: a non-owner cannot update |
 | P0-6 | Remove the 12 demo listings and 2 test accounts | Claude, after owner "go" | Count of seed rows is 0 |
 | P0-7 | Real builds: EAS production iOS and Android, TestFlight and Play internal; Android Maps key; owner's logo | Owner + Claude | Builds install; the 20 manual tests in the tracker pass |
 | P0-8 | Store accounts as an organization (D-U-N-S), reviewer account, privacy forms, contact mailbox | Owner | Accounts active; forms saved |

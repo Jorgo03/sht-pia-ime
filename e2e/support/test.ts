@@ -1,7 +1,7 @@
 import AxeBuilder from '@axe-core/playwright';
 import { test as base, expect, type Page } from '@playwright/test';
 
-import { isSimulatedFailure, mockBackend } from './backend';
+import { fakeSession, isSimulatedFailure, mockBackend, SESSION_STORAGE_KEY, type Write } from './backend';
 
 // Every spec imports `test` from here instead of @playwright/test. It adds,
 // for every test:
@@ -11,14 +11,31 @@ import { isSimulatedFailure, mockBackend } from './backend';
 //   - a failure if the page throws, logs a console error, or the server
 //     answers 5xx.
 // A test that expects an error passes `test.use({ allowConsoleErrors: [/…/] })`.
+// A test that needs an account passes `test.use({ signedIn: true })` and is
+// signed in as the fixtures' agent; `writes` lists what the app saved.
 
-type Options = { allowConsoleErrors: RegExp[]; language: string };
+type Options = { allowConsoleErrors: RegExp[]; language: string; signedIn: boolean };
 
-export const test = base.extend<Options & { guard: void }>({
+export const test = base.extend<Options & { guard: void; writes: Write[] }>({
   allowConsoleErrors: [[], { option: true }],
   language: ['sq', { option: true }],
+  signedIn: [false, { option: true }],
+  // eslint-disable-next-line no-empty-pattern
+  writes: async ({}, use) => use([]),
 
-  page: async ({ page, language }, use) => {
+  page: async ({ page, language, signedIn, writes }, use) => {
+    if (signedIn) {
+      await page.addInitScript(
+        ([key, session]) => {
+          try {
+            if (!localStorage.getItem(key)) localStorage.setItem(key, session);
+          } catch {
+            // storage blocked: the test fails at its first signed-in step
+          }
+        },
+        [SESSION_STORAGE_KEY, JSON.stringify(fakeSession())] as const,
+      );
+    }
     await page.addInitScript((lang) => {
       try {
         if (!localStorage.getItem('fho_lang')) localStorage.setItem('fho_lang', lang);
@@ -27,7 +44,7 @@ export const test = base.extend<Options & { guard: void }>({
         // storage blocked: the app falls back to its defaults
       }
     }, language);
-    await mockBackend(page);
+    await mockBackend(page, { signedIn, writes });
     await use(page);
   },
 

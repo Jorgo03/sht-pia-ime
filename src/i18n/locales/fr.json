@@ -391,7 +391,13 @@
     "roadNoResults": "Aucune rue trouvée. Vous pouvez la saisir vous-même.",
     "dragMarker": "Déplacez le marqueur",
     "pinOrderHint": "Sélectionnez d’abord la rue, puis placez le marqueur sur la carte.",
-    "pinAdjustHint": "Déplacez le marqueur à l’emplacement exact du bien."
+    "pinAdjustHint": "Déplacez le marqueur à l’emplacement exact du bien.",
+    "edit": "Modifier",
+    "editListing": "Modifier l'annonce",
+    "saveChanges": "Enregistrer les modifications",
+    "currentVideo": "Vidéo actuelle",
+    "markSold": "Marquer comme vendu",
+    "markRented": "Marquer comme loué"
   },
   "dashboard": {
     "title": "Tableau de bord du bien",
