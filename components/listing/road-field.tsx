@@ -161,7 +161,9 @@ const createStyles = (colors: AtticoPalette) =>
       borderRadius: Radii.md,
       borderWidth: 1,
       borderColor: colors.border,
-      backgroundColor: colors.surface,
+      // surface2, not surface: `surface` is white in BOTH themes, so in dark
+      // mode the street names (textPrimary, near-white) vanished on it.
+      backgroundColor: colors.surface2,
       overflow: 'hidden',
     },
     // Capped rather than unbounded: the list sits above the map, and a long
@@ -176,7 +178,7 @@ const createStyles = (colors: AtticoPalette) =>
       borderBottomWidth: StyleSheet.hairlineWidth,
       borderBottomColor: colors.border,
     },
-    rowPressed: { backgroundColor: colors.surfaceAlt },
+    rowPressed: { backgroundColor: colors.primaryLight },
     rowText: { flex: 1 },
     roadName: { fontFamily: Fonts.sansSemiBold, fontSize: 14, color: colors.textPrimary },
     roadContext: { fontFamily: Fonts.sans, fontSize: 12, color: colors.textSecondary, marginTop: 1 },

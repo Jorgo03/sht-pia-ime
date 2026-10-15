@@ -155,7 +155,8 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     paddingVertical: 5,
     paddingHorizontal: 9,
     borderRadius: Radii.pill,
-    backgroundColor: colors.surface,
+    // Theme-aware: `surface` is white in both themes, under near-white text.
+    backgroundColor: colors.surface2,
     borderWidth: 1,
     borderColor: colors.border,
   },
