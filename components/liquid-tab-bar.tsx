@@ -9,8 +9,18 @@ import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter, usePathname, type Href } from 'expo-router';
 import Feather from '@expo/vector-icons/Feather';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import * as Haptics from 'expo-haptics';
+import { useEffect, useState, type ComponentProps } from 'react';
+import { Pressable, StyleSheet, Text, View, type LayoutChangeEvent } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import Animated, {
+  useAnimatedStyle,
+  useReducedMotion,
+  useSharedValue,
+  withSequence,
+  withSpring,
+  withTiming,
+} from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Shadows } from '@/constants/theme';
@@ -30,6 +40,79 @@ export const TAB_BAR_BOTTOM_OFFSET = 18;
  *  circle's top 9px proud of the row. */
 const NAV_ADD_SIZE = 58;
 const NAV_ADD_OVERHANG = Math.ceil((NAV_ADD_SIZE - 22 - TAB_BAR_HEIGHT) / 2 + 22);
+
+/** The glass lens that sits behind the active tab and glides between tabs. */
+const LENS_WIDTH = 54;
+const LENS_HEIGHT = 46;
+/** A soft spring: arrives quickly, overshoots a touch, settles without wobble. */
+const LENS_SPRING = { damping: 20, stiffness: 200, mass: 0.9 };
+
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
+
+type TabKey = 'index' | 'explore' | 'messages' | 'profile';
+type FeatherName = ComponentProps<typeof Feather>['name'];
+
+/**
+ * One tab icon. Grows and lifts slightly while active and springs on press;
+ * with Reduce Motion on it only changes colour.
+ */
+function NavItem({
+  icon,
+  active,
+  color,
+  label,
+  onPress,
+  onLayout,
+  children,
+}: {
+  icon: FeatherName;
+  active: boolean;
+  color: string;
+  label?: string;
+  onPress: () => void;
+  onLayout: (e: LayoutChangeEvent) => void;
+  children?: React.ReactNode;
+}) {
+  const reduceMotion = useReducedMotion();
+  const lift = useSharedValue(active ? 1 : 0);
+  const press = useSharedValue(1);
+
+  useEffect(() => {
+    lift.set(reduceMotion ? (active ? 1 : 0) : withSpring(active ? 1 : 0, LENS_SPRING));
+  }, [active, reduceMotion, lift]);
+
+  const iconStyle = useAnimatedStyle(() =>
+    reduceMotion
+      ? {}
+      : {
+          transform: [
+            { translateY: -1.5 * lift.value },
+            { scale: (1 + 0.1 * lift.value) * press.value },
+          ],
+        },
+  );
+
+  return (
+    <Pressable
+      style={styles.navItem}
+      onLayout={onLayout}
+      onPressIn={() => {
+        if (!reduceMotion) press.set(withTiming(0.84, { duration: 90 }));
+      }}
+      onPressOut={() => {
+        if (!reduceMotion) press.set(withSpring(1, { damping: 10, stiffness: 300 }));
+      }}
+      onPress={onPress}
+      accessibilityRole="tab"
+      accessibilityState={{ selected: active }}
+      accessibilityLabel={label}>
+      <Animated.View style={iconStyle}>
+        <Feather name={icon} size={22} strokeWidth={1.8} color={color} />
+      </Animated.View>
+      {children}
+    </Pressable>
+  );
+}
 
 /**
  * Total vertical space the floating nav occupies, measured up from the
@@ -80,6 +163,57 @@ export function LiquidTabBar({ state, descriptors, navigation }: BottomTabBarPro
   // in `state` — web's NavLink highlights it by URL match instead, so this
   // does the same via the actual route pathname.
   const messagesActive = pathname?.startsWith('/messages') ?? false;
+  const activeKey: TabKey = messagesActive ? 'messages' : (activeRouteName as TabKey);
+
+  // Where each tab sits inside the pill, measured on layout, so the lens can
+  // travel to it whatever the screen width.
+  const [slots, setSlots] = useState<Partial<Record<TabKey, { x: number; width: number }>>>({});
+  const measure = (key: TabKey) => (e: LayoutChangeEvent) => {
+    const { x, width } = e.nativeEvent.layout;
+    setSlots((prev) => (prev[key]?.x === x && prev[key]?.width === width ? prev : { ...prev, [key]: { x, width } }));
+  };
+
+  const reduceMotion = useReducedMotion();
+  const lensX = useSharedValue(0);
+  const lensStretch = useSharedValue(1);
+  const lensVisible = useSharedValue(0);
+  const target = slots[activeKey];
+
+  useEffect(() => {
+    if (!target) return;
+    const x = target.x + target.width / 2 - LENS_WIDTH / 2;
+    if (lensVisible.get() === 0 || reduceMotion) {
+      // First placement, or Reduce Motion: no glide, no stretch.
+      lensX.set(x);
+      lensVisible.set(reduceMotion ? 1 : withTiming(1, { duration: 220 }));
+      return;
+    }
+    // Liquid: stretch in proportion to the distance, glide, then settle round.
+    const distance = Math.abs(x - lensX.get());
+    lensStretch.set(withSequence(
+      withTiming(1 + Math.min(distance / 220, 0.55), { duration: 140 }),
+      withSpring(1, LENS_SPRING),
+    ));
+    lensX.set(withSpring(x, LENS_SPRING));
+  }, [target, reduceMotion, lensX, lensStretch, lensVisible]);
+
+  const lensStyle = useAnimatedStyle(() => ({
+    opacity: lensVisible.value,
+    transform: [
+      { translateX: lensX.value },
+      { scaleX: lensStretch.value },
+      { scaleY: 1 - (lensStretch.value - 1) * 0.25 },
+    ],
+  }));
+
+  const select = (key: TabKey, action: () => void) => {
+    if (key !== activeKey) Haptics.selectionAsync().catch(() => {});
+    action();
+  };
+  const isDark = theme === 'dark';
+
+  const addPress = useSharedValue(1);
+  const addStyle = useAnimatedStyle(() => ({ transform: [{ scale: addPress.value }] }));
 
   return (
     <View pointerEvents="box-none" style={[styles.wrap, { bottom: insets.bottom + TAB_BAR_BOTTOM_OFFSET }]}>
@@ -106,29 +240,62 @@ export function LiquidTabBar({ state, descriptors, navigation }: BottomTabBarPro
               },
             ]}
           />
+          {/* The glass lens behind the active tab: brighter frost, a light top
+             highlight and a soft accent glow. It lives inside this clipped
+             layer so the spring's overshoot can never poke out of the bar. */}
+          <Animated.View
+            pointerEvents="none"
+            style={[
+              styles.lens,
+              {
+                backgroundColor: isDark ? 'rgba(255,255,255,0.10)' : 'rgba(255,255,255,0.72)',
+                borderColor: isDark ? 'rgba(255,255,255,0.18)' : 'rgba(255,255,255,0.95)',
+                shadowColor: colors.accent,
+              },
+              lensStyle,
+            ]}>
+            <LinearGradient
+              colors={isDark ? ['rgba(255,255,255,0.16)', 'rgba(255,255,255,0)'] : ['rgba(255,255,255,0.9)', 'rgba(255,255,255,0)']}
+              style={styles.lensShine}
+            />
+          </Animated.View>
         </View>
 
-        <TouchableOpacity
-          style={styles.navItem}
-          onPress={() => go('index')}
-          accessibilityLabel={descriptors[state.routes.find((r) => r.name === 'index')!.key]?.options.title}>
-          <Feather name="home" size={22} strokeWidth={1.8} color={iconColor(activeRouteName === 'index')} />
-        </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.navItem}
-          onPress={() => go('explore')}
-          accessibilityLabel={descriptors[state.routes.find((r) => r.name === 'explore')!.key]?.options.title}>
-          <Feather name="search" size={22} strokeWidth={1.8} color={iconColor(activeRouteName === 'explore')} />
-        </TouchableOpacity>
+        <NavItem
+          icon="home"
+          active={activeKey === 'index'}
+          color={iconColor(activeKey === 'index')}
+          label={descriptors[state.routes.find((r) => r.name === 'index')!.key]?.options.title}
+          onLayout={measure('index')}
+          onPress={() => select('index', () => go('index'))}
+        />
 
-        <TouchableOpacity
-          style={styles.navAdd}
-          activeOpacity={0.85}
+        <NavItem
+          icon="search"
+          active={activeKey === 'explore'}
+          color={iconColor(activeKey === 'explore')}
+          label={descriptors[state.routes.find((r) => r.name === 'explore')!.key]?.options.title}
+          onLayout={measure('explore')}
+          onPress={() => select('explore', () => go('explore'))}
+        />
+
+        <AnimatedPressable
+          style={[styles.navAdd, addStyle]}
+          onPressIn={() => {
+            if (!reduceMotion) addPress.set(withTiming(0.9, { duration: 90 }));
+          }}
+          onPressOut={() => {
+            if (!reduceMotion) addPress.set(withSpring(1, { damping: 9, stiffness: 260 }));
+          }}
           // The wizard, not the single-scroll form — `listing/create` stays
           // reachable by route while the wizard is being verified against real
           // submissions, but this is the entry point users actually take.
-          onPress={() => router.push('/listing/new' as Href)}
+          onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
+            router.push('/listing/new' as Href);
+          }}
+          accessibilityRole="button"
           accessibilityLabel={t('listing.newListing')}>
           <LinearGradient
             // Matches web's --fho-orange-1 → --fho-orange-2 gradient exactly
@@ -137,26 +304,30 @@ export function LiquidTabBar({ state, descriptors, navigation }: BottomTabBarPro
             style={styles.navAddGradient}>
             <Feather name="plus" size={26} strokeWidth={2.5} color="#fff" />
           </LinearGradient>
-        </TouchableOpacity>
+        </AnimatedPressable>
 
-        <TouchableOpacity
-          style={styles.navItem}
-          onPress={() => router.push('/messages' as Href)}
-          accessibilityLabel={t('common.messages')}>
-          <Feather name="message-circle" size={22} strokeWidth={1.8} color={iconColor(messagesActive)} />
+        <NavItem
+          icon="message-circle"
+          active={activeKey === 'messages'}
+          color={iconColor(activeKey === 'messages')}
+          label={t('common.messages')}
+          onLayout={measure('messages')}
+          onPress={() => select('messages', () => router.push('/messages' as Href))}>
           {unread > 0 && (
             <View style={[styles.navBadge, { backgroundColor: colors.accent }]}>
               <Text style={styles.navBadgeText}>{unread > 9 ? '9+' : unread}</Text>
             </View>
           )}
-        </TouchableOpacity>
+        </NavItem>
 
-        <TouchableOpacity
-          style={styles.navItem}
-          onPress={() => go('profile')}
-          accessibilityLabel={descriptors[state.routes.find((r) => r.name === 'profile')!.key]?.options.title}>
-          <Feather name="user" size={22} strokeWidth={1.8} color={iconColor(activeRouteName === 'profile')} />
-        </TouchableOpacity>
+        <NavItem
+          icon="user"
+          active={activeKey === 'profile'}
+          color={iconColor(activeKey === 'profile')}
+          label={descriptors[state.routes.find((r) => r.name === 'profile')!.key]?.options.title}
+          onLayout={measure('profile')}
+          onPress={() => select('profile', () => go('profile'))}
+        />
       </View>
     </View>
   );
@@ -191,6 +362,26 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFill,
     borderRadius: 999,
     overflow: 'hidden',
+  },
+  lens: {
+    position: 'absolute',
+    left: 0,
+    top: (TAB_BAR_HEIGHT - 2 - LENS_HEIGHT) / 2,
+    width: LENS_WIDTH,
+    height: LENS_HEIGHT,
+    borderRadius: LENS_HEIGHT / 2,
+    borderWidth: 1,
+    overflow: 'hidden',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.28,
+    shadowRadius: 10,
+  },
+  lensShine: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: 0,
+    height: LENS_HEIGHT / 2,
   },
   navItem: {
     width: 46,
