@@ -4,14 +4,14 @@
     "slug": "real-estate-app",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/icon-light.png",
     "scheme": "shtepia-ime",
     "userInterfaceStyle": "automatic",
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.shtepiaime.app",
       "icon": {
-        "light": "./assets/images/icon.png",
+        "light": "./assets/images/icon-light.png",
         "dark": "./assets/images/icon-dark.png",
         "tinted": "./assets/images/icon-tinted.png"
       },
@@ -43,7 +43,7 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash-icon.png",
+          "image": "./assets/images/splash-door.png",
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#f1ede6",

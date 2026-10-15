@@ -28,7 +28,7 @@ const SANS = font('manrope/500Medium/Manrope_500Medium.ttf');
 const img = (name, w, h) => `<img src="${dataUri(name)}" width="${w}" height="${h}" style="display:block">`;
 const jobs = [
   // iPhone: light, Dark Mode (iOS 18+) and tinted variants; also the generic icon.
-  [APP, 'icon.png', 1024, 1024, img('app-icon-light.svg', 1024, 1024), false],
+  [APP, 'icon-light.png', 1024, 1024, img('app-icon-light.svg', 1024, 1024), false],
   [APP, 'icon-dark.png', 1024, 1024, img('app-icon-dark.svg', 1024, 1024), false],
   [APP, 'icon-tinted.png', 1024, 1024, img('app-icon-tinted.svg', 1024, 1024), false],
   // Android adaptive icon: white layer + door inside the 66% safe zone. Android
@@ -37,7 +37,7 @@ const jobs = [
   [APP, 'android-icon-foreground.png', 512, 512, img('android-foreground.svg', 512, 512), true],
   [APP, 'android-icon-monochrome.png', 512, 512, img('android-monochrome.svg', 512, 512), true],
   // Splash: the door alone; app.json supplies the light and dark backgrounds.
-  [APP, 'splash-icon.png', 1024, 1024, img('splash-icon.svg', 1024, 1024), true],
+  [APP, 'splash-door.png', 1024, 1024, img('splash-icon.svg', 1024, 1024), true],
   // Phone app's web export, and the website's home-screen icon.
   [APP, 'favicon.png', 48, 48, img('favicon-light.svg', 48, 48), true],
   [WEB, 'apple-touch-icon.png', 180, 180, img('app-icon-light.svg', 180, 180), false],
