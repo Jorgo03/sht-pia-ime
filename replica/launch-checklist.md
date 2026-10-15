@@ -5,6 +5,10 @@ project `xzzzhlwmzotibrxdqmcm`, and Supabase's own docs. "You" means the
 owner, because it needs an account, money, a decision or a login. "Claude"
 means it can be done in code.
 
+Tracker with tick boxes and the payment plan:
+https://claude.ai/artifact/2iwP9xo9hG7x3vkAt8khbr (`replica/publish-plan.md`
+has the same payment plan in text).
+
 Status: **not ready to publish.** Nothing below is a broken feature. The
 website works and CI is green. What stands in the way is accounts, setup and
 store requirements.
@@ -72,8 +76,16 @@ app has none of these today. The work:
   at launch).
 
 This is a schema change, so Claude needs your approval first.
+**Update 2026-10-15:** the database part is written,
+`supabase/pending/report_and_block.sql`. It was tested against the live
+database inside a transaction that was always undone: 18 of 18 checks passed
+for Klient, Agjent and signed-out users, and nothing was left behind. It
+waits for the owner's "go"; the app screens follow.
 
-### 1.6 Real app icon and splash screen (You or a designer; Claude wires them in)
+### 1.6 Real app icon and splash screen (You make the logo; Claude wires it in)
+**Update:** a starter orange-house icon replaced Expo's placeholders in
+5e31792. The owner is designing the real logo; when it arrives, change the mark
+in `scripts/generate-brand-assets.mjs` and run it to redraw every size.
 `assets/images/icon.png`, the Android icons and `splash-icon.png` are still
 **Expo's template placeholders**: a blue chevron on a grid and grey circles.
 Apple rejects placeholder art, and it is the first thing users see. Needed:
@@ -83,7 +95,7 @@ Apple rejects placeholder art, and it is the first thing users see. Needed:
 
 The Android icon background `#E6F4FE` is also the template's blue.
 
-### 1.7 Privacy link inside the phone app (Claude, 5 min)
+### 1.7 Privacy link inside the phone app (DONE in 5e31792)
 The phone app only shows Privacy / Terms when `EXPO_PUBLIC_PRIVACY_POLICY_URL`
 is set, and it is not set, so the app has **no privacy link**. Both stores
 require one. Point it at the website's `/privacy` and `/terms` pages.
@@ -125,7 +137,7 @@ own key. Create a key in Google Cloud, restricted to the Android app.
 
 ## 2. Fix before launch (not blockers, but you'll regret skipping them)
 
-### 2.1 Website title and link previews (Claude, 15 min)
+### 2.1 Website title and link previews (DONE in 5e31792)
 The browser tab says **"Future Home Orange"**, not Shtëpia.ime. There is also
 no meta description, and no Open Graph tags, so a link shared on WhatsApp or
 Facebook shows no title, picture or text. There is no `robots.txt` or
