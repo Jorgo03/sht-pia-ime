@@ -809,7 +809,10 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   contentInner: {
     padding: 24,
-    paddingBottom: 40,
+    // Clears the floating "Ask about this property" button (listing-assistant,
+    // pinned 16px above the safe area, ~48px tall), which otherwise covered the
+    // "Schedule a viewing" button once the page was scrolled to the end.
+    paddingBottom: 104,
   },
   // Per the brief's own tablet diagram for this screen: gallery stays
   // full-width above, info + agent/contact split into two columns below.
