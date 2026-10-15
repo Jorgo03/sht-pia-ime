@@ -1,9 +1,8 @@
 -- Ownership guards, and the missing 'declined' viewing status
 -- (AUDIT.md Pass 15: S-7, S-8, S-9, BUG-015).
 --
--- NOT APPLIED YET: waiting for the owner's approval. When approved, apply it
--- with apply_migration, then move this file to supabase/migrations/ under the
--- version that apply_migration records.
+-- Applied 2026-10-15 on the owner's approval ("go guards"), as migration
+-- 20261015205024. Verified 15/15 against the live database before and after.
 --
 -- What it fixes, each one reproduced live on 2026-10-15 in a transaction that
 -- was rolled back:

@@ -10,6 +10,11 @@ button were reproduced live inside transactions that were rolled back, and
 their fix is written and tested the same way, waiting for the owner's approval
 (`supabase/pending/ownership_guards.sql`).
 
+> **Update, same day: applied** on the owner's "go guards" as migration
+> `20261015205024_ownership_guards`. S-7, S-8, S-9 and BUG-015 are **FIXED**;
+> the 15 checks were re-run against the live guards and all pass; security
+> advisors show no new warnings.
+
 Areas inspected: repository (both apps, Edge Functions, migrations, CI),
 live database (policies, column grants, triggers, constraints, advisors, row
 counts, deployed functions), commands below, App Store guidelines (official
@@ -171,7 +176,7 @@ the database, not in the client. Store receipts (phase 2) go through the same
 
 | ID | Pri | Task | Files / objects | Depends on | Acceptance | Effort |
 | --- | --- | --- | --- | --- | --- | --- |
-| T1 | P0 | Apply ownership guards + `declined` | `supabase/pending/ownership_guards.sql` → migration | your "go" | P1–P15 pass live; Decline works in both apps | S (applied in minutes) |
+| T1 | ✅ DONE | Apply ownership guards + `declined` | `supabase/migrations/20261015205024_ownership_guards.sql` | applied 2026-10-15 | P1–P15 pass live; Decline works in both apps | S (applied in minutes) |
 | T2 | P0 | Delete orphan functions | Dashboard → Edge Functions | you | `list_edge_functions` shows neither | S (you) |
 | T3 | P0 | Report/block DB + UI | `supabase/pending/report_and_block.sql`; property detail, chat, both apps | your "go" | 18/18 DB checks; report and block from listing and chat; e2e | M |
 | T4 | P0 | Custom SMTP | Supabase Auth settings | you: provider account | A non-team address receives sign-up mail | S |

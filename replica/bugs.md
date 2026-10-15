@@ -281,8 +281,9 @@ Expected: the request shows as declined.
 Actual: the update fails with Postgres 23514 (`viewings_status_check` allows
 requested, confirmed, cancelled, completed, no_show; not `declined`) and the
 app shows "update failed".
-Status: open. The fix adds `declined` to the constraint, in
-`supabase/pending/ownership_guards.sql`, waiting for the owner's approval.
+Status: fixed 2026-10-15 by migration `20261015205024_ownership_guards`,
+which adds `declined` to the constraint; an agent's decline was re-checked
+live (rolled back) and succeeds.
 
 ---
 
