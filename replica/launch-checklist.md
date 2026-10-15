@@ -83,7 +83,15 @@ for Klient, Agjent and signed-out users, and nothing was left behind. It
 waits for the owner's "go"; the app screens follow.
 
 ### 1.6 Real app icon and splash screen (You make the logo; Claude wires it in)
-**Update:** a starter orange-house icon replaced Expo's placeholders in
+**Done 2026-10-15:** the owner chose logo "Dera" (an open door whose knob is
+the dot in .ime), neon orange `#FF5F1F`. Masters and the usage guide are in
+`assets/brand/`; `scripts/generate-brand-assets.mjs` draws every size from
+them. iPhone gets a white icon in light mode and a black one in Dark Mode
+(iOS 18+) plus a tinted one; Android has no dark-mode icon, so it stays
+white, with a monochrome layer for themed icons. The rest of this section is
+history.
+
+**Earlier update:** a starter orange-house icon replaced Expo's placeholders in
 5e31792. The owner is designing the real logo; when it arrives, change the mark
 in `scripts/generate-brand-assets.mjs` and run it to redraw every size.
 `assets/images/icon.png`, the Android icons and `splash-icon.png` are still
