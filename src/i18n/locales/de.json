@@ -563,5 +563,31 @@
     "termsOfService": "Nutzungsbedingungen",
     "lastUpdated": "Zuletzt aktualisiert am {{date}}",
     "languageNote": "Dieses Dokument liegt auf Albanisch und Englisch vor. Unten steht die englische Fassung; maßgeblich ist die albanische."
+  },
+  "safety": {
+    "reportListing": "Dieses Inserat melden",
+    "reportUser": "Diesen Nutzer melden",
+    "blockUser": "Nutzer blockieren",
+    "unblockUser": "Blockierung aufheben",
+    "menu": "Weitere Optionen",
+    "reportTitle": "Was stimmt nicht?",
+    "reason": {
+      "spam": "Spam",
+      "scam": "Betrug",
+      "wrong_info": "Falsche Angaben",
+      "unavailable": "Nicht mehr verfügbar",
+      "offensive": "Anstößiger Inhalt",
+      "other": "Sonstiges"
+    },
+    "detailsPlaceholder": "Möchten Sie noch etwas hinzufügen? (optional)",
+    "send": "Meldung senden",
+    "sent": "Danke. Wir sehen uns das an.",
+    "already": "Sie haben dies bereits gemeldet.",
+    "failed": "Die Meldung konnte nicht gesendet werden. Bitte erneut versuchen.",
+    "blockConfirm": "{{name}} blockieren? Diese Person kann Ihnen dann keine Nachrichten mehr senden.",
+    "blocked": "Sie haben diesen Nutzer blockiert. Er kann Ihnen keine Nachrichten senden.",
+    "cannotMessage": "Sie können diesem Nutzer keine Nachrichten senden.",
+    "blockedBadge": "Blockiert",
+    "signInToReport": "Melden Sie sich an, um etwas zu melden."
   }
 }

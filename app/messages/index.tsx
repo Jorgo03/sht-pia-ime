@@ -14,6 +14,7 @@ import { useAuth } from '@/contexts/auth-context';
 import { useTheme } from '@/contexts/theme-context';
 import { supabase } from '@/lib/supabase';
 import { formatRelativeTime, getLocalizedText } from '@/lib/format';
+import { loadBlockedIds } from '@/src/features/safety/lib/safety';
 
 interface Conversation {
   id: string;
@@ -48,6 +49,8 @@ export default function MessagesInboxScreen() {
   const [properties, setProperties] = useState<Record<string, PropertyStub>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  // People this user has blocked, tagged in the list.
+  const [blocked, setBlocked] = useState<Set<string>>(() => new Set());
 
   // Mirrors the web app's Messages.jsx loadConversations() exactly — same
   // query, same batched profile/property lookups for the list preview.
@@ -78,14 +81,16 @@ export default function MessagesInboxScreen() {
     const otherIds = [...new Set(convos.map((c) => (c.client_id === user.id ? c.agent_id : c.client_id)))];
     const propIds = [...new Set(convos.map((c) => c.property_id).filter(Boolean))] as string[];
 
-    const [profRes, propRes] = await Promise.all([
+    const [profRes, propRes, blockedIds] = await Promise.all([
       otherIds.length
         ? supabase.from('profiles').select('id, full_name, agency_name').in('id', otherIds)
         : Promise.resolve({ data: [] as OtherProfile[] }),
       propIds.length
         ? supabase.from('properties').select('id, title, title_i18n').in('id', propIds)
         : Promise.resolve({ data: [] as PropertyStub[] }),
+      loadBlockedIds(supabase),
     ]);
+    setBlocked(blockedIds);
     setProfiles(Object.fromEntries((profRes.data ?? []).map((p) => [p.id, p])));
     setProperties(Object.fromEntries((propRes.data ?? []).map((p) => [p.id, p])));
     setLoading(false);
@@ -198,7 +203,12 @@ export default function MessagesInboxScreen() {
                     <Text style={styles.avatarText}>{name[0]?.toUpperCase() || '?'}</Text>
                   </LinearGradient>
                   <View style={styles.rowBody}>
-                    <Text style={styles.rowName} numberOfLines={1}>{name}</Text>
+                    <View style={styles.nameRow}>
+                      <Text style={[styles.rowName, styles.nameFlex]} numberOfLines={1}>{name}</Text>
+                      {blocked.has(otherId) ? (
+                        <Text style={styles.blockedBadge}>{t('safety.blockedBadge')}</Text>
+                      ) : null}
+                    </View>
                     {propTitle ? (
                       <Text style={styles.rowPreview} numberOfLines={1}>{propTitle}</Text>
                     ) : null}
@@ -336,6 +346,24 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     fontSize: 15,
     fontWeight: '600',
     color: colors.textPrimary,
+  },
+  nameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  nameFlex: {
+    flexShrink: 1,
+  },
+  blockedBadge: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: colors.textSecondary,
+    backgroundColor: colors.surface2,
+    borderRadius: 999,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    overflow: 'hidden',
   },
   rowPreview: {
     fontSize: 13,

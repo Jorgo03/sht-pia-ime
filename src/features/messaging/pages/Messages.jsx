@@ -1,10 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
-import { MessageCircle, ArrowLeft, Send } from 'lucide-react'
+import { MessageCircle, ArrowLeft, Send, MoreVertical } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../auth/AuthContext'
 import { supabase } from '../../../lib/supabase'
 import { formatRelativeTime, getLocalizedText } from '../../../lib/format'
+import { blockUser, isBlockedSendError, loadBlockedIds, unblockUser } from '../../safety/lib/safety'
+import ReportSheet from '../../safety/components/ReportSheet'
 
 export default function Messages() {
   const { t, i18n } = useTranslation()
@@ -17,6 +19,8 @@ export default function Messages() {
   const [profiles, setProfiles] = useState({})
   const [properties, setProperties] = useState({})
   const [loading, setLoading] = useState(true)
+  // People this user has blocked (only the blocker can see their blocks).
+  const [blocked, setBlocked] = useState(() => new Set())
 
   const loadConversations = useCallback(async () => {
     if (!user) { setConversations([]); setLoading(false); return }
@@ -30,14 +34,16 @@ export default function Messages() {
 
     const otherIds = [...new Set(convos.map(c => (c.client_id === user.id ? c.agent_id : c.client_id)))]
     const propIds = [...new Set(convos.map(c => c.property_id).filter(Boolean))]
-    const [profRes, propRes] = await Promise.all([
+    const [profRes, propRes, blockedIds] = await Promise.all([
       otherIds.length
         ? supabase.from('profiles').select('id, full_name, agency_name, avatar_url').in('id', otherIds)
         : Promise.resolve({ data: [] }),
       propIds.length
         ? supabase.from('properties').select('id, title, title_i18n').in('id', propIds)
         : Promise.resolve({ data: [] }),
+      loadBlockedIds(supabase),
     ])
+    setBlocked(blockedIds)
     setProfiles(Object.fromEntries((profRes.data ?? []).map(p => [p.id, p])))
     setProperties(Object.fromEntries((propRes.data ?? []).map(p => [p.id, p])))
     setLoading(false)
@@ -75,6 +81,13 @@ export default function Messages() {
         property={active.property_id ? properties[active.property_id] : null}
         meIsClient={active.client_id === user.id}
         userId={user.id}
+        otherId={otherId}
+        blocked={blocked.has(otherId)}
+        onBlockedChange={(isBlocked) => setBlocked(prev => {
+          const next = new Set(prev)
+          if (isBlocked) next.add(otherId); else next.delete(otherId)
+          return next
+        })}
         onBack={() => setSearchParams({}, { replace: true })}
         onOpenProperty={(id) => navigate(`/property/${id}`)}
       />
@@ -123,7 +136,12 @@ export default function Messages() {
                   {name[0]?.toUpperCase() || '?'}
                 </div>
                 <div className="msg-body">
-                  <div className="msg-name">{name}</div>
+                  <div className="msg-name">
+                    {name}
+                    {blocked.has(otherId) && (
+                      <span className="ml-2 rounded-full bg-fho-surface-2 px-2 py-0.5 align-middle text-[11px] font-semibold text-fho-text-muted">{t('safety.blockedBadge')}</span>
+                    )}
+                  </div>
                   <div className="msg-preview">{propTitle}</div>
                 </div>
                 <div className="msg-meta">
@@ -139,13 +157,38 @@ export default function Messages() {
   )
 }
 
-function Thread({ conversation, other, property, meIsClient, userId, onBack, onOpenProperty }) {
+function Thread({ conversation, other, property, meIsClient, userId, otherId, blocked, onBlockedChange, onBack, onOpenProperty }) {
   const { t, i18n } = useTranslation()
   const [messages, setMessages] = useState([])
   const [text, setText] = useState('')
   const [sending, setSending] = useState(false)
+  // false | 'failed' | 'blockedByThem'
   const [sendError, setSendError] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
+  const [reportOpen, setReportOpen] = useState(false)
+  const [safetyError, setSafetyError] = useState(false)
   const bottomRef = useRef(null)
+  const menuRef = useRef(null)
+
+  useEffect(() => {
+    if (!menuOpen) return
+    const onKey = (e) => { if (e.key === 'Escape') setMenuOpen(false) }
+    const onClick = (e) => { if (!menuRef.current?.contains(e.target)) setMenuOpen(false) }
+    window.addEventListener('keydown', onKey)
+    window.addEventListener('mousedown', onClick)
+    return () => { window.removeEventListener('keydown', onKey); window.removeEventListener('mousedown', onClick) }
+  }, [menuOpen])
+
+  const toggleBlock = async () => {
+    setMenuOpen(false)
+    setSafetyError(false)
+    if (blocked) {
+      if (await unblockUser(supabase, otherId)) onBlockedChange(false); else setSafetyError(true)
+      return
+    }
+    if (!window.confirm(t('safety.blockConfirm', { name: other?.full_name || other?.agency_name || '?' }))) return
+    if (await blockUser(supabase, otherId)) onBlockedChange(true); else setSafetyError(true)
+  }
 
   const markRead = useCallback(() => {
     const patch = meIsClient ? { unread_for_client: 0 } : { unread_for_agent: 0 }
@@ -193,7 +236,8 @@ function Thread({ conversation, other, property, meIsClient, userId, onBack, onO
       setText('')
       setMessages(prev => (prev.some(m => m.id === data.id) ? prev : [...prev, data]))
     } else {
-      setSendError(true)
+      // Refused by the database because the other person blocked you.
+      setSendError(isBlockedSendError(error) ? 'blockedByThem' : 'failed')
     }
   }
 
@@ -215,7 +259,29 @@ function Thread({ conversation, other, property, meIsClient, userId, onBack, onO
             </div>
           )}
         </div>
+        <div className="relative" ref={menuRef}>
+          <button
+            className="msg-thread__back"
+            onClick={() => setMenuOpen(o => !o)}
+            aria-label={t('safety.menu')}
+            aria-haspopup="menu"
+            aria-expanded={menuOpen}
+          >
+            <MoreVertical size={18} />
+          </button>
+          {menuOpen && (
+            <div role="menu" className="absolute right-0 top-full z-20 mt-1 flex min-w-[200px] flex-col overflow-hidden rounded-xl border border-fho-border bg-fho-surface shadow-fho-card">
+              <button role="menuitem" className="min-h-11 px-4 py-2 text-left text-[14px] text-fho-text hover:bg-fho-surface-2" onClick={() => { setMenuOpen(false); setReportOpen(true) }}>
+                {t('safety.reportUser')}
+              </button>
+              <button role="menuitem" className="min-h-11 px-4 py-2 text-left text-[14px] text-[#c0392b] hover:bg-fho-surface-2" onClick={toggleBlock}>
+                {blocked ? t('safety.unblockUser') : t('safety.blockUser')}
+              </button>
+            </div>
+          )}
+        </div>
       </div>
+      {reportOpen && <ReportSheet userId={otherId} onClose={() => setReportOpen(false)} />}
 
       <div className="msg-thread__scroll">
         {messages.length === 0 && (
@@ -232,11 +298,17 @@ function Thread({ conversation, other, property, meIsClient, userId, onBack, onO
         <div ref={bottomRef} />
       </div>
 
-      {sendError && (
+      {(sendError || safetyError) && (
         <div role="alert" style={{ textAlign: 'center', fontSize: 12, color: '#c0392b', padding: '4px 0' }}>
-          {t('messages.sendFailed')}
+          {safetyError ? t('errors.generic') : sendError === 'blockedByThem' ? t('safety.cannotMessage') : t('messages.sendFailed')}
         </div>
       )}
+      {blocked ? (
+        <div className="flex items-center justify-between gap-3 border-t border-fho-border px-4 py-3 text-[13px] text-fho-text-muted" role="status">
+          <span>{t('safety.blocked')}</span>
+          <button className="pill-btn" onClick={toggleBlock}>{t('safety.unblockUser')}</button>
+        </div>
+      ) : (
       <div className="msg-thread__input">
         <input
           type="text"
@@ -249,6 +321,7 @@ function Thread({ conversation, other, property, meIsClient, userId, onBack, onO
           <Send size={16} />
         </button>
       </div>
+      )}
     </div>
   )
 }

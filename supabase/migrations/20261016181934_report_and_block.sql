@@ -3,9 +3,8 @@
 -- (listings) and talk to each other (messages). See
 -- replica/launch-checklist.md 1.5.
 --
--- NOT APPLIED YET: waiting for the owner's approval. When approved, apply it
--- with apply_migration, then move this file to supabase/migrations/ under the
--- version that apply_migration records.
+-- Applied 2026-10-16 on the owner's approval ("go report/block") as migration
+-- 20261016181934. Verified live (rolled back): reports 8/8, blocks 11/11.
 --
 -- Additive only: two new tables, one helper function, and one RESTRICTIVE
 -- policy on messages. Restrictive policies are ANDed with the existing

@@ -85,3 +85,19 @@ export const LISTINGS: Listing[] = [
 export const AGENT_LISTING = LISTINGS[0];
 export const OWNER_LISTINGS = LISTINGS.filter((l) => !l.agent);
 export const MISSING_ID = 'e2e00000-0000-4000-b000-00000000dead';
+
+// One conversation the signed-in agent (AGENT) has with a client about the
+// first listing, for the chat tests (report and block).
+export const CHAT_CLIENT_ID = 'e2e00000-0000-4000-c000-0000000000c1';
+export const CONVERSATIONS = [
+  {
+    id: 'e2e00000-0000-4000-d000-000000000001',
+    client_id: CHAT_CLIENT_ID,
+    agent_id: AGENT.id,
+    property_id: LISTINGS[0].id,
+    last_message_at: '2026-10-10T10:00:00+00:00',
+    created_at: '2026-10-10T09:00:00+00:00',
+    unread_for_agent: 0,
+    unread_for_client: 0,
+  },
+];

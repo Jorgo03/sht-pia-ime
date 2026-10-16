@@ -4,6 +4,7 @@ import { useLocalSearchParams, useRouter, type Href } from 'expo-router';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
+  Alert,
   FlatList,
   KeyboardAvoidingView,
   Platform,
@@ -16,12 +17,19 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 
+import { ReportSheet } from '@/components/safety/report-sheet';
 import { AppHeader } from '@/components/ui/app-header';
 import { type AtticoPalette } from '@/constants/theme';
 import { useAuth } from '@/contexts/auth-context';
 import { useTheme } from '@/contexts/theme-context';
 import { supabase } from '@/lib/supabase';
 import { formatRelativeTime, getLocalizedText } from '@/lib/format';
+import {
+  blockUser,
+  isBlockedSendError,
+  loadBlockedIds,
+  unblockUser,
+} from '@/src/features/safety/lib/safety';
 
 interface Message {
   id: string;
@@ -52,8 +60,14 @@ export default function ThreadScreen() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [text, setText] = useState('');
   const [sending, setSending] = useState(false);
-  const [sendError, setSendError] = useState(false);
+  // null, or the reason the last send failed.
+  const [sendError, setSendError] = useState<null | 'failed' | 'blockedByThem'>(null);
   const [loading, setLoading] = useState(true);
+  const [otherId, setOtherId] = useState<string | null>(null);
+  // Whether *I* blocked the other person (only the blocker can see a block).
+  const [blocked, setBlocked] = useState(false);
+  const [reportOpen, setReportOpen] = useState(false);
+  const [safetyError, setSafetyError] = useState(false);
   const listRef = useRef<FlatList<Message>>(null);
   // The postgres_changes handler below is created once when the effect
   // mounts (conversation is still null at that point) and never recreated,
@@ -90,13 +104,16 @@ export default function ThreadScreen() {
       setConversation(convo);
 
       const otherId = convo.client_id === user.id ? convo.agent_id : convo.client_id;
-      const [profRes, propRes] = await Promise.all([
+      setOtherId(otherId);
+      const [profRes, propRes, blockedIds] = await Promise.all([
         supabase.from('profiles').select('full_name, agency_name').eq('id', otherId).single(),
         convo.property_id
           ? supabase.from('properties').select('id, title, title_i18n').eq('id', convo.property_id).single()
           : Promise.resolve({ data: null }),
+        loadBlockedIds(supabase),
       ]);
       if (cancelled) return;
+      setBlocked(blockedIds.has(otherId));
       setOtherName(profRes.data?.full_name || profRes.data?.agency_name || '?');
       if (propRes.data) {
         setPropertyId(propRes.data.id);
@@ -145,7 +162,7 @@ export default function ThreadScreen() {
     const body = text.trim();
     if (!body || sending || !user || !id) return;
     setSending(true);
-    setSendError(false);
+    setSendError(null);
     const { data, error } = await supabase
       .from('messages')
       .insert({ conversation_id: id, sender_id: user.id, body })
@@ -156,9 +173,44 @@ export default function ThreadScreen() {
       setText('');
       setMessages((prev) => (prev.some((m) => m.id === data.id) ? prev : [...prev, data]));
     } else {
-      setSendError(true);
+      // Refused by the database because the other person blocked you.
+      setSendError(isBlockedSendError(error) ? 'blockedByThem' : 'failed');
     }
   };
+
+  const toggleBlock = async () => {
+    if (!otherId) return;
+    setSafetyError(false);
+    if (blocked) {
+      if (await unblockUser(supabase, otherId)) setBlocked(false);
+      else setSafetyError(true);
+      return;
+    }
+    Alert.alert(t('safety.blockUser'), t('safety.blockConfirm', { name: otherName }), [
+      { text: t('common.cancel'), style: 'cancel' },
+      {
+        text: t('safety.blockUser'),
+        style: 'destructive',
+        onPress: async () => {
+          if (await blockUser(supabase, otherId)) setBlocked(true);
+          else setSafetyError(true);
+        },
+      },
+    ]);
+  };
+
+  // A native action sheet would need a new library; an Alert with options is
+  // the built-in equivalent on both platforms.
+  const openMenu = () =>
+    Alert.alert(otherName, undefined, [
+      { text: t('safety.reportUser'), onPress: () => setReportOpen(true) },
+      {
+        text: blocked ? t('safety.unblockUser') : t('safety.blockUser'),
+        style: blocked ? 'default' : 'destructive',
+        onPress: () => void toggleBlock(),
+      },
+      { text: t('common.cancel'), style: 'cancel' },
+    ]);
 
   if (loading) {
     return (
@@ -182,6 +234,16 @@ export default function ThreadScreen() {
           onBack={() => router.back()}
           showControls={false}
           title={otherName}
+          trailing={
+            <TouchableOpacity
+              onPress={openMenu}
+              style={styles.menuButton}
+              accessibilityRole="button"
+              accessibilityLabel={t('safety.menu')}
+              hitSlop={8}>
+              <MaterialIcons name="more-vert" size={22} color={colors.textPrimary} />
+            </TouchableOpacity>
+          }
           avatar={
             <LinearGradient colors={[colors.accent, colors.accentEnd]} style={styles.headerAvatar}>
               <Text style={styles.headerAvatarText}>{otherName[0]?.toUpperCase() || '?'}</Text>
@@ -227,8 +289,24 @@ export default function ThreadScreen() {
           }}
         />
 
-        {sendError && <Text style={styles.sendError}>{t('messages.sendFailed')}</Text>}
+        {sendError || safetyError ? (
+          <Text style={styles.sendError} accessibilityLiveRegion="polite">
+            {safetyError
+              ? t('errors.generic')
+              : sendError === 'blockedByThem'
+                ? t('safety.cannotMessage')
+                : t('messages.sendFailed')}
+          </Text>
+        ) : null}
 
+        {blocked ? (
+          <View style={styles.blockedRow} accessibilityLiveRegion="polite">
+            <Text style={styles.blockedText}>{t('safety.blocked')}</Text>
+            <TouchableOpacity onPress={toggleBlock} style={styles.unblockButton} accessibilityRole="button">
+              <Text style={styles.unblockText}>{t('safety.unblockUser')}</Text>
+            </TouchableOpacity>
+          </View>
+        ) : (
         <View style={styles.inputRow}>
           <TextInput
             style={styles.input}
@@ -249,6 +327,8 @@ export default function ThreadScreen() {
             </LinearGradient>
           </TouchableOpacity>
         </View>
+        )}
+        <ReportSheet visible={reportOpen} userId={otherId} onClose={() => setReportOpen(false)} />
       </SafeAreaView>
     </KeyboardAvoidingView>
   );
@@ -370,5 +450,38 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   sendButtonDisabled: {
     opacity: 0.5,
+  },
+  menuButton: {
+    width: 44,
+    height: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  blockedRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderTopWidth: 1,
+    borderTopColor: colors.border,
+  },
+  blockedText: {
+    flex: 1,
+    fontSize: 13,
+    color: colors.textSecondary,
+  },
+  unblockButton: {
+    minHeight: 44,
+    justifyContent: 'center',
+    paddingHorizontal: 14,
+    borderRadius: 22,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  unblockText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: colors.textPrimary,
   },
 });

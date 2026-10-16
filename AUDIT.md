@@ -178,9 +178,9 @@ the database, not in the client. Store receipts (phase 2) go through the same
 | --- | --- | --- | --- | --- | --- | --- |
 | T1 | ✅ DONE | Apply ownership guards + `declined` | `supabase/migrations/20261015205024_ownership_guards.sql` | applied 2026-10-15 | P1–P15 pass live; Decline works in both apps | S (applied in minutes) |
 | T2 | ✅ DONE | Delete orphan functions | Dashboard → Edge Functions | done by the owner 2026-10-16 | `list_edge_functions` shows neither (verified) | S (you) |
-| T3 | P0 | Report/block DB + UI | `supabase/pending/report_and_block.sql`; property detail, chat, both apps | your "go" | 18/18 DB checks; report and block from listing and chat; e2e | M |
+| T3 | ✅ DONE 2026-10-16 | Report/block DB + UI | migration `20261016181934_report_and_block`; `src/features/safety/`, property detail and chat in both apps | applied on your "go" | live checks: reports 8/8, blocks 11/11; e2e F10 (5 × 2); phone screens not yet tried on a device | M |
 | T4 | P0 | Custom SMTP | Supabase Auth settings | you: provider account | A non-team address receives sign-up mail | S |
-| T5 | P0 | Remove demo data | 12 listings, 2 test accounts | your "go" | Only real listings remain | S |
+| T5 | ✅ DONE 2026-10-16 | Remove demo data | 12 seed listings + 2 mailinator diagnostic accounts deleted | done on your "go" | 3 real listings and 15 accounts remain; nothing else was linked | S |
 | T6 | P0 | EAS production builds | `eas.json`, `app.json` | Apple Developer account, Maps key, logo | Both builds install and pass the manual checklist | M |
 | T7 | P0 | Apple sign-in on a device | `contexts/auth-context.tsx` | T6 | Sign-in, sign-out, delete account on iPhone | S |
 | T8 | P1 | Crash reporting | both apps | your choice of service | A forced crash appears in the dashboard | S |

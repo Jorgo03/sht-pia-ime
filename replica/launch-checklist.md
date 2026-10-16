@@ -38,6 +38,12 @@ Upgrade the organization to Pro under Billing. This also unlocks leaked-password
 protection (see 2.4).
 
 ### 1.3 Remove the demo data (You approve, Claude does it)
+**Done 2026-10-16:** the 12 seed listings and the 2 `@mailinator.com` diagnostic
+accounts were deleted; no favourites, viewings or chats were linked to them.
+Still open: `claude-test@shtepia.dev` ("Agjent Test") and the seed account
+`system@shtepia.ime` itself, kept until the owner decides. The rest of this
+section is history.
+
 12 of the 15 live listings are seed data under "Future Home Orange", with the
 placeholder phone **+355 69 123 4567**. Real visitors would call or WhatsApp a
 number that isn't yours. There are also 2 test accounts. Before launch:
@@ -63,6 +69,12 @@ Afterwards:
 4. Set `EXPO_PUBLIC_SITE_URL` to it (Claude can update the default).
 
 ### 1.5 Report and block, required for user-generated content (Claude, after you approve the schema)
+**Done 2026-10-16:** migration `20261016181934_report_and_block` applied, and
+both apps have "Report this listing" on the listing page and Report / Block /
+Unblock in chat. Reports are reviewed in the Supabase dashboard (table
+`content_reports`). The phone screens still need a try on a real device. The
+rest of this section is history.
+
 Users post listings and message each other, so both stores treat this as a
 user-generated-content app. Apple's guideline 1.2 requires a way to **report**
 objectionable content, a way to **block** abusive users, a way for you to act

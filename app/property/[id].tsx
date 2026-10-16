@@ -26,6 +26,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 
+import { ReportSheet } from '@/components/safety/report-sheet';
 import { AppHeader } from '@/components/ui/app-header';
 import { ActionButton } from '@/components/ui/action-button';
 import { PrimaryCTA } from '@/components/ui/buttons';
@@ -113,6 +114,9 @@ export default function PropertyDetailScreen() {
 
   const agentId = property?.agent?.id || property?.agent_id || property?.owner_id || null;
   const isOwnListing = !!user && !!agentId && user.id === agentId;
+  // Report is never offered on your own listing (owner or agent).
+  const canReport = !isOwnListing && !(user && property && user.id === property.owner_id);
+  const [reportOpen, setReportOpen] = useState(false);
 
   const handleSendMessage = async () => {
     if (!property) return;
@@ -369,6 +373,17 @@ export default function PropertyDetailScreen() {
           </ScrollView>
         </View>
       )}
+
+      {/* Required by the App Store and Google Play for user posts. */}
+      {canReport && (
+        <TouchableOpacity
+          style={styles.reportLink}
+          onPress={() => (user ? setReportOpen(true) : requireSignIn())}
+          accessibilityRole="button">
+          <MaterialIcons name="flag" size={15} color={colors.textSecondary} />
+          <Text style={styles.reportLinkText}>{t('safety.reportListing')}</Text>
+        </TouchableOpacity>
+      )}
     </>
   );
 
@@ -612,6 +627,8 @@ export default function PropertyDetailScreen() {
         </KeyboardAvoidingView>
         <KeyboardDoneBar nativeID={KEYBOARD_DONE_SHEET_ID} />
       </Modal>
+
+      <ReportSheet visible={reportOpen} propertyId={property?.id} onClose={() => setReportOpen(false)} />
 
       <Modal
         visible={lightboxOpen}
@@ -975,6 +992,19 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     fontSize: 17,
     fontWeight: '700',
     color: colors.textPrimary,
+  },
+  reportLink: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    gap: 6,
+    minHeight: 44,
+    paddingHorizontal: 4,
+  },
+  reportLinkText: {
+    fontSize: 13,
+    color: colors.textSecondary,
+    textDecorationLine: 'underline',
   },
 
   similarRow: {

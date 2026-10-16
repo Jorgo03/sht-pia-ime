@@ -1,7 +1,7 @@
 import { useEffect, useState, lazy, Suspense } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { ChevronLeft, Heart, Share2, MapPin, ExternalLink, ChevronRight as ChevRight, Globe, ArrowRight, Phone } from 'lucide-react'
+import { ChevronLeft, Heart, Share2, MapPin, ExternalLink, ChevronRight as ChevRight, Globe, ArrowRight, Phone, Flag } from 'lucide-react'
 import { useProperty, useProperties } from '../hooks/useProperties'
 import { useTranslatedProperty } from '../hooks/useTranslatedProperty'
 import { formatPrice, imageFor, listingBadgeKey, priceSuffixKey, telUrl, whatsappUrl } from '../../../lib/format'
@@ -14,6 +14,7 @@ import PropertyCard from '../components/PropertyCard'
 import ImageLightbox from '../components/ImageLightbox'
 import ListingAssistant from '../components/ListingAssistant'
 import ViewingRequestSheet from '../../viewings/components/ViewingRequestSheet'
+import ReportSheet from '../../safety/components/ReportSheet'
 import { isEnabled } from '../../../lib/flags'
 import { useSwipe } from '../../../hooks/useSwipe'
 import '../../../styles/property-detail.css'
@@ -32,6 +33,7 @@ export default function PropertyDetail() {
   const [loginToast, setLoginToast] = useState(false)
   const [chatError, setChatError] = useState(false)
   const [viewingSheet, setViewingSheet] = useState(false)
+  const [reportSheet, setReportSheet] = useState(false)
   const [viewingToast, setViewingToast] = useState(false)
   const [brokenImages, setBrokenImages] = useState(new Set())
   const [shareToast, setShareToast] = useState(false)
@@ -282,6 +284,25 @@ export default function PropertyDetail() {
           </div>
         </section>
       )}
+
+      {/* Report: required by the App Store and Google Play for user posts.
+          Not offered on your own listing. */}
+      {user?.id !== property.owner_id && user?.id !== property.agent_id && (
+        <section className="detail-section">
+          <button
+            type="button"
+            className="inline-flex min-h-11 items-center gap-2 bg-transparent p-0 text-[13px] text-fho-text-muted underline underline-offset-2"
+            onClick={() => {
+              if (!user) { setLoginToast(true); setTimeout(() => setLoginToast(false), 2500); return }
+              setReportSheet(true)
+            }}
+          >
+            <Flag size={14} aria-hidden="true" /> {t('safety.reportListing')}
+          </button>
+        </section>
+      )}
+
+      {reportSheet && <ReportSheet propertyId={property.id} onClose={() => setReportSheet(false)} />}
 
       {/* Sticky CTA — in-app viewing request (owner sees no CTA on own listing) */}
       {user?.id !== property.owner_id && user?.id !== property.agent_id && (

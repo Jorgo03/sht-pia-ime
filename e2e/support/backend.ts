@@ -1,6 +1,6 @@
 import type { Page, Route } from '@playwright/test';
 
-import { AGENT, LISTINGS, type Listing } from './fixtures';
+import { AGENT, CONVERSATIONS, LISTINGS, type Listing } from './fixtures';
 
 // A stand-in for Supabase, served from inside the browser. The app under test
 // is built against https://e2e.supabase.co, which does not exist, and every
@@ -138,7 +138,18 @@ export async function mockBackend(page: Page, { signedIn = false, writes = [] as
       if (url.pathname.startsWith('/storage/')) return route.fulfill(IMAGE);
       if (url.pathname.startsWith('/rest/v1/properties')) return properties(route, url, store, writes);
       if (url.pathname.startsWith('/rest/v1/profiles')) return profiles(route, url);
-      if (url.pathname.startsWith('/rest/v1/')) return method === 'GET' ? json(route, 200, []) : route.fulfill({ status: 201, headers: CORS, body: '' });
+      if (url.pathname.startsWith('/rest/v1/')) {
+        const table = url.pathname.split('/')[3];
+        if (method !== 'GET' && method !== 'HEAD') {
+          // Every other write (reports, blocks, activity…) is recorded and accepted.
+          let body: Record<string, unknown> = {};
+          try { body = route.request().postDataJSON() ?? {}; } catch { /* no body (DELETE) */ }
+          writes.push({ table, method, query: url.search, body });
+          return route.fulfill({ status: method === 'POST' ? 201 : 204, headers: CORS, body: '' });
+        }
+        if (table === 'conversations' && signedIn) return json(route, 200, CONVERSATIONS);
+        return json(route, 200, []);
+      }
       // Signed out: there is no session, and every sign-in attempt fails.
       if (url.pathname.startsWith('/auth/v1/user')) {
         return signedIn ? json(route, 200, SIGNED_IN_USER) : json(route, 401, { msg: 'no session' });

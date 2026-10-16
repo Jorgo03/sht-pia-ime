@@ -579,5 +579,31 @@
     "termsOfService": "Regulamin",
     "lastUpdated": "Ostatnia aktualizacja: {{date}}",
     "languageNote": "Ten dokument jest dostępny po albańsku i angielsku. Poniżej znajduje się wersja angielska; rozstrzygająca jest wersja albańska."
+  },
+  "safety": {
+    "reportListing": "Zgłoś to ogłoszenie",
+    "reportUser": "Zgłoś tego użytkownika",
+    "blockUser": "Zablokuj użytkownika",
+    "unblockUser": "Odblokuj użytkownika",
+    "menu": "Więcej opcji",
+    "reportTitle": "Co jest nie tak?",
+    "reason": {
+      "spam": "Spam",
+      "scam": "Oszustwo",
+      "wrong_info": "Błędne informacje",
+      "unavailable": "Już niedostępne",
+      "offensive": "Obraźliwe treści",
+      "other": "Inne"
+    },
+    "detailsPlaceholder": "Coś jeszcze, co powinniśmy wiedzieć? (opcjonalnie)",
+    "send": "Wyślij zgłoszenie",
+    "sent": "Dziękujemy. Sprawdzimy to.",
+    "already": "To zostało już przez Ciebie zgłoszone.",
+    "failed": "Nie udało się wysłać zgłoszenia. Spróbuj ponownie.",
+    "blockConfirm": "Zablokować {{name}}? Ta osoba nie będzie mogła wysyłać Ci wiadomości.",
+    "blocked": "Ten użytkownik jest zablokowany. Nie może wysyłać Ci wiadomości.",
+    "cannotMessage": "Nie możesz wysyłać wiadomości do tego użytkownika.",
+    "blockedBadge": "Zablokowany",
+    "signInToReport": "Zaloguj się, aby zgłosić."
   }
 }

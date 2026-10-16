@@ -563,5 +563,31 @@
     "termsOfService": "Terms of Service",
     "lastUpdated": "Last updated {{date}}",
     "languageNote": "This document is available in Albanian and English. The English version is shown below; the Albanian version prevails."
+  },
+  "safety": {
+    "reportListing": "Report this listing",
+    "reportUser": "Report this user",
+    "blockUser": "Block user",
+    "unblockUser": "Unblock user",
+    "menu": "More options",
+    "reportTitle": "What is wrong?",
+    "reason": {
+      "spam": "Spam",
+      "scam": "Scam or fraud",
+      "wrong_info": "Wrong information",
+      "unavailable": "No longer available",
+      "offensive": "Offensive content",
+      "other": "Something else"
+    },
+    "detailsPlaceholder": "Anything else we should know? (optional)",
+    "send": "Send report",
+    "sent": "Thank you. We will look into it.",
+    "already": "You have already reported this.",
+    "failed": "The report could not be sent. Try again.",
+    "blockConfirm": "Block {{name}}? They will no longer be able to message you.",
+    "blocked": "You blocked this user. They cannot message you.",
+    "cannotMessage": "You can't send messages to this user.",
+    "blockedBadge": "Blocked",
+    "signInToReport": "Sign in to report."
   }
 }

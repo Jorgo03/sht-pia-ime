@@ -563,5 +563,31 @@
     "termsOfService": "Kushtet e shërbimit",
     "lastUpdated": "Përditësuar më {{date}}",
     "languageNote": "Ky dokument është i disponueshëm në shqip dhe anglisht. Më poshtë është versioni në anglisht; versioni në shqip mbizotëron."
+  },
+  "safety": {
+    "reportListing": "Raporto këtë shpallje",
+    "reportUser": "Raporto këtë përdorues",
+    "blockUser": "Blloko përdoruesin",
+    "unblockUser": "Zhblloko përdoruesin",
+    "menu": "Më shumë opsione",
+    "reportTitle": "Çfarë nuk shkon?",
+    "reason": {
+      "spam": "Mesazhe të padëshiruara (spam)",
+      "scam": "Mashtrim",
+      "wrong_info": "Informacion i gabuar",
+      "unavailable": "Nuk është më në dispozicion",
+      "offensive": "Përmbajtje fyese",
+      "other": "Tjetër"
+    },
+    "detailsPlaceholder": "Diçka tjetër që duhet të dimë? (opsionale)",
+    "send": "Dërgo raportin",
+    "sent": "Faleminderit. Do ta shqyrtojmë.",
+    "already": "E keni raportuar tashmë.",
+    "failed": "Raporti nuk u dërgua. Provo përsëri.",
+    "blockConfirm": "Ta bllokoni {{name}}? Nuk do të mund t'ju dërgojë mesazhe.",
+    "blocked": "E keni bllokuar këtë përdorues. Nuk mund t'ju dërgojë mesazhe.",
+    "cannotMessage": "Nuk mund t'i dërgoni mesazhe këtij përdoruesi.",
+    "blockedBadge": "I bllokuar",
+    "signInToReport": "Hyni për të raportuar."
   }
 }

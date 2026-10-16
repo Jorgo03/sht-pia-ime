@@ -571,5 +571,31 @@
     "termsOfService": "Términos del servicio",
     "lastUpdated": "Última actualización: {{date}}",
     "languageNote": "Este documento está disponible en albanés e inglés. A continuación se muestra la versión en inglés; prevalece la versión en albanés."
+  },
+  "safety": {
+    "reportListing": "Denunciar este anuncio",
+    "reportUser": "Denunciar a este usuario",
+    "blockUser": "Bloquear usuario",
+    "unblockUser": "Desbloquear usuario",
+    "menu": "Más opciones",
+    "reportTitle": "¿Qué ocurre?",
+    "reason": {
+      "spam": "Spam",
+      "scam": "Estafa",
+      "wrong_info": "Información incorrecta",
+      "unavailable": "Ya no está disponible",
+      "offensive": "Contenido ofensivo",
+      "other": "Otro motivo"
+    },
+    "detailsPlaceholder": "¿Algo más que debamos saber? (opcional)",
+    "send": "Enviar denuncia",
+    "sent": "Gracias. Lo revisaremos.",
+    "already": "Ya has denunciado esto.",
+    "failed": "No se pudo enviar la denuncia. Inténtalo de nuevo.",
+    "blockConfirm": "¿Bloquear a {{name}}? Ya no podrá enviarte mensajes.",
+    "blocked": "Has bloqueado a este usuario. No puede enviarte mensajes.",
+    "cannotMessage": "No puedes enviar mensajes a este usuario.",
+    "blockedBadge": "Bloqueado",
+    "signInToReport": "Inicia sesión para denunciar."
   }
 }

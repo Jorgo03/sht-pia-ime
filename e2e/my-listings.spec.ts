@@ -36,7 +36,7 @@ test('F09-N1 someone else\'s listing cannot be opened for editing', async ({ pag
   await page.goto(`/my-listings/${OWNER_LISTINGS[0].id}/edit`);
   await expect(page.getByRole('heading', { name: t('detail.unavailable') })).toBeVisible();
   await expect(page.getByPlaceholder(t('listing.titlePlaceholder'))).toHaveCount(0);
-  expect(writes).toEqual([]);
+  expect(writes.filter((w) => w.table === 'properties')).toEqual([]);
 });
 
 test('F09-H2 the edit button on My Listings opens the wizard', async ({ page }) => {
@@ -50,6 +50,6 @@ test('F09-H3 a sale is marked sold and a rental rented', async ({ page, writes }
   await page.goto('/my-listings');
   await page.getByRole('button', { name: t('listing.markSold') }).first().click();
   await page.getByRole('button', { name: t('listing.markRented') }).first().click();
-  await expect.poll(() => writes.map((w) => w.body.status)).toEqual(['sold', 'rented']);
+  await expect.poll(() => writes.filter((w) => w.table === 'properties').map((w) => w.body.status)).toEqual(['sold', 'rented']);
   await expect(page.getByText(t('listing.status.sold')).first()).toBeVisible();
 });
