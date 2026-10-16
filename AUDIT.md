@@ -99,8 +99,8 @@ P14 dashboard/service role can still reassign · P15 agent sets requested/comple
 | S-8 | Medium | Either party can change a conversation's `client_id`/`agent_id`/`property_id` (UPDATE has no WITH CHECK, all columns granted), moving the other side's messages to a third person. | Live probe, rolled back | `guard_conversation_parties` trigger |
 | S-9 | Low–Med | A client can set their own viewing to any status (incl. `confirmed`, `completed`) and move it to another agent or listing. | Live probe, rolled back | `guard_viewing_update` trigger: the client may only cancel |
 | BUG-015 | S2 | Decline sends `declined`, which the constraint rejects; 4 buttons fail. | Live probe, rolled back | Add `declined` to `viewings_status_check` (same file) |
-| S-1 | **High** | `translate-description` v4 still deployed, still unauthenticated spend. | `list_edge_functions` today | Owner deletes it in the dashboard |
-| S-2 | Low | `clerk-link-profile` still deployed, dead. | same | Owner deletes it |
+| S-1 | **High** | `translate-description` v4 still deployed, still unauthenticated spend. | `list_edge_functions` today | **FIXED 2026-10-16**: owner deleted it; confirmed with `list_edge_functions` |
+| S-2 | Low | `clerk-link-profile` still deployed, dead. | same | **FIXED 2026-10-16**: owner deleted it; confirmed with `list_edge_functions` |
 | S-3/S-4 | Med/Low | Leaked-password protection off; two SECURITY DEFINER helpers callable by `anon`. | Advisors today, unchanged | As Pass 14 |
 
 Checked and sound: `favorites`, `saved_searches`, `wanted_homes`, `leads`
@@ -177,7 +177,7 @@ the database, not in the client. Store receipts (phase 2) go through the same
 | ID | Pri | Task | Files / objects | Depends on | Acceptance | Effort |
 | --- | --- | --- | --- | --- | --- | --- |
 | T1 | ✅ DONE | Apply ownership guards + `declined` | `supabase/migrations/20261015205024_ownership_guards.sql` | applied 2026-10-15 | P1–P15 pass live; Decline works in both apps | S (applied in minutes) |
-| T2 | P0 | Delete orphan functions | Dashboard → Edge Functions | you | `list_edge_functions` shows neither | S (you) |
+| T2 | ✅ DONE | Delete orphan functions | Dashboard → Edge Functions | done by the owner 2026-10-16 | `list_edge_functions` shows neither (verified) | S (you) |
 | T3 | P0 | Report/block DB + UI | `supabase/pending/report_and_block.sql`; property detail, chat, both apps | your "go" | 18/18 DB checks; report and block from listing and chat; e2e | M |
 | T4 | P0 | Custom SMTP | Supabase Auth settings | you: provider account | A non-team address receives sign-up mail | S |
 | T5 | P0 | Remove demo data | 12 listings, 2 test accounts | your "go" | Only real listings remain | S |
