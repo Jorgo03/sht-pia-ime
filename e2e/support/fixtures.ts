@@ -101,3 +101,16 @@ export const CONVERSATIONS = [
     unread_for_client: 0,
   },
 ];
+
+// A saved search of the signed-in agent, last seen when 1 listing matched.
+export const SAVED_SEARCHES = [
+  {
+    id: 'e2e00000-0000-4000-e000-000000000001',
+    user_id: AGENT.id,
+    name: 'Shitje në Tiranë',
+    filters: { city: 'Tiranë', listing_type: 'sale' },
+    alerts_enabled: true,
+    last_match_count: 1,
+    created_at: '2026-10-01T09:00:00+00:00',
+  },
+];

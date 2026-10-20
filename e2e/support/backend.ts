@@ -1,6 +1,6 @@
 import type { Page, Route } from '@playwright/test';
 
-import { AGENT, CONVERSATIONS, LISTINGS, type Listing } from './fixtures';
+import { AGENT, CONVERSATIONS, LISTINGS, SAVED_SEARCHES, type Listing } from './fixtures';
 
 // A stand-in for Supabase, served from inside the browser. The app under test
 // is built against https://e2e.supabase.co, which does not exist, and every
@@ -148,6 +148,7 @@ export async function mockBackend(page: Page, { signedIn = false, writes = [] as
           return route.fulfill({ status: method === 'POST' ? 201 : 204, headers: CORS, body: '' });
         }
         if (table === 'conversations' && signedIn) return json(route, 200, CONVERSATIONS);
+        if (table === 'saved_searches' && signedIn) return json(route, 200, SAVED_SEARCHES);
         return json(route, 200, []);
       }
       // Signed out: there is no session, and every sign-in attempt fails.

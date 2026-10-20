@@ -17,6 +17,7 @@ import { useTheme } from '@/contexts/theme-context';
 import { supabase } from '@/lib/supabase';
 import { formatDate, formatPrice } from '@/lib/format';
 import { PropertyFilters } from '@/data/types';
+import { countMatches, markSeen, newMatchCount } from '@/src/features/saved-searches/lib/matches';
 
 type Tab = 'searches' | 'wanted';
 type ListingType = 'sale' | 'rent';
@@ -38,6 +39,7 @@ interface SavedSearch {
     beds?: number | null;
   } | null;
   alerts_enabled: boolean;
+  last_match_count: number | null;
   created_at: string;
 }
 
@@ -65,6 +67,8 @@ export default function SavedSearchesScreen() {
   const [loading, setLoading] = useState(true);
   const [actionError, setActionError] = useState(false);
   const [formOpen, setFormOpen] = useState(false);
+  // Current number of matching listings per saved search (id -> count|null).
+  const [matchCounts, setMatchCounts] = useState<Record<string, number | null>>({});
 
   // New-search form fields
   const [searchName, setSearchName] = useState('');
@@ -93,9 +97,13 @@ export default function SavedSearchesScreen() {
       supabase.from('saved_searches').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
       supabase.from('wanted_homes').select('*').eq('client_id', user.id).order('created_at', { ascending: false }),
     ]);
-    setSearches(s.data ?? []);
+    const rows: SavedSearch[] = s.data ?? [];
+    setSearches(rows);
     setWanted(w.data ?? []);
     setLoading(false);
+    // In-app "alerts": count matches now; the badge compares with last time.
+    const counts = await Promise.all(rows.map((r) => (r.alerts_enabled ? countMatches(supabase, r.filters) : null)));
+    setMatchCounts(Object.fromEntries(rows.map((r, i) => [r.id, counts[i]])));
   }, [user]);
 
   useEffect(() => {
@@ -107,6 +115,15 @@ export default function SavedSearchesScreen() {
     const { error } = await supabase.from('saved_searches').update({ alerts_enabled: next }).eq('id', row.id);
     if (error) return flashError();
     setSearches((prev) => prev.map((s) => (s.id === row.id ? { ...s, alerts_enabled: next } : s)));
+    // Turning it on starts from what matches now, so the badge never counts
+    // listings that were already there.
+    if (next) {
+      const current = await countMatches(supabase, row.filters);
+      if (await markSeen(supabase, row.id, current)) {
+        setSearches((prev) => prev.map((s) => (s.id === row.id ? { ...s, last_match_count: current } : s)));
+      }
+      setMatchCounts((prev) => ({ ...prev, [row.id]: current }));
+    }
   };
 
   const deleteSearch = async (id: string) => {
@@ -116,6 +133,8 @@ export default function SavedSearchesScreen() {
   };
 
   const runSearch = (row: SavedSearch) => {
+    // Opening a saved search counts as seeing its current matches.
+    void markSeen(supabase, row.id, matchCounts[row.id]);
     resetFilters();
     const f = row.filters;
     if (f?.city) setFilter('city', f.city);
@@ -143,11 +162,15 @@ export default function SavedSearchesScreen() {
   const submitSearch = async () => {
     if (!searchName.trim() || !user) return;
     setSaving(true);
+    const filters = { city: searchCity.trim() || null, listing_type: searchType };
+    // Start from what matches today, so only later listings count as new.
+    const current = await countMatches(supabase, filters);
     const { error } = await supabase.from('saved_searches').insert({
       user_id: user.id,
       name: searchName.trim(),
-      filters: { city: searchCity.trim() || null, listing_type: searchType },
+      filters,
       alerts_enabled: true,
+      last_match_count: current ?? 0,
     });
     setSaving(false);
     if (error) return flashError();
@@ -248,7 +271,9 @@ export default function SavedSearchesScreen() {
                   <Text style={styles.emptyHint}>{t('saved.emptySearchesHint')}</Text>
                 </View>
               ) : (
-                searches.map((s) => (
+                <>
+                <Text style={styles.alertsHint}>{t('saved.alertsHint')}</Text>
+                {searches.map((s) => (
                   <View key={s.id} style={styles.card}>
                     <View style={styles.cardHead}>
                       <Text style={styles.cardTitle}>{s.name}</Text>
@@ -264,6 +289,11 @@ export default function SavedSearchesScreen() {
                         <Text style={styles.cardMeta}>{t(`listing.type.${s.filters.listing_type}`, s.filters.listing_type)}</Text>
                       ) : null}
                     </View>
+                    {s.alerts_enabled && newMatchCount(matchCounts[s.id], s.last_match_count) > 0 ? (
+                      <Text style={styles.newBadge} accessibilityLiveRegion="polite">
+                        {t('saved.newMatches', { n: newMatchCount(matchCounts[s.id], s.last_match_count) })}
+                      </Text>
+                    ) : null}
                     <View style={styles.cardActions}>
                       <TouchableOpacity
                         style={styles.actionButton}
@@ -293,7 +323,8 @@ export default function SavedSearchesScreen() {
                       </TouchableOpacity>
                     </View>
                   </View>
-                ))
+                ))}
+                </>
               )
             ) : wanted.length === 0 ? (
               <View style={styles.emptyCard}>
@@ -591,6 +622,22 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     fontSize: 13,
     color: colors.textSecondary,
     textAlign: 'center',
+  },
+  alertsHint: {
+    fontSize: 12,
+    color: colors.textSecondary,
+    marginBottom: 4,
+  },
+  newBadge: {
+    alignSelf: 'flex-start',
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#fff',
+    backgroundColor: colors.accent,
+    borderRadius: 999,
+    paddingHorizontal: 10,
+    paddingVertical: 3,
+    overflow: 'hidden',
   },
   card: {
     backgroundColor: colors.primaryLight,

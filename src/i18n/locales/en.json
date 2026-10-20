@@ -537,8 +537,8 @@
     "emptyWantedHint": "Post what you're looking for with the button above",
     "run": "Run search",
     "delete": "Delete",
-    "alertsOn": "Turn alerts on",
-    "alertsOff": "Turn alerts off",
+    "alertsOn": "Show new matches",
+    "alertsOff": "Stop showing new matches",
     "markClosed": "Mark as found",
     "markOpen": "Reopen",
     "wantedStatus": {
@@ -546,7 +546,9 @@
       "closed": "Closed"
     },
     "newSearch": "New saved search",
-    "newWanted": "New wanted post"
+    "newWanted": "New wanted post",
+    "newMatches": "{{n}} more than last time",
+    "alertsHint": "New matches show up here when you open this page. Email alerts are not available yet."
   },
   "bell": {
     "label": "Notifications",

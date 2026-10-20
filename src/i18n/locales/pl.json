@@ -553,8 +553,8 @@
     "emptyWantedHint": "Opublikuj czego szukasz przyciskiem powyżej",
     "run": "Uruchom wyszukiwanie",
     "delete": "Usuń",
-    "alertsOn": "Włącz powiadomienia",
-    "alertsOff": "Wyłącz powiadomienia",
+    "alertsOn": "Pokazuj nowe wyniki",
+    "alertsOff": "Nie pokazuj nowych wyników",
     "markClosed": "Oznacz jako znalezione",
     "markOpen": "Otwórz ponownie",
     "wantedStatus": {
@@ -562,7 +562,9 @@
       "closed": "Zamknięte"
     },
     "newSearch": "Nowe wyszukiwanie",
-    "newWanted": "Nowe ogłoszenie"
+    "newWanted": "Nowe ogłoszenie",
+    "newMatches": "{{n}} więcej niż ostatnio",
+    "alertsHint": "Nowe wyniki pojawiają się tutaj, gdy otworzysz tę stronę. Powiadomienia e-mail nie są jeszcze dostępne."
   },
   "bell": {
     "label": "Powiadomienia",

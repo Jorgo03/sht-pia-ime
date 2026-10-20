@@ -537,8 +537,8 @@
     "emptyWantedHint": "Posto çfarë kërkon me butonin më sipër",
     "run": "Kërko tani",
     "delete": "Fshi",
-    "alertsOn": "Aktivizo njoftimet",
-    "alertsOff": "Çaktivizo njoftimet",
+    "alertsOn": "Shfaq përputhjet e reja",
+    "alertsOff": "Mos shfaq përputhjet e reja",
     "markClosed": "Mbyll kërkesën",
     "markOpen": "Rihap kërkesën",
     "wantedStatus": {
@@ -546,7 +546,9 @@
       "closed": "E mbyllur"
     },
     "newSearch": "Kërkim i ri",
-    "newWanted": "Kërkesë e re"
+    "newWanted": "Kërkesë e re",
+    "newMatches": "{{n}} më shumë se herën e kaluar",
+    "alertsHint": "Përputhjet e reja shfaqen këtu kur hapni këtë faqe. Njoftimet me email nuk janë ende në dispozicion."
   },
   "bell": {
     "label": "Njoftimet",

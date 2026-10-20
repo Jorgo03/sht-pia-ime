@@ -545,8 +545,8 @@
     "emptyWantedHint": "Publica lo que buscas con el botón de arriba",
     "run": "Ejecutar búsqueda",
     "delete": "Eliminar",
-    "alertsOn": "Activar alertas",
-    "alertsOff": "Desactivar alertas",
+    "alertsOn": "Mostrar nuevos resultados",
+    "alertsOff": "Dejar de mostrar nuevos resultados",
     "markClosed": "Marcar como encontrada",
     "markOpen": "Reabrir",
     "wantedStatus": {
@@ -554,7 +554,9 @@
       "closed": "Cerrada"
     },
     "newSearch": "Nueva búsqueda",
-    "newWanted": "Nueva solicitud"
+    "newWanted": "Nueva solicitud",
+    "newMatches": "{{n}} más que la última vez",
+    "alertsHint": "Los nuevos resultados aparecen aquí cuando abres esta página. Los avisos por correo aún no están disponibles."
   },
   "bell": {
     "label": "Notificaciones",
