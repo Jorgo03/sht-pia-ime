@@ -77,6 +77,7 @@ function PropertyRowBase({ property }: { property: Property }) {
         accessibilityLabel={`${title}, ${price}${suffixKey ? t(suffixKey) : ''}, ${place ?? ''}`}>
         <View style={styles.imageWrap}>
           <Image
+            alt={title}
             source={{ uri: property.image_urls?.[0] }}
             recyclingKey={property.id}
             style={styles.image}

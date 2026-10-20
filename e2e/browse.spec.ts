@@ -14,14 +14,14 @@ test('F01-H1 home shows the listings', async ({ page }) => {
 test('F01-H2 search lists every active listing', async ({ page }) => {
   await page.goto('/search');
   for (const listing of LISTINGS) {
-    await expect(page.getByRole('button', { name: listing.title, exact: true })).toBeVisible();
+    await expect(page.getByRole('link', { name: listing.title, exact: true })).toBeVisible();
   }
 });
 
 test('F01-H3 opening a card goes to its detail page', async ({ page }) => {
   const listing = LISTINGS[1];
   await page.goto('/search');
-  await page.getByRole('button', { name: listing.title, exact: true }).click();
+  await page.getByRole('link', { name: listing.title, exact: true }).click();
   await expect(page).toHaveURL(`/property/${listing.id}`);
   await expect(page.getByRole('heading', { name: listing.title, level: 1 })).toBeVisible();
 });
@@ -33,8 +33,8 @@ test('F01-E1 search still answers when the AI search is down', async ({ page }) 
   await box.press('Enter');
   // ai-parse-search answers 503 in the mock; the page must fall back to a
   // plain search instead of hanging or showing nothing.
-  await expect(page.getByRole('button', { name: 'Apartament pranë plazhit', exact: true })).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Vilë me oborr në Sauk', exact: true })).toBeHidden();
+  await expect(page.getByRole('link', { name: 'Apartament pranë plazhit', exact: true })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Vilë me oborr në Sauk', exact: true })).toBeHidden();
 });
 
 test('F01-E2 no page scrolls sideways on a phone', async ({ page, isMobile }) => {

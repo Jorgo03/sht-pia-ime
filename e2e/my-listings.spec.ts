@@ -53,3 +53,21 @@ test('F09-H3 a sale is marked sold and a rental rented', async ({ page, writes }
   await expect.poll(() => writes.filter((w) => w.table === 'properties').map((w) => w.body.status)).toEqual(['sold', 'rented']);
   await expect(page.getByText(t('listing.status.sold')).first()).toBeVisible();
 });
+
+test('F09-H4 a photo removed while editing is deleted from storage after saving', async ({ page, writes }) => {
+  await page.goto(`/my-listings/${AGENT_LISTING.id}/edit`);
+  await expect(page.getByRole('heading', { name: t('listing.editListing') })).toBeVisible();
+  for (let step = 0; step < 3; step++) await page.getByRole('button', { name: t('listing.next') }).click();
+  // Photos step: remove the first photo.
+  await page.getByRole('button', { name: t('common.close') }).first().click();
+  await page.getByRole('button', { name: t('listing.next') }).click();
+  // Nothing is deleted before the save succeeds.
+  expect(writes.filter((w) => w.table === 'storage')).toEqual([]);
+  await page.getByRole('button', { name: t('listing.saveChanges') }).click();
+  await expect(page).toHaveURL('/my-listings');
+
+  const update = writes.find((w) => w.table === 'properties' && w.method === 'PATCH');
+  expect(update!.body.image_urls).toEqual([(AGENT_LISTING.image_urls as string[])[1]]);
+  const removal = writes.find((w) => w.table === 'storage' && w.method === 'DELETE');
+  expect(removal?.body).toEqual({ prefixes: [`${AGENT_LISTING.agent_id}/photo-1.jpg`] });
+});

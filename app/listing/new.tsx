@@ -4,7 +4,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   ActivityIndicator,
@@ -39,7 +39,7 @@ import { supabase } from '@/lib/supabase';
 import { translatePropertyContent, type I18nMap } from '@/lib/translate';
 import { geocodeCity, type RoadSuggestion } from '@/src/lib/roadSearch';
 import { useListingTranslation } from '@/src/features/listings/hooks/useListingTranslation';
-import { formToColumns, propertyToForm } from '@/src/features/listings/lib/listingForm';
+import { formToColumns, propertyToForm, removedMediaPaths } from '@/src/features/listings/lib/listingForm';
 import type { TranslationMeta } from '@/src/lib/translationCore';
 import {
   MAX_IMAGES,
@@ -61,8 +61,8 @@ import LOCATIONS from '@/src/features/properties/data/locations';
  *
  * Same five steps, same per-step validation, same insert payload and same
  * draft-restore behaviour, so a listing is identical whichever app created it.
- * `listing/create.tsx` remains the single-scroll form and is untouched; this
- * route is additive until the wizard is confirmed against real submissions.
+ * It is the only listing form: the old single-scroll `listing/create.tsx` now
+ * redirects here.
  *
  * Two deliberate divergences from the design handoff's §13 sketch:
  *  - Five steps, not four. Web already ships basics/location/details/media/
@@ -273,6 +273,10 @@ function ListingWizard({ editId }: { editId?: string }) {
 
   // Load the listing being edited. Editing never reads or writes the
   // new-listing draft, so an unfinished draft survives an edit untouched.
+  // Media the listing had when it was opened for editing; anything missing
+  // after a successful save is deleted from storage.
+  const originalMedia = useRef<string[]>([]);
+
   const applyLoaded = useCallback((result: LoadedListing) => {
     if (result.state !== 'ready') {
       setEditState(result.state);
@@ -293,6 +297,7 @@ function ListingWizard({ editId }: { editId?: string }) {
         ? { uri: row.video_url, fileName: '', mimeType: 'video/mp4', size: 0, existing: true }
         : null,
     );
+    originalMedia.current = [...((row.image_urls ?? []) as string[]), row.video_url].filter(Boolean);
     setEditState('ready');
   }, []);
 
@@ -565,6 +570,13 @@ function ListingWizard({ editId }: { editId?: string }) {
       }
 
       if (!isEdit) await AsyncStorage.removeItem(DRAFT_KEY).catch(() => {});
+      if (isEdit) {
+        // The save went through, so photos/video taken out of the listing are
+        // no longer referenced anywhere: remove them (own folder only).
+        await removeUploadedImages(
+          removedMediaPaths({ before: originalMedia.current, after: [...imageUrls, videoUrl], userId: user.id }),
+        );
+      }
       // The new listing must appear in Explore/Home/Map immediately, not once
       // their cache's staleTime quietly expires.
       queryClient.invalidateQueries({ queryKey: ['properties'] });
@@ -896,7 +908,7 @@ function ListingWizard({ editId }: { editId?: string }) {
         <View style={styles.photoGrid}>
           {images.map((img, index) => (
             <View key={img.uri} style={styles.photoThumb}>
-              <Image source={{ uri: img.uri }} style={styles.photoThumbImage} contentFit="cover" />
+              <Image alt={t('listing.images')} source={{ uri: img.uri }} style={styles.photoThumbImage} contentFit="cover" />
               <Pressable
                 style={styles.photoRemove}
                 onPress={() => setImages((prev) => prev.filter((_, i) => i !== index))}

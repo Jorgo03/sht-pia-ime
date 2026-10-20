@@ -21,10 +21,10 @@ that were rolled back.
 | BUG-003 | S3 | Web: WhatsApp link skips the number helper (`wa.me/+355…`, local numbers break) | fixed in ae5a93e |
 | BUG-004 | S3 | Missing listing is a dead end (web and phone app) | fixed in ae5a93e |
 | BUG-005 | S3 | Phone app: signed-out Messages has no sign-in button | fixed in ae5a93e |
-| BUG-006 | S3 | Accessibility: unnamed buttons, buttons nested in clickable elements | partly fixed (see entry) |
+| BUG-006 | S3 | Accessibility: unnamed buttons, buttons nested in clickable elements | fixed (web); phone web export not re-scanned |
 | BUG-007 | S3 | WhatsApp helper puts +355 in front of foreign numbers | fixed in ae5a93e |
-| BUG-008 | S4 | Light mode: several text colours fail contrast | open |
-| BUG-009 | S4 | Phone app: listing images have no text alternative | open |
+| BUG-008 | S4 | Light mode: several text colours fail contrast | partly fixed (orange text open, owner decision) |
+| BUG-009 | S4 | Phone app: listing images have no text alternative | fixed, not re-scanned |
 | BUG-010 | S4 | Web: Share on desktop copies the link silently | fixed in ae5a93e |
 | BUG-011 | S3 | Call link invalid for an owner number typed as "+ 069…" | fixed in ae5a93e |
 | BUG-012 | S3 | Show/hide password buttons have no accessible name (web and phone app) | fixed in c64b1e2 |
@@ -148,9 +148,12 @@ Status: partly fixed.
   `aria-expanded`, and the signed-out person icon now has a name.
 - Fixed in ae5a93e: the agent strip is no longer clickable as a whole. Only the
   agent's name links to the profile, and axe now reports `[]` on the strip.
-- Open: the cards. The fix is to make the card's title the link, stretched
-  over the card with a pseudo-element, and keep the heart as a sibling. That
-  touches every card variant, so it gets its own pass.
+- Fixed 2026-10-20 (docs/LAUNCH_TASKS.md L09): the web cards
+  (`PropertyCard`, `FeaturedCard`, the Favorites row) are no longer
+  `role="button"`. The title is a real link; a click anywhere on the card
+  still opens the listing; the heart is a sibling control. `nested-interactive`
+  is out of the `KNOWN` list in `e2e/a11y.spec.ts` and axe passes on every
+  screen. The phone app's web export was not re-scanned.
 
 ### BUG-007: WhatsApp helper adds +355 to foreign numbers
 
@@ -175,9 +178,13 @@ Status: fixed in ae5a93e in both `src/lib/format.js` and `lib/format.ts`.
 - Screen: web, light theme, several screens
 - Actual: axe `color-contrast` failures on muted and faint text and on some
   orange-on-cream labels, below 4.5:1.
-- Status: open. The fix is a token change (`--fho-text-faint`, the orange text
-  shade), and per CLAUDE.md it has to be mirrored in `constants/theme.ts`. It
-  is a design-system decision, so it was left for a design pass.
+- Status: partly fixed 2026-10-20 (L10). Muted and faint text now pass:
+  `--fho-text-muted` 0.66 and `--fho-text-faint` 0.62 alpha, mirrored as
+  `textSecondary #63605b` / `textFaint #6c6864` in `constants/theme.ts`.
+  Still failing: brand-orange text on cream (`#ff7d1a` 2.2–2.4:1, `#e85d00`
+  3.0–3.2:1) on prices and headline accents. Proposal for the owner: a
+  text-only orange `#b34700` (4.7–5.1:1 on every cream), buttons and logo
+  unchanged.
 
 ### BUG-009: Phone app images have no text alternative
 
@@ -185,8 +192,10 @@ Status: fixed in ae5a93e in both `src/lib/format.js` and `lib/format.ts`.
 - Screen: phone app listing detail and cards, web export
 - Actual: axe `image-alt` (7 to 15 per screen). `expo-image` images have no
   `accessibilityLabel`.
-- Status: open. The fix is to pass the listing title as `accessibilityLabel`
-  on card and gallery images.
+- Status: fixed 2026-10-20 (L11): `alt={title}` on every listing image in
+  the phone app (cards, rows, map card, favorites, my listings, detail gallery
+  and lightbox, wizard thumbnails). Type-checks; not yet re-scanned or tried
+  with VoiceOver/TalkBack.
 
 ### BUG-010: Web share on desktop gives no feedback
 

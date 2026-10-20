@@ -288,9 +288,7 @@ export function LiquidTabBar({ state, descriptors, navigation }: BottomTabBarPro
           onPressOut={() => {
             if (!reduceMotion) addPress.set(withSpring(1, { damping: 9, stiffness: 260 }));
           }}
-          // The wizard, not the single-scroll form — `listing/create` stays
-          // reachable by route while the wizard is being verified against real
-          // submissions, but this is the entry point users actually take.
+          // The listing wizard (the old `listing/create` route redirects here too).
           onPress={() => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
             router.push('/listing/new' as Href);

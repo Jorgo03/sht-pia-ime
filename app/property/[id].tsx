@@ -494,7 +494,7 @@ export default function PropertyDetailScreen() {
                 activeOpacity={0.95}
                 onPress={() => setLightboxOpen(true)}
                 style={{ width: screenWidth, height: imageHeight }}>
-                <Image source={{ uri: item }} style={styles.image} contentFit="cover" transition={300} />
+                <Image alt={title} source={{ uri: item }} style={styles.image} contentFit="cover" transition={300} />
               </TouchableOpacity>
             )}
           />
@@ -657,7 +657,7 @@ export default function PropertyDetailScreen() {
             }}
             renderItem={({ item }) => (
               <View style={{ width: screenWidth, justifyContent: 'center', alignItems: 'center' }}>
-                <Image source={{ uri: item }} style={styles.lightboxImage} contentFit="contain" />
+                <Image alt={title} source={{ uri: item }} style={styles.lightboxImage} contentFit="contain" />
               </View>
             )}
           />

@@ -35,3 +35,10 @@ export interface TranslatedMaps {
 export function propertyToForm(row: Record<string, any>): ListingFormValues;
 export function formToColumns(form: ListingFormValues, translated: TranslatedMaps): Record<string, unknown>;
 export function closedStatusFor(listingType: string): 'sold' | 'rented';
+
+export function removedMediaPaths(args: {
+  before?: (string | null | undefined)[];
+  after?: (string | null | undefined)[];
+  userId: string | null | undefined;
+  bucket?: string;
+}): string[];

@@ -104,3 +104,24 @@ test('closing a listing: sale becomes sold, rent becomes rented', () => {
   assert.equal(closedStatusFor('rent'), 'rented')
   assert.equal(closedStatusFor('daily_rent'), 'rented')
 })
+
+// L07: media removed in an edit is deleted from storage after a successful save.
+import { removedMediaPaths } from '../src/features/listings/lib/listingForm.js'
+const BASE = 'https://x.supabase.co/storage/v1/object/public/property-images/'
+
+test('removed photos of your own folder are the ones to delete', () => {
+  const before = [`${BASE}u1/a.jpg`, `${BASE}u1/b.jpg`, `${BASE}u1/video-1.mp4`]
+  const after = [`${BASE}u1/b.jpg`]
+  assert.deepEqual(removedMediaPaths({ before, after, userId: 'u1' }), ['u1/a.jpg', 'u1/video-1.mp4'])
+})
+
+test('nothing kept is deleted, and nothing outside your folder or bucket', () => {
+  const before = [`${BASE}u2/other-agent.jpg`, 'https://images.unsplash.com/photo-1', `${BASE}u1/../u2/x.jpg`, null]
+  assert.deepEqual(removedMediaPaths({ before, after: [], userId: 'u1' }), [])
+  assert.deepEqual(removedMediaPaths({ before: [`${BASE}u1/a.jpg`], after: [`${BASE}u1/a.jpg`], userId: 'u1' }), [])
+})
+
+test('encoded names and query strings resolve to the stored path; no user, nothing', () => {
+  assert.deepEqual(removedMediaPaths({ before: [`${BASE}u1/my%20photo.jpg?t=1`], after: [], userId: 'u1' }), ['u1/my photo.jpg'])
+  assert.deepEqual(removedMediaPaths({ before: [`${BASE}u1/a.jpg`], after: [], userId: null }), [])
+})

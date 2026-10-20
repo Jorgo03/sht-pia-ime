@@ -1,6 +1,6 @@
 import { memo, useState } from 'react'
 import { Heart, MapPin, Bed, Bath, Ruler } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { formatPrice, imageFor, getLocalizedText, listingBadgeKey, priceSuffixKey } from '../../../lib/format'
 import { useFavorites } from '../../favorites/FavoritesContext'
@@ -21,8 +21,10 @@ function FeaturedCard({ property }) {
   const title = getLocalizedText(property.title_i18n, i18n.language) || property.title
   const badge = t(listingBadgeKey(property.listing_type))
 
-  const open = () => navigate(`/property/${property.id}`)
-  const keyOpen = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open() } }
+  const href = `/property/${property.id}`
+  // Click anywhere opens the listing; the accessible control is the title link
+  // beside the heart button, not a button around it (BUG-006).
+  const open = () => navigate(href)
 
   const handleFavorite = (e) => {
     e.stopPropagation()
@@ -31,7 +33,7 @@ function FeaturedCard({ property }) {
   }
 
   return (
-    <div className="featured-card" role="button" tabIndex={0} onClick={open} onKeyDown={keyOpen}>
+    <div className="featured-card" onClick={open}>
       <div className="featured-card__img">
         {hasImage ? (
           <img className="featured-card__img-bg" src={property.image_urls[0]} alt={title} loading="lazy" decoding="async" onError={() => setImgBroken(true)} />
@@ -44,7 +46,9 @@ function FeaturedCard({ property }) {
         </button>
       </div>
       <div className="featured-card__body">
-        <h3 className="featured-card__title">{title}</h3>
+        <h3 className="featured-card__title">
+          <Link to={href} onClick={(e) => e.stopPropagation()} style={{ color: 'inherit', textDecoration: 'none' }}>{title}</Link>
+        </h3>
         <div className="featured-card__location">
           <MapPin size={14} /> {property.city || property.address}
         </div>

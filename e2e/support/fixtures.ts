@@ -21,6 +21,7 @@ export const AGENT: Agent = {
 };
 
 const img = (n: number) => `https://images.unsplash.com/photo-e2e-${n}?w=1200`;
+const storageImg = (name: string) => `https://e2e.supabase.co/storage/v1/object/public/property-images/${AGENT.id}/${name}`;
 
 function listing(n: number, fields: Partial<Listing>): Listing {
   const id = `e2e00000-0000-4000-b000-${String(n).padStart(12, '0')}`;
@@ -73,7 +74,13 @@ const owner = (n: number) => ({
 });
 
 export const LISTINGS: Listing[] = [
-  listing(1, { title: 'Apartament 2+1 në Bllok', contact_phone: '+355 69 000 0001' }),
+  // Photos in the agent's own storage folder, as the wizard uploads them, so an
+  // edit that removes one can be checked for the storage delete (L07).
+  listing(1, {
+    title: 'Apartament 2+1 në Bllok',
+    contact_phone: '+355 69 000 0001',
+    image_urls: [storageImg('photo-1.jpg'), storageImg('photo-2.jpg')],
+  }),
   listing(2, { title: 'Vilë me oborr në Sauk', property_type: 'villa', price: 420000 }),
   listing(3, { title: 'Garsoniere me qera', listing_type: 'rent', price: 450, beds: 1 }),
   listing(4, { title: 'Apartament pranë plazhit', city: 'Durrës' }),

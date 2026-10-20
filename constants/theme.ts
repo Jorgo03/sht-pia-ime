@@ -105,8 +105,8 @@ export const AtticoColorsLight: AtticoPalette = {
   border: 'rgba(26,23,20,0.08)', // --fho-border (light) — the general card/chip/input border
   borderStrong: 'rgba(26,23,20,0.16)', // --fho-border-strong (light)
   textPrimary: '#1a1714', // --fho-text (light)
-  textSecondary: '#7b7773', // --fho-text-muted (light) flattened
-  textFaint: '#96928d', // --fho-text-faint (light) flattened
+  textSecondary: '#63605b', // --fho-text-muted (light, 0.66) flattened on #f1ede6: 5.4:1 (BUG-008)
+  textFaint: '#6c6864', // --fho-text-faint (light, 0.62) flattened on #f1ede6: 4.7:1 (BUG-008)
   textDark: '#1A1A1A',
   // --fho-status-* (light) — see the dark palette's note above. Now the earthy
   // set from IMPLEMENTATION.md §1, muted to sit with the warm cream ground

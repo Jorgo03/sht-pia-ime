@@ -148,7 +148,7 @@ export default function MyListingsScreen() {
                 <View style={styles.row}>
                   <TouchableOpacity onPress={() => router.push(`/property/${item.id}` as Href)} activeOpacity={0.8}>
                     {item.image_urls?.[0] ? (
-                      <Image source={{ uri: item.image_urls[0] }} style={styles.thumb} contentFit="cover" />
+                      <Image alt={title} source={{ uri: item.image_urls[0] }} style={styles.thumb} contentFit="cover" />
                     ) : (
                       <View style={[styles.thumb, styles.thumbPlaceholder]}>
                         <MaterialIcons name="home" size={22} color={colors.textSecondary} />

@@ -9,8 +9,8 @@
   --fho-surface:      #faf6ef;
   --fho-surface-2:    #ffffff;
   --fho-text:         #1a1714;
-  --fho-text-muted:   rgba(26,23,20,0.55);
-  --fho-text-faint:   rgba(26,23,20,0.4);
+  --fho-text-muted:   rgba(26,23,20,0.66); /* ≥ 4.5:1 on every light surface (BUG-008) */
+  --fho-text-faint:   rgba(26,23,20,0.62); /* ≥ 4.5:1 on every light surface (BUG-008) */
   --fho-text-on-dark: #faf6ef;
   /* Mirror of --fho-text-on-dark: for chips that stay light in BOTH themes
      (e.g. buttons floating over a photo). Deliberately not overridden in the

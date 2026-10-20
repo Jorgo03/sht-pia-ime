@@ -85,3 +85,25 @@ export function formToColumns(form, translated) {
 export function closedStatusFor(listingType) {
   return listingType === 'sale' ? 'sold' : 'rented'
 }
+
+const PUBLIC_MARKER = '/storage/v1/object/public/'
+
+/**
+ * Storage paths of media an edit removed, so they can be deleted after the
+ * save succeeds (docs/LAUNCH_TASKS.md L07). Only files in `bucket` under the
+ * editor's own folder (`<userId>/…`) qualify: the storage policies allow
+ * nothing else, and another agent's photo on a shared listing must survive.
+ */
+export function removedMediaPaths({ before = [], after = [], userId, bucket = 'property-images' }) {
+  if (!userId) return []
+  const kept = new Set(after.filter(Boolean))
+  const paths = []
+  for (const url of before) {
+    if (!url || kept.has(url)) continue
+    const at = url.indexOf(`${PUBLIC_MARKER}${bucket}/`)
+    if (at === -1) continue
+    const path = decodeURIComponent(url.slice(at + PUBLIC_MARKER.length + bucket.length + 1).split('?')[0])
+    if (path.startsWith(`${userId}/`) && !path.includes('..') && !paths.includes(path)) paths.push(path)
+  }
+  return paths
+}

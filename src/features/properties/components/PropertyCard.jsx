@@ -1,6 +1,6 @@
 import { memo, useState } from 'react'
 import { Heart, MapPin, Bed } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { formatPrice, imageFor, getLocalizedText, priceSuffixKey } from '../../../lib/format'
 import { useFavorites } from '../../favorites/FavoritesContext'
@@ -20,8 +20,13 @@ function PropertyCard({ property, variant }) {
   const suffix = suffixKey ? t(suffixKey) : ''
   const title = getLocalizedText(property.title_i18n, i18n.language) || property.title
 
-  const open = () => navigate(`/property/${property.id}`)
-  const keyOpen = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open() } }
+  const href = `/property/${property.id}`
+  // The whole card opens the listing on click, but the accessible control is a
+  // real link (the title/price) next to the heart button, never a button that
+  // contains another button (axe nested-interactive, BUG-006).
+  const open = () => navigate(href)
+  const stop = (e) => e.stopPropagation()
+  const linkStyle = { color: 'inherit', textDecoration: 'none' }
 
   const handleFavorite = (e) => {
     e.stopPropagation()
@@ -31,7 +36,7 @@ function PropertyCard({ property, variant }) {
 
   if (variant === 'compact') {
     return (
-      <div className="compact-card" role="button" tabIndex={0} onClick={open} onKeyDown={keyOpen}>
+      <div className="compact-card" onClick={open}>
         <div className="compact-card__img">
           {hasImage ? (
             <img className="compact-card__img-bg" src={property.image_urls[0]} alt={title} loading="lazy" decoding="async" onError={() => setImgBroken(true)} />
@@ -43,7 +48,7 @@ function PropertyCard({ property, variant }) {
           </button>
         </div>
         <div className="compact-card__body">
-          <h3 className="compact-card__title">{title}</h3>
+          <h3 className="compact-card__title"><Link to={href} onClick={stop} style={linkStyle}>{title}</Link></h3>
           <div className="compact-card__loc"><MapPin size={11} /> {property.city || property.address}</div>
           <div className="compact-card__footer">
             <span className="compact-card__price">{price}{suffix}</span>
@@ -59,14 +64,14 @@ function PropertyCard({ property, variant }) {
     : { background: imageFor(property) }
 
   return (
-    <div className="mini-card" role="button" tabIndex={0} onClick={open} onKeyDown={keyOpen} aria-label={title}>
+    <div className="mini-card" onClick={open}>
       <div className="mini-img" style={bg}>
         {hasImage && <img src={property.image_urls[0]} alt="" loading="lazy" decoding="async" onError={() => setImgBroken(true)} style={{ display: 'none' }} />}
         <button className={`heart-mini ${saved ? 'saved' : ''}`} onClick={handleFavorite} aria-label={t('common.save')}>
           <Heart size={13} fill={saved ? 'currentColor' : 'none'} />
         </button>
       </div>
-      <div className="mini-price">{price}{suffix}</div>
+      <div className="mini-price"><Link to={href} onClick={stop} style={linkStyle} aria-label={title}>{price}{suffix}</Link></div>
       <div className="mini-loc"><MapPin size={10} /> {property.city || property.address}</div>
     </div>
   )

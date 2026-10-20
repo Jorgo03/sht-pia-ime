@@ -12,7 +12,7 @@ import { TranslationBar } from '../components/TranslationBar'
 import { useListingTranslation } from '../hooks/useListingTranslation'
 import { translatePropertyContent } from '../../../lib/translate'
 import { geocodeCity } from '../../../lib/roadSearch'
-import { formToColumns, propertyToForm } from '../lib/listingForm'
+import { formToColumns, propertyToForm, removedMediaPaths } from '../lib/listingForm'
 import '../../../styles/map.css'
 import '../../../styles/new-listing.css'
 
@@ -186,6 +186,9 @@ export default function NewListing() {
   const { user } = useAuth()
   const navigate = useNavigate()
   const fileInputRef = useRef(null)
+  // Media the listing had when it was opened for editing; anything missing
+  // after a successful save is deleted from storage.
+  const originalMedia = useRef([])
   const videoInputRef = useRef(null)
 
   // /my-listings/:id/edit opens the same wizard on a saved listing.
@@ -243,6 +246,7 @@ export default function NewListing() {
     setForm({ ...INITIAL_FORM, ...propertyToForm(row), status: row.status })
     setImages((row.image_urls ?? []).map(url => ({ url, preview: url, existing: true })))
     setVideo(row.video_url ? { url: row.video_url, existing: true } : null)
+    originalMedia.current = [...(row.image_urls ?? []), row.video_url].filter(Boolean)
     setEditState('ready')
   }
   const userId = user?.id
@@ -457,6 +461,12 @@ export default function NewListing() {
 
       if (error) throw error
       if (!isEdit) { try { localStorage.removeItem(DRAFT_KEY) } catch { /* ignore */ } }
+      if (isEdit) {
+        // The save went through, so photos/video taken out of the listing are
+        // no longer referenced anywhere: remove them (own folder only).
+        const removed = removedMediaPaths({ before: originalMedia.current, after: [...imageUrls, videoUrl], userId: user.id })
+        if (removed.length) await supabase.storage.from('property-images').remove(removed).catch(() => {})
+      }
       navigate('/my-listings')
     } catch (err) {
       // Insert failed after upload succeeded — remove the now-orphaned files.

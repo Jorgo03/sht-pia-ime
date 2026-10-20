@@ -135,7 +135,14 @@ export async function mockBackend(page: Page, { signedIn = false, writes = [] as
     }
 
     if (url.hostname === SUPABASE_HOST) {
-      if (url.pathname.startsWith('/storage/')) return route.fulfill(IMAGE);
+      if (url.pathname.startsWith('/storage/')) {
+        if (method === 'GET' || method === 'HEAD') return route.fulfill(IMAGE);
+        // Uploads and deletes are recorded as writes to "storage".
+        let body: Record<string, unknown> = {};
+        try { body = route.request().postDataJSON() ?? {}; } catch { /* binary upload */ }
+        writes.push({ table: 'storage', method, query: url.pathname, body });
+        return json(route, 200, method === 'DELETE' ? [] : { Key: url.pathname });
+      }
       if (url.pathname.startsWith('/rest/v1/properties')) return properties(route, url, store, writes);
       if (url.pathname.startsWith('/rest/v1/profiles')) return profiles(route, url);
       if (url.pathname.startsWith('/rest/v1/')) {
