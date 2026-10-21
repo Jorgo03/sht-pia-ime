@@ -667,5 +667,33 @@
     "startFailed": "Płatność się nie rozpoczęła. Spróbuj ponownie.",
     "returnedDone": "Dziękujemy. Plan włączy się, gdy operator płatności potwierdzi płatność, zwykle w ciągu kilku minut.",
     "returnedCancelled": "Płatność anulowano. Nie pobrano opłaty."
+  },
+  "moderation": {
+    "title": "Moderacja",
+    "subtitle": "Zgłoszenia użytkowników dotyczące ogłoszeń i kont. Ukryte ogłoszenia pozostają niewidoczne, dopóki ich nie przywrócisz.",
+    "notAllowed": "Ta strona jest tylko dla moderatorów.",
+    "queue": {
+      "open": "Otwarte",
+      "closed": "Zamknięte"
+    },
+    "loadFailed": "Nie udało się wczytać zgłoszeń.",
+    "empty": "Brak otwartych zgłoszeń. Wszystko w porządku.",
+    "emptyClosed": "Brak zamkniętych zgłoszeń.",
+    "listing": "Ogłoszenie",
+    "user": "Użytkownik",
+    "missingTarget": "Już nie istnieje",
+    "hiddenBadge": "Ukryte do weryfikacji",
+    "hide": "Ukryj ogłoszenie",
+    "restore": "Przywróć ogłoszenie",
+    "markActioned": "Oznacz jako załatwione",
+    "dismiss": "Odrzuć",
+    "note": "Notatka (opcjonalnie)",
+    "actionFailed": "Nie udało się. Spróbuj ponownie.",
+    "loadMore": "Wczytaj więcej",
+    "reportedOn": "Zgłoszono {{date}}",
+    "status": {
+      "actioned": "Załatwione",
+      "dismissed": "Odrzucone"
+    }
   }
 }

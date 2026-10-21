@@ -651,5 +651,33 @@
     "startFailed": "Pagesa nuk filloi. Provo përsëri.",
     "returnedDone": "Faleminderit. Plani aktivizohet sapo procesori i pagesave ta konfirmojë pagesën; kjo zakonisht zgjat pak minuta.",
     "returnedCancelled": "Pagesa u anulua. Nuk u tarifove."
+  },
+  "moderation": {
+    "title": "Moderimi",
+    "subtitle": "Raportime nga përdoruesit për njoftime dhe llogari. Njoftimet e fshehura mbeten jashtë linje derisa t'i riktheni.",
+    "notAllowed": "Kjo faqe është vetëm për moderatorët.",
+    "queue": {
+      "open": "Të hapura",
+      "closed": "Të mbyllura"
+    },
+    "loadFailed": "Raportimet nuk u ngarkuan.",
+    "empty": "Asnjë raportim i hapur. Gjithçka në rregull.",
+    "emptyClosed": "Ende asnjë raportim i mbyllur.",
+    "listing": "Njoftimi",
+    "user": "Përdoruesi",
+    "missingTarget": "Nuk ekziston më",
+    "hiddenBadge": "I fshehur për shqyrtim",
+    "hide": "Fshih njoftimin",
+    "restore": "Rikthe njoftimin",
+    "markActioned": "Shëno si të trajtuar",
+    "dismiss": "Hidhe poshtë",
+    "note": "Shënim (opsional)",
+    "actionFailed": "Nuk funksionoi. Provo përsëri.",
+    "loadMore": "Ngarko më shumë",
+    "reportedOn": "Raportuar më {{date}}",
+    "status": {
+      "actioned": "I trajtuar",
+      "dismissed": "I hedhur poshtë"
+    }
   }
 }

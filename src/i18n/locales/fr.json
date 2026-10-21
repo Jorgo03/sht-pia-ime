@@ -659,5 +659,33 @@
     "startFailed": "Le paiement n'a pas démarré. Réessayez.",
     "returnedDone": "Merci. Votre formule s'active dès que le prestataire de paiement confirme le paiement, en général en quelques minutes.",
     "returnedCancelled": "Le paiement a été annulé. Vous n'avez pas été débité."
+  },
+  "moderation": {
+    "title": "Modération",
+    "subtitle": "Signalements des utilisateurs sur des annonces et des comptes. Les annonces masquées restent hors ligne jusqu'à ce que vous les rétablissiez.",
+    "notAllowed": "Cette page est réservée aux modérateurs.",
+    "queue": {
+      "open": "Ouverts",
+      "closed": "Clos"
+    },
+    "loadFailed": "Impossible de charger les signalements.",
+    "empty": "Aucun signalement ouvert. Tout est en ordre.",
+    "emptyClosed": "Aucun signalement clos pour l'instant.",
+    "listing": "Annonce",
+    "user": "Utilisateur",
+    "missingTarget": "N'existe plus",
+    "hiddenBadge": "Masquée pour examen",
+    "hide": "Masquer l'annonce",
+    "restore": "Rétablir l'annonce",
+    "markActioned": "Marquer comme traité",
+    "dismiss": "Classer sans suite",
+    "note": "Note (facultative)",
+    "actionFailed": "Cela n'a pas fonctionné. Réessayez.",
+    "loadMore": "Charger plus",
+    "reportedOn": "Signalé le {{date}}",
+    "status": {
+      "actioned": "Traité",
+      "dismissed": "Classé sans suite"
+    }
   }
 }

@@ -651,5 +651,33 @@
     "startFailed": "The payment didn't start. Try again.",
     "returnedDone": "Thank you. Your plan turns on as soon as the payment provider confirms the payment, usually within a few minutes.",
     "returnedCancelled": "The payment was cancelled. You were not charged."
+  },
+  "moderation": {
+    "title": "Moderation",
+    "subtitle": "Reports from users about listings and accounts. Hidden listings stay offline until you restore them.",
+    "notAllowed": "This page is only for moderators.",
+    "queue": {
+      "open": "Open",
+      "closed": "Closed"
+    },
+    "loadFailed": "The reports could not be loaded.",
+    "empty": "No open reports. All clear.",
+    "emptyClosed": "No closed reports yet.",
+    "listing": "Listing",
+    "user": "User",
+    "missingTarget": "No longer exists",
+    "hiddenBadge": "Hidden for review",
+    "hide": "Hide listing",
+    "restore": "Restore listing",
+    "markActioned": "Mark as handled",
+    "dismiss": "Dismiss",
+    "note": "Note (optional)",
+    "actionFailed": "That did not work. Try again.",
+    "loadMore": "Load more",
+    "reportedOn": "Reported {{date}}",
+    "status": {
+      "actioned": "Handled",
+      "dismissed": "Dismissed"
+    }
   }
 }

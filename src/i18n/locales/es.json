@@ -659,5 +659,33 @@
     "startFailed": "El pago no se inició. Inténtalo de nuevo.",
     "returnedDone": "Gracias. Tu plan se activa en cuanto el proveedor de pagos confirma el pago, normalmente en pocos minutos.",
     "returnedCancelled": "El pago se canceló. No se te cobró nada."
+  },
+  "moderation": {
+    "title": "Moderación",
+    "subtitle": "Denuncias de usuarios sobre anuncios y cuentas. Los anuncios ocultos siguen sin publicarse hasta que los restaures.",
+    "notAllowed": "Esta página es solo para moderadores.",
+    "queue": {
+      "open": "Abiertas",
+      "closed": "Cerradas"
+    },
+    "loadFailed": "No se pudieron cargar las denuncias.",
+    "empty": "No hay denuncias abiertas. Todo en orden.",
+    "emptyClosed": "Todavía no hay denuncias cerradas.",
+    "listing": "Anuncio",
+    "user": "Usuario",
+    "missingTarget": "Ya no existe",
+    "hiddenBadge": "Oculto para revisión",
+    "hide": "Ocultar anuncio",
+    "restore": "Restaurar anuncio",
+    "markActioned": "Marcar como gestionada",
+    "dismiss": "Descartar",
+    "note": "Nota (opcional)",
+    "actionFailed": "No ha funcionado. Inténtalo de nuevo.",
+    "loadMore": "Cargar más",
+    "reportedOn": "Denunciado el {{date}}",
+    "status": {
+      "actioned": "Gestionada",
+      "dismissed": "Descartada"
+    }
   }
 }

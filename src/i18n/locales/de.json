@@ -651,5 +651,33 @@
     "startFailed": "Die Zahlung wurde nicht gestartet. Versuche es noch einmal.",
     "returnedDone": "Danke. Dein Plan wird aktiv, sobald der Zahlungsanbieter die Zahlung bestätigt, meist innerhalb weniger Minuten.",
     "returnedCancelled": "Die Zahlung wurde abgebrochen. Dir wurde nichts berechnet."
+  },
+  "moderation": {
+    "title": "Moderation",
+    "subtitle": "Meldungen von Nutzern zu Inseraten und Konten. Ausgeblendete Inserate bleiben offline, bis Sie sie wiederherstellen.",
+    "notAllowed": "Diese Seite ist nur für Moderatoren.",
+    "queue": {
+      "open": "Offen",
+      "closed": "Erledigt"
+    },
+    "loadFailed": "Die Meldungen konnten nicht geladen werden.",
+    "empty": "Keine offenen Meldungen. Alles erledigt.",
+    "emptyClosed": "Noch keine erledigten Meldungen.",
+    "listing": "Inserat",
+    "user": "Nutzer",
+    "missingTarget": "Existiert nicht mehr",
+    "hiddenBadge": "Zur Prüfung ausgeblendet",
+    "hide": "Inserat ausblenden",
+    "restore": "Inserat wiederherstellen",
+    "markActioned": "Als bearbeitet markieren",
+    "dismiss": "Verwerfen",
+    "note": "Notiz (optional)",
+    "actionFailed": "Das hat nicht geklappt. Bitte erneut versuchen.",
+    "loadMore": "Mehr laden",
+    "reportedOn": "Gemeldet am {{date}}",
+    "status": {
+      "actioned": "Bearbeitet",
+      "dismissed": "Verworfen"
+    }
   }
 }

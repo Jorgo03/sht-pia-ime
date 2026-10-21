@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate, useLocation } from 'react-router-dom'
-import { User, Briefcase, Mail, Lock, Eye, EyeOff, ArrowLeft, ArrowRight, Heart, Building2, LogOut, ChevronRight, Search as SearchIcon, Calendar, Loader2, Apple, Linkedin, UserPen } from 'lucide-react'
+import { User, Briefcase, Mail, Lock, Eye, EyeOff, ArrowLeft, ArrowRight, Heart, Building2, LogOut, ChevronRight, Search as SearchIcon, Calendar, Loader2, Apple, Linkedin, UserPen, ShieldCheck } from 'lucide-react'
 import { useAuth } from '../AuthContext'
 import { useProfileStats } from '../hooks/useProfileStats'
 import DuskHero from '../components/DuskHero'
@@ -10,6 +10,7 @@ import Avatar from '../../../shared/Avatar'
 import { EMAIL_RE, friendlyError } from '../../../lib/authErrors'
 import { supabase } from '../../../lib/supabase'
 import LegalLinks from '../../../shared/LegalLinks'
+import { isModerator } from '../../moderation/lib/moderation'
 import '../../../styles/profile.css'
 
 export default function Profile() {
@@ -18,6 +19,16 @@ export default function Profile() {
   const location = useLocation()
   const { user, profile, isAgent, refreshProfile, signIn, signUp, signInWithProvider, sendOtp, verifyOtp, resendCode, signOut, resetPassword, passwordRecovery, updatePassword, loading: authLoading } = useAuth()
   const stats = useProfileStats()
+
+  // The moderation queue link shows only for moderators (F3); the database
+  // enforces the same rule on the page itself.
+  const [canModerate, setCanModerate] = useState(false)
+  useEffect(() => {
+    if (!user) return
+    let active = true
+    isModerator(supabase).then((ok) => { if (active) setCanModerate(ok) })
+    return () => { active = false }
+  }, [user])
 
   // Account deletion — store-mandated (Apple 5.1.1(v), Google Play data
   // deletion). Same delete-account Edge Function the mobile app calls.
@@ -391,6 +402,7 @@ export default function Profile() {
       { icon: Calendar, label: t('viewings.title'), to: '/viewings' },
       { icon: Building2, label: t('listing.myListings'), to: '/my-listings' },
       ...(isAgent ? [{ icon: Briefcase, label: t('agentDashboard.title'), to: '/agent-dashboard' }] : []),
+      ...(canModerate ? [{ icon: ShieldCheck, label: t('moderation.title'), to: '/moderation' }] : []),
     ]
 
     return (

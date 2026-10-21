@@ -659,5 +659,33 @@
     "startFailed": "Il pagamento non è partito. Riprova.",
     "returnedDone": "Grazie. Il piano si attiva appena il fornitore di pagamento conferma il pagamento, di solito in pochi minuti.",
     "returnedCancelled": "Il pagamento è stato annullato. Non ti è stato addebitato nulla."
+  },
+  "moderation": {
+    "title": "Moderazione",
+    "subtitle": "Segnalazioni degli utenti su annunci e account. Gli annunci nascosti restano offline finché non li ripristini.",
+    "notAllowed": "Questa pagina è riservata ai moderatori.",
+    "queue": {
+      "open": "Aperte",
+      "closed": "Chiuse"
+    },
+    "loadFailed": "Impossibile caricare le segnalazioni.",
+    "empty": "Nessuna segnalazione aperta. Tutto in ordine.",
+    "emptyClosed": "Ancora nessuna segnalazione chiusa.",
+    "listing": "Annuncio",
+    "user": "Utente",
+    "missingTarget": "Non esiste più",
+    "hiddenBadge": "Nascosto per verifica",
+    "hide": "Nascondi annuncio",
+    "restore": "Ripristina annuncio",
+    "markActioned": "Segna come gestita",
+    "dismiss": "Archivia",
+    "note": "Nota (facoltativa)",
+    "actionFailed": "Non ha funzionato. Riprova.",
+    "loadMore": "Carica altro",
+    "reportedOn": "Segnalato il {{date}}",
+    "status": {
+      "actioned": "Gestita",
+      "dismissed": "Archiviata"
+    }
   }
 }
