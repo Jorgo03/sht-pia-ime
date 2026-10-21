@@ -254,7 +254,10 @@ export default function PropertyDetailScreen() {
   // a bare rent-only check silently mislabels daily-rent listings as "For
   // Sale", matching the bug already found and fixed on the property cards.
   const badge = t(listingBadgeKey(property.listing_type));
-  const propertyTypeLabel = property.property_type ? t(`search.${property.property_type}`) : '';
+  // defaultValue: a type with no translation shows as stored, never as a key.
+  const propertyTypeLabel = property.property_type
+    ? t(`search.${property.property_type}`, { defaultValue: property.property_type })
+    : '';
   const agent = property.agent;
   const agentInitial = agent?.full_name?.[0]?.toUpperCase() || 'A';
   const features = property.features ?? [];
@@ -266,7 +269,8 @@ export default function PropertyDetailScreen() {
     { id: 'bed', name: `${property.beds ?? 0} ${t('property.bedsCount', { count: property.beds ?? 0 })}`, icon: 'bed' },
     { id: 'bath', name: `${property.baths ?? 0} ${t('property.bathsCount', { count: property.baths ?? 0 })}`, icon: 'bathtub' },
     { id: 'sqft', name: `${property.sqft ?? '-'} ${t('property.sqft')}`, icon: 'square-foot' },
-    { id: 'type', name: property.property_type ?? 'N/A', icon: 'home' },
+    // The translated type, not the raw database value ('apartment').
+    { id: 'type', name: propertyTypeLabel || '—', icon: 'home' },
     ...(property.year_built
       ? [{ id: 'year', name: `${property.year_built}`, icon: 'calendar-today' }]
       : []),

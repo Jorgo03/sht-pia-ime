@@ -92,7 +92,14 @@ export default function AgentProfile() {
         {agent.avatar_url ? (
           <Avatar src={agent.avatar_url} name={agent.full_name} size={64} />
         ) : (
-          <div className="pd-agent-avatar" style={{ width: 64, height: 64, fontSize: 22 }}>
+          // Two initials in the orange circle, as the phone app shows them.
+          // (The old .pd-agent-avatar class no longer exists, which left
+          // bare text here.)
+          <div
+            className="flex shrink-0 items-center justify-center rounded-full bg-[linear-gradient(135deg,var(--fho-orange-1),var(--fho-orange-2))] font-sans font-bold text-white"
+            style={{ width: 64, height: 64, fontSize: 22 }}
+            aria-hidden="true"
+          >
             {initials}
           </div>
         )}
