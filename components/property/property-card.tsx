@@ -157,7 +157,8 @@ function PropertyCardBase({ property, onPress, variant = 'grid' }: PropertyCardP
           style={styles.heartButton}
           onPress={() => toggle(property.id)}
           activeOpacity={0.7}
-          hitSlop={8}>
+          // 24px drawn; 10 on each side makes the 44px a finger needs.
+          hitSlop={10}>
           <Animated.View style={heartStyle}>
             <MaterialIcons
               name={favorited ? 'favorite' : 'favorite-border'}

@@ -1456,19 +1456,6 @@ const createStyles = (colors: AtticoPalette) =>
     radioText: { fontFamily: Fonts?.sansSemiBold, fontSize: 13, color: colors.textPrimary },
     radioTextActive: { color: '#fff' },
 
-    langTabs: { flexDirection: 'row', flexWrap: 'wrap', gap: 4 },
-    langTab: {
-      paddingHorizontal: 10,
-      paddingVertical: 4,
-      borderRadius: Radii.sm,
-      borderWidth: 1,
-      borderColor: colors.border,
-    },
-    langTabActive: { backgroundColor: colors.accentEnd, borderColor: 'transparent' },
-    langTabFilled: { borderColor: colors.accentLight },
-    langTabText: { fontFamily: Fonts?.mono, fontSize: 11, color: colors.textSecondary },
-    langTabTextActive: { color: '#fff' },
-
     input: {
       backgroundColor: colors.surface2,
       borderRadius: Radii.md,

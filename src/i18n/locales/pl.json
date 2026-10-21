@@ -172,7 +172,9 @@
     "rangeInvalid": "Wartość minimalna musi być mniejsza niż maksymalna",
     "zone": "Dzielnica",
     "reference": "Numer referencyjny",
-    "referenceInvalid": "Numer referencyjny ma 8 liter lub cyfr, np. SH-1A2B3C4D."
+    "referenceInvalid": "Numer referencyjny ma 8 liter lub cyfr, np. SH-1A2B3C4D.",
+    "rangeMin": "Min",
+    "rangeMax": "Maks"
   },
   "favourites": {
     "title": "Ulubione",

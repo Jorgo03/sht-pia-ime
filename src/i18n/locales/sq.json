@@ -164,7 +164,9 @@
     "rangeInvalid": "Vlera minimale duhet të jetë më e vogël se maksimalja",
     "zone": "Lagjja",
     "reference": "Referenca",
-    "referenceInvalid": "Referenca ka 8 shkronja ose shifra, p.sh. SH-1A2B3C4D."
+    "referenceInvalid": "Referenca ka 8 shkronja ose shifra, p.sh. SH-1A2B3C4D.",
+    "rangeMin": "Min",
+    "rangeMax": "Maks"
   },
   "favourites": {
     "title": "Të preferuarat",

@@ -85,7 +85,9 @@ export function TranslationBar({
               // tab responsive, which is the difference between a busy form and
               // a frozen one.
               disabled={busy}
-              hitSlop={8}
+              // Taller to the finger only: sideways the 6px gap is all there is,
+              // and overlapping slop would send a tap to the neighbour.
+              hitSlop={{ top: 6, bottom: 6, left: 3, right: 3 }}
               accessibilityRole="button"
               accessibilityState={{ selected: active, busy }}
               accessibilityLabel={lang.toUpperCase()}
@@ -158,16 +160,16 @@ const createStyles = (colors: AtticoPalette) =>
     wrap: {
       gap: 8,
     },
-    // Matches the .nl-lang-tab row this replaces — same pill, same mono caps.
+    // Same pill and mono caps as web's .nl-lang-tab, but one equal-width row:
+    // wrapping left FR alone on a second line at 320px. Eight two-letter codes
+    // fit at ~30px each there; height is fixed so the spinner doesn't jump it.
     tabs: {
       flexDirection: 'row',
-      flexWrap: 'wrap',
-      gap: 4,
+      gap: 6,
     },
     tab: {
-      minWidth: 38,
-      paddingHorizontal: 10,
-      paddingVertical: 5,
+      flex: 1,
+      height: 32,
       borderRadius: 6,
       borderWidth: 1,
       borderColor: colors.border,

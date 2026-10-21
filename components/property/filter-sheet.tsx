@@ -74,7 +74,10 @@ function Chip({
   return (
     <Pressable
       accessibilityRole="button"
+      accessibilityState={{ selected: active }}
       onPress={onPress}
+      // 36px tall drawn; 44px to the finger (the 8px row gap leaves room).
+      hitSlop={4}
       style={[styles.chip, active && styles.chipActive]}>
       <Text style={[styles.chipText, active && styles.chipTextActive]}>
         {label}
@@ -316,7 +319,9 @@ export function FilterSheet({
                 <TextInput
                   style={styles.input}
                   keyboardType="number-pad"
-                  placeholder={t('search.minPrice')}
+                  // The section label names the field; the full name is for screen readers.
+                  placeholder={t('search.rangeMin')}
+                  accessibilityLabel={t('search.minPrice')}
                   placeholderTextColor={colors.textSecondary}
                   value={filters.minPrice?.toString() ?? ''}
                   onChangeText={(v) => setFilter('minPrice', toNumber(v))}
@@ -328,7 +333,9 @@ export function FilterSheet({
                 <TextInput
                   style={styles.input}
                   keyboardType="number-pad"
-                  placeholder={t('search.maxPrice')}
+                  // The section label names the field; the full name is for screen readers.
+                  placeholder={t('search.rangeMax')}
+                  accessibilityLabel={t('search.maxPrice')}
                   placeholderTextColor={colors.textSecondary}
                   value={filters.maxPrice?.toString() ?? ''}
                   onChangeText={(v) => setFilter('maxPrice', toNumber(v))}
@@ -347,7 +354,9 @@ export function FilterSheet({
                 <TextInput
                   style={styles.input}
                   keyboardType="number-pad"
-                  placeholder={t('search.minArea')}
+                  // The section label names the field; the full name is for screen readers.
+                  placeholder={t('search.rangeMin')}
+                  accessibilityLabel={t('search.minArea')}
                   placeholderTextColor={colors.textSecondary}
                   value={filters.minArea?.toString() ?? ''}
                   onChangeText={(v) => setFilter('minArea', toNumber(v))}
@@ -360,7 +369,9 @@ export function FilterSheet({
                 <TextInput
                   style={styles.input}
                   keyboardType="number-pad"
-                  placeholder={t('search.maxArea')}
+                  // The section label names the field; the full name is for screen readers.
+                  placeholder={t('search.rangeMax')}
+                  accessibilityLabel={t('search.maxArea')}
                   placeholderTextColor={colors.textSecondary}
                   value={filters.maxArea?.toString() ?? ''}
                   onChangeText={(v) => setFilter('maxArea', toNumber(v))}
@@ -541,8 +552,11 @@ const createStyles = (colors: AtticoPalette, sheetHeight: number = 0) => StyleSh
   },
   // Matches web's .bed-chip — a light accent tint when active, not a solid
   // fill (Segment, below, is the one that fills solid). padding: 9px 18px.
+  // 12px sides (web's .bed-chip uses 18): "Çdo numër" + 1, 2, 3, 4+ then
+  // fit one 280px row on a 320px phone (measured: 14px still wrapped 4+ by
+  // ~2px) instead of leaving 4+ alone on a second line.
   chip: {
-    paddingHorizontal: 18,
+    paddingHorizontal: 12,
     paddingVertical: 9,
     borderRadius: 999,
     borderWidth: 1,

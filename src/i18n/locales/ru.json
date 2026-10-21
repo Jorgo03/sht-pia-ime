@@ -172,7 +172,9 @@
     "rangeInvalid": "Минимум должен быть меньше максимума",
     "zone": "Район",
     "reference": "Номер объявления",
-    "referenceInvalid": "Номер состоит из 8 букв или цифр, например SH-1A2B3C4D."
+    "referenceInvalid": "Номер состоит из 8 букв или цифр, например SH-1A2B3C4D.",
+    "rangeMin": "От",
+    "rangeMax": "До"
   },
   "favourites": {
     "title": "Избранное",

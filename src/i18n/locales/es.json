@@ -168,7 +168,9 @@
     "rangeInvalid": "El mínimo debe ser menor que el máximo",
     "zone": "Barrio",
     "reference": "Referencia",
-    "referenceInvalid": "Una referencia tiene 8 letras o cifras, p. ej. SH-1A2B3C4D."
+    "referenceInvalid": "Una referencia tiene 8 letras o cifras, p. ej. SH-1A2B3C4D.",
+    "rangeMin": "Mín",
+    "rangeMax": "Máx"
   },
   "favourites": {
     "title": "Favoritos",

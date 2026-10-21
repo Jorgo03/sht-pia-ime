@@ -216,7 +216,9 @@
     "rangeInvalid": "Minimum must be lower than maximum",
     "zone": "Neighborhood",
     "reference": "Reference",
-    "referenceInvalid": "A reference has 8 letters or digits, e.g. SH-1A2B3C4D."
+    "referenceInvalid": "A reference has 8 letters or digits, e.g. SH-1A2B3C4D.",
+    "rangeMin": "Min",
+    "rangeMax": "Max"
   },
   "detail": {
     "forSale": "For Sale",
