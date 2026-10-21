@@ -1,44 +1,38 @@
-import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import { useRouter } from 'expo-router';
-import { forwardRef, useImperativeHandle } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { useTranslation } from 'react-i18next';
+import { forwardRef, useImperativeHandle, useRef } from 'react';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
 
 import { useTheme } from '@/contexts/theme-context';
 
+import { useLeafletMaps } from './leaflet/use-leaflet-maps';
 import type { MapCanvasHandle, MapCanvasProps } from './map-canvas.types';
 
 /**
- * react-native-maps has no web target — importing it (even transitively,
- * through ClusterMarker/CountyMarker) crashes Metro's web bundle with
- * "Importing native-only module ... on web". This is the web sibling Metro
- * picks up instead via Expo's `.web.tsx` platform-extension convention, so
- * the native map module is never even reached while bundling for web.
+ * Web sibling of map-canvas.native.tsx. react-native-maps has no web target
+ * (importing it breaks Metro's web bundle), so the website draws the same
+ * map with Leaflet: county outlines and counts when zoomed out, price and
+ * cluster bubbles when zoomed in, the same callbacks as the native map.
+ * Leaflet loads in the browser after hydration; a spinner holds its place.
  */
-function MapCanvasWeb(_props: MapCanvasProps, ref: React.ForwardedRef<MapCanvasHandle>) {
-  const { t } = useTranslation();
+function MapCanvasWeb(props: MapCanvasProps, ref: React.ForwardedRef<MapCanvasHandle>) {
   const { colors } = useTheme();
-  const router = useRouter();
+  const maps = useLeafletMaps();
+  const inner = useRef<MapCanvasHandle | null>(null);
 
+  // Stable for the parent; forwards to the Leaflet map once it exists.
   useImperativeHandle(ref, () => ({
-    // No native map instance to animate on web — a no-op keeps the parent
-    // screen's animateToRegion() calls safe to make unconditionally.
-    animateToRegion: () => {},
+    animateToRegion: (region, durationMs) => inner.current?.animateToRegion(region, durationMs),
   }));
 
+  if (!maps) {
+    return (
+      <View style={[styles.fill, styles.center, { backgroundColor: colors.primary }]}>
+        <ActivityIndicator color={colors.accent} />
+      </View>
+    );
+  }
   return (
-    <View style={[styles.container, { backgroundColor: colors.primary }]}>
-      <MaterialIcons name="map" size={40} color={colors.textSecondary} />
-      <Text style={[styles.title, { color: colors.textPrimary }]}>{t('map.webUnavailableTitle', 'Map view')}</Text>
-      <Text style={[styles.hint, { color: colors.textSecondary }]}>
-        {t('map.webUnavailableHint', 'Interactive map is available in the mobile app. Browse listings as a list instead.')}
-      </Text>
-      <TouchableOpacity
-        style={[styles.button, { backgroundColor: colors.accent }]}
-        onPress={() => router.push('/(tabs)/explore')}
-        activeOpacity={0.85}>
-        <Text style={styles.buttonText}>{t('search.title')}</Text>
-      </TouchableOpacity>
+    <View style={styles.fill}>
+      <maps.ExploreMap {...props} handleRef={inner} colors={colors} />
     </View>
   );
 }
@@ -46,32 +40,6 @@ function MapCanvasWeb(_props: MapCanvasProps, ref: React.ForwardedRef<MapCanvasH
 export const MapCanvas = forwardRef(MapCanvasWeb);
 
 const styles = StyleSheet.create({
-  container: {
-    ...StyleSheet.absoluteFill,
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    paddingHorizontal: 40,
-  },
-  title: {
-    fontSize: 17,
-    fontWeight: '700',
-    marginTop: 4,
-  },
-  hint: {
-    fontSize: 13,
-    textAlign: 'center',
-    lineHeight: 19,
-  },
-  button: {
-    marginTop: 12,
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    borderRadius: 999,
-  },
-  buttonText: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: '#fff',
-  },
+  fill: { ...StyleSheet.absoluteFill },
+  center: { alignItems: 'center', justifyContent: 'center' },
 });
