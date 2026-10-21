@@ -83,7 +83,8 @@
     "resendIn": "Resend in {{s}}s",
     "showPassword": "Show password",
     "hidePassword": "Hide password",
-    "codeDigit": "Digit {{n}} of 6"
+    "codeDigit": "Digit {{n}} of 6",
+    "newCodeSent": "A new code was sent. Earlier codes no longer work."
   },
   "addSheet": {
     "openLabel": "Create new",
@@ -320,10 +321,11 @@
     "imageUploadFailed": "Image upload failed — try again",
     "updateFailed": "Update failed — try again",
     "oauthFailed": "Sign-in with the provider failed — try again",
-    "invalidCode": "The code is wrong or has expired",
+    "invalidCode": "The code is wrong or no longer valid. Use the most recent code we sent.",
     "videoInvalidType": "Only MP4 or MOV videos are allowed",
     "videoTooLarge": "Video is too large (max {{max}} MB)",
-    "emailSendFailed": "We could not send the confirmation email. This is a server configuration problem, not a problem with your account — please contact the administrator."
+    "emailSendFailed": "We could not send the confirmation email. This is a server configuration problem, not a problem with your account — please contact the administrator.",
+    "waitSeconds": "Wait {{s}} seconds before asking for a new code."
   },
   "agentDashboard": {
     "title": "Agent Dashboard",
@@ -634,7 +636,14 @@
     "messages": "New messages",
     "viewings": "Viewing requests and changes",
     "saveFailed": "Your choice wasn't saved. Try again.",
-    "privacy": "A notification only says who wrote to you or what happened to a viewing, never the message text."
+    "privacy": "A notification only says who wrote to you or what happened to a viewing, never the message text.",
+    "web": "Notifications only arrive in the phone app.",
+    "registering": "Connecting this phone for notifications…",
+    "registerFailed": "Permission is on, but this phone couldn't be connected for notifications. Try again.",
+    "settingsHint": "Open your phone's Settings, choose Shtëpia.ime and turn on Notifications.",
+    "prefsNote": "These choices are saved to your account. This phone won't get notifications until you turn them on.",
+    "loadFailed": "Your choices couldn't be loaded.",
+    "saving": "Saving…"
   },
   "pricing": {
     "title": "Plans and prices",

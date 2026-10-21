@@ -43,6 +43,16 @@ export function buildPush({ kind, data, lang, senderName }) {
   return { title: 'Shtëpia.ime', body, url: '/viewings' }
 }
 
+/**
+ * Whether the person still wants this kind of push, read again at send time:
+ * a push queued before they switched that kind off must not go out. No saved
+ * row means everything is on (same rule as queue_push in the database).
+ */
+export function stillWanted(kind, prefs) {
+  if (!prefs) return true
+  return kind === 'message' ? prefs.messages !== false : prefs.viewings !== false
+}
+
 /** Split into Expo-sized batches. */
 export function chunk(items, size = EXPO_BATCH) {
   const out = []

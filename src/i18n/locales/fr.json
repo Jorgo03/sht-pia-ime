@@ -83,7 +83,8 @@
     "resendIn": "Renvoyer dans {{s}}s",
     "showPassword": "Afficher le mot de passe",
     "hidePassword": "Masquer le mot de passe",
-    "codeDigit": "Chiffre {{n}} sur 6"
+    "codeDigit": "Chiffre {{n}} sur 6",
+    "newCodeSent": "Un nouveau code a été envoyé. Les codes précédents ne fonctionnent plus."
   },
   "home": {
     "greetingMorning": "Bonjour",
@@ -300,10 +301,11 @@
     "imageUploadFailed": "Échec du téléversement des images — réessayez",
     "updateFailed": "Échec de la mise à jour — réessayez",
     "oauthFailed": "La connexion via le fournisseur a échoué — réessayez",
-    "invalidCode": "Le code est incorrect ou a expiré",
+    "invalidCode": "Le code est incorrect ou n'est plus valable. Utilisez le dernier code envoyé.",
     "videoInvalidType": "Seules les vidéos MP4 ou MOV sont autorisées",
     "videoTooLarge": "Vidéo trop volumineuse (max {{max}} Mo)",
-    "emailSendFailed": "Nous n’avons pas pu envoyer l’e-mail de confirmation. Il s’agit d’un problème de configuration du serveur, pas de votre compte — contactez l’administrateur."
+    "emailSendFailed": "Nous n’avons pas pu envoyer l’e-mail de confirmation. Il s’agit d’un problème de configuration du serveur, pas de votre compte — contactez l’administrateur.",
+    "waitSeconds": "Attendez {{s}} secondes avant de demander un nouveau code."
   },
   "agentDashboard": {
     "title": "Tableau de bord Agent",
@@ -642,7 +644,14 @@
     "messages": "Nouveaux messages",
     "viewings": "Demandes et changements de visite",
     "saveFailed": "Votre choix n'a pas été enregistré. Réessayez.",
-    "privacy": "Une notification indique seulement qui vous a écrit ou ce qui est arrivé à une visite, jamais le texte du message."
+    "privacy": "Une notification indique seulement qui vous a écrit ou ce qui est arrivé à une visite, jamais le texte du message.",
+    "web": "Les notifications n'arrivent que dans l'application mobile.",
+    "registering": "Connexion de ce téléphone aux notifications…",
+    "registerFailed": "L'autorisation est accordée, mais ce téléphone n'a pas pu être connecté aux notifications. Réessayez.",
+    "settingsHint": "Ouvrez les Réglages du téléphone, choisissez Shtëpia.ime et activez les Notifications.",
+    "prefsNote": "Ces choix sont enregistrés dans votre compte. Ce téléphone ne recevra pas de notifications tant que vous ne les activez pas.",
+    "loadFailed": "Vos choix n'ont pas pu être chargés.",
+    "saving": "Enregistrement…"
   },
   "pricing": {
     "title": "Formules et prix",

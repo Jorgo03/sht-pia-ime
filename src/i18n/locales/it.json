@@ -83,7 +83,8 @@
     "resendIn": "Reinvia tra {{s}}s",
     "showPassword": "Mostra password",
     "hidePassword": "Nascondi password",
-    "codeDigit": "Cifra {{n}} di 6"
+    "codeDigit": "Cifra {{n}} di 6",
+    "newCodeSent": "È stato inviato un nuovo codice. I codici precedenti non valgono più."
   },
   "home": {
     "greetingMorning": "Buongiorno",
@@ -300,10 +301,11 @@
     "imageUploadFailed": "Caricamento immagini non riuscito — riprova",
     "updateFailed": "Aggiornamento non riuscito — riprova",
     "oauthFailed": "Accesso con il provider non riuscito — riprova",
-    "invalidCode": "Il codice è errato o scaduto",
+    "invalidCode": "Il codice è errato o non è più valido. Usa l'ultimo codice che ti abbiamo inviato.",
     "videoInvalidType": "Sono consentiti solo video MP4 o MOV",
     "videoTooLarge": "Video troppo grande (max {{max}} MB)",
-    "emailSendFailed": "Non siamo riusciti a inviare l’email di conferma. È un problema di configurazione del server, non del tuo account — contatta l’amministratore."
+    "emailSendFailed": "Non siamo riusciti a inviare l’email di conferma. È un problema di configurazione del server, non del tuo account — contatta l’amministratore.",
+    "waitSeconds": "Attendi {{s}} secondi prima di chiedere un nuovo codice."
   },
   "agentDashboard": {
     "title": "Dashboard Agente",
@@ -642,7 +644,14 @@
     "messages": "Nuovi messaggi",
     "viewings": "Richieste e modifiche delle visite",
     "saveFailed": "La scelta non è stata salvata. Riprova.",
-    "privacy": "Una notifica dice solo chi ti ha scritto o cosa è successo a una visita, mai il testo del messaggio."
+    "privacy": "Una notifica dice solo chi ti ha scritto o cosa è successo a una visita, mai il testo del messaggio.",
+    "web": "Le notifiche arrivano solo nell'app per telefono.",
+    "registering": "Collegamento di questo telefono alle notifiche…",
+    "registerFailed": "Il permesso è attivo, ma questo telefono non è stato collegato alle notifiche. Riprova.",
+    "settingsHint": "Apri le Impostazioni del telefono, scegli Shtëpia.ime e attiva le Notifiche.",
+    "prefsNote": "Queste scelte sono salvate nel tuo account. Questo telefono non riceverà notifiche finché non le attivi.",
+    "loadFailed": "Non è stato possibile caricare le tue scelte.",
+    "saving": "Salvataggio…"
   },
   "pricing": {
     "title": "Piani e prezzi",

@@ -83,7 +83,8 @@
     "resendIn": "Wyślij ponownie za {{s}}s",
     "showPassword": "Pokaż hasło",
     "hidePassword": "Ukryj hasło",
-    "codeDigit": "Cyfra {{n}} z 6"
+    "codeDigit": "Cyfra {{n}} z 6",
+    "newCodeSent": "Wysłano nowy kod. Wcześniejsze kody już nie działają."
   },
   "home": {
     "greetingMorning": "Dzień dobry",
@@ -308,10 +309,11 @@
     "imageUploadFailed": "Przesyłanie obrazów nie powiodło się — spróbuj ponownie",
     "updateFailed": "Aktualizacja nie powiodła się — spróbuj ponownie",
     "oauthFailed": "Logowanie przez dostawcę nie powiodło się — spróbuj ponownie",
-    "invalidCode": "Kod jest nieprawidłowy lub wygasł",
+    "invalidCode": "Kod jest nieprawidłowy lub już nieważny. Użyj ostatniego kodu, który wysłaliśmy.",
     "videoInvalidType": "Dozwolone są tylko filmy MP4 lub MOV",
     "videoTooLarge": "Wideo jest za duże (maks. {{max}} MB)",
-    "emailSendFailed": "Nie udało się wysłać e-maila potwierdzającego. To problem z konfiguracją serwera, nie z Twoim kontem — skontaktuj się z administratorem."
+    "emailSendFailed": "Nie udało się wysłać e-maila potwierdzającego. To problem z konfiguracją serwera, nie z Twoim kontem — skontaktuj się z administratorem.",
+    "waitSeconds": "Poczekaj {{s}} s, zanim poprosisz o nowy kod."
   },
   "agentDashboard": {
     "title": "Panel Agenta",
@@ -650,7 +652,14 @@
     "messages": "Nowe wiadomości",
     "viewings": "Prośby i zmiany oglądania",
     "saveFailed": "Wybór nie został zapisany. Spróbuj ponownie.",
-    "privacy": "Powiadomienie mówi tylko, kto napisał lub co stało się z oglądaniem, nigdy treści wiadomości."
+    "privacy": "Powiadomienie mówi tylko, kto napisał lub co stało się z oglądaniem, nigdy treści wiadomości.",
+    "web": "Powiadomienia przychodzą tylko w aplikacji na telefon.",
+    "registering": "Łączenie tego telefonu z powiadomieniami…",
+    "registerFailed": "Zgoda jest włączona, ale tego telefonu nie udało się połączyć z powiadomieniami. Spróbuj ponownie.",
+    "settingsHint": "Otwórz Ustawienia telefonu, wybierz Shtëpia.ime i włącz Powiadomienia.",
+    "prefsNote": "Te wybory są zapisane na Twoim koncie. Ten telefon nie dostanie powiadomień, dopóki ich nie włączysz.",
+    "loadFailed": "Nie udało się wczytać Twoich wyborów.",
+    "saving": "Zapisywanie…"
   },
   "pricing": {
     "title": "Plany i ceny",

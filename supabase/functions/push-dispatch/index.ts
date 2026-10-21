@@ -14,7 +14,7 @@
 // Logs carry outbox ids only: no names, tokens or message content.
 
 import { createClient } from 'npm:@supabase/supabase-js@2';
-import { buildPush, chunk, dispatchEnabled, readTickets } from './logic.js';
+import { buildPush, chunk, dispatchEnabled, readTickets, stillWanted } from './logic.js';
 
 const SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 const CRON_SECRET = Deno.env.get('PUSH_CRON_SECRET');
@@ -50,8 +50,22 @@ async function dispatch() {
     .order('created_at', { ascending: true })
     .limit(MAX_PER_RUN);
   if (error) throw new Error(error.message);
-  const items = (rows ?? []) as Outbox[];
-  if (!items.length) return { sent: 0, failed: 0, removedTokens: 0 };
+  const queued = (rows ?? []) as Outbox[];
+  if (!queued.length) return { sent: 0, failed: 0, removedTokens: 0, optedOut: 0 };
+
+  // Switched off since it was queued: never sent, kept with the reason.
+  const { data: prefRows, error: prefError } = await admin
+    .from('notification_preferences')
+    .select('user_id, messages, viewings')
+    .in('user_id', [...new Set(queued.map((i) => i.user_id))]);
+  if (prefError) throw new Error(prefError.message);
+  const prefsByUser = new Map((prefRows ?? []).map((p) => [p.user_id, p]));
+  const items = queued.filter((i) => stillWanted(i.kind, prefsByUser.get(i.user_id)));
+  const optedOut = queued.filter((i) => !items.includes(i)).map((i) => i.id);
+  if (optedOut.length) {
+    await admin.from('push_outbox').update({ status: 'failed', last_error: 'opted_out' }).in('id', optedOut);
+  }
+  if (!items.length) return { sent: 0, failed: 0, removedTokens: 0, optedOut: optedOut.length };
 
   const userIds = [...new Set(items.map((i) => i.user_id))];
   const senderIds = [...new Set(items.map((i) => i.data?.sender_id).filter(Boolean))];
@@ -116,7 +130,7 @@ async function dispatch() {
       failed++;
     }
   }
-  return { sent, failed, removedTokens: dead.length };
+  return { sent, failed, removedTokens: dead.length, optedOut: optedOut.length };
 }
 
 Deno.serve(async (req) => {

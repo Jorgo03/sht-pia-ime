@@ -19,6 +19,26 @@ export async function loadPreferences(client, userId) {
   }
 }
 
+/**
+ * Like loadPreferences, but says whether the read worked. The sheet uses
+ * this: on a failed read it must not show (or later save) the defaults as if
+ * they were the person's choices.
+ */
+export async function readPreferences(client, userId) {
+  try {
+    const { data, error } = await client
+      .from('notification_preferences')
+      .select('messages, viewings')
+      .eq('user_id', userId)
+      .maybeSingle()
+    if (error) return { ok: false, prefs: { ...DEFAULT_PREFERENCES } }
+    if (!data) return { ok: true, prefs: { ...DEFAULT_PREFERENCES } }
+    return { ok: true, prefs: { messages: data.messages !== false, viewings: data.viewings !== false } }
+  } catch {
+    return { ok: false, prefs: { ...DEFAULT_PREFERENCES } }
+  }
+}
+
 /** Save both switches; user_id comes from the session (column default). */
 export async function savePreferences(client, prefs) {
   try {

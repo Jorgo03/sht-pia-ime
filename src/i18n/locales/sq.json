@@ -83,7 +83,8 @@
     "resendIn": "Ridërgo pas {{s}}s",
     "showPassword": "Shfaq fjalëkalimin",
     "hidePassword": "Fshih fjalëkalimin",
-    "codeDigit": "Shifra {{n}} nga 6"
+    "codeDigit": "Shifra {{n}} nga 6",
+    "newCodeSent": "Kodi i ri u dërgua. Kodet e mëparshme nuk vlejnë më."
   },
   "home": {
     "greetingMorning": "Mirëmëngjes",
@@ -268,10 +269,11 @@
     "imageUploadFailed": "Ngarkimi i imazheve dështoi — provo përsëri",
     "updateFailed": "Përditësimi dështoi — provo përsëri",
     "oauthFailed": "Kyçja me ofruesin dështoi — provo përsëri",
-    "invalidCode": "Kodi është i pasaktë ose ka skaduar",
+    "invalidCode": "Kodi është i pasaktë ose nuk vlen më. Përdor kodin e fundit që të dërguam.",
     "videoInvalidType": "Lejohen vetëm video MP4 ose MOV",
     "videoTooLarge": "Video është shumë e madhe (maks. {{max}} MB)",
-    "emailSendFailed": "Nuk arritëm të dërgojmë emailin e konfirmimit. Është një problem konfigurimi i serverit, jo i llogarisë sate — kontakto administratorin."
+    "emailSendFailed": "Nuk arritëm të dërgojmë emailin e konfirmimit. Është një problem konfigurimi i serverit, jo i llogarisë sate — kontakto administratorin.",
+    "waitSeconds": "Prit {{s}} sekonda para se të kërkosh një kod të ri."
   },
   "agentDashboard": {
     "title": "Paneli i Agjentit",
@@ -634,7 +636,14 @@
     "messages": "Mesazhe të reja",
     "viewings": "Kërkesa dhe ndryshime vizitash",
     "saveFailed": "Zgjedhja nuk u ruajt. Provo përsëri.",
-    "privacy": "Njoftimi tregon vetëm kush të shkroi ose çfarë ndodhi me vizitën, kurrë tekstin e mesazhit."
+    "privacy": "Njoftimi tregon vetëm kush të shkroi ose çfarë ndodhi me vizitën, kurrë tekstin e mesazhit.",
+    "web": "Njoftimet vijnë vetëm në aplikacionin për telefon.",
+    "registering": "Po lidhim këtë telefon për njoftime…",
+    "registerFailed": "Leja është dhënë, por ky telefon nuk u lidh për njoftime. Provo përsëri.",
+    "settingsHint": "Hap Cilësimet e telefonit, zgjidh Shtëpia.ime dhe ndiz Njoftimet.",
+    "prefsNote": "Këto zgjedhje ruhen në llogarinë tënde. Në këtë telefon nuk do të vijnë njoftime derisa t'i ndezësh.",
+    "loadFailed": "Zgjedhjet e tua nuk u ngarkuan.",
+    "saving": "Po ruhet…"
   },
   "pricing": {
     "title": "Planet dhe çmimet",
