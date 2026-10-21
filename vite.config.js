@@ -2,12 +2,17 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import path from 'path'
+import fs from 'fs'
 
 // The public address of the site, used for absolute URLs in index.html
 // (link previews need them), robots.txt and sitemap.xml. Set VITE_SITE_URL in
 // Vercel once a custom domain is live; until then it is the current Vercel
 // deployment.
 process.env.VITE_SITE_URL = (process.env.VITE_SITE_URL || 'https://real-estate-app-hazel-seven.vercel.app').replace(/\/+$/, '')
+
+// Attached to crash reports (src/lib/reportError.js) so a report can be tied
+// to a release. package.json is the web app's version.
+process.env.VITE_APP_VERSION = process.env.VITE_APP_VERSION || JSON.parse(fs.readFileSync(new URL('./package.json', import.meta.url), 'utf8')).version
 
 // Routes that only make sense signed in; kept out of search results.
 const PRIVATE_ROUTES = ['/profile', '/messages', '/favorites', '/my-listings', '/new-listing', '/viewings', '/saved-searches', '/agent-dashboard', '/auth/']

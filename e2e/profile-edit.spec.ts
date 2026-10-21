@@ -79,15 +79,13 @@ test.describe('refused by the database', () => {
   });
 });
 
-// A 2×1 PNG: real image bytes, so the browser decodes and re-encodes it.
-const PNG = Buffer.from(
-  'iVBORw0KGgoAAAANSUhEUgAAAAIAAAABCAYAAAD0In+KAAAAEUlEQVR4nGP4z8DwHwyBDAYAXCQH+aNfsiAAAAAASUVORK5CYII=',
-  'base64',
-);
+// A real 2×1 PNG, so the browser decodes and re-encodes it, and a GIF header.
+const PNG = 'e2e/support/files/avatar.png';
+const GIF = 'e2e/support/files/not-a-photo.gif';
 
 test('F12-H3 a new photo is uploaded to your own folder as a JPEG, then saved on the profile', async ({ page, writes }) => {
   const sheet = await openSheet(page);
-  await sheet.getByLabel(t('profile.edit.changePhoto')).setInputFiles({ name: 'me.png', mimeType: 'image/png', buffer: PNG });
+  await sheet.getByLabel(t('profile.edit.changePhoto')).setInputFiles(PNG);
   await expect(sheet.getByRole('button', { name: t('profile.edit.removePhoto') })).toBeVisible();
 
   const upload = writes.find((w) => w.table === 'storage' && w.method === 'POST');
@@ -101,7 +99,7 @@ test('F12-H3 a new photo is uploaded to your own folder as a JPEG, then saved on
 
 test('F12-N3 a file that is not a photo is refused before anything is sent', async ({ page, writes }) => {
   const sheet = await openSheet(page);
-  await sheet.getByLabel(t('profile.edit.changePhoto')).setInputFiles({ name: 'x.gif', mimeType: 'image/gif', buffer: Buffer.from('GIF89a') });
+  await sheet.getByLabel(t('profile.edit.changePhoto')).setInputFiles(GIF);
   await expect(sheet.getByRole('alert')).toHaveText(t('profile.edit.photoType'));
   expect(writes.filter((w) => w.table === 'storage' || w.table === 'profiles')).toEqual([]);
 });

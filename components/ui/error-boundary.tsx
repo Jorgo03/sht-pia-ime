@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
@@ -5,6 +6,7 @@ import type { ErrorBoundaryProps } from 'expo-router';
 
 import i18n from '@/i18n';
 import { AtticoColorsDark, Fonts } from '@/constants/theme';
+import { reportError } from '@/lib/report-error';
 
 /**
  * Route-level crash screen, exported from app/_layout.tsx so expo-router
@@ -21,6 +23,11 @@ import { AtticoColorsDark, Fonts } from '@/constants/theme';
  * before the theme context resolves.
  */
 export function AppErrorBoundary({ error, retry }: ErrorBoundaryProps) {
+  // Redacted report to client_errors, once per error (src/lib/errorReport.js).
+  useEffect(() => {
+    void reportError('render', error, null);
+  }, [error]);
+
   if (__DEV__) {
     // Full detail stays in the dev console, never on screen.
     console.error('[ErrorBoundary] uncaught render error:', error);

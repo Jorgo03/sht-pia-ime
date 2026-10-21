@@ -1,5 +1,6 @@
 import { Component } from 'react'
 import i18n from '../i18n/index.js'
+import { reportError } from '../lib/reportError.js'
 
 /**
  * Top-level crash guard. Without one, any uncaught render error unmounts the
@@ -24,8 +25,9 @@ export default class ErrorBoundary extends Component {
   }
 
   componentDidCatch(error, info) {
-    // Dev only: in production this would be the hook for a reporting service
-    // (none is wired up yet — see AUDIT.md). Never rendered to the user.
+    // Redacted report to client_errors (src/lib/errorReport.js); never shown
+    // to the user. Full detail stays in the dev console only.
+    reportError('render', error, window.location.pathname)
     if (import.meta.env?.DEV) {
       console.error('[ErrorBoundary] uncaught render error:', error, info?.componentStack)
     }

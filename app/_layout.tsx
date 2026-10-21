@@ -35,6 +35,7 @@ import { FavoritesProvider } from '@/contexts/favorites-context';
 import { FiltersProvider } from '@/contexts/filters-context';
 import { ThemeProvider, useTheme } from '@/contexts/theme-context';
 import { queryClient } from '@/lib/query-client';
+import { installGlobalErrorReporting } from '@/lib/report-error';
 
 export const unstable_settings = {
   anchor: '(tabs)',
@@ -52,6 +53,10 @@ export { AppErrorBoundary as ErrorBoundary } from '@/components/ui/error-boundar
 // warning (Expo's own template code guards it the same way), not a real
 // error, so it's the one intentional swallow in this file.
 SplashScreen.preventAutoHideAsync().catch(() => {});
+
+// Redacted crash reports to client_errors (docs/LAUNCH_TASKS.md F11); a no-op
+// in development.
+installGlobalErrorReporting();
 
 function ThemedNavigation() {
   const { theme } = useTheme();
