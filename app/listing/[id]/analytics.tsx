@@ -238,6 +238,8 @@ const createStyles = (colors: AtticoPalette) =>
     },
     scrollContent: {
       paddingHorizontal: 20,
+      // Clear of the header's bottom line, like every other pushed screen.
+      paddingTop: 16,
       paddingBottom: 40,
       gap: 20,
     },

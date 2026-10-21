@@ -447,16 +447,18 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   row: {
     gap: 0,
   },
+  // Wraps as a whole rather than squeezing both texts (see home's sectionHeader).
   countRow: {
     flexDirection: 'row',
-    alignItems: 'center',
+    flexWrap: 'wrap',
+    alignItems: 'baseline',
     justifyContent: 'space-between',
-    gap: 10,
+    columnGap: 10,
+    rowGap: 2,
     paddingHorizontal: 6,
     paddingBottom: 12,
   },
   count: {
-    flexShrink: 1,
     fontFamily: Fonts?.sans,
     fontSize: 13,
     color: colors.textSecondary,

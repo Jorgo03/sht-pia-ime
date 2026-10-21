@@ -6,6 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 
 import { AppHeader } from '@/components/ui/app-header';
+import { ScreenHero } from '@/components/ui/screen-hero';
 import { GradientBackground } from '@/components/ui/gradient-background';
 import { type AtticoPalette, Fonts } from '@/constants/theme';
 import { useAuth } from '@/contexts/auth-context';
@@ -145,15 +146,11 @@ export default function AgentDashboardScreen() {
         <AppHeader onBack={() => router.back()} />
 
         {/* Matches web's AgentDashboard.jsx screen-kicker/screen-headline hero. */}
-        <View style={styles.heroBlock}>
-          <View style={styles.kickerRow}>
-            <View style={styles.kickerDash} />
-            <Text style={styles.kicker}>{t('agentDashboard.kicker')}</Text>
-          </View>
-          <Text style={styles.headline} accessibilityRole="header">
-            {t('agentDashboard.headlinePre')} <Text style={styles.headlineEm}>{t('agentDashboard.headlineEm')}</Text>
-          </Text>
-        </View>
+        <ScreenHero
+          kicker={t('agentDashboard.kicker')}
+          pre={t('agentDashboard.headlinePre')}
+          em={t('agentDashboard.headlineEm')}
+        />
 
         {actionError && <Text style={styles.errorBanner}>{t('errors.updateFailed')}</Text>}
 
@@ -292,41 +289,6 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   container: {
     flex: 1,
   },
-  // Matches web's .screen-kicker / .screen-headline exactly.
-  heroBlock: {
-    paddingHorizontal: 20,
-    paddingTop: 16,
-    paddingBottom: 4,
-  },
-  kickerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    marginBottom: 6,
-  },
-  kickerDash: {
-    width: 14,
-    height: 1,
-    backgroundColor: colors.accent,
-  },
-  kicker: {
-    fontFamily: Fonts?.mono,
-    fontSize: 11,
-    letterSpacing: 1.5,
-    textTransform: 'uppercase',
-    color: colors.textSecondary,
-    fontWeight: '600',
-  },
-  headline: {
-    fontFamily: Fonts?.serif,
-    fontSize: 28,
-    fontWeight: '500',
-    color: colors.textPrimary,
-  },
-  headlineEm: {
-    fontStyle: 'italic',
-    color: colors.accentText,
-  },
   center: {
     flex: 1,
     justifyContent: 'center',
@@ -388,10 +350,14 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   section: {
     gap: 10,
   },
+  // Same wrapping rule as home's sectionHeader.
   sectionHead: {
     flexDirection: 'row',
-    alignItems: 'center',
+    flexWrap: 'wrap',
+    alignItems: 'baseline',
     justifyContent: 'space-between',
+    columnGap: 12,
+    rowGap: 2,
   },
   // Matches web's .section-title h2.
   sectionTitle: {

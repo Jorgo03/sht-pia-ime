@@ -301,7 +301,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     paddingBottom: 14,
   },
   rows: {
-    paddingHorizontal: 16,
+    paddingHorizontal: 20,
     gap: 12,
   },
   moreButton: {
@@ -342,10 +342,16 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   section: {
     marginTop: 28,
   },
+  // Title left, eyebrow/link right on one line; when both don't fit (320px,
+  // longer languages) the right-hand item moves under the title instead of
+  // both squeezing into ragged two-line columns.
   sectionHeader: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     justifyContent: 'space-between',
-    alignItems: 'center',
+    alignItems: 'baseline',
+    columnGap: 12,
+    rowGap: 2,
     paddingHorizontal: 20,
     marginBottom: 10,
   },

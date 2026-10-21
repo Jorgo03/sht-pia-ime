@@ -14,6 +14,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 
 import { AppHeader } from '@/components/ui/app-header';
+import { ScreenHero } from '@/components/ui/screen-hero';
 import { GradientBackground } from '@/components/ui/gradient-background';
 import { type AtticoPalette, Fonts } from '@/constants/theme';
 import { useFavorites } from '@/contexts/favorites-context';
@@ -45,17 +46,11 @@ export default function FavoritesScreen() {
             entry to go back to. */}
         <AppHeader onBack={() => router.push('/(tabs)/profile' as Href)} />
 
-        <View style={styles.heroBlock}>
-          <View style={styles.kickerRow}>
-            <View style={styles.kickerDash} />
-            <Text style={styles.kicker}>
-              {loading ? t('common.loading') : t('favourites.savedCount', { count: favoriteProperties.length })}
-            </Text>
-          </View>
-          <Text style={styles.headline} accessibilityRole="header">
-            {t('favourites.headlinePre')} <Text style={styles.headlineEm}>{t('favourites.headlineEm')}</Text>
-          </Text>
-        </View>
+        <ScreenHero
+          kicker={loading ? t('common.loading') : t('favourites.savedCount', { count: favoriteProperties.length })}
+          pre={t('favourites.headlinePre')}
+          em={t('favourites.headlineEm')}
+        />
 
         {loading ? (
           <View style={styles.center}>
@@ -145,44 +140,6 @@ function FavRow({
 const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   container: {
     flex: 1,
-  },
-  // Matches web's .screen-kicker / .screen-headline exactly. Slightly more
-  // top padding than before: the old text back-link sat directly above this
-  // and supplied some of the gap; AppHeader has its own bottom border, so the
-  // hero needs to clear it on its own.
-  heroBlock: {
-    paddingHorizontal: 20,
-    paddingTop: 18,
-    paddingBottom: 20,
-  },
-  kickerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    marginBottom: 6,
-  },
-  kickerDash: {
-    width: 14,
-    height: 1,
-    backgroundColor: colors.accent,
-  },
-  kicker: {
-    fontFamily: Fonts?.mono,
-    fontSize: 11,
-    letterSpacing: 1.5,
-    textTransform: 'uppercase',
-    color: colors.textSecondary,
-    fontWeight: '600',
-  },
-  headline: {
-    fontFamily: Fonts?.serif,
-    fontSize: 28,
-    fontWeight: '500',
-    color: colors.textPrimary,
-  },
-  headlineEm: {
-    fontStyle: 'italic',
-    color: colors.accentText,
   },
   center: {
     flex: 1,

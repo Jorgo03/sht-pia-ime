@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { AppState, Linking, Modal, Platform, Pressable, StyleSheet, Switch, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { SheetCloseButton } from '@/components/ui/sheet-close-button';
 import { GhostBtn, PrimaryCTA } from '@/components/ui/buttons';
 import { Fonts, Radii, Spacing, type AtticoPalette } from '@/constants/theme';
 import { useTheme } from '@/contexts/theme-context';
@@ -174,9 +175,7 @@ export function NotificationsSheet({ userId, onClose }: { userId: string; onClos
             <Text style={styles.title} accessibilityRole="header">
               {t('notifications.title')}
             </Text>
-            <Pressable onPress={onClose} hitSlop={10} accessibilityRole="button" accessibilityLabel={t('common.close')}>
-              <MaterialIcons name="close" size={22} color={colors.textSecondary} />
-            </Pressable>
+            <SheetCloseButton onPress={onClose} />
           </View>
           <View style={styles.body}>
             <View style={styles.statusRow}>

@@ -8,8 +8,9 @@ import { useTranslation } from 'react-i18next';
 
 import { ActionButton } from '@/components/ui/action-button';
 import { AppHeader } from '@/components/ui/app-header';
+import { ScreenHero } from '@/components/ui/screen-hero';
 import { GradientBackground } from '@/components/ui/gradient-background';
-import { type AtticoPalette, Fonts } from '@/constants/theme';
+import { type AtticoPalette } from '@/constants/theme';
 import { useAuth } from '@/contexts/auth-context';
 import { useTheme } from '@/contexts/theme-context';
 import { supabase } from '@/lib/supabase';
@@ -141,22 +142,13 @@ export default function MessagesInboxScreen() {
 
         {/* Matches web's Messages.jsx screen-kicker/screen-headline hero
             exactly, including the agent-vs-client copy split. */}
-        <View style={styles.heroBlock}>
-          <View style={styles.kickerRow}>
-            <View style={styles.kickerDash} />
-            <Text style={styles.kicker}>
-              {isAgent
+        <ScreenHero
+          kicker={isAgent
                 ? t('messages.agent.kicker', { leads: conversations.length, newToday: unreadTotal })
                 : t('messages.client.kicker', { count: conversations.length, unread: unreadTotal })}
-            </Text>
-          </View>
-          <Text style={styles.headline} accessibilityRole="header">
-            {isAgent ? t('messages.agent.headlinePre') : t('messages.client.headlinePre')}{' '}
-            <Text style={styles.headlineEm}>
-              {isAgent ? t('messages.agent.headlineEm') : t('messages.client.headlineEm')}
-            </Text>
-          </Text>
-        </View>
+          pre={isAgent ? t('messages.agent.headlinePre') : t('messages.client.headlinePre')}
+          em={isAgent ? t('messages.agent.headlineEm') : t('messages.client.headlineEm')}
+        />
 
         {loading ? (
           <View style={styles.center}>
@@ -232,41 +224,6 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   container: {
     flex: 1,
   },
-  // Matches web's .screen-kicker / .screen-headline exactly.
-  heroBlock: {
-    paddingHorizontal: 20,
-    paddingTop: 16,
-    paddingBottom: 20,
-  },
-  kickerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    marginBottom: 6,
-  },
-  kickerDash: {
-    width: 14,
-    height: 1,
-    backgroundColor: colors.accent,
-  },
-  kicker: {
-    fontFamily: Fonts?.mono,
-    fontSize: 11,
-    letterSpacing: 1.5,
-    textTransform: 'uppercase',
-    color: colors.textSecondary,
-    fontWeight: '600',
-  },
-  headline: {
-    fontFamily: Fonts?.serif,
-    fontSize: 28,
-    fontWeight: '500',
-    color: colors.textPrimary,
-  },
-  headlineEm: {
-    fontStyle: 'italic',
-    color: colors.accentText,
-  },
   center: {
     flex: 1,
     justifyContent: 'center',
@@ -309,7 +266,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     marginTop: 12,
   },
   list: {
-    paddingHorizontal: 16,
+    paddingHorizontal: 20,
     paddingBottom: 24,
   },
   row: {

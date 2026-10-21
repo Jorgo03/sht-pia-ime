@@ -1258,12 +1258,14 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   flex: {
     flex: 1,
   },
+  // 16 below the header's line, as on the other screens.
   scrollContent: {
     paddingHorizontal: 20,
-    paddingTop: 8,
+    paddingTop: 16,
     paddingBottom: 110,
   },
   topBarTitle: {
+    marginBottom: 12,
     fontFamily: Fonts?.serif,
     fontSize: 20,
     fontWeight: '500',
@@ -1438,7 +1440,9 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     gap: 8,
     paddingBottom: 8,
   },
+  // 12px text; the vertical padding makes a ~34px tap row instead of 14px.
   legalLink: {
+    paddingVertical: 10,
     fontSize: 12,
     color: colors.textSecondary,
     textDecorationLine: 'underline',

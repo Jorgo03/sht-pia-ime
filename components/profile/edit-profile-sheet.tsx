@@ -1,4 +1,3 @@
-import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useMemo, useState } from 'react';
@@ -16,6 +15,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+import { SheetCloseButton } from '@/components/ui/sheet-close-button';
 import { PrimaryCTA } from '@/components/ui/buttons';
 import { KEYBOARD_DONE_SHEET_ID, KeyboardDoneBar } from '@/components/ui/keyboard-done-bar';
 import { Fonts, Radii, Spacing, type AtticoPalette } from '@/constants/theme';
@@ -159,13 +159,7 @@ export function EditProfileSheet({
             <Text style={styles.title} accessibilityRole="header">
               {t('profile.edit.title')}
             </Text>
-            <Pressable
-              onPress={onClose}
-              hitSlop={10}
-              accessibilityRole="button"
-              accessibilityLabel={t('common.close')}>
-              <MaterialIcons name="close" size={22} color={colors.textSecondary} />
-            </Pressable>
+            <SheetCloseButton onPress={onClose} />
           </View>
 
           <ScrollView contentContainerStyle={styles.body} keyboardShouldPersistTaps="handled">
