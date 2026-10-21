@@ -81,7 +81,8 @@
     "heroSignUpPost": "today.",
     "resendIn": "Resend in {{s}}s",
     "showPassword": "Show password",
-    "hidePassword": "Hide password"
+    "hidePassword": "Hide password",
+    "codeDigit": "Digit {{n}} of 6"
   },
   "addSheet": {
     "openLabel": "Create new",

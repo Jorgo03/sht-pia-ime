@@ -1,4 +1,5 @@
 import { useMemo, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   StyleSheet,
   TextInput,
@@ -41,6 +42,7 @@ export function OtpInput({
   editable?: boolean;
   autoFocus?: boolean;
 }) {
+  const { t } = useTranslation();
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const refs = useRef<(TextInput | null)[]>([]);
@@ -118,7 +120,7 @@ export function OtpInput({
           selectTextOnFocus
           editable={editable}
           autoFocus={autoFocus && i === 0}
-          accessibilityLabel={`Digit ${i + 1}`}
+          accessibilityLabel={t('auth.codeDigit', { n: i + 1 })}
         />
       ))}
     </View>

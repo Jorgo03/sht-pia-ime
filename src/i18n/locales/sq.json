@@ -81,7 +81,8 @@
     "heroSignUpPost": "që sot.",
     "resendIn": "Ridërgo pas {{s}}s",
     "showPassword": "Shfaq fjalëkalimin",
-    "hidePassword": "Fshih fjalëkalimin"
+    "hidePassword": "Fshih fjalëkalimin",
+    "codeDigit": "Shifra {{n}} nga 6"
   },
   "home": {
     "greetingMorning": "Mirëmëngjes",

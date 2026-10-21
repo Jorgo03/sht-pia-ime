@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="sq">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Konfirmo llogarinë</title></head>
+<!-- Shtëpia.ime auth email: confirmation. Kept in the repo (docs/LAUNCH_TASKS.md F4);
+     paste into Supabase Dashboard → Authentication → Emails → Templates →
+     "Confirm signup". Both apps ask for the 6-digit code, so {{ .Token }} must stay. -->
+<body style="margin:0;padding:0;background:#f1ede6;font-family:Arial,Helvetica,sans-serif;color:#1a1714;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f1ede6;padding:24px 12px;">
+    <tr><td align="center">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:480px;background:#ffffff;border-radius:16px;padding:28px;">
+        <tr><td style="font-family:Georgia,'Times New Roman',serif;font-size:22px;font-weight:bold;color:#1a1714;">Shtëpia<span style="color:#b34700;">.ime</span></td></tr>
+        <tr><td style="padding-top:20px;font-size:16px;line-height:1.5;">
+          <p style="margin:0 0 12px;">Kodi juaj për të konfirmuar llogarinë në Shtëpia.ime:</p>
+          <p style="margin:0 0 16px;font-family:'Courier New',monospace;font-size:30px;letter-spacing:8px;font-weight:bold;color:#1a1714;">{{ .Token }}</p>
+          <p style="margin:0 0 8px;font-size:14px;"><a href="{{ .ConfirmationURL }}" style="color:#b34700;">Ose konfirmoni me këtë lidhje</a></p>
+          <p style="margin:16px 0 0;font-size:13px;color:#5c5852;">Kodi skadon pas 1 ore. Nëse nuk keni krijuar llogari, injorojeni këtë email.</p>
+        </td></tr>
+        <tr><td style="padding-top:20px;border-top:1px solid #e8e2d8;font-size:14px;line-height:1.5;color:#3d3a36;" lang="en">
+          <p style="margin:16px 0 8px;">Your code to confirm your Shtëpia.ime account is shown above.</p>
+          <p style="margin:0 0 8px;font-size:14px;"><a href="{{ .ConfirmationURL }}" style="color:#b34700;">Or confirm with this link</a></p>
+          <p style="margin:12px 0 0;font-size:13px;color:#5c5852;">The code expires in 1 hour. If you didn't create an account, ignore this email.</p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>

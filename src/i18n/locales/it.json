@@ -81,7 +81,8 @@
     "heroSignUpPost": "oggi.",
     "resendIn": "Reinvia tra {{s}}s",
     "showPassword": "Mostra password",
-    "hidePassword": "Nascondi password"
+    "hidePassword": "Nascondi password",
+    "codeDigit": "Cifra {{n}} di 6"
   },
   "home": {
     "greetingMorning": "Buongiorno",

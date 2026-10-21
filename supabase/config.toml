@@ -248,6 +248,28 @@ otp_expiry = 3600
 # subject = "You have been invited"
 # content_path = "./supabase/templates/invite.html"
 
+# Shtëpia.ime's auth emails (docs/LAUNCH_TASKS.md F4). Both apps ask for the
+# 6-digit code, so every template carries {{ .Token }} as well as the link.
+# The hosted project does not read this file: paste the same files into
+# Dashboard → Authentication → Emails → Templates (see
+# docs/ACCOUNT_AND_RELEASE_HANDOFF.md). tests/authEmailTemplates.test.mjs
+# checks both stay in step.
+[auth.email.template.confirmation]
+subject = "Kodi i konfirmimit · Confirm your account — Shtëpia.ime"
+content_path = "./supabase/templates/confirmation.html"
+
+[auth.email.template.recovery]
+subject = "Rivendos fjalëkalimin · Reset your password — Shtëpia.ime"
+content_path = "./supabase/templates/recovery.html"
+
+[auth.email.template.magic_link]
+subject = "Kodi i hyrjes · Your sign-in code — Shtëpia.ime"
+content_path = "./supabase/templates/magic_link.html"
+
+[auth.email.template.email_change]
+subject = "Konfirmo emailin e ri · Confirm your new email — Shtëpia.ime"
+content_path = "./supabase/templates/email_change.html"
+
 # Uncomment to customize notification email template
 # [auth.email.notification.password_changed]
 # enabled = true

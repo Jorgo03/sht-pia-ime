@@ -343,7 +343,11 @@ export default function Profile() {
   // real (the user IS authenticated), but landing on the ordinary dashboard
   // here would mean the reset never actually happens — the old password
   // stays in effect with no indication anything is wrong.
-  if (passwordRecovery) {
+  // Stays on screen after the update too (recoveryDone), so the person sees
+  // that it worked: AuthContext ends the recovery state as soon as the new
+  // password is saved, which used to swap this screen for the dashboard
+  // before the success message could ever show.
+  if (passwordRecovery || recoveryDone) {
     return (
       <div className="profile-page auth-screen">
         <DuskHero />
@@ -384,6 +388,11 @@ export default function Profile() {
               </>
             )}
             {message && <div className={`auth-message ${recoveryDone ? '' : 'auth-message--error'}`} role="status">{message}</div>}
+            {recoveryDone && (
+              <button className="cta-pill" onClick={() => { setRecoveryDone(false); setMessage('') }}>
+                {t('common.done')}
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -526,7 +535,7 @@ export default function Profile() {
             <p className="auth-subtitle">{t('auth.codeSentTo', { email: otpEmail })}</p>
             <div className="otp-inputs" onPaste={handleOtpPaste}>
               {otpCode.map((digit, i) => (
-                <input key={i} ref={(el) => (otpRefs.current[i] = el)} type="text" inputMode="numeric" maxLength={1} className={`otp-digit ${digit ? 'filled' : ''} ${otpError ? 'error' : ''}`} value={digit} onChange={(e) => handleOtpChange(i, e.target.value)} onKeyDown={(e) => handleOtpKeyDown(i, e)} autoFocus={i === 0} />
+                <input key={i} ref={(el) => (otpRefs.current[i] = el)} type="text" inputMode="numeric" autoComplete={i === 0 ? 'one-time-code' : 'off'} aria-label={t('auth.codeDigit', { n: i + 1 })} maxLength={1} className={`otp-digit ${digit ? 'filled' : ''} ${otpError ? 'error' : ''}`} value={digit} onChange={(e) => handleOtpChange(i, e.target.value)} onKeyDown={(e) => handleOtpKeyDown(i, e)} autoFocus={i === 0} />
               ))}
             </div>
             {loading && <p className="auth-subtitle">{t('common.loading')}</p>}
