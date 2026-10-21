@@ -326,3 +326,63 @@ test.describe('email code', () => {
     await expect(page.getByRole('button', { name: new RegExp(t('auth.resendIn').replace('{{s}}', '4[12]')) })).toBeDisabled();
   });
 });
+
+// Layout boundaries on the narrowest supported phone (docs/UI_POLISH.md):
+// no control may sit past the screen edge, and the header wordmark is either
+// clear of the header's buttons or not shown at all.
+async function layoutProblems(page: Page) {
+  return page.evaluate(() => {
+    const problems: string[] = [];
+    const W = window.innerWidth;
+    const shown = (el: Element) => {
+      const r = el.getBoundingClientRect();
+      let n: Element | null = el;
+      while (n) {
+        if (Number(getComputedStyle(n).opacity) === 0) return false;
+        n = n.parentElement;
+      }
+      return r.width > 0 && r.height > 0;
+    };
+    const controls = [...document.querySelectorAll('[role=button],[role=link],[role=switch]')].filter(shown);
+    for (const el of controls) {
+      const r = el.getBoundingClientRect();
+      // Horizontal rails scroll on purpose; only check controls not inside one.
+      let scroller = false;
+      for (let n = el.parentElement; n; n = n.parentElement) {
+        const ox = getComputedStyle(n).overflowX;
+        if ((ox === 'auto' || ox === 'scroll') && n.scrollWidth > n.clientWidth) scroller = true;
+      }
+      if (!scroller && (r.left < -1 || r.right > W + 1)) {
+        problems.push(`off screen: ${el.getAttribute('aria-label') || (el as HTMLElement).innerText} ${Math.round(r.left)}-${Math.round(r.right)}`);
+      }
+    }
+    const brand = [...document.querySelectorAll('div,span')].find(
+      (el) => el.childElementCount <= 1 && (el as HTMLElement).innerText === 'Shtëpia.ime' && shown(el) && el.getBoundingClientRect().top < 80,
+    );
+    if (brand) {
+      const b = brand.getBoundingClientRect();
+      for (const el of controls) {
+        const r = el.getBoundingClientRect();
+        if (r.top > 80) continue;
+        if (Math.min(b.right, r.right) - Math.max(b.left, r.left) > 0 && Math.min(b.bottom, r.bottom) - Math.max(b.top, r.top) > 0) {
+          problems.push(`wordmark overlaps ${el.getAttribute('aria-label')}`);
+        }
+      }
+    }
+    return problems;
+  });
+}
+
+test.describe('narrow phone layout', () => {
+  test.use({ viewport: { width: 320, height: 640 }, signedIn: true });
+
+  for (const path of ['/', '/explore', '/profile', '/my-listings', '/viewings', '/agent-dashboard', '/saved-searches', `/property/${FEATURED.id}`]) {
+    test(`X19 at 320px ${path} keeps every control on screen and the wordmark clear`, async ({ page, isMobile }) => {
+      test.skip(!isMobile, 'phone project only');
+      await page.goto(path);
+      await ready(page);
+      await page.waitForTimeout(500);
+      expect(await layoutProblems(page)).toEqual([]);
+    });
+  }
+});
