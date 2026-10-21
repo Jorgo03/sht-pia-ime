@@ -36,6 +36,8 @@ import { FiltersProvider } from '@/contexts/filters-context';
 import { ThemeProvider, useTheme } from '@/contexts/theme-context';
 import { queryClient } from '@/lib/query-client';
 import { installGlobalErrorReporting } from '@/lib/report-error';
+import { configureForegroundNotifications } from '@/lib/push';
+import { PushBridge } from '@/components/push-bridge';
 
 export const unstable_settings = {
   anchor: '(tabs)',
@@ -57,6 +59,7 @@ SplashScreen.preventAutoHideAsync().catch(() => {});
 // Redacted crash reports to client_errors (docs/LAUNCH_TASKS.md F11); a no-op
 // in development.
 installGlobalErrorReporting();
+configureForegroundNotifications();
 
 function ThemedNavigation() {
   const { theme } = useTheme();
@@ -158,6 +161,7 @@ function AppGate({ fontsReady }: { fontsReady: boolean }) {
       <FiltersProvider>
         <ThemeProvider>
           <ThemedNavigation />
+          <PushBridge />
         </ThemeProvider>
       </FiltersProvider>
     </FavoritesProvider>

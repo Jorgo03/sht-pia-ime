@@ -625,5 +625,18 @@
     "cannotMessage": "Non puoi inviare messaggi a questo utente.",
     "blockedBadge": "Bloccato",
     "signInToReport": "Accedi per segnalare."
+  },
+  "notifications": {
+    "title": "Notifiche",
+    "off": "Le notifiche sono disattivate su questo telefono.",
+    "turnOn": "Attiva le notifiche",
+    "enabled": "Le notifiche sono attive su questo telefono.",
+    "denied": "Le notifiche sono disattivate nelle impostazioni del telefono.",
+    "openSettings": "Apri impostazioni",
+    "unavailable": "Le notifiche non funzionano ancora in questa versione dell'app.",
+    "messages": "Nuovi messaggi",
+    "viewings": "Richieste e modifiche delle visite",
+    "saveFailed": "La scelta non è stata salvata. Riprova.",
+    "privacy": "Una notifica dice solo chi ti ha scritto o cosa è successo a una visita, mai il testo del messaggio."
   }
 }

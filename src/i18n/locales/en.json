@@ -617,5 +617,18 @@
     "cannotMessage": "You can't send messages to this user.",
     "blockedBadge": "Blocked",
     "signInToReport": "Sign in to report."
+  },
+  "notifications": {
+    "title": "Notifications",
+    "off": "Notifications are off on this phone.",
+    "turnOn": "Turn on notifications",
+    "enabled": "Notifications are on for this phone.",
+    "denied": "Notifications are turned off in your phone's settings.",
+    "openSettings": "Open settings",
+    "unavailable": "Notifications don't work in this version of the app yet.",
+    "messages": "New messages",
+    "viewings": "Viewing requests and changes",
+    "saveFailed": "Your choice wasn't saved. Try again.",
+    "privacy": "A notification only says who wrote to you or what happened to a viewing, never the message text."
   }
 }

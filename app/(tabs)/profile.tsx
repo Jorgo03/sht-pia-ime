@@ -31,6 +31,7 @@ import { useTheme } from '@/contexts/theme-context';
 import { useTabBarClearance } from '@/components/liquid-tab-bar';
 import { AppHeader } from '@/components/ui/app-header';
 import { EditProfileSheet } from '@/components/profile/edit-profile-sheet';
+import { NotificationsSheet } from '@/components/profile/notifications-sheet';
 import { BottomSheet } from '@/components/ui/bottom-sheet';
 import { GhostBtn, PrimaryCTA } from '@/components/ui/buttons';
 import { DuskHero } from '@/components/ui/dusk-hero';
@@ -154,6 +155,7 @@ export default function ProfileScreen() {
   const [resetSending, setResetSending] = useState(false);
   const [signOutOpen, setSignOutOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
   // Local copies so TypeScript keeps the null-narrowing inside the onPress
   // closures below — narrowing of an imported binding does not survive one.
   // Account deletion is mandatory for store approval (Apple 5.1.1(v), Google
@@ -543,6 +545,15 @@ export default function ProfileScreen() {
               <View style={styles.menuDivider} />
               <TouchableOpacity
                 style={styles.menuRow}
+                onPress={() => setNotificationsOpen(true)}
+                activeOpacity={0.7}>
+                <MaterialIcons name="notifications-none" size={20} color={colors.textPrimary} />
+                <Text style={styles.menuRowText}>{t('notifications.title')}</Text>
+                <MaterialIcons name="chevron-right" size={18} color={colors.textSecondary} />
+              </TouchableOpacity>
+              <View style={styles.menuDivider} />
+              <TouchableOpacity
+                style={styles.menuRow}
                 onPress={() => router.push('/favorites' as Href)}
                 activeOpacity={0.7}>
                 <MaterialIcons name="favorite-border" size={20} color={colors.textPrimary} />
@@ -651,6 +662,10 @@ export default function ProfileScreen() {
             </View>
           </ScrollView>
         </SafeAreaView>
+
+        {notificationsOpen && (
+          <NotificationsSheet userId={user.id} onClose={() => setNotificationsOpen(false)} />
+        )}
 
         {editOpen && (
           <EditProfileSheet

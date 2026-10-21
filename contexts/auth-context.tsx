@@ -21,6 +21,7 @@ import { Platform } from 'react-native';
 import Constants, { ExecutionEnvironment } from 'expo-constants';
 
 import { signInWithAppleNative } from '@/lib/apple-auth';
+import { forgetDevice } from '@/lib/push';
 import { supabase } from '@/lib/supabase';
 // Same classifier the web AuthContext uses, imported rather than re-written:
 // it is a pure function with no imports of its own, so it costs the mobile
@@ -563,6 +564,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Invalidate first: a profile fetch already in flight is now stale and
     // would otherwise still match the current generation and commit.
     generation.current += 1;
+    // While still signed in: stop this device getting the account's pushes
+    // (a shared phone must not keep receiving the previous person's).
+    await forgetDevice();
     const { error } = await supabase.auth.signOut();
     // This previously relied solely on the SIGNED_OUT event to clear state.
     // supabase-js drops the local session even when the server call fails

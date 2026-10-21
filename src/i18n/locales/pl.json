@@ -633,5 +633,18 @@
     "cannotMessage": "Nie możesz wysyłać wiadomości do tego użytkownika.",
     "blockedBadge": "Zablokowany",
     "signInToReport": "Zaloguj się, aby zgłosić."
+  },
+  "notifications": {
+    "title": "Powiadomienia",
+    "off": "Powiadomienia są wyłączone na tym telefonie.",
+    "turnOn": "Włącz powiadomienia",
+    "enabled": "Powiadomienia są włączone na tym telefonie.",
+    "denied": "Powiadomienia są wyłączone w ustawieniach telefonu.",
+    "openSettings": "Otwórz ustawienia",
+    "unavailable": "Powiadomienia nie działają jeszcze w tej wersji aplikacji.",
+    "messages": "Nowe wiadomości",
+    "viewings": "Prośby i zmiany oglądania",
+    "saveFailed": "Wybór nie został zapisany. Spróbuj ponownie.",
+    "privacy": "Powiadomienie mówi tylko, kto napisał lub co stało się z oglądaniem, nigdy treści wiadomości."
   }
 }

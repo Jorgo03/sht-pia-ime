@@ -617,5 +617,18 @@
     "cannotMessage": "Sie können diesem Nutzer keine Nachrichten senden.",
     "blockedBadge": "Blockiert",
     "signInToReport": "Melden Sie sich an, um etwas zu melden."
+  },
+  "notifications": {
+    "title": "Benachrichtigungen",
+    "off": "Benachrichtigungen sind auf diesem Telefon aus.",
+    "turnOn": "Benachrichtigungen einschalten",
+    "enabled": "Benachrichtigungen sind auf diesem Telefon an.",
+    "denied": "Benachrichtigungen sind in den Telefoneinstellungen ausgeschaltet.",
+    "openSettings": "Einstellungen öffnen",
+    "unavailable": "Benachrichtigungen funktionieren in dieser App-Version noch nicht.",
+    "messages": "Neue Nachrichten",
+    "viewings": "Besichtigungsanfragen und Änderungen",
+    "saveFailed": "Deine Auswahl wurde nicht gespeichert. Versuche es noch einmal.",
+    "privacy": "Eine Benachrichtigung sagt nur, wer dir geschrieben hat oder was mit einer Besichtigung passiert ist, nie den Nachrichtentext."
   }
 }

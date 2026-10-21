@@ -617,5 +617,18 @@
     "cannotMessage": "Nuk mund t'i dërgoni mesazhe këtij përdoruesi.",
     "blockedBadge": "I bllokuar",
     "signInToReport": "Hyni për të raportuar."
+  },
+  "notifications": {
+    "title": "Njoftimet",
+    "off": "Njoftimet janë të fikura në këtë telefon.",
+    "turnOn": "Ndiz njoftimet",
+    "enabled": "Njoftimet janë të ndezura në këtë telefon.",
+    "denied": "Njoftimet janë të fikura te cilësimet e telefonit.",
+    "openSettings": "Hap cilësimet",
+    "unavailable": "Njoftimet nuk funksionojnë ende në këtë version të aplikacionit.",
+    "messages": "Mesazhe të reja",
+    "viewings": "Kërkesa dhe ndryshime vizitash",
+    "saveFailed": "Zgjedhja nuk u ruajt. Provo përsëri.",
+    "privacy": "Njoftimi tregon vetëm kush të shkroi ose çfarë ndodhi me vizitën, kurrë tekstin e mesazhit."
   }
 }
