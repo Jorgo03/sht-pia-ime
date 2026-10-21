@@ -24,12 +24,13 @@ that were rolled back.
 | BUG-006 | S3 | Accessibility: unnamed buttons, buttons nested in clickable elements | fixed (web); phone web export not re-scanned |
 | BUG-007 | S3 | WhatsApp helper puts +355 in front of foreign numbers | fixed in ae5a93e |
 | BUG-008 | S4 | Light mode: several text colours fail contrast | partly fixed (orange text open, owner decision) |
-| BUG-009 | S4 | Phone app: listing images have no text alternative | fixed, not re-scanned |
+| BUG-009 | S4 | Phone app: listing images have no text alternative | fixed, verified on the Expo web export |
 | BUG-010 | S4 | Web: Share on desktop copies the link silently | fixed in ae5a93e |
 | BUG-011 | S3 | Call link invalid for an owner number typed as "+ 069…" | fixed in ae5a93e |
 | BUG-012 | S3 | Show/hide password buttons have no accessible name (web and phone app) | fixed in c64b1e2 |
 | BUG-013 | S4 | After a reload in another language the page still says it is Albanian | fixed in c64b1e2 |
 | BUG-014 | S4 | Sign-in errors are not announced to screen readers | fixed in c64b1e2 |
+| BUG-016 | S4 | Phone tab bar: tabs without a tablist; theme switch without aria-checked | partly fixed (switch); tab bar open (L31) |
 
 ---
 
@@ -192,10 +193,12 @@ Status: fixed in ae5a93e in both `src/lib/format.js` and `lib/format.ts`.
 - Screen: phone app listing detail and cards, web export
 - Actual: axe `image-alt` (7 to 15 per screen). `expo-image` images have no
   `accessibilityLabel`.
-- Status: fixed 2026-10-20 (L11): `alt={title}` on every listing image in
-  the phone app (cards, rows, map card, favorites, my listings, detail gallery
-  and lightbox, wizard thumbnails). Type-checks; not yet re-scanned or tried
-  with VoiceOver/TalkBack.
+- Status: fixed 2026-10-21 (L11): every listing image in the phone app
+  passes the title as `accessibilityLabel` (cards, rows, map card, favorites,
+  my listings, detail gallery and lightbox, wizard thumbnails). A first pass
+  used `alt`, which expo-image 57 drops on web; the Expo web export scan
+  showed it (7/7 unlabeled) and then 0 unlabeled after the switch. Not yet
+  tried with VoiceOver/TalkBack on a device.
 
 ### BUG-010: Web share on desktop gives no feedback
 
@@ -314,3 +317,15 @@ live (rolled back) and succeeds.
   no TRUNCATE), but revoking them is cleaner.
 - `supabase/pending/plans_by_period_months.sql` still needs the owner's
   approval before it is applied.
+
+### BUG-016: Phone tab bar and theme switch ARIA
+
+- Severity: S4
+- Screen: phone app, every tab screen (Expo web export, axe 2026-10-21)
+- Actual: `aria-required-parent` ×4, because the tab items are `role=tab` and
+  no element is a `tablist`. `aria-required-attr`, because the theme switch
+  had no `aria-checked` (react-native-web drops `accessibilityState.checked`
+  for `switch`).
+- Status: switch fixed (explicit `aria-checked`; gone from the rescan). Tab
+  bar open: a `tablist` around it fails `aria-required-children` because the
+  centre "+" is a button. It needs a small redesign of the group (L31).

@@ -69,7 +69,7 @@ function PropertyCardBase({ property, onPress, variant = 'grid' }: PropertyCardP
         onPressOut={onPressOut}>
         <View>
           <Image
-            alt={title}
+            accessibilityLabel={title}
             source={{ uri: property.image_urls[0] }}
             // Ties the loaded image to this listing, so a FlatList row reused
             // for a different property cannot flash the previous one.
@@ -135,7 +135,7 @@ function PropertyCardBase({ property, onPress, variant = 'grid' }: PropertyCardP
           with its own smaller radius, not flush with the card edges. */}
       <View style={styles.imageWrap}>
         <Image
-          alt={title}
+          accessibilityLabel={title}
           source={{ uri: property.image_urls[0] }}
           // Ties the loaded image to this listing, so a FlatList row reused
           // for a different property cannot flash the previous one.

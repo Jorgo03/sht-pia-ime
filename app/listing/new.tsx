@@ -908,7 +908,7 @@ function ListingWizard({ editId }: { editId?: string }) {
         <View style={styles.photoGrid}>
           {images.map((img, index) => (
             <View key={img.uri} style={styles.photoThumb}>
-              <Image alt={t('listing.images')} source={{ uri: img.uri }} style={styles.photoThumbImage} contentFit="cover" />
+              <Image accessibilityLabel={t('listing.images')} source={{ uri: img.uri }} style={styles.photoThumbImage} contentFit="cover" />
               <Pressable
                 style={styles.photoRemove}
                 onPress={() => setImages((prev) => prev.filter((_, i) => i !== index))}

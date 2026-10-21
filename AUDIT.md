@@ -1,5 +1,33 @@
 # Pre-Launch Audit — Shtëpia.ime (Vite web app)
 
+## ═══ PASS 16 — 2026-10-20/21: COMPLETION PASS (ledger L01–L32) ═══
+
+Status per task lives in `docs/LAUNCH_TASKS.md`; the summary, checks and
+verdict in `docs/READINESS_REPORT.md`; accounts in
+`docs/ACCOUNT_AND_RELEASE_HANDOFF.md`. Not repeated here.
+
+New findings this pass, all reproduced:
+- **S-4 correction.** A plain `revoke execute … from anon` on
+  `current_user_is_agent()` / `buyer_has_open_wanted_home()` would break every
+  signed-out profile read, because the profiles SELECT policy (TO public) calls
+  both. Safe version: `supabase/pending/anon_profile_helpers.sql`, tested in a
+  rolled-back transaction (identical visibility for anon and all 15 accounts).
+  **DEFERRED** (owner go).
+- **expo-image `alt` is dropped on web** (v57). The first BUG-009 fix did not
+  reach the DOM. An axe scan of the Expo web export caught it; fixed with
+  `accessibilityLabel`. **FIXED.**
+- **Generic iOS camera purpose string** from `expo-image-picker` defaults,
+  for a camera the app never uses. **FIXED** (`cameraPermission: false`;
+  prebuild verified).
+- **Phone tab bar ARIA** (BUG-016): theme switch **FIXED**; tab grouping
+  **DEFERRED** (L31, design).
+- **Stale Metro cache** can inline an old Supabase URL into an export.
+  **NO ACTION REQUIRED** in code; documented in `docs/CLAUDE_RESUME.md`.
+
+Database changed this pass: nothing applied. Two pending files were added with
+rolled-back live tests. Live RLS checks for applied migrations are now in
+`supabase/tests/`.
+
 ## ═══ PASS 15 — 2026-10-15: FULL AUDIT & PRODUCTION ROADMAP (A–K) ═══
 
 Builds on Pass 14 (same day) instead of repeating it: every Pass 14 number was

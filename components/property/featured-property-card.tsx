@@ -69,7 +69,7 @@ function FeaturedPropertyCardBase({
       onPressOut={onPressOut}>
       <View style={styles.imageWrap}>
         <Image
-          alt={title}
+          accessibilityLabel={title}
           source={{ uri: property.image_urls[0] }}
           // Ties the loaded image to this listing, so a FlatList row reused
           // for a different property cannot flash the previous one.

@@ -112,7 +112,7 @@ function FavRow({
     <TouchableOpacity style={styles.row} onPress={onTap} activeOpacity={0.85}>
       <View style={styles.rowImageWrap}>
         {property.image_urls?.[0] ? (
-          <Image alt={title} source={{ uri: property.image_urls[0] }} style={styles.rowImage} contentFit="cover" />
+          <Image accessibilityLabel={title} source={{ uri: property.image_urls[0] }} style={styles.rowImage} contentFit="cover" />
         ) : (
           <View style={[styles.rowImage, styles.rowImagePlaceholder]} />
         )}

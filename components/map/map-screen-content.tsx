@@ -228,7 +228,7 @@ export function MapScreenContent() {
             onPress={() => router.push(`/property/${previewProperty.id}` as Href)}>
             {previewProperty.image_urls?.[0] ? (
               <Image
-                alt={getLocalizedText(previewProperty.title_i18n, i18n.language) || previewProperty.title}
+                accessibilityLabel={getLocalizedText(previewProperty.title_i18n, i18n.language) || previewProperty.title}
                 source={{ uri: previewProperty.image_urls[0] }}
                 style={styles.previewImage}
                 contentFit="cover"
