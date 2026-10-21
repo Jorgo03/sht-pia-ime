@@ -19,6 +19,14 @@ load is heavier than the Vite site (one ~0.9 MB compressed script versus
 ~0.3 MB), and the 164 Vite e2e tests must be rewritten for the new build
 before the switch.
 
+### W2. Website parked; the store apps come first (DECIDED by owner, 2026-10-21)
+
+The owner will design a new website later. Until then the Vite site in `src/`
+stays in production with bug fixes only, and the `deploy/expo-web` preview
+(W1 stage 1) is not being set up. Stage 2 of W1 (moving the domain, retiring
+`src/`) is off. All work now goes to finishing the Expo app and releasing it
+on the App Store and Google Play.
+
 ## ═══ MONETISATION — 2026-10-14 ═══
 
 ### M1. Paid products: listing promotion AND agency monthly plans (DECIDED by owner)
