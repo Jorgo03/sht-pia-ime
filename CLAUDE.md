@@ -35,6 +35,7 @@ Each app has its own Supabase client singleton (`src/lib/supabase.js` for web, `
 Web:
 - `npm run dev` — Vite dev server, http://localhost:5173
 - `npm run build` — production build to `dist/` (the Vite site, still production)
+- `npm run test:e2e:expo` — Playwright suite for the website built from the Expo app (`e2e-expo/`, `playwright.expo.config.ts`): exports, runs the post-build step, serves it like `deploy/expo-web/vercel.json`; same fake backend and failure rules as `test:e2e`
 - `npm run build:web-expo` then `node scripts/expo-web-postbuild.mjs <dir>` — the website built from the Expo app (`expo export -p web`), plus per-listing SEO pages, sitemap and robots; see `deploy/expo-web/README.md`
 - `npm test` — Node's built-in test runner over `tests/**/*.test.mjs`; run a single file with `npm test -- tests/aiSchemas.test.mjs`
 - `npm run test:e2e` — Playwright end-to-end suite (`e2e/`, `playwright.config.ts`), phone + desktop Chromium. Builds the web app to `dist-e2e/` against a fake Supabase host; `e2e/support/backend.ts` answers every backend call in the browser, so it runs offline and never touches production. Every test fails on a page error, console error or 5xx; `e2e/a11y.spec.ts` runs axe-core, with open accessibility bugs listed by rule in `KNOWN` (remove one when it is fixed). First run on a machine: `npm run test:e2e:install`. `PW_CHROMIUM_PATH=<chrome>` reuses an existing Chromium instead
@@ -58,7 +59,7 @@ Mobile:
 - `npx expo-doctor` — SDK/config compatibility checks; 21 checks, all passing offline-independent ones. There are no `android/`/`ios/` directories: this is a CNG project, so native config comes from app.json at build time and there is nothing to regenerate after an SDK bump
 
 Shared:
-- **CI** — `.github/workflows/ci.yml` runs on every push and PR: job `checks` (lint, `tsc`, `npm test`, web build) and job `e2e` (`npm run test:e2e`; on failure the Playwright report is uploaded as the `playwright-report` artifact). Uses no secrets and never reaches Supabase. Keep it green: run the same commands locally before pushing
+- **CI** — `.github/workflows/ci.yml` runs on every push and PR: job `checks` (lint, `tsc`, `npm test`, web build), job `e2e` (`npm run test:e2e`; on failure the Playwright report is uploaded as the `playwright-report` artifact) and job `e2e-expo` (`npm run test:e2e:expo`, artifact `playwright-report-expo`). Uses no secrets and never reaches Supabase. Keep it green: run the same commands locally before pushing
 - `npx tsc --noEmit` — type-checks both apps from one `tsconfig.json`
 - `npm run lint` — runs `expo lint` (ESLint) across the whole repo, not a web-only linter
 

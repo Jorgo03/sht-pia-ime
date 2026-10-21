@@ -1,6 +1,8 @@
-# Runs on every push and pull request. Two jobs, in parallel:
-#   checks: lint, type check (both apps), unit tests, web build
-#   e2e:    Playwright end-to-end suite (npm run test:e2e)
+# Runs on every push and pull request. Three jobs, in parallel:
+#   checks:   lint, type check (both apps), unit tests, web build
+#   e2e:      Playwright end-to-end suite for the Vite site (npm run test:e2e)
+#   e2e-expo: the same for the website built from the Expo app
+#             (npm run test:e2e:expo; DECISIONS.md W1)
 #
 # No secrets are used or needed. The web build gets placeholder Supabase
 # values, and the e2e suite answers every backend call itself
@@ -78,5 +80,34 @@ jobs:
           name: playwright-report
           path: |
             playwright-report/
+            test-results/
+          retention-days: 14
+
+  e2e-expo:
+    name: End-to-end, Expo web build (Playwright)
+    # Same pin and reasons as the e2e job above.
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          # CI only reads the code; don't leave a token in .git/config.
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Run end-to-end tests
+        run: npm run test:e2e:expo
+      - name: Upload report
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: playwright-report-expo
+          path: |
+            playwright-report-expo/
             test-results/
           retention-days: 14
