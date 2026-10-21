@@ -33,6 +33,7 @@ import { usePropertiesCountQuery } from '@/hooks/use-property-queries';
 // already uses to pull locales out of src/.
 import LOCATIONS from '@/src/features/properties/data/locations';
 import { normalizeRef, zonesFor } from '@/src/features/properties/lib/searchFilters';
+import { webColumn } from '@/constants/web-frame';
 
 type PropertyType = NonNullable<Property['property_type']>;
 type ListingType = NonNullable<Property['listing_type']>;
@@ -213,7 +214,7 @@ export function FilterSheet({
       onRequestClose={onClose}>
       <View style={styles.backdrop}>
         <Pressable style={StyleSheet.absoluteFill} onPress={onClose} />
-        <Animated.View style={[styles.container, sheetAnimatedStyle]}>
+        <Animated.View style={[styles.container, webColumn, sheetAnimatedStyle]}>
         <GestureDetector gesture={panGesture}>
           <View>
             <View style={styles.grip} />

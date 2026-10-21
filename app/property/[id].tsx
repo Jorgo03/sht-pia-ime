@@ -47,6 +47,8 @@ import { logActivity } from '@/lib/activity';
 import { propertyUrl } from '@/lib/site';
 import { supabase } from '@/lib/supabase';
 import { formatPrice, listingBadgeKey, priceSuffixKey, telUrl, whatsappUrl } from '@/lib/format';
+import { webColumn } from '@/constants/web-frame';
+import { useAppDimensions } from '@/hooks/use-app-dimensions';
 
 // Rounds "now + 1h" to the next half hour — same default the web app's
 // ViewingRequestSheet uses.
@@ -78,6 +80,9 @@ export default function PropertyDetailScreen() {
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const heroListRef = useRef<FlatList<string>>(null);
   const lightboxListRef = useRef<FlatList<string>>(null);
+  // The photo carousel is as wide as the app (the phone-width column on the
+  // web); the full-screen photo viewer is as wide as the window.
+  const { width: heroWidth } = useAppDimensions();
   const screenWidth = Dimensions.get('window').width;
   const { title, description, translating, isTranslated } = useTranslatedProperty(property, i18n.language);
 
@@ -496,14 +501,14 @@ export default function PropertyDetailScreen() {
             showsHorizontalScrollIndicator={false}
             keyExtractor={(uri, i) => `${uri}-${i}`}
             onMomentumScrollEnd={(e: NativeSyntheticEvent<NativeScrollEvent>) => {
-              const idx = Math.round(e.nativeEvent.contentOffset.x / screenWidth);
+              const idx = Math.round(e.nativeEvent.contentOffset.x / heroWidth);
               setImgIndex(idx);
             }}
             renderItem={({ item }) => (
               <TouchableOpacity
                 activeOpacity={0.95}
                 onPress={() => setLightboxOpen(true)}
-                style={{ width: screenWidth, height: imageHeight }}>
+                style={{ width: heroWidth, height: imageHeight }}>
                 <Image accessibilityLabel={title} source={{ uri: item }} style={styles.image} contentFit="cover" transition={300} />
               </TouchableOpacity>
             )}
@@ -591,7 +596,7 @@ export default function PropertyDetailScreen() {
         <KeyboardAvoidingView
           style={styles.modalBackdrop}
           behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-          <View style={styles.modalSheet}>
+          <View style={[styles.modalSheet, webColumn]}>
             <View style={styles.modalHeader}>
               {/* requestTitle ("Request a") + requestTitleEm ("viewing") — same
                   two-key split as the web sheet's <h2>, joined with a space

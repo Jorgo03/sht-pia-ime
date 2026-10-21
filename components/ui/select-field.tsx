@@ -10,6 +10,7 @@ import {
 
 import { Fonts, Radii, type AtticoPalette } from '@/constants/theme';
 import { useTheme } from '@/contexts/theme-context';
+import { webColumn } from '@/constants/web-frame';
 
 export interface SelectOption {
   value: string;
@@ -63,7 +64,7 @@ export function SelectField({
 
       <Modal visible={open} transparent animationType="fade" onRequestClose={() => setOpen(false)}>
         <Pressable style={styles.backdrop} onPress={() => setOpen(false)}>
-          <Pressable style={styles.sheet} onPress={(e) => e.stopPropagation()}>
+          <Pressable style={[styles.sheet, webColumn]} onPress={(e) => e.stopPropagation()}>
             <FlatList
               data={options}
               keyExtractor={(o) => o.value || '__any__'}

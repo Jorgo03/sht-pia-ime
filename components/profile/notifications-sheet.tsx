@@ -15,6 +15,7 @@ import {
   savePreferences,
   type NotificationPreferences,
 } from '@/src/features/notifications/lib/preferences';
+import { webColumn } from '@/constants/web-frame';
 
 type Shown = PushStatus | 'checking' | 'off';
 
@@ -75,7 +76,7 @@ export function NotificationsSheet({ userId, onClose }: { userId: string; onClos
     <Modal visible transparent animationType="slide" onRequestClose={onClose}>
       <Pressable style={styles.backdrop} onPress={onClose} accessibilityLabel={t('common.close')} />
       <View style={styles.sheetWrap} pointerEvents="box-none">
-        <SafeAreaView edges={['bottom']} style={styles.sheet}>
+        <SafeAreaView edges={['bottom']} style={[styles.sheet, webColumn]}>
           <View style={styles.grip} />
           <View style={styles.header}>
             <Text style={styles.title} accessibilityRole="header">

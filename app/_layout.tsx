@@ -23,8 +23,8 @@ import { DarkTheme, DefaultTheme, Stack, ThemeProvider as NavigationThemeProvide
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect } from 'react';
-import { Platform } from 'react-native';
+import { useEffect, type ReactNode } from 'react';
+import { Platform, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import 'react-native-reanimated';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -38,6 +38,7 @@ import { queryClient } from '@/lib/query-client';
 import { installGlobalErrorReporting } from '@/lib/report-error';
 import { configureForegroundNotifications } from '@/lib/push';
 import { PushBridge } from '@/components/push-bridge';
+import { IS_WEB, WEB_MAX_WIDTH } from '@/constants/web-frame';
 
 export const unstable_settings = {
   anchor: '(tabs)',
@@ -61,66 +62,92 @@ SplashScreen.preventAutoHideAsync().catch(() => {});
 installGlobalErrorReporting();
 configureForegroundNotifications();
 
+/**
+ * The website is this app's web build. On a screen wider than a phone it is
+ * drawn in a centred phone-width column (constants/web-frame.ts), with a
+ * hairline edge, so it looks like the app instead of a stretched page.
+ * Native builds render the navigator directly.
+ */
+function WebColumn({ children }: { children: ReactNode }) {
+  const { colors } = useTheme();
+  const { width } = useWindowDimensions();
+  if (!IS_WEB) return <>{children}</>;
+  const framed = width > WEB_MAX_WIDTH;
+  return (
+    <View style={[styles.webPage, { backgroundColor: colors.primary }]}>
+      <View
+        style={[
+          styles.webColumn,
+          framed && { borderLeftWidth: StyleSheet.hairlineWidth, borderRightWidth: StyleSheet.hairlineWidth, borderColor: colors.border },
+        ]}>
+        {children}
+      </View>
+    </View>
+  );
+}
+
 function ThemedNavigation() {
   const { theme } = useTheme();
 
   return (
     <NavigationThemeProvider value={theme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen
-          name="property/[id]"
-          options={{ headerShown: false, presentation: 'card' }}
-        />
-        <Stack.Screen
-          name="listing/create"
-          options={{ headerShown: false, presentation: 'card' }}
-        />
-        <Stack.Screen
-          name="listing/new"
-          options={{ headerShown: false, presentation: 'card' }}
-        />
-        <Stack.Screen
-          name="listing/[id]/analytics"
-          options={{ headerShown: false, presentation: 'card' }}
-        />
-        <Stack.Screen
-          name="listing/[id]/edit"
-          options={{ headerShown: false, presentation: 'card' }}
-        />
-        <Stack.Screen
-          name="favorites/index"
-          options={{ headerShown: false, presentation: 'card' }}
-        />
-        <Stack.Screen
-          name="messages/index"
-          options={{ headerShown: false, presentation: 'card' }}
-        />
-        <Stack.Screen
-          name="messages/[id]"
-          options={{ headerShown: false, presentation: 'card' }}
-        />
-        <Stack.Screen
-          name="viewings/index"
-          options={{ headerShown: false, presentation: 'card' }}
-        />
-        <Stack.Screen
-          name="my-listings/index"
-          options={{ headerShown: false, presentation: 'card' }}
-        />
-        <Stack.Screen
-          name="agent-dashboard/index"
-          options={{ headerShown: false, presentation: 'card' }}
-        />
-        <Stack.Screen
-          name="saved-searches/index"
-          options={{ headerShown: false, presentation: 'card' }}
-        />
-        <Stack.Screen
-          name="agent/[id]"
-          options={{ headerShown: false, presentation: 'card' }}
-        />
-      </Stack>
+      <WebColumn>
+        <Stack>
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen
+            name="property/[id]"
+            options={{ headerShown: false, presentation: 'card' }}
+          />
+          <Stack.Screen
+            name="listing/create"
+            options={{ headerShown: false, presentation: 'card' }}
+          />
+          <Stack.Screen
+            name="listing/new"
+            options={{ headerShown: false, presentation: 'card' }}
+          />
+          <Stack.Screen
+            name="listing/[id]/analytics"
+            options={{ headerShown: false, presentation: 'card' }}
+          />
+          <Stack.Screen
+            name="listing/[id]/edit"
+            options={{ headerShown: false, presentation: 'card' }}
+          />
+          <Stack.Screen
+            name="favorites/index"
+            options={{ headerShown: false, presentation: 'card' }}
+          />
+          <Stack.Screen
+            name="messages/index"
+            options={{ headerShown: false, presentation: 'card' }}
+          />
+          <Stack.Screen
+            name="messages/[id]"
+            options={{ headerShown: false, presentation: 'card' }}
+          />
+          <Stack.Screen
+            name="viewings/index"
+            options={{ headerShown: false, presentation: 'card' }}
+          />
+          <Stack.Screen
+            name="my-listings/index"
+            options={{ headerShown: false, presentation: 'card' }}
+          />
+          <Stack.Screen
+            name="agent-dashboard/index"
+            options={{ headerShown: false, presentation: 'card' }}
+          />
+          <Stack.Screen
+            name="saved-searches/index"
+            options={{ headerShown: false, presentation: 'card' }}
+          />
+          <Stack.Screen
+            name="agent/[id]"
+            options={{ headerShown: false, presentation: 'card' }}
+          />
+        </Stack>
+      </WebColumn>
       <StatusBar style={theme === 'dark' ? 'light' : 'dark'} />
     </NavigationThemeProvider>
   );
@@ -224,3 +251,8 @@ export default function RootLayout() {
     </GestureHandlerRootView>
   );
 }
+
+const styles = StyleSheet.create({
+  webPage: { flex: 1 },
+  webColumn: { flex: 1, width: '100%', maxWidth: WEB_MAX_WIDTH, alignSelf: 'center', overflow: 'hidden' },
+});

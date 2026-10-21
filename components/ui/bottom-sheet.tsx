@@ -18,6 +18,7 @@ import Animated, {
 
 import { Radii, Shadows, type AtticoPalette } from '@/constants/theme';
 import { useTheme } from '@/contexts/theme-context';
+import { webColumn } from '@/constants/web-frame';
 
 /**
  * Reusable bottom sheet (§17) — backdrop, sliding card, drag handle.
@@ -92,7 +93,7 @@ export function BottomSheet({
           onPress={onClose}
           accessibilityLabel={t('common.close')}
         />
-        <Animated.View style={[styles.sheet, sheetStyle]}>
+        <Animated.View style={[styles.sheet, webColumn, sheetStyle]}>
           <GestureDetector gesture={pan}>
             <View style={styles.gripZone}>
               <View style={styles.grip} />

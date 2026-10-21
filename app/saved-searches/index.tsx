@@ -18,6 +18,7 @@ import { supabase } from '@/lib/supabase';
 import { formatDate, formatPrice } from '@/lib/format';
 import { PropertyFilters } from '@/data/types';
 import { countMatches, markSeen, newMatchCount, setEmailAlerts } from '@/src/features/saved-searches/lib/matches';
+import { webColumn } from '@/constants/web-frame';
 
 // Email alerts are offered only once sending is configured (docs/LAUNCH_TASKS.md F13).
 const EMAIL_ALERTS = process.env.EXPO_PUBLIC_EMAIL_ALERTS === 'true';
@@ -409,7 +410,7 @@ export default function SavedSearchesScreen() {
 
       <Modal visible={formOpen} transparent animationType="slide" onRequestClose={() => setFormOpen(false)}>
         <View style={styles.modalBackdrop}>
-          <View style={styles.modalSheet}>
+          <View style={[styles.modalSheet, webColumn]}>
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>
                 {tab === 'searches' ? t('saved.newSearch') : t('saved.newWanted')}

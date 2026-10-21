@@ -26,6 +26,7 @@ import {
   type ReportReason,
   type ReportResult,
 } from '@/src/features/safety/lib/safety';
+import { webColumn } from '@/constants/web-frame';
 
 /**
  * Report a listing (propertyId) or a person (userId) — the phone twin of
@@ -74,7 +75,7 @@ export function ReportSheet({
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         style={styles.sheetWrap}
         pointerEvents="box-none">
-        <SafeAreaView edges={['bottom']} style={styles.sheet}>
+        <SafeAreaView edges={['bottom']} style={[styles.sheet, webColumn]}>
           <View style={styles.grip} />
           <View style={styles.header}>
             <Text style={styles.title} accessibilityRole="header">

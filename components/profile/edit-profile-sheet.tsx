@@ -30,6 +30,7 @@ import {
   type ProfileError,
   type ProfileFields,
 } from '@/src/features/auth/lib/profileForm';
+import { webColumn } from '@/constants/web-frame';
 
 type FormError = ProfileError | 'failed' | null;
 type PhotoError = 'photoType' | 'photoSize' | 'photoFailed' | 'photoPermission' | null;
@@ -152,7 +153,7 @@ export function EditProfileSheet({
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         style={styles.sheetWrap}
         pointerEvents="box-none">
-        <SafeAreaView edges={['bottom']} style={styles.sheet}>
+        <SafeAreaView edges={['bottom']} style={[styles.sheet, webColumn]}>
           <View style={styles.grip} />
           <View style={styles.header}>
             <Text style={styles.title} accessibilityRole="header">
