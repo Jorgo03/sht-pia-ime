@@ -15,6 +15,8 @@ import { groupPlans, perMonth, planName } from '../lib/plans'
 // provider's verified callback activates it, server-side.
 const CHECKOUT_ENABLED = import.meta.env.VITE_CHECKOUT_ENABLED === 'true'
 
+const fetchPlans = () => supabase.from('plans').select('*').order('sort_order', { ascending: true })
+
 export default function Pricing() {
   const { t, i18n } = useTranslation()
   const { user } = useAuth()
@@ -25,16 +27,24 @@ export default function Pricing() {
   const [starting, setStarting] = useState(false)
   const [startError, setStartError] = useState(false)
 
-  const load = useCallback(() => {
-    setState('loading')
-    supabase.from('plans').select('*').order('sort_order', { ascending: true }).then(({ data, error }) => {
-      if (error) { setState('error'); return }
-      setCards(groupPlans(data))
-      setState('ready')
-    })
+  // State is only set when the request settles, never synchronously inside
+  // the effect; the retry button resets to 'loading' itself.
+  const apply = useCallback(({ data, error }) => {
+    if (error) { setState('error'); return }
+    setCards(groupPlans(data))
+    setState('ready')
   }, [])
 
-  useEffect(() => { load() }, [load])
+  useEffect(() => {
+    let active = true
+    fetchPlans().then((res) => { if (active) apply(res) })
+    return () => { active = false }
+  }, [apply])
+
+  const retry = () => {
+    setState('loading')
+    fetchPlans().then(apply)
+  }
 
   const checkout = async (optionId) => {
     if (!CHECKOUT_ENABLED || starting) return
@@ -64,7 +74,7 @@ export default function Pricing() {
       ) : state === 'error' ? (
         <div className="placeholder-card mt-6" role="alert">
           <div>{t('pricing.loadFailed')}</div>
-          <button className="pill-btn" onClick={load}><RotateCcw size={14} /> {t('common.retry')}</button>
+          <button className="pill-btn" onClick={retry}><RotateCcw size={14} /> {t('common.retry')}</button>
         </div>
       ) : cards.length === 0 ? (
         <div className="placeholder-card mt-6">
