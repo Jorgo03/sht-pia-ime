@@ -262,7 +262,14 @@
       "nameRequired": "Escribe tu nombre.",
       "tooLong": "Uno de los campos es demasiado largo.",
       "phoneInvalid": "Eso no parece un número de teléfono. Usa dígitos, espacios y un + inicial.",
-      "failed": "No se guardaron los cambios. Inténtalo de nuevo."
+      "failed": "No se guardaron los cambios. Inténtalo de nuevo.",
+      "photo": "Foto de perfil",
+      "changePhoto": "Cambiar foto",
+      "removePhoto": "Quitar foto",
+      "photoType": "Elige una foto JPEG, PNG o WebP.",
+      "photoSize": "La foto es demasiado grande. Elige una de menos de 15 MB.",
+      "photoFailed": "No se guardó la foto. Inténtalo de nuevo.",
+      "photoPermission": "Permite el acceso a las fotos en los ajustes del teléfono para elegir una foto."
     }
   },
   "errors": {

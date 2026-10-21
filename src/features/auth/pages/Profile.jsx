@@ -6,6 +6,7 @@ import { useAuth } from '../AuthContext'
 import { useProfileStats } from '../hooks/useProfileStats'
 import DuskHero from '../components/DuskHero'
 import EditProfileSheet from '../components/EditProfileSheet'
+import Avatar from '../../../shared/Avatar'
 import { EMAIL_RE, friendlyError } from '../../../lib/authErrors'
 import { supabase } from '../../../lib/supabase'
 import LegalLinks from '../../../shared/LegalLinks'
@@ -395,7 +396,9 @@ export default function Profile() {
     return (
       <div className="page profile-page">
         <div className="profile-card">
-          <div className="profile-avatar">{initial}</div>
+          {profile?.avatar_url
+            ? <Avatar src={profile.avatar_url} name={displayName} size={60} className="mb-2" />
+            : <div className="profile-avatar">{initial}</div>}
           <div className="profile-name">{displayName}</div>
           <div className="profile-role-badge">{isAgent ? t('auth.agent') : t('auth.user')}</div>
           <div className="profile-email-row">{user.email}</div>

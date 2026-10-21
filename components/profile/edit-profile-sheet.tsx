@@ -1,4 +1,6 @@
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { Image } from 'expo-image';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -19,6 +21,8 @@ import { KEYBOARD_DONE_SHEET_ID, KeyboardDoneBar } from '@/components/ui/keyboar
 import { Fonts, Radii, Spacing, type AtticoPalette } from '@/constants/theme';
 import { useTheme } from '@/contexts/theme-context';
 import { supabase } from '@/lib/supabase';
+import { pickAvatar } from '@/lib/upload';
+import { removeAvatar, saveAvatar } from '@/src/features/auth/lib/avatar';
 import {
   PROFILE_LIMITS,
   profilePatch,
@@ -28,10 +32,12 @@ import {
 } from '@/src/features/auth/lib/profileForm';
 
 type FormError = ProfileError | 'failed' | null;
+type PhotoError = 'photoType' | 'photoSize' | 'photoFailed' | 'photoPermission' | null;
 
 /**
- * Edit your name, phone and (agents) agency — the phone twin of web's
- * EditProfileSheet (docs/LAUNCH_TASKS.md L12). Only changed fields are sent.
+ * Edit your photo, name, phone and (agents) agency — the phone twin of web's
+ * EditProfileSheet (docs/LAUNCH_TASKS.md L12/F12). Only changed fields are
+ * sent; the photo saves on its own as soon as it is picked or removed.
  */
 export function EditProfileSheet({
   visible,
@@ -43,7 +49,7 @@ export function EditProfileSheet({
 }: {
   visible: boolean;
   userId: string;
-  profile: ProfileFields | null;
+  profile: (ProfileFields & { avatar_url?: string | null }) | null;
   isAgent: boolean;
   onSaved: () => Promise<void>;
   onClose: () => void;
@@ -58,6 +64,55 @@ export function EditProfileSheet({
   const [agency, setAgency] = useState(profile?.agency_name ?? '');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<FormError>(null);
+  const [photoUrl, setPhotoUrl] = useState<string | null>(profile?.avatar_url ?? null);
+  const [photoBusy, setPhotoBusy] = useState(false);
+  const [photoError, setPhotoError] = useState<PhotoError>(null);
+
+  const changePhoto = async () => {
+    if (photoBusy) return;
+    setPhotoError(null);
+    const picked = await pickAvatar();
+    if ('error' in picked) {
+      if (picked.error === 'canceled') return;
+      setPhotoError(
+        picked.error === 'type' ? 'photoType' : picked.error === 'permission' ? 'photoPermission' : 'photoFailed',
+      );
+      return;
+    }
+    setPhotoBusy(true);
+    const res = await saveAvatar(supabase, userId, picked.blob, photoUrl);
+    setPhotoBusy(false);
+    if (res.status !== 'saved') {
+      setPhotoError(res.status === 'tooLarge' ? 'photoSize' : 'photoFailed');
+      return;
+    }
+    setPhotoUrl(res.url);
+    await onSaved();
+  };
+
+  const clearPhoto = async () => {
+    if (photoBusy) return;
+    setPhotoBusy(true);
+    setPhotoError(null);
+    const result = await removeAvatar(supabase, userId, photoUrl);
+    setPhotoBusy(false);
+    if (result !== 'saved') {
+      setPhotoError('photoFailed');
+      return;
+    }
+    setPhotoUrl(null);
+    await onSaved();
+  };
+
+  const photoErrorText = photoError
+    ? {
+        photoType: t('profile.edit.photoType'),
+        photoSize: t('profile.edit.photoSize'),
+        photoFailed: t('profile.edit.photoFailed'),
+        photoPermission: t('profile.edit.photoPermission'),
+      }[photoError]
+    : null;
+  const initial = (fullName.trim()[0] ?? '?').toUpperCase();
 
   const submit = async () => {
     if (saving) return;
@@ -113,6 +168,35 @@ export function EditProfileSheet({
           </View>
 
           <ScrollView contentContainerStyle={styles.body} keyboardShouldPersistTaps="handled">
+            <View style={styles.photoRow}>
+              {photoUrl ? (
+                <Image source={{ uri: photoUrl }} style={styles.photo} contentFit="cover" accessibilityLabel={t('profile.edit.photo')} />
+              ) : (
+                <LinearGradient colors={[colors.accent, colors.accentEnd]} style={styles.photo}>
+                  <Text style={styles.photoInitial}>{initial}</Text>
+                </LinearGradient>
+              )}
+              <View style={styles.photoActions}>
+                <Pressable
+                  onPress={changePhoto}
+                  disabled={photoBusy}
+                  accessibilityRole="button"
+                  accessibilityState={{ disabled: photoBusy, busy: photoBusy }}
+                  style={styles.photoBtn}>
+                  <Text style={styles.photoBtnText}>{photoBusy ? t('common.loading') : t('profile.edit.changePhoto')}</Text>
+                </Pressable>
+                {photoUrl ? (
+                  <Pressable onPress={clearPhoto} disabled={photoBusy} accessibilityRole="button" style={styles.photoBtn}>
+                    <Text style={styles.photoBtnText}>{t('profile.edit.removePhoto')}</Text>
+                  </Pressable>
+                ) : null}
+              </View>
+            </View>
+            {photoErrorText ? (
+              <Text style={styles.error} accessibilityLiveRegion="polite">
+                {photoErrorText}
+              </Text>
+            ) : null}
             <Text style={styles.label}>{t('auth.fullName')}</Text>
             <TextInput
               inputAccessoryViewID={KEYBOARD_DONE_SHEET_ID}
@@ -227,5 +311,19 @@ const createStyles = (colors: AtticoPalette) =>
       color: colors.textPrimary,
     },
     hint: { fontFamily: Fonts.sans, fontSize: 12, color: colors.textSecondary },
+    photoRow: { flexDirection: 'row', alignItems: 'center', gap: Spacing.md, marginBottom: Spacing.sm },
+    photo: { width: 72, height: 72, borderRadius: 36, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
+    photoInitial: { fontFamily: Fonts.serifSemiBold, fontSize: 28, color: '#fff' },
+    photoActions: { flex: 1, gap: Spacing.sm },
+    photoBtn: {
+      minHeight: 44,
+      justifyContent: 'center',
+      paddingHorizontal: Spacing.md,
+      borderRadius: Radii.md,
+      borderWidth: 1,
+      borderColor: colors.border,
+      alignSelf: 'flex-start',
+    },
+    photoBtnText: { fontFamily: Fonts.sansSemiBold, fontSize: 14, color: colors.textPrimary },
     error: { fontFamily: Fonts.sans, fontSize: 13, color: colors.error },
   });

@@ -298,7 +298,14 @@
       "nameRequired": "Shkruaj emrin.",
       "tooLong": "Një nga fushat është shumë e gjatë.",
       "phoneInvalid": "Ky nuk duket si numër telefoni. Përdor shifra, hapësira dhe + në fillim.",
-      "failed": "Ndryshimet nuk u ruajtën. Provo përsëri."
+      "failed": "Ndryshimet nuk u ruajtën. Provo përsëri.",
+      "photo": "Foto e profilit",
+      "changePhoto": "Ndrysho foton",
+      "removePhoto": "Hiq foton",
+      "photoType": "Zgjidh një foto JPEG, PNG ose WebP.",
+      "photoSize": "Kjo foto është shumë e madhe. Zgjidh një më të vogël se 15 MB.",
+      "photoFailed": "Fotoja nuk u ruajt. Provo përsëri.",
+      "photoPermission": "Lejo aksesin te fotot te cilësimet e telefonit për të zgjedhur një foto."
     }
   },
   "addSheet": {

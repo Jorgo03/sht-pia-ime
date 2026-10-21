@@ -254,7 +254,14 @@
       "nameRequired": "Gib deinen Namen ein.",
       "tooLong": "Eines der Felder ist zu lang.",
       "phoneInvalid": "Das sieht nicht wie eine Telefonnummer aus. Nutze Ziffern, Leerzeichen und ein + am Anfang.",
-      "failed": "Deine Änderungen wurden nicht gespeichert. Versuche es noch einmal."
+      "failed": "Deine Änderungen wurden nicht gespeichert. Versuche es noch einmal.",
+      "photo": "Profilfoto",
+      "changePhoto": "Foto ändern",
+      "removePhoto": "Foto entfernen",
+      "photoType": "Wähle ein JPEG-, PNG- oder WebP-Foto.",
+      "photoSize": "Das Foto ist zu groß. Wähle eines unter 15 MB.",
+      "photoFailed": "Das Foto wurde nicht gespeichert. Versuche es noch einmal.",
+      "photoPermission": "Erlaube den Zugriff auf Fotos in den Einstellungen deines Telefons, um ein Foto auszuwählen."
     }
   },
   "errors": {

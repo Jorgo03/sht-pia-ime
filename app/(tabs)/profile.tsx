@@ -1,5 +1,6 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Provider } from '@supabase/supabase-js';
 
@@ -493,9 +494,13 @@ export default function ProfileScreen() {
 
             {/* Matches web's .profile-card exactly. */}
             <View style={styles.profileCard}>
-              <LinearGradient colors={[colors.accent, colors.accentEnd]} style={styles.avatar}>
-                <Text style={styles.avatarText}>{initial}</Text>
-              </LinearGradient>
+              {typeof profile?.avatar_url === 'string' && profile.avatar_url ? (
+                <Image source={{ uri: profile.avatar_url }} style={styles.avatar} contentFit="cover" accessibilityLabel={displayName} />
+              ) : (
+                <LinearGradient colors={[colors.accent, colors.accentEnd]} style={styles.avatar}>
+                  <Text style={styles.avatarText}>{initial}</Text>
+                </LinearGradient>
+              )}
               <Text style={styles.profileName}>{displayName}</Text>
               <View style={styles.roleBadge}>
                 <Text style={styles.roleBadgeText}>{isAgentAccount ? t('auth.agent') : t('auth.user')}</Text>

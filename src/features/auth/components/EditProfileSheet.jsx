@@ -2,11 +2,15 @@ import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { X } from 'lucide-react'
 import { supabase } from '../../../lib/supabase'
+import Avatar from '../../../shared/Avatar'
+import { AVATAR_SOURCE_TYPES, avatarSourceError, removeAvatar, saveAvatar } from '../lib/avatar'
 import { PROFILE_LIMITS, profilePatch, saveProfile } from '../lib/profileForm'
+import { resizeToSquareJpeg } from '../lib/resizeAvatar'
 
 /**
- * Edit your name, phone and (agents) agency — docs/LAUNCH_TASKS.md L12.
- * Same bottom sheet as ReportSheet. Only fields that changed are sent.
+ * Edit your photo, name, phone and (agents) agency — docs/LAUNCH_TASKS.md
+ * L12/F12. Same bottom sheet as ReportSheet. Only fields that changed are
+ * sent; the photo saves on its own as soon as it is picked or removed.
  */
 export default function EditProfileSheet({ userId, profile, isAgent, onSaved, onClose }) {
   const { t } = useTranslation()
@@ -19,6 +23,11 @@ export default function EditProfileSheet({ userId, profile, isAgent, onSaved, on
   // 'nameRequired' | 'tooLong' | 'phoneInvalid' | 'failed' | ''
   const [error, setError] = useState('')
   const firstField = useRef(null)
+  const fileInput = useRef(null)
+  const [photoUrl, setPhotoUrl] = useState(profile?.avatar_url ?? null)
+  const [photoBusy, setPhotoBusy] = useState(false)
+  // 'photoType' | 'photoSize' | 'photoFailed' | ''
+  const [photoError, setPhotoError] = useState('')
 
   useEffect(() => {
     firstField.current?.focus()
@@ -42,6 +51,39 @@ export default function EditProfileSheet({ userId, profile, isAgent, onSaved, on
     onClose()
   }
 
+  const pickPhoto = async (e) => {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file || photoBusy) return
+    const invalid = avatarSourceError(file)
+    if (invalid) { setPhotoError(invalid === 'type' ? 'photoType' : 'photoSize'); return }
+    setPhotoBusy(true)
+    setPhotoError('')
+    const blob = await resizeToSquareJpeg(file)
+    const res = blob ? await saveAvatar(supabase, userId, blob, photoUrl) : { status: 'failed' }
+    setPhotoBusy(false)
+    if (res.status !== 'saved') { setPhotoError(res.status === 'tooLarge' ? 'photoSize' : 'photoFailed'); return }
+    setPhotoUrl(res.url)
+    await onSaved()
+  }
+
+  const clearPhoto = async () => {
+    if (photoBusy) return
+    setPhotoBusy(true)
+    setPhotoError('')
+    const result = await removeAvatar(supabase, userId, photoUrl)
+    setPhotoBusy(false)
+    if (result !== 'saved') { setPhotoError('photoFailed'); return }
+    setPhotoUrl(null)
+    await onSaved()
+  }
+
+  const photoErrorText = {
+    photoType: t('profile.edit.photoType'),
+    photoSize: t('profile.edit.photoSize'),
+    photoFailed: t('profile.edit.photoFailed'),
+  }[photoError]
+
   const errorText = {
     nameRequired: t('profile.edit.nameRequired'),
     tooLong: t('profile.edit.tooLong'),
@@ -63,6 +105,32 @@ export default function EditProfileSheet({ userId, profile, isAgent, onSaved, on
         </div>
 
         <form className="addsheet-miniform" onSubmit={submit} noValidate>
+          <div className="flex items-center gap-4">
+            <Avatar src={photoUrl} name={form.full_name} size={72} />
+            <div className="flex flex-col items-start gap-1.5">
+              <span className="text-[13px] font-semibold text-fho-text">{t('profile.edit.photo')}</span>
+              <div className="flex flex-wrap gap-2">
+                <button type="button" className="ghost-btn" disabled={photoBusy} onClick={() => fileInput.current?.click()}>
+                  {photoBusy ? t('common.loading') : t('profile.edit.changePhoto')}
+                </button>
+                {photoUrl && (
+                  <button type="button" className="ghost-btn" disabled={photoBusy} onClick={clearPhoto}>
+                    {t('profile.edit.removePhoto')}
+                  </button>
+                )}
+              </div>
+              <input
+                ref={fileInput}
+                type="file"
+                accept={AVATAR_SOURCE_TYPES.join(',')}
+                className="sr-only"
+                tabIndex={-1}
+                aria-label={t('profile.edit.changePhoto')}
+                onChange={pickPhoto}
+              />
+            </div>
+          </div>
+          {photoErrorText && <div className="nl-error" role="alert">{photoErrorText}</div>}
           <label className={labelClass}>
             {t('auth.fullName')}
             <input

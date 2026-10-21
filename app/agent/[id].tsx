@@ -1,4 +1,5 @@
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, FlatList, StyleSheet, Text, View } from 'react-native';
@@ -19,6 +20,7 @@ interface AgentProfile {
   full_name: string | null;
   phone: string | null;
   agency_name: string | null;
+  avatar_url: string | null;
 }
 
 export default function AgentProfileScreen() {
@@ -46,7 +48,7 @@ export default function AgentProfileScreen() {
       // maybeSingle, not single: a removed agent or an id that never existed is
       // a normal "not found", not a failure. single() rejects with PGRST116
       // there, which left `agent` null and rendered a bare word, "Error".
-      supabase.from('profiles').select('id, full_name, phone, agency_name').eq('id', id).maybeSingle(),
+      supabase.from('profiles').select('id, full_name, phone, agency_name, avatar_url').eq('id', id).maybeSingle(),
       supabase.from('properties').select('*').eq('agent_id', id).eq('status', 'active').order('created_at', { ascending: false }),
     ]).then(([profileRes, propsRes]) => {
       if (!active) return;
@@ -104,9 +106,18 @@ export default function AgentProfileScreen() {
             showsVerticalScrollIndicator={false}
             ListHeaderComponent={
               <View style={styles.agentHead}>
-                <View style={styles.avatar}>
-                  <Text style={styles.avatarText}>{initials}</Text>
-                </View>
+                {agent.avatar_url ? (
+                  <Image
+                    source={{ uri: agent.avatar_url }}
+                    style={styles.avatar}
+                    contentFit="cover"
+                    accessibilityLabel={agent.full_name ?? undefined}
+                  />
+                ) : (
+                  <View style={styles.avatar}>
+                    <Text style={styles.avatarText}>{initials}</Text>
+                  </View>
+                )}
                 <View style={styles.agentInfo}>
                   <Text style={styles.agentName}>{agent.full_name}</Text>
                   {agent.agency_name ? (

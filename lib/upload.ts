@@ -2,6 +2,7 @@ import * as ImageManipulatorModule from 'expo-image-manipulator';
 import * as ImagePicker from 'expo-image-picker';
 
 import { supabase } from '@/lib/supabase';
+import { AVATAR_SIZE_PX, AVATAR_SOURCE_TYPES } from '@/src/features/auth/lib/avatar';
 
 const { ImageManipulator, SaveFormat } = ImageManipulatorModule;
 
@@ -111,11 +112,12 @@ export async function uploadPropertyImages(
     const response = await fetch(compressed.uri);
     const blob = await response.blob();
 
-    const ext = img.fileName.split('.').pop()?.toLowerCase() || 'jpg';
-    const path = `${userId}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+    // compressImage always re-encodes to JPEG, so name and label the file as
+    // one; the picked file's own extension and type no longer describe it.
+    const path = `${userId}/${Date.now()}-${Math.random().toString(36).slice(2)}.jpg`;
 
     const { error } = await supabase.storage.from(BUCKET).upload(path, blob, {
-      contentType: img.mimeType,
+      contentType: 'image/jpeg',
     });
 
     if (error) {
@@ -219,4 +221,36 @@ export async function uploadPropertyVideo(
 
   const { data } = supabase.storage.from(BUCKET).getPublicUrl(path);
   return { url: data.publicUrl, path };
+}
+
+export type AvatarPick = { blob: Blob } | { error: 'canceled' | 'permission' | 'type' | 'failed' };
+
+/**
+ * Pick a profile photo, crop it square in the system picker, and re-encode it
+ * as a small JPEG (docs/LAUNCH_TASKS.md F12). Re-encoding drops EXIF,
+ * including GPS, before anything leaves the phone. The upload itself is
+ * saveAvatar() in src/features/auth/lib/avatar.js, shared with the website.
+ */
+export async function pickAvatar(): Promise<AvatarPick> {
+  const perm = await ImagePicker.requestMediaLibraryPermissionsAsync();
+  if (!perm.granted) return { error: 'permission' };
+  const result = await ImagePicker.launchImageLibraryAsync({
+    mediaTypes: ['images'],
+    allowsEditing: true,
+    aspect: [1, 1],
+    quality: 1,
+  });
+  if (result.canceled || !result.assets[0]) return { error: 'canceled' };
+  const asset = result.assets[0];
+  if (asset.mimeType && !AVATAR_SOURCE_TYPES.includes(asset.mimeType)) return { error: 'type' };
+  try {
+    const context = ImageManipulator.manipulate(asset.uri);
+    context.resize({ width: AVATAR_SIZE_PX, height: AVATAR_SIZE_PX });
+    const rendered = await context.renderAsync();
+    const saved = await rendered.saveAsync({ compress: 0.85, format: SaveFormat.JPEG });
+    const blob = await (await fetch(saved.uri)).blob();
+    return { blob };
+  } catch {
+    return { error: 'failed' };
+  }
 }

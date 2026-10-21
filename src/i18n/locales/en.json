@@ -350,7 +350,14 @@
       "nameRequired": "Enter your name.",
       "tooLong": "One of the fields is too long.",
       "phoneInvalid": "That doesn't look like a phone number. Use digits, spaces and a leading +.",
-      "failed": "Your changes weren't saved. Try again."
+      "failed": "Your changes weren't saved. Try again.",
+      "photo": "Profile photo",
+      "changePhoto": "Change photo",
+      "removePhoto": "Remove photo",
+      "photoType": "Choose a JPEG, PNG or WebP photo.",
+      "photoSize": "That photo is too large. Choose one under 15 MB.",
+      "photoFailed": "The photo wasn't saved. Try again.",
+      "photoPermission": "Allow photo access in your phone's settings to choose a photo."
     }
   },
   "account": {

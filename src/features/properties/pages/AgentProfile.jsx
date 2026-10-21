@@ -6,6 +6,7 @@ import { supabase } from '../../../lib/supabase'
 import PropertyCard from '../components/PropertyCard'
 import SkeletonCard from '../../../shared/SkeletonCard'
 import BackButton from '../../../shared/BackButton'
+import Avatar from '../../../shared/Avatar'
 
 export default function AgentProfile() {
   const { id } = useParams()
@@ -88,9 +89,13 @@ export default function AgentProfile() {
   return (
     <div className="page">
       <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 24 }}>
-        <div className="pd-agent-avatar" style={{ width: 64, height: 64, fontSize: 22 }}>
-          {initials}
-        </div>
+        {agent.avatar_url ? (
+          <Avatar src={agent.avatar_url} name={agent.full_name} size={64} />
+        ) : (
+          <div className="pd-agent-avatar" style={{ width: 64, height: 64, fontSize: 22 }}>
+            {initials}
+          </div>
+        )}
         <div>
           <h1 className="page-title" style={{ marginBottom: 2 }}>{agent.full_name}</h1>
           {agent.agency_name && (

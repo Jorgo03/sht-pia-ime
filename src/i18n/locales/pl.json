@@ -270,7 +270,14 @@
       "nameRequired": "Wpisz swoje imię i nazwisko.",
       "tooLong": "Jedno z pól jest za długie.",
       "phoneInvalid": "To nie wygląda na numer telefonu. Użyj cyfr, spacji i + na początku.",
-      "failed": "Zmiany nie zostały zapisane. Spróbuj ponownie."
+      "failed": "Zmiany nie zostały zapisane. Spróbuj ponownie.",
+      "photo": "Zdjęcie profilowe",
+      "changePhoto": "Zmień zdjęcie",
+      "removePhoto": "Usuń zdjęcie",
+      "photoType": "Wybierz zdjęcie JPEG, PNG lub WebP.",
+      "photoSize": "To zdjęcie jest za duże. Wybierz mniejsze niż 15 MB.",
+      "photoFailed": "Zdjęcie nie zostało zapisane. Spróbuj ponownie.",
+      "photoPermission": "Zezwól na dostęp do zdjęć w ustawieniach telefonu, aby wybrać zdjęcie."
     }
   },
   "errors": {
