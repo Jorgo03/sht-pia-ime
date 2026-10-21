@@ -23,10 +23,10 @@ Shtëpia.ime ("My Home") is a multilingual real estate marketplace built by **Fu
 
 One `package.json`, two independently-shipping frontends against the **same** Supabase project (`xzzzhlwmzotibrxdqmcm`) — no mock data, no second backend, no forked schema:
 
-- **Web** (deployed to Vercel) — Vite + React 19 + React Router DOM v7, feature-first under `src/`.
+- **Web** (deployed to Vercel) — Vite + React 19 + React Router DOM v7, feature-first under `src/`. Still the production website, but **being replaced** by the Expo app's own web build (below); it gets bug fixes only, no new design work.
 - **Mobile** (Expo, targeting an installed dev-client on Android/iOS, not a legacy prototype) — Expo SDK 57, React Native 0.86.2, `expo-router` (file-based, typed routes) at the repo root: `app/`, `components/`, `contexts/`, `hooks/`, `constants/`, `data/`, `lib/format.ts` + `lib/supabase.ts`.
 
-Web is the design source of truth; mobile is expected to reach and hold visual/functional parity with it, adapted only where touch/native platform mechanics require it (see `CLAUDE_CODE_BRIEF.md` if present for the full parity spec). i18n locale files are **shared** — `src/i18n/locales/*.json` is imported directly by both `src/i18n/index.js` (web) and `i18n/index.ts` (mobile); never fork them per-platform.
+**The Expo app is the design and product source of truth** (owner decision 2026-10-21, DECISIONS.md W1; this reverses the earlier "web leads" rule). The website is moving to the Expo app's own web build (`npx expo export -p web`, deployed by the separate Vercel project in `deploy/expo-web/`), so web and app are identical by construction. Stage 1 (now): that build runs as a preview next to the Vite site. Stage 2 (only after the owner approves): the production domain moves to it and `src/` is retired. Until then, never change the production domain or delete `src/`. Web-only pages live in the Expo app as `.web.tsx` routes with a native file that redirects home (`app/pricing`, `app/moderation`, `app/auth/callback`; Pricing must never ship in the store apps, Apple 3.1.1). On the web the app is drawn in a 480px column (`constants/web-frame.ts`, `hooks/use-app-dimensions.ts`); maps on the web are Leaflet (`components/map/leaflet/`). i18n locale files are **shared** — `src/i18n/locales/*.json` is imported directly by both `src/i18n/index.js` (web) and `i18n/index.ts` (mobile); never fork them per-platform.
 
 Each app has its own Supabase client singleton (`src/lib/supabase.js` for web, `lib/supabase.ts` for mobile) — that's correct, not a violation of the "one client" rule below, which is per-app (never a second `createClient()` call *within* either app).
 
@@ -34,7 +34,8 @@ Each app has its own Supabase client singleton (`src/lib/supabase.js` for web, `
 
 Web:
 - `npm run dev` — Vite dev server, http://localhost:5173
-- `npm run build` — production build to `dist/`
+- `npm run build` — production build to `dist/` (the Vite site, still production)
+- `npm run build:web-expo` then `node scripts/expo-web-postbuild.mjs <dir>` — the website built from the Expo app (`expo export -p web`), plus per-listing SEO pages, sitemap and robots; see `deploy/expo-web/README.md`
 - `npm test` — Node's built-in test runner over `tests/**/*.test.mjs`; run a single file with `npm test -- tests/aiSchemas.test.mjs`
 - `npm run test:e2e` — Playwright end-to-end suite (`e2e/`, `playwright.config.ts`), phone + desktop Chromium. Builds the web app to `dist-e2e/` against a fake Supabase host; `e2e/support/backend.ts` answers every backend call in the browser, so it runs offline and never touches production. Every test fails on a page error, console error or 5xx; `e2e/a11y.spec.ts` runs axe-core, with open accessibility bugs listed by rule in `KNOWN` (remove one when it is fixed). First run on a machine: `npm run test:e2e:install`. `PW_CHROMIUM_PATH=<chrome>` reuses an existing Chromium instead
 
@@ -69,7 +70,7 @@ Shared:
 | Layer | Web | Mobile |
 |---|---|---|
 | Frontend | Vite + React 19 + React Router DOM v7 | Expo SDK 57 + React Native 0.86.2 + expo-router |
-| Styling | Tailwind CSS | `StyleSheet` + `constants/theme.ts` tokens, hand-ported 1:1 from web's `--fho-*` CSS custom properties — update both when a token changes |
+| Styling | Tailwind CSS | `StyleSheet` + `constants/theme.ts` tokens (the source of truth now; `--fho-*` in the Vite site mirror them) — update both while both ship |
 | Typography | `@import` Newsreader/Manrope/JetBrains Mono in `src/styles/theme.css` | Same three families via `@expo-google-fonts/*`, loaded in `app/_layout.tsx`'s `useFonts()` and gated behind the splash screen; family-name strings live in `constants/theme.ts`'s `Fonts` export. These are static per-weight font files, not variable fonts — pick the matching weight constant (`Fonts.sansBold`, etc.) rather than layering a `fontWeight` override on top |
 | Backend | Supabase — Postgres, Auth, Storage, Edge Functions (shared by both apps) | same |
 | i18n | i18next, JSONB per-listing translations, locale files shared with mobile | i18next, device-language detection, same shared locale files |

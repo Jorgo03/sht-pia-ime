@@ -5,6 +5,20 @@ AUDIT.md was fixed; see the final report for the change log.
 
 ---
 
+## ═══ ONE CODEBASE — 2026-10-21 ═══
+
+### W1. The Expo app is the source of truth; the website becomes its web build (DECIDED by owner)
+
+Approved "two-stage Expo web" after the parity audit (all 17 shared screens
+differed). Stage 1: `deploy/expo-web` is a separate Vercel preview project of
+`expo export -p web`, with the website-only pages ported (privacy, terms,
+pricing, moderation, OAuth callback), page titles, pre-rendered listing pages
+and a 480px column. Stage 2, only on the owner's approval: move the
+production domain, then retire `src/`. Accepted trade-off: the first page
+load is heavier than the Vite site (one ~0.9 MB compressed script versus
+~0.3 MB), and the 164 Vite e2e tests must be rewritten for the new build
+before the switch.
+
 ## ═══ MONETISATION — 2026-10-14 ═══
 
 ### M1. Paid products: listing promotion AND agency monthly plans (DECIDED by owner)
