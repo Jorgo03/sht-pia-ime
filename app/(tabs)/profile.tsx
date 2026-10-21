@@ -29,6 +29,7 @@ import { useFavorites } from '@/contexts/favorites-context';
 import { useTheme } from '@/contexts/theme-context';
 import { useTabBarClearance } from '@/components/liquid-tab-bar';
 import { AppHeader } from '@/components/ui/app-header';
+import { EditProfileSheet } from '@/components/profile/edit-profile-sheet';
 import { BottomSheet } from '@/components/ui/bottom-sheet';
 import { GhostBtn, PrimaryCTA } from '@/components/ui/buttons';
 import { DuskHero } from '@/components/ui/dusk-hero';
@@ -36,6 +37,7 @@ import { GoogleLogo } from '@/components/ui/google-logo';
 import { GradientBackground } from '@/components/ui/gradient-background';
 import { OtpInput, OTP_LENGTH } from '@/components/ui/otp-input';
 import { useProfileStats } from '@/hooks/use-profile-stats';
+import type { ProfileFields } from '@/src/features/auth/lib/profileForm';
 import { useUnreadMessages } from '@/hooks/use-unread-messages';
 
 type Role = 'buyer' | 'agent';
@@ -94,6 +96,7 @@ export default function ProfileScreen() {
     user,
     profile,
     isAgent: isAgentAccount,
+    refreshProfile,
     signIn,
     signUp,
     signOut,
@@ -149,6 +152,7 @@ export default function ProfileScreen() {
   const [cooldown, setCooldown] = useState(0);
   const [resetSending, setResetSending] = useState(false);
   const [signOutOpen, setSignOutOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
   // Local copies so TypeScript keeps the null-narrowing inside the onPress
   // closures below — narrowing of an imported binding does not survive one.
   // Account deletion is mandatory for store approval (Apple 5.1.1(v), Google
@@ -525,6 +529,15 @@ export default function ProfileScreen() {
             <View style={styles.menuList}>
               <TouchableOpacity
                 style={styles.menuRow}
+                onPress={() => setEditOpen(true)}
+                activeOpacity={0.7}>
+                <MaterialIcons name="edit" size={20} color={colors.textPrimary} />
+                <Text style={styles.menuRowText}>{t('profile.edit.title')}</Text>
+                <MaterialIcons name="chevron-right" size={18} color={colors.textSecondary} />
+              </TouchableOpacity>
+              <View style={styles.menuDivider} />
+              <TouchableOpacity
+                style={styles.menuRow}
                 onPress={() => router.push('/favorites' as Href)}
                 activeOpacity={0.7}>
                 <MaterialIcons name="favorite-border" size={20} color={colors.textPrimary} />
@@ -633,6 +646,17 @@ export default function ProfileScreen() {
             </View>
           </ScrollView>
         </SafeAreaView>
+
+        {editOpen && (
+          <EditProfileSheet
+            visible
+            userId={user.id}
+            profile={profile as ProfileFields | null}
+            isAgent={isAgentAccount}
+            onSaved={refreshProfile}
+            onClose={() => setEditOpen(false)}
+          />
+        )}
 
         <BottomSheet
           visible={signOutOpen}

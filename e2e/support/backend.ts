@@ -68,7 +68,14 @@ async function properties(route: Route, url: URL, store: Listing[], writes: Writ
   return json(route, 200, page, { 'content-range': `${range}/${rows.length}` });
 }
 
-async function profiles(route: Route, url: URL) {
+async function profiles(route: Route, url: URL, writes: Write[]) {
+  const method = route.request().method();
+  if (method !== 'GET' && method !== 'HEAD') {
+    let body: Record<string, unknown> = {};
+    try { body = route.request().postDataJSON() ?? {}; } catch { /* no body */ }
+    writes.push({ table: 'profiles', method, query: url.search, body });
+    return route.fulfill({ status: 204, headers: CORS, body: '' });
+  }
   const id = (url.searchParams.get('id') ?? '').replace(/^eq\./, '');
   const agent = LISTINGS.map((l) => l.agent).find((a) => a?.id === id);
   const row = agent ? { ...agent, role: 'agent' } : null;
@@ -144,7 +151,7 @@ export async function mockBackend(page: Page, { signedIn = false, writes = [] as
         return json(route, 200, method === 'DELETE' ? [] : { Key: url.pathname });
       }
       if (url.pathname.startsWith('/rest/v1/properties')) return properties(route, url, store, writes);
-      if (url.pathname.startsWith('/rest/v1/profiles')) return profiles(route, url);
+      if (url.pathname.startsWith('/rest/v1/profiles')) return profiles(route, url, writes);
       if (url.pathname.startsWith('/rest/v1/')) {
         const table = url.pathname.split('/')[3];
         if (method !== 'GET' && method !== 'HEAD') {

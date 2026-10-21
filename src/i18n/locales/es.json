@@ -253,7 +253,17 @@
     "statSaved": "Guardados",
     "statSearches": "Búsquedas",
     "statListings": "Anuncios",
-    "statViewings": "Visitas"
+    "statViewings": "Visitas",
+    "edit": {
+      "title": "Editar perfil",
+      "phone": "Número de teléfono",
+      "phoneHintAgent": "Aparece en tu página de agente para que te llamen o te escriban por WhatsApp. Cada anuncio conserva su propio número de contacto. Incluye el prefijo del país, p. ej. +355.",
+      "phoneHintClient": "Solo lo ven los agentes a los que escribes o con quienes reservas una visita.",
+      "nameRequired": "Escribe tu nombre.",
+      "tooLong": "Uno de los campos es demasiado largo.",
+      "phoneInvalid": "Eso no parece un número de teléfono. Usa dígitos, espacios y un + inicial.",
+      "failed": "No se guardaron los cambios. Inténtalo de nuevo."
+    }
   },
   "errors": {
     "generic": "Algo salió mal. Inténtalo de nuevo.",

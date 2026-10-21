@@ -341,7 +341,17 @@
     "statSaved": "Saved",
     "statSearches": "Searches",
     "statListings": "Listings",
-    "statViewings": "Viewings"
+    "statViewings": "Viewings",
+    "edit": {
+      "title": "Edit profile",
+      "phone": "Phone number",
+      "phoneHintAgent": "Shown on your agent page so people can call or WhatsApp you. Each listing keeps its own contact number. Include the country code, e.g. +355.",
+      "phoneHintClient": "Only agents you message or book a viewing with can see it.",
+      "nameRequired": "Enter your name.",
+      "tooLong": "One of the fields is too long.",
+      "phoneInvalid": "That doesn't look like a phone number. Use digits, spaces and a leading +.",
+      "failed": "Your changes weren't saved. Try again."
+    }
   },
   "account": {
     "welcomeBack": "Welcome back, {{name}} 👋",

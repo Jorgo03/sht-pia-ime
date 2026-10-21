@@ -245,7 +245,17 @@
     "statSaved": "Gespeichert",
     "statSearches": "Suchen",
     "statListings": "Inserate",
-    "statViewings": "Besichtigungen"
+    "statViewings": "Besichtigungen",
+    "edit": {
+      "title": "Profil bearbeiten",
+      "phone": "Telefonnummer",
+      "phoneHintAgent": "Wird auf deiner Maklerseite angezeigt, damit man dich anrufen oder per WhatsApp erreichen kann. Jede Anzeige behält ihre eigene Kontaktnummer. Mit Ländervorwahl, z. B. +355.",
+      "phoneHintClient": "Nur Makler, denen du schreibst oder bei denen du eine Besichtigung buchst, sehen sie.",
+      "nameRequired": "Gib deinen Namen ein.",
+      "tooLong": "Eines der Felder ist zu lang.",
+      "phoneInvalid": "Das sieht nicht wie eine Telefonnummer aus. Nutze Ziffern, Leerzeichen und ein + am Anfang.",
+      "failed": "Deine Änderungen wurden nicht gespeichert. Versuche es noch einmal."
+    }
   },
   "errors": {
     "generic": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",

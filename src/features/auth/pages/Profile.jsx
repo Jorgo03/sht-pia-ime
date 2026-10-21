@@ -1,10 +1,11 @@
 import { useState, useRef, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate, useLocation } from 'react-router-dom'
-import { User, Briefcase, Mail, Lock, Eye, EyeOff, ArrowLeft, ArrowRight, Heart, Building2, LogOut, ChevronRight, Search as SearchIcon, Calendar, Loader2, Apple, Linkedin } from 'lucide-react'
+import { User, Briefcase, Mail, Lock, Eye, EyeOff, ArrowLeft, ArrowRight, Heart, Building2, LogOut, ChevronRight, Search as SearchIcon, Calendar, Loader2, Apple, Linkedin, UserPen } from 'lucide-react'
 import { useAuth } from '../AuthContext'
 import { useProfileStats } from '../hooks/useProfileStats'
 import DuskHero from '../components/DuskHero'
+import EditProfileSheet from '../components/EditProfileSheet'
 import { EMAIL_RE, friendlyError } from '../../../lib/authErrors'
 import { supabase } from '../../../lib/supabase'
 import LegalLinks from '../../../shared/LegalLinks'
@@ -14,7 +15,7 @@ export default function Profile() {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const location = useLocation()
-  const { user, profile, isAgent, signIn, signUp, signInWithProvider, sendOtp, verifyOtp, resendCode, signOut, resetPassword, passwordRecovery, updatePassword, loading: authLoading } = useAuth()
+  const { user, profile, isAgent, refreshProfile, signIn, signUp, signInWithProvider, sendOtp, verifyOtp, resendCode, signOut, resetPassword, passwordRecovery, updatePassword, loading: authLoading } = useAuth()
   const stats = useProfileStats()
 
   // Account deletion — store-mandated (Apple 5.1.1(v), Google Play data
@@ -22,6 +23,7 @@ export default function Profile() {
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [deleteError, setDeleteError] = useState(false)
+  const [editOpen, setEditOpen] = useState(false)
 
   const handleDeleteAccount = async () => {
     if (deleting) return
@@ -382,6 +384,7 @@ export default function Profile() {
     const initial = displayName[0]?.toUpperCase() || '?'
 
     const settingsRows = [
+      { icon: UserPen, label: t('profile.edit.title'), onClick: () => setEditOpen(true) },
       { icon: Heart, label: t('favourites.title'), to: '/favorites', badge: stats.saved || null },
       { icon: SearchIcon, label: t('profile.savedSearches'), to: '/saved-searches', badge: stats.searches || null },
       { icon: Calendar, label: t('viewings.title'), to: '/viewings' },
@@ -417,7 +420,7 @@ export default function Profile() {
           {settingsRows.map((row, i) => {
             const Icon = row.icon
             return (
-              <button key={i} className="profile-row" onClick={() => row.to && navigate(row.to)}>
+              <button key={i} className="profile-row" onClick={() => (row.onClick ? row.onClick() : row.to && navigate(row.to))}>
                 <Icon size={20} />
                 <span>{row.label}</span>
                 {row.badge ? <span className="profile-row__badge">{row.badge}</span> : null}
@@ -445,6 +448,16 @@ export default function Profile() {
         {/* Both stores expect a reachable Privacy Policy; the pages are part
             of this web app (src/features/legal), so the links always work. */}
         <LegalLinks className="profile-legal" />
+
+        {editOpen && (
+          <EditProfileSheet
+            userId={user.id}
+            profile={profile}
+            isAgent={isAgent}
+            onSaved={refreshProfile}
+            onClose={() => setEditOpen(false)}
+          />
+        )}
 
         {deleteOpen && (
           <div className="delete-account-backdrop" onClick={() => !deleting && setDeleteOpen(false)}>

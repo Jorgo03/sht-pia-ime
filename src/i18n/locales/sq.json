@@ -289,7 +289,17 @@
     "statSaved": "Ruajtur",
     "statSearches": "Kërkime",
     "statListings": "Lista",
-    "statViewings": "Vizita"
+    "statViewings": "Vizita",
+    "edit": {
+      "title": "Ndrysho profilin",
+      "phone": "Numri i telefonit",
+      "phoneHintAgent": "Shfaqet në faqen tënde të agjentit, që njerëzit të të telefonojnë ose të të shkruajnë në WhatsApp. Çdo njoftim ruan numrin e vet të kontaktit. Shto prefiksin e shtetit, p.sh. +355.",
+      "phoneHintClient": "E sheh vetëm agjenti me të cilin flet ose cakton një vizitë.",
+      "nameRequired": "Shkruaj emrin.",
+      "tooLong": "Një nga fushat është shumë e gjatë.",
+      "phoneInvalid": "Ky nuk duket si numër telefoni. Përdor shifra, hapësira dhe + në fillim.",
+      "failed": "Ndryshimet nuk u ruajtën. Provo përsëri."
+    }
   },
   "addSheet": {
     "openLabel": "Krijo",
