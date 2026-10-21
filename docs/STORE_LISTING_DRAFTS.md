@@ -41,9 +41,11 @@ the console is the authority if they differ.
 >
 > Report a listing or a user, and block anyone you don't want to hear from.
 
-Not claimed on purpose: email or push alerts (not built — L06, L27), paid
-promotion (not built — L23), "verified" agents (no verification exists),
-any number of listings or users.
+Not claimed on purpose: email or push alerts (built, but switched off until
+the owner enables sending — F13, F14), paid plans and promotion (built on the
+website only and switched off — F15), "verified" agents (no verification
+exists), any number of listings or users. Add a line for alerts only after
+sending is switched on in production.
 
 - Category: _OWNER_ (suggested: Lifestyle; Apple has no Real Estate category, Google has "House & Home").
 - Support URL, marketing URL, support email: _OWNER_ (blocked on the domain and mailbox, L16/L17).
@@ -54,21 +56,23 @@ any number of listings or users.
 
 Source of truth: Apple's App Privacy Details page
 (https://developer.apple.com/app-store/app-privacy-details/). Derived from the
-tables and SDKs in this repo on 2026-10-21. No analytics, advertising or
-crash-reporting SDK is installed, and nothing is used for tracking.
+tables and SDKs in this repo on 2026-10-21 (updated the same day for profile
+photos, crash reports and push notifications). No analytics, advertising or
+third-party crash-reporting SDK is installed, and nothing is used for tracking.
 
 | Data type (Apple) | Collected? | Linked to the user | Used for tracking | Purpose | Where |
 | --- | --- | --- | --- | --- | --- |
 | Name | Yes | Yes | No | App functionality | `profiles.full_name` |
 | Email address | Yes | Yes | No | App functionality | Supabase Auth |
 | Phone number | Yes (optional) | Yes | No | App functionality | `profiles.phone`, `properties.contact_phone` |
-| Photos or videos | Yes (agents' listing photos) | Yes | No | App functionality | Storage `property-images/<user id>/` |
+| Photos or videos | Yes (listing photos and videos; optional profile photo) | Yes | No | App functionality | Storage `property-images/<user id>/`, `avatars/<user id>/` |
 | Other user content | Yes (listings, messages, viewing notes, wanted-home posts, reports) | Yes | No | App functionality | `properties`, `messages`, `viewings`, `wanted_homes`, `content_reports` |
 | Search history | Yes (saved searches only) | Yes | No | App functionality | `saved_searches` |
 | Product interaction | Yes (listing views, calls, WhatsApp taps, for the agent's dashboard) | Yes | No | App functionality, Analytics (first-party, shown to the listing's owner) | `property_activity` |
 | User ID | Yes | Yes | No | App functionality | Supabase Auth |
+| Device ID | Yes (push token, only after the person allows notifications) | Yes | No | App functionality | `push_tokens` (removed on sign-out) |
 | Location | **No** — the app never reads the device location (no location permission). Listing addresses are content, not the user's location. | | | | |
-| Crash / diagnostics | **No** (no crash SDK, L26) | | | | |
+| Crash data | Yes (first-party crash reports: message, stack, screen path, app version; ids, emails and phone numbers redacted before storage) | **No** — no user id is stored | No | App functionality | `client_errors` (F11) |
 
 Third parties that process data on our behalf: Supabase (database, auth,
 storage), Anthropic (AI listing text, search parsing and translation, through
@@ -83,7 +87,7 @@ Account deletion (guideline 5.1.1(v)): Profile → "Delete account", both apps,
 
 Same inventory, in Google's terms. Answers to verify in the console:
 
-- Data collected: Personal info (name, email, phone — optional), Photos, Messages (in-app messages), App activity (in-app search history: saved searches; other actions: listing views/calls for owners' dashboards), App info and performance: **none**, Location: **none**, Device or other IDs: none beyond the account user ID.
+- Data collected: Personal info (name, email, phone — optional), Photos (listing photos, optional profile photo), Messages (in-app messages), App activity (in-app search history: saved searches; other actions: listing views/calls for owners' dashboards), App info and performance: **crash logs** (first-party, not linked to an account, redacted — F11), Location: **none**, Device or other IDs: **yes** — the push token, only after notifications are allowed (F14).
 - Shared with third parties: **No** (service providers processing on our behalf are not "sharing" under Google's definition — confirm in the console help).
 - Encrypted in transit: Yes (HTTPS to Supabase only).
 - Users can request deletion: Yes, in the app (Profile → Delete account) and on the website profile page.
@@ -97,7 +101,8 @@ Same inventory, in Google's terms. Answers to verify in the console:
 | Microphone | — | disabled in `app.json` (`microphonePermission: false`) | not needed |
 | Camera | both | not requested: `cameraPermission: false` (no iOS purpose string; Android `CAMERA` removed) — checked with `expo prebuild` 2026-10-21 | the app only picks existing photos/videos |
 | Storage (Android ≤ 12) | Android | `READ`/`WRITE_EXTERNAL_STORAGE` with `maxSdkVersion 32`, added by the picker | photo picking on older Android |
-| Location, contacts, notifications | — | not requested | — |
+| Notifications | both | asked only when the person turns notifications on in Profile → Notifications, never at launch (`lib/push.ts`); Android 13+ `POST_NOTIFICATIONS` comes from `expo-notifications` | new messages and viewing updates (F14) |
+| Location, contacts | — | not requested | — |
 
 ## 5. Reviewer access (Apple 2.1, Google "App access")
 
@@ -118,8 +123,9 @@ build is submitted:
 
 ## 6. Payments note for review
 
-There is no purchase screen in either app today, so no in-app purchase is
-needed for this version. When listing promotion or agency plans are sold
+There is no purchase screen in either app, so no in-app purchase is needed
+for this version. The website's `/pricing` page (F15) is website-only: neither
+app links to it or mentions buying. When listing promotion or agency plans are sold
 (DECISIONS.md M1): Apple 3.1.1 requires in-app purchase for features unlocked
 inside the app, and Google Play has an equivalent billing policy. Selling them
 only on the website and not linking to that from the app is the plan recorded
