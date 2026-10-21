@@ -630,5 +630,26 @@
     "viewings": "Viewing requests and changes",
     "saveFailed": "Your choice wasn't saved. Try again.",
     "privacy": "A notification only says who wrote to you or what happened to a viewing, never the message text."
+  },
+  "pricing": {
+    "title": "Plans and prices",
+    "subtitle": "Posting listings is free. Plans and promotions are prepaid and never renew by themselves.",
+    "comingSoon": "Prices will be published soon.",
+    "comingSoonHint": "Until then, posting listings stays free.",
+    "loadFailed": "Prices couldn't be loaded.",
+    "kindPlan": "Agency plan",
+    "kindPromotion": "Listing promotion",
+    "period": "Length",
+    "months": "{{n}} months",
+    "perMonth": "≈ {{price}} per month",
+    "listingCap": "Up to {{n}} active listings",
+    "credits": "{{n}} promotions a month included",
+    "prepaid": "Paid once, no automatic renewal",
+    "buy": "Buy",
+    "signInToBuy": "Sign in to buy.",
+    "notYet": "Online payment isn't available yet.",
+    "startFailed": "The payment didn't start. Try again.",
+    "returnedDone": "Thank you. Your plan turns on as soon as the payment provider confirms the payment, usually within a few minutes.",
+    "returnedCancelled": "The payment was cancelled. You were not charged."
   }
 }

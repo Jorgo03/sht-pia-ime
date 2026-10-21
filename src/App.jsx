@@ -30,6 +30,7 @@ const AgentProfile = lazy(() => import('./features/properties/pages/AgentProfile
 const Viewings = lazy(() => import('./features/viewings/pages/Viewings'))
 const SavedSearches = lazy(() => import('./features/saved-searches/pages/SavedSearches'))
 const LegalPage = lazy(() => import('./features/legal/pages/LegalPage'))
+const Pricing = lazy(() => import('./features/billing/pages/Pricing'))
 
 function ScrollToTop() {
   const { pathname } = useLocation()
@@ -82,6 +83,7 @@ function AppShell() {
           <Route path="/auth/callback" element={<AuthCallback />} />
           <Route path="/privacy" element={<LegalPage doc="privacy" />} />
           <Route path="/terms" element={<LegalPage doc="terms" />} />
+          <Route path="/pricing" element={<Pricing />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>

@@ -638,5 +638,26 @@
     "viewings": "Demandes et changements de visite",
     "saveFailed": "Votre choix n'a pas été enregistré. Réessayez.",
     "privacy": "Une notification indique seulement qui vous a écrit ou ce qui est arrivé à une visite, jamais le texte du message."
+  },
+  "pricing": {
+    "title": "Formules et prix",
+    "subtitle": "Publier des annonces est gratuit. Les formules et promotions sont prépayées et ne se renouvellent jamais seules.",
+    "comingSoon": "Les prix seront publiés bientôt.",
+    "comingSoonHint": "D'ici là, publier des annonces reste gratuit.",
+    "loadFailed": "Impossible de charger les prix.",
+    "kindPlan": "Formule agence",
+    "kindPromotion": "Mise en avant d'annonce",
+    "period": "Durée",
+    "months": "{{n}} mois",
+    "perMonth": "≈ {{price}} par mois",
+    "listingCap": "Jusqu'à {{n}} annonces actives",
+    "credits": "{{n}} mises en avant par mois incluses",
+    "prepaid": "Payé une fois, sans renouvellement automatique",
+    "buy": "Acheter",
+    "signInToBuy": "Connectez-vous pour acheter.",
+    "notYet": "Le paiement en ligne n'est pas encore disponible.",
+    "startFailed": "Le paiement n'a pas démarré. Réessayez.",
+    "returnedDone": "Merci. Votre formule s'active dès que le prestataire de paiement confirme le paiement, en général en quelques minutes.",
+    "returnedCancelled": "Le paiement a été annulé. Vous n'avez pas été débité."
   }
 }

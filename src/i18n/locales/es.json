@@ -638,5 +638,26 @@
     "viewings": "Solicitudes y cambios de visitas",
     "saveFailed": "No se guardó tu elección. Inténtalo de nuevo.",
     "privacy": "Una notificación solo dice quién te escribió o qué pasó con una visita, nunca el texto del mensaje."
+  },
+  "pricing": {
+    "title": "Planes y precios",
+    "subtitle": "Publicar anuncios es gratis. Los planes y promociones son prepago y nunca se renuevan solos.",
+    "comingSoon": "Los precios se publicarán pronto.",
+    "comingSoonHint": "Hasta entonces, publicar anuncios sigue siendo gratis.",
+    "loadFailed": "No se pudieron cargar los precios.",
+    "kindPlan": "Plan de agencia",
+    "kindPromotion": "Promoción de anuncio",
+    "period": "Duración",
+    "months": "{{n}} meses",
+    "perMonth": "≈ {{price}} al mes",
+    "listingCap": "Hasta {{n}} anuncios activos",
+    "credits": "{{n}} promociones al mes incluidas",
+    "prepaid": "Pago único, sin renovación automática",
+    "buy": "Comprar",
+    "signInToBuy": "Inicia sesión para comprar.",
+    "notYet": "El pago en línea aún no está disponible.",
+    "startFailed": "El pago no se inició. Inténtalo de nuevo.",
+    "returnedDone": "Gracias. Tu plan se activa en cuanto el proveedor de pagos confirma el pago, normalmente en pocos minutos.",
+    "returnedCancelled": "El pago se canceló. No se te cobró nada."
   }
 }

@@ -630,5 +630,26 @@
     "viewings": "Besichtigungsanfragen und Änderungen",
     "saveFailed": "Deine Auswahl wurde nicht gespeichert. Versuche es noch einmal.",
     "privacy": "Eine Benachrichtigung sagt nur, wer dir geschrieben hat oder was mit einer Besichtigung passiert ist, nie den Nachrichtentext."
+  },
+  "pricing": {
+    "title": "Pläne und Preise",
+    "subtitle": "Anzeigen veröffentlichen ist kostenlos. Pläne und Hervorhebungen sind vorausbezahlt und verlängern sich nie von selbst.",
+    "comingSoon": "Die Preise werden bald veröffentlicht.",
+    "comingSoonHint": "Bis dahin bleibt das Veröffentlichen kostenlos.",
+    "loadFailed": "Die Preise konnten nicht geladen werden.",
+    "kindPlan": "Agenturplan",
+    "kindPromotion": "Anzeige hervorheben",
+    "period": "Laufzeit",
+    "months": "{{n}} Monate",
+    "perMonth": "≈ {{price}} pro Monat",
+    "listingCap": "Bis zu {{n}} aktive Anzeigen",
+    "credits": "{{n}} Hervorhebungen pro Monat inklusive",
+    "prepaid": "Einmal bezahlt, keine automatische Verlängerung",
+    "buy": "Kaufen",
+    "signInToBuy": "Melde dich an, um zu kaufen.",
+    "notYet": "Online-Zahlung ist noch nicht verfügbar.",
+    "startFailed": "Die Zahlung wurde nicht gestartet. Versuche es noch einmal.",
+    "returnedDone": "Danke. Dein Plan wird aktiv, sobald der Zahlungsanbieter die Zahlung bestätigt, meist innerhalb weniger Minuten.",
+    "returnedCancelled": "Die Zahlung wurde abgebrochen. Dir wurde nichts berechnet."
   }
 }

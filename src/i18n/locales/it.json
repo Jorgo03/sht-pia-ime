@@ -638,5 +638,26 @@
     "viewings": "Richieste e modifiche delle visite",
     "saveFailed": "La scelta non è stata salvata. Riprova.",
     "privacy": "Una notifica dice solo chi ti ha scritto o cosa è successo a una visita, mai il testo del messaggio."
+  },
+  "pricing": {
+    "title": "Piani e prezzi",
+    "subtitle": "Pubblicare annunci è gratis. Piani e promozioni sono prepagati e non si rinnovano da soli.",
+    "comingSoon": "I prezzi saranno pubblicati presto.",
+    "comingSoonHint": "Fino ad allora, pubblicare annunci resta gratis.",
+    "loadFailed": "Impossibile caricare i prezzi.",
+    "kindPlan": "Piano agenzia",
+    "kindPromotion": "Promozione annuncio",
+    "period": "Durata",
+    "months": "{{n}} mesi",
+    "perMonth": "≈ {{price}} al mese",
+    "listingCap": "Fino a {{n}} annunci attivi",
+    "credits": "{{n}} promozioni al mese incluse",
+    "prepaid": "Pagato una volta, senza rinnovo automatico",
+    "buy": "Acquista",
+    "signInToBuy": "Accedi per acquistare.",
+    "notYet": "Il pagamento online non è ancora disponibile.",
+    "startFailed": "Il pagamento non è partito. Riprova.",
+    "returnedDone": "Grazie. Il piano si attiva appena il fornitore di pagamento conferma il pagamento, di solito in pochi minuti.",
+    "returnedCancelled": "Il pagamento è stato annullato. Non ti è stato addebitato nulla."
   }
 }

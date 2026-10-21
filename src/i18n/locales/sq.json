@@ -630,5 +630,26 @@
     "viewings": "Kërkesa dhe ndryshime vizitash",
     "saveFailed": "Zgjedhja nuk u ruajt. Provo përsëri.",
     "privacy": "Njoftimi tregon vetëm kush të shkroi ose çfarë ndodhi me vizitën, kurrë tekstin e mesazhit."
+  },
+  "pricing": {
+    "title": "Planet dhe çmimet",
+    "subtitle": "Publikimi i njoftimeve është falas. Planet dhe promovimet paguhen paraprakisht dhe nuk rinovohen vetë.",
+    "comingSoon": "Çmimet do të publikohen së shpejti.",
+    "comingSoonHint": "Deri atëherë, publikimi i njoftimeve mbetet falas.",
+    "loadFailed": "Çmimet nuk u ngarkuan.",
+    "kindPlan": "Plan agjencie",
+    "kindPromotion": "Promovim njoftimi",
+    "period": "Kohëzgjatja",
+    "months": "{{n}} muaj",
+    "perMonth": "≈ {{price}} në muaj",
+    "listingCap": "Deri në {{n}} njoftime aktive",
+    "credits": "{{n}} promovime në muaj të përfshira",
+    "prepaid": "Paguhet një herë, pa rinovim automatik",
+    "buy": "Bli",
+    "signInToBuy": "Hyr në llogari për të blerë.",
+    "notYet": "Pagesa online nuk është ende e disponueshme.",
+    "startFailed": "Pagesa nuk filloi. Provo përsëri.",
+    "returnedDone": "Faleminderit. Plani aktivizohet sapo procesori i pagesave ta konfirmojë pagesën; kjo zakonisht zgjat pak minuta.",
+    "returnedCancelled": "Pagesa u anulua. Nuk u tarifove."
   }
 }

@@ -646,5 +646,26 @@
     "viewings": "Prośby i zmiany oglądania",
     "saveFailed": "Wybór nie został zapisany. Spróbuj ponownie.",
     "privacy": "Powiadomienie mówi tylko, kto napisał lub co stało się z oglądaniem, nigdy treści wiadomości."
+  },
+  "pricing": {
+    "title": "Plany i ceny",
+    "subtitle": "Publikowanie ogłoszeń jest bezpłatne. Plany i promowanie są przedpłacone i nigdy nie odnawiają się same.",
+    "comingSoon": "Ceny zostaną wkrótce opublikowane.",
+    "comingSoonHint": "Do tego czasu publikowanie ogłoszeń pozostaje bezpłatne.",
+    "loadFailed": "Nie udało się wczytać cen.",
+    "kindPlan": "Plan dla agencji",
+    "kindPromotion": "Promowanie ogłoszenia",
+    "period": "Okres",
+    "months": "{{n}} mies.",
+    "perMonth": "≈ {{price}} miesięcznie",
+    "listingCap": "Do {{n}} aktywnych ogłoszeń",
+    "credits": "{{n}} promowań miesięcznie w cenie",
+    "prepaid": "Płatne raz, bez automatycznego odnowienia",
+    "buy": "Kup",
+    "signInToBuy": "Zaloguj się, aby kupić.",
+    "notYet": "Płatność online nie jest jeszcze dostępna.",
+    "startFailed": "Płatność się nie rozpoczęła. Spróbuj ponownie.",
+    "returnedDone": "Dziękujemy. Plan włączy się, gdy operator płatności potwierdzi płatność, zwykle w ciągu kilku minut.",
+    "returnedCancelled": "Płatność anulowano. Nie pobrano opłaty."
   }
 }
