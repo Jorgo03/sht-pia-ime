@@ -155,6 +155,7 @@ function ThemedNavigation() {
           <Stack.Screen name="pricing" options={{ headerShown: false }} />
           <Stack.Screen name="moderation" options={{ headerShown: false }} />
           <Stack.Screen name="auth/callback" options={{ headerShown: false }} />
+          <Stack.Screen name="+not-found" options={{ headerShown: false }} />
         </Stack>
       </WebColumn>
       <StatusBar style={theme === 'dark' ? 'light' : 'dark'} />

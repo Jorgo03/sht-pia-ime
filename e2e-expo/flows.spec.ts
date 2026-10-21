@@ -3,7 +3,7 @@ import type { Page, Route } from '@playwright/test';
 import { CHAT_CLIENT_ID, CONVERSATIONS, LISTINGS } from '../e2e/support/fixtures';
 import { fakeSession, SIGNED_IN_USER } from '../e2e/support/backend';
 import { t } from '../e2e/support/i18n';
-import { expect, test } from '../e2e/support/test';
+import { axeViolations, expect, test } from '../e2e/support/test';
 
 // The main flows on the website built from the Expo app (DECISIONS.md W1,
 // stage 1): browse, search and filters, sign-in, favourites, profile and
@@ -146,4 +146,21 @@ test('X10 a wide screen shows the app as a phone-width column', async ({ page, i
   expect(tabs!.width).toBeLessThanOrEqual(480);
   // Centred: equal space either side, within a pixel or two.
   expect(Math.abs(tabs!.x - (viewport.width - tabs!.x - tabs!.width))).toBeLessThan(40);
+});
+
+test.describe('not found', () => {
+  // The browser logs the page's own 404 status as a console error.
+  test.use({ allowConsoleErrors: [/status of 404/] });
+
+  test('X11 an unknown address shows the app 404 page, which leads home', async ({ page }) => {
+    const response = await page.goto('/no-such-page');
+    expect(response?.status()).toBe(404);
+    await ready(page);
+    await expect(page.getByRole('heading', { name: t('notFound.title'), level: 1 })).toBeVisible();
+    await expect(page).toHaveTitle(new RegExp(`^${escape(t('notFound.title'))} \\| Shtëpia\\.ime$`));
+    // Same exception as a11y.spec.ts: white on the solid orange button.
+    expect(await axeViolations(page, { known: ['color-contrast'] })).toEqual([]);
+    await page.getByRole('button', { name: t('common.home') }).click();
+    await expect(page).toHaveURL(/\/$/);
+  });
 });
