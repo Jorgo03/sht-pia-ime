@@ -77,7 +77,9 @@ export { expect };
  * out here so the test stays green, and must be removed once fixed.
  */
 export async function axeViolations(page: Page, { include, known = [] }: { include?: string; known?: string[] } = {}) {
-  let builder = new AxeBuilder({ page });
+  // The header wordmark is the logo: WCAG 1.4.3 exempts "text that is part
+  // of a logo or brand name" from contrast, and its orange ".ime" is the brand.
+  let builder = new AxeBuilder({ page }).exclude('.header-brand');
   if (include) builder = builder.include(include);
   const { violations } = await builder.analyze();
   return violations

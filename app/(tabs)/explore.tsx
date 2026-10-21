@@ -340,7 +340,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   brand: {
     fontSize: 14,
     fontWeight: '600',
-    color: colors.accent,
+    color: colors.accentText,
     letterSpacing: 1,
     marginBottom: 12,
   },
@@ -362,7 +362,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   // the italic comes from the italic family, not a fontStyle override.
   titleEm: {
     fontFamily: Fonts?.serifItalic,
-    color: colors.accent,
+    color: colors.accentText,
   },
   titleActions: {
     flexDirection: 'row',
@@ -503,6 +503,6 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   emptyResetText: {
     fontSize: 13,
     fontWeight: '600',
-    color: colors.accent,
+    color: colors.accentText,
   },
 });

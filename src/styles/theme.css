@@ -26,6 +26,10 @@
   --fho-orange-deep: #cc5200;
   --fho-orange-tint: #fff1e6;
   --fho-orange-soft: #ffb380;
+  /* Orange for TEXT on light surfaces: #b34700 is 4.7–5.5:1 on every cream
+     and white (WCAG AA, BUG-008). Fills, buttons and the logo keep the
+     brand oranges above. Mirrored in constants/theme.ts (orangeText). */
+  --fho-orange-text: #b34700;
 
   --fho-glass-bg:     rgba(28,24,20,0.62);
   --fho-glass-border: rgba(255,255,255,0.12);
@@ -70,7 +74,7 @@
   --fho-surface-2: #221d18;
   --fho-text: #faf6ef;
   --fho-text-muted: rgba(255,235,210,0.55);
-  --fho-text-faint: rgba(255,235,210,0.4);
+  --fho-text-faint: rgba(255,235,210,0.5); /* ≥ 4.5:1 on every dark surface (BUG-008) */
   --fho-text-on-dark: #faf6ef;
 
   --fho-border: rgba(255,255,255,0.08);
@@ -79,6 +83,7 @@
   /* Not in the spec, which leaves the light #fff1e6 to bleed through: that is a
      near-white chip on a near-black ground. Kept as the app already had it. */
   --fho-orange-tint: rgba(255,125,26,0.12);
+  --fho-orange-text: #ff7d1a; /* 5.4–7.7:1 on every dark surface, incl. the orange tint */
 
   --fho-glass-bg: rgba(20,16,12,0.7);
   --fho-glass-border: rgba(255,255,255,0.08);

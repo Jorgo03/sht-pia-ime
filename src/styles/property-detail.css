@@ -153,7 +153,7 @@
   font-family: var(--font-serif);
   font-size: 26px;
   font-weight: 500;
-  color: var(--fho-orange-1);
+  color: var(--fho-orange-text);
 }
 
 .detail-price__per {
@@ -291,7 +291,7 @@ button.agent-strip__who {
 }
 
 button.agent-strip__who:hover .agent-name {
-  color: var(--fho-orange-2);
+  color: var(--fho-orange-text);
 }
 
 .agent-strip__actions {
@@ -349,7 +349,7 @@ button.agent-strip__who:hover .agent-name {
 
 .pill-btn:hover {
   border-color: var(--fho-orange-1);
-  color: var(--fho-orange-1);
+  color: var(--fho-orange-text);
 }
 
 /* Map link */
@@ -360,7 +360,7 @@ button.agent-strip__who:hover .agent-name {
   gap: 6px;
   margin-top: 8px;
   font-size: 13px;
-  color: var(--fho-orange-2);
+  color: var(--fho-orange-text);
   text-decoration: none;
   font-weight: 500;
 }

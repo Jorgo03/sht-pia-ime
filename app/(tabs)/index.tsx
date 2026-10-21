@@ -324,7 +324,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   retryText: {
     fontSize: 14,
     fontWeight: '600',
-    color: colors.accent,
+    color: colors.accentText,
   },
   section: {
     marginTop: 28,

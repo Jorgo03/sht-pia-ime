@@ -504,7 +504,7 @@ const createStyles = (colors: AtticoPalette, sheetHeight: number = 0) => StyleSh
   resetText: {
     fontFamily: Fonts?.sans,
     fontSize: 13,
-    color: colors.accent,
+    color: colors.accentText,
   },
   scroll: {
     paddingHorizontal: 20,
@@ -556,7 +556,7 @@ const createStyles = (colors: AtticoPalette, sheetHeight: number = 0) => StyleSh
     color: colors.textPrimary,
   },
   chipTextActive: {
-    color: colors.accent,
+    color: colors.accentText,
   },
   // Matches web's .segment-control / .segment.
   segmentControl: {

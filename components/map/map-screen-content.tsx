@@ -407,7 +407,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   previewPrice: {
     fontSize: 15,
     fontWeight: '700',
-    color: colors.accent,
+    color: colors.accentText,
   },
   previewMeta: {
     fontSize: 12,

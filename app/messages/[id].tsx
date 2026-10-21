@@ -360,7 +360,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   headerProperty: {
     fontSize: 12,
-    color: colors.accent,
+    color: colors.accentText,
   },
   messageList: {
     padding: 16,

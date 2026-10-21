@@ -89,7 +89,7 @@
 }
 .nav-item.active .nav-badge {
   background: #fff;
-  color: var(--fho-orange-2);
+  color: var(--fho-orange-text);
   border-color: var(--fho-orange-2);
 }
 

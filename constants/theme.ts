@@ -40,6 +40,7 @@ export const AtticoColorsDark = {
   accentDeep: '#cc5200', // --fho-orange-deep
   accentTint: 'rgba(255,107,0,0.12)', // dark-theme form of ShtepiaColors.orangeTint
   accentLight: '#ffb380', // --fho-orange-soft
+  accentText: '#ff7d1a', // --fho-orange-text (dark): orange for text, 5.4–7.7:1 on every dark surface
   accentGlow: 'rgba(255,107,0,0.35)',
   surface: '#FFFFFF',
   surface2: '#221d18', // --fho-surface-2 (dark) — inputs / deepest cards
@@ -58,8 +59,11 @@ export const AtticoColorsDark = {
   // native colors. Both are now a WARM cast — rgba(255,235,210,·) rather than
   // the old neutral rgba(240,236,230,·) — composited over the new #0e0b09
   // ground, so they track the web dusk palette instead of the charcoal one.
-  textSecondary: '#938678',
-  textFaint: '#6e6559',
+  // Raised 2026-10-21 for WCAG AA (BUG-008): muted ≥ 4.8:1 on every dark
+  // surface including the #282420/#2e2924 chips; faint ≥ 4.5:1 on the ground
+  // and both surfaces, like --fho-text-faint (dark, 0.5) on the web.
+  textSecondary: '#a09384',
+  textFaint: '#908477',
   textDark: '#1A1A1A',
   // Listing/viewing status colors. Web reads these from --fho-status-* which
   // swap per theme; RN screens used to hardcode the LIGHT values in both
@@ -87,6 +91,7 @@ export const AtticoColorsLight: AtticoPalette = {
   accentDeep: '#cc5200', // --fho-orange-deep (same both themes)
   accentTint: '#fff1e6', // ShtepiaColors.orangeTint (§4) — a solid cream, not the dark theme's translucent orange
   accentLight: '#ffb380', // --fho-orange-soft (same both themes)
+  accentText: '#b34700', // --fho-orange-text (light): orange for text, 4.7–5.5:1 on every cream (BUG-008)
   accentGlow: 'rgba(255,107,0,0.25)',
   surface: '#FFFFFF',
   surface2: '#ffffff', // --fho-surface-2 (light)

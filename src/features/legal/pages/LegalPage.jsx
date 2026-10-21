@@ -34,7 +34,7 @@ function Section({ section, contact }) {
           {LEGAL_CONTACT_EMAIL ? (
             <>
               {contact.withEmail}
-              <a className="text-fho-orange-2 underline" href={`mailto:${LEGAL_CONTACT_EMAIL}`}>{LEGAL_CONTACT_EMAIL}</a>
+              <a className="text-fho-orange-text underline" href={`mailto:${LEGAL_CONTACT_EMAIL}`}>{LEGAL_CONTACT_EMAIL}</a>
             </>
           ) : contact.withoutEmail}
         </p>
@@ -79,7 +79,7 @@ export default function LegalPage({ doc }) {
         <Section key={section.h} section={section} contact={content.contact} />
       ))}
       <p className="mt-10 border-t border-fho-border pt-5 text-sm">
-        <Link className="text-fho-orange-2 underline" to={`/${other}`}>{t(DOCS[other])}</Link>
+        <Link className="text-fho-orange-text underline" to={`/${other}`}>{t(DOCS[other])}</Link>
       </p>
     </article>
   )

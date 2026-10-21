@@ -190,7 +190,7 @@
   transition: all 150ms var(--ease-out);
 }
 
-.load-more-btn:hover { border-color: var(--fho-orange-1); color: var(--fho-orange-2); }
+.load-more-btn:hover { border-color: var(--fho-orange-1); color: var(--fho-orange-text); }
 .load-more-btn:disabled { opacity: 0.6; cursor: default; }
 
 /* ===== Filter bottom sheet ===== */
@@ -312,7 +312,7 @@
 .bed-chip.active {
   background: var(--fho-orange-tint);
   border-color: var(--fho-orange-1);
-  color: var(--fho-orange-2);
+  color: var(--fho-orange-text);
 }
 
 /* --- AI natural-language search (Feature B) --- */
@@ -339,7 +339,7 @@
   gap: 6px;
   margin-top: 8px;
   font-size: 12px;
-  color: var(--fho-orange-1);
+  color: var(--fho-orange-text);
 }
 
 /* ===== Tier 1 — collapsed inline filter bar ===== */
@@ -374,7 +374,7 @@
   min-width: 0;
   padding: 10px 12px;
   border-left: 1px solid var(--fho-border);
-  color: var(--fho-orange-1);
+  color: var(--fho-orange-text);
   cursor: pointer;
 }
 
@@ -422,7 +422,7 @@
   background: var(--fho-surface-2);
   border: 1px solid var(--fho-border);
   border-radius: var(--r-md);
-  color: var(--fho-orange-1);
+  color: var(--fho-orange-text);
   transition: border-color 150ms;
 }
 
@@ -457,7 +457,7 @@
   background: var(--fho-surface-2);
   border: 1px solid var(--fho-border);
   border-radius: var(--r-md);
-  color: var(--fho-orange-1);
+  color: var(--fho-orange-text);
   font-size: 13px;
   transition: border-color 150ms;
 }

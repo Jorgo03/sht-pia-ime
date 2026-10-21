@@ -104,7 +104,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     color: colors.textPrimary,
   },
   chipTextOn: {
-    color: colors.accentEnd,
+    color: colors.accentText,
   },
   chipDot: {
     width: 5,

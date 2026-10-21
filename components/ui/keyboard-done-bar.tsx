@@ -72,6 +72,6 @@ const createStyles = (colors: AtticoPalette) =>
     label: {
       fontSize: 16,
       fontFamily: Fonts.sansBold,
-      color: colors.accent,
+      color: colors.accentText,
     },
   });

@@ -1218,7 +1218,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     fontWeight: '600',
     letterSpacing: 1,
     textTransform: 'uppercase',
-    color: colors.accentEnd,
+    color: colors.accentText,
   },
   profileEmail: {
     fontSize: 13,

@@ -299,7 +299,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     fontFamily: Fonts?.serif,
     fontSize: 16,
     fontWeight: '500',
-    color: colors.accent,
+    color: colors.accentText,
   },
   compactBeds: {
     flexDirection: 'row',

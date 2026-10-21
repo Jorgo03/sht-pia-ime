@@ -83,7 +83,6 @@ test('A11Y contact strip has no nested or unnamed controls (BUG-006)', async ({ 
   for (const listing of [AGENT_LISTING, LISTINGS.find((l) => !l.agent)!]) {
     await page.goto(`/property/${listing.id}`);
     await expect(strip(page)).toBeVisible();
-    // color-contrast is BUG-008, tracked separately.
-    expect(await axeViolations(page, { include: '.agent-strip', known: ['color-contrast'] })).toEqual([]);
+    expect(await axeViolations(page, { include: '.agent-strip' })).toEqual([]);
   }
 });

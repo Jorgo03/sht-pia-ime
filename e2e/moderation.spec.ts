@@ -50,7 +50,7 @@ test.describe('signed in', () => {
     const card = page.getByRole('listitem').filter({ hasText: REPORT.details });
     await expect(card.getByRole('heading', { name: t('safety.reason.scam') })).toBeVisible();
     await expect(card.getByRole('link', { name: AGENT_LISTING.title as string })).toBeVisible();
-    expect(await axeViolations(page, { known: ['color-contrast'] })).toEqual([]);
+    expect(await axeViolations(page)).toEqual([]);
 
     await card.getByRole('button', { name: t('moderation.hide') }).click();
     await expect(card.getByText(t('moderation.hiddenBadge'))).toBeVisible();

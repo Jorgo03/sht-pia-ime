@@ -148,6 +148,6 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   optionTextActive: {
     fontFamily: Fonts?.sansSemiBold,
-    color: colors.accent,
+    color: colors.accentText,
   },
 });

@@ -208,6 +208,6 @@ const createStyles = (colors: AtticoPalette) =>
     action: {
       fontSize: 12,
       fontWeight: '700',
-      color: colors.accent,
+      color: colors.accentText,
     },
   });

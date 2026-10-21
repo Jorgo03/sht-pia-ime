@@ -322,7 +322,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   headlineEm: {
     fontStyle: 'italic',
-    color: colors.accent,
+    color: colors.accentText,
   },
   center: {
     flex: 1,
@@ -400,7 +400,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   sectionLink: {
     fontSize: 13,
     fontWeight: '600',
-    color: colors.accent,
+    color: colors.accentText,
   },
   sectionSub: {
     fontSize: 11,

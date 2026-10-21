@@ -88,7 +88,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     fontFamily: Fonts?.serif,
     fontStyle: 'italic',
     fontWeight: '500',
-    color: colors.accent,
+    color: colors.accentText,
   },
   searchBar: {
     flexDirection: 'row',
@@ -117,6 +117,6 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   filtersChipText: {
     fontSize: 12,
     fontWeight: '600',
-    color: colors.accent,
+    color: colors.accentText,
   },
 });

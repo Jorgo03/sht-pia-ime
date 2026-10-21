@@ -217,7 +217,9 @@ export function LiquidTabBar({ state, descriptors, navigation }: BottomTabBarPro
 
   return (
     <View pointerEvents="box-none" style={[styles.wrap, { bottom: insets.bottom + TAB_BAR_BOTTOM_OFFSET }]}>
-      <View style={[styles.pill, { borderColor: theme === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.6)' }]}>
+      <View
+        accessibilityRole="tablist"
+        style={[styles.pill, { borderColor: theme === 'dark' ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.6)' }]}>
         {/* The frosting has to be clipped to the pill's rounded shape, but the
             "+" button deliberately overhangs the pill's top edge (web's
             `.nav-add { margin-top: -22px }`). Putting `overflow: hidden` on
@@ -280,29 +282,11 @@ export function LiquidTabBar({ state, descriptors, navigation }: BottomTabBarPro
           onPress={() => select('explore', () => go('explore'))}
         />
 
-        <AnimatedPressable
-          style={[styles.navAdd, addStyle]}
-          onPressIn={() => {
-            if (!reduceMotion) addPress.set(withTiming(0.9, { duration: 90 }));
-          }}
-          onPressOut={() => {
-            if (!reduceMotion) addPress.set(withSpring(1, { damping: 9, stiffness: 260 }));
-          }}
-          // The listing wizard (the old `listing/create` route redirects here too).
-          onPress={() => {
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
-            router.push('/listing/new' as Href);
-          }}
-          accessibilityRole="button"
-          accessibilityLabel={t('listing.newListing')}>
-          <LinearGradient
-            // Matches web's --fho-orange-1 → --fho-orange-2 gradient exactly
-            // (src/styles/theme.css); RN's palette only exposes the first stop.
-            colors={[colors.accent, colors.accentEnd]}
-            style={styles.navAddGradient}>
-            <Feather name="plus" size={26} strokeWidth={2.5} color="#fff" />
-          </LinearGradient>
-        </AnimatedPressable>
+        {/* Keeps the "+" button's place between the tabs. The button itself
+            is rendered after the pill (below), so the tablist holds only
+            tabs: a button inside a tablist is invalid for screen readers
+            (axe aria-required-children / aria-required-parent, L31). */}
+        <View style={styles.navAddSlot} />
 
         <NavItem
           icon="message-circle"
@@ -327,6 +311,30 @@ export function LiquidTabBar({ state, descriptors, navigation }: BottomTabBarPro
           onPress={() => select('profile', () => go('profile'))}
         />
       </View>
+
+      <AnimatedPressable
+        style={[styles.navAdd, styles.navAddFloating, addStyle]}
+        onPressIn={() => {
+          if (!reduceMotion) addPress.set(withTiming(0.9, { duration: 90 }));
+        }}
+        onPressOut={() => {
+          if (!reduceMotion) addPress.set(withSpring(1, { damping: 9, stiffness: 260 }));
+        }}
+        // The listing wizard (the old `listing/create` route redirects here too).
+        onPress={() => {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
+          router.push('/listing/new' as Href);
+        }}
+        accessibilityRole="button"
+        accessibilityLabel={t('listing.newListing')}>
+        <LinearGradient
+          // Matches web's --fho-orange-1 → --fho-orange-2 gradient exactly
+          // (src/styles/theme.css); RN's palette only exposes the first stop.
+          colors={[colors.accent, colors.accentEnd]}
+          style={styles.navAddGradient}>
+          <Feather name="plus" size={26} strokeWidth={2.5} color="#fff" />
+        </LinearGradient>
+      </AnimatedPressable>
     </View>
   );
 }
@@ -400,6 +408,21 @@ const styles = StyleSheet.create({
     zIndex: 1,
     ...Shadows.cta,
     elevation: 14,
+  },
+  navAddSlot: {
+    width: NAV_ADD_SIZE,
+    height: NAV_ADD_SIZE,
+  },
+  // Same spot the button had as the pill's middle child: horizontally
+  // centred (the four tabs are symmetric around it) and, from the margin-box
+  // centring above, (TAB_BAR_HEIGHT - NAV_ADD_SIZE - 22) / 2 below the pill's
+  // top edge, which sits NAV_ADD_OVERHANG below the wrapper's.
+  navAddFloating: {
+    position: 'absolute',
+    left: '50%',
+    marginLeft: -NAV_ADD_SIZE / 2,
+    top: NAV_ADD_OVERHANG + (TAB_BAR_HEIGHT - NAV_ADD_SIZE - 22) / 2,
+    marginTop: 0,
   },
   navAddGradient: {
     flex: 1,

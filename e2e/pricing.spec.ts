@@ -9,7 +9,7 @@ test('F15-H1 with no prices yet the page says so, without errors', async ({ page
   await page.goto('/pricing');
   await expect(page.getByRole('heading', { name: t('pricing.title') })).toBeVisible();
   await expect(page.getByText(t('pricing.comingSoon'))).toBeVisible();
-  expect(await axeViolations(page, { known: ['color-contrast'] })).toEqual([]);
+  expect(await axeViolations(page)).toEqual([]);
 });
 
 test('F15-H2 prices are grouped per plan with their periods; buying is off', async ({ page, writes }) => {

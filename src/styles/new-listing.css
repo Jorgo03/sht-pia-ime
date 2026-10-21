@@ -378,7 +378,7 @@
   background: none;
   font-size: 12px;
   font-weight: 700;
-  color: var(--fho-orange-2);
+  color: var(--fho-orange-text);
   cursor: pointer;
 }
 
@@ -422,7 +422,7 @@
 .nl-chip.active {
   background: var(--fho-orange-tint);
   border-color: var(--fho-orange-1);
-  color: var(--fho-orange-2);
+  color: var(--fho-orange-text);
 }
 
 .nl-chip.active::before {

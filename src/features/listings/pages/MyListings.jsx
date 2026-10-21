@@ -118,7 +118,7 @@ export default function MyListings() {
                         {t(`listing.status.${p.status}`)}
                       </span>
                     </div>
-                    <div className="mt-0.5 text-[15px] font-semibold text-fho-orange-2">
+                    <div className="mt-0.5 text-[15px] font-semibold text-fho-orange-text">
                       {formatPrice(p.price, i18n.language, p.currency)}
                     </div>
                   </div>

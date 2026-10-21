@@ -562,7 +562,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   headlineEm: {
     fontStyle: 'italic',
-    color: colors.accent,
+    color: colors.accentText,
   },
   // Matches web's .segment-control / .segment — bordered track, gradient
   // fill on the active tab (not a flat accent fill).

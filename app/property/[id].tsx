@@ -960,7 +960,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   openMapsLinkText: {
     fontSize: 13,
     fontWeight: '600',
-    color: colors.accent,
+    color: colors.accentText,
   },
   amenityRow: {
     flexDirection: 'row',
@@ -1045,7 +1045,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   agentAvatarText: {
     fontSize: 18,
     fontWeight: '700',
-    color: colors.accent,
+    color: colors.accentText,
   },
   agentInfo: {
     flex: 1,
@@ -1058,7 +1058,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   agentRole: {
     fontSize: 12,
-    color: colors.accent,
+    color: colors.accentText,
     fontWeight: '500',
   },
   callButton: {
@@ -1086,7 +1086,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   sentConfirm: {
     textAlign: 'center',
-    color: colors.accent,
+    color: colors.accentText,
     fontWeight: '600',
     paddingVertical: 14,
   },
@@ -1103,7 +1103,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   whatsappButtonText: {
     fontSize: 14,
     fontWeight: '600',
-    color: colors.accent,
+    color: colors.accentText,
   },
 
   priceRow: {
@@ -1120,7 +1120,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   price: {
     fontSize: 28,
     fontWeight: '700',
-    color: colors.accent,
+    color: colors.accentText,
   },
   priceSuffix: {
     fontSize: 14,

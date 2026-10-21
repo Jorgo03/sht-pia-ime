@@ -58,7 +58,7 @@
 
 .addsheet-title em {
   font-style: italic;
-  color: var(--fho-orange-1);
+  color: var(--fho-orange-text);
 }
 
 .addsheet-close {
@@ -214,7 +214,7 @@
 .addsheet-toggle.active {
   border-color: var(--fho-orange-1);
   background: var(--fho-orange-tint);
-  color: var(--fho-orange-1);
+  color: var(--fho-orange-text);
 }
 
 /* Toast */

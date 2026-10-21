@@ -357,7 +357,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   rowPrice: {
     fontSize: 15,
     fontWeight: '700',
-    color: colors.accent,
+    color: colors.accentText,
   },
   rowActions: {
     flexDirection: 'row',

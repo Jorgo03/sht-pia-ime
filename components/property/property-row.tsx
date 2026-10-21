@@ -269,7 +269,7 @@ const createStyles = (colors: AtticoPalette) =>
       flexShrink: 1,
       fontFamily: Fonts?.serifSemiBold,
       fontSize: 17,
-      color: colors.accent,
+      color: colors.accentText,
     },
     priceSuffix: {
       fontFamily: Fonts?.sans,

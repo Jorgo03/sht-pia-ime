@@ -259,7 +259,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   headlineEm: {
     fontStyle: 'italic',
-    color: colors.accent,
+    color: colors.accentText,
   },
   center: {
     flex: 1,

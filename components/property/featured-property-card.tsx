@@ -230,6 +230,6 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     fontSize: 22,
     fontWeight: '500',
     fontStyle: 'italic',
-    color: colors.accent,
+    color: colors.accentText,
   },
 });

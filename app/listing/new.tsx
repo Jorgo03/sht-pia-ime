@@ -1418,7 +1418,7 @@ const createStyles = (colors: AtticoPalette) =>
     draftAction: {
       fontFamily: Fonts?.sansSemiBold,
       fontSize: 12,
-      color: colors.accentEnd,
+      color: colors.accentText,
     },
 
     scrollContent: {
