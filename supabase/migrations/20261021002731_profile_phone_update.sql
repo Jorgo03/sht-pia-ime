@@ -1,5 +1,6 @@
--- PENDING: not applied. Apply only on the owner's "go"
--- (docs/LAUNCH_TASKS.md L12).
+-- Applied 2026-10-21 as migration 20261021002731, under the owner's "go" in
+-- the completion prompt (docs/LAUNCH_TASKS.md L12). Verified after applying:
+-- authenticated may update phone, still not role.
 --
 -- Lets a signed-in user change their own phone number, which "Edit profile"
 -- (web Profile page, phone Profile tab) offers. Today `profiles` UPDATE is

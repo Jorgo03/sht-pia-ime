@@ -1,9 +1,8 @@
--- Pre-apply check for supabase/pending/profile_phone_update.sql (L12).
--- Applies the pending grant and CHECK inside one DO block, tests them, then
--- raises an exception so ALL of it is rolled back: the database is left
--- exactly as it was. Expected: RESULTS passed=8/8. Run before applying; after
--- applying, G0 fails by design (the grant then exists).
--- Note: ALTER TABLE briefly locks `profiles` for the length of the block.
+-- Profile phone editing (migration 20261021002731, docs/LAUNCH_TASKS.md L12).
+-- Re-runnable on production: one DO block that always raises at the end, so
+-- every change is rolled back; no DELETE. Expected: RESULTS passed=7/7.
+-- (Before the migration was applied this file also applied it inside the
+-- block; that pre-apply run passed 8/8 on 2026-10-20.)
 do $$
 declare
   me uuid; other uuid; got text; n int;
@@ -13,21 +12,6 @@ begin
   select id into me from public.profiles where role = 'agent' order by created_at limit 1;
   select id into other from public.profiles where role = 'agent' and id <> me order by created_at limit 1;
   if me is null or other is null then raise exception 'RESULTS SKIP: needs two agents'; end if;
-
-  perform set_config('request.jwt.claims', json_build_object('sub', me, 'role', 'authenticated')::text, true);
-  set local role authenticated;
-  begin update public.profiles set phone = '+355 69 123 4567' where id = me; got := 'ok';
-  exception when others then got := sqlstate; end;
-  names := names || 'G0 before the grant, phone is not writable'::text; expected := expected || '42501'::text; actual := actual || got;
-  reset role;
-
-  -- The pending migration, verbatim.
-  alter table public.profiles
-    add constraint profiles_phone_format
-    check (phone is null or (phone ~ '^\+?[0-9 ()-]{6,32}$' and length(regexp_replace(phone, '\D', '', 'g')) >= 6))
-    not valid;
-  alter table public.profiles validate constraint profiles_phone_format;
-  grant update (phone) on public.profiles to authenticated;
 
   perform set_config('request.jwt.claims', json_build_object('sub', me, 'role', 'authenticated')::text, true);
   set local role authenticated;

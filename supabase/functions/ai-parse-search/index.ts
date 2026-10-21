@@ -33,15 +33,35 @@ const admin = createClient(
 
 async function rateLimit(key: string, feature: string, max: number): Promise<boolean> {
   const since = new Date(Date.now() - 3600_000).toISOString();
-  const { count } = await admin
+  const { count, error } = await admin
     .from('ai_usage')
     .select('id', { count: 'exact', head: true })
     .eq('key', key)
     .eq('feature', feature)
     .gte('created_at', since);
-  if ((count ?? 0) >= max) return false;
+  // Fail closed: if usage cannot be counted, no paid call is made.
+  if (error || (count ?? 0) >= max) return false;
   await admin.from('ai_usage').insert({ key, feature });
   return true;
+}
+
+// Project-wide ceiling on paid AI calls per feature per 24 hours, across every
+// caller (docs/LAUNCH_TASKS.md F1). The per-user and per-IP limits stop one
+// caller; this stops many, including one rotating a spoofed x-forwarded-for.
+// Set AI_DAILY_CALL_CAP as an Edge Function secret to change it. The default
+// is a safety net against runaway cost, not a budget the owner chose; the real
+// spend cap belongs in the Anthropic console.
+const AI_DAILY_CALL_CAP = Number(Deno.env.get('AI_DAILY_CALL_CAP') ?? '2000');
+
+async function underDailyCap(feature: string): Promise<boolean> {
+  const since = new Date(Date.now() - 86_400_000).toISOString();
+  const { count, error } = await admin
+    .from('ai_usage')
+    .select('id', { count: 'exact', head: true })
+    .eq('feature', feature)
+    .gte('created_at', since);
+  if (error) return false;
+  return (count ?? 0) <= AI_DAILY_CALL_CAP;
 }
 
 async function callerKey(req: Request): Promise<string> {
@@ -63,6 +83,10 @@ Deno.serve(async (req) => {
 
     if (!(await rateLimit(await callerKey(req), 'parse-search', RATE_LIMIT_PER_HOUR))) {
       return json({ error: 'rate_limited' }, 429);
+    }
+    if (!(await underDailyCap('parse-search'))) {
+      // Same answer as any AI outage: the client keeps working without AI.
+      return json({ error: 'ai_unavailable' }, 503);
     }
 
     const r = await fetch('https://api.anthropic.com/v1/messages', {

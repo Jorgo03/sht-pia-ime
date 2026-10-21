@@ -9,7 +9,7 @@ runs a `DELETE`.
 | --- | --- | --- |
 | `rls_ownership_guards.sql` | Listing, conversation and viewing ownership guards (migration `20261015205024`) | `passed=15/15` |
 | `rls_report_and_block.sql` | Reports and blocks (migration `20261016181934`) | `passed=18/18` |
-| `pending_profile_phone_update.sql` | The **not yet applied** `supabase/pending/profile_phone_update.sql`, applied and tested inside the rolled-back block | `passed=8/8` before applying |
+| `rls_profile_phone.sql` | Own-phone editing (migration `20261021002731`) | `passed=7/7` |
 
 Run one in the Supabase SQL editor, with the Supabase MCP `execute_sql` tool,
 or with `psql "$DATABASE_URL" -f <file>`. The "error" you get back is the

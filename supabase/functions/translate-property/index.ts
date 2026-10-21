@@ -87,15 +87,35 @@ const admin = createClient(
 
 async function rateLimit(key: string, feature: string, max: number): Promise<boolean> {
   const since = new Date(Date.now() - 3600_000).toISOString();
-  const { count } = await admin
+  const { count, error } = await admin
     .from('ai_usage')
     .select('id', { count: 'exact', head: true })
     .eq('key', key)
     .eq('feature', feature)
     .gte('created_at', since);
-  if ((count ?? 0) >= max) return false;
+  // Fail closed: if usage cannot be counted, no paid call is made.
+  if (error || (count ?? 0) >= max) return false;
   await admin.from('ai_usage').insert({ key, feature });
   return true;
+}
+
+// Project-wide ceiling on paid AI calls per feature per 24 hours, across every
+// caller (docs/LAUNCH_TASKS.md F1). The per-user and per-IP limits stop one
+// caller; this stops many, including one rotating a spoofed x-forwarded-for.
+// Set AI_DAILY_CALL_CAP as an Edge Function secret to change it. The default
+// is a safety net against runaway cost, not a budget the owner chose; the real
+// spend cap belongs in the Anthropic console.
+const AI_DAILY_CALL_CAP = Number(Deno.env.get('AI_DAILY_CALL_CAP') ?? '2000');
+
+async function underDailyCap(feature: string): Promise<boolean> {
+  const since = new Date(Date.now() - 86_400_000).toISOString();
+  const { count, error } = await admin
+    .from('ai_usage')
+    .select('id', { count: 'exact', head: true })
+    .eq('feature', feature)
+    .gte('created_at', since);
+  if (error) return false;
+  return (count ?? 0) <= AI_DAILY_CALL_CAP;
 }
 
 /**
@@ -475,8 +495,11 @@ async function translate(
   source: Lang,
   targets: Lang[],
   fields: FieldPair,
+  paidAllowed = true,
 ): Promise<{ result: Record<string, FieldPair>; provider: string }> {
-  if (ANTHROPIC_KEY) {
+  // Past the daily ceiling the free engine takes over, so listings still
+  // translate and the paid key stops being spent.
+  if (ANTHROPIC_KEY && paidAllowed) {
     try {
       return { result: await translateViaAnthropic(source, targets, fields), provider: 'anthropic' };
     } catch (err) {
@@ -568,7 +591,9 @@ Deno.serve(async (req) => {
       return json({ error: 'rate_limited' }, 429);
     }
 
-    const { result, provider } = await translate(source, targets, fields);
+    // The service role (bulk scripts) is exempt, like its hourly limit.
+    const paidAllowed = rateLimitKey === null || (await underDailyCap('translate-property'));
+    const { result, provider } = await translate(source, targets, fields, paidAllowed);
 
     if (legacy) {
       const flat: Record<string, string> = { [source]: fields.title };

@@ -1,5 +1,7 @@
--- PENDING: not applied. Apply only on the owner's "go"
--- (docs/LAUNCH_TASKS.md L13, AUDIT.md S-4).
+-- Applied 2026-10-21 as migration 20261021002739, under the owner's "go" in
+-- the completion prompt (docs/LAUNCH_TASKS.md L13, AUDIT.md S-4). Verified
+-- after applying: signed out still sees the same 6 agent profiles, and a
+-- signed-out call to buyer_has_open_wanted_home() fails with 42501.
 --
 -- Problem: current_user_is_agent() and buyer_has_open_wanted_home(uuid) are
 -- SECURITY DEFINER and executable while signed out. The second answers "does
