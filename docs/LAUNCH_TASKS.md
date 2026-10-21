@@ -107,6 +107,15 @@ Earlier IDs, kept for history. Status updated 2026-10-21.
 | L31 | F16 | Phone tab-bar semantics | VERIFIED (export) | As F16. |
 | L32 | store | Unused camera purpose string | VERIFIED | Prebuild. |
 
+## Follow-up 2026-10-21: Google sign-in name, notification switches, email codes
+
+See `docs/AUTH_NOTIFICATIONS_EMAIL_REPORT.md`. F14's sheet now keeps device
+permission, registration and the account's switches apart (tests X13–X16,
+`notificationDeviceState`), and `push-dispatch` v2 drops pushes switched off
+after queueing. F4's code flow follows Supabase's own wait time (F4-N6, X18).
+Still BLOCKED: Google branding/verification, a sending domain for Resend, and
+device delivery checks.
+
 ## What is left, by kind
 
 1. **Engineering that can be done now:** none open. Two finished pieces wait
