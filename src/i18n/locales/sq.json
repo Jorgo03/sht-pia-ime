@@ -26,7 +26,8 @@
     "previous": "E mëparshme",
     "next": "Tjetra",
     "retry": "Provo përsëri",
-    "done": "U krye"
+    "done": "U krye",
+    "language": "Gjuha"
   },
   "auth": {
     "roleClient": "Klient",

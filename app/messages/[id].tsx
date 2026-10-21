@@ -253,6 +253,7 @@ export default function ThreadScreen() {
           subtitle={
             propertyTitle ? (
               <TouchableOpacity
+                accessibilityRole="button"
                 onPress={() => propertyId && router.push(`/property/${propertyId}` as Href)}>
                 <Text style={styles.headerProperty} numberOfLines={1}>
                   {propertyTitle}
@@ -319,6 +320,7 @@ export default function ThreadScreen() {
             returnKeyType="send"
           />
           <TouchableOpacity
+            accessibilityRole="button" accessibilityLabel={t('common.send')}
             onPress={send}
             disabled={sending || !text.trim()}
             activeOpacity={0.8}

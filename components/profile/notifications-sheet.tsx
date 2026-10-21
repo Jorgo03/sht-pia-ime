@@ -74,7 +74,7 @@ export function NotificationsSheet({ userId, onClose }: { userId: string; onClos
 
   return (
     <Modal visible transparent animationType="slide" onRequestClose={onClose}>
-      <Pressable style={styles.backdrop} onPress={onClose} accessibilityLabel={t('common.close')} />
+      <Pressable accessibilityRole="button" style={styles.backdrop} onPress={onClose} accessibilityLabel={t('common.close')} />
       <View style={styles.sheetWrap} pointerEvents="box-none">
         <SafeAreaView edges={['bottom']} style={[styles.sheet, webColumn]}>
           <View style={styles.grip} />

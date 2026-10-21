@@ -113,7 +113,7 @@ export default function MyListingsScreen() {
             a gradient "+ New Listing" pill, not a bare icon button. */}
         <View style={styles.titleRow}>
           <Text style={styles.pageTitle} accessibilityRole="header">{t('listing.myListings')}</Text>
-          <TouchableOpacity onPress={() => router.push('/listing/new' as Href)} activeOpacity={0.85}>
+          <TouchableOpacity accessibilityRole="button" onPress={() => router.push('/listing/new' as Href)} activeOpacity={0.85}>
             <LinearGradient colors={[colors.accent, colors.accentEnd]} style={styles.newListingPill}>
               <MaterialIcons name="add" size={16} color="#fff" />
               <Text style={styles.newListingPillText}>{t('listing.newListing')}</Text>
@@ -146,7 +146,7 @@ export default function MyListingsScreen() {
               const color = statusColor(colors, item.status);
               return (
                 <View style={styles.row}>
-                  <TouchableOpacity onPress={() => router.push(`/property/${item.id}` as Href)} activeOpacity={0.8}>
+                  <TouchableOpacity accessibilityRole="button" accessibilityLabel={title} onPress={() => router.push(`/property/${item.id}` as Href)} activeOpacity={0.8}>
                     {item.image_urls?.[0] ? (
                       <Image accessibilityLabel={title} source={{ uri: item.image_urls[0] }} style={styles.thumb} contentFit="cover" />
                     ) : (

@@ -73,6 +73,7 @@ function Chip({
   const styles = useMemo(() => createStyles(colors), [colors]);
   return (
     <Pressable
+      accessibilityRole="button"
       onPress={onPress}
       style={[styles.chip, active && styles.chipActive]}>
       <Text style={[styles.chipText, active && styles.chipTextActive]}>
@@ -102,6 +103,7 @@ function Segment({
         const isActive = active === opt.value;
         return (
           <Pressable
+            accessibilityRole="button"
             key={opt.value}
             onPress={() => onChange(opt.value)}
             style={styles.segment}>
@@ -213,14 +215,14 @@ export function FilterSheet({
       animationType="slide"
       onRequestClose={onClose}>
       <View style={styles.backdrop}>
-        <Pressable style={StyleSheet.absoluteFill} onPress={onClose} />
+        <Pressable accessibilityRole="button" accessibilityLabel={t('common.close')} style={StyleSheet.absoluteFill} onPress={onClose} />
         <Animated.View style={[styles.container, webColumn, sheetAnimatedStyle]}>
         <GestureDetector gesture={panGesture}>
           <View>
             <View style={styles.grip} />
             <View style={styles.header}>
               <Text style={styles.title}>{t('search.filtersTitle')}</Text>
-              <Pressable onPress={reset} hitSlop={12}>
+              <Pressable accessibilityRole="button" onPress={reset} hitSlop={12}>
                 <Text style={styles.resetText}>{t('search.reset')}</Text>
               </Pressable>
             </View>
@@ -434,7 +436,7 @@ export function FilterSheet({
           </Section>
         </ScrollView>
 
-        <Pressable style={styles.cta} onPress={onClose}>
+        <Pressable accessibilityRole="button" style={styles.cta} onPress={onClose}>
           <LinearGradient
             colors={[colors.accent, colors.accentEnd]}
             start={{ x: 0, y: 0 }}

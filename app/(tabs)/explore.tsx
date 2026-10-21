@@ -167,6 +167,7 @@ export default function ExploreScreen() {
                   of this same screen, not a separate tab. */}
               <View style={styles.viewToggle}>
                 <Pressable
+                  accessibilityRole="button"
                   style={[styles.viewToggleButton, viewMode === 'list' && styles.viewToggleButtonActive]}
                   onPress={() => setViewMode('list')}
                   accessibilityLabel={t('search.listView')}>
@@ -177,6 +178,7 @@ export default function ExploreScreen() {
                   />
                 </Pressable>
                 <Pressable
+                  accessibilityRole="button"
                   style={[styles.viewToggleButton, viewMode === 'map' && styles.viewToggleButtonActive]}
                   onPress={() => setViewMode('map')}
                   accessibilityLabel={t('search.mapView')}>
@@ -188,6 +190,7 @@ export default function ExploreScreen() {
                 </Pressable>
               </View>
               <Pressable
+                accessibilityRole="button"
                 style={styles.filterButton}
                 onPress={() => setSheetOpen(true)}
                 accessibilityLabel={t('search.filtersTitle')}>
@@ -217,7 +220,7 @@ export default function ExploreScreen() {
             returnKeyType="search"
           />
           {searchText.length > 0 && (
-            <Pressable onPress={() => setSearchText('')} hitSlop={8}>
+            <Pressable accessibilityRole="button" accessibilityLabel={t('search.reset')} onPress={() => setSearchText('')} hitSlop={8}>
               <MaterialIcons name="close" size={16} color={colors.textSecondary} />
             </Pressable>
           )}
@@ -245,7 +248,7 @@ export default function ExploreScreen() {
           <View style={styles.empty}>
             <MaterialIcons name="error-outline" size={40} color={colors.textSecondary} />
             <Text style={styles.emptyTitle}>{t('errors.generic')}</Text>
-            <Pressable style={styles.emptyResetButton} onPress={() => refetch()}>
+            <Pressable accessibilityRole="button" style={styles.emptyResetButton} onPress={() => refetch()}>
               <MaterialIcons name="restart-alt" size={14} color={colors.accent} />
               <Text style={styles.emptyResetText}>{t('common.retry')}</Text>
             </Pressable>
@@ -297,6 +300,7 @@ export default function ExploreScreen() {
                 <Text style={styles.emptyHint}>{t('search.emptyHint')}</Text>
                 {activeCount > 0 && (
                   <Pressable
+                    accessibilityRole="button"
                     style={styles.emptyResetButton}
                     onPress={() => {
                       reset();

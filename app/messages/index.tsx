@@ -168,7 +168,7 @@ export default function MessagesInboxScreen() {
               <MaterialIcons name="error-outline" size={40} color={colors.accent} />
             </View>
             <Text style={styles.subtitle}>{t('errors.generic')}</Text>
-            <TouchableOpacity onPress={loadConversations} activeOpacity={0.7}>
+            <TouchableOpacity accessibilityRole="button" onPress={loadConversations} activeOpacity={0.7}>
               <Text style={styles.retryText}>{t('common.retry')}</Text>
             </TouchableOpacity>
           </View>
@@ -196,6 +196,7 @@ export default function MessagesInboxScreen() {
 
               return (
                 <TouchableOpacity
+                  accessibilityRole="button"
                   style={[styles.row, myUnread > 0 && styles.rowUnread]}
                   activeOpacity={0.7}
                   onPress={() => router.push(`/messages/${item.id}` as Href)}>

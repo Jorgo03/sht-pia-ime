@@ -128,6 +128,7 @@ export function RoadField({
             nestedScrollEnabled>
             {suggestions.map((road) => (
               <Pressable
+                accessibilityRole="button"
                 key={`${road.name}-${road.latitude}-${road.longitude}`}
                 style={({ pressed }) => [styles.row, pressed && styles.rowPressed]}
                 onPress={() => pick(road)}>

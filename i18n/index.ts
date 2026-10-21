@@ -60,6 +60,14 @@ const languageDetector = {
   },
 };
 
+// Web: keep <html lang> in step with the language shown, so screen readers
+// read the page with the right voice (the HTML is pre-rendered as "sq").
+if (Platform.OS === 'web' && typeof document !== 'undefined') {
+  i18n.on('languageChanged', (lng) => {
+    document.documentElement.lang = lng;
+  });
+}
+
 /** Web: switch to the visitor's language after hydration. No-op on native. */
 export async function applyPreferredLanguage(): Promise<void> {
   if (!deferToHydration || languageReady) return;

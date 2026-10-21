@@ -26,7 +26,8 @@
     "previous": "Anterior",
     "next": "Siguiente",
     "retry": "Reintentar",
-    "done": "Listo"
+    "done": "Listo",
+    "language": "Idioma"
   },
   "auth": {
     "roleClient": "Cliente",

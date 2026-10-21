@@ -164,12 +164,13 @@ export function AppHeader({
       <View style={styles.actions}>
         {showControls && (
           <>
-            {/* No accessibilityLabel: the visible code is the name, same as
-                web's `.lang-btn`, which has no aria-label either. */}
+            {/* Labelled: the visible content is only a flag emoji, which a
+                screen reader reads as "flag" rather than "Language". */}
             <Pressable
               style={styles.langBtn}
               onPress={() => setLangOpen(true)}
-              accessibilityRole="button">
+              accessibilityRole="button"
+              accessibilityLabel={t('common.language')}>
               <Text style={styles.langCode}>{currentFlag}</Text>
               <MaterialIcons name="expand-more" size={14} color={styles.langCode.color} />
             </Pressable>

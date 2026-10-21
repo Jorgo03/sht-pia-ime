@@ -70,7 +70,7 @@ export function ReportSheet({
 
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={close}>
-      <Pressable style={styles.backdrop} onPress={close} accessibilityLabel={t('common.close')} />
+      <Pressable accessibilityRole="button" style={styles.backdrop} onPress={close} accessibilityLabel={t('common.close')} />
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         style={styles.sheetWrap}

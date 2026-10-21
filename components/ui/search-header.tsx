@@ -37,7 +37,7 @@ export function SearchHeader({ kicker, headline, emphasis, onSearchPress }: Sear
         {emphasis ? <Text style={styles.headlineEmphasis}> {emphasis}</Text> : null}
       </Text>
 
-      <TouchableOpacity style={styles.searchBar} onPress={onSearchPress} activeOpacity={0.8}>
+      <TouchableOpacity accessibilityRole="button" style={styles.searchBar} onPress={onSearchPress} activeOpacity={0.8}>
         <MaterialIcons name="search" size={18} color={colors.textSecondary} />
         <Text style={styles.searchPlaceholder} numberOfLines={1}>
           {t('home.searchPlaceholder')}

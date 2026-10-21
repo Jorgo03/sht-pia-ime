@@ -14,6 +14,7 @@ import { useTheme } from '@/contexts/theme-context';
 import { useResponsive } from '@/hooks/use-responsive';
 import { Property } from '@/data/types';
 import { formatPrice, getLocalizedText, priceSuffixKey } from '@/lib/format';
+import { CARD_CONTAINER_A11Y } from '@/components/property/card-a11y';
 
 const COMPACT_GAP = 12;
 
@@ -63,6 +64,7 @@ function PropertyCardBase({ property, onPress, variant = 'grid' }: PropertyCardP
     return (
       <Animated.View style={pressStyle}>
       <Pressable
+        {...CARD_CONTAINER_A11Y}
         style={[styles.compactCard, { width: getCompactCardWidth(screenWidth) }]}
         onPress={handlePress}
         onPressIn={onPressIn}
@@ -79,6 +81,9 @@ function PropertyCardBase({ property, onPress, variant = 'grid' }: PropertyCardP
             transition={300}
           />
           <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel={t('common.save')}
+            accessibilityState={{ selected: favorited }}
             style={styles.compactHeart}
             onPress={() => toggle(property.id)}
             activeOpacity={0.7}
@@ -93,7 +98,7 @@ function PropertyCardBase({ property, onPress, variant = 'grid' }: PropertyCardP
           </TouchableOpacity>
         </View>
         <View style={styles.compactInfo}>
-          <Text style={styles.compactTitle} numberOfLines={1}>
+          <Text style={styles.compactTitle} numberOfLines={1} accessibilityRole="link" onPress={handlePress}>
             {title}
           </Text>
           <View style={styles.compactLocationRow}>
@@ -127,6 +132,7 @@ function PropertyCardBase({ property, onPress, variant = 'grid' }: PropertyCardP
   return (
     <Animated.View style={[styles.cardOuter, pressStyle]}>
     <Pressable
+      {...CARD_CONTAINER_A11Y}
       style={styles.card}
       onPress={handlePress}
       onPressIn={onPressIn}
@@ -145,6 +151,9 @@ function PropertyCardBase({ property, onPress, variant = 'grid' }: PropertyCardP
           transition={300}
         />
         <TouchableOpacity
+          accessibilityRole="button"
+          accessibilityLabel={t('common.save')}
+          accessibilityState={{ selected: favorited }}
           style={styles.heartButton}
           onPress={() => toggle(property.id)}
           activeOpacity={0.7}
@@ -161,7 +170,13 @@ function PropertyCardBase({ property, onPress, variant = 'grid' }: PropertyCardP
       <View style={styles.info}>
         {/* Matches web's .mini-price — price and suffix share one plain text
             node with no distinct sub-styling for the suffix. */}
-        <Text style={styles.price}>{price}{suffix}</Text>
+        <Text
+          style={styles.price}
+          accessibilityRole="link"
+          accessibilityLabel={`${title}, ${price}${suffix}`}
+          onPress={handlePress}>
+          {price}{suffix}
+        </Text>
         <View style={styles.locationRow}>
           <MaterialIcons name="location-on" size={11} color={colors.textSecondary} />
           <Text style={styles.location} numberOfLines={1}>

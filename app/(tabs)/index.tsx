@@ -138,7 +138,7 @@ export default function HomeScreen() {
           ) : isError ? (
             <View style={styles.errorCard}>
               <Text style={styles.errorText}>{t('common.error')}</Text>
-              <TouchableOpacity onPress={() => refetch()} activeOpacity={0.7}>
+              <TouchableOpacity accessibilityRole="button" onPress={() => refetch()} activeOpacity={0.7}>
                 <Text style={styles.retryText}>{t('common.retry')}</Text>
               </TouchableOpacity>
             </View>
@@ -169,6 +169,7 @@ export default function HomeScreen() {
                   <View style={styles.sectionHeader}>
                     <Text style={styles.sectionTitle}>{t('home.matched')}</Text>
                     <TouchableOpacity
+                      accessibilityRole="button"
                       onPress={() => router.push('/(tabs)/explore' as Href)}
                       activeOpacity={0.7}>
                       <Text style={styles.seeAll}>{t('home.seeAll')}</Text>
@@ -213,7 +214,7 @@ export default function HomeScreen() {
                 <View style={styles.section}>
                   <View style={styles.sectionHeader}>
                     <Text style={styles.sectionTitle}>{t('search.sort.newest')}</Text>
-                    <TouchableOpacity onPress={() => openExplore(newestType)} activeOpacity={0.7}>
+                    <TouchableOpacity accessibilityRole="button" onPress={() => openExplore(newestType)} activeOpacity={0.7}>
                       <Text style={styles.seeAll}>{t('home.seeAll')}</Text>
                     </TouchableOpacity>
                   </View>

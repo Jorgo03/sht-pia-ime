@@ -30,6 +30,7 @@ export function FilterTabs({ tabs, activeTab, onTabChange }: FilterTabsProps) {
         const isActive = selected === tab;
         return (
           <TouchableOpacity
+            accessibilityRole="button"
             key={tab}
             style={[styles.tab, isActive && styles.activeTab]}
             onPress={() => handlePress(tab)}

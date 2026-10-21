@@ -13,6 +13,7 @@ import { useTheme } from '@/contexts/theme-context';
 import { useResponsive } from '@/hooks/use-responsive';
 import { Property } from '@/data/types';
 import { formatPrice, getLocalizedText, listingBadgeKey, priceSuffixKey } from '@/lib/format';
+import { CARD_CONTAINER_A11Y } from '@/components/property/card-a11y';
 
 /** Matches web's .featured-card__img exactly — a fixed height regardless of
  *  viewport width, not an aspect ratio (src/styles/home.css has no media
@@ -63,6 +64,7 @@ function FeaturedPropertyCardBase({
   return (
     <Animated.View style={pressStyle}>
     <Pressable
+      {...CARD_CONTAINER_A11Y}
       style={[styles.card, { width: cardWidth }]}
       onPress={handlePress}
       onPressIn={onPressIn}
@@ -82,6 +84,9 @@ function FeaturedPropertyCardBase({
           <Text style={styles.badgeText}>{badgeLabel.toUpperCase()}</Text>
         </View>
         <TouchableOpacity
+          accessibilityRole="button"
+          accessibilityLabel={t('common.save')}
+          accessibilityState={{ selected: favorited }}
           style={styles.heartButton}
           onPress={handleFavorite}
           activeOpacity={0.7}
@@ -97,7 +102,7 @@ function FeaturedPropertyCardBase({
       </View>
 
       <View style={styles.body}>
-        <Text style={styles.name} numberOfLines={1}>
+        <Text style={styles.name} numberOfLines={1} accessibilityRole="link" onPress={handlePress}>
           {title}
         </Text>
         <View style={styles.locationRow}>

@@ -89,6 +89,7 @@ export function BottomSheet({
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
       <View style={styles.backdrop}>
         <Pressable
+          accessibilityRole="button"
           style={StyleSheet.absoluteFill}
           onPress={onClose}
           accessibilityLabel={t('common.close')}

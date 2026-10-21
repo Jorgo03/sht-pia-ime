@@ -151,6 +151,7 @@ export default function PropertyAnalyticsScreen() {
                   const active = metric === type;
                   return (
                     <TouchableOpacity
+                      accessibilityRole="button"
                       key={type}
                       onPress={() => setMetric(type)}
                       activeOpacity={0.7}

@@ -73,6 +73,7 @@ export function SelectField({
                 const active = item.value === value;
                 return (
                   <Pressable
+                    accessibilityRole="button"
                     style={[styles.option, active && styles.optionActive]}
                     onPress={() => {
                       onChange(item.value);

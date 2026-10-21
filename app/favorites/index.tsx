@@ -109,7 +109,7 @@ function FavRow({
   const suffix = suffixKey ? t(suffixKey) : '';
 
   return (
-    <TouchableOpacity style={styles.row} onPress={onTap} activeOpacity={0.85}>
+    <TouchableOpacity accessibilityRole="button" style={styles.row} onPress={onTap} activeOpacity={0.85}>
       <View style={styles.rowImageWrap}>
         {property.image_urls?.[0] ? (
           <Image accessibilityLabel={title} source={{ uri: property.image_urls[0] }} style={styles.rowImage} contentFit="cover" />

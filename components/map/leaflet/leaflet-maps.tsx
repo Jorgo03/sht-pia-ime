@@ -167,7 +167,9 @@ export function PreviewMap({ latitude, longitude, colors }: { latitude: number; 
     { zoomControl: false, dragging: false, scrollWheelZoom: false, doubleClickZoom: false, touchZoom: false, boxZoom: false, keyboard: false },
     (map) => {
       map.fitBounds(toBounds({ latitude, longitude, latitudeDelta: 0.02, longitudeDelta: 0.02 }));
-      L.marker([latitude, longitude], { icon: pinIcon(colors), interactive: false }).addTo(map);
+      // keyboard: false — Leaflet otherwise makes every marker an unnamed
+      // keyboard "button", even this one that does nothing.
+      L.marker([latitude, longitude], { icon: pinIcon(colors), interactive: false, keyboard: false }).addTo(map);
     },
   );
   return <div ref={el} style={FILL} />;
@@ -218,7 +220,8 @@ export function PickerMap({
       marker.current.setLatLng(at);
       return;
     }
-    marker.current = L.marker(at, { icon: pinIcon(colors), draggable: true })
+    // Placed by tapping the map and moved by dragging; not a keyboard control.
+    marker.current = L.marker(at, { icon: pinIcon(colors), draggable: true, keyboard: false })
       .on('dragend', () => {
         const p = marker.current.getLatLng();
         pick.current(p.lat, p.lng);

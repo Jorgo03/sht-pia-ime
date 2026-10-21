@@ -223,6 +223,7 @@ export function MapScreenContent() {
       {previewProperty && (
         <View style={styles.previewCard} pointerEvents="box-none">
           <TouchableOpacity
+            accessibilityRole="button"
             style={styles.previewTouchable}
             activeOpacity={0.9}
             onPress={() => router.push(`/property/${previewProperty.id}` as Href)}>
@@ -259,6 +260,7 @@ export function MapScreenContent() {
             </View>
           </TouchableOpacity>
           <TouchableOpacity
+            accessibilityRole="button" accessibilityLabel={t('common.close')}
             style={styles.previewClose}
             onPress={() => setPreviewProperty(null)}
             hitSlop={10}>

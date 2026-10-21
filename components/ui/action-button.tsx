@@ -22,6 +22,7 @@ export function ActionButton({
 
   return (
     <TouchableOpacity
+      accessibilityRole="button"
       style={[
         styles.button,
         variant === 'secondary' && styles.secondary,

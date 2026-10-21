@@ -50,6 +50,7 @@ import { formatPrice, listingBadgeKey, priceSuffixKey, telUrl, whatsappUrl } fro
 import { webColumn } from '@/constants/web-frame';
 import { useAppDimensions } from '@/hooks/use-app-dimensions';
 import { PageHead } from '@/components/web/page-head';
+import { CARD_CONTAINER_A11Y } from '@/components/property/card-a11y';
 
 // Rounds "now + 1h" to the next half hour — same default the web app's
 // ViewingRequestSheet uses.
@@ -363,6 +364,7 @@ export default function PropertyDetailScreen() {
             <LocationPreviewMap latitude={property.latitude} longitude={property.longitude} />
           </View>
           <TouchableOpacity
+            accessibilityRole="button"
             style={styles.openMapsLink}
             onPress={() =>
               Linking.openURL(`https://www.google.com/maps?q=${property.latitude},${property.longitude}`)
@@ -412,6 +414,7 @@ export default function PropertyDetailScreen() {
             <Text style={styles.sectionTitle}>{t('auth.agent')}</Text>
           </View>
           <TouchableOpacity
+            {...CARD_CONTAINER_A11Y}
             style={styles.agentRow}
             activeOpacity={0.8}
             onPress={() => router.push(`/agent/${agent.id}` as Href)}>
@@ -419,11 +422,21 @@ export default function PropertyDetailScreen() {
               <Text style={styles.agentAvatarText}>{agentInitial}</Text>
             </View>
             <View style={styles.agentInfo}>
-              <Text style={styles.agentName}>{agent.full_name || t('auth.agent')}</Text>
+              <Text
+                style={styles.agentName}
+                accessibilityRole="link"
+                onPress={() => router.push(`/agent/${agent.id}` as Href)}>
+                {agent.full_name || t('auth.agent')}
+              </Text>
               {agent.agency_name ? <Text style={styles.agentRole}>{agent.agency_name}</Text> : null}
             </View>
             {contactPhone ? (
-              <TouchableOpacity style={styles.callButton} onPress={handleCall} activeOpacity={0.7}>
+              <TouchableOpacity
+                accessibilityRole="button"
+                accessibilityLabel={t('property.call')}
+                style={styles.callButton}
+                onPress={handleCall}
+                activeOpacity={0.7}>
                 <MaterialIcons name="phone" size={20} color="#fff" />
               </TouchableOpacity>
             ) : null}
@@ -458,7 +471,7 @@ export default function PropertyDetailScreen() {
             />
           )}
           {contactPhone ? (
-            <TouchableOpacity style={styles.whatsappButton} onPress={handleWhatsApp} activeOpacity={0.8}>
+            <TouchableOpacity accessibilityRole="button" style={styles.whatsappButton} onPress={handleWhatsApp} activeOpacity={0.8}>
               <MaterialIcons name="chat" size={18} color={colors.accent} />
               <Text style={styles.whatsappButtonText}>WhatsApp</Text>
             </TouchableOpacity>
@@ -511,6 +524,7 @@ export default function PropertyDetailScreen() {
             }}
             renderItem={({ item }) => (
               <TouchableOpacity
+                accessibilityRole="button" accessibilityLabel={t('listing.images')}
                 activeOpacity={0.95}
                 onPress={() => setLightboxOpen(true)}
                 style={{ width: heroWidth, height: imageHeight }}>
@@ -541,12 +555,14 @@ export default function PropertyDetailScreen() {
             trailing={
               <>
                 <TouchableOpacity
+                  accessibilityRole="button" accessibilityLabel={t('detail.share')}
                   style={styles.headerButton}
                   onPress={handleShare}
                   activeOpacity={0.7}>
                   <MaterialIcons name="share" size={20} color="#fff" />
                 </TouchableOpacity>
                 <TouchableOpacity
+                  accessibilityRole="button" accessibilityLabel={t('common.save')}
                   style={styles.headerButton}
                   onPress={() => toggle(id ?? '')}
                   activeOpacity={0.7}>
@@ -610,7 +626,7 @@ export default function PropertyDetailScreen() {
               <Text style={styles.modalTitle}>
                 {t('viewings.requestTitle')} {t('viewings.requestTitleEm')}
               </Text>
-              <TouchableOpacity onPress={() => setViewingSheetOpen(false)} hitSlop={8}>
+              <TouchableOpacity accessibilityRole="button" accessibilityLabel={t('common.close')} onPress={() => setViewingSheetOpen(false)} hitSlop={8}>
                 <MaterialIcons name="close" size={22} color={colors.textSecondary} />
               </TouchableOpacity>
             </View>
@@ -657,6 +673,7 @@ export default function PropertyDetailScreen() {
         onRequestClose={() => setLightboxOpen(false)}>
         <View style={styles.lightboxBackdrop}>
           <TouchableOpacity
+            accessibilityRole="button" accessibilityLabel={t('common.close')}
             style={styles.lightboxClose}
             onPress={() => setLightboxOpen(false)}
             activeOpacity={0.7}

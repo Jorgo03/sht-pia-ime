@@ -17,6 +17,7 @@ import {
   listingBadgeKey,
   priceSuffixKey,
 } from '@/lib/format';
+import { CARD_CONTAINER_A11Y } from '@/components/property/card-a11y';
 
 const IMAGE_SIZE = 108;
 
@@ -73,8 +74,7 @@ function PropertyRowBase({ property }: { property: Property }) {
         onPress={() => router.push(`/property/${property.id}` as Href)}
         onPressIn={onPressIn}
         onPressOut={onPressOut}
-        accessibilityRole="button"
-        accessibilityLabel={`${title}, ${price}${suffixKey ? t(suffixKey) : ''}, ${place ?? ''}`}>
+        {...CARD_CONTAINER_A11Y}>
         <View style={styles.imageWrap}>
           <Image
             accessibilityLabel={title}
@@ -101,6 +101,7 @@ function PropertyRowBase({ property }: { property: Property }) {
               hitSlop={12}
               activeOpacity={0.7}
               accessibilityRole="button"
+              accessibilityLabel={t('common.save')}
               accessibilityState={{ selected: favorited }}
               style={styles.heart}>
               <Animated.View style={heartStyle}>
@@ -113,7 +114,12 @@ function PropertyRowBase({ property }: { property: Property }) {
             </TouchableOpacity>
           </View>
 
-          <Text style={styles.title} numberOfLines={2}>
+          <Text
+            style={styles.title}
+            numberOfLines={2}
+            accessibilityRole="link"
+            accessibilityLabel={`${title}, ${price}${suffixKey ? t(suffixKey) : ''}, ${place ?? ''}`}
+            onPress={() => router.push(`/property/${property.id}` as Href)}>
             {title}
           </Text>
 

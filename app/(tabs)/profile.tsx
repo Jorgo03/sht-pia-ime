@@ -558,6 +558,7 @@ export default function ProfileScreen() {
                 nav pill already covers it. */}
             <View style={styles.menuList}>
               <TouchableOpacity
+                accessibilityRole="button"
                 style={styles.menuRow}
                 onPress={() => setEditOpen(true)}
                 activeOpacity={0.7}>
@@ -567,6 +568,7 @@ export default function ProfileScreen() {
               </TouchableOpacity>
               <View style={styles.menuDivider} />
               <TouchableOpacity
+                accessibilityRole="button"
                 style={styles.menuRow}
                 onPress={() => setNotificationsOpen(true)}
                 activeOpacity={0.7}>
@@ -576,6 +578,7 @@ export default function ProfileScreen() {
               </TouchableOpacity>
               <View style={styles.menuDivider} />
               <TouchableOpacity
+                accessibilityRole="button"
                 style={styles.menuRow}
                 onPress={() => router.push('/favorites' as Href)}
                 activeOpacity={0.7}>
@@ -592,6 +595,7 @@ export default function ProfileScreen() {
               </TouchableOpacity>
               <View style={styles.menuDivider} />
               <TouchableOpacity
+                accessibilityRole="button"
                 style={styles.menuRow}
                 onPress={() => router.push('/messages' as Href)}
                 activeOpacity={0.7}>
@@ -606,6 +610,7 @@ export default function ProfileScreen() {
               </TouchableOpacity>
               <View style={styles.menuDivider} />
               <TouchableOpacity
+                accessibilityRole="button"
                 style={styles.menuRow}
                 onPress={() => router.push('/saved-searches' as Href)}
                 activeOpacity={0.7}>
@@ -620,6 +625,7 @@ export default function ProfileScreen() {
               </TouchableOpacity>
               <View style={styles.menuDivider} />
               <TouchableOpacity
+                accessibilityRole="button"
                 style={styles.menuRow}
                 onPress={() => router.push('/viewings' as Href)}
                 activeOpacity={0.7}>
@@ -629,6 +635,7 @@ export default function ProfileScreen() {
               </TouchableOpacity>
               <View style={styles.menuDivider} />
               <TouchableOpacity
+                accessibilityRole="button"
                 style={styles.menuRow}
                 onPress={() => router.push('/my-listings' as Href)}
                 activeOpacity={0.7}>
@@ -640,6 +647,7 @@ export default function ProfileScreen() {
                 <>
                   <View style={styles.menuDivider} />
                   <TouchableOpacity
+                    accessibilityRole="button"
                     style={styles.menuRow}
                     onPress={() => router.push('/agent-dashboard' as Href)}
                     activeOpacity={0.7}>
@@ -653,6 +661,7 @@ export default function ProfileScreen() {
                 <>
                   <View style={styles.menuDivider} />
                   <TouchableOpacity
+                    accessibilityRole="button"
                     style={styles.menuRow}
                     onPress={() => router.push('/moderation' as Href)}
                     activeOpacity={0.7}>
@@ -667,6 +676,7 @@ export default function ProfileScreen() {
             {/* Signing out is one tap from a scroll — easy to hit by accident,
                 and it costs the user their session. Confirm first. */}
             <TouchableOpacity
+              accessibilityRole="button"
               style={styles.signOutButton}
               onPress={() => setSignOutOpen(true)}
               activeOpacity={0.8}>
@@ -679,6 +689,7 @@ export default function ProfileScreen() {
                 rather than a button, so it reads as deliberate and is hard to
                 hit by accident — it is irreversible. */}
             <TouchableOpacity
+              accessibilityRole="button"
               style={styles.deleteAccountButton}
               onPress={() => { setDeleteError(false); setDeleteOpen(true); }}
               activeOpacity={0.7}>
@@ -814,6 +825,7 @@ export default function ProfileScreen() {
             <View style={styles.authGlass}>
               <View style={styles.roleToggle}>
                 <TouchableOpacity
+                  accessibilityRole="button"
                   style={[styles.roleBtn, role === 'buyer' && styles.roleBtnActive]}
                   onPress={() => setRole('buyer')}
                   activeOpacity={0.7}>
@@ -827,6 +839,7 @@ export default function ProfileScreen() {
                   </Text>
                 </TouchableOpacity>
                 <TouchableOpacity
+                  accessibilityRole="button"
                   style={[styles.roleBtn, role === 'agent' && styles.roleBtnActive]}
                   onPress={() => setRole('agent')}
                   activeOpacity={0.7}>
@@ -860,6 +873,7 @@ export default function ProfileScreen() {
                   />
                   {otpVerifying && <Text style={styles.otpSubtitle}>{t('common.loading')}</Text>}
                   <TouchableOpacity
+                    accessibilityRole="button"
                     onPress={handleResendRecovery}
                     style={styles.linkButton}
                     disabled={cooldown > 0 || resetSending}>
@@ -867,7 +881,7 @@ export default function ProfileScreen() {
                       {cooldown > 0 ? t('auth.resendIn', { s: cooldown }) : t('auth.resendCode')}
                     </Text>
                   </TouchableOpacity>
-                  <TouchableOpacity onPress={() => setRecoveryStep(null)} style={styles.linkButton}>
+                  <TouchableOpacity accessibilityRole="button" onPress={() => setRecoveryStep(null)} style={styles.linkButton}>
                     <Text style={styles.linkButtonText}>{t('common.back')}</Text>
                   </TouchableOpacity>
                 </>
@@ -916,7 +930,7 @@ export default function ProfileScreen() {
                     />
                   </View>
 
-                  <TouchableOpacity onPress={handleSetNewPassword} activeOpacity={0.85} disabled={loading}>
+                  <TouchableOpacity accessibilityRole="button" onPress={handleSetNewPassword} activeOpacity={0.85} disabled={loading}>
                     <LinearGradient colors={[colors.accent, colors.accentEnd]} style={styles.ctaPill}>
                       <Text style={styles.ctaPillText}>
                         {loading ? t('common.loading') : t('auth.updatePassword')}
@@ -945,6 +959,7 @@ export default function ProfileScreen() {
                   />
                   {otpVerifying && <Text style={styles.otpSubtitle}>{t('common.loading')}</Text>}
                   <TouchableOpacity
+                    accessibilityRole="button"
                     onPress={handleResendOtp}
                     style={styles.linkButton}
                     disabled={cooldown > 0 || otpSending}>
@@ -955,7 +970,7 @@ export default function ProfileScreen() {
                         : t('auth.resendCode')}
                     </Text>
                   </TouchableOpacity>
-                  <TouchableOpacity onPress={() => setOtpStep(false)} style={styles.linkButton}>
+                  <TouchableOpacity accessibilityRole="button" onPress={() => setOtpStep(false)} style={styles.linkButton}>
                     <Text style={styles.linkButtonText}>{t('common.back')}</Text>
                   </TouchableOpacity>
                 </>
@@ -1050,6 +1065,7 @@ export default function ProfileScreen() {
                     {role === 'agent' ? t('auth.accessAgent') : t('auth.accessClient')}
                   </Text>
                   <TouchableOpacity
+                    accessibilityRole="button"
                     onPress={handleForgotPassword}
                     disabled={resetSending}
                     hitSlop={8}>
@@ -1060,7 +1076,7 @@ export default function ProfileScreen() {
                 </View>
               )}
 
-              <TouchableOpacity onPress={handleAuth} activeOpacity={0.85} disabled={loading}>
+              <TouchableOpacity accessibilityRole="button" onPress={handleAuth} activeOpacity={0.85} disabled={loading}>
                 <LinearGradient colors={[colors.accent, colors.accentEnd]} style={styles.ctaPill}>
                   {/* Prototype CTA copy: "Step inside" on sign-in,
                       "Create account" on sign-up — not the bare verbs. */}
@@ -1087,6 +1103,7 @@ export default function ProfileScreen() {
                   instead of one row of alternatives. */}
               <View style={styles.socialRow}>
                 <TouchableOpacity
+                  accessibilityRole="button"
                   style={styles.socialButton}
                   onPress={() => handleProvider('google' as Provider)}
                   activeOpacity={0.8}
@@ -1120,6 +1137,7 @@ export default function ProfileScreen() {
                       fixable from in-app error handling; goes away once the
                       Dashboard config lands. */}
                 <TouchableOpacity
+                  accessibilityRole="button"
                   style={styles.socialButton}
                   onPress={() => handleProvider('apple' as Provider)}
                   activeOpacity={0.8}
@@ -1131,6 +1149,7 @@ export default function ProfileScreen() {
                 </TouchableOpacity>
 
                 <TouchableOpacity
+                  accessibilityRole="button"
                   style={styles.socialButton}
                   onPress={() => handleProvider('linkedin_oidc' as Provider)}
                   activeOpacity={0.8}
@@ -1142,6 +1161,7 @@ export default function ProfileScreen() {
                 </TouchableOpacity>
 
                 <TouchableOpacity
+                  accessibilityRole="button"
                   style={styles.socialButton}
                   onPress={handleSendOtp}
                   activeOpacity={0.8}
@@ -1158,6 +1178,7 @@ export default function ProfileScreen() {
               </View>
 
               <TouchableOpacity
+                accessibilityRole="button"
                 onPress={() => setIsSignUp(!isSignUp)}
                 style={styles.linkButton}>
                 <Text style={styles.linkButtonText}>

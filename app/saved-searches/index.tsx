@@ -229,7 +229,7 @@ export default function SavedSearchesScreen() {
         </View>
 
         <View style={styles.tabRow}>
-          <TouchableOpacity onPress={() => setTab('searches')} activeOpacity={0.85} style={styles.segmentWrap}>
+          <TouchableOpacity accessibilityRole="button" onPress={() => setTab('searches')} activeOpacity={0.85} style={styles.segmentWrap}>
             {tab === 'searches' ? (
               <LinearGradient colors={[colors.accent, colors.accentEnd]} style={styles.tab}>
                 <Text style={[styles.tabText, styles.tabTextActive]}>
@@ -242,7 +242,7 @@ export default function SavedSearchesScreen() {
               </View>
             )}
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => setTab('wanted')} activeOpacity={0.85} style={styles.segmentWrap}>
+          <TouchableOpacity accessibilityRole="button" onPress={() => setTab('wanted')} activeOpacity={0.85} style={styles.segmentWrap}>
             {tab === 'wanted' ? (
               <LinearGradient colors={[colors.accent, colors.accentEnd]} style={styles.tab}>
                 <Text style={[styles.tabText, styles.tabTextActive]}>
@@ -259,7 +259,7 @@ export default function SavedSearchesScreen() {
 
         {/* Matches web's .pill-btn "+ New Search/Wanted" placed below the
             tabs, not a corner icon button in the header. */}
-        <TouchableOpacity style={styles.addPill} onPress={() => setFormOpen(true)} activeOpacity={0.7}>
+        <TouchableOpacity accessibilityRole="button" style={styles.addPill} onPress={() => setFormOpen(true)} activeOpacity={0.7}>
           <MaterialIcons name="add" size={14} color={colors.textPrimary} />
           <Text style={styles.addPillText}>
             {tab === 'searches' ? t('saved.newSearch') : t('saved.newWanted')}
@@ -307,6 +307,7 @@ export default function SavedSearchesScreen() {
                     ) : null}
                     <View style={styles.cardActions}>
                       <TouchableOpacity
+                        accessibilityRole="button"
                         style={styles.actionButton}
                         onPress={() => runSearch(s)}
                         activeOpacity={0.7}
@@ -315,6 +316,7 @@ export default function SavedSearchesScreen() {
                         <Text style={styles.actionButtonText}>{t('saved.run')}</Text>
                       </TouchableOpacity>
                       <TouchableOpacity
+                        accessibilityRole="button"
                         style={styles.iconButton}
                         onPress={() => toggleAlerts(s)}
                         activeOpacity={0.7}
@@ -341,6 +343,7 @@ export default function SavedSearchesScreen() {
                         </TouchableOpacity>
                       ) : null}
                       <TouchableOpacity
+                        accessibilityRole="button"
                         style={styles.iconButton}
                         onPress={() => deleteSearch(s.id)}
                         activeOpacity={0.7}
@@ -387,12 +390,13 @@ export default function SavedSearchesScreen() {
                     </View>
                     {w.notes ? <Text style={styles.cardMeta}>{w.notes}</Text> : null}
                     <View style={styles.cardActions}>
-                      <TouchableOpacity style={styles.actionButton} onPress={() => closeWanted(w)} activeOpacity={0.7}>
+                      <TouchableOpacity accessibilityRole="button" style={styles.actionButton} onPress={() => closeWanted(w)} activeOpacity={0.7}>
                         <Text style={styles.actionButtonText}>
                           {w.status === 'open' ? t('saved.markClosed') : t('saved.markOpen')}
                         </Text>
                       </TouchableOpacity>
                       <TouchableOpacity
+                        accessibilityRole="button"
                         style={styles.iconButton}
                         onPress={() => deleteWanted(w.id)}
                         activeOpacity={0.7}
@@ -415,7 +419,7 @@ export default function SavedSearchesScreen() {
               <Text style={styles.modalTitle}>
                 {tab === 'searches' ? t('saved.newSearch') : t('saved.newWanted')}
               </Text>
-              <TouchableOpacity onPress={() => setFormOpen(false)} hitSlop={8}>
+              <TouchableOpacity accessibilityRole="button" accessibilityLabel={t('common.close')} onPress={() => setFormOpen(false)} hitSlop={8}>
                 <MaterialIcons name="close" size={22} color={colors.textSecondary} />
               </TouchableOpacity>
             </View>
@@ -439,6 +443,7 @@ export default function SavedSearchesScreen() {
                 <View style={styles.toggleRow}>
                   {(['sale', 'rent'] as const).map((typ) => (
                     <TouchableOpacity
+                      accessibilityRole="button"
                       key={typ}
                       style={[styles.toggle, searchType === typ && styles.toggleActive]}
                       onPress={() => setSearchType(typ)}
@@ -470,6 +475,7 @@ export default function SavedSearchesScreen() {
                 <View style={styles.toggleRow}>
                   {(['sale', 'rent'] as const).map((typ) => (
                     <TouchableOpacity
+                      accessibilityRole="button"
                       key={typ}
                       style={[styles.toggle, wantedType === typ && styles.toggleActive]}
                       onPress={() => setWantedType(typ)}

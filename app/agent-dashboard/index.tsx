@@ -164,7 +164,7 @@ export default function AgentDashboardScreen() {
         ) : error ? (
           <View style={styles.center}>
             <Text style={styles.description}>{t('common.error')}</Text>
-            <TouchableOpacity style={styles.retryButton} onPress={load} activeOpacity={0.8}>
+            <TouchableOpacity accessibilityRole="button" style={styles.retryButton} onPress={load} activeOpacity={0.8}>
               <Text style={styles.retryButtonText}>{t('common.retry')}</Text>
             </TouchableOpacity>
           </View>
@@ -173,6 +173,7 @@ export default function AgentDashboardScreen() {
             <View style={styles.statGrid}>
               {statCards.map((card) => (
                 <TouchableOpacity
+                  accessibilityRole="button"
                   key={card.label}
                   style={styles.statCard}
                   disabled={!card.to}
@@ -188,7 +189,7 @@ export default function AgentDashboardScreen() {
             <View style={styles.section}>
               <View style={styles.sectionHead}>
                 <Text style={styles.sectionTitle}>{t('agentDashboard.pendingViewings')}</Text>
-                <TouchableOpacity onPress={() => router.push('/viewings' as Href)}>
+                <TouchableOpacity accessibilityRole="button" onPress={() => router.push('/viewings' as Href)}>
                   <Text style={styles.sectionLink}>{t('home.seeAll')}</Text>
                 </TouchableOpacity>
               </View>
@@ -215,6 +216,7 @@ export default function AgentDashboardScreen() {
                       </View>
                       <View style={styles.listCardActions}>
                         <TouchableOpacity
+                          accessibilityRole="button"
                           style={styles.actionButton}
                           onPress={() => setViewingStatus(v.id, 'confirmed')}
                           activeOpacity={0.7}>
@@ -222,6 +224,7 @@ export default function AgentDashboardScreen() {
                           <Text style={styles.actionButtonText}>{t('viewings.confirm')}</Text>
                         </TouchableOpacity>
                         <TouchableOpacity
+                          accessibilityRole="button"
                           style={styles.actionButton}
                           onPress={() => setViewingStatus(v.id, 'declined')}
                           activeOpacity={0.7}>

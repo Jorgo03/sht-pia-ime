@@ -118,6 +118,7 @@ export default function ViewingsScreen() {
       <View key={v.id} style={styles.card}>
         <View style={styles.cardHead}>
           <TouchableOpacity
+            accessibilityRole="button"
             disabled={!v.property}
             onPress={() => v.property && router.push(`/property/${v.property.id}` as Href)}
             style={styles.cardTitleWrap}>
@@ -150,18 +151,18 @@ export default function ViewingsScreen() {
         <View style={styles.cardActions}>
           {isIncoming && v.status === 'requested' && (
             <>
-              <TouchableOpacity style={styles.actionButton} onPress={() => setStatus(v.id, 'confirmed')} activeOpacity={0.7}>
+              <TouchableOpacity accessibilityRole="button" style={styles.actionButton} onPress={() => setStatus(v.id, 'confirmed')} activeOpacity={0.7}>
                 <MaterialIcons name="check" size={14} color={colors.textPrimary} />
                 <Text style={styles.actionButtonText}>{t('viewings.confirm')}</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.actionButton} onPress={() => setStatus(v.id, 'declined')} activeOpacity={0.7}>
+              <TouchableOpacity accessibilityRole="button" style={styles.actionButton} onPress={() => setStatus(v.id, 'declined')} activeOpacity={0.7}>
                 <MaterialIcons name="close" size={14} color={colors.textPrimary} />
                 <Text style={styles.actionButtonText}>{t('viewings.decline')}</Text>
               </TouchableOpacity>
             </>
           )}
           {!isIncoming && (v.status === 'requested' || v.status === 'confirmed') && (
-            <TouchableOpacity style={styles.actionButton} onPress={() => setStatus(v.id, 'cancelled')} activeOpacity={0.7}>
+            <TouchableOpacity accessibilityRole="button" style={styles.actionButton} onPress={() => setStatus(v.id, 'cancelled')} activeOpacity={0.7}>
               <MaterialIcons name="close" size={14} color={colors.textPrimary} />
               <Text style={styles.actionButtonText}>{t('viewings.cancel')}</Text>
             </TouchableOpacity>
