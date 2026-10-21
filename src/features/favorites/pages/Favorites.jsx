@@ -5,6 +5,7 @@ import { useAuth } from '../../auth/AuthContext'
 import { useFavorites } from '../FavoritesContext'
 import { formatPrice, imageFor, getLocalizedText, priceSuffixKey } from '../../../lib/format'
 import SkeletonCard from '../../../shared/SkeletonCard'
+import BackButton from '../../../shared/BackButton'
 import { useState } from 'react'
 
 export default function Favorites() {
@@ -25,7 +26,7 @@ export default function Favorites() {
   if (!user) {
     return (
       <div className="page">
-        <button className="fav-back" onClick={() => navigate('/profile')}>{t('favourites.backToProfile')}</button>
+        <BackButton />
         <div className="screen-head" style={{ padding: 0 }}>
           <div className="screen-kicker"><span className="screen-kicker__dash" />{t('favourites.kicker')}</div>
           <h1 className="screen-headline">{t('favourites.headlinePre')} <em>{t('favourites.headlineEm')}</em>.</h1>
@@ -41,7 +42,7 @@ export default function Favorites() {
 
   return (
     <div className="page">
-      <button className="fav-back" onClick={() => navigate('/profile')}>{t('favourites.backToProfile')}</button>
+      <BackButton />
       <div className="screen-head" style={{ padding: 0 }}>
         <div className="screen-kicker"><span className="screen-kicker__dash" />{t('favourites.savedCount', { count: favoriteProperties.length })}</div>
         <h1 className="screen-headline">{t('favourites.headlinePre')} <em>{t('favourites.headlineEm')}</em>.</h1>

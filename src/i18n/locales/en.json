@@ -242,7 +242,7 @@
     "savedCount_one": "{{count}} saved · organized for you",
     "savedCount_other": "{{count}} saved · organized for you",
     "headlineEm": "shortlist",
-    "backToProfile": "← Back to profile",
+    "backToProfile": "Back to profile",
     "empty": "No favorites yet. Tap the heart icon on a property to save it.",
     "emptyDescription": "Tap the heart icon on a property to save it",
     "loginPrompt": "Sign in to see your favorites",

@@ -605,6 +605,9 @@ const createStyles = (colors: AtticoPalette, sheetHeight: number = 0) => StyleSh
   },
   input: {
     flex: 1,
+    // Lets the field shrink below the input's intrinsic width, so the "m²"
+    // suffix stays inside the pill instead of being pushed over the text.
+    minWidth: 0,
     fontFamily: Fonts?.sans,
     paddingVertical: 12,
     color: colors.textPrimary,
@@ -617,7 +620,9 @@ const createStyles = (colors: AtticoPalette, sheetHeight: number = 0) => StyleSh
   },
   zoneField: { marginTop: 8 },
   // inputField grows to fill a row; on its own in a section it must not.
-  refField: { flex: 0 },
+  // Spelled out: `flex: 0` collapsed the field to its border on the web
+  // (react-native-web reads it as a zero flex-basis), hiding the input.
+  refField: { flexGrow: 0, flexShrink: 0, flexBasis: 'auto' },
   zoneWarning: {
     fontFamily: Fonts?.sans,
     fontSize: 12,
