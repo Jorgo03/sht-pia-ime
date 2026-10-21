@@ -21,6 +21,27 @@ the source of truth for status), then `docs/READINESS_REPORT.md`.
   - payments (L23: prices, provider, web-only vs in-app).
 - Blocked on accounts: L15–L22 (see the handoff).
 
+## Completion prompt #2 (2026-10-21) — progress checkpoint
+
+Executing `Claude_Code_App_Completion_Prompt_1.md` (F1–F19 work map). Push to
+the feature branch only; never to `master` (the prompt forbids merging to
+production). Done so far, each committed and pushed:
+- Applied: profile phone grant, anon helper policy split, AI usage index,
+  profile avatar guard, client_errors (+retention, +redaction fix), listing
+  zone/ref_code. Live checks in `supabase/tests/` all pass.
+- F1 AI daily ceiling deployed (3 functions). F11 error reporting, F12
+  avatars, F19 zone/reference: both apps, tests.
+- Blocked on the owner's confirmation in the Supabase prompt (DROP/DELETE
+  time out unattended): `supabase/pending/plans_by_period_months.sql`, and
+  deleting `claude-test@shtepia.dev` + `system@shtepia.ime` (synthetic; their
+  only conversation is with each other; 8 unreferenced test files in
+  `property-images/9c47f15e-.../`).
+- Next, in order: F13 saved-search email alerts (outbox + edge function,
+  dispatch disabled until SMTP), F14 push (token table + expo-notifications,
+  dispatch gated), F15 pricing/Paysera boundary (test in PGlite harness),
+  F3 moderation (moderator role), F9 maps key config, F7 build checks, F8
+  Apple tests, F10 store assets, F16 tab bar, then docs + ledger + verify.
+
 ## How to check the app
 
 ```bash
