@@ -61,6 +61,10 @@ function listing(n: number, fields: Partial<Listing>): Listing {
     source_language: 'sq',
     translation_meta: null,
     promoted_until: null,
+    // Production derives ref_code from the id; fixture ids share a prefix, so
+    // each gets its own here (F19).
+    zone: null,
+    ref_code: `B${String(n).padStart(7, '0')}`,
     agent: AGENT,
     ...fields,
   };
@@ -80,6 +84,7 @@ export const LISTINGS: Listing[] = [
     title: 'Apartament 2+1 në Bllok',
     contact_phone: '+355 69 000 0001',
     image_urls: [storageImg('photo-1.jpg'), storageImg('photo-2.jpg')],
+    zone: 'Blloku',
   }),
   listing(2, { title: 'Vilë me oborr në Sauk', property_type: 'villa', price: 420000 }),
   listing(3, { title: 'Garsoniere me qera', listing_type: 'rent', price: 450, beds: 1 }),

@@ -25,6 +25,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
+import { formatRef } from '@/src/features/properties/lib/searchFilters';
 
 import { ReportSheet } from '@/components/safety/report-sheet';
 import { AppHeader } from '@/components/ui/app-header';
@@ -287,9 +288,14 @@ export default function PropertyDetailScreen() {
       <View style={styles.locationRow}>
         <MaterialIcons name="location-on" size={16} color={colors.accent} />
         <Text style={styles.location}>
-          {property.address}, {property.city}
+          {[property.address, property.zone, property.city].filter(Boolean).join(', ')}
         </Text>
       </View>
+      {property.ref_code ? (
+        <Text style={styles.reference} selectable>
+          {t('detail.reference')} {formatRef(property.ref_code)}
+        </Text>
+      ) : null}
 
       {translating ? (
         <View style={styles.shimmerGroup}>
@@ -878,6 +884,13 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   location: {
     fontSize: 14,
     color: colors.textSecondary,
+  },
+  reference: {
+    fontFamily: Fonts.mono,
+    fontSize: 12,
+    letterSpacing: 0.5,
+    color: colors.textSecondary,
+    marginTop: 4,
   },
   description: {
     fontSize: 14,

@@ -28,7 +28,7 @@ test('F01-H3 opening a card goes to its detail page', async ({ page }) => {
 
 test('F01-E1 search still answers when the AI search is down', async ({ page }) => {
   await page.goto('/search');
-  const box = page.getByRole('textbox');
+  const box = page.getByRole('textbox', { name: t('search.aiPlaceholder') });
   await box.fill('Durrës');
   await box.press('Enter');
   // ai-parse-search answers 503 in the mock; the page must fall back to a

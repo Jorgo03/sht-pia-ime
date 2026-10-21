@@ -158,7 +158,10 @@
     "surface": "Wohnfläche",
     "minArea": "Fläche min",
     "maxArea": "Fläche max",
-    "rangeInvalid": "Der Mindestwert muss kleiner als der Höchstwert sein"
+    "rangeInvalid": "Der Mindestwert muss kleiner als der Höchstwert sein",
+    "zone": "Stadtteil",
+    "reference": "Referenz",
+    "referenceInvalid": "Eine Referenz hat 8 Buchstaben oder Ziffern, z. B. SH-1A2B3C4D."
   },
   "favourites": {
     "title": "Favoriten",
@@ -213,7 +216,8 @@
     "owner": "Eigentümer",
     "linkCopied": "Link kopiert",
     "unavailable": "Dieses Inserat ist nicht mehr verfügbar",
-    "unavailableHint": "Es wurde möglicherweise verkauft, vermietet oder vom Makler entfernt."
+    "unavailableHint": "Es wurde möglicherweise verkauft, vermietet oder vom Makler entfernt.",
+    "reference": "Ref."
   },
   "messages": {
     "subtitle": "Gespräche mit Maklern",
@@ -406,7 +410,9 @@
     "saveChanges": "Änderungen speichern",
     "currentVideo": "Aktuelles Video",
     "markSold": "Als verkauft markieren",
-    "markRented": "Als vermietet markieren"
+    "markRented": "Als vermietet markieren",
+    "zone": "Stadtteil",
+    "zoneNone": "Kein Stadtteil"
   },
   "dashboard": {
     "title": "Immobilien-Dashboard",

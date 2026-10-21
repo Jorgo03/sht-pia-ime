@@ -210,7 +210,10 @@
     "surface": "Surface area",
     "minArea": "Min m²",
     "maxArea": "Max m²",
-    "rangeInvalid": "Minimum must be lower than maximum"
+    "rangeInvalid": "Minimum must be lower than maximum",
+    "zone": "Neighborhood",
+    "reference": "Reference",
+    "referenceInvalid": "A reference has 8 letters or digits, e.g. SH-1A2B3C4D."
   },
   "detail": {
     "forSale": "For Sale",
@@ -229,7 +232,8 @@
     "owner": "Owner",
     "linkCopied": "Link copied",
     "unavailable": "This listing is no longer available",
-    "unavailableHint": "It may have been sold, rented out or removed by the agent."
+    "unavailableHint": "It may have been sold, rented out or removed by the agent.",
+    "reference": "Ref."
   },
   "favourites": {
     "title": "Favorites",
@@ -458,7 +462,9 @@
     "saveChanges": "Save changes",
     "currentVideo": "Current video",
     "markSold": "Mark as sold",
-    "markRented": "Mark as rented"
+    "markRented": "Mark as rented",
+    "zone": "Neighborhood",
+    "zoneNone": "No neighborhood"
   },
   "dashboard": {
     "title": "Property Dashboard",

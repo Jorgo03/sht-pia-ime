@@ -91,6 +91,8 @@ export function FiltersProvider({ children }: { children: ReactNode }) {
         filters.propertyType,
         filters.listingType,
         filters.city,
+        filters.zone,
+        filters.refCode,
         filters.minPrice,
         filters.maxPrice,
         filters.beds,

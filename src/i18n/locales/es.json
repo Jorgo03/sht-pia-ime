@@ -162,7 +162,10 @@
     "surface": "Superficie",
     "minArea": "Sup. mín",
     "maxArea": "Sup. máx",
-    "rangeInvalid": "El mínimo debe ser menor que el máximo"
+    "rangeInvalid": "El mínimo debe ser menor que el máximo",
+    "zone": "Barrio",
+    "reference": "Referencia",
+    "referenceInvalid": "Una referencia tiene 8 letras o cifras, p. ej. SH-1A2B3C4D."
   },
   "favourites": {
     "title": "Favoritos",
@@ -220,7 +223,8 @@
     "owner": "Propietario",
     "linkCopied": "Enlace copiado",
     "unavailable": "Este anuncio ya no está disponible",
-    "unavailableHint": "Puede que se haya vendido, alquilado o que el agente lo haya retirado."
+    "unavailableHint": "Puede que se haya vendido, alquilado o que el agente lo haya retirado.",
+    "reference": "Ref."
   },
   "messages": {
     "subtitle": "Conversaciones con agentes",
@@ -414,7 +418,9 @@
     "saveChanges": "Guardar cambios",
     "currentVideo": "Vídeo actual",
     "markSold": "Marcar como vendido",
-    "markRented": "Marcar como alquilado"
+    "markRented": "Marcar como alquilado",
+    "zone": "Barrio",
+    "zoneNone": "Sin barrio"
   },
   "dashboard": {
     "title": "Dashboard de propiedad",

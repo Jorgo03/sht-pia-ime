@@ -8,6 +8,8 @@
 // either conversion: who owns a listing never changes on save, status has its
 // own actions (pause, mark sold), and photos/video are uploaded separately.
 
+import { validZone } from '../../properties/lib/searchFilters.js'
+
 const toText = (value) => (value === null || value === undefined ? '' : String(value))
 
 /** A saved listing, as the wizard's form state. */
@@ -24,6 +26,7 @@ export function propertyToForm(row) {
     translation_meta:
       row.translation_meta && typeof row.translation_meta === 'object' ? row.translation_meta : {},
     city: row.city ?? '',
+    zone: row.zone ?? '',
     address: row.address ?? '',
     latitude: typeof row.latitude === 'number' ? row.latitude : null,
     longitude: typeof row.longitude === 'number' ? row.longitude : null,
@@ -63,6 +66,8 @@ export function formToColumns(form, translated) {
     listing_type: form.listing_type,
     property_type: form.property_type,
     city: form.city || null,
+    // Only a zone of the chosen city is kept (a city change clears it in the UI).
+    zone: validZone(form.city, form.zone),
     address: form.address,
     latitude: form.latitude,
     longitude: form.longitude,

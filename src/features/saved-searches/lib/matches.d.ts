@@ -1,6 +1,7 @@
 // Types for matches.js, so the phone app (TypeScript) can import it.
 export interface SavedFilters {
   city?: string | null;
+  zone?: string | null;
   listing_type?: string | null;
   type?: string | null;
   minPrice?: number | string | null;

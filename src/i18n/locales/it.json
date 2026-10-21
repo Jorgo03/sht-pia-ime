@@ -162,7 +162,10 @@
     "surface": "Superficie",
     "minArea": "Sup. min",
     "maxArea": "Sup. max",
-    "rangeInvalid": "Il minimo deve essere inferiore al massimo"
+    "rangeInvalid": "Il minimo deve essere inferiore al massimo",
+    "zone": "Quartiere",
+    "reference": "Riferimento",
+    "referenceInvalid": "Un riferimento ha 8 lettere o cifre, es. SH-1A2B3C4D."
   },
   "favourites": {
     "title": "Preferiti",
@@ -220,7 +223,8 @@
     "owner": "Proprietario",
     "linkCopied": "Link copiato",
     "unavailable": "Questo annuncio non è più disponibile",
-    "unavailableHint": "Potrebbe essere stato venduto, affittato o rimosso dall'agente."
+    "unavailableHint": "Potrebbe essere stato venduto, affittato o rimosso dall'agente.",
+    "reference": "Rif."
   },
   "messages": {
     "subtitle": "Conversazioni con agenti",
@@ -414,7 +418,9 @@
     "saveChanges": "Salva modifiche",
     "currentVideo": "Video attuale",
     "markSold": "Segna come venduto",
-    "markRented": "Segna come affittato"
+    "markRented": "Segna come affittato",
+    "zone": "Quartiere",
+    "zoneNone": "Nessun quartiere"
   },
   "dashboard": {
     "title": "Dashboard immobile",

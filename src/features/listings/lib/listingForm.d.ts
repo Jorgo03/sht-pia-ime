@@ -9,6 +9,7 @@ export interface ListingFormValues {
   description_i18n: I18nMap;
   translation_meta: TranslationMeta;
   city: string;
+  zone: string;
   address: string;
   latitude: number | null;
   longitude: number | null;

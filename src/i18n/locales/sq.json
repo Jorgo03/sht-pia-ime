@@ -158,7 +158,10 @@
     "surface": "Sipërfaqja",
     "minArea": "Sip min",
     "maxArea": "Sip max",
-    "rangeInvalid": "Vlera minimale duhet të jetë më e vogël se maksimalja"
+    "rangeInvalid": "Vlera minimale duhet të jetë më e vogël se maksimalja",
+    "zone": "Lagjja",
+    "reference": "Referenca",
+    "referenceInvalid": "Referenca ka 8 shkronja ose shifra, p.sh. SH-1A2B3C4D."
   },
   "favourites": {
     "title": "Të preferuarat",
@@ -213,7 +216,8 @@
     "owner": "Pronari",
     "linkCopied": "Lidhja u kopjua",
     "unavailable": "Kjo pronë nuk është më e disponueshme",
-    "unavailableHint": "Mund të jetë shitur, dhënë me qira ose hequr nga agjenti."
+    "unavailableHint": "Mund të jetë shitur, dhënë me qira ose hequr nga agjenti.",
+    "reference": "Ref."
   },
   "messages": {
     "subtitle": "Bisedat me agjentët",
@@ -458,7 +462,9 @@
     "saveChanges": "Ruaj ndryshimet",
     "currentVideo": "Videoja aktuale",
     "markSold": "Shëno si të shitur",
-    "markRented": "Shëno si të dhënë me qira"
+    "markRented": "Shëno si të dhënë me qira",
+    "zone": "Lagjja",
+    "zoneNone": "Pa lagje"
   },
   "dashboard": {
     "title": "Paneli i pronës",

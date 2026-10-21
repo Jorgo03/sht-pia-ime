@@ -7,6 +7,10 @@ export interface Property {
   title: string;
   title_i18n: Record<string, string> | null;
   description: string | null;
+  /** Neighbourhood within the city (F19). */
+  zone?: string | null;
+  /** Generated short reference, shown as SH-XXXXXXXX (F19). */
+  ref_code?: string | null;
   description_i18n: Record<string, string> | null;
   price: number;
   address: string;
@@ -72,6 +76,10 @@ export interface PropertyFilters {
   propertyType?: Property['property_type'] | null;
   listingType?: Property['listing_type'] | null;
   city?: string | null;
+  /** Neighbourhood of `city` (F19); ignored unless it belongs to that city. */
+  zone?: string | null;
+  /** What the person typed as a listing reference (SH-XXXXXXXX). */
+  refCode?: string | null;
   minPrice?: number | null;
   maxPrice?: number | null;
   beds?: number | null;

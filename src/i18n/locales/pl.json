@@ -166,7 +166,10 @@
     "surface": "Powierzchnia",
     "minArea": "Pow. min",
     "maxArea": "Pow. maks",
-    "rangeInvalid": "Wartość minimalna musi być mniejsza niż maksymalna"
+    "rangeInvalid": "Wartość minimalna musi być mniejsza niż maksymalna",
+    "zone": "Dzielnica",
+    "reference": "Numer referencyjny",
+    "referenceInvalid": "Numer referencyjny ma 8 liter lub cyfr, np. SH-1A2B3C4D."
   },
   "favourites": {
     "title": "Ulubione",
@@ -227,7 +230,8 @@
     "owner": "Właściciel",
     "linkCopied": "Link skopiowany",
     "unavailable": "To ogłoszenie nie jest już dostępne",
-    "unavailableHint": "Mogło zostać sprzedane, wynajęte lub usunięte przez agenta."
+    "unavailableHint": "Mogło zostać sprzedane, wynajęte lub usunięte przez agenta.",
+    "reference": "Nr ref."
   },
   "messages": {
     "subtitle": "Rozmowy z agentami",
@@ -422,7 +426,9 @@
     "saveChanges": "Zapisz zmiany",
     "currentVideo": "Obecne wideo",
     "markSold": "Oznacz jako sprzedane",
-    "markRented": "Oznacz jako wynajęte"
+    "markRented": "Oznacz jako wynajęte",
+    "zone": "Dzielnica",
+    "zoneNone": "Bez dzielnicy"
   },
   "dashboard": {
     "title": "Dashboard nieruchomości",

@@ -31,6 +31,17 @@ test('filters follow the Search page rules', () => {
   ])
 })
 
+test('a zone is applied only together with its own city', () => {
+  const { calls, q } = recorder()
+  applySavedFilters(q, { city: 'Tiranë', zone: 'Blloku' })
+  applySavedFilters(q, { city: 'Durrës', zone: 'Blloku' })
+  assert.deepEqual(calls, [
+    ['ilike', 'city', '%Tiranë%'],
+    ['eq', 'zone', 'Blloku'],
+    ['ilike', 'city', '%Durrës%'],
+  ])
+})
+
 test('empty, "all" and nonsense values add no filter', () => {
   const { calls, q } = recorder()
   applySavedFilters(q, { city: '', type: 'all', minPrice: '', maxPrice: 'abc', beds: null })

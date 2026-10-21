@@ -54,6 +54,7 @@ import {
   type PickedVideo,
 } from '@/lib/upload';
 import LOCATIONS from '@/src/features/properties/data/locations';
+import { zonesFor } from '@/src/features/properties/lib/searchFilters';
 
 /**
  * Multi-step listing wizard — the native counterpart to web's
@@ -196,6 +197,8 @@ interface ListingForm {
   translation_meta: TranslationMeta;
   address: string;
   city: string;
+  /** Neighbourhood from the city's zone list; '' when not chosen. */
+  zone: string;
   /** Null until the agent taps the map; such rows are excluded from the map tab. */
   latitude: number | null;
   longitude: number | null;
@@ -221,6 +224,7 @@ const INITIAL_FORM: ListingForm = {
   translation_meta: {},
   address: '',
   city: '',
+  zone: '',
   latitude: null,
   longitude: null,
   price: '',
@@ -726,6 +730,7 @@ function ListingWizard({ editId }: { editId?: string }) {
             setForm((prev) => ({
               ...prev,
               city: v,
+              zone: '',
               address: '',
               latitude: null,
               longitude: null,
@@ -740,6 +745,21 @@ function ListingWizard({ editId }: { editId?: string }) {
           }}
         />
       </Labeled>
+
+      {zonesFor(form.city).length > 0 ? (
+        <Labeled styles={styles} label={t('listing.zone')}>
+          <SelectField
+            value={form.zone}
+            options={[
+              { value: '', label: t('listing.zoneNone') },
+              ...zonesFor(form.city).map((z) => ({ value: z, label: z })),
+            ]}
+            placeholder={t('listing.zoneNone')}
+            icon="place"
+            onChange={(v) => update('zone', v)}
+          />
+        </Labeled>
+      ) : null}
 
       <Labeled styles={styles} label={t('listing.address')}>
         <RoadField

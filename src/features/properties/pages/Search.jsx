@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect, useCallback } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Search as SearchIcon, SlidersHorizontal, LayoutGrid, Map as MapIcon, RotateCcw, SearchX, Sparkles, Maximize2, AlertCircle, MapPin } from 'lucide-react'
+import { Search as SearchIcon, SlidersHorizontal, LayoutGrid, Map as MapIcon, RotateCcw, SearchX, Sparkles, Maximize2, AlertCircle, MapPin, Hash } from 'lucide-react'
 import { parseSearchQuery } from '../../../lib/ai'
 import { isEnabled } from '../../../lib/flags'
 import PropertyCard from '../components/PropertyCard'
@@ -11,6 +11,7 @@ import SkeletonCard from '../../../shared/SkeletonCard'
 import { useProperties } from '../hooks/useProperties'
 import { useDragSheet } from '../../../hooks/useDragSheet'
 import LOCATIONS from '../data/locations'
+import { normalizeRef, zonesFor } from '../lib/searchFilters'
 import {
   PROPERTY_TYPES, BED_OPTIONS, BATH_OPTIONS,
   PRICE_MIN, PRICE_STEP, AREA_MAX,
@@ -45,14 +46,16 @@ export default function Search() {
   const minArea = searchParams.get('minArea') || ''
   const maxArea = searchParams.get('maxArea') || ''
   const sort = searchParams.get('sort') || 'newest'
-  // TODO: id/referenca — not implemented yet; would read from searchParams here.
-  // TODO: zona — blocked on a `zone` column on properties (see useProperties).
+  // Zone belongs to the selected city; the reference is exact (F19).
+  const zone = searchParams.get('zone') || ''
+  const refText = searchParams.get('ref') || ''
 
   const debouncedMin = useDebounced(minPrice)
   const debouncedMax = useDebounced(maxPrice)
   const debouncedMinArea = useDebounced(minArea)
   const debouncedMaxArea = useDebounced(maxArea)
   const debouncedSearch = useDebounced(searchText)
+  const debouncedRef = useDebounced(refText)
 
   // An inverted range is a typo in progress, not a query — hold the bound back
   // until it makes sense again so the user isn't shown a misleading empty state.
@@ -70,6 +73,8 @@ export default function Search() {
     filter: propertyType || 'all',
     listingType: listingType || null,
     city: debouncedSearch || city || null,
+    zone: zone || null,
+    refCode: debouncedRef || null,
     minPrice: rangesValid ? queryMin : null,
     maxPrice: rangesValid ? queryMax : null,
     beds: beds ? Number(beds) : null,
@@ -85,6 +90,8 @@ export default function Search() {
       const params = new URLSearchParams(prev)
       if (value) params.set(key, value)
       else params.delete(key)
+      // A zone only means something inside its city.
+      if (key === 'city') params.delete('zone')
       return params
     }, { replace: true })
   }, [setSearchParams])
@@ -111,11 +118,11 @@ export default function Search() {
     setAiStatus('applied')
     setTimeout(() => setAiStatus(null), 3000)
   }
-  const activeCount = [city, minPrice, maxPrice, propertyType, listingType, beds, baths, minArea, maxArea].filter(Boolean).length
+  const activeCount = [city, zone, refText, minPrice, maxPrice, propertyType, listingType, beds, baths, minArea, maxArea].filter(Boolean).length
 
   const barValues = useMemo(
-    () => ({ type: propertyType, city, beds, baths, minPrice, maxPrice }),
-    [propertyType, city, beds, baths, minPrice, maxPrice],
+    () => ({ type: propertyType, city, zone, refText, beds, baths, minPrice, maxPrice }),
+    [propertyType, city, zone, refText, beds, baths, minPrice, maxPrice],
   )
 
   useEffect(() => {
@@ -145,6 +152,7 @@ export default function Search() {
             <input
               type="text"
               placeholder={isEnabled('aiSearch') ? t('search.aiPlaceholder') : t('search.placeholder')}
+              aria-label={isEnabled('aiSearch') ? t('search.aiPlaceholder') : t('search.placeholder')}
               value={searchText}
               onChange={e => setSearchText(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && isEnabled('aiSearch') && handleAiSearch()}
@@ -258,9 +266,33 @@ export default function Search() {
                   {LOCATIONS.map(l => <option key={l.city} value={l.city}>{l.city}</option>)}
                 </select>
               </div>
-              {/* TODO: Zona select goes directly below Qyteti, options from
-                  LOCATIONS.find(l => l.city === city).zones — blocked on a
-                  `zone` column on properties. */}
+              {zonesFor(city).length > 0 && (
+                <div className="filter-select mt-2">
+                  <MapPin size={15} aria-hidden="true" />
+                  <select value={zone} onChange={e => updateFilter('zone', e.target.value)} aria-label={t('search.zone')}>
+                    <option value="">{t('search.anyZone')}</option>
+                    {zonesFor(city).map(z => <option key={z} value={z}>{z}</option>)}
+                  </select>
+                </div>
+              )}
+            </div>
+
+            {/* Reference — the SH-XXXXXXXX code shown on every listing. */}
+            <div className="filter-section">
+              <label className="filter-label" htmlFor="filter-ref">{t('search.reference')}</label>
+              <div className="filter-select">
+                <Hash size={15} aria-hidden="true" />
+                <input
+                  id="filter-ref"
+                  type="text"
+                  autoCapitalize="characters"
+                  spellCheck={false}
+                  placeholder="SH-1A2B3C4D"
+                  value={refText}
+                  onChange={e => updateFilter('ref', e.target.value)}
+                />
+              </div>
+              {refText && !normalizeRef(refText) && <div className="filter-warning" role="alert"><AlertCircle size={12} /> {t('search.referenceInvalid')}</div>}
             </div>
 
             {/* Listing type */}

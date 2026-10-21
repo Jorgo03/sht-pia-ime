@@ -1,6 +1,7 @@
 import { useEffect, useState, lazy, Suspense } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { formatRef } from '../lib/searchFilters'
 import { ChevronLeft, Heart, Share2, MapPin, ExternalLink, ChevronRight as ChevRight, Globe, ArrowRight, Phone, Flag } from 'lucide-react'
 import { useProperty, useProperties } from '../hooks/useProperties'
 import { useTranslatedProperty } from '../hooks/useTranslatedProperty'
@@ -179,7 +180,12 @@ export default function PropertyDetail() {
       <section className="detail-title">
         <div className="screen-kicker"><span className="screen-kicker__dash" />{badge}{propertyTypeLabel ? ` · ${propertyTypeLabel}` : ''}</div>
         <h1 className="screen-headline">{title}</h1>
-        <div className="muted-row"><MapPin size={14} /> {property.address}, {property.city}</div>
+        <div className="muted-row"><MapPin size={14} /> {[property.address, property.zone, property.city].filter(Boolean).join(', ')}</div>
+        {property.ref_code && (
+          <div className="mt-1 font-mono text-[12px] tracking-wide text-fho-text-muted">
+            {t('detail.reference')} <span className="select-all">{formatRef(property.ref_code)}</span>
+          </div>
+        )}
         <div className="detail-price">
           <span className="detail-price__main">{price}{suffix}</span>
           {pricePerSqm && <span className="detail-price__per">≈ {formatPrice(pricePerSqm, i18n.language, property.currency)}{t('detail.perSqm')}</span>}

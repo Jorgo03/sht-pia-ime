@@ -13,6 +13,7 @@ import { useListingTranslation } from '../hooks/useListingTranslation'
 import { translatePropertyContent } from '../../../lib/translate'
 import { geocodeCity } from '../../../lib/roadSearch'
 import { formToColumns, propertyToForm, removedMediaPaths } from '../lib/listingForm'
+import { zonesFor } from '../../properties/lib/searchFilters'
 import '../../../styles/map.css'
 import '../../../styles/new-listing.css'
 
@@ -135,6 +136,7 @@ const INITIAL_FORM = {
   // Per-language provenance — see properties.translation_meta.
   translation_meta: {},
   city: 'Tiranë',
+  zone: '',
   address: '',
   latitude: null,
   longitude: null,
@@ -284,7 +286,7 @@ export default function NewListing() {
    */
   const selectCity = (city) => {
     if (city === form.city) return
-    setForm(prev => ({ ...prev, city, address: '', latitude: null, longitude: null }))
+    setForm(prev => ({ ...prev, city, zone: '', address: '', latitude: null, longitude: null }))
     setErrors(prev => ({ ...prev, city: undefined }))
     setMapFocus(null)
     // Move the map to the new city so the next pin starts somewhere plausible
@@ -626,6 +628,15 @@ export default function NewListing() {
               </select>
               {errors.city && <span className="nl-error">{errors.city}</span>}
             </div>
+            {zonesFor(form.city).length > 0 && (
+              <div className="nl-field">
+                <label htmlFor="nl-zone">{t('listing.zone')}</label>
+                <select id="nl-zone" value={form.zone} onChange={e => update('zone', e.target.value)}>
+                  <option value="">{t('listing.zoneNone')}</option>
+                  {zonesFor(form.city).map(z => <option key={z} value={z}>{z}</option>)}
+                </select>
+              </div>
+            )}
             <div className="nl-field">
               <label>{t('listing.address')}</label>
               <RoadField

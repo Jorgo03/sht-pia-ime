@@ -162,7 +162,10 @@
     "surface": "Surface",
     "minArea": "Surf. min",
     "maxArea": "Surf. max",
-    "rangeInvalid": "Le minimum doit être inférieur au maximum"
+    "rangeInvalid": "Le minimum doit être inférieur au maximum",
+    "zone": "Quartier",
+    "reference": "Référence",
+    "referenceInvalid": "Une référence compte 8 lettres ou chiffres, par ex. SH-1A2B3C4D."
   },
   "favourites": {
     "title": "Favoris",
@@ -220,7 +223,8 @@
     "owner": "Propriétaire",
     "linkCopied": "Lien copié",
     "unavailable": "Cette annonce n'est plus disponible",
-    "unavailableHint": "Il a peut-être été vendu, loué ou retiré par l'agent."
+    "unavailableHint": "Il a peut-être été vendu, loué ou retiré par l'agent.",
+    "reference": "Réf."
   },
   "messages": {
     "subtitle": "Conversations avec les agents",
@@ -414,7 +418,9 @@
     "saveChanges": "Enregistrer les modifications",
     "currentVideo": "Vidéo actuelle",
     "markSold": "Marquer comme vendu",
-    "markRented": "Marquer comme loué"
+    "markRented": "Marquer comme loué",
+    "zone": "Quartier",
+    "zoneNone": "Aucun quartier"
   },
   "dashboard": {
     "title": "Tableau de bord du bien",

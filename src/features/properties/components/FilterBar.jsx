@@ -1,7 +1,8 @@
 import { memo } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Home, MapPin, BedDouble, Bath, Euro } from 'lucide-react'
+import { Home, MapPin, BedDouble, Bath, Euro, Hash } from 'lucide-react'
 import LOCATIONS from '../data/locations'
+import { zonesFor } from '../lib/searchFilters'
 import { PROPERTY_TYPES, BED_OPTIONS, BATH_OPTIONS, PRICE_MIN, PRICE_STEP } from '../data/filterOptions'
 
 /**
@@ -12,7 +13,7 @@ import { PROPERTY_TYPES, BED_OPTIONS, BATH_OPTIONS, PRICE_MIN, PRICE_STEP } from
  */
 function FilterBar({ values, onChange }) {
   const { t } = useTranslation()
-  const { type, city, beds, baths, minPrice, maxPrice } = values
+  const { type, city, zone, refText, beds, baths, minPrice, maxPrice } = values
 
   const countLabel = n => (n === BED_OPTIONS[BED_OPTIONS.length - 1] ? `${n}+` : String(n))
 
@@ -49,9 +50,22 @@ function FilterBar({ values, onChange }) {
           </select>
         </label>
 
-        {/* TODO: Zona goes here, between Qyteti and Dhoma Gjumi. Needs a `zone`
-            column on properties + capture in NewListing; zone lists per city are
-            already available in ../data/locations.js. */}
+        {zonesFor(city).length > 0 && (
+          <label className="filter-bar__field">
+            <MapPin size={15} aria-hidden="true" />
+            <select
+              className={zone ? 'has-value' : ''}
+              value={zone}
+              onChange={e => onChange('zone', e.target.value)}
+              aria-label={t('search.zone')}
+            >
+              <option value="">{t('search.anyZone')}</option>
+              {zonesFor(city).map(z => (
+                <option key={z} value={z}>{z}</option>
+              ))}
+            </select>
+          </label>
+        )}
       </div>
 
       <div className="filter-bar__group">
@@ -113,8 +127,18 @@ function FilterBar({ values, onChange }) {
           />
         </label>
 
-        {/* TODO: Id/Referenca goes here, after Cmimi max — plain text input,
-            matching the FutureHome field order. Excluded for now by request. */}
+        <label className="filter-bar__field">
+          <Hash size={15} aria-hidden="true" />
+          <input
+            type="text"
+            autoCapitalize="characters"
+            spellCheck={false}
+            placeholder={t('search.reference')}
+            value={refText}
+            onChange={e => onChange('ref', e.target.value)}
+            aria-label={t('search.reference')}
+          />
+        </label>
       </div>
     </div>
   )

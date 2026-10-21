@@ -32,6 +32,7 @@ import { usePropertiesCountQuery } from '@/hooks/use-property-queries';
 // Shared with the web app rather than duplicated — the same convention i18n
 // already uses to pull locales out of src/.
 import LOCATIONS from '@/src/features/properties/data/locations';
+import { normalizeRef, zonesFor } from '@/src/features/properties/lib/searchFilters';
 
 type PropertyType = NonNullable<Property['property_type']>;
 type ListingType = NonNullable<Property['listing_type']>;
@@ -251,8 +252,47 @@ export function FilterSheet({
                 { value: '', label: t('search.anyCity') },
                 ...CITIES.map((city) => ({ value: city, label: city })),
               ]}
-              onChange={(v) => setFilter('city', v || null)}
+              onChange={(v) => {
+                setFilter('city', v || null);
+                // A zone only means something inside its own city.
+                setFilter('zone', null);
+              }}
             />
+            {zonesFor(filters.city).length > 0 ? (
+              <View style={styles.zoneField}>
+                <SelectField
+                  value={filters.zone ?? ''}
+                  placeholder={t('search.anyZone')}
+                  accessibilityLabel={t('search.zone')}
+                  options={[
+                    { value: '', label: t('search.anyZone') },
+                    ...zonesFor(filters.city).map((z) => ({ value: z, label: z })),
+                  ]}
+                  onChange={(v) => setFilter('zone', v || null)}
+                />
+              </View>
+            ) : null}
+          </Section>
+
+          <Section label={t('search.reference')}>
+            <View style={[styles.inputField, styles.refField]}>
+              <MaterialIcons name="tag" size={14} color={colors.textSecondary} />
+              <TextInput
+                style={styles.input}
+                autoCapitalize="characters"
+                autoCorrect={false}
+                placeholder="SH-1A2B3C4D"
+                placeholderTextColor={colors.textSecondary}
+                value={filters.refCode ?? ''}
+                onChangeText={(v) => setFilter('refCode', v || null)}
+                accessibilityLabel={t('search.reference')}
+              />
+            </View>
+            {filters.refCode && !normalizeRef(filters.refCode) ? (
+              <Text style={styles.zoneWarning} accessibilityLiveRegion="polite">
+                {t('search.referenceInvalid')}
+              </Text>
+            ) : null}
           </Section>
 
           <Section label={t('search.listingType')}>
@@ -574,6 +614,15 @@ const createStyles = (colors: AtticoPalette, sheetHeight: number = 0) => StyleSh
     fontFamily: Fonts?.sans,
     fontSize: 12,
     color: colors.textSecondary,
+  },
+  zoneField: { marginTop: 8 },
+  // inputField grows to fill a row; on its own in a section it must not.
+  refField: { flex: 0 },
+  zoneWarning: {
+    fontFamily: Fonts?.sans,
+    fontSize: 12,
+    color: colors.error,
+    marginTop: 6,
   },
   dash: {
     fontFamily: Fonts?.sans,

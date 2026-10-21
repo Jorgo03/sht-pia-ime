@@ -2,7 +2,7 @@ const LOCATIONS = [
   {
     city: 'Tiranë',
     zones: [
-      'Blloku', 'Liqeni i Thatë', 'Myslym Shyri', 'Selvia', 'Ali Dem',
+      'Blloku', 'Liqeni i Thatë', 'Myslym Shyri', 'Selvia', 'Ali Demi',
       'Komuna e Parisit', 'Sauk', 'Lunder', '21 Dhjetori', 'Yzberisht',
       'Rruga e Kavajës', 'Pazari i Ri', 'Don Bosko', 'Tirana e Re', 'Kombinat',
       'Laprakë', 'Astir', 'Fresk', 'Kinostudio', 'Medreseja',

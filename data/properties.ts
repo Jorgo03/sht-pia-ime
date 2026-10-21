@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabase';
+import { applyZoneAndRef } from '@/src/features/properties/lib/searchFilters';
 
 import { Property, PropertyFilters, PropertySort } from './types';
 
@@ -45,6 +46,8 @@ function applyFilters(query: any, f: PropertyFilters): any {
   // `sqft` holds m², matching the surface labels in the UI.
   if (f.minArea != null) q = q.gte('sqft', f.minArea);
   if (f.maxArea != null) q = q.lte('sqft', f.maxArea);
+  // Zone only with its own city; a reference is exact (shared with web).
+  q = applyZoneAndRef(q, { city: f.city, zone: f.zone, ref: f.refCode });
 
   if (f.bounds) {
     // Listings without coordinates can't be placed, so they are excluded here
