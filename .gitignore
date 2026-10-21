@@ -34,3 +34,6 @@ dist-e2e/
 test-results/
 playwright-report/
 blob-report/
+
+# Website built from the Expo app (deploy/expo-web, scripts/expo-web-postbuild.mjs)
+dist-expo/

@@ -9,6 +9,7 @@
     "fix:supabase-key": "node scripts/fix-supabase-key.cjs",
     "dev": "vite",
     "build": "vite build",
+    "build:web-expo": "expo export -p web --clear",
     "preview": "vite preview",
     "test": "node --test \"tests/**/*.test.mjs\"",
     "test:e2e": "playwright test",

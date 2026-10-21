@@ -1,0 +1,38 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "installCommand": "cd ../.. && npm ci",
+  "buildCommand": "cd ../.. && npm run build:web-expo -- --output-dir deploy/expo-web/dist && node scripts/expo-web-postbuild.mjs deploy/expo-web/dist",
+  "outputDirectory": "dist",
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "redirects": [
+    { "source": "/search", "destination": "/explore", "permanent": true },
+    { "source": "/new-listing", "destination": "/listing/new", "permanent": true },
+    { "source": "/my-listings/:id/edit", "destination": "/listing/:id/edit", "permanent": true },
+    { "source": "/my-listings/:id/dashboard", "destination": "/listing/:id/analytics", "permanent": true },
+    {
+      "source": "/messages",
+      "has": [{ "type": "query", "key": "c", "value": "(?<cid>[0-9a-fA-F-]{36})" }],
+      "destination": "/messages/:cid",
+      "permanent": true
+    }
+  ],
+  "rewrites": [
+    { "source": "/property/:id", "destination": "/property/[id]" },
+    { "source": "/agent/:id", "destination": "/agent/[id]" },
+    { "source": "/messages/:id", "destination": "/messages/[id]" },
+    { "source": "/listing/:id/edit", "destination": "/listing/[id]/edit" },
+    { "source": "/listing/:id/analytics", "destination": "/listing/[id]/analytics" }
+  ],
+  "headers": [
+    {
+      "source": "/_expo/static/(.*)",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
+    },
+    {
+      "source": "/assets/(.*)",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
+    }
+  ]
+}
