@@ -183,3 +183,146 @@ test.describe('time of day', () => {
     });
   }
 });
+
+// Profile -> Notifications. The website cannot receive pushes, so this checks
+// the account's two switches (saved server-side, shared by every device) and
+// that the sheet never presents them as "notifications will arrive here".
+async function preferencesBackend(page: Page, initial: { messages: boolean; viewings: boolean }, fail: { read?: number; write?: boolean } = {}) {
+  const server = { ...initial };
+  const saves: Record<string, unknown>[] = [];
+  let failedReads = 0;
+  await page.route('**/rest/v1/notification_preferences*', async (route) => {
+    const req = route.request();
+    if (req.method() === 'GET') {
+      if (fail.read && failedReads < fail.read) {
+        failedReads++;
+        return json(route, { code: 'PGRST000', message: 'unavailable' }, 400);
+      }
+      const asObject = (req.headers()['accept'] ?? '').includes('vnd.pgrst.object');
+      return json(route, asObject ? server : [server]);
+    }
+    const body = req.postDataJSON() as { messages: boolean; viewings: boolean };
+    saves.push(body);
+    if (fail.write) return json(route, { code: '42501', message: 'denied' }, 400);
+    Object.assign(server, body);
+    return route.fulfill({ status: 201, headers: CORS, body: '' });
+  });
+  return { server, saves };
+}
+
+async function openNotifications(page: Page) {
+  await page.getByRole('button', { name: t('notifications.title') }).click();
+  await expect(page.getByRole('heading', { name: t('notifications.title') })).toBeVisible();
+}
+
+test.describe('notifications sheet', () => {
+  test.use({ signedIn: true });
+
+  test('X13 each switch saves only itself and the choice survives reopening and a reload', async ({ page }) => {
+    const backend = await preferencesBackend(page, { messages: true, viewings: true });
+    await page.goto('/profile');
+    await ready(page);
+    await openNotifications(page);
+    await expect(page.getByText(t('notifications.web'))).toBeVisible();
+    // Saved choices, clearly not "arriving on this device".
+    await expect(page.getByText(t('notifications.prefsNote'))).toBeVisible();
+    const messages = page.getByRole('switch', { name: t('notifications.messages') });
+    const viewings = page.getByRole('switch', { name: t('notifications.viewings') });
+    await expect(messages).toHaveAttribute('aria-checked', 'true');
+    await messages.click();
+    await expect(messages).toHaveAttribute('aria-checked', 'false');
+    await expect.poll(() => backend.server).toEqual({ messages: false, viewings: true });
+    expect(backend.saves).toEqual([{ messages: false, viewings: true }]);
+    await expect(viewings).toHaveAttribute('aria-checked', 'true');
+
+    await page.getByRole('button', { name: t('common.close') }).last().click();
+    await openNotifications(page);
+    await expect(page.getByRole('switch', { name: t('notifications.messages') })).toHaveAttribute('aria-checked', 'false');
+    await page.reload();
+    await ready(page);
+    await openNotifications(page);
+    await expect(page.getByRole('switch', { name: t('notifications.messages') })).toHaveAttribute('aria-checked', 'false');
+    await expect(page.getByRole('switch', { name: t('notifications.viewings') })).toHaveAttribute('aria-checked', 'true');
+  });
+
+  test('X14 rapid taps on both switches end with the newest choice saved', async ({ page }) => {
+    const backend = await preferencesBackend(page, { messages: true, viewings: true });
+    await page.goto('/profile');
+    await ready(page);
+    await openNotifications(page);
+    const messages = page.getByRole('switch', { name: t('notifications.messages') });
+    const viewings = page.getByRole('switch', { name: t('notifications.viewings') });
+    await expect(messages).toHaveAttribute('aria-checked', 'true');
+    await messages.click();
+    await viewings.click();
+    await messages.click();
+    await expect.poll(() => backend.server).toEqual({ messages: true, viewings: false });
+    await expect(messages).toHaveAttribute('aria-checked', 'true');
+    await expect(viewings).toHaveAttribute('aria-checked', 'false');
+    await expect(page.getByText(t('notifications.saving'))).toBeHidden();
+  });
+
+  test.describe('failures', () => {
+    test.use({ allowConsoleErrors: [/status of 400/] });
+
+    test('X15 a failed save puts the switch back and says so', async ({ page }) => {
+      await preferencesBackend(page, { messages: true, viewings: true }, { write: true });
+      await page.goto('/profile');
+      await ready(page);
+      await openNotifications(page);
+      const messages = page.getByRole('switch', { name: t('notifications.messages') });
+      await expect(messages).toHaveAttribute('aria-checked', 'true');
+      await messages.click();
+      await expect(page.getByText(t('notifications.saveFailed'))).toBeVisible();
+      await expect(messages).toHaveAttribute('aria-checked', 'true');
+    });
+
+    test('X16 when the saved choices cannot be read, the switches wait instead of showing defaults', async ({ page }) => {
+      const backend = await preferencesBackend(page, { messages: false, viewings: false }, { read: 1 });
+      await page.goto('/profile');
+      await ready(page);
+      await openNotifications(page);
+      await expect(page.getByText(t('notifications.loadFailed'))).toBeVisible();
+      const messages = page.getByRole('switch', { name: t('notifications.messages') });
+      await expect(messages).toBeDisabled();
+      await messages.dispatchEvent('click');
+      expect(backend.saves).toEqual([]);
+      await page.getByRole('button', { name: t('common.retry') }).click();
+      await expect(messages).toBeEnabled();
+      await expect(messages).toHaveAttribute('aria-checked', 'false');
+    });
+  });
+});
+
+// Email code: one send per tap, and Supabase's "wait N seconds" drives the
+// resend timer (the earlier code is still valid, so code entry opens).
+test.describe('email code', () => {
+  test.use({ allowConsoleErrors: [/status of 429/] });
+
+  test('X17 a double tap sends one code', async ({ page }) => {
+    const sent: unknown[] = [];
+    await page.route('**/auth/v1/otp*', async (route) => {
+      sent.push(route.request().postDataJSON());
+      await new Promise((r) => setTimeout(r, 400));
+      return json(route, {});
+    });
+    await page.goto('/profile');
+    await ready(page);
+    await page.getByRole('textbox', { name: t('auth.email') }).fill('new.user@example.com');
+    await page.getByRole('button', { name: t('auth.signInWithEmail') }).dblclick();
+    await expect(page.getByText(t('auth.enterCode')).first()).toBeVisible();
+    expect(sent).toHaveLength(1);
+  });
+
+  test('X18 "wait N seconds" opens code entry with the resend timer at the server\'s number', async ({ page }) => {
+    await page.route('**/auth/v1/otp*', (route) =>
+      json(route, { code: 'over_email_send_rate_limit', msg: 'For security purposes, you can only request this after 42 seconds.' }, 429),
+    );
+    await page.goto('/profile');
+    await ready(page);
+    await page.getByRole('textbox', { name: t('auth.email') }).fill('new.user@example.com');
+    await page.getByRole('button', { name: t('auth.signInWithEmail') }).click();
+    await expect(page.getByText(t('auth.enterCode')).first()).toBeVisible();
+    await expect(page.getByRole('button', { name: new RegExp(t('auth.resendIn').replace('{{s}}', '4[12]')) })).toBeDisabled();
+  });
+});

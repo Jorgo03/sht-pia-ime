@@ -170,3 +170,55 @@ test.describe('when Supabase refuses to send', () => {
     await expect(page.getByText(t('errors.rateLimited'))).toBeVisible();
   });
 });
+
+async function openEmailCode(page: Page) {
+  await page.goto('/profile');
+  await page.getByRole('button', { name: t('auth.signInWithEmail') }).click();
+  await page.getByPlaceholder(t('auth.email')).fill(EMAIL);
+}
+
+test('F4-H5 a double click sends one code, and the code signs in once', async ({ page }) => {
+  const log: Sent[] = [];
+  // Slow answers, so the second click lands while the first is in flight.
+  await page.route('**/auth/v1/otp*', async (route) => {
+    log.push({ path: 'otp', query: new URL(route.request().url()).searchParams, body: route.request().postDataJSON() });
+    await new Promise((r) => setTimeout(r, 400));
+    return json(route, 200, {});
+  });
+  await page.route('**/auth/v1/verify*', async (route) => {
+    log.push({ path: 'verify', query: new URL(route.request().url()).searchParams, body: route.request().postDataJSON() });
+    await new Promise((r) => setTimeout(r, 400));
+    return json(route, 200, fakeSession());
+  });
+  await openEmailCode(page);
+  await page.getByRole('button', { name: t('auth.sendCode') }).dblclick();
+  await expect(page.getByRole('heading', { name: t('auth.enterCode') })).toBeVisible();
+  expect(log.filter((s) => s.path === 'otp')).toHaveLength(1);
+  expect(log[0].body).toMatchObject({ email: EMAIL });
+
+  // Paste fills every box at once, then a typed last digit fires again.
+  await page.getByRole('textbox', { name: t('auth.codeDigit').replace('{{n}}', '1') }).focus();
+  await page.evaluate(() => {
+    const data = new DataTransfer();
+    data.setData('text', '123456');
+    document.querySelector('.otp-inputs')!.dispatchEvent(new ClipboardEvent('paste', { clipboardData: data, bubbles: true }));
+  });
+  await page.getByRole('textbox', { name: t('auth.codeDigit').replace('{{n}}', '6') }).fill('6').catch(() => {});
+  await expect(page).toHaveURL(/\/$/);
+  expect(log.filter((s) => s.path === 'verify')).toHaveLength(1);
+});
+
+test.describe('server wait', () => {
+  test.use({ allowConsoleErrors: [/status of 429/] });
+
+  test('F4-N6 "wait N seconds" from Supabase sets the resend timer and keeps the earlier code usable', async ({ page }) => {
+    const log: Sent[] = [];
+    await authRoute(page, 'otp', () => [429, { code: 'over_email_send_rate_limit', msg: 'For security purposes, you can only request this after 42 seconds.' }], log);
+    await openEmailCode(page);
+    await page.getByRole('button', { name: t('auth.sendCode') }).click();
+    await expect(page.getByRole('heading', { name: t('auth.enterCode') })).toBeVisible();
+    await expect(page.getByText(t('errors.waitSeconds').replace('{{s}}', '42'))).toBeVisible();
+    // The countdown starts from the server's 42 (it may have ticked once).
+    await expect(page.getByRole('button', { name: new RegExp(t('auth.resendIn').replace('{{s}}', '4[12]')) })).toBeDisabled();
+  });
+});

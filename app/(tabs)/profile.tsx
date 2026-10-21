@@ -10,7 +10,7 @@ import { isModerator } from '@/src/features/moderation/lib/moderation';
 import { supabase } from '@/lib/supabase';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter, type Href } from 'expo-router';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Alert,
   KeyboardAvoidingView,
@@ -40,6 +40,7 @@ import { DuskHero } from '@/components/ui/dusk-hero';
 import { GoogleLogo } from '@/components/ui/google-logo';
 import { GradientBackground } from '@/components/ui/gradient-background';
 import { OtpInput, OTP_LENGTH } from '@/components/ui/otp-input';
+import { retryAfterSeconds } from '@/src/lib/authErrors';
 import { useProfileStats } from '@/hooks/use-profile-stats';
 import type { ProfileFields } from '@/src/features/auth/lib/profileForm';
 import { useUnreadMessages } from '@/hooks/use-unread-messages';
@@ -175,6 +176,11 @@ export default function ProfileScreen() {
   // Seconds left on the resend lock. Web starts this at 30 on every send so a
   // user can't hammer the endpoint into a Supabase rate-limit.
   const [cooldown, setCooldown] = useState(0);
+  // Set synchronously, before the button re-renders as busy: a quick double
+  // tap would otherwise send two codes (the second silently invalidates the
+  // first), or verify one code twice (the second attempt fails as "used").
+  const sendingCode = useRef(false);
+  const verifyingCode = useRef(false);
   const [resetSending, setResetSending] = useState(false);
   const [signOutOpen, setSignOutOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
@@ -330,9 +336,25 @@ export default function ProfileScreen() {
     } catch {
       /* storage blocked — role stays buyer */
     }
+    if (sendingCode.current) return;
+    sendingCode.current = true;
     setOtpSending(true);
-    const { error } = await sendOtp(cleanEmail);
+    const { error } = await sendOtp(cleanEmail).finally(() => {
+      sendingCode.current = false;
+    });
     setOtpSending(false);
+    const wait = retryAfterSeconds(error);
+    if (wait) {
+      // A code went to this address moments ago and is still valid: go to
+      // code entry, and unlock "resend" when the server will accept it.
+      setOtpType('email');
+      setOtpCode('');
+      setOtpError(false);
+      setCooldown(wait);
+      setOtpStep(true);
+      Alert.alert(t('errors.waitSeconds', { s: wait }));
+      return;
+    }
     if (error) {
       Alert.alert(t('common.error'), friendlyAuthError(error, t));
       return;
@@ -356,9 +378,19 @@ export default function ProfileScreen() {
       Alert.alert(t('common.error'), t('errors.invalidEmail'));
       return;
     }
+    if (sendingCode.current) return;
+    sendingCode.current = true;
     setOtpSending(true);
-    const { error } = await resendCode(email.trim(), otpType);
+    const { error } = await resendCode(email.trim(), otpType).finally(() => {
+      sendingCode.current = false;
+    });
     setOtpSending(false);
+    const wait = retryAfterSeconds(error);
+    if (wait) {
+      setCooldown(wait);
+      Alert.alert(t('errors.waitSeconds', { s: wait }));
+      return;
+    }
     if (error) {
       Alert.alert(t('common.error'), friendlyAuthError(error, t));
       return;
@@ -374,18 +406,21 @@ export default function ProfileScreen() {
     setOtpCode('');
     setOtpError(false);
     setCooldown(RESEND_COOLDOWN_S);
-    // Single-argument alert: auth.checkEmail is signup-specific wording
-    // ("...to confirm your account") and would be wrong as a title here.
-    Alert.alert(t('auth.otpSent'));
+    // Says that earlier codes stopped working: entering the first email's
+    // code after a resend is the common way to hit "wrong or expired".
+    Alert.alert(t('auth.newCodeSent'));
   };
 
   // Takes the code as an argument rather than reading `otpCode` — the
   // auto-verify fires from inside onChangeText, before that state update has
   // flushed, so the state value would still be 5 digits here.
   const handleVerifyOtp = async (code: string) => {
-    if (code.length < OTP_LENGTH) return;
+    if (code.length < OTP_LENGTH || verifyingCode.current) return;
+    verifyingCode.current = true;
     setOtpVerifying(true);
-    const { error } = await verifyOtp(email, code, otpType);
+    const { error } = await verifyOtp(email, code, otpType).finally(() => {
+      verifyingCode.current = false;
+    });
     setOtpVerifying(false);
     if (error) {
       Alert.alert(t('common.error'), friendlyAuthError(error, t));
@@ -425,9 +460,12 @@ export default function ProfileScreen() {
   };
 
   const handleVerifyRecovery = async (code: string) => {
-    if (code.length < OTP_LENGTH || otpVerifying) return;
+    if (code.length < OTP_LENGTH || verifyingCode.current) return;
+    verifyingCode.current = true;
     setOtpVerifying(true);
-    const { error } = await verifyRecoveryCode(email.trim(), code);
+    const { error } = await verifyRecoveryCode(email.trim(), code).finally(() => {
+      verifyingCode.current = false;
+    });
     setOtpVerifying(false);
     if (error) {
       setOtpCode('');
@@ -711,7 +749,8 @@ export default function ProfileScreen() {
         </SafeAreaView>
 
         {notificationsOpen && (
-          <NotificationsSheet userId={user.id} onClose={() => setNotificationsOpen(false)} />
+          // Keyed by account: another person never sees, or saves over, the previous one's choices.
+          <NotificationsSheet key={user.id} userId={user.id} onClose={() => setNotificationsOpen(false)} />
         )}
 
         {editOpen && (

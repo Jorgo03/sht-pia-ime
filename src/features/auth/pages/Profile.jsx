@@ -7,7 +7,7 @@ import { useProfileStats } from '../hooks/useProfileStats'
 import DuskHero from '../components/DuskHero'
 import EditProfileSheet from '../components/EditProfileSheet'
 import Avatar from '../../../shared/Avatar'
-import { EMAIL_RE, friendlyError } from '../../../lib/authErrors'
+import { EMAIL_RE, friendlyError, retryAfterSeconds } from '../../../lib/authErrors'
 import { supabase } from '../../../lib/supabase'
 import LegalLinks from '../../../shared/LegalLinks'
 import { isModerator } from '../../moderation/lib/moderation'
@@ -108,6 +108,11 @@ export default function Profile() {
   const [otpError, setOtpError] = useState(false)
   const [cooldown, setCooldown] = useState(0)
   const otpRefs = useRef([])
+  // Set synchronously, before the button re-renders as busy: a double click
+  // would otherwise send two codes (the second invalidates the first) or
+  // verify one code twice (the second attempt fails as already used).
+  const sendingCode = useRef(false)
+  const verifyingCode = useRef(false)
 
   // Resend cooldown ticker. Keyed on whether a countdown is running, not on
   // the value: depending on `cooldown` itself would clear and recreate the
@@ -235,12 +240,18 @@ export default function Profile() {
     // path as OAuth, and overwriting here means an aborted OAuth click
     // can't leak its role choice into this flow.
     try { localStorage.setItem('fho_pending_role', role) } catch { /* ignore */ }
+    if (sendingCode.current) return
+    sendingCode.current = true
     setLoading(true); setMessage('')
     try {
       const { error } = await sendOtp(cleanEmail)
-      if (error) setMessage(friendlyError(error, t))
+      const wait = retryAfterSeconds(error)
+      // A code went to this address moments ago and is still valid.
+      if (wait) { setOtpStep('enter-code'); setOtpError(false); setCooldown(wait); setMessage(t('errors.waitSeconds', { s: wait })) }
+      else if (error) setMessage(friendlyError(error, t))
       else { setOtpStep('enter-code'); setOtpError(false); setCooldown(30); setMessage(t('auth.otpSent')) }
     } finally {
+      sendingCode.current = false
       setLoading(false)
     }
   }
@@ -250,12 +261,17 @@ export default function Profile() {
     // Guarded too: otpEmail is cleared when the component remounts after a
     // magic-link login, and resending with an empty address 400s.
     if (!EMAIL_RE.test(otpEmail)) { setMessage(t('errors.invalidEmail')); return }
+    if (sendingCode.current) return
+    sendingCode.current = true
     setLoading(true); setMessage(''); setOtpError(false)
     try {
       const { error } = await resendCode(otpEmail, otpType)
-      if (error) setMessage(friendlyError(error, t))
-      else { setCooldown(30); setMessage(t('auth.otpSent')) }
+      const wait = retryAfterSeconds(error)
+      if (wait) { setCooldown(wait); setMessage(t('errors.waitSeconds', { s: wait })) }
+      else if (error) setMessage(friendlyError(error, t))
+      else { setCooldown(30); setOtpCode(['', '', '', '', '', '']); setMessage(t('auth.newCodeSent')) }
     } finally {
+      sendingCode.current = false
       setLoading(false)
     }
   }
@@ -287,6 +303,8 @@ export default function Profile() {
   }
 
   const handleVerifyOtp = async (code) => {
+    if (verifyingCode.current) return
+    verifyingCode.current = true
     setLoading(true); setMessage('')
     try {
       const { error } = await verifyOtp(otpEmail, code, otpType)
@@ -300,6 +318,7 @@ export default function Profile() {
         setPendingRedirect(location.state?.from || '/')
       }
     } finally {
+      verifyingCode.current = false
       setLoading(false)
     }
   }

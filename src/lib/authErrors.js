@@ -49,3 +49,16 @@ export function friendlyError(err, t) {
   const key = Object.keys(map).find((k) => err.message.includes(k))
   return key ? t(map[key]) : t('errors.generic')
 }
+
+/**
+ * Seconds Supabase asks the person to wait before another code, from its
+ * per-address limit ("For security purposes, you can only request this after
+ * 42 seconds."), or null. The resend timer uses it, so the app's countdown
+ * matches the server's instead of offering a resend that will be refused.
+ */
+export function retryAfterSeconds(err) {
+  const match = /only request this after (\d+) seconds?/i.exec(err?.message ?? '')
+  if (!match) return null
+  const s = Number(match[1])
+  return Number.isFinite(s) && s > 0 && s <= 3600 ? s : null
+}

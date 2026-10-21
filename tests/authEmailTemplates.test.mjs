@@ -28,3 +28,13 @@ for (const name of ['confirmation', 'recovery', 'magic_link', 'email_change']) {
 test('the code length the apps expect matches the config', () => {
   assert.match(config, /otp_length = 6/)
 })
+
+test('the expiry the emails state matches the configured one, not a guess', () => {
+  const seconds = Number(/\[auth\.email\][\s\S]*?otp_expiry = (\d+)/.exec(config)[1])
+  assert.equal(seconds, 3600, 'the templates say 1 hour; change them together with otp_expiry')
+  for (const name of ['confirmation', 'magic_link', 'recovery']) {
+    const html = readFileSync(new URL(`../supabase/templates/${name}.html`, import.meta.url), 'utf8')
+    assert.match(html, /1 ore/, `${name}: Albanian expiry`)
+    assert.match(html, /1 hour/, `${name}: English expiry`)
+  }
+})

@@ -2,7 +2,7 @@
 // Supabase-error-to-user-facing-message mapper. Run with: npm test
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { EMAIL_RE, friendlyError } from '../src/lib/authErrors.js'
+import { EMAIL_RE, friendlyError, retryAfterSeconds } from '../src/lib/authErrors.js'
 
 // A stand-in for react-i18next's t() — returns the key itself, so
 // assertions can check which key was chosen without needing real
@@ -139,4 +139,13 @@ test('the real Supabase texts for a bad address and a weak password are mapped',
     friendlyError({ message: 'Password should be at least 8 characters.' }, t),
     'errors.passwordMin',
   )
+})
+
+test('retryAfterSeconds reads Supabase\'s per-address wait, and nothing else', () => {
+  assert.equal(retryAfterSeconds({ message: 'For security purposes, you can only request this after 42 seconds.' }), 42)
+  assert.equal(retryAfterSeconds({ message: 'For security purposes, you can only request this after 1 second.' }), 1)
+  assert.equal(retryAfterSeconds({ message: 'email rate limit exceeded' }), null)
+  assert.equal(retryAfterSeconds({ message: 'Token has expired or is invalid' }), null)
+  assert.equal(retryAfterSeconds(null), null)
+  assert.equal(retryAfterSeconds({ message: 'you can only request this after 99999 seconds' }), null)
 })
