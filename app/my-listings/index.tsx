@@ -112,7 +112,7 @@ export default function MyListingsScreen() {
             kicker/headline hero — this page doesn't use that pattern) plus
             a gradient "+ New Listing" pill, not a bare icon button. */}
         <View style={styles.titleRow}>
-          <Text style={styles.pageTitle}>{t('listing.myListings')}</Text>
+          <Text style={styles.pageTitle} accessibilityRole="header">{t('listing.myListings')}</Text>
           <TouchableOpacity onPress={() => router.push('/listing/new' as Href)} activeOpacity={0.85}>
             <LinearGradient colors={[colors.accent, colors.accentEnd]} style={styles.newListingPill}>
               <MaterialIcons name="add" size={16} color="#fff" />

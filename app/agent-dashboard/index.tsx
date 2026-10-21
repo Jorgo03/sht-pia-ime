@@ -150,7 +150,7 @@ export default function AgentDashboardScreen() {
             <View style={styles.kickerDash} />
             <Text style={styles.kicker}>{t('agentDashboard.kicker')}</Text>
           </View>
-          <Text style={styles.headline}>
+          <Text style={styles.headline} accessibilityRole="header">
             {t('agentDashboard.headlinePre')} <Text style={styles.headlineEm}>{t('agentDashboard.headlineEm')}</Text>
           </Text>
         </View>

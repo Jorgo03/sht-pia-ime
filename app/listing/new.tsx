@@ -1139,7 +1139,7 @@ function ListingWizard({ editId }: { editId?: string }) {
           <Text style={styles.stepCounter}>
             {`${t('listing.step.' + STEPS[step])} ${step + 1}/${STEPS.length}`.toUpperCase()}
           </Text>
-          <Text style={styles.stepName} numberOfLines={1}>
+          <Text style={styles.stepName} numberOfLines={1} accessibilityRole="header">
             {isEdit ? t('listing.editListing') : t('listing.newListing')}
           </Text>
         </View>

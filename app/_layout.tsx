@@ -39,6 +39,7 @@ import { installGlobalErrorReporting } from '@/lib/report-error';
 import { configureForegroundNotifications } from '@/lib/push';
 import { PushBridge } from '@/components/push-bridge';
 import { IS_WEB, WEB_MAX_WIDTH } from '@/constants/web-frame';
+import { RouteHead } from '@/components/web/page-head';
 
 export const unstable_settings = {
   anchor: '(tabs)',
@@ -91,6 +92,7 @@ function ThemedNavigation() {
 
   return (
     <NavigationThemeProvider value={theme === 'dark' ? DarkTheme : DefaultTheme}>
+      <RouteHead />
       <WebColumn>
         <Stack>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />

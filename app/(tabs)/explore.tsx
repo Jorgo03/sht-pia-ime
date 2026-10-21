@@ -158,7 +158,7 @@ export default function ExploreScreen() {
                 serif with the emphasis in orange italic. Mobile was rendering
                 a bold sans `search.title` and leaving headline/headlineEm
                 unused, so the two screens didn't read as the same app. */}
-            <Text style={styles.title}>
+            <Text style={styles.title} accessibilityRole="header">
               {t('search.headline')}{' '}
               <Text style={styles.titleEm}>{t('search.headlineEm')}</Text>.
             </Text>

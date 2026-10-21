@@ -123,7 +123,7 @@ export default function PropertyAnalyticsScreen() {
   return (
     <GradientBackground>
       <SafeAreaView style={styles.container} edges={['top']}>
-        <AppHeader onBack={() => router.back()} title={t('dashboard.title')} />
+        <AppHeader onBack={() => router.back()} title={t('dashboard.title')} titleIsHeading />
 
         {loading ? (
           <View style={styles.center}>

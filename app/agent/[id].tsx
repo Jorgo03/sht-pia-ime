@@ -14,6 +14,7 @@ import { useTheme } from '@/contexts/theme-context';
 import { supabase } from '@/lib/supabase';
 import { Property } from '@/data/types';
 import { useResponsive } from '@/hooks/use-responsive';
+import { PageHead } from '@/components/web/page-head';
 
 interface AgentProfile {
   id: string;
@@ -80,6 +81,7 @@ export default function AgentProfileScreen() {
   return (
     <GradientBackground>
       <SafeAreaView style={styles.container} edges={['top']}>
+        <PageHead title={agent?.full_name || t('auth.agent')} />
         <AppHeader onBack={() => router.back()} title={t('auth.agent')} />
 
         {loading ? (
@@ -119,7 +121,7 @@ export default function AgentProfileScreen() {
                   </View>
                 )}
                 <View style={styles.agentInfo}>
-                  <Text style={styles.agentName}>{agent.full_name}</Text>
+                  <Text style={styles.agentName} accessibilityRole="header">{agent.full_name}</Text>
                   {agent.agency_name ? (
                     <View style={styles.metaRow}>
                       <MaterialIcons name="business" size={13} color={colors.textSecondary} />

@@ -65,6 +65,7 @@ export function AppHeader({
    *  property hero share/save matter more than switching language. */
   showControls = true,
   onDark = false,
+  titleIsHeading = false,
 }: {
   trailing?: ReactNode;
   onBack?: () => void;
@@ -74,6 +75,9 @@ export function AppHeader({
   floating?: boolean;
   showControls?: boolean;
   onDark?: boolean;
+  /** The title is the screen's only heading (an <h1> on the web, a heading
+   *  for VoiceOver/TalkBack). Off where the screen has its own headline. */
+  titleIsHeading?: boolean;
 }) {
   const { t, i18n } = useTranslation();
   const { user } = useAuth();
@@ -127,7 +131,7 @@ export function AppHeader({
         {avatar}
         {title ? (
           <View style={styles.titleBlock}>
-            <Text style={styles.title} numberOfLines={1}>
+            <Text style={styles.title} numberOfLines={1} accessibilityRole={titleIsHeading ? 'header' : undefined}>
               {title}
             </Text>
             {subtitle}

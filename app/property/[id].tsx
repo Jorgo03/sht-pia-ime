@@ -49,6 +49,7 @@ import { supabase } from '@/lib/supabase';
 import { formatPrice, listingBadgeKey, priceSuffixKey, telUrl, whatsappUrl } from '@/lib/format';
 import { webColumn } from '@/constants/web-frame';
 import { useAppDimensions } from '@/hooks/use-app-dimensions';
+import { PageHead } from '@/components/web/page-head';
 
 // Rounds "now + 1h" to the next half hour — same default the web app's
 // ViewingRequestSheet uses.
@@ -293,7 +294,7 @@ export default function PropertyDetailScreen() {
           {propertyTypeLabel ? ` · ${propertyTypeLabel.toUpperCase()}` : ''}
         </Text>
       </View>
-      <Text style={styles.name}>{title}</Text>
+      <Text style={styles.name} accessibilityRole="header">{title}</Text>
       <View style={styles.locationRow}>
         <MaterialIcons name="location-on" size={16} color={colors.accent} />
         <Text style={styles.location}>
@@ -491,6 +492,10 @@ export default function PropertyDetailScreen() {
 
   return (
     <View style={styles.container}>
+      <PageHead
+        title={property.city ? `${title} - ${property.city}` : title}
+        description={(description || '').replace(/\s+/g, ' ').trim().slice(0, 160) || null}
+      />
       <View style={[styles.imageContainer, { height: imageHeight }]}>
         {images.length > 0 ? (
           <FlatList

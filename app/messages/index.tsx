@@ -150,7 +150,7 @@ export default function MessagesInboxScreen() {
                 : t('messages.client.kicker', { count: conversations.length, unread: unreadTotal })}
             </Text>
           </View>
-          <Text style={styles.headline}>
+          <Text style={styles.headline} accessibilityRole="header">
             {isAgent ? t('messages.agent.headlinePre') : t('messages.client.headlinePre')}{' '}
             <Text style={styles.headlineEm}>
               {isAgent ? t('messages.agent.headlineEm') : t('messages.client.headlineEm')}

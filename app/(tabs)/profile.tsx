@@ -492,7 +492,7 @@ export default function ProfileScreen() {
               of running a parallel one. */}
           <AppHeader />
           <ScrollView contentContainerStyle={[styles.scrollContent, { paddingBottom: tabBarClearance }]} showsVerticalScrollIndicator={false}>
-            <Text style={styles.topBarTitle}>{t('common.profile')}</Text>
+            <Text style={styles.topBarTitle} accessibilityRole="header">{t('common.profile')}</Text>
 
             {/* Matches web's .profile-card exactly. */}
             <View style={styles.profileCard}>
@@ -762,7 +762,7 @@ export default function ProfileScreen() {
                   48px/0.98. Each line is its own <Text> rather than one
                   wrapping paragraph, so the break points are fixed by the
                   copy instead of by the device width. */}
-              <View>
+              <View accessibilityRole="header">
                 <Text style={styles.authHeadline}>
                   {isSignUp ? t('auth.heroSignUpPre') : t('auth.heroSignInPre')}
                 </Text>

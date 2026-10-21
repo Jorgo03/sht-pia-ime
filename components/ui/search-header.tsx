@@ -32,7 +32,7 @@ export function SearchHeader({ kicker, headline, emphasis, onSearchPress }: Sear
         <View style={styles.kickerDash} />
         <Text style={styles.kicker}>{kicker}</Text>
       </View>
-      <Text style={styles.headline}>
+      <Text style={styles.headline} accessibilityRole="header">
         {headline}
         {emphasis ? <Text style={styles.headlineEmphasis}> {emphasis}</Text> : null}
       </Text>

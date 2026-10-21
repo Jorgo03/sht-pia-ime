@@ -52,7 +52,7 @@ export default function FavoritesScreen() {
               {loading ? t('common.loading') : t('favourites.savedCount', { count: favoriteProperties.length })}
             </Text>
           </View>
-          <Text style={styles.headline}>
+          <Text style={styles.headline} accessibilityRole="header">
             {t('favourites.headlinePre')} <Text style={styles.headlineEm}>{t('favourites.headlineEm')}</Text>
           </Text>
         </View>

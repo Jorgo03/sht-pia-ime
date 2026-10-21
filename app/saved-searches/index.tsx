@@ -223,7 +223,7 @@ export default function SavedSearchesScreen() {
             <View style={styles.kickerDash} />
             <Text style={styles.kicker}>{t('saved.kicker')}</Text>
           </View>
-          <Text style={styles.headline}>
+          <Text style={styles.headline} accessibilityRole="header">
             {t('saved.headlinePre')} <Text style={styles.headlineEm}>{t('saved.headlineEm')}</Text>
           </Text>
         </View>

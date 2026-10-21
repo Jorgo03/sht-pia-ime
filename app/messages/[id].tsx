@@ -234,6 +234,7 @@ export default function ThreadScreen() {
           onBack={() => router.back()}
           showControls={false}
           title={otherName}
+          titleIsHeading
           trailing={
             <TouchableOpacity
               onPress={openMenu}

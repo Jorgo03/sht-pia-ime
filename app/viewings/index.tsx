@@ -182,7 +182,7 @@ export default function ViewingsScreen() {
             <View style={styles.kickerDash} />
             <Text style={styles.kicker}>{t('viewings.kicker')}</Text>
           </View>
-          <Text style={styles.headline}>
+          <Text style={styles.headline} accessibilityRole="header">
             {t('viewings.headlinePre')} <Text style={styles.headlineEm}>{t('viewings.headlineEm')}</Text>
           </Text>
         </View>
