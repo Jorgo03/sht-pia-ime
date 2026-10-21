@@ -1,5 +1,5 @@
 import { useFocusEffect, useRouter, type Href } from 'expo-router';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState, useSyncExternalStore } from 'react';
 import {
   ScrollView,
   StyleSheet,
@@ -51,6 +51,17 @@ function getGreeting(hour: number, t: (key: string) => string): string {
   return t('home.greetingEvening');
 }
 
+// The website's pages are pre-rendered when the site is built, so the hour
+// in that HTML is the build's, not the visitor's; a different greeting in the
+// browser is a hydration mismatch (React #418) that throws the page away and
+// re-renders it. The server snapshot (noon: "Mirëdita", which Albanian uses
+// all day) is what both sides render first; React then switches to the
+// visitor's own hour straight after hydrating. Native has no pre-render and
+// reads the clock directly.
+const subscribeNever = () => () => {};
+const currentHour = () => new Date().getHours();
+const buildHour = () => 12;
+
 export default function HomeScreen() {
   const router = useRouter();
   const { t } = useTranslation();
@@ -72,7 +83,8 @@ export default function HomeScreen() {
   // scroll has to reserve its full footprint or the last row sits under it.
   const tabBarClearance = useTabBarClearance();
 
-  const greeting = getGreeting(new Date().getHours(), t);
+  const hour = useSyncExternalStore(subscribeNever, currentHour, buildHour);
+  const greeting = getGreeting(hour, t);
   const firstName = user?.user_metadata?.full_name?.split(' ')[0] || user?.email?.split('@')[0] || '';
   const matchCount = listings.length;
 

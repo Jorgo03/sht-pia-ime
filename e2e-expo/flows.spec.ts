@@ -164,3 +164,22 @@ test.describe('not found', () => {
     await expect(page).toHaveURL(/\/$/);
   });
 });
+
+test.describe('time of day', () => {
+  test.use({ timezoneId: 'Europe/Tirane' });
+
+  // The pages are pre-rendered at build time; a greeting chosen from the
+  // build's clock broke hydration (React #418) for visitors at another hour.
+  // The guard fails the test on that page error.
+  for (const [when, key] of [['09:00', 'home.greetingMorning'], ['20:30', 'home.greetingEvening']] as const) {
+    test(`X12 at ${when} the greeting follows the visitor's clock and the pages hydrate`, async ({ page }) => {
+      await page.clock.setFixedTime(new Date(`2026-10-21T${when}:00+02:00`));
+      await page.goto('/');
+      await ready(page);
+      await expect(page.getByText(t(key)).first()).toBeVisible();
+      await page.goto('/privacy');
+      await ready(page);
+      await expect(page.getByRole('heading', { name: t('legal.privacyPolicy'), level: 1 })).toBeVisible();
+    });
+  }
+});
