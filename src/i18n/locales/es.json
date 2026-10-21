@@ -579,7 +579,10 @@
     "newSearch": "Nueva búsqueda",
     "newWanted": "Nueva solicitud",
     "newMatches": "{{n}} más que la última vez",
-    "alertsHint": "Los nuevos resultados aparecen aquí cuando abres esta página. Los avisos por correo aún no están disponibles."
+    "alertsHint": "Los nuevos resultados aparecen aquí cuando abres esta página. Los avisos por correo aún no están disponibles.",
+    "emailOn": "Enviarme por correo las coincidencias nuevas",
+    "emailOff": "Dejar de enviarme correos",
+    "emailHint": "Las coincidencias nuevas aparecen aquí al abrir esta página. Activa el correo para recibirlas también por email; cada correo tiene un enlace para darte de baja."
   },
   "bell": {
     "label": "Notificaciones",

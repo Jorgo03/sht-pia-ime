@@ -587,7 +587,10 @@
     "newSearch": "Nowe wyszukiwanie",
     "newWanted": "Nowe ogłoszenie",
     "newMatches": "{{n}} więcej niż ostatnio",
-    "alertsHint": "Nowe wyniki pojawiają się tutaj, gdy otworzysz tę stronę. Powiadomienia e-mail nie są jeszcze dostępne."
+    "alertsHint": "Nowe wyniki pojawiają się tutaj, gdy otworzysz tę stronę. Powiadomienia e-mail nie są jeszcze dostępne.",
+    "emailOn": "Wysyłaj mi nowe dopasowania e-mailem",
+    "emailOff": "Nie wysyłaj mi więcej e-maili",
+    "emailHint": "Nowe dopasowania pojawiają się tutaj po otwarciu tej strony. Włącz e-mail, aby otrzymywać je także pocztą; każdy e-mail ma link do wypisania się."
   },
   "bell": {
     "label": "Powiadomienia",

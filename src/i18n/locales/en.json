@@ -571,7 +571,10 @@
     "newSearch": "New saved search",
     "newWanted": "New wanted post",
     "newMatches": "{{n}} more than last time",
-    "alertsHint": "New matches show up here when you open this page. Email alerts are not available yet."
+    "alertsHint": "New matches show up here when you open this page. Email alerts are not available yet.",
+    "emailOn": "Email me new matches",
+    "emailOff": "Stop emailing me",
+    "emailHint": "New matches show up here when you open this page. Turn on email to get them by email too; every email has a link to stop."
   },
   "bell": {
     "label": "Notifications",

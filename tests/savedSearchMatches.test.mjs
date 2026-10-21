@@ -1,6 +1,6 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { applySavedFilters, countMatches, markSeen, newMatchCount } from '../src/features/saved-searches/lib/matches.js'
+import { applySavedFilters, countMatches, markSeen, newMatchCount, setEmailAlerts } from '../src/features/saved-searches/lib/matches.js'
 
 // Saved-search "new matches" (docs/LAUNCH_TASKS.md L06). The bell used to
 // promise alerts nothing sent; the app now shows how many more listings match
@@ -78,4 +78,16 @@ test('marking as seen stores the current count, and skips an unknown one', async
   const r2 = recorder()
   assert.equal(await markSeen(r2.client, 's1', null), false)
   assert.deepEqual(r2.calls, [])
+})
+
+test('email alerts: on starts the window now, off just stops', async () => {
+  const r = recorder({ error: null })
+  assert.equal(await setEmailAlerts(r.client, 's1', true), true)
+  const patch = r.calls[1][1]
+  assert.equal(patch.email_alerts, true)
+  assert.ok(Math.abs(Date.parse(patch.last_alerted_at) - Date.now()) < 5000)
+  const r2 = recorder({ error: null })
+  await setEmailAlerts(r2.client, 's1', false)
+  assert.deepEqual(r2.calls, [['from', 'saved_searches'], ['update', { email_alerts: false }], ['eq', 'id', 's1']])
+  assert.equal(await setEmailAlerts({ from() { throw new Error('x') } }, 's1', true), false)
 })

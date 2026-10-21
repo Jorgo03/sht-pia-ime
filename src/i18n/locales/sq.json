@@ -571,7 +571,10 @@
     "newSearch": "Kërkim i ri",
     "newWanted": "Kërkesë e re",
     "newMatches": "{{n}} më shumë se herën e kaluar",
-    "alertsHint": "Përputhjet e reja shfaqen këtu kur hapni këtë faqe. Njoftimet me email nuk janë ende në dispozicion."
+    "alertsHint": "Përputhjet e reja shfaqen këtu kur hapni këtë faqe. Njoftimet me email nuk janë ende në dispozicion.",
+    "emailOn": "Më dërgo email për përputhjet e reja",
+    "emailOff": "Mos më dërgo më email",
+    "emailHint": "Përputhjet e reja shfaqen këtu kur hap këtë faqe. Ndiz email-in për t'i marrë edhe me email; çdo email ka një lidhje për ta ndalur."
   },
   "bell": {
     "label": "Njoftimet",

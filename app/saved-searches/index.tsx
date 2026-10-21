@@ -17,7 +17,10 @@ import { useTheme } from '@/contexts/theme-context';
 import { supabase } from '@/lib/supabase';
 import { formatDate, formatPrice } from '@/lib/format';
 import { PropertyFilters } from '@/data/types';
-import { countMatches, markSeen, newMatchCount } from '@/src/features/saved-searches/lib/matches';
+import { countMatches, markSeen, newMatchCount, setEmailAlerts } from '@/src/features/saved-searches/lib/matches';
+
+// Email alerts are offered only once sending is configured (docs/LAUNCH_TASKS.md F13).
+const EMAIL_ALERTS = process.env.EXPO_PUBLIC_EMAIL_ALERTS === 'true';
 
 type Tab = 'searches' | 'wanted';
 type ListingType = 'sale' | 'rent';
@@ -39,6 +42,7 @@ interface SavedSearch {
     beds?: number | null;
   } | null;
   alerts_enabled: boolean;
+  email_alerts?: boolean;
   last_match_count: number | null;
   created_at: string;
 }
@@ -109,6 +113,12 @@ export default function SavedSearchesScreen() {
   useEffect(() => {
     load();
   }, [load]);
+
+  const toggleEmail = async (row: SavedSearch) => {
+    const next = !row.email_alerts;
+    if (!(await setEmailAlerts(supabase, row.id, next))) return flashError();
+    setSearches((prev) => prev.map((s) => (s.id === row.id ? { ...s, email_alerts: next } : s)));
+  };
 
   const toggleAlerts = async (row: SavedSearch) => {
     const next = !row.alerts_enabled;
@@ -272,7 +282,7 @@ export default function SavedSearchesScreen() {
                 </View>
               ) : (
                 <>
-                <Text style={styles.alertsHint}>{t('saved.alertsHint')}</Text>
+                <Text style={styles.alertsHint}>{EMAIL_ALERTS ? t('saved.emailHint') : t('saved.alertsHint')}</Text>
                 {searches.map((s) => (
                   <View key={s.id} style={styles.card}>
                     <View style={styles.cardHead}>
@@ -314,6 +324,21 @@ export default function SavedSearchesScreen() {
                           color={colors.textPrimary}
                         />
                       </TouchableOpacity>
+                      {EMAIL_ALERTS ? (
+                        <TouchableOpacity
+                          style={styles.iconButton}
+                          onPress={() => toggleEmail(s)}
+                          activeOpacity={0.7}
+                          accessibilityRole="switch"
+                          accessibilityState={{ checked: Boolean(s.email_alerts) }}
+                          accessibilityLabel={s.email_alerts ? t('saved.emailOff') : t('saved.emailOn')}>
+                          <MaterialIcons
+                            name={s.email_alerts ? 'mark-email-read' : 'unsubscribe'}
+                            size={16}
+                            color={colors.textPrimary}
+                          />
+                        </TouchableOpacity>
+                      ) : null}
                       <TouchableOpacity
                         style={styles.iconButton}
                         onPress={() => deleteSearch(s.id)}

@@ -1,13 +1,16 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Search as SearchIcon, Heart, Trash2, Bell, BellOff, Play, MapPin, Plus } from 'lucide-react'
+import { Search as SearchIcon, Heart, Trash2, Bell, BellOff, Play, MapPin, Plus, Mail, MailX } from 'lucide-react'
 import { useAuth } from '../../auth/AuthContext'
 import { useAddSheet } from '../../quick-add/AddSheetContext'
 import BackButton from '../../../shared/BackButton'
 import { supabase } from '../../../lib/supabase'
 import { formatPrice, formatDate } from '../../../lib/format'
-import { countMatches, markSeen, newMatchCount } from '../lib/matches'
+import { countMatches, markSeen, newMatchCount, setEmailAlerts } from '../lib/matches'
+
+// Email alerts are offered only once sending is configured (docs/LAUNCH_TASKS.md F13).
+const EMAIL_ALERTS = import.meta.env.VITE_EMAIL_ALERTS === 'true'
 
 // saved_searches.filters JSONB → /search URL params. Only known keys pass.
 function filtersToParams(filters = {}) {
@@ -68,6 +71,12 @@ export default function SavedSearches() {
   }
 
   useEffect(() => { load() }, [load])
+
+  const toggleEmail = async (row) => {
+    const next = !row.email_alerts
+    if (!(await setEmailAlerts(supabase, row.id, next))) { flashError(); return }
+    setSearches(prev => prev.map(s => s.id === row.id ? { ...s, email_alerts: next } : s))
+  }
 
   const toggleAlerts = async (row) => {
     const next = !row.alerts_enabled
@@ -146,7 +155,7 @@ export default function SavedSearches() {
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 16 }}>
-            <p className="m-0 text-[12px] text-fho-text-muted">{t('saved.alertsHint')}</p>
+            <p className="m-0 text-[12px] text-fho-text-muted">{EMAIL_ALERTS ? t('saved.emailHint') : t('saved.alertsHint')}</p>
             {searches.map(s => (
               <div key={s.id} className="placeholder-card" style={{ textAlign: 'left', alignItems: 'stretch', gap: 6 }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
@@ -174,6 +183,17 @@ export default function SavedSearches() {
                   >
                     {s.alerts_enabled ? <Bell size={14} /> : <BellOff size={14} />}
                   </button>
+                  {EMAIL_ALERTS && (
+                    <button
+                      style={iconBtn}
+                      onClick={() => toggleEmail(s)}
+                      aria-pressed={Boolean(s.email_alerts)}
+                      aria-label={s.email_alerts ? t('saved.emailOff') : t('saved.emailOn')}
+                      title={s.email_alerts ? t('saved.emailOff') : t('saved.emailOn')}
+                    >
+                      {s.email_alerts ? <Mail size={14} /> : <MailX size={14} />}
+                    </button>
+                  )}
                   <button style={{ ...iconBtn, color: '#e74c3c' }} onClick={() => deleteSearch(s.id)} aria-label={t('saved.delete')} title={t('saved.delete')}>
                     <Trash2 size={14} />
                   </button>

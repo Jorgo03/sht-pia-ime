@@ -65,3 +65,19 @@ export async function markSeen(client, id, current) {
     return false
   }
 }
+
+/**
+ * Turn email alerts for one saved search on or off (docs/LAUNCH_TASKS.md F13).
+ * The apps only offer this when sending is configured (VITE_EMAIL_ALERTS /
+ * EXPO_PUBLIC_EMAIL_ALERTS = 'true'), so nobody opts into emails that never
+ * come. Turning it on starts the window now: no backlog of old listings.
+ */
+export async function setEmailAlerts(client, id, on) {
+  const patch = on ? { email_alerts: true, last_alerted_at: new Date().toISOString() } : { email_alerts: false }
+  try {
+    const { error } = await client.from('saved_searches').update(patch).eq('id', id)
+    return !error
+  } catch {
+    return false
+  }
+}

@@ -15,3 +15,4 @@ export function applySavedFilters<Q>(query: Q, filters: SavedFilters | null | un
 export function countMatches(client: Client, filters: SavedFilters | null | undefined): Promise<number | null>;
 export function newMatchCount(current: number | null | undefined, lastSeen: number | null | undefined): number;
 export function markSeen(client: Client, id: string, current: number | null | undefined): Promise<boolean>;
+export function setEmailAlerts(client: Client, id: string, on: boolean): Promise<boolean>;
