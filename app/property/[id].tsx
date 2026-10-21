@@ -25,6 +25,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
+import { SheetCloseButton } from '@/components/ui/sheet-close-button';
 import { formatRef } from '@/src/features/properties/lib/searchFilters';
 
 import { ReportSheet } from '@/components/safety/report-sheet';
@@ -626,9 +627,7 @@ export default function PropertyDetailScreen() {
               <Text style={styles.modalTitle}>
                 {t('viewings.requestTitle')} {t('viewings.requestTitleEm')}
               </Text>
-              <TouchableOpacity accessibilityRole="button" accessibilityLabel={t('common.close')} onPress={() => setViewingSheetOpen(false)} hitSlop={8}>
-                <MaterialIcons name="close" size={22} color={colors.textSecondary} />
-              </TouchableOpacity>
+              <SheetCloseButton onPress={() => setViewingSheetOpen(false)} />
             </View>
             <Text style={styles.modalLabel}>{t('viewings.when')}</Text>
             <DateTimePicker
@@ -764,7 +763,8 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 16,
+    // No side padding here: AppHeader already pads to the 20px gutter, and
+    // both together put the chevron and buttons 36px in.
     paddingTop: 8,
   },
   headerButton: {

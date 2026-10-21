@@ -3,7 +3,7 @@ import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useMemo, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Modal, Pressable, StyleSheet, Text, View, type LayoutChangeEvent } from 'react-native';
 
 import { ThemeToggleButton } from '@/components/ui/theme-toggle-button';
 import { Fonts, Radii, Shadows, type AtticoPalette } from '@/constants/theme';
@@ -12,6 +12,11 @@ import { useTheme } from '@/contexts/theme-context';
 import { supabase } from '@/lib/supabase';
 
 /** Same list, same native-language labels as web's Header.jsx LANGUAGES. */
+/** The bar's side padding: the app's page gutter. */
+const HEADER_GUTTER = 20;
+/** Minimum space between the centred wordmark and the controls either side. */
+const BRAND_CLEARANCE = 8;
+
 const LANGUAGES = [
   { code: 'sq', name: 'Shqip', flag: '🇦🇱' },
   { code: 'en', name: 'English', flag: '🇬🇧' },
@@ -87,6 +92,17 @@ export function AppHeader({
     [colors, onDark, onBack, floating],
   );
   const [langOpen, setLangOpen] = useState(false);
+  // Widths of the bar, its two sides and the wordmark, so the centred
+  // wordmark is shown only when it fits between equal insets. Fixed insets
+  // assumed an 88px control group; language + theme is ~106px, and at 320-
+  // 360px the wordmark slid under the controls.
+  const [box, setBox] = useState({ bar: 0, lead: 0, act: 0, brand: 0 });
+  const track = (key: keyof typeof box) => (e: LayoutChangeEvent) => {
+    const w = Math.ceil(e.nativeEvent.layout.width);
+    setBox((b) => (b[key] === w ? b : { ...b, [key]: w }));
+  };
+  const side = Math.max(box.lead, box.act);
+  const brandFits = box.bar > 0 && box.brand > 0 && box.brand <= box.bar - 2 * (HEADER_GUTTER + side + BRAND_CLEARANCE);
 
   const currentFlag =
     LANGUAGES.find((l) => l.code === i18n.language)?.flag ?? LANGUAGES[0].flag;
@@ -103,7 +119,7 @@ export function AppHeader({
   };
 
   return (
-    <View style={styles.header}>
+    <View style={styles.header} onLayout={track('bar')}>
       {/* A floating header lets the hero image show through, so it gets no
           blur layer and no tint — only the controls sit on top. */}
       {!floating && (
@@ -117,7 +133,7 @@ export function AppHeader({
         </>
       )}
 
-      <View style={styles.leading}>
+      <View style={styles.leading} onLayout={track('lead')}>
         {onBack && (
           <Pressable
             style={styles.backBtn}
@@ -154,14 +170,18 @@ export function AppHeader({
           that got shoved into a corner. Screens with their own `title` are
           untouched; that block still sits next to the chevron. */}
       {!title && onBack && (
-        <View style={styles.brandCentered} pointerEvents="none">
-          <Text style={styles.brand}>
+        <View
+          style={[styles.brandCentered, !brandFits && styles.brandHidden]}
+          pointerEvents="none"
+          accessibilityElementsHidden={!brandFits}
+          importantForAccessibility={brandFits ? 'auto' : 'no-hide-descendants'}>
+          <Text style={styles.brand} numberOfLines={1} onLayout={track('brand')}>
             Shtëpia<Text style={styles.brandIme}>.ime</Text>
           </Text>
         </View>
       )}
 
-      <View style={styles.actions}>
+      <View style={styles.actions} onLayout={track('act')}>
         {showControls && (
           <>
             {/* Labelled: the visible content is only a flag emoji, which a
@@ -255,7 +275,7 @@ const createStyles = (
       // breathing room — `leading`'s `flexShrink: 1` only kicks in once
       // they're already touching.
       gap: 8,
-      paddingHorizontal: 20,
+      paddingHorizontal: HEADER_GUTTER,
       paddingVertical: 10,
       // The floating variant is chrome over a photo — a border would draw a
       // line across the image.
@@ -282,22 +302,19 @@ const createStyles = (
       marginLeft: hasBack ? -6 : 0,
     },
     // The centered wordmark for a back-button screen with no title of its
-    // own. Insets are fixed rather than measured against the actual chevron/
-    // actions width — that's the standard nav-bar trade-off (Slack, iOS
-    // Mail, etc. all do the same): a screen with no trailing controls won't
-    // be pixel-perfect optically centered, but it's still dead-centered on
-    // the bar itself, which reads as intentional. 56 clears the chevron on
-    // one side and a two-icon action group (share + favorite, ~88px) on the
-    // other with room to spare.
+    // own: dead-centre on the bar (the standard back/title/actions layout).
+    // It spans the whole bar so the text measures at its natural width; the
+    // component hides it when that width doesn't fit between the two sides.
     brandCentered: {
       position: 'absolute',
-      left: 56,
-      right: 56,
+      left: 0,
+      right: 0,
       top: 0,
       bottom: 0,
       alignItems: 'center',
       justifyContent: 'center',
     },
+    brandHidden: { opacity: 0 },
     backBtn: {
       width: 28,
       height: 34,

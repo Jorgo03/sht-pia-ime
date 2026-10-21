@@ -113,7 +113,12 @@ export default function MyListingsScreen() {
             a gradient "+ New Listing" pill, not a bare icon button. */}
         <View style={styles.titleRow}>
           <Text style={styles.pageTitle} accessibilityRole="header">{t('listing.myListings')}</Text>
-          <TouchableOpacity accessibilityRole="button" onPress={() => router.push('/listing/new' as Href)} activeOpacity={0.85}>
+          <TouchableOpacity
+            accessibilityRole="button"
+            onPress={() => router.push('/listing/new' as Href)}
+            activeOpacity={0.85}
+            style={styles.newListingTouch}
+            hitSlop={6}>
             <LinearGradient colors={[colors.accent, colors.accentEnd]} style={styles.newListingPill}>
               <MaterialIcons name="add" size={16} color="#fff" />
               <Text style={styles.newListingPillText}>{t('listing.newListing')}</Text>
@@ -166,6 +171,7 @@ export default function MyListingsScreen() {
                     <View style={styles.rowActions}>
                       <TouchableOpacity
                         style={styles.iconButton}
+                        hitSlop={4}
                         onPress={() => router.push(`/property/${item.id}` as Href)}
                         accessibilityRole="button"
                         accessibilityLabel={t('listing.viewPublic')}
@@ -174,6 +180,7 @@ export default function MyListingsScreen() {
                       </TouchableOpacity>
                       <TouchableOpacity
                         style={styles.iconButton}
+                        hitSlop={4}
                         onPress={() => router.push(`/listing/${item.id}/edit` as Href)}
                         accessibilityRole="button"
                         accessibilityLabel={t('listing.edit')}
@@ -182,6 +189,7 @@ export default function MyListingsScreen() {
                       </TouchableOpacity>
                       <TouchableOpacity
                         style={styles.iconButton}
+                        hitSlop={4}
                         onPress={() => router.push(`/listing/${item.id}/analytics` as Href)}
                         accessibilityRole="button"
                         accessibilityLabel={t('listing.viewDashboard')}
@@ -190,6 +198,7 @@ export default function MyListingsScreen() {
                       </TouchableOpacity>
                       <TouchableOpacity
                         style={styles.iconButton}
+                        hitSlop={4}
                         onPress={() => toggleStatus(item.id, item.status)}
                         accessibilityRole="button"
                         accessibilityLabel={item.status === 'active' ? t('listing.pause') : t('listing.activate')}
@@ -206,6 +215,7 @@ export default function MyListingsScreen() {
                       {(item.status === 'active' || item.status === 'paused') && (
                         <TouchableOpacity
                           style={styles.iconButton}
+                        hitSlop={4}
                           onPress={() => setStatus(item.id, closedStatusFor(item.listing_type))}
                           accessibilityRole="button"
                           accessibilityLabel={
@@ -219,6 +229,7 @@ export default function MyListingsScreen() {
                       )}
                       <TouchableOpacity
                         style={styles.iconButton}
+                        hitSlop={4}
                         onPress={() => confirmDelete(item.id)}
                         accessibilityRole="button"
                         accessibilityLabel={t('listing.delete')}
@@ -247,15 +258,19 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    gap: 12,
     paddingHorizontal: 20,
     paddingTop: 12,
     paddingBottom: 16,
   },
   pageTitle: {
+    flexShrink: 1,
     fontSize: 26,
     fontWeight: '700',
     color: colors.textPrimary,
   },
+  // Never squeezed by a long title in another language: the title wraps.
+  newListingTouch: { flexShrink: 0 },
   newListingPill: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -304,8 +319,9 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     color: colors.error,
     paddingVertical: 4,
   },
+  // Same 20px gutter as the title row and the header above it.
   list: {
-    paddingHorizontal: 16,
+    paddingHorizontal: 20,
     paddingBottom: 24,
     gap: 12,
   },
@@ -359,8 +375,11 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     fontWeight: '700',
     color: colors.accentText,
   },
+  // Six 30px actions need 220px; the column beside the photo is ~148px on a
+  // 320px phone, so they wrap to a second line instead of running off the card.
   rowActions: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: 8,
   },
   iconButton: {
