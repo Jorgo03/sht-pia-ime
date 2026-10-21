@@ -1,115 +1,99 @@
 # Readiness report — Shtëpia.ime
 
-Date: 2026-10-21. Branch `claude/app-property-translation-kosqyj` (not merged to
-`master`, so none of this is on the live website yet). Task ledger:
+Date: 2026-10-21. Branch `claude/app-property-translation-kosqyj`, not merged
+to `master`, so none of this is on the live website yet. Database changes
+listed below **are** live on the production Supabase project (they are
+additive and were each tested in a rolled-back transaction first). Ledger:
 `docs/LAUNCH_TASKS.md`. Accounts: `docs/ACCOUNT_AND_RELEASE_HANDOFF.md`.
+Device checks: `docs/DEVICE_CHECKLIST.md`.
 
 ## Verdict
 
 **READY FOR ACCOUNT SETUP AND REMAINING RELEASE VERIFICATION**
 
-All code work that can be done before buying anything is done or waiting
-on an owner decision. What stands between this and a release needs your
-accounts, a device or your yes:
-- real-user email (SMTP);
-- a domain and mailbox;
-- store accounts and signed builds;
-- the Android map key;
-- the hosting and database plans;
-- three pending database changes;
-- a brand-colour decision.
+- Every tracker finding (F1–F20) has its engineering done. What remains needs
+  an account, a purchase, a device, a credential, or your confirmation.
+- No P0/P1 engineering defect is open.
+- Lint, type checks, 230 unit tests, the production build, 164 end-to-end
+  tests and all 9 live database checks pass.
 
-It is **not** ready for release. No production iOS or Android build exists or
-has been tried on a phone. Email sign-up and password reset do not work for
-the public today (L15).
+It is **not ready for release**:
+- No iOS or Android build has been made or run on a phone.
+- Email sign-up and reset still do not reach the public. That needs SMTP, L15.
+- Payments, email alerts and push notifications are built but switched off.
+- Nothing was verified with a real provider: Apple, Google Maps, Paysera, an
+  email sender or Expo push.
 
-## Fixes in this pass (since `6a4422b`)
+## What changed in this pass
 
-| ID | Fix | Evidence |
+| Finding | Change | Where |
 | --- | --- | --- |
-| L06 | Saved-search "alerts" no longer promise emails nobody sends; the app shows "N more than last time" instead | 6 unit tests; e2e F11 ×2 viewports |
-| L07 | Photos removed while editing a listing are deleted from storage (own folder only) | 3 unit tests; e2e F09-H4 checks the exact storage DELETE |
-| L08 | The legacy phone listing form is retired; old link redirects to the wizard (−1,172 lines) | tsc, lint |
-| L09 | Web cards no longer nest a button inside `role=button` | axe passes; `nested-interactive` removed from the KNOWN list; also absent on the phone export |
-| L10 | Light-mode grey text meets 4.5:1 (web and phone) | axe contrast report: only brand-orange text remains |
-| L11 | Phone listing images have text alternatives | axe on the Expo web export: 0 unlabeled of 7/7/13 (was 7/7) |
-| L12 | Edit profile (name, agency, phone) in both apps | 6 unit tests; e2e F12 ×2; phone grant tested live 8/8, rolled back |
-| L13 | Safe fix for S-4 (signed-out helper calls) designed | Rolled-back live test: same visibility for every role |
-| L14 | Re-runnable live RLS checks in the repo | 15/15 and 18/18 against production, nothing left behind |
-| L24 | Store texts, privacy label, data safety, reviewer plan | `docs/STORE_LISTING_DRAFTS.md` |
-| L25 | Backup / restore / rollback procedure | `docs/BACKUP_AND_ROLLBACK.md` |
-| L32 | iOS no longer ships an unused, vague camera purpose string | prebuild: no `NSCameraUsageDescription`; Android CAMERA removed |
-| BUG-016 | Phone theme switch announces on/off | axe `aria-required-attr` gone |
+| F1 | Project-wide daily ceiling on paid AI calls, fail-closed rate limits | `supabase/functions/ai-*`, `translate-property` (deployed) |
+| F3 | Moderation: moderators table, review queue, hide/restore listing (owner cannot undo), close reports; web `/moderation` page | migrations `20261021052850`, `20261021053224`; `src/features/moderation/` |
+| F4 | Bilingual auth emails with the 6-digit code; recovery success message bug fixed; code boxes labelled | `supabase/templates/`, `supabase/config.toml`, `Profile.jsx`, `otp-input.tsx` |
+| F8 | Apple sign-in: nonce, first-sign-in name saved, silent cancel | `lib/apple-auth.ts`, `src/features/auth/lib/appleName.js` |
+| F9 | Android Maps key from `GOOGLE_MAPS_ANDROID_API_KEY` at build time only | `app.config.js` |
+| F10 | Android notification icon; Play Store 512 px icon | `app.json`, `store/`, `scripts/make-store-icons.cjs` |
+| F11 | First-party crash reports, redacted, no user id | migrations `20261021004522`–`004604`; `src/lib/reportError.js`, `lib/report-error.ts` |
+| F12 | Own phone and profile photo, both apps | migrations `20261021002731`, `20261021003934` |
+| F13 | Saved-search email alerts with unsubscribe; sending off | migration `20261021051016`; functions `saved-search-alerts`, `saved-search-unsubscribe` |
+| F14 | Push for messages and viewings, opt-in, preferences; sending off | migration `20261021051557`; function `push-dispatch`; `lib/push.ts` |
+| F15 | Website pricing page, Paysera checkout and verified callback, prepaid 1/3/6/12-month plans, listing caps in the database; all off | `src/features/billing/`, `supabase/functions/checkout-start`, `paysera-callback` (not deployed), `supabase/pending/` |
+| F16 | Readable orange text both themes and apps; valid phone tab bar | `src/styles/theme.css`, `constants/theme.ts`, `components/liquid-tab-bar.tsx` |
+| F19 | Zone and reference-number search, both apps | migration `20261021005208` |
+| F20 | Signed-out helper calls closed | migration `20261021002739` |
 
-## Checks
-
-**Passed (run 2026-10-21 on this branch):**
+## Checks (run 2026-10-21 on this branch)
 
 | Check | Result |
 | --- | --- |
-| `npm run lint` | 0 errors, 32 warnings (same 32 as before this pass) |
+| `npm run lint` | 0 errors, 32 warnings (all pre-existing) |
 | `npx tsc --noEmit` | clean |
-| `npm test` | 160/160 |
-| `npm run test:e2e` | 103 passed, 1 skipped (a phone-layout-only test, skipped on desktop by design) |
-| `npm run build` | succeeds; bundle has no service-role or Anthropic key strings |
-| `npx expo export --platform web` | succeeds (with `--clear`, see risks) |
-| `npx expo prebuild` on a scratch copy | succeeds; manifest and Info.plist checked |
-| `npx expo-doctor` | 19/21; the 2 failures need `exp.host`, unreachable from this sandbox |
-| Live RLS checks | guards 15/15, report/block 18/18 |
+| `npm test` | 230/230 |
+| `npm run build` | succeeds; no service-role or Anthropic key strings in `dist/` |
+| `npm run test:e2e` | 164 passed, 2 skipped by design (one phone-only, one desktop-only test) |
+| Live database checks (`supabase/tests/`, rolled back) | ownership 15/15, report/block 18/18, phone 7/7, avatar 9/9, crash reports 7/7, alerts 7/7, push 11/11, moderation 12/12, moderator reads 6/6 |
+| Offline payments SQL (PGlite) | prepaid checkout 31/31, payments foundation 23/23 |
+| `npx expo export --clear` (android, ios, web; fake backend) | succeeds; no production URL in the bundles |
+| `npx expo prebuild` (scratch copy) | succeeds; Maps key only when the variable is set; Apple sign-in and push entitlements present; no camera/microphone |
+| `npx expo-doctor` | 19/21; the 2 failures need `exp.host`, blocked from this sandbox |
+| axe on the phone app's web export | only white-on-orange contrast remains (brand decision) |
 
-**Not verified:**
-- Anything on a real iPhone or Android phone.
-- Sign in with Apple.
-- Android map (no key).
-- Real email delivery.
-- Any store-console step.
-- A restore from backup.
-- Screen reader use on a device.
-- The two `expo-doctor` network checks.
+**Not verified:** any physical phone or store build; Sign in with Apple
+against Apple; the Android map; real email delivery; push delivery; Paysera
+sandbox or live payments; screen readers on a device; a restore from backup;
+the two `expo-doctor` network checks.
 
 ## Blockers and the smallest owner action
 
 | Blocker | Smallest action |
 | --- | --- |
-| Public sign-up/reset email fails (L15) | Buy the domain, open an SMTP provider account, paste its SMTP settings into Supabase |
-| No domain / contact address (L16, L17) | Buy the domain; create one mailbox |
-| No store builds (L18, L20) | Enrol in Apple Developer and Google Play; create a free Expo account |
-| Android map (L19) | Google Cloud project with billing + restricted Maps SDK key |
-| Plans (L21, L22) | Supabase Pro and Vercel Pro before public launch |
-| Pending DB changes (L12, L13) | Say "go" for `profile_phone_update.sql` and `anon_profile_helpers.sql` |
-| Orange text contrast (L10) | Yes/no to a text-only orange `#b34700` |
-| Live website | Say "merge" — `master` deploys to production |
-
-Order of purchase/setup: see `docs/ACCOUNT_AND_RELEASE_HANDOFF.md` §2
-(domain → mailbox → SMTP → individual vs organisation and D-U-N-S → Apple →
-Google Play → Expo + Maps key → Supabase Pro + Vercel Pro → payments later).
+| Public email sign-up/reset (F4, L15) | Domain → SMTP provider → paste SMTP settings and the 4 templates in Supabase |
+| Store builds, Apple sign-in, push on a phone (F7, F8, F14) | Apple Developer + Google Play + free Expo login |
+| Android map (F9) | Google Cloud project, restricted Maps SDK key, set it as an EAS variable |
+| Plans (F5) | Supabase Pro and Vercel Pro before public launch |
+| Prepaid plans schema (F15) | Approve `plans_by_period_months` then `prepaid_checkout` when the Supabase prompt asks |
+| Test accounts (F6) | Approve the two account deletions when the Supabase prompt asks |
+| Contrast on orange buttons (F16) | Choose: darker orange fill, or dark text on orange |
+| Live website | Say "merge" (`master` deploys production) |
 
 ## Open production risks
 
-1. **Email:** new users who sign up with email never get their code (L15).
-2. **No backups:** the Free plan has no automatic database backups, and storage is never backed up (L21, L25).
-3. **Commercial use:** Vercel Hobby is non-commercial only (L22).
-4. **Phone change refused:** until `profile_phone_update.sql` is applied, saving a new phone shows "not saved". The name and agency fields save normally.
-5. **Stale Metro cache:** a stale Metro cache inlined the production Supabase URL into an export built with other env values. Use `--clear` for any build whose backend matters.
-6. **Contrast:** brand-orange text fails WCAG contrast on cream backgrounds (L10).
-7. **Phone tab bar** semantics are incomplete for screen readers (L31).
-8. **No crash reporting** (L26) and no push notifications (L27).
+1. **Email:** until SMTP is set, new email users never get their code.
+2. **No backups** on the Free plan, and storage is never in database backups.
+3. **Commercial use** on Vercel Hobby breaks its terms.
+4. **Native behaviour is untested:** maps, Apple sign-in, push, uploads,
+   deep links, safe areas.
+5. **Payments:** Paysera's support for this merchant and any recurring
+   charging is unverified (its developer site is blocked here). Only prepaid
+   is built. App Store and Google Play billing rules for selling plans used
+   inside the apps are a product decision; the apps never link to pricing.
+6. **White text on orange** buttons and chips is 2.4–3.4:1.
+7. **Stale Metro cache** can inline an old backend URL; build with `--clear`.
+8. **Moderation needs people:** reports pile up unless someone is added to
+   `public.moderators` and checks `/moderation`.
 
-## Before / after
+## Score
 
-Rubric, per area:
-- **0** = broken or missing;
-- **1** = partly works or has a known serious gap;
-- **2** = works with known, documented gaps;
-- **3** = verified ready for release.
-
-"Before" is `6a4422b` (2026-10-20, start of this pass); "after" is this branch.
-
-| Area | Before | After | Why |
-| --- | --- | --- | --- |
-| Functionality | 1 | 2 | Profile editing added; listing photo cleanup; old form gone; alerts honest. Email sign-up still blocked by SMTP |
-| Security | 2 | 2 | Re-runnable RLS checks now in the repo. S-4 and the phone grant are designed and tested but wait for your go |
-| Reliability | 1 | 1 | Procedures written, but still no backups (Free plan), no crash reporting, no restore drill |
-| Mobile UX | 1 | 2 | Accessibility fixes verified on the export; still never run as a store build on a device |
-| Deployment | 1 | 1 | Prebuild passes and permissions are cleaned, but no signed build, domain or paid plans |
-| Billing | 0 | 0 | No provider and no prices; correctly nothing for sale in the apps (L23) |
+Not re-scored. The tracker's 58/100 was the 15 October audit (`AUDIT.md`
+Pass 15) and is not reproduced here; the blockers above are what matters.

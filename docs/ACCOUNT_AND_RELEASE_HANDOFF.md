@@ -1,62 +1,104 @@
 # Account and release handoff — Shtëpia.ime
 
-For the owner (Future Home Orange). Written 2026-10-21. It lists every outside
-account the launch depends on: what it is for, whether it is needed now, what
-the provider's official page says, what you do, and what I (Claude) do after.
+For the owner (Future Home Orange). Updated 2026-10-21. Every outside
+dependency the launch has: why, when, what the official source says, what you
+do, what I (Claude) do afterwards, and what still has to be checked.
 
 **How requirements were checked.** From this sandbox, `developer.apple.com`
 could be read directly and Supabase's documentation through its official docs
-tool. `vercel.com`, `support.google.com`, `developers.google.com` and
-`expo.dev` are blocked here, so for those I read the official page's content
-through web search on 2026-10-21. Those rows are marked "(via search)". Open
-the link yourself before paying. Prices are given only where the official
-page stated one; where it did not, the row says to check, and no price is
-assumed.
+tool. `vercel.com`, `support.google.com`, `developers.google.com`, `expo.dev`
+and `developers.paysera.com` are blocked here. For those, the official page's
+content was read through web search on 2026-10-21 ("via search"), or the row
+says **unverified**. Open the link yourself before paying. Prices appear only
+where the official page stated one. The tracker's cost totals (≈ $181 up
+front, ≈ $50–65 a month) were **not** re-verified and are not promised here.
 
-**Kind of need:** _Policy_ = the provider's rules or the stores' rules require
-it · _Capacity_ = needed for reliability or limits, not by any rule · _Optional_.
+## 1. Dependencies
 
-## 1. Accounts
-
-| Account/service | Needed for what | Required now, later, or conditional | Official requirement checked | What I must do (owner) | What you will do afterward (Claude) | Final verification |
+| Dependency | Why needed | Needed now/later/conditional | Official source checked | What I must do (owner) | What you will do afterward (Claude) | Verification still required |
 | --- | --- | --- | --- | --- | --- | --- |
-| **Domain name** (any registrar) | Real links and sitemap (L16), email sender domain (L15), contact mailbox (L17); Apple organisation enrolment needs a work email on the organisation's domain and a public website on it | **Now**: it blocks 4 other rows | Apple enrolment page, organisation requirements ("Work email… associated with the organization's domain name"; "Website… tied to the organization's domain"), developer.apple.com/programs/enroll, 2026-10-21. Kind: _Policy_ (for Apple org) + _Capacity_ | Choose and buy the domain; add it to the Vercel project (Settings → Domains) and set the DNS records Vercel shows | Set `VITE_SITE_URL` (Vercel) and `EXPO_PUBLIC_SITE_URL` (EAS) with you, update Supabase Auth redirect URLs and Google OAuth origins (with you, since those are dashboard settings), regenerate sitemap | Site loads on the domain over HTTPS; Google sign-in returns to the domain; sitemap URLs use it |
-| **Mailbox on the domain** (e.g. `kontakt@…`) | Contact line on Privacy/Terms (L17), store support email, Apple's work-email rule | Now (after the domain) | Apple 1.2 requires "Published contact information so users can easily reach you", developer.apple.com/app-store/review/guidelines, 2026-10-21. Kind: _Policy_ | Create the mailbox with your registrar or mail host | Set `VITE_LEGAL_CONTACT_EMAIL`, show it on /privacy and /terms, re-run e2e | Address visible on both legal pages, both languages |
-| **SMTP email provider** (Supabase lists Resend, AWS SES, Postmark, SendGrid, ZeptoMail, Brevo) | Email sign-up codes and password reset for real users (L15). Without it Supabase "will refuse to deliver messages to addresses that are not part of the project's team" | **Now**: email sign-up is broken for the public today | supabase.com/docs/guides/auth/auth-smtp (Supabase docs tool), 2026-10-21. Kind: _Policy_ (Supabase's default sender is "not meant for production use") | Open an account with one provider, verify the domain (SPF/DKIM records it gives you), create SMTP credentials, paste them in Supabase → Auth → SMTP. **Keep the password out of chat** | Raise the Auth email rate limit to a sensible value with you, test sign-up and reset with a fresh address, update L15 | A new outside address receives the code; reset works |
-| **Apple Developer Program** | Any iOS build outside Expo Go, TestFlight, App Store, Sign in with Apple (L18, L20) | Now, if iOS is in the launch | developer.apple.com/programs/enroll, 2026-10-21: "99 USD per membership year. Prices may vary by region"; Individual = legal name shown as seller; Organisation = legal entity, binding authority, **D-U-N-S number**, domain email, public website. Kind: _Policy_ | Decide individual vs organisation (the seller name the App Store shows). For FHO as seller: get the D-U-N-S number first, then enrol with the company | Create the app record values (bundle `com.shtepiaime.app` is set), configure EAS iOS credentials with you, build, TestFlight, run the device checklist | TestFlight build installs; sign in (email, Google, Apple), sign out, delete account all work on an iPhone |
-| **D-U-N-S number** (Dun & Bradstreet) | Organisation enrolment at Apple and Google Play | Conditional: only if publishing as the company | Apple enrolment page (above); Google's 2023 Play Console announcement says new organisation accounts must provide one and that getting one "can take up to 30 days" (android-developers.googleblog.com/2023/07/boosting-trust-and-transparency-in-google-play.html, via search). Kind: _Policy_ | Look up or request FHO's number; make sure the D&B record's name and address match the company documents | — | Number accepted by both consoles |
-| **Google Play Console** | Android release (L18) | Now, if Android is in the launch | support.google.com/googleplay/android-developer/answer/6112435 (via search): US$25 one-time fee, ID may be requested. answer/14151465 (via search): **personal** accounts created after 13 Nov 2023 must run a closed test with at least 12 testers opted in for 14 continuous days before production. Kind: _Policy_ | Register (organisation account avoids the 12-tester rule but needs the D-U-N-S number). If personal: line up 12 real testers | Build the Android release with EAS, prepare the data-safety answers (`docs/STORE_LISTING_DRAFTS.md`), set up the closed test track with you | Closed test live; production access granted; build installs from Play |
-| **Expo account** (free) | EAS Build and Submit for both stores | Now, at build time | expo.dev/pricing (via search): Free plan lists 15 Android + 15 iOS builds per month, no overage charges on Free. Kind: _Capacity_ (local Android builds are possible without it; iOS needs a Mac or EAS) | Create the account (`npx expo login`) — free, no card | `eas init`, link the project, run `development` and `production` builds | Builds appear in the Expo dashboard and install |
-| **Google Cloud project + Maps SDK for Android key** | The map on Android (`react-native-maps` uses Google Maps there); `app.json` has no key today (L19) | Now, for Android | developers.google.com/maps/documentation/android-sdk/get-api-key (via search): a project with a **billing account** and the Maps SDK for Android enabled is a prerequisite. Free-usage limits not confirmed here. Kind: _Policy_ | Create the project and billing account, enable "Maps SDK for Android", create a key **restricted** to package `com.shtepiaime.app` + the app's signing SHA-1 | Put the key in the Android build config through an EAS secret (never in git), rebuild | Map renders on an Android build; key restricted in the console |
-| **Supabase Pro** | Daily backups (7 days kept), no inactivity pausing, leaked-password protection (L21) | Before public launch | supabase.com/docs/guides/platform/backups ("We automatically back up all Pro, Team, and Enterprise Plan projects"); …/free-project-pausing (Free projects paused after low activity over 7 days); …/auth/password-security ("Leaked password protection is available on the Pro Plan and above"). Docs tool, 2026-10-21. Price not checked (pricing page blocked here). Kind: _Capacity_ | Check the current price at supabase.com/pricing; upgrade the organisation that owns `xzzzhlwmzotibrxdqmcm` | Turn on leaked-password protection with you, confirm backups appear, update `docs/BACKUP_AND_ROLLBACK.md` | Dashboard shows Pro and a first daily backup |
-| **Vercel Pro** | Hosting the website commercially (L22) | Before public launch (it is a company marketplace) | vercel.com/docs/plans/hobby and …/limits/fair-use-guidelines (via search): Hobby is for "non-commercial, personal use"; "all commercial usage of the platform requires either a Pro or Enterprise plan". Price not checked. Kind: _Policy_ | Check the price on vercel.com/pricing; move the project to a Pro team | Re-check deployments, env vars and the domain after the move | Production deploys from `master` on the Pro team |
-| **Anthropic API** (already in use) | AI listing text, search parsing, translation via Edge Functions | Now (exists) | — Kind: _Capacity_ | Check the account's spending limit and billing contact | Nothing in code; rate limits per user already exist | Edge Function logs show no billing errors |
-| **Payment provider** (e.g. Paysera or a bank) | Listing promotion and agency plans (DECISIONS.md M1, L23) | **Later**: no purchase UI exists, so not a launch blocker | Apple 3.1.1: features unlocked in the app "must use in-app purchase" (developer.apple.com/app-store/review/guidelines, 2026-10-21). Kind: _Policy_ | Decide prices, provider and where people pay (website only vs in-app) | Integrate with signed webhooks; grant entitlements only server-side, never from a redirect | Test-mode payment produces the entitlement only after the verified webhook |
-| **Crash reporting** (e.g. Sentry) | Seeing crashes (L26) | Optional | — Kind: _Optional_ | Say yes or no | Add the SDK and update the privacy answers | A test crash appears in the dashboard |
+| **Domain + DNS** | Real links and sitemap, the email sender's domain (F4), contact address, Apple organisation enrolment (work email and website on the company's domain) | **Now**, it unblocks 4 rows | developer.apple.com/programs/enroll (read 2026-10-21): organisation needs a domain email and website | Buy it; add it in Vercel → Settings → Domains and set the DNS records Vercel shows | Set `VITE_SITE_URL` / `EXPO_PUBLIC_SITE_URL`, update Supabase Auth redirect URLs and Google OAuth origins with you, regenerate the sitemap | Site on HTTPS at the domain; Google sign-in returns there |
+| **Mailbox** on the domain | Contact line on Privacy/Terms, store support email | Now, after the domain | Apple guideline 1.2 "published contact information" (read 2026-10-21) | Create e.g. `kontakt@…` | Set `VITE_LEGAL_CONTACT_EMAIL`, re-run e2e | Address visible on /privacy and /terms |
+| **SMTP email provider** (Resend, Brevo, Postmark, SES… listed by Supabase) | Sign-up codes and password reset for the public (F4); later the saved-search alerts (F13) | **Now**: public email sign-up is broken today | supabase.com/docs/guides/auth/auth-smtp (docs tool, 2026-10-21): the default sender only reaches the project's team and is not for production | Open an account, verify the domain (SPF/DKIM records), create SMTP credentials, paste them in Supabase → Authentication → SMTP. Paste the 4 files in `supabase/templates/` into Authentication → Emails → Templates (Confirm signup, Reset password, Magic Link, Change Email Address) with the subjects in `supabase/config.toml`. Keep the password out of chat | Raise the Auth email rate limit with you; sign up and reset with a fresh outside address; enable F13 sending (`RESEND_API_KEY`, `ALERT_EMAIL_FROM`, `ALERTS_DISPATCH_ENABLED=true` as function secrets) | A stranger receives the 6-digit code; reset works; an alert email arrives and its unsubscribe link works |
+| **D-U-N-S number** | Company enrolment at Apple and Google Play | Conditional: only if FHO publishes as a company | Apple enrolment page (read); Google's 2023 announcement: organisation accounts need one, "can take up to 30 days" (via search) | Look up or request FHO's number; make the D&B name and address match the company papers | — | Number accepted by both consoles |
+| **Apple Developer Program** | iOS builds, TestFlight, App Store, Sign in with Apple (F7, F8), push on iPhone (F14) | Now, if iOS is in the launch | developer.apple.com/programs/enroll (read 2026-10-21): 99 USD per membership year, prices may vary by region; organisation needs D-U-N-S | Enrol (individual or company); in Supabase → Auth → Providers turn on Apple with the bundle id `com.shtepiaime.app` | EAS iOS credentials (incl. the APNs key for push) with you, production build, TestFlight, run `docs/DEVICE_CHECKLIST.md` | Apple sign-in, push, safe areas on an iPhone |
+| **Google Play Console** | Android release (F7) | Now, if Android is in the launch | answer/6112435 (via search): US$25 one-time; answer/14151465 (via search): **personal** accounts made after 13 Nov 2023 need a closed test with 12 testers for 14 days | Register (company account avoids the 12-tester rule but needs D-U-N-S) | Android release build, data-safety answers from `docs/STORE_LISTING_DRAFTS.md`, closed track, `store/google-play-icon-512.png` | Build installs from Play; device checklist passes |
+| **Expo account** (free) | EAS Build/Submit; push service | Now, at build time | expo.dev/pricing (via search): Free plan includes a monthly build allowance | `npx expo login` (no card) | `eas init`, credentials, builds; FCM V1 key upload for Android push with you | Builds appear and install |
+| **Firebase project (FCM)** for Android push | Expo push on Android needs FCM credentials | Later: when push is switched on | **Unverified** here (expo.dev and Firebase docs blocked); Expo's push setup guide is the source to follow | Create a Firebase project for `com.shtepiaime.app`; give me nothing secret, upload the service-account key in EAS yourself or with me watching | Set `PUSH_DISPATCH_ENABLED=true` and schedule `push-dispatch` (§3) | A message and a viewing request arrive as pushes on both platforms |
+| **Google Cloud: Maps SDK for Android key** | Android map (F9) | Now, for Android | developers.google.com/maps/…/get-api-key (via search): project with billing and the Maps SDK for Android enabled. Free usage limits **unverified** | Create the key; restrict it: *Application restriction* Android apps → package `com.shtepiaime.app` + the SHA-1 of the EAS upload key **and** the Play app-signing key (Play Console → App integrity); *API restriction* Maps SDK for Android only. Save it as the EAS environment variable `GOOGLE_MAPS_ANDROID_API_KEY` (never in git or chat) | Rebuild; `app.config.js` writes it into the manifest | Map renders on an Android build; key shows the restrictions |
+| **Google OAuth consent screen** | Google sign-in should say "Shtëpia.ime" (F9) | Now | **Unverified** here (console docs blocked) | Google Cloud → OAuth consent screen: app name Shtëpia.ime, logo, support email, privacy/terms links on the domain | Re-check sign-in on web and phone | The Google sheet shows Shtëpia.ime |
+| **Supabase Pro** | Daily backups, no pausing, leaked-password protection (F5) | Before public launch | Supabase docs (docs tool, 2026-10-21): backups for Pro and above; Free projects pause after 7 quiet days; leaked-password protection on Pro and above. Price not checked | Upgrade the organisation that owns `xzzzhlwmzotibrxdqmcm` | Turn on leaked-password protection, confirm backups, update `docs/BACKUP_AND_ROLLBACK.md` | First daily backup visible |
+| **Vercel Pro** | Commercial hosting (F5) | Before public launch | vercel.com/docs/plans/hobby (via search): Hobby is non-commercial only | Move the project to a Pro team | Re-check env vars, domain, deploys | Production deploys from `master` on Pro |
+| **Anthropic** (already in use) | AI listing text, search, translation | Now (exists) | — | In the Anthropic console set a monthly spend limit you are comfortable with (I did not invent one) | `AI_DAILY_CALL_CAP` can be lowered to match; currently 2000 calls/day | Function logs show no billing errors |
+| **Paysera merchant account** | Website checkout for prepaid plans and promotions (F15) | Later: when you sell | **Unverified**: developers.paysera.com is blocked here; the integration follows Paysera's WebToPay v1.6 as described in search results and the `paysera-webtopay` npm package. Merchant eligibility for FHO in Albania and any recurring card charging are **not confirmed**, so only prepaid is built | Open the account; ask Paysera (a) Albania/ALL support, (b) whether recurring charges exist for you; decide prices per plan and period | Approve the pending SQL (§2); deploy `checkout-start` and `paysera-callback` (`verify_jwt` off for the callback) with `PAYSERA_PROJECT_ID`, `PAYSERA_SIGN_PASSWORD`, `PAYSERA_TEST_MODE=true`, `SITE_URL`; insert your prices; sandbox test; then `VITE_CHECKOUT_ENABLED=true` | A sandbox payment activates the plan only after the signed callback; a duplicate callback changes nothing |
+| **Store billing rules** | Selling plans that unlock features used in the apps | Decision before selling | Apple 3.1.1 (read 2026-10-21): in-app unlocks "must use in-app purchase"; Google's equivalent **unverified** | Decide: website-only selling (current build: the apps never link to pricing) or in-app purchase. Ask a lawyer for your countries if unsure | Nothing until you decide | Store review outcome |
 
-## 2. Order to set things up
+## 2. Confirmations waiting for you in the Supabase prompt
 
-1. **Domain** → 2. **mailbox** → 3. **SMTP provider** (fixes sign-up for real
-   people; nothing else depends on money after that).
-4. Decide **individual vs organisation**. If organisation: request the
-   **D-U-N-S number** now, since it can take weeks.
-5. **Apple Developer Program**, 6. **Google Play Console** (after the D-U-N-S
-   number if organisation).
-7. **Expo account** (free) and **Google Cloud Maps key**.
-8. **Supabase Pro** and **Vercel Pro**, before announcing the app publicly.
-9. **Payment provider**, only when you are ready to sell promotion.
+These are ready and tested. The Supabase tool asks for your confirmation
+before any `DROP` or `DELETE`, and timed out when nobody answered.
 
-## 3. Database changes waiting for your "go"
-
-| File | What it does | Tested |
+| What | File / target | Tested |
 | --- | --- | --- |
-| `supabase/pending/profile_phone_update.sql` | Lets people change their own phone number (Edit profile), with a phone-format check | Rolled-back live test 8/8 |
-| `supabase/pending/anon_profile_helpers.sql` | Stops signed-out visitors from calling two internal helper functions, without changing what anyone can see | Rolled-back live test: identical visibility for anon and all 15 accounts |
-| `supabase/pending/plans_by_period_months.sql` | Billing plans by period (from the payments foundation) | Offline test (`supabase/tests_payments_foundation.test.mjs`) |
+| Plans table by period (needed before payments) | `supabase/pending/plans_by_period_months.sql` (the table is empty) | Offline 23/23 |
+| Prepaid checkout, listing caps (after the line above) | `supabase/pending/prepaid_checkout.sql` | Offline PGlite 31/31 |
+| Delete the 2 synthetic test accounts | `claude-test@shtepia.dev`, `system@shtepia.ime` + 8 unreferenced test files in `property-images/9c47f15e-…/` | Dry run: only conversation is with each other |
 
-## 4. What I can't do for you
+## 3. After setup: schedules (Supabase Cron)
 
-I have no authority, and should have none, to buy anything, accept any terms,
-enrol in the developer programmes, see your passwords or card, publish to the
-stores, or merge to `master` (which deploys the live website) without you
-saying so.
+Supabase runs scheduled calls with `pg_cron` + `pg_net`, keeping keys in
+Vault (supabase.com/docs/guides/functions/schedule-functions, docs tool
+2026-10-21). Once sending is enabled, store the secrets in Vault yourself or
+with me (never in chat), then:
+
+```sql
+-- every 15 minutes: saved-search alerts; every minute: push queue
+select cron.schedule('saved-search-alerts', '*/15 * * * *', $$
+  select net.http_post(
+    url := (select decrypted_secret from vault.decrypted_secrets where name = 'project_url') || '/functions/v1/saved-search-alerts',
+    headers := jsonb_build_object(
+      'Content-Type', 'application/json',
+      'Authorization', 'Bearer ' || (select decrypted_secret from vault.decrypted_secrets where name = 'anon_key'),
+      'x-cron-secret', (select decrypted_secret from vault.decrypted_secrets where name = 'alerts_cron_secret')),
+    body := '{}'::jsonb);
+$$);
+select cron.schedule('push-dispatch', '* * * * *', $$
+  select net.http_post(
+    url := (select decrypted_secret from vault.decrypted_secrets where name = 'project_url') || '/functions/v1/push-dispatch',
+    headers := jsonb_build_object(
+      'Content-Type', 'application/json',
+      'Authorization', 'Bearer ' || (select decrypted_secret from vault.decrypted_secrets where name = 'anon_key'),
+      'x-cron-secret', (select decrypted_secret from vault.decrypted_secrets where name = 'push_cron_secret')),
+    body := '{}'::jsonb);
+$$);
+```
+
+The same cron secrets go in as function secrets `ALERTS_CRON_SECRET` and
+`PUSH_CRON_SECRET`.
+
+## 4. Moderation
+
+Add each moderator once, in the SQL editor:
+`insert into public.moderators(user_id) values ('<their account id>');`
+They then see "Moderation" in their website profile.
+
+## 5. Order to set things up
+
+1. **Domain** → **mailbox** → **SMTP provider** + email templates. This fixes
+   public sign-up.
+2. Decide **individual vs company**. If company, request the **D-U-N-S**
+   number now, since it can take weeks.
+3. **Apple Developer**, **Google Play**, free **Expo** login.
+4. **Google Cloud**: Maps key (restricted) and OAuth consent name. Then
+   **Firebase** for Android push.
+5. I build, you run `docs/DEVICE_CHECKLIST.md` on TestFlight and the Play
+   test track.
+6. **Supabase Pro** and **Vercel Pro** before announcing publicly; say
+   "merge" to put the website changes live.
+7. **Paysera** and prices when you are ready to sell; approve §2 first.
+
+## 6. What I can't do for you
+
+I cannot and should not buy anything, accept terms, enrol in programmes, see
+passwords or cards, publish to the stores, or merge to `master` (the live
+website) without you saying so.

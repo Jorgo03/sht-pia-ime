@@ -1,5 +1,27 @@
 # Pre-Launch Audit — Shtëpia.ime (Vite web app)
 
+## ═══ PASS 17 — 2026-10-21: COMPLETION PROMPT #2 (tracker F1–F20) ═══
+
+Status per finding in `docs/LAUNCH_TASKS.md`; checks and verdict in
+`docs/READINESS_REPORT.md`. New findings this pass, all reproduced first:
+- **Auth emails carried no code** while both apps ask for a 6-digit code.
+  **FIXED** in the repo (`supabase/templates/`); the hosted project needs the
+  templates pasted in (CONFIGURATION REQUIRED).
+- **Password-recovery success never showed** (web): the context ended the
+  recovery state before the message rendered. **FIXED**; e2e F4-H2.
+- **OTP boxes unlabelled** (web) / hard-coded English (phone). **FIXED**.
+- **Contrast** (BUG-008): orange text and dark-theme faint text. **FIXED**
+  with a text-only orange; axe now runs both themes without exceptions.
+  White text on orange fills remains (owner decision; axe cannot measure
+  gradients, computed 2.4–3.4:1).
+- **Phone tab bar ARIA** (L31). **FIXED** (tablist of 4 + separate button).
+- **Moderators could not see hidden listings or buyer profiles** they were
+  asked to judge. **FIXED** with read-only policies (`20261021053224`).
+
+Database changed this pass (all additive, each tested rolled back first):
+`20261021002731`, `…002739`, `…003200`, `…003934`, `…004522`, `…004530`,
+`…004604`, `…005208`, `…051016`, `…051557`, `…052850`, `…053224`.
+
 ## ═══ PASS 16 — 2026-10-20/21: COMPLETION PASS (ledger L01–L32) ═══
 
 Status per task lives in `docs/LAUNCH_TASKS.md`; the summary, checks and

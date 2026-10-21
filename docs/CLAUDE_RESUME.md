@@ -1,46 +1,44 @@
 # Resume notes for the next Claude session
 
-Last updated 2026-10-21. Read this, then `docs/LAUNCH_TASKS.md` (the ledger is
+Last updated 2026-10-21 (end of completion prompt #2). Read this, then `docs/LAUNCH_TASKS.md` (the ledger is
 the source of truth for status), then `docs/READINESS_REPORT.md`.
 
 ## Where things stand
 
-- Work branch: `claude/app-property-translation-kosqyj`. It is **ahead of
-  `master`**. `master` auto-deploys the live website on Vercel, so merging is
+- Work branch: `claude/app-property-translation-kosqyj`, **ahead of `master`**
+  and pushed. `master` auto-deploys the live website on Vercel, so merging is
   the owner's call. Ask before merging, and say what changes for real users.
-- Verdict: READY FOR ACCOUNT SETUP AND REMAINING RELEASE VERIFICATION.
-- Not applied, waiting for the owner's "go" (each has a rolled-back live test):
-  - `supabase/pending/profile_phone_update.sql` (L12);
-  - `supabase/pending/anon_profile_helpers.sql` (L13);
-  - `supabase/pending/plans_by_period_months.sql`.
-- Waiting for owner decisions:
-  - L10 orange text shade (`#b34700` proposed);
-  - L29 "Ali Demi" listing (postponed by the owner);
-  - L30 test accounts;
-  - L31 tab-bar grouping;
-  - payments (L23: prices, provider, web-only vs in-app).
-- Blocked on accounts: L15–L22 (see the handoff).
+- Completion prompt #2 (`Claude_Code_App_Completion_Prompt_1.md`, F1–F19 work
+  map) is **finished** as of 2026-10-21. Every tracker finding F1–F20 has its
+  engineering done (F17/F18/F20 recovered from the tracker page data). See
+  `docs/LAUNCH_TASKS.md`. Verdict in `docs/READINESS_REPORT.md`: READY FOR
+  ACCOUNT SETUP AND REMAINING RELEASE VERIFICATION. Not ready for release.
+- Working tree: clean after the last push. Last full run: lint 0 errors / 32
+  warnings, tsc clean, unit 230/230, e2e 164 passed + 2 skipped by design,
+  build OK, all 9 live checks in `supabase/tests/` pass.
+- Waiting for the owner's confirmation in the Supabase prompt (the tool times
+  out unattended on DROP/DELETE; retried 2026-10-21, still unchanged):
+  `supabase/pending/plans_by_period_months.sql`, then
+  `supabase/pending/prepaid_checkout.sql`; deleting the 2 synthetic accounts.
+- Built but switched off: email alerts (`ALERTS_DISPATCH_ENABLED`), push
+  (`PUSH_DISPATCH_ENABLED`), checkout (`VITE_CHECKOUT_ENABLED`,
+  `CHECKOUT_ENABLED`; `checkout-start` and `paysera-callback` not deployed).
+- Owner decisions open: white text on orange fills (F16), selling in-app vs
+  website only (F15), individual vs company publisher, L29 listing.
+- Blocked on accounts: see `docs/ACCOUNT_AND_RELEASE_HANDOFF.md` §1 and its
+  order in §5.
 
-## Completion prompt #2 (2026-10-21) — progress checkpoint
+## Next actions when the owner provides access
 
-Executing `Claude_Code_App_Completion_Prompt_1.md` (F1–F19 work map). Push to
-the feature branch only; never to `master` (the prompt forbids merging to
-production). Done so far, each committed and pushed:
-- Applied: profile phone grant, anon helper policy split, AI usage index,
-  profile avatar guard, client_errors (+retention, +redaction fix), listing
-  zone/ref_code. Live checks in `supabase/tests/` all pass.
-- F1 AI daily ceiling deployed (3 functions). F11 error reporting, F12
-  avatars, F19 zone/reference: both apps, tests.
-- Blocked on the owner's confirmation in the Supabase prompt (DROP/DELETE
-  time out unattended): `supabase/pending/plans_by_period_months.sql`, and
-  deleting `claude-test@shtepia.dev` + `system@shtepia.ime` (synthetic; their
-  only conversation is with each other; 8 unreferenced test files in
-  `property-images/9c47f15e-.../`).
-- Next, in order: F13 saved-search email alerts (outbox + edge function,
-  dispatch disabled until SMTP), F14 push (token table + expo-notifications,
-  dispatch gated), F15 pricing/Paysera boundary (test in PGlite harness),
-  F3 moderation (moderator role), F9 maps key config, F7 build checks, F8
-  Apple tests, F10 store assets, F16 tab bar, then docs + ledger + verify.
+1. SMTP set → test sign-up/reset with a fresh address; enable F13 sending;
+   schedule it (handoff §3).
+2. Apple/Google/Expo → EAS builds (`eas.json` profiles exist); Maps key as an
+   EAS env var; run `docs/DEVICE_CHECKLIST.md` with the owner.
+3. Confirmations given → apply the pending SQL in order, re-run
+   `supabase/tests_prepaid_checkout.test.mjs` logic live in a rolled-back
+   block, deploy the two payment functions with test mode.
+4. "merge" → merge to `master`, watch the Vercel deploy, smoke-test the
+   live site.
 
 ## How to check the app
 
@@ -68,6 +66,9 @@ Live RLS checks: run each file in `supabase/tests/` with the Supabase MCP
   developers.google.com are blocked, and so is the production website.
   developer.apple.com and the Supabase docs tool work. Never claim a page was
   read when only a search summary was.
+- **`pkill -f` / `pgrep -f` with a pattern that appears in your own command
+  line kills the Bash tool's shell** (exit 144). Select processes with
+  `ps -eo pid,comm,args | awk '$2=="node" && /pattern/'` instead.
 - **Phone-app web scans.** Run `npx expo export --clear --platform web` with the
   fake env (`EXPO_PUBLIC_SUPABASE_URL=https://e2e.supabase.co`). Then serve it
   with a static server that maps `/property/<id>` to `property/[id].html`,
