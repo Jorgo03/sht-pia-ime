@@ -497,7 +497,10 @@
   },
   "authCallback": {
     "signingIn": "Du wirst angemeldet…",
-    "preparingMatches": "Deine Treffer werden vorbereitet…"
+    "preparingMatches": "Deine Treffer werden vorbereitet…",
+    "returning": "Sie werden zur App zurückgeleitet…",
+    "openApp": "App öffnen",
+    "tapHint": "Wenn nichts passiert ist, tippen Sie auf die Schaltfläche oben."
   },
   "ai": {
     "errorUnavailable": "KI ist gerade nicht verfügbar — bitte manuell schreiben.",

@@ -497,7 +497,10 @@
   },
   "authCallback": {
     "signingIn": "Signing you in…",
-    "preparingMatches": "Preparing your matches…"
+    "preparingMatches": "Preparing your matches…",
+    "returning": "Returning you to the app…",
+    "openApp": "Open the app",
+    "tapHint": "If nothing happened, tap the button above."
   },
   "ai": {
     "errorUnavailable": "AI is unavailable right now — please write manually.",

@@ -2,6 +2,7 @@ import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import { getLocales } from 'expo-localization';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Platform } from 'react-native';
 
 import sq from '../src/i18n/locales/sq.json';
 import en from '../src/i18n/locales/en.json';
@@ -26,23 +27,46 @@ function getDeviceLanguage(): string {
   return 'sq';
 }
 
+const isSupported = (lng: string | null | undefined): lng is string =>
+  !!lng && (SUPPORTED as readonly string[]).includes(lng);
+
+// The website is pre-rendered in Albanian, and React needs the first render
+// in the browser to match that HTML exactly. So on the web every page starts
+// in Albanian and switches to the saved or device language only once the
+// page has hydrated (applyPreferredLanguage, called from the root layout).
+// Until then nothing is written back, so the start-up language never
+// overwrites a saved choice. Native apps detect the language up front.
+const deferToHydration = Platform.OS === 'web';
+let languageReady = !deferToHydration;
+
+async function preferredLanguage(): Promise<string> {
+  const saved = await AsyncStorage.getItem(STORAGE_KEY).catch(() => null);
+  return isSupported(saved) ? saved : getDeviceLanguage();
+}
+
 const languageDetector = {
   type: 'languageDetector' as const,
   async: true,
   detect: (callback: (lng: string) => void) => {
-    if (isSSR) {
+    if (isSSR || deferToHydration) {
       callback('sq');
       return;
     }
-    AsyncStorage.getItem(STORAGE_KEY).then((saved) => {
-      callback(saved && (SUPPORTED as readonly string[]).includes(saved) ? saved : getDeviceLanguage());
-    });
+    preferredLanguage().then(callback);
   },
   init: () => {},
   cacheUserLanguage: (lng: string) => {
-    if (!isSSR) AsyncStorage.setItem(STORAGE_KEY, lng);
+    if (!isSSR && languageReady) AsyncStorage.setItem(STORAGE_KEY, lng);
   },
 };
+
+/** Web: switch to the visitor's language after hydration. No-op on native. */
+export async function applyPreferredLanguage(): Promise<void> {
+  if (!deferToHydration || languageReady) return;
+  const lng = await preferredLanguage();
+  languageReady = true;
+  if (lng !== i18n.language) await i18n.changeLanguage(lng);
+}
 
 i18n
   .use(languageDetector)

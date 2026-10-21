@@ -505,7 +505,10 @@
   },
   "authCallback": {
     "signingIn": "Iniciando sesión…",
-    "preparingMatches": "Preparando tus coincidencias…"
+    "preparingMatches": "Preparando tus coincidencias…",
+    "returning": "Volviendo a la aplicación…",
+    "openApp": "Abrir la aplicación",
+    "tapHint": "Si no ha pasado nada, toca el botón de arriba."
   },
   "ai": {
     "errorUnavailable": "La IA no está disponible ahora — escribe manualmente.",

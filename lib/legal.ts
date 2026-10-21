@@ -33,3 +33,18 @@ const clean = (v: string | undefined): string | null => {
 
 export const PRIVACY_POLICY_URL = clean(process.env.EXPO_PUBLIC_PRIVACY_POLICY_URL) ?? `${SITE_URL}/privacy`;
 export const TERMS_URL = clean(process.env.EXPO_PUBLIC_TERMS_URL) ?? `${SITE_URL}/terms`;
+
+/**
+ * Contact address printed on the Privacy and Terms pages of the website (the
+ * Expo app's web build). Same rule as the Vite site's VITE_LEGAL_CONTACT_EMAIL:
+ * unset or not an address, the pages point people to the in-app controls
+ * instead of printing an address nobody reads.
+ *
+ *   EXPO_PUBLIC_LEGAL_CONTACT_EMAIL=privacy@yourdomain
+ */
+const email = (v: string | undefined): string | null => {
+  const s = (v ?? '').trim();
+  return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(s) ? s : null;
+};
+
+export const LEGAL_CONTACT_EMAIL = email(process.env.EXPO_PUBLIC_LEGAL_CONTACT_EMAIL);

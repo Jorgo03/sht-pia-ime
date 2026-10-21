@@ -28,7 +28,7 @@ import { Platform, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import 'react-native-reanimated';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import '@/i18n';
+import { applyPreferredLanguage } from '@/i18n';
 
 import { AuthProvider, useAuth } from '@/contexts/auth-context';
 import { FavoritesProvider } from '@/contexts/favorites-context';
@@ -148,6 +148,13 @@ function ThemedNavigation() {
             name="agent/[id]"
             options={{ headerShown: false, presentation: 'card' }}
           />
+          {/* Website pages; pricing, moderation and auth/callback are web
+              only (their native files redirect home). */}
+          <Stack.Screen name="privacy" options={{ headerShown: false }} />
+          <Stack.Screen name="terms" options={{ headerShown: false }} />
+          <Stack.Screen name="pricing" options={{ headerShown: false }} />
+          <Stack.Screen name="moderation" options={{ headerShown: false }} />
+          <Stack.Screen name="auth/callback" options={{ headerShown: false }} />
         </Stack>
       </WebColumn>
       <StatusBar style={theme === 'dark' ? 'light' : 'dark'} />
@@ -177,6 +184,12 @@ function AppGate({ fontsReady }: { fontsReady: boolean }) {
   useEffect(() => {
     if (ready) SplashScreen.hideAsync();
   }, [ready]);
+
+  // Web: the page hydrated in Albanian (what was pre-rendered); now switch to
+  // the visitor's own language. No-op on native.
+  useEffect(() => {
+    applyPreferredLanguage();
+  }, []);
 
   if (!ready) {
     // Native splash screen is still visible (prevented above) — this isn't

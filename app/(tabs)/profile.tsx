@@ -5,6 +5,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Provider } from '@supabase/supabase-js';
 
 import { PRIVACY_POLICY_URL, TERMS_URL } from '@/lib/legal';
+import { IS_WEB } from '@/constants/web-frame';
+import { isModerator } from '@/src/features/moderation/lib/moderation';
 import { supabase } from '@/lib/supabase';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter, type Href } from 'expo-router';
@@ -120,6 +122,27 @@ export default function ProfileScreen() {
   const unreadMessages = useUnreadMessages();
   const { favoriteProperties } = useFavorites();
   const stats = useProfileStats();
+
+  // Website only: a "Moderation" row for people in public.moderators (the
+  // page itself is web only, and the database enforces the same rule).
+  const [canModerate, setCanModerate] = useState(false);
+  useEffect(() => {
+    if (!IS_WEB || !user) return;
+    let active = true;
+    isModerator(supabase).then((ok) => {
+      if (active) setCanModerate(ok);
+    });
+    return () => {
+      active = false;
+    };
+  }, [user]);
+
+  // On the website the documents are this app's own pages; the phone apps
+  // open them on the website (lib/legal.ts).
+  const openLegal = (doc: 'privacy' | 'terms') => {
+    if (IS_WEB) router.push(`/${doc}` as Href);
+    else Linking.openURL(doc === 'privacy' ? PRIVACY_POLICY_URL : TERMS_URL);
+  };
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -626,6 +649,19 @@ export default function ProfileScreen() {
                   </TouchableOpacity>
                 </>
               )}
+              {canModerate && (
+                <>
+                  <View style={styles.menuDivider} />
+                  <TouchableOpacity
+                    style={styles.menuRow}
+                    onPress={() => router.push('/moderation' as Href)}
+                    activeOpacity={0.7}>
+                    <MaterialIcons name="verified-user" size={20} color={colors.textPrimary} />
+                    <Text style={styles.menuRowText}>{t('moderation.title')}</Text>
+                    <MaterialIcons name="chevron-right" size={18} color={colors.textSecondary} />
+                  </TouchableOpacity>
+                </>
+              )}
             </View>
 
             {/* Signing out is one tap from a scroll — easy to hit by accident,
@@ -652,11 +688,11 @@ export default function ProfileScreen() {
             {/* Both stores require the Privacy Policy to be reachable from
                 inside the app. The pages live on the website (lib/legal.ts). */}
             <View style={styles.legalRow}>
-              <Text style={styles.legalLink} accessibilityRole="link" onPress={() => Linking.openURL(PRIVACY_POLICY_URL)}>
+              <Text style={styles.legalLink} accessibilityRole="link" onPress={() => openLegal('privacy')}>
                 {t('legal.privacyPolicy')}
               </Text>
               <Text style={styles.legalDot}>·</Text>
-              <Text style={styles.legalLink} accessibilityRole="link" onPress={() => Linking.openURL(TERMS_URL)}>
+              <Text style={styles.legalLink} accessibilityRole="link" onPress={() => openLegal('terms')}>
                 {t('legal.termsOfService')}
               </Text>
             </View>
@@ -1135,11 +1171,11 @@ export default function ProfileScreen() {
               {/* Reachable before signing up too: this is where people
                   decide whether to hand over their details. */}
               <View style={[styles.legalRow, styles.legalRowAuth]}>
-                <Text style={[styles.legalLink, styles.legalLinkAuth]} accessibilityRole="link" onPress={() => Linking.openURL(PRIVACY_POLICY_URL)}>
+                <Text style={[styles.legalLink, styles.legalLinkAuth]} accessibilityRole="link" onPress={() => openLegal('privacy')}>
                   {t('legal.privacyPolicy')}
                 </Text>
                 <Text style={[styles.legalDot, styles.legalLinkAuth]}>·</Text>
-                <Text style={[styles.legalLink, styles.legalLinkAuth]} accessibilityRole="link" onPress={() => Linking.openURL(TERMS_URL)}>
+                <Text style={[styles.legalLink, styles.legalLinkAuth]} accessibilityRole="link" onPress={() => openLegal('terms')}>
                   {t('legal.termsOfService')}
                 </Text>
               </View>

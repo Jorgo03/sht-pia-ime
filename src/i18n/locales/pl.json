@@ -513,7 +513,10 @@
   },
   "authCallback": {
     "signingIn": "Logowanie…",
-    "preparingMatches": "Przygotowujemy Twoje dopasowania…"
+    "preparingMatches": "Przygotowujemy Twoje dopasowania…",
+    "returning": "Wracamy do aplikacji…",
+    "openApp": "Otwórz aplikację",
+    "tapHint": "Jeśli nic się nie stało, dotknij przycisku powyżej."
   },
   "ai": {
     "errorUnavailable": "AI jest teraz niedostępne — napisz ręcznie.",

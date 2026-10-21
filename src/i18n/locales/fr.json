@@ -505,7 +505,10 @@
   },
   "authCallback": {
     "signingIn": "Connexion en cours…",
-    "preparingMatches": "Préparation de vos correspondances…"
+    "preparingMatches": "Préparation de vos correspondances…",
+    "returning": "Retour vers l'application…",
+    "openApp": "Ouvrir l'application",
+    "tapHint": "Si rien ne s'est passé, touchez le bouton ci-dessus."
   },
   "ai": {
     "errorUnavailable": "L'IA est indisponible pour le moment — rédigez manuellement.",

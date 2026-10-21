@@ -497,7 +497,10 @@
   },
   "authCallback": {
     "signingIn": "Duke u kyçur…",
-    "preparingMatches": "Duke përgatitur përputhjet e tua…"
+    "preparingMatches": "Duke përgatitur përputhjet e tua…",
+    "returning": "Po ju kthejmë te aplikacioni…",
+    "openApp": "Hap aplikacionin",
+    "tapHint": "Nëse nuk ndodhi asgjë, prekni butonin më sipër."
   },
   "ai": {
     "errorUnavailable": "AI nuk është i disponueshëm tani — shkruaje manualisht.",
