@@ -13,6 +13,7 @@
     "preview": "vite preview",
     "test": "node --test \"tests/**/*.test.mjs\"",
     "test:e2e": "playwright test",
+    "test:e2e:expo": "playwright test -c playwright.expo.config.ts",
     "test:e2e:install": "playwright install chromium",
     "expo:start": "expo start",
     "expo:lan": "node scripts/start-expo-lan.cjs",

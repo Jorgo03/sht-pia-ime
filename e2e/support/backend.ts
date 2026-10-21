@@ -161,7 +161,16 @@ export async function mockBackend(page: Page, { signedIn = false, writes = [] as
           writes.push({ table, method, query: url.search, body });
           return route.fulfill({ status: method === 'POST' ? 201 : 204, headers: CORS, body: '' });
         }
-        if (table === 'conversations' && signedIn) return json(route, 200, CONVERSATIONS);
+        if (table === 'conversations' && signedIn) {
+          // Like PostgREST: honour ?id=eq.<id>, and answer a .single() request
+          // (Accept: vnd.pgrst.object) with one row, or 406 when none match.
+          const id = (url.searchParams.get('id') ?? '').replace(/^eq\./, '');
+          const rows = id ? CONVERSATIONS.filter((c) => c.id === id) : CONVERSATIONS;
+          if ((route.request().headers()['accept'] ?? '').includes('vnd.pgrst.object')) {
+            return rows[0] ? json(route, 200, rows[0]) : json(route, 406, { code: 'PGRST116' });
+          }
+          return json(route, 200, rows);
+        }
         if (table === 'saved_searches' && signedIn) return json(route, 200, SAVED_SEARCHES);
         return json(route, 200, []);
       }
