@@ -21,6 +21,7 @@ import { ReportSheet } from '@/components/safety/report-sheet';
 import { AppHeader } from '@/components/ui/app-header';
 import { type AtticoPalette } from '@/constants/theme';
 import { useAuth } from '@/contexts/auth-context';
+import { KeyboardDoneBar } from '@/components/ui/keyboard-done-bar';
 import { useTheme } from '@/contexts/theme-context';
 import { supabase } from '@/lib/supabase';
 import { formatRelativeTime, getLocalizedText } from '@/lib/format';
@@ -332,6 +333,7 @@ export default function ThreadScreen() {
         </View>
         )}
         <ReportSheet visible={reportOpen} userId={otherId} onClose={() => setReportOpen(false)} />
+        <KeyboardDoneBar />
       </SafeAreaView>
     </KeyboardAvoidingView>
   );

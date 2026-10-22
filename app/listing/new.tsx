@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Crypto from 'expo-crypto';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useQueryClient } from '@tanstack/react-query';
 import { Image } from 'expo-image';
@@ -31,15 +32,17 @@ import { Field } from '@/components/ui/field';
 import { GradientBackground } from '@/components/ui/gradient-background';
 import { RiseIn } from '@/components/ui/motion';
 import { SelectField } from '@/components/ui/select-field';
-import { KEYBOARD_DONE_ID, KeyboardDoneBar } from '@/components/ui/keyboard-done-bar';
+import { KeyboardDoneBar } from '@/components/ui/keyboard-done-bar';
 import { Fonts, Radii, Spacing, type AtticoPalette } from '@/constants/theme';
 import { useAuth } from '@/contexts/auth-context';
 import { useTheme } from '@/contexts/theme-context';
+import { debugWarn } from '@/lib/debug';
 import { supabase } from '@/lib/supabase';
+import { isDuplicateKey } from '@/src/features/listings/lib/mediaUpload';
 import { translatePropertyContent, type I18nMap } from '@/lib/translate';
 import { geocodeCity, type RoadSuggestion } from '@/src/lib/roadSearch';
 import { useListingTranslation } from '@/src/features/listings/hooks/useListingTranslation';
-import { formToColumns, propertyToForm, removedMediaPaths } from '@/src/features/listings/lib/listingForm';
+import { formToColumns, normalizeAmount, propertyToForm, removedMediaPaths } from '@/src/features/listings/lib/listingForm';
 import type { TranslationMeta } from '@/src/lib/translationCore';
 import {
   MAX_IMAGES,
@@ -280,6 +283,12 @@ function ListingWizard({ editId }: { editId?: string }) {
   // Media the listing had when it was opened for editing; anything missing
   // after a successful save is deleted from storage.
   const originalMedia = useRef<string[]>([]);
+  // One save at a time, set before the button re-renders as busy.
+  const saving = useRef(false);
+  // A new listing's id, made here and kept across retries: if a save's reply
+  // is lost after the row was written, the retry finds that row (duplicate
+  // key) and updates it instead of creating a second listing.
+  const newListingId = useRef<string | null>(null);
 
   const applyLoaded = useCallback((result: LoadedListing) => {
     if (result.state !== 'ready') {
@@ -494,6 +503,8 @@ function ListingWizard({ editId }: { editId?: string }) {
       return;
     }
 
+    if (saving.current) return;
+    saving.current = true;
     setSubmitting(true);
     setErrors((prev) => ({ ...prev, submit: undefined }));
     let uploadedPaths: string[] = [];
@@ -557,19 +568,41 @@ function ListingWizard({ editId }: { editId?: string }) {
           .eq('id', user.id)
           .single();
         const isAgent = profile?.role === 'agent';
+        newListingId.current ??= Crypto.randomUUID();
+        const id = newListingId.current;
         ({ error } = await supabase.from('properties').insert({
           ...columns,
+          id,
           // RLS requires owner_id = auth.uid() on insert.
           owner_id: user.id,
           agent_id: isAgent ? user.id : null,
           owner_type: isAgent ? 'agent' : 'client',
           status,
         }));
+        if (isDuplicateKey(error)) {
+          // An earlier attempt landed: bring that row up to date (RLS: own
+          // rows only) and drop the photos only it referenced.
+          const { data: earlier } = await supabase.from('properties').select('image_urls, video_url').eq('id', id).maybeSingle();
+          ({ error } = await supabase.from('properties').update({ ...columns, status }).eq('id', id));
+          if (!error && earlier) {
+            await removeUploadedImages(
+              removedMediaPaths({
+                before: [...(earlier.image_urls ?? []), earlier.video_url],
+                after: [...imageUrls, videoUrl],
+                userId: user.id,
+              }),
+            );
+          }
+        }
       }
 
-      // Insert failed after upload succeeded — don't leave orphaned files.
       if (error) {
-        await removeUploadedImages(uploadedPaths);
+        // The database refused the row (a Postgres/PostgREST code): nothing
+        // references the new files, so remove them. With no code the reply
+        // was lost on the network and the row may exist; keep the files
+        // rather than risk a saved listing whose photos are gone. The retry
+        // reuses the same id, finds that row and cleans up what it replaces.
+        if (error.code) await removeUploadedImages(uploadedPaths);
         throw error;
       }
 
@@ -587,15 +620,21 @@ function ListingWizard({ editId }: { editId?: string }) {
       router.replace('/my-listings');
     } catch (err: any) {
       setUploadProgress(null);
-      // A raw Postgres "out of range" isn't something an agent can act on.
+      debugWarn('listing save', err?.cause ?? err);
+      // Never the raw error (a native stack trace or Postgres text). The form
+      // and the picked photos stay as they are, so the agent can retry.
       const outOfRangeErr = err?.code === '22003' || /out of range/i.test(err?.message ?? '');
-      const message = err?.uploadFailed
-        ? t('errors.imageUploadFailed')
-        : outOfRangeErr
-          ? t('errors.valueOutOfRange')
-          : (err?.message ?? t('errors.submitFailed'));
+      const message =
+        err?.stage === 'prepare'
+          ? t('errors.photoPrepareFailed')
+          : err?.stage === 'read' || err?.uploadFailed
+            ? t('errors.imageUploadFailed')
+            : outOfRangeErr
+              ? t('errors.valueOutOfRange')
+              : t('errors.listingSaveFailed');
       setErrors((prev) => ({ ...prev, submit: message }));
     } finally {
+      saving.current = false;
       setSubmitting(false);
     }
   };
@@ -637,6 +676,7 @@ function ListingWizard({ editId }: { editId?: string }) {
 
       <Labeled styles={styles} label={t('search.propertyType')}>
         <SelectField
+          variant="form"
           value={form.property_type}
           options={PROPERTY_TYPES.map((pt) => ({ value: pt, label: t(`search.${pt}`) }))}
           placeholder={t('search.propertyType')}
@@ -667,7 +707,6 @@ function ListingWizard({ editId }: { editId?: string }) {
         />
 
         <TextInput
-          inputAccessoryViewID={KEYBOARD_DONE_ID}
           style={styles.input}
           // On a non-source language with nothing translated yet, the Albanian
           // itself is the most useful placeholder — it shows what is about to
@@ -691,7 +730,6 @@ function ListingWizard({ editId }: { editId?: string }) {
       <View style={styles.fieldBlock}>
         <Text style={styles.fieldLabel}>{t('listing.description')}</Text>
         <TextInput
-          inputAccessoryViewID={KEYBOARD_DONE_ID}
           style={[styles.input, styles.textArea]}
           placeholder={
             translation.activeLang === 'sq'
@@ -717,6 +755,7 @@ function ListingWizard({ editId }: { editId?: string }) {
     <>
       <Labeled styles={styles} label={t('listing.city')} error={errors.city}>
         <SelectField
+          variant="form"
           value={form.city}
           options={CITIES.map((c) => ({ value: c, label: c }))}
           placeholder={t('listing.city')}
@@ -749,6 +788,7 @@ function ListingWizard({ editId }: { editId?: string }) {
       {zonesFor(form.city).length > 0 ? (
         <Labeled styles={styles} label={t('listing.zone')}>
           <SelectField
+            variant="form"
             value={form.zone}
             options={[
               { value: '', label: t('listing.zoneNone') },
@@ -792,25 +832,29 @@ function ListingWizard({ editId }: { editId?: string }) {
   const renderDetails = () => (
     <>
       <View style={styles.row}>
-        <Labeled styles={styles} label={t('listing.price')} error={errors.price} style={styles.flex2}>
+        <Labeled styles={styles} label={t('listing.price')} error={errors.price} style={styles.flex1}>
+          {/* A currency-neutral banknote: the currency is the select beside it,
+              and a fixed € next to "ALL" said the wrong thing. */}
           <Field
-            inputAccessoryViewID={KEYBOARD_DONE_ID}
-            icon="euro"
+            icon="payments"
             placeholder="0"
-            keyboardType="numeric"
+            keyboardType="decimal-pad"
+            accessibilityLabel={t('listing.price')}
             value={form.price}
             onChangeText={(val) => {
-              update('price', val);
+              update('price', normalizeAmount(val));
               clearError('price');
             }}
           />
         </Labeled>
-        <Labeled styles={styles} label={t('listing.currency')} style={styles.flex1}>
+        <Labeled styles={styles} label={t('listing.currency')} style={styles.currencyColumn}>
           <SelectField
+            variant="form"
             value={form.currency}
             options={CURRENCIES.map((c) => ({ value: c, label: c }))}
             placeholder={t('listing.currency')}
-            icon="payments"
+            icon={null}
+            accessibilityLabel={t('listing.currency')}
             onChange={(v) => update('currency', v as Currency)}
           />
         </Labeled>
@@ -818,7 +862,6 @@ function ListingWizard({ editId }: { editId?: string }) {
 
       <Labeled styles={styles} label={`${t('listing.surface')} (m²)`} error={errors.sqft}>
         <Field
-          inputAccessoryViewID={KEYBOARD_DONE_ID}
           icon="straighten"
           placeholder="0"
           keyboardType="numeric"
@@ -833,7 +876,6 @@ function ListingWizard({ editId }: { editId?: string }) {
       <View style={styles.row}>
         <Labeled styles={styles} label={t('property.beds')} error={errors.beds} style={styles.flex1}>
           <Field
-            inputAccessoryViewID={KEYBOARD_DONE_ID}
             icon="king-bed"
             placeholder="0"
             keyboardType="numeric"
@@ -846,7 +888,6 @@ function ListingWizard({ editId }: { editId?: string }) {
         </Labeled>
         <Labeled styles={styles} label={t('property.baths')} error={errors.baths} style={styles.flex1}>
           <Field
-            inputAccessoryViewID={KEYBOARD_DONE_ID}
             icon="bathtub"
             placeholder="0"
             keyboardType="numeric"
@@ -862,7 +903,6 @@ function ListingWizard({ editId }: { editId?: string }) {
       <View style={styles.row}>
         <Labeled styles={styles} label={t('listing.floor')} error={errors.floor} style={styles.flex1}>
           <Field
-            inputAccessoryViewID={KEYBOARD_DONE_ID}
             icon="stairs"
             placeholder="0"
             keyboardType="numeric"
@@ -875,7 +915,6 @@ function ListingWizard({ editId }: { editId?: string }) {
         </Labeled>
         <Labeled styles={styles} label={t('listing.totalFloors')} error={errors.total_floors} style={styles.flex1}>
           <Field
-            inputAccessoryViewID={KEYBOARD_DONE_ID}
             icon="layers"
             placeholder="0"
             keyboardType="numeric"
@@ -890,7 +929,6 @@ function ListingWizard({ editId }: { editId?: string }) {
 
       <Labeled styles={styles} label={t('listing.yearBuilt')} error={errors.year_built}>
         <Field
-          inputAccessoryViewID={KEYBOARD_DONE_ID}
           icon="event"
           placeholder="2024"
           keyboardType="numeric"
@@ -1011,7 +1049,6 @@ function ListingWizard({ editId }: { editId?: string }) {
 
       <Labeled styles={styles} label={t('listing.phone')} error={errors.phone}>
         <Field
-          inputAccessoryViewID={KEYBOARD_DONE_ID}
           icon="phone"
           placeholder="+355 69..."
           keyboardType="phone-pad"
@@ -1039,7 +1076,6 @@ function ListingWizard({ editId }: { editId?: string }) {
 
       <Labeled styles={styles} label={t('listing.email')}>
         <Field
-          inputAccessoryViewID={KEYBOARD_DONE_ID}
           icon="mail"
           placeholder="john.doe@gmail.com"
           keyboardType="email-address"
@@ -1327,6 +1363,9 @@ const createStyles = (colors: AtticoPalette) =>
     },
     flex1: { flex: 1 },
     flex2: { flex: 2 },
+    // Fits "EUR"/"ALL"/"USD" + caret in Control's box (16 + ~34 + 10 + 20 + 16
+    // + borders = ~98) with room for larger text; the amount takes the rest.
+    currencyColumn: { width: 112 },
 
     header: {
       flexDirection: 'row',

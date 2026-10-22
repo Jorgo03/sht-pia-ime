@@ -26,6 +26,7 @@ import { useTranslation } from 'react-i18next';
 import { SelectField } from '@/components/ui/select-field';
 import { type AtticoPalette, Fonts } from '@/constants/theme';
 import { useFilters } from '@/contexts/filters-context';
+import { KeyboardDoneBar } from '@/components/ui/keyboard-done-bar';
 import { useTheme } from '@/contexts/theme-context';
 import { Property, PropertySort } from '@/data/types';
 import { usePropertiesCountQuery } from '@/hooks/use-property-queries';
@@ -460,6 +461,7 @@ export function FilterSheet({
               : t('search.showHomes', { count })}
           </Text>
         </Pressable>
+          <KeyboardDoneBar />
         </KeyboardAvoidingView>
         </Animated.View>
       </View>

@@ -17,7 +17,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { SheetCloseButton } from '@/components/ui/sheet-close-button';
 import { PrimaryCTA } from '@/components/ui/buttons';
-import { KEYBOARD_DONE_SHEET_ID, KeyboardDoneBar } from '@/components/ui/keyboard-done-bar';
+import { KeyboardDoneBar } from '@/components/ui/keyboard-done-bar';
 import { Fonts, Radii, Spacing, type AtticoPalette } from '@/constants/theme';
 import { useTheme } from '@/contexts/theme-context';
 import { supabase } from '@/lib/supabase';
@@ -194,7 +194,6 @@ export function EditProfileSheet({
             ) : null}
             <Text style={styles.label}>{t('auth.fullName')}</Text>
             <TextInput
-              inputAccessoryViewID={KEYBOARD_DONE_SHEET_ID}
               style={styles.input}
               value={fullName}
               onChangeText={(v) => {
@@ -210,7 +209,6 @@ export function EditProfileSheet({
               <>
                 <Text style={styles.label}>{t('auth.agencyName')}</Text>
                 <TextInput
-                  inputAccessoryViewID={KEYBOARD_DONE_SHEET_ID}
                   style={styles.input}
                   value={agency}
                   onChangeText={(v) => {
@@ -225,7 +223,6 @@ export function EditProfileSheet({
             ) : null}
             <Text style={styles.label}>{t('profile.edit.phone')}</Text>
             <TextInput
-              inputAccessoryViewID={KEYBOARD_DONE_SHEET_ID}
               style={styles.input}
               value={phone}
               onChangeText={(v) => {
@@ -257,7 +254,7 @@ export function EditProfileSheet({
               onPress={submit}
             />
           </ScrollView>
-          <KeyboardDoneBar nativeID={KEYBOARD_DONE_SHEET_ID} />
+          <KeyboardDoneBar />
         </SafeAreaView>
       </KeyboardAvoidingView>
     </Modal>

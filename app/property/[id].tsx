@@ -35,7 +35,7 @@ import { PrimaryCTA } from '@/components/ui/buttons';
 import { ListingAssistant } from '@/components/property/listing-assistant';
 import { LocationPreviewMap } from '@/components/property/location-preview-map';
 import { PropertyCard } from '@/components/property/property-card';
-import { KEYBOARD_DONE_ID, KEYBOARD_DONE_SHEET_ID, KeyboardDoneBar } from '@/components/ui/keyboard-done-bar';
+import { KeyboardDoneBar } from '@/components/ui/keyboard-done-bar';
 import { Fonts, type AtticoPalette } from '@/constants/theme';
 import { useAuth } from '@/contexts/auth-context';
 import { useFavorites } from '@/contexts/favorites-context';
@@ -452,7 +452,6 @@ export default function PropertyDetailScreen() {
             <Text style={styles.sectionTitle}>{t('detail.message')}</Text>
           </View>
           <TextInput
-            inputAccessoryViewID={KEYBOARD_DONE_ID}
             style={[styles.contactInput, styles.contactMessage]}
             placeholder={t('property.whatsappMessage', { title })}
             placeholderTextColor={colors.textSecondary}
@@ -639,7 +638,6 @@ export default function PropertyDetailScreen() {
               themeVariant="dark"
             />
             <TextInput
-              inputAccessoryViewID={KEYBOARD_DONE_SHEET_ID}
               style={[styles.contactInput, styles.contactMessage, { marginTop: 12 }]}
               placeholder={t('addSheet.notes')}
               placeholderTextColor={colors.textSecondary}
@@ -660,7 +658,7 @@ export default function PropertyDetailScreen() {
             />
           </View>
         </KeyboardAvoidingView>
-        <KeyboardDoneBar nativeID={KEYBOARD_DONE_SHEET_ID} />
+        <KeyboardDoneBar />
       </Modal>
 
       <ReportSheet visible={reportOpen} propertyId={property?.id} onClose={() => setReportOpen(false)} />

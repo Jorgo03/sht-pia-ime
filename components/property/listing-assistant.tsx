@@ -15,6 +15,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Fonts, Radii, Shadows, type AtticoPalette } from '@/constants/theme';
+import { KeyboardDoneBar } from '@/components/ui/keyboard-done-bar';
 import { useTheme } from '@/contexts/theme-context';
 import { useResponsive } from '@/hooks/use-responsive';
 import { askListingAssistant, type AssistantMessage } from '@/lib/ai';
@@ -181,6 +182,7 @@ export function ListingAssistant({ property }: { property: Property | null }) {
         </View>
         <Text style={styles.disclaimer}>{t('assistant.disclaimer')}</Text>
       </View>
+      <KeyboardDoneBar />
     </KeyboardAvoidingView>
   );
 }

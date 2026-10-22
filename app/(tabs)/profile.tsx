@@ -29,6 +29,7 @@ import { useTranslation } from 'react-i18next';
 import { type AtticoPalette, Fonts, Radii } from '@/constants/theme';
 import { useAuth } from '@/contexts/auth-context';
 import { useFavorites } from '@/contexts/favorites-context';
+import { KeyboardDoneBar } from '@/components/ui/keyboard-done-bar';
 import { useTheme } from '@/contexts/theme-context';
 import { useTabBarClearance } from '@/components/liquid-tab-bar';
 import { AppHeader } from '@/components/ui/app-header';
@@ -1243,6 +1244,7 @@ export default function ProfileScreen() {
               )}
             </View>
           </ScrollView>
+          <KeyboardDoneBar />
         </KeyboardAvoidingView>
       </SafeAreaView>
 

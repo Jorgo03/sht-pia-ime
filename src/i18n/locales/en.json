@@ -27,7 +27,8 @@
     "next": "Next",
     "retry": "Retry",
     "done": "Done",
-    "language": "Language"
+    "language": "Language",
+    "closeKeyboard": "Closes the keyboard"
   },
   "auth": {
     "roleClient": "Client",
@@ -327,7 +328,9 @@
     "videoInvalidType": "Only MP4 or MOV videos are allowed",
     "videoTooLarge": "Video is too large (max {{max}} MB)",
     "emailSendFailed": "We could not send the confirmation email. This is a server configuration problem, not a problem with your account — please contact the administrator.",
-    "waitSeconds": "Wait {{s}} seconds before asking for a new code."
+    "waitSeconds": "Wait {{s}} seconds before asking for a new code.",
+    "photoPrepareFailed": "A photo couldn't be prepared for upload. Try again or choose a different photo.",
+    "listingSaveFailed": "The listing wasn't saved. Everything you entered is still here; try again."
   },
   "agentDashboard": {
     "title": "Agent Dashboard",

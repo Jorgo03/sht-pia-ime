@@ -27,7 +27,8 @@
     "next": "Dalej",
     "retry": "Spróbuj ponownie",
     "done": "Gotowe",
-    "language": "Język"
+    "language": "Język",
+    "closeKeyboard": "Zamyka klawiaturę"
   },
   "auth": {
     "roleClient": "Klient",
@@ -315,7 +316,9 @@
     "videoInvalidType": "Dozwolone są tylko filmy MP4 lub MOV",
     "videoTooLarge": "Wideo jest za duże (maks. {{max}} MB)",
     "emailSendFailed": "Nie udało się wysłać e-maila potwierdzającego. To problem z konfiguracją serwera, nie z Twoim kontem — skontaktuj się z administratorem.",
-    "waitSeconds": "Poczekaj {{s}} s, zanim poprosisz o nowy kod."
+    "waitSeconds": "Poczekaj {{s}} s, zanim poprosisz o nowy kod.",
+    "photoPrepareFailed": "Nie udało się przygotować zdjęcia do wysłania. Spróbuj ponownie lub wybierz inne zdjęcie.",
+    "listingSaveFailed": "Ogłoszenie nie zostało zapisane. Wszystko, co wpisałeś, nadal tu jest; spróbuj ponownie."
   },
   "agentDashboard": {
     "title": "Panel Agenta",

@@ -27,7 +27,8 @@
     "next": "Suivant",
     "retry": "Réessayer",
     "done": "OK",
-    "language": "Langue"
+    "language": "Langue",
+    "closeKeyboard": "Ferme le clavier"
   },
   "auth": {
     "roleClient": "Client",
@@ -307,7 +308,9 @@
     "videoInvalidType": "Seules les vidéos MP4 ou MOV sont autorisées",
     "videoTooLarge": "Vidéo trop volumineuse (max {{max}} Mo)",
     "emailSendFailed": "Nous n’avons pas pu envoyer l’e-mail de confirmation. Il s’agit d’un problème de configuration du serveur, pas de votre compte — contactez l’administrateur.",
-    "waitSeconds": "Attendez {{s}} secondes avant de demander un nouveau code."
+    "waitSeconds": "Attendez {{s}} secondes avant de demander un nouveau code.",
+    "photoPrepareFailed": "Une photo n'a pas pu être préparée pour l'envoi. Réessayez ou choisissez une autre photo.",
+    "listingSaveFailed": "L'annonce n'a pas été enregistrée. Tout ce que vous avez saisi est encore là ; réessayez."
   },
   "agentDashboard": {
     "title": "Tableau de bord Agent",

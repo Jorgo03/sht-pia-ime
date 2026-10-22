@@ -27,7 +27,8 @@
     "next": "Weiter",
     "retry": "Erneut versuchen",
     "done": "Fertig",
-    "language": "Sprache"
+    "language": "Sprache",
+    "closeKeyboard": "Schließt die Tastatur"
   },
   "auth": {
     "roleClient": "Kunde",
@@ -299,7 +300,9 @@
     "videoInvalidType": "Nur MP4- oder MOV-Videos sind erlaubt",
     "videoTooLarge": "Video ist zu groß (max. {{max}} MB)",
     "emailSendFailed": "Die Bestätigungs-E-Mail konnte nicht gesendet werden. Das ist ein Serverkonfigurationsproblem, nicht ein Problem mit deinem Konto — bitte kontaktiere den Administrator.",
-    "waitSeconds": "Warte {{s}} Sekunden, bevor du einen neuen Code anforderst."
+    "waitSeconds": "Warte {{s}} Sekunden, bevor du einen neuen Code anforderst.",
+    "photoPrepareFailed": "Ein Foto konnte nicht für den Upload vorbereitet werden. Versuche es erneut oder wähle ein anderes Foto.",
+    "listingSaveFailed": "Das Inserat wurde nicht gespeichert. Alle Eingaben sind noch da; versuche es erneut."
   },
   "agentDashboard": {
     "title": "Makler-Dashboard",

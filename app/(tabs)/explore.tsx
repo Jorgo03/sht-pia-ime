@@ -24,6 +24,7 @@ import { GradientBackground } from '@/components/ui/gradient-background';
 import { RiseIn } from '@/components/ui/motion';
 import { type AtticoPalette, Fonts } from '@/constants/theme';
 import { useFilters } from '@/contexts/filters-context';
+import { KeyboardDoneBar } from '@/components/ui/keyboard-done-bar';
 import { useTheme } from '@/contexts/theme-context';
 import { Property } from '@/data/types';
 import { useInfinitePropertiesQuery, usePropertiesCountQuery } from '@/hooks/use-property-queries';
@@ -327,6 +328,7 @@ export default function ExploreScreen() {
           visible={sheetOpen}
           onClose={() => setSheetOpen(false)}
         />
+        <KeyboardDoneBar />
       </SafeAreaView>
     </GradientBackground>
   );
