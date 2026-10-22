@@ -81,7 +81,7 @@ export function EditProfileSheet({
       return;
     }
     setPhotoBusy(true);
-    const res = await saveAvatar(supabase, userId, picked.blob, photoUrl);
+    const res = await saveAvatar(supabase, userId, picked.bytes, photoUrl);
     setPhotoBusy(false);
     if (res.status !== 'saved') {
       setPhotoError(res.status === 'tooLarge' ? 'photoSize' : 'photoFailed');

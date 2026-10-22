@@ -33,18 +33,30 @@ export function ownAvatarPath(url, userId) {
   return removedMediaPaths({ before: [url], after: [], userId, bucket: AVATAR_BUCKET })[0] ?? null
 }
 
+/** Size of a Blob (website) or an ArrayBuffer (phone app), or null. */
+export function bodySize(body) {
+  if (!body) return null
+  if (typeof body.size === 'number') return body.size
+  if (typeof body.byteLength === 'number') return body.byteLength
+  return null
+}
+
 /**
  * Upload a resized JPEG and point the profile at it.
+ * `body` is a Blob on the website and an ArrayBuffer in the phone app: a
+ * React Native Blob is sent as text/plain, which the bucket refuses.
  * Returns { status: 'saved', url } or { status: 'failed' | 'tooLarge' }.
  * Never leaves a half-done change: if the profile update fails, the new file
  * is removed; the old photo is removed only after the update succeeded.
  */
-export async function saveAvatar(client, userId, blob, previousUrl) {
-  if (!blob || blob.size > AVATAR_MAX_BYTES) return { status: 'tooLarge' }
+export async function saveAvatar(client, userId, body, previousUrl) {
+  const size = bodySize(body)
+  if (!size) return { status: 'failed' }
+  if (size > AVATAR_MAX_BYTES) return { status: 'tooLarge' }
   const bucket = client.storage.from(AVATAR_BUCKET)
   const path = newAvatarPath(userId)
   try {
-    const { error: uploadError } = await bucket.upload(path, blob, { contentType: 'image/jpeg', upsert: false })
+    const { error: uploadError } = await bucket.upload(path, body, { contentType: 'image/jpeg', upsert: false })
     if (uploadError) return { status: 'failed' }
     const url = bucket.getPublicUrl(path).data.publicUrl
     const { error } = await client.from('profiles').update({ avatar_url: url }).eq('id', userId)
