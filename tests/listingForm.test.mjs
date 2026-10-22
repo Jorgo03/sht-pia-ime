@@ -125,3 +125,23 @@ test('encoded names and query strings resolve to the stored path; no user, nothi
   assert.deepEqual(removedMediaPaths({ before: [`${BASE}u1/my%20photo.jpg?t=1`], after: [], userId: 'u1' }), ['u1/my photo.jpg'])
   assert.deepEqual(removedMediaPaths({ before: [`${BASE}u1/a.jpg`], after: [], userId: null }), [])
 })
+
+test('price box: separators are read as people write money, never shifting the amount', async () => {
+  const { normalizeAmount } = await import('../src/features/listings/lib/listingForm.js')
+  // Decimals: one separator, one or two digits after it.
+  assert.equal(normalizeAmount('1500,50'), '1500.50')
+  assert.equal(normalizeAmount('1500.5'), '1500.5')
+  assert.equal(normalizeAmount('1500,'), '1500.', 'kept while typing')
+  // Thousands: several separators, or exactly three digits after one.
+  assert.equal(normalizeAmount('1.200.000'), '1200000')
+  assert.equal(normalizeAmount('1,200,000'), '1200000')
+  assert.equal(normalizeAmount('1.500'), '1500')
+  assert.equal(normalizeAmount('120 000'), '120000')
+  // Noise and empty input.
+  assert.equal(normalizeAmount('€ 250'), '250')
+  assert.equal(normalizeAmount('99,999'), '99999')
+  assert.equal(normalizeAmount(''), '')
+  assert.equal(normalizeAmount(null), '')
+  assert.equal(Number(normalizeAmount('1500,50')), 1500.5)
+  assert.equal(Number(normalizeAmount('1.200.000')), 1200000)
+})

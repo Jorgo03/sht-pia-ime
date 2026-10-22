@@ -163,6 +163,19 @@ export const Spacing = {
 } as const;
 
 /**
+ * A form control's box: text fields (Field) and the selects beside them
+ * (SelectField variant="form") share it, so a price field and its currency
+ * select are the same height with the same padding. 54 is the handoff's
+ * Field height (§17).
+ */
+export const Control = {
+  height: 54,
+  paddingHorizontal: 16,
+  gap: 10,
+  iconSize: 18,
+} as const;
+
+/**
  * Shadows — ShtepiaShadows from §4, used verbatim (these are already written
  * as RN shadow props in the handoff, not CSS, so no translation needed).
  */

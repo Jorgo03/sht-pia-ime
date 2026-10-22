@@ -112,3 +112,26 @@ export function removedMediaPaths({ before = [], after = [], userId, bucket = 'p
   }
   return paths
 }
+
+/**
+ * What the price box keeps as the person types: digits and at most one
+ * decimal point, read the way people write money here, so a price is never
+ * silently changed by an order of magnitude:
+ * - several separators ("1.200.000", "1,200,000") are thousands: dropped;
+ * - one separator followed by exactly 3 digits ("1.500", "1,500") is
+ *   thousands too;
+ * - one separator followed by 1-2 digits ("1500,5", "99.99") is the decimal
+ *   point, written as "."; a trailing one ("1500,") is kept while typing.
+ * Spaces and anything that is not a digit are dropped. Never converts
+ * between currencies.
+ */
+export function normalizeAmount(text) {
+  const kept = String(text ?? '').replace(/[^0-9.,]/g, '')
+  const seps = kept.match(/[.,]/g) ?? []
+  if (seps.length === 0) return kept
+  const digitsOnly = kept.replace(/[.,]/g, '')
+  if (seps.length > 1) return digitsOnly
+  const [whole, fraction] = kept.split(/[.,]/)
+  if (fraction.length === 3) return digitsOnly
+  return `${whole}.${fraction.slice(0, 2)}`
+}

@@ -3,6 +3,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useMemo, useState, type ReactNode } from 'react';
 import {
   LayoutChangeEvent,
+  Platform,
   Pressable,
   StyleSheet,
   Text,
@@ -19,7 +20,7 @@ import Animated, {
   Easing,
 } from 'react-native-reanimated';
 
-import { Fonts, Motion, Radii, type AtticoPalette } from '@/constants/theme';
+import { Control, Fonts, Motion, Radii, type AtticoPalette } from '@/constants/theme';
 import { useTheme } from '@/contexts/theme-context';
 
 /**
@@ -57,7 +58,7 @@ export function Field({
         focused && styles.fieldFocused,
         style,
       ]}>
-      <MaterialIcons name={icon} size={18} color={iconColor} />
+      <MaterialIcons name={icon} size={Control.iconSize} color={iconColor} />
       <TextInput
         {...inputProps}
         onFocus={(e) => {
@@ -165,11 +166,11 @@ export function RoleToggle<T extends string>({
 
 const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   field: {
-    minHeight: 54,
+    minHeight: Control.height,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
-    paddingHorizontal: 16,
+    gap: Control.gap,
+    paddingHorizontal: Control.paddingHorizontal,
     borderRadius: Radii.md,
     borderWidth: 1,
     borderColor: colors.border,
@@ -184,10 +185,15 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   input: {
     flex: 1,
+    // Lets the text shrink inside the box instead of pushing a trailing slot.
+    minWidth: 0,
     fontFamily: Fonts?.sans,
     fontSize: 15,
     color: colors.textPrimary,
     paddingVertical: 14,
+    // The box's orange border is the focus ring; on the web the browser's own
+    // outline drew a second rectangle inside it. No effect on native.
+    ...(Platform.OS === 'web' ? ({ outlineWidth: 0 } as object) : null),
   },
   inputOnDark: {
     color: colors.cream100,

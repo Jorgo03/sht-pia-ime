@@ -43,3 +43,4 @@ export function removedMediaPaths(args: {
   userId: string | null | undefined;
   bucket?: string;
 }): string[];
+export function normalizeAmount(text: string | null | undefined): string;

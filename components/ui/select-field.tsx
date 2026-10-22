@@ -6,9 +6,11 @@ import {
   Pressable,
   StyleSheet,
   Text,
+  type StyleProp,
+  type ViewStyle,
 } from 'react-native';
 
-import { Fonts, Radii, type AtticoPalette } from '@/constants/theme';
+import { Control, Fonts, Radii, type AtticoPalette } from '@/constants/theme';
 import { useTheme } from '@/contexts/theme-context';
 import { webColumn } from '@/constants/web-frame';
 
@@ -33,30 +35,41 @@ export function SelectField({
   icon = 'place',
   onChange,
   accessibilityLabel,
+  variant = 'filter',
+  style,
 }: {
   /** '' means "no selection" — renders `placeholder` in muted text. */
   value: string;
   options: SelectOption[];
   placeholder: string;
-  icon?: keyof typeof MaterialIcons.glyphMap;
+  /** null: no leading icon (a short value like a currency code). */
+  icon?: keyof typeof MaterialIcons.glyphMap | null;
   onChange: (value: string) => void;
   accessibilityLabel?: string;
+  /** 'filter': web's compact .filter-select. 'form': the same box as Field
+   *  (constants/theme Control), for selects that sit beside text fields. */
+  variant?: 'filter' | 'form';
+  style?: StyleProp<ViewStyle>;
 }) {
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const [open, setOpen] = useState(false);
 
   const selected = options.find((o) => o.value === value);
+  const form = variant === 'form';
 
   return (
     <>
       <Pressable
-        style={styles.field}
+        style={[styles.field, form && styles.fieldForm, style]}
         onPress={() => setOpen(true)}
         accessibilityRole="button"
-        accessibilityLabel={accessibilityLabel ?? placeholder}>
-        <MaterialIcons name={icon} size={15} color={colors.accent} />
-        <Text style={[styles.value, !selected && styles.valueMuted]} numberOfLines={1}>
+        accessibilityLabel={accessibilityLabel ?? placeholder}
+        accessibilityValue={selected ? { text: selected.label } : undefined}>
+        {icon ? (
+          <MaterialIcons name={icon} size={form ? Control.iconSize : 15} color={form ? colors.textSecondary : colors.accent} />
+        ) : null}
+        <Text style={[styles.value, form && styles.valueForm, !selected && styles.valueMuted]} numberOfLines={1}>
           {selected ? selected.label : placeholder}
         </Text>
         <MaterialIcons name="arrow-drop-down" size={20} color={colors.textFaint} />
@@ -108,11 +121,23 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     borderColor: colors.border,
     borderRadius: Radii.md,
   },
+  // Field's box: same height, side padding and gap as a text field.
+  fieldForm: {
+    minHeight: Control.height,
+    paddingVertical: 0,
+    paddingHorizontal: Control.paddingHorizontal,
+    gap: Control.gap,
+  },
   value: {
     flex: 1,
     fontFamily: Fonts?.sansSemiBold,
     fontSize: 13,
     color: colors.textPrimary,
+  },
+  // Field's text: 15 regular.
+  valueForm: {
+    fontFamily: Fonts?.sans,
+    fontSize: 15,
   },
   // Web's select shows the muted placeholder until it holds a real value
   // (`.filter-bar__field select` vs `.has-value`).
