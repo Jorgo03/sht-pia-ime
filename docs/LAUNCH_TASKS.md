@@ -116,6 +116,28 @@ after queueing. F4's code flow follows Supabase's own wait time (F4-N6, X18).
 Still BLOCKED: Google branding/verification, a sending domain for Resend, and
 device delivery checks.
 
+## Follow-up 2026-10-22: listing photos, profile photo, keyboard bar, price row
+
+See `docs/PHOTO_KEYBOARD_PRICE_REPORT.md`.
+
+- **Uploads (F12 and the listing wizard):** uploads now send the file's bytes,
+  so the buckets no longer refuse a React Native Blob as `text/plain`.
+- **Expo Go's HDR rotation crash:** avoided with the compatible picker
+  representation.
+- **Saving a listing:**
+  - a retry reuses the same id, so it cannot create a second listing;
+  - all photos upload or none do;
+  - only translated errors are shown.
+- **Profile photo:** the old one is kept until the new one is saved.
+- **"U krye":** follows the keyboard on every screen with fields.
+- **Price row:** the price field and the currency selector share one control
+  size (X24, measured).
+
+| Part | Status |
+|---|---|
+| Website build | VERIFIED (X20–X26) |
+| On a device | IMPLEMENTED—UNVERIFIED |
+
 ## What is left, by kind
 
 1. **Engineering that can be done now:** none open. Two finished pieces wait

@@ -386,3 +386,281 @@ test.describe('narrow phone layout', () => {
     });
   }
 });
+
+// The listing wizard end to end in the app's web build: two photos, then
+// publish or draft (docs/PHOTO_KEYBOARD_PRICE_REPORT.md). Storage and the
+// properties table are answered here; what the app sends is recorded.
+type StorageSent = { path: string; contentType: string; bytes: number; multipart: boolean };
+
+async function wizardBackend(page: Page, opts: { failFirstUpload?: boolean; loseFirstInsert?: boolean } = {}) {
+  const storage: StorageSent[] = [];
+  const removed: string[] = [];
+  const inserts: Record<string, unknown>[] = [];
+  const updates: Record<string, unknown>[] = [];
+  let uploadCalls = 0;
+  let insertCalls = 0;
+  // Picking a city centres the map via OpenStreetMap's geocoder.
+  await page.route(/nominatim\.openstreetmap\.org|photon\.komoot\.io/, (route) =>
+    json(route, [{ lat: '41.3275', lon: '19.8187', display_name: 'Tiranë' }]),
+  );
+  await page.route('**/storage/v1/object/**', async (route) => {
+    const req = route.request();
+    if (req.method() === 'DELETE' || (req.method() === 'POST' && req.url().endsWith('/storage/v1/object/property-images'))) {
+      try { removed.push(...((req.postDataJSON() as { prefixes?: string[] })?.prefixes ?? [])); } catch { /* none */ }
+      return route.fulfill({ status: 200, contentType: 'application/json', headers: CORS, body: '[]' });
+    }
+    if (req.method() !== 'POST') return route.fallback();
+    uploadCalls++;
+    const contentType = req.headers()['content-type'] ?? '';
+    const path = new URL(req.url()).pathname.replace('/storage/v1/object/property-images/', '');
+    storage.push({ path, contentType, bytes: req.postDataBuffer()?.length ?? 0, multipart: contentType.startsWith('multipart/') });
+    if (opts.failFirstUpload && uploadCalls === 1) {
+      return route.fulfill({ status: 400, contentType: 'application/json', headers: CORS, body: JSON.stringify({ statusCode: '415', error: 'invalid_mime_type', message: 'mime type text/plain is not supported' }) });
+    }
+    return route.fulfill({ status: 200, contentType: 'application/json', headers: CORS, body: JSON.stringify({ Key: `property-images/${path}` }) });
+  });
+  await page.route('**/rest/v1/properties*', async (route) => {
+    const req = route.request();
+    if (req.method() === 'POST') {
+      insertCalls++;
+      inserts.push(req.postDataJSON());
+      if (opts.loseFirstInsert && insertCalls === 1) return route.abort('connectionreset');
+      if (opts.loseFirstInsert && insertCalls === 2) {
+        return route.fulfill({ status: 409, contentType: 'application/json', headers: CORS, body: JSON.stringify({ code: '23505', message: 'duplicate key value violates unique constraint "properties_pkey"' }) });
+      }
+      return route.fulfill({ status: 201, headers: CORS, body: '' });
+    }
+    if (req.method() === 'PATCH') {
+      updates.push(req.postDataJSON());
+      return route.fulfill({ status: 204, headers: CORS, body: '' });
+    }
+    if (opts.loseFirstInsert && req.url().includes('id=eq.')) {
+      // The row the lost first attempt wrote.
+      const first = inserts[0] ?? {};
+      return json(route, { image_urls: first.image_urls ?? [], video_url: null });
+    }
+    return route.fallback();
+  });
+  return { storage, removed, inserts, updates };
+}
+
+const PHOTOS = ['assets/images/icon-light.png', 'assets/images/icon-dark.png'];
+// The footer button (the step dots also carry the step's name).
+const publishButton = (page: Page) => page.getByRole('button', { name: t('listing.publish') }).last();
+
+async function toPriceStep(page: Page) {
+  await page.goto('/listing/new');
+  await ready(page);
+  await page.getByPlaceholder(t('listing.titlePlaceholder')).fill('Apartament prove 2+1');
+  await page.getByPlaceholder(t('listing.descriptionPlaceholder')).fill('Rreshti i parë\nRreshti i dytë');
+  await page.getByRole('button', { name: t('listing.next') }).click();
+  await page.getByRole('button', { name: t('listing.city') }).click();
+  await page.getByRole('button', { name: 'Tiranë', exact: true }).click();
+  await page.getByRole('button', { name: t('listing.next') }).click();
+}
+
+async function fillWizard(page: Page) {
+  await toPriceStep(page);
+  const price = page.getByRole('textbox', { name: t('listing.price') });
+  await price.fill('1.200.000');
+  await expect(price).toHaveValue('1200000');
+  await page.getByPlaceholder('0').nth(1).fill('85');
+  await page.getByRole('button', { name: t('listing.next') }).click();
+  const chooser = page.waitForEvent('filechooser');
+  await page.getByRole('button', { name: t('listing.dropImages') }).click();
+  await (await chooser).setFiles(PHOTOS);
+  // The first photo is marked as the cover once both are in.
+  await expect(page.getByText(t('listing.cover'))).toBeVisible();
+  await page.getByRole('button', { name: t('listing.next') }).click();
+  await page.getByPlaceholder('+355 69...').fill('+355 69 000 0000');
+}
+
+test.describe('listing wizard', () => {
+  test.use({ signedIn: true, allowConsoleErrors: [/status of 4\d\d|ERR_CONNECTION_RESET|Failed to fetch|fetch failed/i] });
+
+  test('X20 publish with two photos: bytes reach storage as JPEG, one row with both photos in order', async ({ page }) => {
+    const backend = await wizardBackend(page);
+    await fillWizard(page);
+    await publishButton(page).click();
+    await expect(page).toHaveURL(/\/my-listings$/);
+    expect(backend.storage).toHaveLength(2);
+    for (const s of backend.storage) {
+      expect(s.contentType).toBe('image/jpeg');
+      expect(s.multipart).toBe(false);
+      expect(s.bytes).toBeGreaterThan(100);
+    }
+    expect(backend.inserts).toHaveLength(1);
+    const row = backend.inserts[0] as { id: string; status: string; price: number; currency: string; image_urls: string[] };
+    expect(row.status).toBe('active');
+    expect(row.price).toBe(1200000);
+    expect(row.currency).toBe('EUR');
+    expect(row.id).toMatch(/^[0-9a-f-]{36}$/);
+    expect(row.image_urls).toHaveLength(2);
+    backend.storage.forEach((s, i) => expect(row.image_urls[i]).toContain(s.path));
+  });
+
+  test('X21 save as draft stores a draft', async ({ page }) => {
+    const backend = await wizardBackend(page);
+    await fillWizard(page);
+    await page.getByRole('button', { name: t('listing.saveDraft') }).click();
+    await expect(page).toHaveURL(/\/my-listings$/);
+    expect(backend.inserts).toHaveLength(1);
+    expect((backend.inserts[0] as { status: string }).status).toBe('draft');
+  });
+
+  test('X22 a refused photo: a translated message, the form kept, and a retry saves one listing', async ({ page }) => {
+    const backend = await wizardBackend(page, { failFirstUpload: true });
+    await fillWizard(page);
+    await publishButton(page).click();
+    await expect(page.getByText(t('errors.imageUploadFailed'))).toBeVisible();
+    await expect(page.getByText(/Exception|renderAsync|text\/plain/)).toHaveCount(0);
+    expect(backend.inserts).toHaveLength(0);
+    // Still on the last step with the phone number typed.
+    await expect(page.getByPlaceholder('+355 69...')).toHaveValue('+355 69 000 0000');
+    await publishButton(page).click();
+    await expect(page).toHaveURL(/\/my-listings$/);
+    expect(backend.inserts).toHaveLength(1);
+    expect((backend.inserts[0] as { image_urls: string[] }).image_urls).toHaveLength(2);
+  });
+
+  test('X23 a lost reply then a retry: the same id, an update instead of a second listing', async ({ page }) => {
+    const backend = await wizardBackend(page, { loseFirstInsert: true });
+    await fillWizard(page);
+    await publishButton(page).click();
+    await expect(page.getByText(t('errors.listingSaveFailed'))).toBeVisible();
+    // Unknown outcome: the first attempt's photos are kept, not deleted.
+    expect(backend.removed).toEqual([]);
+    await publishButton(page).click();
+    await expect(page).toHaveURL(/\/my-listings$/);
+    expect(backend.inserts).toHaveLength(2);
+    const [first, second] = backend.inserts as { id: string }[];
+    expect(second.id).toBe(first.id);
+    expect(backend.updates).toHaveLength(1);
+    expect((backend.updates[0] as { status: string }).status).toBe('active');
+  });
+});
+
+// The price row: the price field and the currency selector are one control
+// size, top and bottom aligned (docs/PHOTO_KEYBOARD_PRICE_REPORT.md records
+// the numbers this prints).
+test.describe('price row', () => {
+  test.use({ signedIn: true, allowConsoleErrors: [/status of 4\d\d/i] });
+
+  for (const width of [320, 390]) {
+    for (const scheme of ['light', 'dark'] as const) {
+      test(`X24 at ${width}px, ${scheme}: price and currency share height and edges`, async ({ page, isMobile }, info) => {
+        test.skip(!isMobile, 'phone project only');
+        await page.setViewportSize({ width, height: 760 });
+        await page.emulateMedia({ colorScheme: scheme });
+        await wizardBackend(page);
+        await toPriceStep(page);
+        const input = page.getByRole('textbox', { name: t('listing.price') });
+        const currency = page.getByRole('button', { name: t('listing.currency') });
+        await expect(currency).toBeVisible();
+        const m = await input.evaluate((el, label) => {
+          // The bordered box around the input is the field itself.
+          let field = el as HTMLElement;
+          while (field.parentElement && parseFloat(getComputedStyle(field).borderTopWidth) === 0) field = field.parentElement;
+          const select = document.querySelector(`[aria-label="${label}"]`) as HTMLElement;
+          const icon = field.firstElementChild as HTMLElement;
+          const r = (e: Element) => e.getBoundingClientRect();
+          const f = r(field), c = r(select), i = r(icon), x = r(el);
+          return {
+            fieldHeight: f.height, currencyHeight: c.height,
+            topDelta: Math.abs(f.top - c.top), bottomDelta: Math.abs(f.bottom - c.bottom),
+            rowGap: c.left - f.right, currencyWidth: c.width,
+            paddingLeft: i.left - f.left, iconSize: i.width, iconToText: x.left - i.right,
+            iconCentreOffset: Math.abs((i.top + i.bottom) / 2 - (f.top + f.bottom) / 2),
+            fieldRadius: getComputedStyle(field).borderTopLeftRadius, currencyRadius: getComputedStyle(select).borderTopLeftRadius,
+            leftGutter: f.left, rightGutter: window.innerWidth - c.right,
+          };
+        }, t('listing.currency'));
+        await info.attach('price-row.json', { body: JSON.stringify(m, null, 2), contentType: 'application/json' });
+        console.info(`price-row ${width} ${scheme} ${JSON.stringify(m)}`);
+        await page.locator('body').screenshot({ path: info.outputPath(`price-row-${width}-${scheme}.png`) });
+        expect(Math.abs(m.fieldHeight - m.currencyHeight)).toBeLessThanOrEqual(0.5);
+        expect(m.fieldHeight).toBeGreaterThanOrEqual(54);
+        expect(m.topDelta).toBeLessThanOrEqual(0.5);
+        expect(m.bottomDelta).toBeLessThanOrEqual(0.5);
+        expect(m.iconCentreOffset).toBeLessThanOrEqual(1);
+        expect(m.fieldRadius).toBe(m.currencyRadius);
+        expect(Math.abs(m.leftGutter - m.rightGutter)).toBeLessThanOrEqual(0.5);
+      });
+    }
+  }
+});
+
+// Profile photo: pick, resize to JPEG, upload the bytes, point the profile at
+// it, and only then remove the old one. A refused profile update keeps the
+// old photo and removes the new file.
+test.describe('profile photo', () => {
+  test.use({ signedIn: true, allowConsoleErrors: [/status of 4\d\d|ERR_FAILED/i] });
+
+  const OLD = `https://e2e.supabase.co/storage/v1/object/public/avatars/${SIGNED_IN_USER.id}/avatar-1.jpg`;
+
+  async function avatarBackend(page: Page, opts: { refuseUpdate?: boolean } = {}) {
+    const uploads: StorageSent[] = [];
+    const removed: string[] = [];
+    const updates: Record<string, unknown>[] = [];
+    await page.route('**/storage/v1/object/**', async (route) => {
+      const req = route.request();
+      const url = new URL(req.url());
+      if (req.method() === 'DELETE' || (req.method() === 'POST' && url.pathname.endsWith('/storage/v1/object/avatars'))) {
+        try { removed.push(...((req.postDataJSON() as { prefixes?: string[] })?.prefixes ?? [])); } catch { /* none */ }
+        return route.fulfill({ status: 200, contentType: 'application/json', headers: CORS, body: '[]' });
+      }
+      if (req.method() !== 'POST') return route.fallback();
+      const contentType = req.headers()['content-type'] ?? '';
+      const path = url.pathname.replace('/storage/v1/object/avatars/', '');
+      uploads.push({ path, contentType, bytes: req.postDataBuffer()?.length ?? 0, multipart: contentType.startsWith('multipart/') });
+      return route.fulfill({ status: 200, contentType: 'application/json', headers: CORS, body: JSON.stringify({ Key: `avatars/${path}` }) });
+    });
+    await page.route('**/rest/v1/profiles*', async (route) => {
+      const req = route.request();
+      if (req.method() === 'PATCH') {
+        updates.push(req.postDataJSON());
+        if (opts.refuseUpdate) {
+          return route.fulfill({ status: 403, contentType: 'application/json', headers: CORS, body: JSON.stringify({ code: '42501', message: 'new row violates row-level security policy' }) });
+        }
+        return route.fulfill({ status: 204, headers: CORS, body: '' });
+      }
+      const row = { ...LISTINGS[0].agent, id: SIGNED_IN_USER.id, role: 'agent', avatar_url: OLD };
+      const single = (req.headers()['accept'] ?? '').includes('vnd.pgrst.object');
+      return json(route, single ? row : [row]);
+    });
+    return { uploads, removed, updates };
+  }
+
+  async function changePhoto(page: Page) {
+    await page.goto('/profile');
+    await ready(page);
+    await page.getByRole('button', { name: t('profile.edit.title') }).first().click();
+    const chooser = page.waitForEvent('filechooser');
+    await page.getByRole('button', { name: t('profile.edit.changePhoto') }).click();
+    await (await chooser).setFiles(PHOTOS[0]);
+  }
+
+  test('X25 replacing the photo uploads a JPEG, updates the profile, then removes the old file', async ({ page }) => {
+    const backend = await avatarBackend(page);
+    await changePhoto(page);
+    await expect.poll(() => backend.removed.length).toBe(1);
+    expect(backend.uploads).toHaveLength(1);
+    const [up] = backend.uploads;
+    expect(up.path).toMatch(new RegExp(`^${SIGNED_IN_USER.id}/avatar-\\d+\\.jpg$`));
+    expect(up.contentType).toBe('image/jpeg');
+    expect(up.multipart).toBe(false);
+    expect(up.bytes).toBeGreaterThan(100);
+    expect(backend.updates).toEqual([{ avatar_url: expect.stringContaining(up.path) }]);
+    expect(backend.removed).toEqual([`${SIGNED_IN_USER.id}/avatar-1.jpg`]);
+    await expect(page.getByText(t('profile.edit.photoFailed'))).toHaveCount(0);
+  });
+
+  test('X26 a refused profile update: a translated message, the old photo kept, the new file removed', async ({ page }) => {
+    const backend = await avatarBackend(page, { refuseUpdate: true });
+    await changePhoto(page);
+    await expect(page.getByText(t('profile.edit.photoFailed'))).toBeVisible();
+    expect(backend.uploads).toHaveLength(1);
+    expect(backend.removed).toEqual([backend.uploads[0].path]);
+    expect(backend.removed).not.toContain(`${SIGNED_IN_USER.id}/avatar-1.jpg`);
+  });
+});
