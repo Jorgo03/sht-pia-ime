@@ -10,13 +10,7 @@ export const privacy = {
   ],
   sections: [
     {
-      h: '1. Kush jemi',
-      p: [
-        'Shtëpia.ime operohet nga Future Home Orange ("FHO", "ne"), shoqëri e regjistruar në Republikën e Shqipërisë. FHO është kontrollues i të dhënave personale të përshkruara këtu, sipas Ligjit nr. 124/2024 "Për mbrojtjen e të dhënave personale" dhe, për përdoruesit në Bashkimin Evropian, sipas Rregullores së Përgjithshme për Mbrojtjen e të Dhënave (GDPR).',
-      ],
-    },
-    {
-      h: '2. Çfarë mbledhim',
+      h: '1. Çfarë mbledhim',
       ul: [
         'Llogaria: adresa juaj e email-it dhe fjalëkalimi (i ruajtur nga ofruesi ynë i hyrjes vetëm në formë të koduar e të sigurt), ose, nëse hyni me Google ose Apple, emri, email-i dhe fotoja e profilit që ata ndajnë me ne.',
         'Profili: emri, roli (klient ose agjent), emri i agjencisë, numri i telefonit, fotoja e profilit dhe gjuha e preferuar, për aq sa i jepni.',
@@ -29,7 +23,7 @@ export const privacy = {
       ],
     },
     {
-      h: '3. Si i përdorim',
+      h: '2. Si i përdorim',
       ul: [
         'Për të ofruar shërbimin: krijimin e llogarisë, publikimin dhe shfaqjen e shpalljeve, lidhjen e blerësve dhe qiramarrësve me pronarët dhe agjentët, dhe dërgimin e mesazheve e kërkesave për vizitë.',
         'Për të përkthyer automatikisht shpalljet në gjuhët e aplikacionit dhe, kur e kërkoni ju, për t\'ju ndihmuar të shkruani një shpallje ose për të kuptuar një kërkim të shkruar me fjalë të thjeshta.',
@@ -40,19 +34,19 @@ export const privacy = {
       p: ['Ne nuk i shesim të dhënat tuaja personale dhe nuk i përdorim për reklama të palëve të treta.'],
     },
     {
-      h: '4. Bazat ligjore',
+      h: '3. Bazat ligjore',
       p: [
         'I përpunojmë të dhënat tuaja për të zbatuar kontratën me ju (ofrimin e shërbimit), për interesat tona të ligjshme (sigurinë dhe përmirësimin e shërbimit), me pëlqimin tuaj kur jua kërkojmë (për shembull vendndodhjen në hartë), dhe për të respektuar ligjin.',
       ],
     },
     {
-      h: '5. Çfarë shohin të tjerët',
+      h: '4. Çfarë shohin të tjerët',
       p: [
         'Shpalljet janë publike: kushdo mund të shohë të dhënat, fotot, vendndodhjen dhe kontaktet që keni zgjedhur të shfaqen në to. Profilet e agjentëve (emri, agjencia, telefoni dhe fotoja) janë publike. Mesazhet i shohin vetëm personat që marrin pjesë në bisedë.',
       ],
     },
     {
-      h: '6. Me kë i ndajmë',
+      h: '5. Me kë i ndajmë',
       p: ['Përdorim ofruesit e mëposhtëm të shërbimeve, që i përpunojnë të dhënat në emrin tonë dhe vetëm për këto qëllime:'],
       ul: [
         'Supabase: baza e të dhënave, hyrja në llogari dhe ruajtja e skedarëve. Të dhënat ruhen në Bashkimin Evropian (Frankfurt, Gjermani).',
@@ -69,7 +63,7 @@ export const privacy = {
       ],
     },
     {
-      h: '7. Sa kohë i ruajmë',
+      h: '6. Sa kohë i ruajmë',
       ul: [
         'Llogaria, profili, shpalljet, të preferuarat, kërkimet dhe mesazhet: për aq kohë sa ekziston llogaria juaj.',
         'Statistikat e shpalljeve: deri në 400 ditë.',
@@ -78,33 +72,33 @@ export const privacy = {
       ],
     },
     {
-      h: '8. Fshirja e llogarisë',
+      h: '7. Fshirja e llogarisë',
       p: [
         'Mund ta fshini llogarinë në çdo kohë në aplikacion, te Profili → Fshi llogarinë. Kjo fshin përgjithmonë profilin tuaj, shpalljet që zotëroni dhe fotot e tyre, të preferuarat, kërkimet e ruajtura, kërkesat "kërkoj shtëpi", kërkesat për vizitë dhe mesazhet.',
       ],
     },
     {
-      h: '9. Të drejtat tuaja',
+      h: '8. Të drejtat tuaja',
       p: [
         'Keni të drejtë të aksesoni të dhënat tuaja, t\'i korrigjoni, t\'i fshini, të kufizoni ose të kundërshtoni përpunimin e tyre, t\'i merrni në një format të transferueshëm dhe të tërhiqni çdo pëlqim që keni dhënë. Shumë prej tyre mund t\'i bëni vetë në aplikacion. Mund të ankoheni edhe te Komisioneri për të Drejtën e Informimit dhe Mbrojtjen e të Dhënave Personale (idp.al), ose tek autoriteti i mbrojtjes së të dhënave i vendit tuaj në BE.',
       ],
     },
     {
-      h: '10. Fëmijët',
+      h: '9. Fëmijët',
       p: ['Shtëpia.ime është menduar për të rriturit. Duhet të jeni të paktën 18 vjeç për të krijuar llogari.'],
     },
     {
-      h: '11. Siguria',
+      h: '10. Siguria',
       p: [
         'Të dhënat kodohen gjatë transmetimit, aksesi në to kufizohet me rregulla sipas rolit në bazën e të dhënave, dhe fjalëkalimet nuk ruhen kurrë në formë të lexueshme. Asnjë sistem nuk është plotësisht i sigurt, prandaj përdorni një fjalëkalim të fortë dhe unik.',
       ],
     },
     {
-      h: '12. Ndryshimet e kësaj politike',
+      h: '11. Ndryshimet e kësaj politike',
       p: ['Nëse e ndryshojmë këtë politikë, do të përditësojmë datën në krye dhe, për ndryshimet e rëndësishme, do t\'jua njoftojmë në aplikacion.'],
     },
     {
-      h: '13. Kontakti',
+      h: '12. Kontakti',
       contact: true,
     },
   ],

@@ -12,13 +12,7 @@ export const privacy = {
   ],
   sections: [
     {
-      h: '1. Who we are',
-      p: [
-        'Shtëpia.ime is operated by Future Home Orange ("FHO", "we", "us"), a company registered in the Republic of Albania. FHO is the controller of the personal data described here, under Albanian Law No. 124/2024 "On Personal Data Protection" and, for users in the European Union, the General Data Protection Regulation (GDPR).',
-      ],
-    },
-    {
-      h: '2. What we collect',
+      h: '1. What we collect',
       ul: [
         'Account: your email address and password (stored by our authentication provider only as a secure hash), or, if you sign in with Google or Apple, the name, email and profile picture they share with us.',
         'Profile: your name, role (client or agent), agency name, phone number, profile photo and preferred language, as far as you provide them.',
@@ -31,7 +25,7 @@ export const privacy = {
       ],
     },
     {
-      h: '3. How we use it',
+      h: '2. How we use it',
       ul: [
         'To run the service: create your account, publish and show listings, connect buyers and renters with owners and agents, and deliver messages and viewing requests.',
         'To translate listings automatically into the app\'s languages and, if you ask, to help write a listing or understand a search typed in plain words.',
@@ -42,19 +36,19 @@ export const privacy = {
       p: ['We do not sell your personal data and we do not use it for third-party advertising.'],
     },
     {
-      h: '4. Legal bases',
+      h: '3. Legal bases',
       p: [
         'We process your data to perform our contract with you (providing the service), for our legitimate interests (keeping the service secure and improving it), with your consent where we ask for it (for example your location on the map), and to comply with the law.',
       ],
     },
     {
-      h: '5. What other people can see',
+      h: '4. What other people can see',
       p: [
         'Listings are public: anyone can see a listing\'s details, photos, location and the contact details you chose to show on it. Agent profiles (name, agency, phone and photo) are public. Messages are visible only to the people in the conversation.',
       ],
     },
     {
-      h: '6. Who we share it with',
+      h: '5. Who we share it with',
       p: ['We use the following service providers, who process data on our behalf and only for these purposes:'],
       ul: [
         'Supabase: database, sign-in and file storage. Data is stored in the European Union (Frankfurt, Germany).',
@@ -71,7 +65,7 @@ export const privacy = {
       ],
     },
     {
-      h: '7. How long we keep it',
+      h: '6. How long we keep it',
       ul: [
         'Account, profile, listings, favourites, searches and messages: as long as your account exists.',
         'Listing statistics: up to 400 days.',
@@ -80,33 +74,33 @@ export const privacy = {
       ],
     },
     {
-      h: '8. Deleting your account',
+      h: '7. Deleting your account',
       p: [
         'You can delete your account at any time in the app under Profile → Delete account. This permanently deletes your profile, the listings you own and their photos, your favourites, saved searches, wanted-home requests, viewing requests and messages.',
       ],
     },
     {
-      h: '9. Your rights',
+      h: '8. Your rights',
       p: [
         'You have the right to access your data, correct it, delete it, restrict or object to its processing, receive it in a portable format, and withdraw any consent you gave. Much of this you can do yourself in the app. You can also complain to the Information and Data Protection Commissioner of Albania (idp.al), or to the data protection authority of your EU country.',
       ],
     },
     {
-      h: '10. Children',
+      h: '9. Children',
       p: ['Shtëpia.ime is meant for adults. You must be at least 18 to create an account.'],
     },
     {
-      h: '11. Security',
+      h: '10. Security',
       p: [
         'Data is encrypted in transit, access to it is limited by role-based rules in the database, and passwords are never stored in readable form. No system is perfectly secure, so please use a strong, unique password.',
       ],
     },
     {
-      h: '12. Changes to this policy',
+      h: '11. Changes to this policy',
       p: ['If we change this policy, we will update the date at the top and, for significant changes, tell you in the app.'],
     },
     {
-      h: '13. Contact',
+      h: '12. Contact',
       contact: true,
     },
   ],
