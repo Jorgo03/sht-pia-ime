@@ -188,6 +188,11 @@ Këtu aplikacioni bëhet aplikacion i vërtetë dhe nuk ka më nevojë për Expo
   - fshirja e llogarisë.
 - [ ] **5.5 Rregulloj çdo gabim** që del dhe bëj build të ri. Përsërisim derisa lista të jetë e
   pastër.
+- [ ] **5.5b Ngarkimi i parë në Google Play bëhet me dorë.**
+  - Google nuk lejon që EAS ta ngarkojë vetë aplikacionin e parë.
+  - Unë të jap skedarin `.aab` nga build-i, ti e ngarkon te Play Console → Testing → Closed
+    testing → Create release.
+  - Nga versioni i dytë e ngarkoj unë me `eas submit`.
 - [ ] **5.6 Nis testin e mbyllur me 12 testues për 14 ditë** (detyrim për llogarinë tënde
   personale).
   - Unë të them saktë ku klikohet te Play Console → Testing → Closed testing.
@@ -343,3 +348,56 @@ para se të paguash**. Nuk i kam verifikuar dhe nuk dua të të jap shifra të g
 Nuk blej asgjë, nuk pranoj kushte në emrin tënd, nuk shoh fjalëkalime ose karta, dhe nuk shtyp
 "publiko" në dyqane. Këto i bën ti, ndërsa unë të them saktë çfarë të klikosh dhe kontrolloj
 rezultatin.
+
+---
+
+## Shtojca A: Mesazhi për 12 testuesit (kopjoje dhe dërgoje)
+
+> Përshëndetje! Po nxjerr aplikacionin tim **Shtëpia.ime**, për shtëpi në shitje dhe me qira në
+> Shqipëri. Google kërkon që 12 persona ta provojnë 14 ditë para se të dalë në Play Store. A më
+> ndihmon?
+>
+> 1. Më dërgo adresën Gmail që përdor në telefonin Android.
+> 2. Kur të vijë lidhja nga unë, hape në telefon, shtyp **"Become a tester"** dhe instalo
+>    aplikacionin nga Play Store.
+> 3. **Mos e çinstalo për 14 ditë.** Hape herë pas here dhe më shkruaj nëse diçka nuk punon.
+>
+> Faleminderit!
+
+Shënime:
+
+- Llogaritet vetëm kush shtyp "Become a tester", jo kush merr ftesën. Fto 15–16 veta, që të kesh
+  rezervë.
+- Adresat i fut ti te Play Console → Testing → Closed testing → Testers. **Mos m'i dërgo në
+  chat.**
+
+## Shtojca B: Testi i mbyllur te Play Console (pasi të kemi build-in e parë)
+
+1. Play Console → **Create app**.
+   - Emri: `Shtëpia.ime`.
+   - Gjuha kryesore: shqip.
+   - App, Free.
+   - Prano deklaratat.
+2. **Testing → Closed testing → Create track.**
+   - Emri: p.sh. `testuesit`.
+3. **Testers:**
+   - krijo një listë email-esh dhe fut adresat;
+   - kopjo **lidhjen e ftesës** ("Join on Android") dhe dërgoja testuesve.
+4. **Create release:**
+   - ngarko `.aab`-në që të jap unë;
+   - shënimet e versionit (unë t'i shkruaj);
+   - **Review release → Start rollout**.
+5. Plotëso **App content**. Përgjigjet e gatshme janë te `docs/STORE_LISTING_DRAFTS.md`:
+   - privacy policy;
+   - app access;
+   - ads: jo;
+   - content rating;
+   - target audience;
+   - data safety.
+
+   Mund ta bëjmë bashkë, ekran pas ekrani.
+6. Numëro: Play Console → Closed testing tregon sa testues kanë pranuar.
+   - **Dita 1 e 14-ës nis kur të jenë 12 të pranuar.**
+7. Pas 14 ditësh: **Apply for production**. Google bën disa pyetje për testin, dhe përgjigjet i
+   përgatisim bashkë.
+
