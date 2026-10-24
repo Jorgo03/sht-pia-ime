@@ -138,8 +138,11 @@ one passes.
 ### Status
 
 - Saving logic and uploads in the website build: VERIFIED.
-- On an iPhone in Expo Go (HDR photos, a real upload to Supabase):
-  IMPLEMENTED—UNVERIFIED. There is no device or simulator here, and this sandbox
+- On an iPhone in Expo Go: VERIFIED by the owner (2026-10-24, after the SDK
+  58 upgrade). A listing published with photos, and the owner reported the
+  changes work as requested. Still unchecked on a device: saving a draft and
+  Android.
+- Earlier, before the owner's check: IMPLEMENTED—UNVERIFIED. There is no device or simulator here, and this sandbox
   cannot reach `supabase.co`.
 - A store or development build includes manipulator 57.0.21, which fixes the
   HDR case even without the picker option.
@@ -180,7 +183,7 @@ The app showed "Fotoja nuk u ruajt. Provo përsëri."
 ### Status
 
 - Website build: VERIFIED.
-- On a phone: IMPLEMENTED—UNVERIFIED.
+- On a phone: VERIFIED by the owner on iPhone (2026-10-24): the photo is replaced. Android not yet tried.
 
 ## 4. "U krye" keyboard bar
 

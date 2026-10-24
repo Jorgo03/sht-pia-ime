@@ -68,7 +68,7 @@ duhen adresat e tyre Gmail për listën e testuesve. Ato i fut ti në Play Conso
 
 Çfarë provon në telefon:
 
-- [ ] **1.1 Hap aplikacionin në Expo Go.**
+- [x] **1.1 Hap aplikacionin në Expo Go.** U krye 2026-10-24, pas ngritjes në SDK 58.
   - Në kompjuterin tënd, te dosja e projektit:
 
     ```
@@ -82,10 +82,10 @@ duhen adresat e tyre Gmail për listën e testuesve. Ato i fut ti në Play Conso
     - Ose përdor `npm run expo:tunnel:qr`.
     - Ose lidhe kompjuterin me hotspot-in e telefonit.
   - Unë nuk mund ta nis serverin nga këtu: ambienti im në cloud nuk arrin dot telefonin tënd.
-- [ ] **1.2 Listim i ri me 2 foto të reja nga kamera e iPhone-it.**
+- [x] **1.2 Listim i ri me 2 foto të reja nga kamera e iPhone-it.** U krye: publikimi punon.
   - Hapat: Publiko → shfaqet te "Listimet e mia" → hape → ndrysho çmimin → ruaj.
 - [ ] **1.3 Ruaj një draft**, mbyll aplikacionin, rihape. Drafti duhet të jetë aty.
-- [ ] **1.4 Fotoja e profilit:** vendose, pastaj zëvendësoje me një tjetër.
+- [x] **1.4 Fotoja e profilit:** vendose, pastaj zëvendësoje me një tjetër. U krye: fotoja ndryshon.
 - [ ] **1.5 "U krye":** duhet të dalë te përshkrimi (shumë rreshta), te çmimi (numra) dhe te
   mesazhet.
   - Shtypja e butonit mbyll tastierën dhe teksti mbetet.

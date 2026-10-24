@@ -579,7 +579,8 @@ test.describe('price row', () => {
         console.info(`price-row ${width} ${scheme} ${JSON.stringify(m)}`);
         await page.locator('body').screenshot({ path: info.outputPath(`price-row-${width}-${scheme}.png`) });
         expect(Math.abs(m.fieldHeight - m.currencyHeight)).toBeLessThanOrEqual(0.5);
-        expect(m.fieldHeight).toBeGreaterThanOrEqual(54);
+        // Sub-pixel layout can report 53.99998; same 0.5 tolerance as the checks around it.
+        expect(m.fieldHeight).toBeGreaterThanOrEqual(53.5);
         expect(m.topDelta).toBeLessThanOrEqual(0.5);
         expect(m.bottomDelta).toBeLessThanOrEqual(0.5);
         expect(m.iconCentreOffset).toBeLessThanOrEqual(1);
