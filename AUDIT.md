@@ -43,6 +43,20 @@ only the newest Expo Go, so the project had to move.
   documented in expo-router's `ServerDocument.d.ts`. Native builds never use
   this file.
 
+- **The app did not open in Expo Go on Android.** The owner's Samsung A23
+  reported `Cannot find native module 'ExpoTopicSubscriptionModule'`, followed
+  by "missing the required default export" for every route and
+  `Cannot read property 'ErrorBoundary' of undefined`.
+  - **Cause:** importing `expo-notifications` loads its topic-subscription
+    module. Expo Go on Android has none of expo-notifications' native modules
+    (removed in SDK 53), so the import threw. `lib/push.ts` is imported by the
+    auth context, so the root layout and every route failed with it.
+  - **Fix:** `lib/notifications-module.ts` requires the package only outside
+    Expo Go on Android (`null` there). `lib/push.ts` and
+    `components/push-bridge.tsx` check for it, and keep type-only imports.
+  - **What changes:** push was already unsupported in Expo Go on Android;
+    store and development builds load the package as before.
+
 **Not changed**
 
 - `Gesture.Pan()` (bottom-sheet, filter-sheet) still works on gesture-handler 3

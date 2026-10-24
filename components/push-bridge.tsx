@@ -1,9 +1,10 @@
-import * as Notifications from 'expo-notifications';
+import type { NotificationResponse } from 'expo-notifications';
 import { useRouter, type Href } from 'expo-router';
 import { useEffect, useRef } from 'react';
 import { Platform } from 'react-native';
 
 import { useAuth } from '@/contexts/auth-context';
+import { Notifications } from '@/lib/notifications-module';
 import { refreshPushRegistration, routeFromNotification } from '@/lib/push';
 
 /**
@@ -23,8 +24,9 @@ export function PushBridge() {
   }, [user]);
 
   useEffect(() => {
-    if (Platform.OS === 'web') return;
-    const open = (response: Notifications.NotificationResponse | null) => {
+    // Not in Expo Go on Android, where the package is not available.
+    if (Platform.OS === 'web' || !Notifications) return;
+    const open = (response: NotificationResponse | null) => {
       const route = routeFromNotification(response);
       if (route) router.push(route as Href);
     };

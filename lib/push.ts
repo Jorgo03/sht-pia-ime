@@ -9,10 +9,11 @@
 // and a token needs the EAS project id (app.json extra.eas.projectId). Real
 // delivery needs a development or production build with push credentials.
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Constants, { ExecutionEnvironment } from 'expo-constants';
-import * as Notifications from 'expo-notifications';
+import Constants from 'expo-constants';
+import type { NotificationResponse } from 'expo-notifications';
 import { Platform } from 'react-native';
 
+import { isExpoGoAndroid, Notifications } from '@/lib/notifications-module';
 import { supabase } from '@/lib/supabase';
 import type { DevicePermission } from '@/src/features/notifications/lib/deviceState';
 
@@ -27,7 +28,7 @@ function projectId(): string | null {
 
 /** Show pushes that arrive while the app is open, quietly. */
 export function configureForegroundNotifications() {
-  if (Platform.OS === 'web') return;
+  if (Platform.OS === 'web' || !Notifications) return;
   Notifications.setNotificationHandler({
     handleNotification: async () => ({
       shouldShowBanner: true,
@@ -46,7 +47,7 @@ export function configureForegroundNotifications() {
  */
 export function remotePushSupported(): boolean {
   if (Platform.OS === 'web') return false;
-  if (Platform.OS === 'android' && Constants.executionEnvironment === ExecutionEnvironment.StoreClient) return false;
+  if (isExpoGoAndroid) return false;
   return projectId() !== null;
 }
 
@@ -55,7 +56,7 @@ export function remotePushSupported(): boolean {
  * (quiet) authorisation counts as granted. Never asks.
  */
 export async function readPermission(): Promise<DevicePermission | null> {
-  if (Platform.OS === 'web') return null;
+  if (Platform.OS === 'web' || !Notifications) return null;
   try {
     const p = await Notifications.getPermissionsAsync();
     const iosStatus = p.ios?.status;
@@ -70,7 +71,7 @@ export async function readPermission(): Promise<DevicePermission | null> {
 
 /** Shows the OS prompt (from a button press only) and returns the result. */
 export async function requestPermission(): Promise<DevicePermission | null> {
-  if (Platform.OS === 'web') return null;
+  if (Platform.OS === 'web' || !Notifications) return null;
   if (Platform.OS === 'android') {
     // Android 13+ shows the prompt only once a channel exists.
     await Notifications.setNotificationChannelAsync('default', {
@@ -94,6 +95,7 @@ export async function registerDevice(): Promise<'registered' | 'failed'> {
 async function registerToken(): Promise<PushStatus> {
   const id = projectId();
   if (!id) return 'unavailable';
+  if (!Notifications) return 'unsupported';
   try {
     const { data: token } = await Notifications.getExpoPushTokenAsync({ projectId: id });
     const { error } = await supabase.rpc('register_push_token', {
@@ -115,7 +117,7 @@ async function registerToken(): Promise<PushStatus> {
  * Never asks for permission.
  */
 export async function refreshPushRegistration(): Promise<void> {
-  if (Platform.OS === 'web') return;
+  if (Platform.OS === 'web' || !Notifications) return;
   const { status } = await Notifications.getPermissionsAsync().catch(() => ({ status: 'undetermined' as const }));
   if (status === 'granted') await registerToken();
 }
@@ -135,7 +137,7 @@ export async function forgetDevice(): Promise<void> {
  * The in-app route a tapped notification asks for, if it is one the app knows.
  * Mirrors safeRoute() in supabase/functions/push-dispatch/logic.js.
  */
-export function routeFromNotification(response: Notifications.NotificationResponse | null): string | null {
+export function routeFromNotification(response: NotificationResponse | null): string | null {
   const url = response?.notification.request.content.data?.url;
   return typeof url === 'string' && /^\/(messages\/[0-9a-f-]{36}|viewings)$/.test(url) ? url : null;
 }
