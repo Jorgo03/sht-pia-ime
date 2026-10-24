@@ -401,3 +401,16 @@ Shënime:
 7. Pas 14 ditësh: **Apply for production**. Google bën disa pyetje për testin, dhe përgjigjet i
    përgatisim bashkë.
 
+## Shtojca C: Shënimet e versionit për testin e mbyllur (kopjoji te "Release notes")
+
+Google i kërkon këto shënime brenda etiketave të gjuhës. Kopjo të dy bllokat:
+
+```
+<sq-AL>
+Versioni i parë për testim. Kërko shtëpi në shitje dhe me qira në të gjithë Shqipërinë, ruaj të preferuarat, shkruaji agjentit dhe cakto vizita. Agjentët mund të publikojnë listime me foto. Na shkruaj nëse diçka nuk punon.
+</sq-AL>
+<en-US>
+First test version. Search homes for sale and rent across Albania, save favourites, message agents and book viewings. Agents can publish listings with photos. Tell us if anything does not work.
+</en-US>
+```
+
