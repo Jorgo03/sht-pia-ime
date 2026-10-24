@@ -47,7 +47,7 @@ export function configureForegroundNotifications() {
  */
 export function remotePushSupported(): boolean {
   if (Platform.OS === 'web') return false;
-  if (isExpoGoAndroid) return false;
+  if (isExpoGoAndroid || !Notifications) return false;
   return projectId() !== null;
 }
 

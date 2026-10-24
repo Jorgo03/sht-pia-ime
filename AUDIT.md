@@ -56,6 +56,16 @@ only the newest Expo Go, so the project had to move.
     `components/push-bridge.tsx` check for it, and keep type-only imports.
   - **What changes:** push was already unsupported in Expo Go on Android;
     store and development builds load the package as before.
+  - **First attempt was not enough (901e75f).** It detected Expo Go with
+    `Constants.executionEnvironment`, which did not report Expo Go on the
+    owner's Samsung, so the package still loaded and threw. The loader
+    (`src/features/notifications/lib/loadNotifications.js`, unit-tested) now
+    has three guards, any one of which prevents the crash:
+    1. `isRunningInExpoGo()` on Android (the check expo-notifications itself
+       uses);
+    2. `ExpoTopicSubscriptionModule` missing on Android, the exact module that
+       threw;
+    3. a try/catch around the load.
 
 **Not changed**
 
