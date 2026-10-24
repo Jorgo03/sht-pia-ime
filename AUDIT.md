@@ -66,6 +66,8 @@ only the newest Expo Go, so the project had to move.
     2. `ExpoTopicSubscriptionModule` missing on Android, the exact module that
        threw;
     3. a try/catch around the load.
+  - **Verified by the owner on 2026-10-24:** the app opens on the Samsung A23
+    in Expo Go (SDK 58).
 
 **Not changed**
 

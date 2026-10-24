@@ -91,8 +91,10 @@ duhen adresat e tyre Gmail për listën e testuesve. Ato i fut ti në Play Conso
   - Shtypja e butonit mbyll tastierën dhe teksti mbetet.
 - [ ] **1.6 E njëjta provë në Android**, nëse ke një telefon Android.
   - 2026-10-24, Samsung A23: aplikacioni nuk hapej (`ExpoTopicSubscriptionModule`).
-    Rregullimi i parë (901e75f) nuk mjaftoi, sepse gabimi u përsërit. I dyti ka
-    tre mbrojtje; pret provën e re në telefon.
+    Rregullimi i parë (901e75f) nuk mjaftoi, sepse gabimi u përsërit. I dyti
+    (8af3e63) ka tre mbrojtje, dhe **aplikacioni hapet në Samsung A23**
+    (2026-10-24). Mbetet të provohen në Android listimi, drafti, fotoja e
+    profilit dhe "U krye".
 
 **Gati kur:** asnjë mesazh gabimi. Nëse del ndonjë, më dërgo një screenshot, pa numra telefoni
 ose të dhëna personale, dhe e rregulloj.
