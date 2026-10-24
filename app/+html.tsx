@@ -1,4 +1,4 @@
-import { ScrollViewStyleReset } from 'expo-router/html';
+import { ScrollViewStyleReset, useServerDocumentContext } from 'expo-router/html';
 import type { PropsWithChildren } from 'react';
 
 // The HTML around every page of the website (the app's web build). Web only:
@@ -8,6 +8,11 @@ import type { PropsWithChildren } from 'react';
 // - lang, theme colour, icons and the site-wide link-preview tags (each page
 //   then sets its own title and description; see components/web/page-head);
 // - the mobile OAuth relay below, which must run before the app's script.
+//
+// Since SDK 58 the renderer hands the app's scripts, styles and page-level
+// head tags to this component (useServerDocumentContext) instead of pasting
+// them into the HTML afterwards. Leaving out headNodes/bodyNodes ships a page
+// with no app script: it renders but never starts.
 
 // Mobile OAuth relay (same rules as the Vite site's index.html and
 // AuthCallback.jsx). Expo Go's exp:// callback cannot be allow-listed in
@@ -48,8 +53,9 @@ body { background-color: #f1ede6; overscroll-behavior-y: none; }
 const SITE_URL = (process.env.EXPO_PUBLIC_SITE_URL ?? '').trim().replace(/\/+$/, '');
 
 export default function Root({ children }: PropsWithChildren) {
+  const { htmlAttributes, headNodes, bodyAttributes, bodyNodes } = useServerDocumentContext();
   return (
-    <html lang="sq">
+    <html lang="sq" {...htmlAttributes}>
       <head>
         <meta charSet="utf-8" />
         <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
@@ -71,8 +77,12 @@ export default function Root({ children }: PropsWithChildren) {
         <script dangerouslySetInnerHTML={{ __html: OAUTH_RELAY }} />
         <ScrollViewStyleReset />
         <style dangerouslySetInnerHTML={{ __html: BASE_CSS }} />
+        {headNodes}
       </head>
-      <body>{children}</body>
+      <body {...bodyAttributes}>
+        {children}
+        {bodyNodes}
+      </body>
     </html>
   );
 }

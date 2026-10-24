@@ -4,8 +4,8 @@ import {
   StyleSheet,
   TextInput,
   View,
-  type NativeSyntheticEvent,
-  type TextInputKeyPressEventData,
+  type TextInputInstance,
+  type TextInputKeyPressEvent,
 } from 'react-native';
 
 import { Fonts, Radii, type AtticoPalette } from '@/constants/theme';
@@ -45,7 +45,7 @@ export function OtpInput({
   const { t } = useTranslation();
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
-  const refs = useRef<(TextInput | null)[]>([]);
+  const refs = useRef<(TextInputInstance | null)[]>([]);
 
   const digits = Array.from({ length: OTP_LENGTH }, (_, i) => value[i] ?? '');
 
@@ -78,7 +78,7 @@ export function OtpInput({
 
   const handleKeyPress = (
     index: number,
-    e: NativeSyntheticEvent<TextInputKeyPressEventData>,
+    e: TextInputKeyPressEvent,
   ) => {
     if (e.nativeEvent.key !== 'Backspace') return;
     if (digits[index]) {

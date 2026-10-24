@@ -1,5 +1,71 @@
 # Pre-Launch Audit — Shtëpia.ime (Vite web app)
 
+## ═══ PASS 18 — 2026-10-24: EXPO SDK 57 → 58 ═══
+
+**Trigger:** the owner's iPhone showed "Project is incompatible with this
+version of Expo Go" (Expo Go for SDK 58.0.0, project on SDK 57). iOS installs
+only the newest Expo Go, so the project had to move.
+
+**What changed**
+
+- expo 57.0.31 → ~58.0.19 (npm `latest`).
+- Every native module was aligned offline (`EXPO_OFFLINE=1 npx expo install
+  --fix`, from `expo/bundledNativeModules.json`). Key versions:
+  - react-native 0.86.3 → 0.88.0;
+  - react / react-dom 19.2.3 → 19.3.0;
+  - reanimated 4.5.1 → 4.7.1, worklets 0.10.1 → 0.13.0;
+  - gesture-handler 2.32 → 3.3;
+  - screens, safe-area-context, maps, svg, react-native-web and every
+    expo-* module to its 58 line.
+- eslint-config-expo → 58.
+- expo-router → ~58.0.26, by hand (it is excluded from `--fix`).
+- app.json is unchanged.
+
+**Breaking changes fixed (13 tsc errors, 5 files)**
+
+- **RN 0.88 host components are function components**, so `useRef<View>` no
+  longer names the instance. Now:
+  - `HostInstance` in keyboard-done-bar;
+  - `ScrollViewInstance` in listing-assistant;
+  - `TextInputInstance` and `TextInputKeyPressEvent` in otp-input.
+- **expo-router 58's `BottomTabBarProps`** replaced `navigation` with `emitter`
+  and `navigateToTab(routeKey)`. `LiquidTabBar` now emits `tabPress` and
+  navigates by route key, the same way expo-router's own `BottomTabBar` does.
+- **`FlatList.ListFooterComponent`** no longer accepts `null` (explore.tsx
+  passes `undefined`).
+- **The website built from the app shipped with no app script.** In SDK 58
+  the export renders pages with a streaming renderer. That renderer hands the
+  scripts, styles and head tags to the custom `app/+html.tsx` through
+  `useServerDocumentContext()`; it no longer pastes them into the HTML. Our
+  template did not render `headNodes` and `bodyNodes`, so every page was
+  static HTML that never started: no styles, no data. The Expo-web e2e tests
+  that load data or need interaction failed on this. Fixed with the pattern
+  documented in expo-router's `ServerDocument.d.ts`. Native builds never use
+  this file.
+
+**Not changed**
+
+- `Gesture.Pan()` (bottom-sheet, filter-sheet) still works on gesture-handler 3
+  but is marked deprecated in favour of `usePanGesture`. Migrate it in its own
+  change.
+
+**Verified**
+
+| Check | Result |
+|---|---|
+| tsc | 0 errors |
+| lint | 0 errors, same 32 warnings |
+| `npm test` | 259/259 |
+| `expo config` | sdkVersion 58.0.0; prebuild config resolves |
+| `expo export -p ios -p android` | succeeds |
+| Metro manifest | runtimeVersion `exposdk:58.0.0` |
+| Dev bundles from Metro | HTTP 200, real JS (iOS 12.4 MB, Android 12.5 MB) |
+| Vite build | clean |
+| Both Playwright suites | see the commit |
+
+**Not verified here:** the app running in Expo Go on a device. That is the
+owner's check.
+
 ## ═══ PASS 17 — 2026-10-21: COMPLETION PROMPT #2 (tracker F1–F20) ═══
 
 Status per finding in `docs/LAUNCH_TASKS.md`; checks and verdict in

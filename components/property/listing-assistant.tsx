@@ -11,6 +11,7 @@ import {
   Text,
   TextInput,
   View,
+  type ScrollViewInstance,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -54,7 +55,7 @@ export function ListingAssistant({ property }: { property: Property | null }) {
   const [messages, setMessages] = useState<(AssistantMessage & { failed?: boolean })[]>([]);
   const [text, setText] = useState('');
   const [thinking, setThinking] = useState(false);
-  const scrollRef = useRef<ScrollView>(null);
+  const scrollRef = useRef<ScrollViewInstance>(null);
 
   useEffect(() => {
     if (open) scrollRef.current?.scrollToEnd({ animated: true });

@@ -319,7 +319,7 @@ export default function ExploreScreen() {
                   style={styles.footer}
                   color={colors.accent}
                 />
-              ) : null
+              ) : undefined
             }
           />
         )}

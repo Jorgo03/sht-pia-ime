@@ -136,7 +136,7 @@ export function useTabBarClearance(extraGap: number = 12) {
  * stack pushes on top of it, exactly like BottomNav.jsx's own `/new-listing`
  * and `/messages` links aren't separate router "tabs" on web either.
  */
-export function LiquidTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
+export function LiquidTabBar({ state, descriptors, emitter, navigateToTab }: BottomTabBarProps) {
   const router = useRouter();
   const { t } = useTranslation();
   const pathname = usePathname();
@@ -152,9 +152,11 @@ export function LiquidTabBar({ state, descriptors, navigation }: BottomTabBarPro
 
   const go = (routeName: string) => {
     const isFocused = activeRouteName === routeName;
-    const event = navigation.emit({ type: 'tabPress', target: state.routes.find((r) => r.name === routeName)?.key, canPreventDefault: true });
+    const key = state.routes.find((r) => r.name === routeName)?.key;
+    if (!key) return;
+    const event = emitter.emit({ type: 'tabPress', target: key, canPreventDefault: true });
     if (!isFocused && !event.defaultPrevented) {
-      navigation.navigate(routeName);
+      navigateToTab(key);
     }
   };
 

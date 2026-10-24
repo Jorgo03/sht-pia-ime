@@ -1,7 +1,7 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Dimensions, Keyboard, Platform, Pressable, StyleSheet, Text, View, type KeyboardEvent } from 'react-native';
+import { Dimensions, Keyboard, Platform, Pressable, StyleSheet, Text, View, type HostInstance, type KeyboardEvent } from 'react-native';
 
 import { Fonts, Radii, type AtticoPalette } from '@/constants/theme';
 import { useTheme } from '@/contexts/theme-context';
@@ -31,7 +31,7 @@ export function KeyboardDoneBar() {
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const keyboardTop = useKeyboardTop();
-  const sentinel = useRef<View>(null);
+  const sentinel = useRef<HostInstance>(null);
   const [lift, setLift] = useState(0);
 
   // Where the container's bottom is in the window, measured with a zero-height
