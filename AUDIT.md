@@ -76,6 +76,17 @@ only the newest Expo Go, so the project had to move.
   browser was left blank. `IS_EXPO_GO` now uses `isRunningInExpoGo()`, and
   this was the last `executionEnvironment` check in the app. Not yet re-run
   on the phone.
+- **The PKCE verifier for Google sign-in was made with Math.random().**
+  supabase-js falls back to it when there is no global `crypto`, which is the
+  case in React Native. The owner's Metro log showed the related warning
+  ("WebCrypto API is not supported... plain").
+  - **Fix:** `lib/crypto-polyfill.ts`, imported first by `lib/supabase.ts`,
+    installs only `crypto.getRandomValues`, from expo-crypto, where it is
+    missing (`src/lib/randomValues.js`, 4 unit tests).
+  - **Not added:** `crypto.subtle`. supabase-js reads `'subtle' in crypto` as
+    full WebCrypto and would call `importKey`/`verify` in `getClaims`. So the
+    challenge stays `plain` and the warning remains. A full WebCrypto is a
+    separate change.
 
 **Not changed**
 

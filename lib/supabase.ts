@@ -1,3 +1,5 @@
+// First: PKCE needs a secure random source before any sign-in starts.
+import '@/lib/crypto-polyfill';
 import { createClient } from '@supabase/supabase-js';
 import { Platform } from 'react-native';
 
