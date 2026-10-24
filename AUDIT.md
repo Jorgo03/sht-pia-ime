@@ -68,6 +68,14 @@ only the newest Expo Go, so the project had to move.
     3. a try/catch around the load.
   - **Verified by the owner on 2026-10-24:** the app opens on the Samsung A23
     in Expo Go (SDK 58).
+- **Google sign-in stayed on a blank page in Expo Go on Android.** Same root
+  cause: `contexts/auth-context.tsx` decided Expo Go with
+  `Constants.executionEnvironment`. That did not report Expo Go on the
+  Samsung, so the app sent Supabase the raw `exp://` callback instead of the
+  web relay (`/auth/callback?rt=`). Supabase refuses that address, and the
+  browser was left blank. `IS_EXPO_GO` now uses `isRunningInExpoGo()`, and
+  this was the last `executionEnvironment` check in the app. Not yet re-run
+  on the phone.
 
 **Not changed**
 

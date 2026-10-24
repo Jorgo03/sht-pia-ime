@@ -18,7 +18,7 @@ import {
 } from 'react';
 import { Platform } from 'react-native';
 
-import Constants, { ExecutionEnvironment } from 'expo-constants';
+import { isRunningInExpoGo } from 'expo';
 
 import { signInWithAppleNative } from '@/lib/apple-auth';
 import { forgetDevice } from '@/lib/push';
@@ -81,8 +81,13 @@ function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T | typeof tim
  * of app-side code can reclaim that scheme. A dev-client build owns
  * `shtepia-ime://` (app.json `scheme`, already registered in the Android
  * manifest) and does not have this problem.
+ *
+ * Detected by Expo Go's own native module (isRunningInExpoGo), not
+ * Constants.executionEnvironment: on a Samsung A23 in Expo Go (SDK 58) that
+ * did not report Expo Go, so Google sign-in skipped the web relay, Supabase
+ * refused the exp:// address and the browser was left on a blank page.
  */
-const IS_EXPO_GO = Constants.executionEnvironment === ExecutionEnvironment.StoreClient;
+const IS_EXPO_GO = isRunningInExpoGo();
 
 // Dev-only OAuth diagnostics (Metro console), on failure paths only — the
 // happy path is silent. Never logs token/credential values, only the shape
