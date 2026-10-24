@@ -131,3 +131,7 @@ inside the app, and Google Play has an equivalent billing policy. Selling them
 only on the website and not linking to that from the app is the plan recorded
 in the tracker; confirm the exact rules for the countries involved before
 building it (L23).
+
+Update 2026-10-24: Apple's 3.1.3(b) lets an app use items bought on the website
+only if they are also sold as in-app purchases. So web-only selling is safe on
+Google Play but not on iOS. See DECISIONS.md M2.

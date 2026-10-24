@@ -48,6 +48,31 @@ fee. Schema **applied 2026-10-14** after the owner's review
 (`20261014214726_add_payments_foundation`); 14/14 live checks as agent,
 client, signed out and payment server, in a rolled-back transaction.
 
+### M2. Website-only checkout conflicts with Apple 3.1.3(b): AWAITING OWNER DECISION (2026-10-24)
+
+The rules were read on 2026-10-24 on Apple's guidelines page. M1's plan is to
+sell only on the website, with the apps showing plan and promotion status.
+That works under Google Play's rules: a consumption-only app may mention web
+purchases, as long as it has no links. Apple's rules are stricter:
+
+- **3.1.1:** unlocking features inside the app must use in-app purchase.
+- **3.1.3(b):** something bought on the website may be used in the app only if
+  the same item is also available as an in-app purchase.
+- **3.1.1(a):** outside the US storefront, the app may not link or call people
+  to an outside purchase.
+
+Agency plans (listing caps, analytics, badge) and promotions are used or shown
+inside the app, so web-only selling risks rejection on iOS.
+
+Plan (`docs/PLANI_I_PUBLIKIMIT.md`, phase 9):
+
+- Ship 1.0 with no payments.
+- Then the owner chooses one of three routes:
+  - **A** (recommended): web checkout plus in-app purchase;
+  - **B:** web only, accepting the iOS risk;
+  - **C:** in-app purchase only.
+- The website `/pricing` stays off until that choice is made.
+
 ## ═══ AUTH INCIDENT REMEDIATION — 2026-08-19 ═══
 
 Full findings in `AUTH_AUDIT.md`; fixes on branch `fix/auth-recovery-and-validation`.
