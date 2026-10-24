@@ -36,30 +36,31 @@ rendi dhe "si-ja".
 
 ---
 
-## Faza 0: Katër vendime (sot, 15 minuta, pa kosto)
+## Faza 0: Katër vendime (KRYER 2026-10-24)
 
-- [ ] **0.1 Publikon si person apo si kompani (FHO)?**
-  - **Pse:** të gjitha llogaritë varen nga kjo.
-  - **Si kompani:**
-    - në dyqan shfaqet emri "Future Home Orange";
-    - te Google nuk ke nevojë për testin me 12 testues;
-    - por duhet numri **D-U-N-S**, që mund të zgjasë deri në 30 ditë.
-  - **Si person:**
-    - fillon menjëherë;
-    - në dyqan shfaqet emri yt;
-    - te Google duhet një test i mbyllur me 12 testues për 14 ditë (llogaritë personale të krijuara
-      pas 13 nëntorit 2023).
-  - **Rekomandimi im:** kompani, nëse FHO është e regjistruar dhe ke dokumentet. Kërko D-U-N-S
-    **sot**, që të mos presim më vonë.
-- [ ] **0.2 Emri i domain-it** (p.sh. `shtepiaime.al` ose `.com`).
-  - **Pse:** pa domain nuk ka email për kodet e regjistrimit, adresë kontakti, ose regjistrim të
-    kompanisë te Apple.
-- [ ] **0.3 Dalim në iOS dhe Android njëkohësisht?**
-  - **Rekomandimi im:** po, të dy, sepse kodi është një.
-- [ ] **0.4 Pagesat në versionin 1.0 apo 1.1?**
-  - **Rekomandimi im:** 1.1, sipas rregullit të rendit më sipër.
+- [x] **0.1 Publikuesi:** **person.**
+  - Nuk duhet D-U-N-S, dhe në dyqan del emri yt.
+  - Te Google duhet **testi i mbyllur me 12 testues për 14 ditë**. Shiko "Rruga kritike" më
+    poshtë.
+- [x] **0.2 Domain-i:** do e blesh tani (Faza 2). Emrin e zgjedhim bashkë te hapi 2.1.
+- [x] **0.3 Platformat:** iPhone dhe Android bashkë.
+- [x] **0.4 Pagesat:** te versioni 1.1. Versioni 1.0 del falas.
 
-**Gati kur:** më ke dhënë katër përgjigjet.
+### Rruga kritike (çfarë e vendos datën e publikimit)
+
+Si llogari personale, Google nuk të lejon të publikosh para se **12 testues** të kenë qenë në
+testin e mbyllur **14 ditë rresht**. Ftesat nuk mjaftojnë: llogaritet vetëm kush e ka pranuar
+testin. Prandaj Android-i ecën i pari:
+
+1. Llogaria Expo (3.4) dhe Google Play Console (3.3).
+2. Build-i i parë Android (5.1).
+3. Testi i mbyllur me 12 testues. **Dita 1 e 14 ditëve.**
+4. Gjatë atyre 14 ditëve bëjmë gjithçka tjetër: domain, email, Apple, iPhone, faqen në dyqan.
+
+Për testin mjafton lidhja e privatësisë në faqen e sotme. Domain-i i ri mund të vijë më vonë.
+
+**Fillo sot të mbledhësh 12 njerëz me telefon Android**, p.sh. agjentë, miq ose familjarë. Më
+duhen adresat e tyre Gmail për listën e testuesve. Ato i fut ti në Play Console, jo në chat.
 
 ---
 
@@ -68,8 +69,19 @@ rendi dhe "si-ja".
 Çfarë provon në telefon:
 
 - [ ] **1.1 Hap aplikacionin në Expo Go.**
-  - Unë e nis serverin dhe të dërgoj kodin QR.
-  - Në rrjet të kufizuar përdorim tunelin, ose hotspot-in e telefonit.
+  - Në kompjuterin tënd, te dosja e projektit:
+
+    ```
+    git pull origin master
+    npm install
+    npm start
+    ```
+
+  - Hapet faqja me kodin QR. Skanoje me Expo Go (Android) ose me kamerën (iPhone).
+  - Kompjuteri dhe telefoni duhet të jenë në të njëjtin Wi-Fi.
+    - Ose përdor `npm run expo:tunnel:qr`.
+    - Ose lidhe kompjuterin me hotspot-in e telefonit.
+  - Unë nuk mund ta nis serverin nga këtu: ambienti im në cloud nuk arrin dot telefonin tënd.
 - [ ] **1.2 Listim i ri me 2 foto të reja nga kamera e iPhone-it.**
   - Hapat: Publiko → shfaqet te "Listimet e mia" → hape → ndrysho çmimin → ruaj.
 - [ ] **1.3 Ruaj një draft**, mbyll aplikacionin, rihape. Drafti duhet të jetë aty.
@@ -118,15 +130,12 @@ Supabase, jo publikut.
 
 ## Faza 3: Llogaritë e dyqaneve (java 1, paralelisht me Fazën 2)
 
-- [ ] **3.1 D-U-N-S** (vetëm nëse zgjodhe kompaninë).
-  - **Kush:** ti.
-  - **Kosto:** falas për Apple.
-  - Emri dhe adresa duhet të jenë **njësoj** si në dokumentet e kompanisë.
+- [x] **3.1 D-U-N-S:** nuk duhet, sepse publikon si person.
 - [ ] **3.2 Apple Developer Program.**
   - **Kush:** ti.
   - **Kosto:** **99 USD në vit** (faqja zyrtare e Apple; çmimi mund të ndryshojë sipas vendit).
   - **Gati kur:** hyn te App Store Connect.
-- [ ] **3.3 Google Play Console.**
+- [ ] **3.3 Google Play Console** (bëje **të parën**, sepse është rruga kritike).
   - **Kush:** ti.
   - **Kosto:** **25 USD, një herë** (faqja e ndihmës së Google).
   - **Gati kur:** hyn te Play Console dhe identiteti është verifikuar.
@@ -179,8 +188,9 @@ Këtu aplikacioni bëhet aplikacion i vërtetë dhe nuk ka më nevojë për Expo
   - fshirja e llogarisë.
 - [ ] **5.5 Rregulloj çdo gabim** që del dhe bëj build të ri. Përsërisim derisa lista të jetë e
   pastër.
-- [ ] **5.6 Vetëm për llogari personale Google:** nis **testin e mbyllur me 12 testues për 14
-  ditë**.
+- [ ] **5.6 Nis testin e mbyllur me 12 testues për 14 ditë** (detyrim për llogarinë tënde
+  personale).
+  - Unë të them saktë ku klikohet te Play Console → Testing → Closed testing.
   - Gjej 12 njerëz me Android, p.sh. agjentë që njeh.
   - 14 ditët ecin paralelisht me Fazat 6 dhe 7.
 
