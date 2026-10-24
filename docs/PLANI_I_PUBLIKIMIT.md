@@ -84,9 +84,9 @@ duhen adresat e tyre Gmail për listën e testuesve. Ato i fut ti në Play Conso
   - Unë nuk mund ta nis serverin nga këtu: ambienti im në cloud nuk arrin dot telefonin tënd.
 - [x] **1.2 Listim i ri me 2 foto të reja nga kamera e iPhone-it.** U krye: publikimi punon.
   - Hapat: Publiko → shfaqet te "Listimet e mia" → hape → ndrysho çmimin → ruaj.
-- [ ] **1.3 Ruaj një draft**, mbyll aplikacionin, rihape. Drafti duhet të jetë aty.
+- [x] **1.3 Ruaj një draft**, mbyll aplikacionin, rihape. Drafti duhet të jetë aty. U krye 2026-10-24.
 - [x] **1.4 Fotoja e profilit:** vendose, pastaj zëvendësoje me një tjetër. U krye: fotoja ndryshon.
-- [ ] **1.5 "U krye":** duhet të dalë te përshkrimi (shumë rreshta), te çmimi (numra) dhe te
+- [x] **1.5 "U krye":** u krye 2026-10-24 (iPhone). Kërkesa: duhet të dalë te përshkrimi (shumë rreshta), te çmimi (numra) dhe te
   mesazhet.
   - Shtypja e butonit mbyll tastierën dhe teksti mbetet.
 - [ ] **1.6 E njëjta provë në Android**, nëse ke një telefon Android.

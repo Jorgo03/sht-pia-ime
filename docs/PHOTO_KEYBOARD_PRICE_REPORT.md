@@ -140,8 +140,8 @@ one passes.
 - Saving logic and uploads in the website build: VERIFIED.
 - On an iPhone in Expo Go: VERIFIED by the owner (2026-10-24, after the SDK
   58 upgrade). A listing published with photos, and the owner reported the
-  changes work as requested. Still unchecked on a device: saving a draft and
-  Android.
+  changes work as requested. Saving a draft also checked (it survives closing
+  the app). Android not yet tried.
 - Earlier, before the owner's check: IMPLEMENTED—UNVERIFIED. There is no device or simulator here, and this sandbox
   cannot reach `supabase.co`.
 - A store or development build includes manipulator 57.0.21, which fixes the
@@ -237,7 +237,8 @@ events, so it serves every field on the screen, of any keyboard type:
 
 ### Status
 
-IMPLEMENTED—UNVERIFIED. Keyboards only exist on a device or simulator; tsc and
+On iPhone: VERIFIED by the owner (2026-10-24): "U krye" appears and closes the
+keyboard. Android: not yet tried. Before that: IMPLEMENTED—UNVERIFIED. Keyboards only exist on a device or simulator; tsc and
 the export build pass.
 
 ## 5. Price field and "Monedha"
