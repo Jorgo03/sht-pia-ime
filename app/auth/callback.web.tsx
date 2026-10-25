@@ -22,6 +22,15 @@ import { supabase } from '@/lib/supabase';
 const RELAY_SCHEMES = ['exp:', 'shtepia-ime:'];
 
 function buildRelayTarget(): string | null {
+  // app/+html.tsx already took the code out of the address and left it here.
+  const kept = (window as { __FHO_RELAY_TARGET__?: unknown }).__FHO_RELAY_TARGET__;
+  if (typeof kept === 'string') {
+    try {
+      if (RELAY_SCHEMES.includes(new URL(kept).protocol)) return kept;
+    } catch {
+      // fall through to the address
+    }
+  }
   const params = new URLSearchParams(window.location.search);
   const target = params.get('rt');
   if (!target) return null;
@@ -49,7 +58,8 @@ export default function AuthCallbackScreen() {
   useEffect(() => {
     if (relayTarget) {
       settled.current = true;
-      window.location.href = relayTarget;
+      // Android's Chrome blocks a jump to an app scheme without a tap.
+      if (!/Android/i.test(navigator.userAgent)) window.location.href = relayTarget;
       return;
     }
     let mounted = true;

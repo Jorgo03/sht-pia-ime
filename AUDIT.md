@@ -76,6 +76,23 @@ only the newest Expo Go, so the project had to move.
   browser was left blank. `IS_EXPO_GO` now uses `isRunningInExpoGo()`, and
   this was the last `executionEnvironment` check in the app. Not yet re-run
   on the phone.
+- **Google sign-in stayed on a blank Vercel page on Android** (Samsung A23,
+  2026-10-25, after the `isRunningInExpoGo` fix routed it through the relay).
+  - **Cause:** `index.html`'s relay script called
+    `location.replace('exp://…')` while the page was still loading. Android's
+    Chrome (the Custom Tab used for sign-in) refuses a scripted jump to an app
+    scheme without a tap. The attempt also stopped the page loading, so the
+    React fallback with its button never appeared.
+  - **Fix (Vite site and the Expo web build):**
+    1. The script keeps the validated target in `window.__FHO_RELAY_TARGET__`.
+    2. It removes the code from the address (`history.replaceState`) before the
+       Supabase client loads, so the website never sees the phone's code.
+    3. It jumps automatically everywhere except Android. There, AuthCallback
+       shows its translated button, and a tap is allowed through.
+  - **Tests:** e2e F4-R1, Samsung A23 user agent: the button carries
+    `exp://…?code=`, the code is gone from the address, there is no token
+    request and no redirect. F4-R2: a web address in `rt` is ignored.
+  - **Not yet re-run on the phone.**
 - **The PKCE verifier for Google sign-in was made with Math.random().**
   supabase-js falls back to it when there is no global `crypto`, which is the
   case in React Native. The owner's Metro log showed the related warning

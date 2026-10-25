@@ -222,3 +222,49 @@ test.describe('server wait', () => {
     await expect(page.getByRole('button', { name: new RegExp(t('auth.resendIn').replace('{{s}}', '4[12]')) })).toBeDisabled();
   });
 });
+
+// Google sign-in from the phone app in Expo Go returns through this site's
+// /auth/callback?rt=<the app's exp:// address>&code=… (index.html relay). On a
+// Samsung A23 the page stayed blank: Android's Chrome refuses a scripted jump
+// to an app scheme without a tap, and the attempt also stopped the page
+// loading. On Android the page now loads and shows a button to tap.
+test.describe('mobile sign-in relay on Android', () => {
+  test.use({
+    userAgent:
+      'Mozilla/5.0 (Linux; Android 14; SM-A235F) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Mobile Safari/537.36',
+  });
+
+  const APP = 'exp://192.168.1.20:8081/--/auth/callback';
+
+  test('F4-R1 shows a button carrying the code back to the app, and the website never uses the code', async ({ page }) => {
+    const tokenCalls: string[] = [];
+    page.on('request', (req) => {
+      if (req.url().includes('/auth/v1/token')) tokenCalls.push(req.url());
+    });
+    const navigations: string[] = [];
+    page.on('framenavigated', (frame) => {
+      if (frame === page.mainFrame()) navigations.push(frame.url());
+    });
+
+    await page.goto(`/auth/callback?rt=${encodeURIComponent(APP)}&code=abc-123`);
+
+    const button = page.getByRole('link', { name: t('authCallback.openApp') });
+    await expect(button).toBeVisible();
+    await expect(page.getByText(t('authCallback.returning'))).toBeVisible();
+    await expect(button).toHaveAttribute('href', `${APP}?code=abc-123`);
+    // The code left the address before the Supabase client loaded.
+    await expect(page).toHaveURL(/\/auth\/callback$/);
+    // Still here a moment later: no redirect to the profile or home page.
+    await page.waitForTimeout(1500);
+    await expect(button).toBeVisible();
+    expect(tokenCalls).toEqual([]);
+    expect(navigations.every((u) => !u.startsWith('exp:'))).toBe(true);
+  });
+
+  test('F4-R2 a web address in rt is never followed and gets no button', async ({ page }) => {
+    await page.goto(`/auth/callback?rt=${encodeURIComponent('https://evil.example/steal')}&code=abc-123`);
+    await expect(page.getByRole('link', { name: t('authCallback.openApp') })).toHaveCount(0);
+    await page.waitForTimeout(1000);
+    expect(new URL(page.url()).hostname).toBe('localhost');
+  });
+});

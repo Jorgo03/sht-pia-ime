@@ -70,7 +70,16 @@
           if (window.location.hash && window.location.hash.length > 1) {
             parsed.hash = window.location.hash;
           }
-          window.location.replace(parsed.toString());
+          var relay = parsed.toString();
+          // The code belongs to the phone. Keep it for AuthCallback's button
+          // and take it out of the address before the Supabase client loads.
+          window.__FHO_RELAY_TARGET__ = relay;
+          history.replaceState(null, '', window.location.pathname);
+          // Android's Chrome refuses a scripted jump to an app scheme without
+          // a tap, and the attempt also stopped this page loading, so it sat
+          // blank (Samsung A23, 2026-10-25). There the page loads and shows a
+          // button instead; a tap is allowed through.
+          if (!/Android/i.test(navigator.userAgent)) window.location.replace(relay);
         } catch (e) {
           /* fall through to the React relay, which renders a tappable link */
         }

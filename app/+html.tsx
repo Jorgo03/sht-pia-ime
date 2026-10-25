@@ -31,7 +31,14 @@ const OAUTH_RELAY = `(function () {
     params.delete('rt');
     params.forEach(function (value, key) { parsed.searchParams.set(key, value); });
     if (window.location.hash && window.location.hash.length > 1) parsed.hash = window.location.hash;
-    window.location.replace(parsed.toString());
+    var relay = parsed.toString();
+    // Keep the code for the callback page's button, out of the address the
+    // Supabase client reads. Android's Chrome blocks a scripted jump to an
+    // app scheme without a tap (and the attempt stopped the page loading),
+    // so there the page shows the button instead.
+    window.__FHO_RELAY_TARGET__ = relay;
+    history.replaceState(null, '', window.location.pathname);
+    if (!/Android/i.test(navigator.userAgent)) window.location.replace(relay);
   } catch (e) {
     /* fall through: app/auth/callback.tsx shows a tappable link */
   }

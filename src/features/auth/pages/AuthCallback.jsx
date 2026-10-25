@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../../../lib/supabase";
 import LoadingScreen from "../../../shared/LoadingScreen";
@@ -33,7 +34,20 @@ const RELAY_SCHEMES = ['exp:', 'shtepia-ime:'];
  * The same mechanism Expo's retired auth proxy used, hosted on our own domain
  * rather than a third party's.
  */
+function isRelayScheme(url) {
+  try {
+    return RELAY_SCHEMES.includes(new URL(url).protocol);
+  } catch {
+    return false;
+  }
+}
+
 function buildRelayTarget() {
+  // index.html already took the code out of the address (so the Supabase
+  // client never sees it) and left the target here.
+  const kept = window.__FHO_RELAY_TARGET__;
+  if (typeof kept === "string" && isRelayScheme(kept)) return kept;
+
   const params = new URLSearchParams(window.location.search);
   const target = params.get('rt');
   if (!target) return null;
@@ -60,6 +74,7 @@ function buildRelayTarget() {
 }
 
 export default function AuthCallback() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const settled = useRef(false);
   // Set when this callback belongs to the mobile app. Rendering a real link
@@ -82,8 +97,9 @@ export default function AuthCallback() {
       setRelayTarget(target);
       // location.href rather than replace(): replace() is more likely to be
       // suppressed for a custom scheme, and there is no history entry worth
-      // preserving here anyway.
-      window.location.href = target;
+      // preserving here anyway. Not on Android, whose Chrome blocks a jump
+      // to an app scheme without a tap: the button below is the way there.
+      if (!/Android/i.test(navigator.userAgent)) window.location.href = target;
       return;
     }
 
@@ -166,7 +182,7 @@ export default function AuthCallback() {
           color: 'var(--fho-text, #f5f0e8)',
         }}
       >
-        <p style={{ fontSize: 15, opacity: 0.75, margin: 0 }}>Returning you to the app…</p>
+        <p style={{ fontSize: 15, opacity: 0.75, margin: 0 }}>{t("authCallback.returning")}</p>
         {/* A genuine anchor, not a button calling location.href: a user tap on
             a real link is the navigation browsers reliably allow through to a
             custom scheme. */}
@@ -184,10 +200,10 @@ export default function AuthCallback() {
               'linear-gradient(135deg, var(--fho-orange-1, #ff7d1a), var(--fho-orange-2, #e85d00))',
           }}
         >
-          Open the app
+          {t("authCallback.openApp")}
         </a>
         <p style={{ fontSize: 12, opacity: 0.5, margin: 0, maxWidth: 320 }}>
-          If nothing happened automatically, tap the button above.
+          {t("authCallback.tapHint")}
         </p>
       </div>
     );
