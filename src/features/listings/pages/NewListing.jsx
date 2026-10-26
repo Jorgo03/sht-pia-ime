@@ -158,15 +158,27 @@ const INITIAL_FORM = {
 // Draft persistence: the wizard survives navigation/refresh via
 // localStorage. Selected photos are File objects and can't be serialized —
 // they're the one thing a returning user re-adds.
+// One draft per account (`fho_listing_draft:<user id>`): on a shared computer
+// the next person must never open the previous agent's listing and contact
+// details. The bare key is the old one-per-browser draft, deleted on sight.
 const DRAFT_KEY = 'fho_listing_draft'
 const DRAFT_TTL_MS = 7 * 24 * 60 * 60 * 1000
+const draftKeyFor = (userId) => `${DRAFT_KEY}:${userId}`
+// Photos are never kept in a draft, so a restored one reopens here at the
+// latest: one left on Publish could otherwise go live with no photos.
+const MEDIA_STEP = 3
 
-function loadDraft() {
+// Nothing typed or chosen yet: not worth saving, or restoring, as a draft.
+const isPristine = (form, step = 0) => step === 0 && JSON.stringify({ ...INITIAL_FORM, ...form }) === JSON.stringify(INITIAL_FORM)
+
+function loadDraft(userId) {
   try {
-    const raw = localStorage.getItem(DRAFT_KEY)
+    localStorage.removeItem(DRAFT_KEY)
+    if (!userId) return null
+    const raw = localStorage.getItem(draftKeyFor(userId))
     if (!raw) return null
     const draft = JSON.parse(raw)
-    if (!draft?.form || Date.now() - (draft.savedAt || 0) > DRAFT_TTL_MS) return null
+    if (!draft?.form || Date.now() - (draft.savedAt || 0) > DRAFT_TTL_MS || isPristine(draft.form, draft.step)) return null
     return draft
   } catch {
     return null
@@ -185,7 +197,7 @@ async function fetchEditableListing(id, userId) {
 
 export default function NewListing() {
   const { t } = useTranslation()
-  const { user } = useAuth()
+  const { user, profile } = useAuth()
   const navigate = useNavigate()
   const fileInputRef = useRef(null)
   // Media the listing had when it was opened for editing; anything missing
@@ -200,8 +212,8 @@ export default function NewListing() {
   const [editState, setEditState] = useState(isEdit ? 'loading' : 'ready')
 
   // Editing never reads or overwrites the new-listing draft.
-  const [draft] = useState(() => (isEdit ? null : loadDraft()))
-  const [step, setStep] = useState(draft?.step ?? 0)
+  const [draft] = useState(() => (isEdit ? null : loadDraft(user?.id)))
+  const [step, setStep] = useState(Math.min(draft?.step ?? 0, MEDIA_STEP))
   const [submitting, setSubmitting] = useState(false)
   const [errors, setErrors] = useState({})
   const [draftRestored, setDraftRestored] = useState(Boolean(draft))
@@ -212,6 +224,7 @@ export default function NewListing() {
   // persisted with the draft — it is a camera position, not listing data, and
   // a restored draft should show the pin it saved rather than fly somewhere.
   const [mapFocus, setMapFocus] = useState(null)
+  const cityLookup = useRef('')
 
   // Owns the language selection for BOTH text fields, plus the per-language
   // cache, staleness against the Albanian source, protection for hand-edited
@@ -232,12 +245,16 @@ export default function NewListing() {
   const [video, setVideo] = useState(null)
 
   // Persist progress on every change; cleared on successful submit/discard.
+  // An untouched form is not a draft: saving one showed "draft restored" over
+  // blank fields on every later visit, even after "start fresh".
+  const draftOwner = user?.id
   useEffect(() => {
-    if (isEdit) return
+    if (isEdit || !draftOwner) return
     try {
-      localStorage.setItem(DRAFT_KEY, JSON.stringify({ form, step, savedAt: Date.now() }))
+      if (isPristine(form, step)) localStorage.removeItem(draftKeyFor(draftOwner))
+      else localStorage.setItem(draftKeyFor(draftOwner), JSON.stringify({ form, step, savedAt: Date.now() }))
     } catch { /* storage full/blocked — wizard still works, just unsaved */ }
-  }, [form, step, isEdit])
+  }, [form, step, isEdit, draftOwner])
 
   // Load the listing being edited. Photos and video already uploaded join the
   // same lists as new ones, flagged `existing`, so ordering, the cover photo
@@ -264,7 +281,7 @@ export default function NewListing() {
   }
 
   const discardDraft = () => {
-    try { localStorage.removeItem(DRAFT_KEY) } catch { /* ignore */ }
+    try { if (user) localStorage.removeItem(draftKeyFor(user.id)) } catch { /* ignore */ }
     setForm(INITIAL_FORM)
     setStep(0)
     setImages([])
@@ -290,8 +307,10 @@ export default function NewListing() {
     setErrors(prev => ({ ...prev, city: undefined }))
     setMapFocus(null)
     // Move the map to the new city so the next pin starts somewhere plausible
-    // rather than wherever it was left.
-    geocodeCity({ city }).then(centre => { if (centre) setMapFocus(centre) })
+    // rather than wherever it was left. A late answer for a city changed
+    // since (or after a road was picked) must not pull the map back there.
+    cityLookup.current = city
+    geocodeCity({ city }).then(centre => { if (centre && cityLookup.current === city) setMapFocus(centre) })
   }
 
   const toggleFeature = (feat) => {
@@ -355,20 +374,21 @@ export default function NewListing() {
     })
   }
 
-  const validate = () => {
+  const errorsFor = (s) => {
     const errs = {}
-    if (step === 0) {
+    if (s === 0) {
       if (!form.title_i18n.sq?.trim()) errs.title = t('listing.required')
       if (!form.description_i18n.sq?.trim()) errs.description = t('listing.required')
     }
-    if (step === 1) {
+    if (s === 1) {
       if (!form.city) errs.city = t('listing.required')
     }
-    if (step === 2) {
+    if (s === 2) {
       if (!form.price || Number(form.price) <= 0) errs.price = t('listing.required')
       else if (Number(form.price) > MAX_PRICE) errs.price = t('listing.valueOutOfRange', { min: 0, max: MAX_PRICE.toLocaleString() })
 
-      if (!form.sqft || Number(form.sqft) <= 0) errs.sqft = t('listing.required')
+      // At least 1 m² once rounded: the column holds whole square metres.
+      if (!form.sqft || !(Number(form.sqft) >= 1)) errs.sqft = t('listing.required')
       else if (Number(form.sqft) > MAX_SQFT) errs.sqft = t('listing.valueOutOfRange', { min: 1, max: MAX_SQFT.toLocaleString() })
 
       if (outOfRange(form.beds, 0, MAX_BEDS)) errs.beds = t('listing.valueOutOfRange', { min: 0, max: MAX_BEDS })
@@ -377,14 +397,34 @@ export default function NewListing() {
       if (outOfRange(form.total_floors, 1, MAX_FLOOR)) errs.total_floors = t('listing.valueOutOfRange', { min: 1, max: MAX_FLOOR })
       if (outOfRange(form.year_built, MIN_YEAR, MAX_YEAR)) errs.year_built = t('listing.valueOutOfRange', { min: MIN_YEAR, max: MAX_YEAR })
     }
-    if (step === 3) {
+    if (s === 3) {
       if (images.length < MIN_IMAGES) errs.images = t('listing.minImages', { min: MIN_IMAGES })
     }
-    if (step === 4) {
+    if (s === 4) {
       if (!form.contact_phone?.trim()) errs.phone = t('listing.required')
     }
+    return errs
+  }
+
+  const validate = () => {
+    const errs = errorsFor(step)
     setErrors(errs)
     return Object.keys(errs).length === 0
+  }
+
+  // Publishing checks every step, not only the one on screen, and opens the
+  // first one that is incomplete.
+  const validateAll = () => {
+    for (let s = 0; s < STEPS.length; s++) {
+      const errs = errorsFor(s)
+      if (Object.keys(errs).length > 0) {
+        setStep(s)
+        setErrors(errs)
+        return false
+      }
+    }
+    setErrors({})
+    return true
   }
 
   const next = () => { if (validate()) setStep(s => Math.min(s + 1, STEPS.length - 1)) }
@@ -414,11 +454,22 @@ export default function NewListing() {
   }
 
   const submit = async (asDraft = false) => {
-    if (!asDraft && !validate()) return
+    if (!asDraft && !validateAll()) return
     setSubmitting(true)
 
     let uploadedPaths = []
     try {
+      // Agent or not decides agent_id and owner_type, which the ownership
+      // guard never lets change afterwards, so a failed lookup must stop the
+      // save rather than file an agent's listing as a client's. Before any
+      // upload, so a failure leaves nothing behind.
+      let role = profile?.role ?? null
+      if (!isEdit && !role) {
+        const { data, error: roleError } = await supabase.from('profiles').select('role').eq('id', user.id).single()
+        if (roleError || !data) throw roleError ?? new Error('profile role unavailable')
+        role = data.role
+      }
+
       const { urls: imageUrls, paths } = await uploadImages()
       uploadedPaths = paths
 
@@ -451,18 +502,17 @@ export default function NewListing() {
         // actions on My Listings (pause, mark sold/rented).
         ;({ error } = await supabase.from('properties').update(columns).eq('id', editId))
       } else {
-        const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single()
         ;({ error } = await supabase.from('properties').insert({
           ...columns,
           owner_id: user.id,
-          agent_id: profile?.role === 'agent' ? user.id : null,
-          owner_type: profile?.role === 'agent' ? 'agent' : 'client',
+          agent_id: role === 'agent' ? user.id : null,
+          owner_type: role === 'agent' ? 'agent' : 'client',
           status: asDraft ? 'draft' : 'active',
         }))
       }
 
       if (error) throw error
-      if (!isEdit) { try { localStorage.removeItem(DRAFT_KEY) } catch { /* ignore */ } }
+      if (!isEdit) { try { localStorage.removeItem(draftKeyFor(user.id)) } catch { /* ignore */ } }
       if (isEdit) {
         // The save went through, so photos/video taken out of the listing are
         // no longer referenced anywhere: remove them (own folder only).
@@ -646,7 +696,7 @@ export default function NewListing() {
                 onChange={val => update('address', val)}
                 // Picking a road frames the map; it never sets the property's
                 // position. That still comes from the marker.
-                onSelectRoad={road => setMapFocus({ latitude: road.latitude, longitude: road.longitude })}
+                onSelectRoad={road => { cityLookup.current = ''; setMapFocus({ latitude: road.latitude, longitude: road.longitude }) }}
               />
             </div>
             <div className="nl-field">
