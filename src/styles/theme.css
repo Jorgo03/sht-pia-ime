@@ -52,11 +52,15 @@
 
   /* Earthy status palette (IMPLEMENTATION.md §1) — muted to sit with the warm
      cream ground rather than the saturated web-safe set that preceded it. */
-  --fho-status-active: #5b8a5a;
-  --fho-status-paused: #d4a23a;
+  /* Darkened 2026-10-27 for WCAG AA: these are also the badge TEXT on their own
+     tint, where #5b8a5a / #d4a23a / #7f7a72 read 3.7 / 2.2 / 4.0:1. */
+  --fho-status-active: #3d6b3c;
+  --fho-status-paused: #8a6414;
   --fho-status-sold: #c0392b;
   --fho-status-rented: #8a4d80;
-  --fho-status-draft: #7f7a72;
+  --fho-status-draft: #66625b;
+  /* Sign out / delete text: #dc3545 was 3.9:1 on the cream ground. */
+  --fho-signout: #b42330;
   --fho-danger: #d63a3a;
 
   --ease-out: cubic-bezier(.2,.7,.3,1);
@@ -99,6 +103,7 @@
   /* Navy reads too dark on near-black — lift it for dark theme */
   --fho-navy: #9db8e0;
 
+  --fho-signout: #f26d78; /* #dc3545 was 4.3:1 on the dark ground */
   --fho-status-active: #2ecc71;
   --fho-status-paused: #f1c40f;
   --fho-status-sold: #e74c3c;

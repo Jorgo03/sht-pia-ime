@@ -729,7 +729,7 @@ export default function ProfileScreen() {
               style={styles.signOutButton}
               onPress={() => setSignOutOpen(true)}
               activeOpacity={0.8}>
-              <MaterialIcons name="logout" size={18} color="#dc3545" />
+              <MaterialIcons name="logout" size={18} color={colors.signOut} />
               <Text style={styles.signOutText}>{t('common.signOut')}</Text>
             </TouchableOpacity>
 
@@ -786,7 +786,7 @@ export default function ProfileScreen() {
           heightRatio={0.32}>
           <View style={styles.confirmBody}>
             <View style={styles.confirmIcon}>
-              <MaterialIcons name="logout" size={22} color="#dc3545" />
+              <MaterialIcons name="logout" size={22} color={colors.signOut} />
             </View>
             <Text style={styles.confirmTitle}>{t('common.signOut')}</Text>
             <Text style={styles.confirmText}>{t('common.confirmSignOut')}</Text>
@@ -808,7 +808,7 @@ export default function ProfileScreen() {
           heightRatio={0.42}>
           <View style={styles.confirmBody}>
             <View style={styles.confirmIcon}>
-              <MaterialIcons name="delete-forever" size={22} color="#dc3545" />
+              <MaterialIcons name="delete-forever" size={22} color={colors.signOut} />
             </View>
             <Text style={styles.confirmTitle}>{t('account.deleteAccount')}</Text>
             <Text style={styles.confirmText}>{t('account.deleteConfirmBody')}</Text>
@@ -1500,12 +1500,12 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     paddingVertical: 14,
     borderRadius: 16,
     borderWidth: 1.5,
-    borderColor: '#dc3545',
+    borderColor: colors.signOut,
   },
   signOutText: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#dc3545',
+    color: colors.signOut,
   },
   // Deliberately quieter than Sign out: a plain, unboxed text link at the very
   // bottom. Deleting an account is irreversible, so it should take intent to
@@ -1522,7 +1522,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   deleteErrorText: {
     fontSize: 13,
-    color: '#dc3545',
+    color: colors.signOut,
     textAlign: 'center',
   },
   legalRow: {

@@ -174,7 +174,7 @@ export default function SavedSearches() {
                   {s.filters?.listing_type && <span>{t(`listing.type.${s.filters.listing_type}`, s.filters.listing_type)}</span>}
                 </div>
                 {s.alerts_enabled && newMatchCount(matchCounts[s.id], s.last_match_count) > 0 && (
-                  <div className="self-start rounded-full bg-fho-orange-1 px-2.5 py-0.5 text-[12px] font-semibold text-white" role="status">
+                  <div className="self-start rounded-full bg-fho-orange-1 px-2.5 py-0.5 text-[12px] font-semibold text-[#1a1714]" role="status">
                     {t('saved.newMatches', { n: newMatchCount(matchCounts[s.id], s.last_match_count) })}
                   </div>
                 )}

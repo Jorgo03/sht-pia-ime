@@ -75,6 +75,8 @@ export const AtticoColorsDark = {
   statusDraft: '#95a5a6',
   // ShtepiaColors.danger / .ok (§4).
   error: '#d63a3a',
+  // Sign out / delete text and icons: #dc3545 was 4.3:1 on the dark ground.
+  signOut: '#f26d78',
   ok: '#5b8a5a',
   gradientStart: '#0A0A0A',
   gradientEnd: '#141414',
@@ -116,13 +118,15 @@ export const AtticoColorsLight: AtticoPalette = {
   // --fho-status-* (light) — see the dark palette's note above. Now the earthy
   // set from IMPLEMENTATION.md §1, muted to sit with the warm cream ground
   // rather than the saturated web-safe values these replace.
-  statusActive: '#5b8a5a',
-  statusPaused: '#d4a23a',
+  // Darkened 2026-10-27 for WCAG AA as badge text (mirrors --fho-status-*).
+  statusActive: '#3d6b3c',
+  statusPaused: '#8a6414',
   statusSold: '#c0392b',
   statusRented: '#8a4d80',
   ok: '#5b8a5a', // ShtepiaColors.ok (§4)
-  statusDraft: '#7f7a72',
+  statusDraft: '#66625b',
   error: '#d63a3a', // ShtepiaColors.danger (§4)
+  signOut: '#b42330', // --fho-signout (light): #dc3545 was 3.9:1 on cream
   gradientStart: '#faf6ef',
   gradientEnd: '#f1ede6',
 };
