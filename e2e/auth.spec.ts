@@ -1,6 +1,6 @@
 import type { Page, Route } from '@playwright/test';
 
-import { fakeSession, SIGNED_IN_USER } from './support/backend';
+import { fakeSession, SESSION_STORAGE_KEY, SIGNED_IN_USER } from './support/backend';
 import { t } from './support/i18n';
 import { axeViolations, expect, test } from './support/test';
 
@@ -36,6 +36,15 @@ async function openSignUp(page: Page) {
   await page.goto('/profile');
   await page.getByRole('button', { name: new RegExp(t('common.signUp')) }).click();
   await expect(page.getByRole('button', { name: t('auth.createAccount') })).toBeVisible();
+}
+
+/** Sign-in form → "Forgot?" with the address typed, as a person would. */
+async function openForgot(page: Page) {
+  await page.goto('/profile');
+  await page.getByRole('textbox', { name: t('auth.email') }).fill(EMAIL);
+  await page.getByRole('button', { name: t('auth.forgotShort') }).click();
+  await expect(page.getByRole('heading', { name: t('auth.forgotTitle') })).toBeVisible();
+  await expect(page.getByRole('textbox', { name: t('auth.email') })).toHaveValue(EMAIL);
 }
 
 async function typeCode(page: Page, code: string) {
@@ -124,10 +133,11 @@ test('F4-H2 password recovery: request, open the emailed link, set a new passwor
   await authRoute(page, 'token', () => [200, fakeSession()], log);
   await authRoute(page, 'user', () => [200, SIGNED_IN_USER], log);
 
-  await page.goto('/profile');
-  await page.getByRole('textbox', { name: t('auth.email') }).fill(EMAIL);
-  await page.getByRole('button', { name: t('auth.forgotShort') }).click();
-  await expect(page.getByText(t('auth.resetSent'))).toBeVisible();
+  await authRoute(page, 'logout', () => [200, {}], log);
+  await openForgot(page);
+  await page.getByRole('button', { name: t('auth.sendCode') }).click();
+  // Neutral: the same words whether or not the address has an account.
+  await expect(page.getByText(t('auth.resetCodeSent').replace('{{email}}', EMAIL))).toBeVisible();
   const recover = log.find((s) => s.path === 'recover')!;
   expect(recover.body).toMatchObject({ email: EMAIL });
   expect(recover.query.get('redirect_to')).toMatch(/\/profile$/);
@@ -152,6 +162,9 @@ test('F4-H2 password recovery: request, open the emailed link, set a new passwor
   await page.getByRole('button', { name: t('auth.updatePassword') }).click();
   await expect(page.getByText(t('auth.recoverySuccess'))).toBeVisible();
   expect(log.find((s) => s.path === 'user' && s.body.password)?.body).toMatchObject({ password: 'a-new-long-password' });
+  // Whoever else was in the account is signed out.
+  expect(log.find((s) => s.path === 'logout')?.query.get('scope')).toBe('others');
+  await expect(page.getByText(t('security.othersSignedOut'))).toBeVisible();
   // Then on to the signed-in profile.
   await page.getByRole('button', { name: t('common.done') }).click();
   await expect(page.getByRole('button', { name: t('profile.edit.title') })).toBeVisible();
@@ -164,9 +177,8 @@ test.describe('when Supabase refuses to send', () => {
   test('F4-E1 the email quota says "wait", not "try again"', async ({ page }) => {
     const log: Sent[] = [];
     await authRoute(page, 'recover', () => [429, { code: 'over_email_send_rate_limit', msg: 'email rate limit exceeded' }], log);
-    await page.goto('/profile');
-    await page.getByRole('textbox', { name: t('auth.email') }).fill(EMAIL);
-    await page.getByRole('button', { name: t('auth.forgotShort') }).click();
+    await openForgot(page);
+    await page.getByRole('button', { name: t('auth.sendCode') }).click();
     await expect(page.getByText(t('errors.rateLimited'))).toBeVisible();
   });
 });
@@ -266,5 +278,241 @@ test.describe('mobile sign-in relay on Android', () => {
     await expect(page.getByRole('link', { name: t('authCallback.openApp') })).toHaveCount(0);
     await page.waitForTimeout(1000);
     expect(new URL(page.url()).hostname).toBe('localhost');
+  });
+});
+
+// ---------- Pass 20: reset by code, links that cannot work, provider off ----------
+
+test('F4-H6 reset with the emailed code on any device: one send, code, new password', async ({ page }) => {
+  const log: Sent[] = [];
+  await page.route('**/auth/v1/recover*', async (route) => {
+    log.push({ path: 'recover', query: new URL(route.request().url()).searchParams, body: route.request().postDataJSON() });
+    await new Promise((r) => setTimeout(r, 300));
+    return json(route, 200, {});
+  });
+  await authRoute(page, 'verify', () => [200, fakeSession()], log);
+  await authRoute(page, 'user', () => [200, SIGNED_IN_USER], log);
+  await authRoute(page, 'logout', () => [200, {}], log);
+  await openForgot(page);
+  await page.getByRole('button', { name: t('auth.sendCode') }).dblclick();
+  await expect(page.getByRole('heading', { name: t('auth.enterCode') })).toBeVisible();
+  expect(log.filter((s) => s.path === 'recover')).toHaveLength(1);
+
+  await typeCode(page, '654321');
+  await expect(page.getByRole('heading', { name: t('auth.recoveryTitle') })).toBeVisible();
+  expect(log.find((s) => s.path === 'verify')?.body).toMatchObject({ email: EMAIL, token: '654321', type: 'recovery' });
+
+  await page.getByPlaceholder(t('auth.newPassword')).fill('a-new-long-password');
+  await page.getByPlaceholder(t('auth.confirmPassword')).fill('a-new-long-passworD');
+  await page.getByRole('button', { name: t('auth.updatePassword') }).click();
+  await expect(page.getByText(t('errors.passwordMismatch'))).toBeVisible();
+  expect(log.some((s) => s.path === 'user' && s.body.password)).toBe(false);
+
+  await page.getByPlaceholder(t('auth.confirmPassword')).fill('a-new-long-password');
+  await page.getByRole('button', { name: t('auth.updatePassword') }).click();
+  await expect(page.getByText(t('auth.recoverySuccess'))).toBeVisible();
+});
+
+test('F4-N7 a reset link opened in another browser says so and offers the code instead', async ({ page }) => {
+  const log: Sent[] = [];
+  await authRoute(page, 'token', () => [200, fakeSession()], log);
+  // No PKCE verifier in this browser: the link's ?code= cannot be used here.
+  await page.goto('/profile?code=from-another-browser');
+  await expect(page.getByText(t('errors.linkOtherDevice'))).toBeVisible();
+  await expect(page.getByRole('heading', { name: t('auth.forgotTitle') })).toBeVisible();
+  await expect(page).toHaveURL(/\/profile$/);
+  expect(log).toEqual([]);
+});
+
+test('F4-N8 an expired or used link says so at once, on both landing pages', async ({ page }) => {
+  await page.goto('/profile#error=access_denied&error_code=otp_expired&error_description=Email+link+is+invalid+or+has+expired');
+  await expect(page.getByText(t('errors.linkExpired'))).toBeVisible();
+  await expect(page.getByRole('heading', { name: t('auth.forgotTitle') })).toBeVisible();
+
+  const started = Date.now();
+  await page.goto('/auth/callback#error=access_denied&error_code=otp_expired&error_description=Email+link+is+invalid+or+has+expired');
+  await expect(page.getByText(t('errors.linkExpired'))).toBeVisible();
+  expect(Date.now() - started).toBeLessThan(10_000);
+  await page.getByRole('button', { name: t('authConfirm.goSignIn') }).click();
+  await expect(page).toHaveURL(/\/profile$/);
+});
+
+test('F4-N9 a sign-up link opened in another browser does not spin, it explains', async ({ page }) => {
+  await page.goto('/auth/callback?code=from-another-browser');
+  await expect(page.getByText(t('errors.linkOtherDevice'))).toBeVisible();
+});
+
+const TOKEN_HASH = 'pkce_' + '0123456789abcdef'.repeat(3) + '01234567';
+
+test('F4-H7 /auth/confirm waits for the button, then a reset link opens the new-password form', async ({ page }) => {
+  const log: Sent[] = [];
+  await authRoute(page, 'verify', () => [200, fakeSession()], log);
+  await authRoute(page, 'user', () => [200, SIGNED_IN_USER], log);
+  await page.goto(`/auth/confirm?token_hash=${TOKEN_HASH}&type=recovery`);
+  await expect(page.getByRole('heading', { name: t('authConfirm.titleRecovery') })).toBeVisible();
+  // A mail scanner opening the link uses nothing up: no verify until the press.
+  await page.waitForTimeout(500);
+  expect(log).toEqual([]);
+  // The token left the address bar.
+  await expect(page).toHaveURL(/\/auth\/confirm$/);
+  expect(await axeViolations(page)).toEqual([]);
+
+  await page.getByRole('button', { name: t('authConfirm.ctaRecovery') }).click();
+  await expect(page.getByRole('heading', { name: t('auth.recoveryTitle') })).toBeVisible();
+  expect(log.find((s) => s.path === 'verify')?.body).toMatchObject({ token_hash: TOKEN_HASH, type: 'recovery' });
+});
+
+test('F4-H8 /auth/confirm for a sign-up link confirms and signs in', async ({ page }) => {
+  const log: Sent[] = [];
+  await authRoute(page, 'verify', () => [200, fakeSession()], log);
+  await page.goto(`/auth/confirm?token_hash=${TOKEN_HASH}&type=email`);
+  await page.getByRole('button', { name: t('authConfirm.ctaEmail') }).click();
+  await expect(page).toHaveURL(/\/$/);
+  expect(log.find((s) => s.path === 'verify')?.body).toMatchObject({ token_hash: TOKEN_HASH, type: 'email' });
+});
+
+test.describe('a used confirm link', () => {
+  test.use({ allowConsoleErrors: [/403/] });
+
+  test('F4-N10 /auth/confirm: a used link says so and leads to a new code; a broken one never calls Supabase', async ({ page }) => {
+    const log: Sent[] = [];
+    await authRoute(page, 'verify', () => [403, { error_code: 'otp_expired', msg: 'Email link is invalid or has expired' }], log);
+    await page.goto(`/auth/confirm?token_hash=${TOKEN_HASH}&type=recovery`);
+    await page.getByRole('button', { name: t('authConfirm.ctaRecovery') }).click();
+    await expect(page.getByText(t('errors.linkExpired'))).toBeVisible();
+    await page.getByRole('button', { name: t('authConfirm.requestNew') }).click();
+    await expect(page.getByRole('heading', { name: t('auth.forgotTitle') })).toBeVisible();
+
+    log.length = 0;
+    await page.goto('/auth/confirm?token_hash=<script>&type=admin');
+    await expect(page.getByText(t('errors.linkInvalid'))).toBeVisible();
+    expect(log).toEqual([]);
+  });
+});
+
+test('F4-N11 an unconfirmed account is taken to its code, with a resend', async ({ page }) => {
+  const log: Sent[] = [];
+  await authRoute(page, 'token', () => [400, { error_code: 'email_not_confirmed', msg: 'Email not confirmed' }], log);
+  await authRoute(page, 'resend', () => [200, {}], log);
+  await page.goto('/profile');
+  await page.getByRole('textbox', { name: t('auth.email') }).fill(EMAIL);
+  await page.getByPlaceholder(t('auth.password'), { exact: true }).fill(PASSWORD);
+  await page.getByRole('button', { name: t('auth.stepInside') }).click();
+  await expect(page.getByText(t('auth.confirmFirst'))).toBeVisible();
+  await page.getByRole('button', { name: t('auth.resendCode') }).click();
+  await expect(page.getByText(t('auth.newCodeSent'))).toBeVisible();
+  const resend = log.find((s) => s.path === 'resend')!;
+  expect(resend.body).toMatchObject({ email: EMAIL, type: 'signup' });
+  expect(resend.query.get('redirect_to')).toMatch(/\/auth\/callback$/);
+});
+
+test('F4-N12 a provider switched off in Supabase gets a plain message, not its raw error page', async ({ page }) => {
+  await page.route('**/auth/v1/settings*', (route) => json(route, 200, { external: { email: true, google: true, apple: false, linkedin_oidc: false } }));
+  const authorize: string[] = [];
+  page.on('request', (r) => { if (r.url().includes('/authorize')) authorize.push(r.url()); });
+  await page.goto('/profile');
+  await page.getByRole('button', { name: t('auth.continueWithApple') }).click();
+  await expect(page.getByText(t('errors.providerUnavailable'))).toBeVisible();
+  expect(authorize).toEqual([]);
+  await expect(page).toHaveURL(/\/profile$/);
+});
+
+// ---------- Pass 20: change the password while signed in ----------
+
+test.describe('signed in: Password & security', () => {
+  test.use({ signedIn: true });
+  const CURRENT = 'the-current-one';
+
+  async function openSecurity(page: Page, log: Sent[]) {
+    await authRoute(page, 'token', (sent) => sent.body.password === CURRENT
+      ? [200, fakeSession()]
+      : [400, { error_code: 'invalid_credentials', msg: 'Invalid login credentials' }], log);
+    await page.route('**/auth/v1/user*', (route) => {
+      const req = route.request();
+      if (req.method() === 'PUT') log.push({ path: 'user', query: new URL(req.url()).searchParams, body: req.postDataJSON() });
+      return json(route, 200, SIGNED_IN_USER);
+    });
+    await authRoute(page, 'logout', () => [200, {}], log);
+    await page.goto('/profile');
+    await page.getByRole('button', { name: t('security.row') }).click();
+    await expect(page.getByRole('dialog', { name: t('security.title') })).toBeVisible();
+  }
+
+  test('F4-H9 the current password is checked, then the new one is set and other devices signed out', async ({ page }) => {
+    const log: Sent[] = [];
+    await openSecurity(page, log);
+    const dialog = page.getByRole('dialog', { name: t('security.title') });
+    // The sheet itself; the dimmed dashboard behind the backdrop is not on show.
+    expect(await axeViolations(page, { include: '[role="dialog"]' })).toEqual([]);
+
+    await dialog.getByLabel(t('security.currentPassword')).fill('not-it-at-all');
+    await dialog.getByLabel(t('auth.newPassword')).fill('a-brand-new-password');
+    await dialog.getByLabel(t('auth.confirmPassword')).fill('a-brand-new-password');
+    await dialog.getByRole('button', { name: t('security.save') }).click();
+    await expect(dialog.getByText(t('errors.currentPasswordWrong'))).toBeVisible();
+    expect(log.some((s) => s.path === 'user')).toBe(false);
+
+    await dialog.getByLabel(t('security.currentPassword')).fill(CURRENT);
+    await dialog.getByRole('button', { name: t('security.save') }).dblclick();
+    await expect(dialog.getByText(t('security.success'))).toBeVisible();
+    await expect(dialog.getByText(t('security.othersSignedOut'))).toBeVisible();
+    const checks = log.filter((s) => s.path === 'token');
+    expect(checks.at(-1)?.body).toMatchObject({ email: SIGNED_IN_USER.email, password: CURRENT });
+    expect(log.filter((s) => s.path === 'user')).toHaveLength(1);
+    expect(log.find((s) => s.path === 'user')?.body).toMatchObject({ password: 'a-brand-new-password' });
+    expect(log.find((s) => s.path === 'logout')?.query.get('scope')).toBe('others');
+    // The passwords are not left behind anywhere the page can read later.
+    const stored = await page.evaluate(() => JSON.stringify({ ...localStorage }) + JSON.stringify({ ...sessionStorage }));
+    expect(stored).not.toContain('a-brand-new-password');
+    expect(stored).not.toContain(CURRENT);
+  });
+
+  test('F4-N13 mismatched, short or unchanged new passwords never reach Supabase', async ({ page }) => {
+    const log: Sent[] = [];
+    await openSecurity(page, log);
+    const dialog = page.getByRole('dialog', { name: t('security.title') });
+    const fill = async (current: string, next: string, confirm: string) => {
+      await dialog.getByLabel(t('security.currentPassword')).fill(current);
+      await dialog.getByLabel(t('auth.newPassword')).fill(next);
+      await dialog.getByLabel(t('auth.confirmPassword')).fill(confirm);
+      await dialog.getByRole('button', { name: t('security.save') }).click();
+    };
+    await fill(CURRENT, 'short', 'short');
+    await expect(dialog.getByText(t('errors.passwordMin'), { exact: true }).last()).toBeVisible();
+    await fill(CURRENT, 'long-enough-one', 'long-enough-two');
+    await expect(dialog.getByText(t('errors.passwordMismatch'))).toBeVisible();
+    await fill(CURRENT, CURRENT, CURRENT);
+    await expect(dialog.getByText(t('errors.passwordSame'))).toBeVisible();
+    expect(log).toEqual([]);
+  });
+
+  test('F4-N14 a session that has ended says so instead of "something went wrong"', async ({ page }) => {
+    const log: Sent[] = [];
+    await openSecurity(page, log);
+    await page.unroute('**/auth/v1/user*');
+    await page.route('**/auth/v1/user*', (route) => route.request().method() === 'PUT'
+      ? json(route, 403, { error_code: 'session_not_found', msg: 'Session from session_id claim in JWT does not exist' })
+      : json(route, 200, SIGNED_IN_USER));
+    const dialog = page.getByRole('dialog', { name: t('security.title') });
+    await dialog.getByLabel(t('security.currentPassword')).fill(CURRENT);
+    await dialog.getByLabel(t('auth.newPassword')).fill('a-brand-new-password');
+    await dialog.getByLabel(t('auth.confirmPassword')).fill('a-brand-new-password');
+    await dialog.getByRole('button', { name: t('security.save') }).click();
+    await expect(dialog.getByText(t('errors.sessionExpired'))).toBeVisible();
+  });
+});
+
+test.describe('signed in with Google only', () => {
+  test.use({ signedIn: true });
+
+  test('F4-N15 a Google-only account is told there is no password here, not shown a form', async ({ page }) => {
+    const googleOnly = { ...SIGNED_IN_USER, app_metadata: { provider: 'google', providers: ['google'] }, identities: [{ provider: 'google' }] };
+    await page.addInitScript(([key, session]) => localStorage.setItem(key, session), [SESSION_STORAGE_KEY, JSON.stringify({ ...fakeSession(), user: googleOnly })] as const);
+    await page.route('**/auth/v1/user*', (route) => json(route, 200, googleOnly));
+    await page.goto('/profile');
+    await page.getByRole('button', { name: t('security.row') }).click();
+    const dialog = page.getByRole('dialog', { name: t('security.title') });
+    await expect(dialog.getByText(t('security.providerOnly').replaceAll('{{providers}}', 'Google'))).toBeVisible();
+    await expect(dialog.getByLabel(t('security.currentPassword'))).toHaveCount(0);
   });
 });

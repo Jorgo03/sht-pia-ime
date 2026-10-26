@@ -1,7 +1,7 @@
 // First: PKCE needs a secure random source before any sign-in starts.
 import '@/lib/crypto-polyfill';
 import { createClient } from '@supabase/supabase-js';
-import { Platform } from 'react-native';
+import { AppState, Platform } from 'react-native';
 
 const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
@@ -92,3 +92,14 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     flowType: 'pkce',
   },
 });
+
+// Supabase's React Native guidance: refresh the session only while the app is
+// in the foreground, and straight away on coming back. Off by itself, the
+// refresh timer kept ticking (or was frozen) in the background, and on return
+// the first requests could carry an expired token until the next tick.
+if (!isSSR && Platform.OS !== 'web') {
+  AppState.addEventListener('change', (state) => {
+    if (state === 'active') supabase.auth.startAutoRefresh();
+    else supabase.auth.stopAutoRefresh();
+  });
+}

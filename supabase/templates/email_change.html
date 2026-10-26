@@ -12,12 +12,12 @@
         <tr><td style="padding-top:20px;font-size:16px;line-height:1.5;">
           <p style="margin:0 0 12px;">Kodi për të konfirmuar adresën e re {{ .NewEmail }}:</p>
           <p style="margin:0 0 16px;font-family:'Courier New',monospace;font-size:30px;letter-spacing:8px;font-weight:bold;color:#1a1714;">{{ .Token }}</p>
-          <p style="margin:0 0 8px;font-size:14px;"><a href="{{ .ConfirmationURL }}" style="color:#b34700;">Ose konfirmoni me këtë lidhje</a></p>
+          <p style="margin:0 0 8px;font-size:14px;"><a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&amp;type=email_change" style="color:#b34700;">Ose konfirmoni me këtë lidhje</a></p>
           <p style="margin:16px 0 0;font-size:13px;color:#5c5852;">Nëse nuk e kërkuat ju këtë ndryshim, mos bëni asgjë dhe na shkruani.</p>
         </td></tr>
         <tr><td style="padding-top:20px;border-top:1px solid #e8e2d8;font-size:14px;line-height:1.5;color:#3d3a36;" lang="en">
           <p style="margin:16px 0 8px;">Your code to confirm the new address {{ .NewEmail }} is shown above.</p>
-          <p style="margin:0 0 8px;font-size:14px;"><a href="{{ .ConfirmationURL }}" style="color:#b34700;">Or confirm with this link</a></p>
+          <p style="margin:0 0 8px;font-size:14px;"><a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&amp;type=email_change" style="color:#b34700;">Or confirm with this link</a></p>
           <p style="margin:12px 0 0;font-size:13px;color:#5c5852;">If you didn't ask for this change, do nothing and contact us.</p>
         </td></tr>
       </table>

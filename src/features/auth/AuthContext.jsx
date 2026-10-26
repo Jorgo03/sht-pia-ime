@@ -3,8 +3,24 @@ import i18n from '../../i18n/index.js'
 import { supabase } from '../../lib/supabase'
 import { classifyAuthEvent } from '../../lib/authEvents'
 import { signOutOfDevice } from '../../lib/signOut'
+import { changePassword as changePasswordOnServer, signOutOtherDevices } from './lib/password'
 
 const AuthContext = createContext(null)
+
+// Survives a reload in the middle of a password reset: the recovery session is
+// restored as an ordinary INITIAL_SESSION, which used to drop the person onto
+// the dashboard with the old password still in place and no way back to the
+// new-password form. sessionStorage, so it ends with the tab.
+const RECOVERY_FLAG = 'fho_password_recovery'
+const rememberRecovery = (on) => {
+  try {
+    if (on) sessionStorage.setItem(RECOVERY_FLAG, '1')
+    else sessionStorage.removeItem(RECOVERY_FLAG)
+  } catch { /* storage blocked: the flag lives for this page only */ }
+}
+const recoveryRemembered = () => {
+  try { return sessionStorage.getItem(RECOVERY_FLAG) === '1' } catch { return false }
+}
 
 /**
  * How long the first paint may wait on the profile fetch.
@@ -169,7 +185,12 @@ export function AuthProvider({ children }) {
         generation.current += 1
         const myGeneration = generation.current
 
-        if ('passwordRecovery' in decision) setPasswordRecovery(decision.passwordRecovery)
+        if ('passwordRecovery' in decision) {
+          setPasswordRecovery(decision.passwordRecovery)
+          rememberRecovery(decision.passwordRecovery)
+        } else if (event === 'INITIAL_SESSION' && session && recoveryRemembered()) {
+          setPasswordRecovery(true)
+        }
 
         if (decision.action === 'clear') {
           setState({ user: null, session: null, profile: null, loading: false })
@@ -293,7 +314,11 @@ export function AuthProvider({ children }) {
   // Resend the right kind of code for the flow that's waiting on it.
   const resendCode = async (email, type = 'email') => {
     if (type === 'signup') {
-      const { error } = await supabase.auth.resend({ type: 'signup', email })
+      const { error } = await supabase.auth.resend({
+        type: 'signup',
+        email,
+        options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
+      })
       return { error }
     }
     return sendOtp(email)
@@ -322,15 +347,32 @@ export function AuthProvider({ children }) {
     return { error }
   }
 
+  // The 6-digit code from the recovery email, for when the link cannot be
+  // used: opened on another device, or eaten by a mail scanner. A right code
+  // gives a recovery session and fires PASSWORD_RECOVERY, which shows the
+  // new-password form exactly as the link does.
+  const verifyRecoveryCode = async (email, token) => {
+    const { error } = await supabase.auth.verifyOtp({ email, token, type: 'recovery' })
+    return { error }
+  }
+
   // Completes the recovery flow the PASSWORD_RECOVERY branch above started.
   // Only meaningful while passwordRecovery is true — the recovery link's own
   // session is what authorizes this updateUser() call, same as any other
-  // authenticated request.
+  // authenticated request. Someone resetting a forgotten password may be
+  // locking someone else out, so every other session is ended too.
   const updatePassword = async (newPassword) => {
     const { error } = await supabase.auth.updateUser({ password: newPassword })
-    if (!error) setPasswordRecovery(false)
-    return { error }
+    if (error) return { error, othersSignedOut: false }
+    const othersSignedOut = await signOutOtherDevices(supabase)
+    setPasswordRecovery(false)
+    rememberRecovery(false)
+    return { error: null, othersSignedOut }
   }
+
+  // Signed in and knows the current password: checked first (see lib/password.js).
+  const changePassword = (currentPassword, newPassword) =>
+    changePasswordOnServer(supabase, { email: state.user?.email ?? '', currentPassword, newPassword })
 
   const signOut = async () => {
     // Invalidate first: any profile fetch already in flight is now stale, and
@@ -345,6 +387,7 @@ export function AuthProvider({ children }) {
     // event, and the error is surfaced instead of swallowed.
     setState({ user: null, session: null, profile: null, loading: false })
     setPasswordRecovery(false)
+    rememberRecovery(false)
     return { error }
   }
 
@@ -357,6 +400,8 @@ export function AuthProvider({ children }) {
     isAgent: state.profile?.role === 'agent',
     passwordRecovery,
     updatePassword,
+    verifyRecoveryCode,
+    changePassword,
     welcomeName,
     clearWelcome: () => setWelcomeName(null),
     signUp,

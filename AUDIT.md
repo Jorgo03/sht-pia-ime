@@ -1,5 +1,123 @@
 # Pre-Launch Audit — Shtëpia.ime (Vite web app)
 
+## ═══ PASS 20 — 2026-10-26: SIGN-IN, PASSWORDS AND AUTH EMAIL (owner master prompt) ═══
+
+**Method.** Both apps' auth code read in full (website `src/features/auth/`,
+phone `contexts/auth-context.tsx`, `app/(tabs)/profile.tsx`, both Supabase
+clients, templates, `config.toml`), installed `@supabase/auth-js` 2.105.4
+checked for the exact behaviour relied on. Three read-only finder agents were
+started and all died on the plan's usage limit with nothing returned; the
+audit was done by the lead alone. Live, read-only evidence:
+
+| Check (2026-10-26, 14:11 UTC) | Result |
+| --- | --- |
+| `GET /auth/v1/settings` (public) | `mailer_autoconfirm: true` (**Confirm email is OFF**), `disable_signup: false`, `email: true`, `google: true`, `apple: false`, `linkedin_oidc: false` |
+| One `POST /auth/v1/recover` for the QA account `claude-test@shtepia.dev` (domain does not exist, NXDOMAIN, so nobody could receive it) | **HTTP 500 `unexpected_failure` "Error sending recovery email"**: the SMTP sender still refuses (DECISIONS.md §15: Resend without a verified domain) |
+| DNS `resend.dev` (current sender `onboarding@resend.dev`) | Resend's shared test domain (SPF `include:_spf.google.com -all`, DMARC `p=reject`). Not ours; usable only for the Resend account owner's own address |
+| A domain for Shtëpia.ime | **None exists** (repo mentions `https://shtepia.ime`, not a real TLD). SPF/DKIM/DMARC for a brand sender: nothing to check yet |
+
+### Findings (verified unless marked)
+
+1. **P1 — Forgot password and email-code sign-in fail for every real user
+   today** (live 500 above). Cause: external (SMTP sender with no verified
+   domain). The apps now say so plainly (`errors.emailSendFailed`, reworded
+   from "confirmation email" to "the email", since it covers resets too).
+2. **P1 — Email confirmation is OFF in production** (owner's option A, §15).
+   Accounts are created for addresses nobody has proved they own. Beyond
+   "unverified addresses": Supabase links sign-ins that share a verified
+   email, so someone could register a stranger's address with a password
+   and still hold that password after the real owner later signs in with
+   Google (pre-account takeover; SUSPECTED, follows Supabase's documented
+   linking rules, not reproduced). Fix order in DECISIONS.md §17.
+3. **P1 — No way to change the password while signed in** (both apps).
+   Built: "Password & security".
+4. **P1 — Website: no place to type the reset code**, although the email
+   tells people to; the reset worked only through the link, and only in the
+   browser that asked (PKCE verifier). Built: a reset step with the code.
+5. **P2 — Website: a reset or confirmation link opened in another browser,
+   expired or already used, showed nothing** (`/profile`) or spun for 15 s
+   then blamed "the provider" (`/auth/callback`). auth-js leaves `?code=` in
+   place when the verifier is missing and returns no error.
+6. **P2 — Email links could be used up by mail scanners** (Outlook Safe
+   Links and similar open links): `{{ .ConfirmationURL }}` verifies on GET.
+7. **P2 — Website: Apple and LinkedIn buttons replace the page with
+   Supabase's raw JSON** (`provider is not enabled`), the providers being off.
+8. **P2 — Sign-in with an unconfirmed email was a dead end** (message, no
+   code entry or resend) in both apps.
+9. **P2 — Errors matched on English text only**; same_password, breached
+   password, ended session and no connection all read "Something went
+   wrong". The phone app had its own copy of the mapper.
+10. **P3 — Phone reset: no step asking for the address, no double-tap guard,
+    no server-wait handling** (the second email kills the first code).
+11. **P3 — Website reset state lost on reload** (back on the dashboard with
+    the old password and no form).
+12. **P3 — Phone app did not pause/resume token refresh with the app state**
+    (Supabase's React Native guidance).
+13. **P3 — Password fields had no autofill hints or labels** for password
+    managers and screen readers (both apps); website resend of a sign-up code
+    lost its redirect.
+
+Checked and fine: one Supabase client per app; PKCE on both; no token or
+password logged; ProtectedRoute waits for the profile (Pass 19); relay
+allows only `exp:`/`shtepia-ime:` (P2 still open, owner decision); role
+writes only through `claim_role` (RLS per AUDIT/DECISIONS §16); sign-in
+errors neutral ("Invalid email or password"); reset answers identical for
+unknown addresses (Supabase returns 200).
+
+### Fixed
+
+- `src/lib/authErrors.js`: error **codes** first (30 codes), then the old
+  text matches; network, ended session, breached/simple/short password,
+  same password, link expired/other device. Phone app uses this one mapper.
+- `src/features/auth/lib/password.js` (new, both apps): rules (8 chars,
+  72-byte bcrypt limit, not the current one, confirmation), sign-in methods
+  (Google-only accounts have no password), and `changePassword`: checks the
+  current password with `signInWithPassword` (which also gives the fresh
+  session "Secure password change" needs), `updateUser`, then
+  `signOut({ scope: 'others' })`.
+- **Password & security** sheet, website `ChangePasswordSheet.jsx` and phone
+  `components/profile/change-password-sheet.tsx`: current/new/confirm,
+  show/hide, rules, one request at a time, success, "other devices signed
+  out", ended-session message, "Forgot your current password?" → email code →
+  new password; Google/Apple-only accounts get an explanation, no form.
+- Reset (both apps): its own step for the address, neutral message
+  ("If an account exists…"), guarded send, server wait honoured, code entry
+  (website now too), new password with the same rules, other sessions ended
+  after a reset; website keeps the reset form across a reload.
+- `src/features/auth/lib/authLinks.js` (new) + `pages/AuthConfirm.jsx`
+  (new, `/auth/confirm`): email links carry `token_hash`, verified only when
+  the person presses the button, on any device; the token leaves the address
+  bar; only fixed routes are ever navigated to. `/profile` and
+  `/auth/callback` now explain expired, used and other-browser links at once.
+- Templates: links → `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=…`;
+  new security notice `password_changed_notification.html` (no link on
+  purpose). `config.toml` (local): password ≥ 8, secure password change on,
+  notification wired.
+- Provider switched off → "This sign-in option isn't available yet"
+  (Auth's public `/settings`), both apps.
+- Unconfirmed sign-in → code entry with resend; sign-up code screen says
+  what to do if the link was already opened. Autofill and labels on every
+  auth field. Phone: `startAutoRefresh`/`stopAutoRefresh` on AppState.
+- 40 new strings × 8 languages.
+
+### Verification
+
+| Command | Result |
+| --- | --- |
+| `npx tsc --noEmit` | clean |
+| `npm run lint` | 0 errors, 33 warnings (32 before; the new one is the same set-state-in-effect pattern) |
+| `npm test` | 311/311 (17 new: `password`, `authLinks`, `authErrors` codes, templates) |
+| `npm run build` | OK |
+| `npm run test:e2e` | 200 passed, 2 skipped (26 new: F4-H6–H9, F4-N7–N15 × 2 viewports; F4-H2/E1 updated) |
+| `npm run test:e2e:expo` | 107 passed, 13 skipped (6 new: X30–X32 × 2; X27 updated) |
+| `npx expo export -p android` | bundles |
+
+All email in tests is simulated (fake backend). **No real email was sent or
+delivered.** Not verified: a real reset/confirmation round trip in an inbox,
+Inbox vs Spam placement, SPF/DKIM/DMARC (no domain), the hosted Site URL and
+redirect list (dashboard only), the new templates in the dashboard (not yet
+pasted), native iOS/Android password autofill on a device.
+
 ## ═══ PASS 19 — 2026-10-25/26: FULL AUDIT (owner master prompt) ═══
 
 **Method.** Baseline first, then four slice auditors (backend, search/map,

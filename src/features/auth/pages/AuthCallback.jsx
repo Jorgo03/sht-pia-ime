@@ -3,6 +3,8 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../../../lib/supabase";
 import LoadingScreen from "../../../shared/LoadingScreen";
+import "../../../styles/profile.css";
+import { authRedirectError, hasAuthCode, linkErrorKey } from "../lib/authLinks";
 
 /**
  * Schemes this page may hand an authorization code to.
@@ -84,6 +86,9 @@ export default function AuthCallback() {
   // web app" symptom. The automatic attempt below still runs and usually
   // wins; this is the visible fallback for when it does not.
   const [relayTarget, setRelayTarget] = useState(null);
+  // A link that cannot sign anyone in, shown at once with a way on, instead
+  // of a spinner that gave up after 15 seconds and blamed "the provider".
+  const [failure, setFailure] = useState(null);
 
   useEffect(() => {
     let mounted = true;
@@ -103,8 +108,23 @@ export default function AuthCallback() {
       return;
     }
 
+    // Read before supabase-js tidies the address.
+    const href = window.location.href;
+    const linkError = authRedirectError(href);
+    if (linkError) {
+      settled.current = true;
+      const key = linkErrorKey(linkError);
+      // A provider's refusal keeps its old message on the sign-in page; an
+      // expired or used email link says so here.
+      if (key === "errors.oauthFailed") navigate("/profile?error=oauth_failed", { replace: true });
+      else setFailure(key);
+      return;
+    }
+
     const finishAuth = async () => {
       try {
+        // Settles once the client has tried to exchange a ?code= for a session.
+        await supabase.auth.initialize();
         // First check whether Supabase has already restored the session.
         // This is important because onAuthStateChange can fire before or
         // after this callback runs depending on the browser/provider timing.
@@ -117,6 +137,16 @@ export default function AuthCallback() {
         if (session?.user) {
           settled.current = true;
           navigate("/", { replace: true });
+          return;
+        }
+
+        // A confirmation or sign-in link opened in another browser: the
+        // verifier for its ?code= lives in the browser that asked, so the
+        // code was never exchanged. (A confirmation is already done by then;
+        // only the session is missing.)
+        if (hasAuthCode(window.location.href)) {
+          settled.current = true;
+          setFailure("errors.linkOtherDevice");
           return;
         }
 
@@ -205,6 +235,21 @@ export default function AuthCallback() {
         <p style={{ fontSize: 12, opacity: 0.5, margin: 0, maxWidth: 320 }}>
           {t("authCallback.tapHint")}
         </p>
+      </div>
+    );
+  }
+
+  if (failure) {
+    return (
+      <div className="profile-page auth-screen">
+        <div className="auth-content">
+          <div className="auth-glass">
+            <div className="auth-message auth-message--error" role="alert">{t(failure)}</div>
+            <button className="cta-pill" onClick={() => navigate("/profile", { replace: true })}>
+              {t("authConfirm.goSignIn")}
+            </button>
+          </div>
+        </div>
       </div>
     );
   }

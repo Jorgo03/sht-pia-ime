@@ -47,7 +47,7 @@
     "accessClient": "Accesso acquirenti e affittuari",
     "accessAgent": "Accesso al portale agenti",
     "forgotShort": "Dimenticata?",
-    "resetSent": "Controlla la tua email per reimpostare la password.",
+    "resetSent": "Se esiste un account con questa email, abbiamo inviato un codice per reimpostare la password.",
     "recoveryTitle": "Imposta una nuova password",
     "recoverySubtitle": "Scegli una nuova password per il tuo account.",
     "newPassword": "Nuova password",
@@ -85,7 +85,13 @@
     "showPassword": "Mostra password",
     "hidePassword": "Nascondi password",
     "codeDigit": "Cifra {{n}} di 6",
-    "newCodeSent": "È stato inviato un nuovo codice. I codici precedenti non valgono più."
+    "newCodeSent": "È stato inviato un nuovo codice. I codici precedenti non valgono più.",
+    "forgotTitle": "Reimposta la password",
+    "forgotSubtitle": "Inserisci l’email del tuo account. Ti invieremo un codice a 6 cifre.",
+    "resetCodeSent": "Se esiste un account per {{email}}, abbiamo inviato un codice a 6 cifre.",
+    "backToSignIn": "Torna all’accesso",
+    "confirmFirst": "Prima conferma la tua email: inserisci il codice inviato o richiedine uno nuovo.",
+    "signupCodeHint": "Hai già aperto il link nell’email? Allora l’email è confermata: accedi."
   },
   "home": {
     "greetingMorning": "Buongiorno",
@@ -308,10 +314,23 @@
     "invalidCode": "Il codice è errato o non è più valido. Usa l'ultimo codice che ti abbiamo inviato.",
     "videoInvalidType": "Sono consentiti solo video MP4 o MOV",
     "videoTooLarge": "Video troppo grande (max {{max}} MB)",
-    "emailSendFailed": "Non siamo riusciti a inviare l’email di conferma. È un problema di configurazione del server, non del tuo account — contatta l’amministratore.",
+    "emailSendFailed": "Non siamo riusciti a inviare l’email. È un problema di configurazione del server, non del tuo account — contatta l’amministratore.",
     "waitSeconds": "Attendi {{s}} secondi prima di chiedere un nuovo codice.",
     "photoPrepareFailed": "Non è stato possibile preparare una foto per il caricamento. Riprova o scegli un'altra foto.",
-    "listingSaveFailed": "L'annuncio non è stato salvato. Tutto ciò che hai inserito è ancora qui; riprova."
+    "listingSaveFailed": "L'annuncio non è stato salvato. Tutto ciò che hai inserito è ancora qui; riprova.",
+    "network": "Impossibile raggiungere il server. Controlla la connessione e riprova.",
+    "sessionExpired": "La sessione è scaduta. Accedi di nuovo.",
+    "passwordSame": "Scegli una password diversa da quella attuale.",
+    "passwordPwned": "Questa password è comparsa in una violazione di dati. Scegline un’altra.",
+    "passwordWeak": "Questa password è troppo semplice. Combina lettere, numeri e simboli.",
+    "passwordTooLong": "La password è troppo lunga. Usa al massimo 72 caratteri.",
+    "reauthNeeded": "Per sicurezza, conferma prima con un codice ricevuto via email.",
+    "signupDisabled": "Al momento non è possibile creare nuovi account.",
+    "linkExpired": "Questo link è scaduto o è già stato usato. Richiedi un nuovo codice.",
+    "linkInvalid": "Questo link non è valido. Richiedi un nuovo codice.",
+    "linkOtherDevice": "Hai aperto il link in un browser diverso da quello in cui l’hai richiesto. Inserisci invece il codice a 6 cifre dell’email.",
+    "currentPasswordWrong": "La password attuale non è corretta.",
+    "providerUnavailable": "Questo metodo di accesso non è ancora disponibile. Scegline un altro."
   },
   "agentDashboard": {
     "title": "Dashboard Agente",
@@ -713,5 +732,28 @@
   "seo": {
     "siteTitle": "Shtëpia.ime — Case in vendita e in affitto in Albania",
     "siteDescription": "Appartamenti, ville e uffici in vendita e in affitto a Tirana, Durazzo e in tutta l'Albania. Contatta direttamente agenti e proprietari."
+  },
+  "security": {
+    "row": "Password e sicurezza",
+    "title": "Cambia password",
+    "currentPassword": "Password attuale",
+    "save": "Salva la nuova password",
+    "success": "La password è stata cambiata.",
+    "othersSignedOut": "Gli altri dispositivi sono stati disconnessi.",
+    "forgotCurrent": "Hai dimenticato la password attuale?",
+    "codeIntro": "Invieremo un codice a 6 cifre a {{email}}. Inseriscilo qui, poi scegli la nuova password.",
+    "providerOnly": "Accedi con {{providers}}, quindi non c’è una password Shtëpia.ime da cambiare. Il tuo account è protetto dal tuo account {{providers}}."
+  },
+  "authConfirm": {
+    "titleEmail": "Conferma la tua email",
+    "titleRecovery": "Reimposta la password",
+    "titleEmailChange": "Conferma la nuova email",
+    "intro": "Per la tua sicurezza, continua con il pulsante qui sotto.",
+    "ctaEmail": "Conferma e accedi",
+    "ctaRecovery": "Continua",
+    "ctaEmailChange": "Conferma nuova email",
+    "emailChanged": "L’indirizzo email è stato aggiornato.",
+    "requestNew": "Richiedi un nuovo codice",
+    "goSignIn": "Vai all’accesso"
   }
 }

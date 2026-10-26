@@ -346,6 +346,10 @@ test('X27 forgot password: the code opens the new-password step, which stays unt
   await ready(page);
   await page.getByRole('textbox', { name: t('auth.email') }).fill('agent@example.com');
   await page.getByRole('button', { name: t('auth.forgotShort') }).click();
+  // Its own step, with the address already typed.
+  await expect(page.getByText(t('auth.forgotTitle'))).toBeVisible();
+  await expect(page.getByRole('textbox', { name: t('auth.email') })).toHaveValue('agent@example.com');
+  await page.getByRole('button', { name: t('auth.sendCode') }).click();
   await page.getByRole('textbox', { name: t('auth.codeDigit').replace('{{n}}', '1') }).fill('123456');
 
   const newPassword = page.getByPlaceholder(t('auth.newPassword'));
@@ -720,4 +724,80 @@ test.describe('profile photo', () => {
     expect(backend.removed).toEqual([backend.uploads[0].path]);
     expect(backend.removed).not.toContain(`${SIGNED_IN_USER.id}/avatar-1.jpg`);
   });
+});
+
+// Pass 20: change the password while signed in, in the app.
+test.describe('signed in: Password & security', () => {
+  test.use({ signedIn: true });
+  const CURRENT = 'the-current-one';
+
+  test('X30 the current password is checked first, then the new one is set and other devices signed out', async ({ page }) => {
+    const checks: Record<string, unknown>[] = [];
+    const saved: unknown[] = [];
+    const logouts: string[] = [];
+    await page.route('**/auth/v1/token*', (route) => {
+      const body = route.request().postDataJSON();
+      checks.push(body);
+      return body.password === CURRENT
+        ? json(route, fakeSession())
+        : json(route, { error_code: 'invalid_credentials', msg: 'Invalid login credentials' }, 400);
+    });
+    await page.route('**/auth/v1/user*', (route) => {
+      if (route.request().method() === 'PUT') saved.push(route.request().postDataJSON());
+      return json(route, SIGNED_IN_USER);
+    });
+    await page.route('**/auth/v1/logout*', (route) => {
+      logouts.push(route.request().url());
+      return json(route, {});
+    });
+    await page.goto('/profile');
+    await ready(page);
+    await page.getByRole('button', { name: t('security.row') }).click();
+    await expect(page.getByText(t('security.title')).first()).toBeVisible();
+
+    await page.getByLabel(t('security.currentPassword')).fill('not-it-at-all');
+    await page.getByLabel(t('auth.newPassword')).fill('a-brand-new-password');
+    await page.getByLabel(t('auth.confirmPassword')).fill('a-brand-new-password');
+    await page.getByRole('button', { name: t('security.save') }).click();
+    await expect(page.getByText(t('errors.currentPasswordWrong'))).toBeVisible();
+    expect(saved).toEqual([]);
+
+    await page.getByLabel(t('security.currentPassword')).fill(CURRENT);
+    await page.getByRole('button', { name: t('security.save') }).click();
+    await expect(page.getByText(t('security.success'))).toBeVisible();
+    await expect(page.getByText(t('security.othersSignedOut'))).toBeVisible();
+    expect(checks.at(-1)).toMatchObject({ email: SIGNED_IN_USER.email, password: CURRENT });
+    expect(saved).toHaveLength(1);
+    expect(saved[0]).toMatchObject({ password: 'a-brand-new-password' });
+    expect(logouts.some((u) => u.includes('scope=others'))).toBe(true);
+  });
+
+  test('X31 a short or mismatched new password never reaches Supabase', async ({ page }) => {
+    const calls: string[] = [];
+    await page.route('**/auth/v1/token*', (route) => { calls.push('token'); return json(route, fakeSession()); });
+    await page.goto('/profile');
+    await ready(page);
+    await page.getByRole('button', { name: t('security.row') }).click();
+    await page.getByLabel(t('security.currentPassword')).fill(CURRENT);
+    await page.getByLabel(t('auth.newPassword')).fill('short');
+    await page.getByLabel(t('auth.confirmPassword')).fill('short');
+    await page.getByRole('button', { name: t('security.save') }).click();
+    await expect(page.getByText(t('errors.passwordMin')).last()).toBeVisible();
+    await page.getByLabel(t('auth.newPassword')).fill('long-enough-one');
+    await page.getByLabel(t('auth.confirmPassword')).fill('long-enough-two');
+    await page.getByRole('button', { name: t('security.save') }).click();
+    await expect(page.getByText(t('errors.passwordMismatch'))).toBeVisible();
+    expect(calls).toEqual([]);
+  });
+});
+
+test('X32 signing in before confirming the email opens the code entry instead of a dead end', async ({ page }) => {
+  await page.route('**/auth/v1/token*', (route) => json(route, { error_code: 'email_not_confirmed', msg: 'Email not confirmed' }, 400));
+  await page.goto('/profile');
+  await ready(page);
+  await page.getByRole('textbox', { name: t('auth.email') }).fill('new.user@example.com');
+  await page.getByLabel(t('auth.password'), { exact: true }).fill('correct-horse-battery');
+  await page.getByRole('button', { name: t('auth.stepInside') }).click();
+  await expect(page.getByText(t('auth.enterCode')).first()).toBeVisible();
+  await expect(page.getByText(t('auth.signupCodeHint'))).toBeVisible();
 });

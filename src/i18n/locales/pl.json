@@ -47,7 +47,7 @@
     "accessClient": "Dostęp dla kupujących i najemców",
     "accessAgent": "Dostęp do portalu agenta",
     "forgotShort": "Zapomniałeś?",
-    "resetSent": "Sprawdź e-mail, aby zresetować hasło.",
+    "resetSent": "Jeśli istnieje konto z tym adresem, wysłaliśmy kod do zresetowania hasła.",
     "recoveryTitle": "Ustaw nowe hasło",
     "recoverySubtitle": "Wybierz nowe hasło do swojego konta.",
     "newPassword": "Nowe hasło",
@@ -85,7 +85,13 @@
     "showPassword": "Pokaż hasło",
     "hidePassword": "Ukryj hasło",
     "codeDigit": "Cyfra {{n}} z 6",
-    "newCodeSent": "Wysłano nowy kod. Wcześniejsze kody już nie działają."
+    "newCodeSent": "Wysłano nowy kod. Wcześniejsze kody już nie działają.",
+    "forgotTitle": "Zresetuj hasło",
+    "forgotSubtitle": "Podaj e-mail konta. Wyślemy 6-cyfrowy kod.",
+    "resetCodeSent": "Jeśli istnieje konto dla {{email}}, wysłaliśmy 6-cyfrowy kod.",
+    "backToSignIn": "Wróć do logowania",
+    "confirmFirst": "Najpierw potwierdź e-mail: wpisz wysłany kod lub poproś o nowy.",
+    "signupCodeHint": "Link z e-maila już otwarty? Wtedy adres jest potwierdzony — zaloguj się."
   },
   "home": {
     "greetingMorning": "Dzień dobry",
@@ -316,10 +322,23 @@
     "invalidCode": "Kod jest nieprawidłowy lub już nieważny. Użyj ostatniego kodu, który wysłaliśmy.",
     "videoInvalidType": "Dozwolone są tylko filmy MP4 lub MOV",
     "videoTooLarge": "Wideo jest za duże (maks. {{max}} MB)",
-    "emailSendFailed": "Nie udało się wysłać e-maila potwierdzającego. To problem z konfiguracją serwera, nie z Twoim kontem — skontaktuj się z administratorem.",
+    "emailSendFailed": "Nie udało się wysłać e-maila. To problem z konfiguracją serwera, nie z Twoim kontem — skontaktuj się z administratorem.",
     "waitSeconds": "Poczekaj {{s}} s, zanim poprosisz o nowy kod.",
     "photoPrepareFailed": "Nie udało się przygotować zdjęcia do wysłania. Spróbuj ponownie lub wybierz inne zdjęcie.",
-    "listingSaveFailed": "Ogłoszenie nie zostało zapisane. Wszystko, co wpisałeś, nadal tu jest; spróbuj ponownie."
+    "listingSaveFailed": "Ogłoszenie nie zostało zapisane. Wszystko, co wpisałeś, nadal tu jest; spróbuj ponownie.",
+    "network": "Nie udało się połączyć z serwerem. Sprawdź połączenie i spróbuj ponownie.",
+    "sessionExpired": "Sesja wygasła. Zaloguj się ponownie.",
+    "passwordSame": "Wybierz hasło inne niż obecne.",
+    "passwordPwned": "To hasło pojawiło się w wycieku danych. Wybierz inne.",
+    "passwordWeak": "To hasło jest zbyt proste. Połącz litery, cyfry i symbole.",
+    "passwordTooLong": "Hasło jest za długie. Użyj najwyżej 72 znaków.",
+    "reauthNeeded": "Dla bezpieczeństwa najpierw potwierdź kodem z e-maila.",
+    "signupDisabled": "Obecnie nie można tworzyć nowych kont.",
+    "linkExpired": "Ten link wygasł lub został już użyty. Poproś o nowy kod.",
+    "linkInvalid": "Ten link jest nieprawidłowy. Poproś o nowy kod.",
+    "linkOtherDevice": "Link otwarto w innej przeglądarce niż ta, w której o niego proszono. Wpisz 6-cyfrowy kod z e-maila.",
+    "currentPasswordWrong": "Obecne hasło jest nieprawidłowe.",
+    "providerUnavailable": "Ta metoda logowania nie jest jeszcze dostępna. Wybierz inną."
   },
   "agentDashboard": {
     "title": "Panel Agenta",
@@ -721,5 +740,28 @@
   "seo": {
     "siteTitle": "Shtëpia.ime — Nieruchomości na sprzedaż i wynajem w Albanii",
     "siteDescription": "Mieszkania, wille i biura na sprzedaż i wynajem w Tiranie, Durrës i całej Albanii. Kontaktuj się bezpośrednio z agentami i właścicielami."
+  },
+  "security": {
+    "row": "Hasło i bezpieczeństwo",
+    "title": "Zmień hasło",
+    "currentPassword": "Obecne hasło",
+    "save": "Zapisz nowe hasło",
+    "success": "Hasło zostało zmienione.",
+    "othersSignedOut": "Wylogowano Cię na innych urządzeniach.",
+    "forgotCurrent": "Nie pamiętasz obecnego hasła?",
+    "codeIntro": "Wyślemy 6-cyfrowy kod na {{email}}. Wpisz go tutaj, a potem wybierz nowe hasło.",
+    "providerOnly": "Logujesz się przez {{providers}}, więc nie ma hasła Shtëpia.ime do zmiany. Konto chroni Twoje konto {{providers}}."
+  },
+  "authConfirm": {
+    "titleEmail": "Potwierdź e-mail",
+    "titleRecovery": "Zresetuj hasło",
+    "titleEmailChange": "Potwierdź nowy e-mail",
+    "intro": "Dla bezpieczeństwa kontynuuj przyciskiem poniżej.",
+    "ctaEmail": "Potwierdź i zaloguj",
+    "ctaRecovery": "Dalej",
+    "ctaEmailChange": "Potwierdź nowy e-mail",
+    "emailChanged": "Adres e-mail został zaktualizowany.",
+    "requestNew": "Poproś o nowy kod",
+    "goSignIn": "Przejdź do logowania"
   }
 }
