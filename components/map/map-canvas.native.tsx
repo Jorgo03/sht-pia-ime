@@ -57,7 +57,10 @@ function MapCanvasNative(
           />
           {countyGroups.map((county) => (
             <CountyMarker
-              key={county.id}
+              // The count is in the key: Android draws a marker once
+              // (tracksViewChanges goes off after mount), so the same marker
+              // kept showing its old number after a filter change or a pan.
+              key={`${county.id}:${county.count}`}
               id={county.id}
               count={county.count}
               coordinate={geometryCentroid(county.geometry)}
@@ -67,7 +70,8 @@ function MapCanvasNative(
         </>
       ) : (
         clusters.map((cluster) => (
-          <ClusterMarker key={cluster.id} cluster={cluster} onPress={onMarkerPress} />
+          // Count in the key for the same Android redraw reason as above.
+          <ClusterMarker key={`${cluster.id}:${cluster.properties.length}`} cluster={cluster} onPress={onMarkerPress} />
         ))
       )}
     </MapView>

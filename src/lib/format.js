@@ -31,15 +31,22 @@ export function formatPrice(n, lang = 'sq', currency = 'EUR') {
   }).format(num)
 }
 
-// Compact price for a map marker: 200000 -> "€200K", 1250000 -> "€1.3M".
-export function formatCompactPrice(n) {
+// Compact price for a map marker, in the listing's own currency:
+// 200000 -> "€200K", 1250000 -> "€1.3M", 15000000 ALL -> "ALL 15M". Same
+// rule as the phone app's formatBubblePrice (lib/cluster.ts). Every marker
+// used to say €, so a lek price read about 100 times too high.
+export function formatCompactPrice(n, currency = 'EUR') {
   const num = Number(n) || 0
-  if (num >= 1_000_000) {
-    const millions = num / 1_000_000
-    return `€${millions % 1 === 0 ? millions : millions.toFixed(1)}M`
+  const code = (currency || 'EUR').toUpperCase()
+  const tag = (amount) => (code === 'EUR' ? `€${amount}` : code === 'USD' ? `$${amount}` : `${code} ${amount}`)
+  // Rounded before choosing the unit, so 999,600 is "1M", not "1000K".
+  const thousands = Math.round(num / 1_000)
+  if (thousands >= 1_000) {
+    const millions = Math.round(num / 100_000) / 10
+    return tag(`${millions % 1 === 0 ? millions : millions.toFixed(1)}M`)
   }
-  if (num >= 1_000) return `€${Math.round(num / 1_000)}K`
-  return `€${num}`
+  if (num >= 1_000) return tag(`${thousands}K`)
+  return tag(String(num))
 }
 
 // i18n key for a listing-type badge / price suffix — the only place that

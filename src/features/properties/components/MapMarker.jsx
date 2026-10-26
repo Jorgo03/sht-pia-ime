@@ -43,9 +43,9 @@ const priceIconCache = {}
  * and use CSS (translate(-50%,-50%) in map.css) to center the bubble over
  * it regardless of width.
  */
-export function getPriceMarkerIcon(listingType, price) {
+export function getPriceMarkerIcon(listingType, price, currency) {
   const color = COLORS[listingType] || COLORS.sale
-  const label = formatCompactPrice(price)
+  const label = formatCompactPrice(price, currency)
   const key = `${color}:${label}`
   if (priceIconCache[key]) return priceIconCache[key]
 
