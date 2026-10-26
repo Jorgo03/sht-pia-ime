@@ -116,7 +116,7 @@ export function MapScreenContent() {
     }),
     [queryFilters, queryRegion],
   );
-  const { data: properties = [], isLoading: loading } = useMapPropertiesQuery(mapFilters);
+  const { data: properties = [], isLoading: loading, isError: failed, refetch } = useMapPropertiesQuery(mapFilters);
 
   const clusters = useMemo(
     () => clusterProperties(properties, region),
@@ -187,6 +187,8 @@ export function MapScreenContent() {
         <View style={styles.card}>
           {loading ? (
             <ActivityIndicator size="small" color={colors.accent} />
+          ) : failed && properties.length === 0 ? (
+            <Text style={styles.count}>{t('errors.generic')}</Text>
           ) : (
             <Text style={styles.count}>
               {/* Base key, not the `_other` variant — naming a plural suffix
@@ -215,12 +217,21 @@ export function MapScreenContent() {
           </View>
         )}
 
-        {!loading && properties.length === 0 && (
+        {/* A failed load also has zero rows: say so and offer a retry rather
+            than telling the visitor their filters matched nothing. */}
+        {!loading && failed && properties.length === 0 ? (
+          <View style={styles.empty}>
+            <Text style={styles.emptyTitle}>{t('errors.generic')}</Text>
+            <TouchableOpacity accessibilityRole="button" onPress={() => refetch()} style={styles.retry} hitSlop={8}>
+              <Text style={styles.retryText}>{t('common.retry')}</Text>
+            </TouchableOpacity>
+          </View>
+        ) : !loading && properties.length === 0 ? (
           <View style={styles.empty}>
             <Text style={styles.emptyTitle}>{t('search.empty')}</Text>
             <Text style={styles.emptyHint}>{t('search.emptyHint')}</Text>
           </View>
-        )}
+        ) : null}
       </View>
 
       {previewProperty && (
@@ -341,6 +352,17 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   emptyHint: {
     color: colors.textSecondary,
     fontSize: 13,
+  },
+  retry: {
+    marginTop: 6,
+    minHeight: 44,
+    paddingHorizontal: 18,
+    justifyContent: 'center',
+  },
+  retryText: {
+    color: colors.accentText,
+    fontSize: 14,
+    fontWeight: '600',
   },
   legend: {
     flexDirection: 'row',

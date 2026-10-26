@@ -1,7 +1,7 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import {
-  applySavedFilters as serverFilters, buildAlertEmail, dedupeKey, dispatchEnabled, windowStart, MAX_LISTINGS_PER_EMAIL,
+  applySavedFilters as serverFilters, buildAlertEmail, dedupeKey, dispatchEnabled, unsubscribeHeaders, windowStart, MAX_LISTINGS_PER_EMAIL,
 } from '../supabase/functions/saved-search-alerts/logic.js'
 import { applySavedFilters as appFilters } from '../src/features/saved-searches/lib/matches.js'
 
@@ -70,4 +70,23 @@ test('the dedupe key is short, stable and order-independent', () => {
   assert.notEqual(key, dedupeKey('search-1', ids.slice(1)))
   assert.notEqual(key, dedupeKey('search-2', ids))
   assert.ok(key.length < 80)
+})
+
+test('alert emails carry one-click unsubscribe headers for this project only', () => {
+  const base = 'https://xzzzhlwmzotibrxdqmcm.supabase.co'
+  const token = '3f2a9c1e-7b4d-4e8a-9c2f-1a2b3c4d5e6f'
+  const url = `${base}/functions/v1/saved-search-unsubscribe?token=${token}`
+  const email = buildAlertEmail({
+    lang: 'sq', searchName: 'Tiranë', listings: [], siteUrl: 'https://example.com', unsubscribeUrl: url,
+  })
+  assert.deepEqual(unsubscribeHeaders(email.text, base), {
+    'List-Unsubscribe': `<${url}>`,
+    'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+  })
+  assert.deepEqual(unsubscribeHeaders(`Stop: ${url}`, `${base}/`), unsubscribeHeaders(`Stop: ${url}`, base))
+  // Another host, a malformed token or no text: no header rather than a wrong one.
+  assert.deepEqual(unsubscribeHeaders(`Stop: https://evil.example/functions/v1/saved-search-unsubscribe?token=${token}`, base), {})
+  assert.deepEqual(unsubscribeHeaders(`Stop: ${base}/functions/v1/saved-search-unsubscribe?token=abc`, base), {})
+  assert.deepEqual(unsubscribeHeaders(null, base), {})
+  assert.deepEqual(unsubscribeHeaders(email.text, undefined), {})
 })

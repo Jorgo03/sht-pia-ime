@@ -181,7 +181,8 @@
     "reference": "Numer referencyjny",
     "referenceInvalid": "Numer referencyjny ma 8 liter lub cyfr, np. SH-1A2B3C4D.",
     "rangeMin": "Min",
-    "rangeMax": "Maks"
+    "rangeMax": "Maks",
+    "showHomesAny": "Pokaż nieruchomości"
   },
   "favourites": {
     "title": "Ulubione",
@@ -198,7 +199,8 @@
     "headlineEm": "krótka lista",
     "backToProfile": "← Wróć do profilu",
     "kicker": "ULUBIONE",
-    "headlinePre": "Twoja"
+    "headlinePre": "Twoja",
+    "loadFailed": "Nie udało się wczytać zapisanych nieruchomości."
   },
   "property": {
     "beds": "pokoje",
@@ -457,7 +459,10 @@
     "markSold": "Oznacz jako sprzedane",
     "markRented": "Oznacz jako wynajęte",
     "zone": "Dzielnica",
-    "zoneNone": "Bez dzielnicy"
+    "zoneNone": "Bez dzielnicy",
+    "fileSizeMb": "{{size}} MB",
+    "removePhoto": "Usuń zdjęcie",
+    "removeVideo": "Usuń wideo"
   },
   "dashboard": {
     "title": "Dashboard nieruchomości",
@@ -557,7 +562,9 @@
     "regenerateTranslation": "Przetłumacz ponownie",
     "translationFailed": "Tłumaczenie nie powiodło się. Spróbuj ponownie.",
     "translationNotConfigured": "Tłumaczenie nie jest skonfigurowane na serwerze. Skontaktuj się z administratorem.",
-    "translationBasic": "Tłumaczenie podstawowe — sprawdź przed publikacją"
+    "translationBasic": "Tłumaczenie podstawowe — sprawdź przed publikacją",
+    "translationPartialTitle": "Zapisano, brakuje niektórych języków",
+    "translationPartial": "Ogłoszenie zostało zapisane. Automatyczne tłumaczenie nie zadziałało dla: {{langs}}. Otwórz ogłoszenie i dotknij języka, aby spróbować ponownie."
   },
   "assistant": {
     "title": "Asystent ogłoszenia",

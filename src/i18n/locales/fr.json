@@ -177,7 +177,8 @@
     "reference": "Référence",
     "referenceInvalid": "Une référence compte 8 lettres ou chiffres, par ex. SH-1A2B3C4D.",
     "rangeMin": "Min",
-    "rangeMax": "Max"
+    "rangeMax": "Max",
+    "showHomesAny": "Voir les biens"
   },
   "favourites": {
     "title": "Favoris",
@@ -193,7 +194,8 @@
     "headlineEm": "sélection",
     "backToProfile": "← Retour au profil",
     "kicker": "FAVORIS",
-    "headlinePre": "Votre"
+    "headlinePre": "Votre",
+    "loadFailed": "Impossible de charger vos biens enregistrés."
   },
   "property": {
     "beds": "ch.",
@@ -449,7 +451,10 @@
     "markSold": "Marquer comme vendu",
     "markRented": "Marquer comme loué",
     "zone": "Quartier",
-    "zoneNone": "Aucun quartier"
+    "zoneNone": "Aucun quartier",
+    "fileSizeMb": "{{size}} Mo",
+    "removePhoto": "Retirer la photo",
+    "removeVideo": "Retirer la vidéo"
   },
   "dashboard": {
     "title": "Tableau de bord du bien",
@@ -549,7 +554,9 @@
     "regenerateTranslation": "Traduire à nouveau",
     "translationFailed": "Échec de la traduction. Veuillez réessayer.",
     "translationNotConfigured": "La traduction n’est pas configurée sur le serveur. Contactez l’administrateur.",
-    "translationBasic": "Traduction basique — vérifiez-la avant de publier"
+    "translationBasic": "Traduction basique — vérifiez-la avant de publier",
+    "translationPartialTitle": "Enregistrée, certaines langues manquent",
+    "translationPartial": "Votre annonce a été enregistrée. La traduction automatique n'a pas fonctionné pour : {{langs}}. Ouvrez l'annonce et touchez une langue pour réessayer."
   },
   "assistant": {
     "title": "Assistant de l'annonce",

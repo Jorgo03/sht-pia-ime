@@ -173,7 +173,8 @@
     "reference": "Referenca",
     "referenceInvalid": "Referenca ka 8 shkronja ose shifra, p.sh. SH-1A2B3C4D.",
     "rangeMin": "Min",
-    "rangeMax": "Maks"
+    "rangeMax": "Maks",
+    "showHomesAny": "Shfaq shtëpitë"
   },
   "favourites": {
     "title": "Të preferuarat",
@@ -188,7 +189,8 @@
     "headlineEm": "jote",
     "backToProfile": "Kthehu te profili",
     "kicker": "TË PREFERUARAT",
-    "headlinePre": "Lista"
+    "headlinePre": "Lista",
+    "loadFailed": "Shtëpitë e ruajtura nuk u ngarkuan."
   },
   "property": {
     "beds": "dhoma",
@@ -493,7 +495,10 @@
     "markSold": "Shëno si të shitur",
     "markRented": "Shëno si të dhënë me qira",
     "zone": "Lagjja",
-    "zoneNone": "Pa lagje"
+    "zoneNone": "Pa lagje",
+    "fileSizeMb": "{{size}} MB",
+    "removePhoto": "Hiq foton",
+    "removeVideo": "Hiq videon"
   },
   "dashboard": {
     "title": "Paneli i pronës",
@@ -541,7 +546,9 @@
     "regenerateTranslation": "Përkthe sërish",
     "translationFailed": "Përkthimi dështoi. Provo përsëri.",
     "translationNotConfigured": "Përkthimi nuk është i konfiguruar në server. Kontakto administratorin.",
-    "translationBasic": "Përkthim bazë — kontrolloje para publikimit"
+    "translationBasic": "Përkthim bazë — kontrolloje para publikimit",
+    "translationPartialTitle": "U ruajt, por pa disa gjuhë",
+    "translationPartial": "Njoftimi u ruajt. Përkthimi automatik nuk funksionoi për: {{langs}}. Hape njoftimin dhe prek gjuhën për ta provuar përsëri."
   },
   "assistant": {
     "title": "Asistenti i shpalljes",

@@ -136,3 +136,20 @@ export function dedupeKey(searchId, listingIds) {
   }
   return `ssa:${searchId}:${listingIds.length}:${fnv(0x811c9dc5)}${fnv(0x01234567)}`
 }
+
+/**
+ * One-click unsubscribe headers (RFC 8058), so mail apps show their own
+ * "Unsubscribe" button and Gmail and Yahoo accept bulk mail. The address is the
+ * one already in the email's text: the unsubscribe function under this
+ * project, with a UUID token, and nothing else is accepted. The function turns
+ * alerts off on a POST, which is what a mail app sends with
+ * List-Unsubscribe-Post.
+ */
+export function unsubscribeHeaders(bodyText, supabaseUrl) {
+  if (!bodyText || !supabaseUrl) return {}
+  const base = supabaseUrl.replace(/\/+$/, '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  const m = new RegExp(`${base}/functions/v1/saved-search-unsubscribe\\?token=[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}`, 'i').exec(bodyText)
+  if (!m) return {}
+  return { 'List-Unsubscribe': `<${m[0]}>`, 'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click' }
+}
+

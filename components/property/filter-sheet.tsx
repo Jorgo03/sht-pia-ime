@@ -178,7 +178,7 @@ export function FilterSheet({
   // and only while the sheet is open. Shares a cache entry with Explore's
   // own count for the same filters — reopening the sheet right after
   // Explore loaded shows the number instantly, no network round-trip.
-  const { data: count } = usePropertiesCountQuery(queryFilters, visible);
+  const { data: count, isError: countFailed } = usePropertiesCountQuery(queryFilters, visible);
 
   // Drag-to-dismiss, driven by react-native-gesture-handler + reanimated
   // (both already app dependencies, so no new one added). The pan is
@@ -459,9 +459,12 @@ export function FilterSheet({
             style={styles.ctaGradient}
           />
           <Text style={styles.ctaText}>
-            {count == null
-              ? t('common.loading')
-              : t('search.showHomes', { count })}
+            {/* A failed count is not "loading" forever: the button still applies the filters. */}
+            {count != null
+              ? t('search.showHomes', { count })
+              : countFailed
+                ? t('search.showHomesAny')
+                : t('common.loading')}
           </Text>
         </Pressable>
           <KeyboardDoneBar />

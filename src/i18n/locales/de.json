@@ -173,7 +173,8 @@
     "reference": "Referenz",
     "referenceInvalid": "Eine Referenz hat 8 Buchstaben oder Ziffern, z. B. SH-1A2B3C4D.",
     "rangeMin": "Min.",
-    "rangeMax": "Max."
+    "rangeMax": "Max.",
+    "showHomesAny": "Immobilien anzeigen"
   },
   "favourites": {
     "title": "Favoriten",
@@ -188,7 +189,8 @@
     "headlineEm": "Favoritenliste",
     "backToProfile": "← Zurück zum Profil",
     "kicker": "FAVORITEN",
-    "headlinePre": "Deine"
+    "headlinePre": "Deine",
+    "loadFailed": "Ihre gespeicherten Immobilien konnten nicht geladen werden."
   },
   "property": {
     "beds": "Zimmer",
@@ -441,7 +443,10 @@
     "markSold": "Als verkauft markieren",
     "markRented": "Als vermietet markieren",
     "zone": "Stadtteil",
-    "zoneNone": "Kein Stadtteil"
+    "zoneNone": "Kein Stadtteil",
+    "fileSizeMb": "{{size}} MB",
+    "removePhoto": "Foto entfernen",
+    "removeVideo": "Video entfernen"
   },
   "dashboard": {
     "title": "Immobilien-Dashboard",
@@ -541,7 +546,9 @@
     "regenerateTranslation": "Erneut übersetzen",
     "translationFailed": "Übersetzung fehlgeschlagen. Bitte erneut versuchen.",
     "translationNotConfigured": "Die Übersetzung ist auf dem Server nicht konfiguriert. Bitte kontaktiere den Administrator.",
-    "translationBasic": "Einfache Übersetzung — vor dem Veröffentlichen prüfen"
+    "translationBasic": "Einfache Übersetzung — vor dem Veröffentlichen prüfen",
+    "translationPartialTitle": "Gespeichert, einige Sprachen fehlen",
+    "translationPartial": "Ihr Inserat wurde gespeichert. Die automatische Übersetzung hat nicht funktioniert für: {{langs}}. Öffnen Sie das Inserat und tippen Sie auf eine Sprache, um es erneut zu versuchen."
   },
   "assistant": {
     "title": "Inserats-Assistent",

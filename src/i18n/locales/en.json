@@ -225,7 +225,8 @@
     "reference": "Reference",
     "referenceInvalid": "A reference has 8 letters or digits, e.g. SH-1A2B3C4D.",
     "rangeMin": "Min",
-    "rangeMax": "Max"
+    "rangeMax": "Max",
+    "showHomesAny": "Show homes"
   },
   "detail": {
     "forSale": "For Sale",
@@ -260,7 +261,8 @@
     "loginCta": "Sign In",
     "remove": "Remove",
     "kicker": "FAVORITES",
-    "headlinePre": "Your"
+    "headlinePre": "Your",
+    "loadFailed": "Your saved homes couldn't be loaded."
   },
   "messages": {
     "subtitle": "Conversations with agents",
@@ -493,7 +495,10 @@
     "markSold": "Mark as sold",
     "markRented": "Mark as rented",
     "zone": "Neighborhood",
-    "zoneNone": "No neighborhood"
+    "zoneNone": "No neighborhood",
+    "fileSizeMb": "{{size}} MB",
+    "removePhoto": "Remove photo",
+    "removeVideo": "Remove video"
   },
   "dashboard": {
     "title": "Property Dashboard",
@@ -541,7 +546,9 @@
     "regenerateTranslation": "Translate again",
     "translationFailed": "Translation failed. Please try again.",
     "translationNotConfigured": "Translation is not configured on the server. Contact the administrator.",
-    "translationBasic": "Basic translation — check it before publishing"
+    "translationBasic": "Basic translation — check it before publishing",
+    "translationPartialTitle": "Saved, with some languages missing",
+    "translationPartial": "Your listing was saved. Automatic translation didn't work for: {{langs}}. Open the listing and tap a language to try again."
   },
   "assistant": {
     "title": "Listing assistant",

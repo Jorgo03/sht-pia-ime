@@ -47,3 +47,17 @@ test('truncates absurdly long city strings', () => {
   assert.equal(out.city.length, 60)
 })
 
+
+test('prices in lekë or dollars become euros, the unit of the search fields', () => {
+  assert.deepEqual(sanitizeSearchFilters({ max_price: 15_000_000, currency: 'ALL' }), { maxPrice: '153061' })
+  assert.deepEqual(sanitizeSearchFilters({ min_price: 115_000, currency: 'USD' }), { minPrice: '100000' })
+  assert.deepEqual(sanitizeSearchFilters({ max_price: 200_000, currency: 'EUR' }), { maxPrice: '200000' })
+  // No currency, or one the site does not know, is euros, as before.
+  assert.deepEqual(sanitizeSearchFilters({ max_price: 200_000 }), { maxPrice: '200000' })
+  assert.deepEqual(sanitizeSearchFilters({ max_price: 200_000, currency: 'GBP' }), { maxPrice: '200000' })
+  assert.deepEqual(sanitizeSearchFilters({ max_price: 200_000, currency: 'toString' }), { maxPrice: '200000' })
+  // The cap is in euros, so a large but real lek price is not thrown away.
+  assert.deepEqual(sanitizeSearchFilters({ max_price: 2_000_000_000, currency: 'ALL' }), { maxPrice: '20408163' })
+  // A lek amount too small for one euro still keeps a usable bound.
+  assert.deepEqual(sanitizeSearchFilters({ min_price: 50, currency: 'ALL' }), { minPrice: '1' })
+})

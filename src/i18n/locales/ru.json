@@ -181,7 +181,8 @@
     "reference": "Номер объявления",
     "referenceInvalid": "Номер состоит из 8 букв или цифр, например SH-1A2B3C4D.",
     "rangeMin": "От",
-    "rangeMax": "До"
+    "rangeMax": "До",
+    "showHomesAny": "Показать объекты"
   },
   "favourites": {
     "title": "Избранное",
@@ -198,7 +199,8 @@
     "headlineEm": "подборка",
     "backToProfile": "← Назад в профиль",
     "kicker": "ИЗБРАННОЕ",
-    "headlinePre": "Ваша"
+    "headlinePre": "Ваша",
+    "loadFailed": "Не удалось загрузить сохранённые объекты."
   },
   "property": {
     "beds": "комн.",
@@ -457,7 +459,10 @@
     "markSold": "Отметить как продано",
     "markRented": "Отметить как сдано",
     "zone": "Район",
-    "zoneNone": "Без района"
+    "zoneNone": "Без района",
+    "fileSizeMb": "{{size}} МБ",
+    "removePhoto": "Удалить фото",
+    "removeVideo": "Удалить видео"
   },
   "dashboard": {
     "title": "Панель объекта",
@@ -557,7 +562,9 @@
     "regenerateTranslation": "Перевести заново",
     "translationFailed": "Не удалось выполнить перевод. Попробуйте ещё раз.",
     "translationNotConfigured": "Перевод не настроен на сервере. Обратитесь к администратору.",
-    "translationBasic": "Базовый перевод — проверьте перед публикацией"
+    "translationBasic": "Базовый перевод — проверьте перед публикацией",
+    "translationPartialTitle": "Сохранено, но не на всех языках",
+    "translationPartial": "Объявление сохранено. Автоматический перевод не сработал для: {{langs}}. Откройте объявление и нажмите на язык, чтобы попробовать снова."
   },
   "assistant": {
     "title": "Помощник по объявлению",

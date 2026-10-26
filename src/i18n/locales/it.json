@@ -177,7 +177,8 @@
     "reference": "Riferimento",
     "referenceInvalid": "Un riferimento ha 8 lettere o cifre, es. SH-1A2B3C4D.",
     "rangeMin": "Min",
-    "rangeMax": "Max"
+    "rangeMax": "Max",
+    "showHomesAny": "Mostra le case"
   },
   "favourites": {
     "title": "Preferiti",
@@ -193,7 +194,8 @@
     "headlineEm": "selezione",
     "backToProfile": "← Torna al profilo",
     "kicker": "PREFERITI",
-    "headlinePre": "La tua"
+    "headlinePre": "La tua",
+    "loadFailed": "Non è stato possibile caricare le case salvate."
   },
   "property": {
     "beds": "camere",
@@ -449,7 +451,10 @@
     "markSold": "Segna come venduto",
     "markRented": "Segna come affittato",
     "zone": "Quartiere",
-    "zoneNone": "Nessun quartiere"
+    "zoneNone": "Nessun quartiere",
+    "fileSizeMb": "{{size}} MB",
+    "removePhoto": "Rimuovi foto",
+    "removeVideo": "Rimuovi video"
   },
   "dashboard": {
     "title": "Dashboard immobile",
@@ -549,7 +554,9 @@
     "regenerateTranslation": "Traduci di nuovo",
     "translationFailed": "Traduzione non riuscita. Riprova.",
     "translationNotConfigured": "La traduzione non è configurata sul server. Contatta l’amministratore.",
-    "translationBasic": "Traduzione di base — controllala prima di pubblicare"
+    "translationBasic": "Traduzione di base — controllala prima di pubblicare",
+    "translationPartialTitle": "Salvato, mancano alcune lingue",
+    "translationPartial": "Il tuo annuncio è stato salvato. La traduzione automatica non ha funzionato per: {{langs}}. Apri l'annuncio e tocca una lingua per riprovare."
   },
   "assistant": {
     "title": "Assistente dell'annuncio",

@@ -177,7 +177,8 @@
     "reference": "Referencia",
     "referenceInvalid": "Una referencia tiene 8 letras o cifras, p. ej. SH-1A2B3C4D.",
     "rangeMin": "Mín",
-    "rangeMax": "Máx"
+    "rangeMax": "Máx",
+    "showHomesAny": "Ver viviendas"
   },
   "favourites": {
     "title": "Favoritos",
@@ -193,7 +194,8 @@
     "headlineEm": "lista final",
     "backToProfile": "← Volver al perfil",
     "kicker": "FAVORITOS",
-    "headlinePre": "Tu"
+    "headlinePre": "Tu",
+    "loadFailed": "No se han podido cargar tus viviendas guardadas."
   },
   "property": {
     "beds": "hab.",
@@ -449,7 +451,10 @@
     "markSold": "Marcar como vendido",
     "markRented": "Marcar como alquilado",
     "zone": "Barrio",
-    "zoneNone": "Sin barrio"
+    "zoneNone": "Sin barrio",
+    "fileSizeMb": "{{size}} MB",
+    "removePhoto": "Quitar foto",
+    "removeVideo": "Quitar vídeo"
   },
   "dashboard": {
     "title": "Dashboard de propiedad",
@@ -549,7 +554,9 @@
     "regenerateTranslation": "Traducir de nuevo",
     "translationFailed": "La traducción ha fallado. Inténtalo de nuevo.",
     "translationNotConfigured": "La traducción no está configurada en el servidor. Contacta con el administrador.",
-    "translationBasic": "Traducción básica: revísala antes de publicar"
+    "translationBasic": "Traducción básica: revísala antes de publicar",
+    "translationPartialTitle": "Guardado, faltan algunos idiomas",
+    "translationPartial": "Tu anuncio se ha guardado. La traducción automática no funcionó para: {{langs}}. Abre el anuncio y toca un idioma para intentarlo de nuevo."
   },
   "assistant": {
     "title": "Asistente del anuncio",

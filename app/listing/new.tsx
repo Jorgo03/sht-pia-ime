@@ -684,6 +684,14 @@ function ListingWizard({ editId }: { editId?: string }) {
       // The new listing must appear in Explore/Home/Map immediately, not once
       // their cache's staleTime quietly expires.
       queryClient.invalidateQueries({ queryKey: ['properties'] });
+      // Saved either way; say which languages the engine could not produce,
+      // so the agent knows to open those tabs again.
+      if (translated.failed.length) {
+        Alert.alert(
+          t('ai.translationPartialTitle'),
+          t('ai.translationPartial', { langs: translated.failed.map((l) => l.toUpperCase()).join(', ') }),
+        );
+      }
       router.replace('/my-listings');
     } catch (err: any) {
       setUploadProgress(null);
@@ -1046,7 +1054,7 @@ function ListingWizard({ editId }: { editId?: string }) {
                 onPress={() => setImages((prev) => prev.filter((_, i) => i !== index))}
                 hitSlop={8}
                 accessibilityRole="button"
-                accessibilityLabel={t('common.close')}>
+                accessibilityLabel={t('listing.removePhoto')}>
                 <MaterialIcons name="close" size={13} color="#fff" />
               </Pressable>
               {index === 0 && (
@@ -1080,14 +1088,14 @@ function ListingWizard({ editId }: { editId?: string }) {
                 {video.existing ? t('listing.currentVideo') : video.fileName}
               </Text>
               {!video.existing && (
-                <Text style={styles.hint}>{(video.size / (1024 * 1024)).toFixed(1)} MB</Text>
+                <Text style={styles.hint}>{t('listing.fileSizeMb', { size: (video.size / (1024 * 1024)).toFixed(1) })}</Text>
               )}
             </View>
             <Pressable
               onPress={() => setVideo(null)}
               hitSlop={8}
               accessibilityRole="button"
-              accessibilityLabel={t('common.close')}>
+              accessibilityLabel={t('listing.removeVideo')}>
               <MaterialIcons name="close" size={16} color={colors.textSecondary} />
             </Pressable>
           </View>
