@@ -327,6 +327,41 @@ test.describe('email code', () => {
   });
 });
 
+// Password recovery in the app. The emailed code signs you in (verifyOtp), and
+// the signed-in dashboard used to replace the new-password step within a
+// moment, so the new password was never set.
+test('X27 forgot password: the code opens the new-password step, which stays until the password is saved', async ({ page }) => {
+  const recovered: unknown[] = [];
+  const saved: unknown[] = [];
+  await page.route('**/auth/v1/recover*', (route) => json(route, {}));
+  await page.route('**/auth/v1/verify*', (route) => {
+    recovered.push(route.request().postDataJSON());
+    return json(route, fakeSession());
+  });
+  await page.route('**/auth/v1/user*', (route) => {
+    if (route.request().method() === 'PUT') saved.push(route.request().postDataJSON());
+    return json(route, SIGNED_IN_USER);
+  });
+  await page.goto('/profile');
+  await ready(page);
+  await page.getByRole('textbox', { name: t('auth.email') }).fill('agent@example.com');
+  await page.getByRole('button', { name: t('auth.forgotShort') }).click();
+  await page.getByRole('textbox', { name: t('auth.codeDigit').replace('{{n}}', '1') }).fill('123456');
+
+  const newPassword = page.getByPlaceholder(t('auth.newPassword'));
+  await expect(newPassword).toBeVisible();
+  // Signed in by now, and the profile has loaded: the step must still be here.
+  await ready(page);
+  await expect(newPassword).toBeVisible();
+  expect(recovered[0]).toMatchObject({ email: 'agent@example.com', token: '123456', type: 'recovery' });
+
+  await newPassword.fill('NewPassword!2026');
+  await page.getByPlaceholder(t('auth.confirmPassword')).fill('NewPassword!2026');
+  await page.getByRole('button', { name: t('auth.updatePassword') }).click();
+  await expect(page.getByRole('heading', { name: t('common.profile'), level: 1 })).toBeVisible();
+  expect(saved[0]).toMatchObject({ password: 'NewPassword!2026' });
+});
+
 // Layout boundaries on the narrowest supported phone (docs/UI_POLISH.md):
 // no control may sit past the screen edge, and the header wordmark is either
 // clear of the header's buttons or not shown at all.

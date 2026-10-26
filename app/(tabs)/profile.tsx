@@ -541,7 +541,10 @@ export default function ProfileScreen() {
 
   if (authLoading) return null;
 
-  if (user) {
+  // The recovery code signs the user in (verifyOtp), so the new-password step
+  // must stay on screen with a user present; the dashboard follows once the
+  // password is saved or the step is left.
+  if (user && recoveryStep !== 'password') {
     const displayName = profile?.full_name || user.user_metadata?.full_name || user.email?.split('@')[0] || '?';
     const initial = (displayName[0] ?? '?').toUpperCase();
 
@@ -977,6 +980,19 @@ export default function ProfileScreen() {
                       </Text>
                       <MaterialIcons name="arrow-forward" size={18} color="#fff" />
                     </LinearGradient>
+                  </TouchableOpacity>
+                  {/* Leaving keeps the old password: signed in (the code did
+                      that) if the recovery session is live, else the sign-in form. */}
+                  <TouchableOpacity
+                    accessibilityRole="button"
+                    onPress={() => {
+                      setNewPassword('');
+                      setConfirmNewPassword('');
+                      setRecoveryStep(null);
+                    }}
+                    style={styles.linkButton}
+                    disabled={loading}>
+                    <Text style={styles.linkButtonText}>{t('common.back')}</Text>
                   </TouchableOpacity>
                 </>
               ) : otpStep ? (
