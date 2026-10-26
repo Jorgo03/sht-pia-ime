@@ -59,7 +59,7 @@ test('F09-H4 a photo removed while editing is deleted from storage after saving'
   await expect(page.getByRole('heading', { name: t('listing.editListing') })).toBeVisible();
   for (let step = 0; step < 3; step++) await page.getByRole('button', { name: t('listing.next') }).click();
   // Photos step: remove the first photo.
-  await page.getByRole('button', { name: t('common.close') }).first().click();
+  await page.getByRole('button', { name: t('listing.removePhoto') }).first().click();
   await page.getByRole('button', { name: t('listing.next') }).click();
   // Nothing is deleted before the save succeeds.
   expect(writes.filter((w) => w.table === 'storage')).toEqual([]);

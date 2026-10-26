@@ -1,5 +1,36 @@
 # Pre-Launch Audit — Shtëpia.ime (Vite web app)
 
+## ═══ PASS 21 — 2026-10-26: THE "FIXES I CAN DO NOW" LIST (owner request) ═══
+
+**Scope.** The no-cost list from `docs/TODO.md`: one P2, seven P3 and two
+modernisations. Code only: no migration, no deploy. Commits `baeb5e5`,
+`f750b3e` and `182e991`.
+
+| # | Was | Now | Proof |
+| --- | --- | --- | --- |
+| P2 | The sign-in relay (`/auth/callback?rt=`) forwarded the OAuth code to any `exp://` host and path, including anyone's Expo tunnel | Only `exp://` on localhost or a private range (10/8, 127/8, 172.16/12, 192.168/16, `[::1]`) with the path exactly `/--/auth/callback` and no user:pass, or `shtepia-ime://auth/callback`. **Expo tunnels (`*.exp.direct`) are refused**, so Google sign-in in Expo Go needs LAN or the phone hotspot | `src/lib/oauthRelay.js`, inline copies parity-tested through `vm` (`tests/oauthRelay.test.mjs`, 3); e2e F4-R3 |
+| P3 | Publishing said nothing when translations failed | App: an alert naming the languages. Website: a notice on My listings | `ai.translationPartial*` keys, 8 locales |
+| P3 | Photo step: English "Remove" labels, "MB" hard-coded | `listing.removePhoto`, `listing.removeVideo`, `listing.fileSizeMb` | e2e F09-H4 now finds the button by its real name (it was labelled "Close") |
+| P3 | Favorites had no error state | Error view with Retry. A failed reload keeps the current account's hearts and never shows another account's | `contexts/favorites-context.tsx` (`error`, `reload`) |
+| P3 | Map and filter count showed "no results" when loading failed | Map: `errors.generic` with Retry. Filter button: "Show homes" (`search.showHomesAny`) instead of a false 0 | `map-screen-content.tsx`, `filter-sheet.tsx` |
+| P3 | Sign-out forgot the push token before its row was deleted, so a failed delete left a row nobody could remove | The token is kept until the delete succeeds, with one retry | `forgetToken.js`, 4 tests |
+| P3 | Alert emails had no `List-Unsubscribe` | `List-Unsubscribe` + `List-Unsubscribe-Post: One-Click` (RFC 8058), only for this project's unsubscribe URL with a UUID token. The unsubscribe function already turns alerts off on POST | `unsubscribeHeaders`, 1 test. **Needs a deploy of `saved-search-alerts`** |
+| P3 | AI search assumed euros ("deri 15 milionë lekë" became €15M) | The model returns `currency`. Lekë and dollars become euros with the price filter's reference rates (`UNITS_PER_EUR`) | `tests/aiSchemas.test.mjs`. **Needs a deploy of `ai-parse-search`** |
+| Mod | `Gesture.Pan()` (deprecated in gesture-handler 3) | `usePanGesture` in both sheets. The worklets plugin still compiles both callbacks to worklets (checked in the Babel output) | tsc, lint, native export |
+| Mod | PKCE `plain` on the phone (no `crypto.subtle`) | A digest-only `crypto.subtle` from expo-crypto, so supabase-js sends `s256`. Safe because nothing calls `getClaims`, the one path that would take it for full WebCrypto, and a test fails if anything does | `tests/randomValues.test.mjs` (8, incl. supabase-js choosing s256) |
+
+**Verification (2026-10-26, merged with master `af8e163`).**
+- tsc: clean.
+- Lint: 0 errors, 33 warnings (unchanged).
+- `npm test`: 332/332.
+- `npm run build`: ok.
+- `test:e2e`: 204 passed, 2 skipped (after the F09-H4 selector update).
+- `test:e2e:expo`: 107 passed, 13 skipped.
+- `expo export -p ios -p android`: both bundles built.
+
+**Not tested on a phone.** The usePanGesture swipe, the s256 sign-in and the
+relay restriction need the owner's Samsung A23 test.
+
 ## ═══ PASS 20 — 2026-10-26: SIGN-IN, PASSWORDS AND AUTH EMAIL (owner master prompt) ═══
 
 **Method.** Both apps' auth code read in full (website `src/features/auth/`,
