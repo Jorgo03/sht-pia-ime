@@ -121,7 +121,7 @@ export default function HomeScreen() {
   // Hands the chosen type over to Explore, so "see all rentals" opens on
   // rentals instead of on everything.
   const openExplore = (listingType: ListingType | null) => {
-    setFilter('listingType', listingType);
+    setFilter('listingType', listingType, { immediate: true });
     router.push('/(tabs)/explore' as Href);
   };
 
@@ -133,7 +133,6 @@ export default function HomeScreen() {
         {/* Web's `.app-header` sits above the greeting hero on Home too. */}
         <AppHeader />
         <SearchHeader
-          kicker={greeting}
           headline={headline}
           emphasis={t('home.matchesToday', { count: matchCount })}
           onSearchPress={() => router.push('/(tabs)/explore' as Href)}
@@ -171,7 +170,6 @@ export default function HomeScreen() {
                 <>
                   <View style={styles.sectionHeader}>
                     <Text style={styles.sectionTitle}>{t('home.featured')}</Text>
-                    <Text style={styles.editorsPick}>{t('home.editorsPick')}</Text>
                   </View>
                   <RiseIn>
                     <FeaturedPropertyCard property={featured} />
@@ -364,14 +362,6 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     fontSize: 18,
     fontWeight: '500',
     color: colors.textPrimary,
-  },
-  // Matches web's .mono-eyebrow — monospace, not bold sans.
-  editorsPick: {
-    fontFamily: Fonts?.mono,
-    fontSize: 11,
-    color: colors.textSecondary,
-    letterSpacing: 1,
-    textTransform: 'uppercase',
   },
   // Matches web's .section-title a — muted by default, orange only on
   // :hover, which has no touch equivalent, so muted is the practical

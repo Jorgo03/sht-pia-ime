@@ -52,7 +52,7 @@ function FeaturedPropertyCardBase({
   // Matches web's listingBadgeKey() — the badge reads "For Sale"/"For Rent"/
   // "For Daily Rent" (a bare `=== 'rent'` check silently drops daily_rent
   // into "For Sale"), never "Featured" (that label is reserved for the
-  // section header above this card, via home.featured/home.editorsPick).
+  // section header above this card, via home.featured).
   const badgeLabel = t(listingBadgeKey(property.listing_type));
 
   const cardWidth = isTablet

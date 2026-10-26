@@ -801,3 +801,36 @@ test('X32 signing in before confirming the email opens the code entry instead of
   await expect(page.getByText(t('auth.enterCode')).first()).toBeVisible();
   await expect(page.getByText(t('auth.signupCodeHint'))).toBeVisible();
 });
+
+test('X33 All/Sale/Rent: the tab lights up at once and its homes are already loaded', async ({ page }) => {
+  const asked: string[] = [];
+  page.on('request', (r) => {
+    if (r.url().includes('/rest/v1/properties')) asked.push(decodeURIComponent(r.url()));
+  });
+  await page.goto('/explore');
+  await ready(page);
+  // The other two tabs were fetched in the background, before any tap.
+  expect(asked.some((u) => u.includes('listing_type=eq.rent'))).toBe(true);
+  expect(asked.some((u) => u.includes('listing_type=eq.sale'))).toBe(true);
+
+  const before = asked.length;
+  const rent = page.getByRole('button', { name: t('search.rent'), exact: true });
+  const all = page.getByRole('button', { name: t('common.all'), exact: true });
+  const background = (el: typeof rent) => el.evaluate((n) => getComputedStyle(n).backgroundColor);
+  const activeBg = await background(all);
+  await rent.click();
+  // Highlighted from the tap itself, not after the 350 ms typing debounce.
+  await expect.poll(() => background(rent), { timeout: 200 }).toBe(activeBg);
+  const rentals = LISTINGS.filter((l) => l.listing_type === 'rent').length;
+  await expect(page.getByText(/në shikim/)).toContainText(String(rentals), { timeout: 300 });
+  // Shown from the prefetched cache: tapping asked the server for nothing new.
+  expect(asked.slice(before).filter((u) => u.includes('listing_type=eq.rent'))).toEqual([]);
+});
+
+test('X34 Home has no kicker above the greeting and no "editor\'s pick" label', async ({ page }) => {
+  await page.goto('/');
+  await ready(page);
+  await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+  await expect(page.getByText(t('home.editorsPick'))).toHaveCount(0);
+  await expect(page.getByText(t('home.featured'))).toBeVisible();
+});
