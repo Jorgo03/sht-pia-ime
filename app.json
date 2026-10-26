@@ -46,7 +46,7 @@
           "image": "./assets/images/splash-door.png",
           "imageWidth": 200,
           "resizeMode": "contain",
-          "backgroundColor": "#f1ede6",
+          "backgroundColor": "#FFFFFF",
           "dark": {
             "backgroundColor": "#0e0b09"
           }

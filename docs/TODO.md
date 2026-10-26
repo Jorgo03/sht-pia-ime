@@ -117,6 +117,8 @@ transaction before you approve it.
 
 ## Recently done
 
+- [x] Launch animation: the logo's door opens onto a warm room, then fades into the app (`components/brand/door-splash.tsx`). Needs a look on both phones.
+
 - [x] SDK 58 upgrade; the app opens in Expo Go on iPhone and Android.
 - [x] Android crash on start (`ExpoTopicSubscriptionModule`) fixed; confirmed
   on the Samsung A23.

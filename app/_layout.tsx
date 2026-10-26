@@ -37,6 +37,7 @@ import { ThemeProvider, useTheme } from '@/contexts/theme-context';
 import { queryClient } from '@/lib/query-client';
 import { installGlobalErrorReporting } from '@/lib/report-error';
 import { configureForegroundNotifications } from '@/lib/push';
+import { LaunchDoorSplash } from '@/components/brand/door-splash';
 import { PushBridge } from '@/components/push-bridge';
 import { IS_WEB, WEB_MAX_WIDTH } from '@/constants/web-frame';
 import { RouteHead } from '@/components/web/page-head';
@@ -199,15 +200,21 @@ function AppGate({ fontsReady }: { fontsReady: boolean }) {
   }
 
   return (
-    <FavoritesProvider>
-      {/* Above the navigator so the list and map tabs share one filter state. */}
-      <FiltersProvider>
-        <ThemeProvider>
-          <ThemedNavigation />
-          <PushBridge />
-        </ThemeProvider>
-      </FiltersProvider>
-    </FavoritesProvider>
+    <>
+      <FavoritesProvider>
+        {/* Above the navigator so the list and map tabs share one filter state. */}
+        <FiltersProvider>
+          <ThemeProvider>
+            <ThemedNavigation />
+            <PushBridge />
+          </ThemeProvider>
+        </FiltersProvider>
+      </FavoritesProvider>
+      {/* The door opening, over the first screen as the native splash hides
+          (phones only, once per launch). The app is already mounted beneath
+          it, so session restore, routing and deep links carry on as usual. */}
+      <LaunchDoorSplash />
+    </>
   );
 }
 
