@@ -1,11 +1,14 @@
 import { useState, useRef, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate, useLocation } from 'react-router-dom'
-import { User, Briefcase, Mail, Lock, Eye, EyeOff, ArrowLeft, ArrowRight, Heart, Building2, LogOut, ChevronRight, Search as SearchIcon, Calendar, Loader2, Apple, Linkedin, UserPen, ShieldCheck } from 'lucide-react'
+import { User, Briefcase, Mail, Lock, Eye, EyeOff, ArrowLeft, ArrowRight, Heart, Building2, LogOut, ChevronRight, Search as SearchIcon, Calendar, Loader2, Apple, Linkedin, UserPen, ShieldCheck, KeyRound } from 'lucide-react'
 import { useAuth } from '../AuthContext'
 import { useProfileStats } from '../hooks/useProfileStats'
 import DuskHero from '../components/DuskHero'
 import EditProfileSheet from '../components/EditProfileSheet'
+import ChangePasswordSheet from '../components/ChangePasswordSheet'
+import { newPasswordError, passwordStrengthError } from '../lib/password'
+import { authRedirectError, hasAuthCode, linkErrorKey, providerEnabled } from '../lib/authLinks'
 import Avatar from '../../../shared/Avatar'
 import { EMAIL_RE, friendlyError, retryAfterSeconds } from '../../../lib/authErrors'
 import { supabase } from '../../../lib/supabase'
@@ -17,7 +20,7 @@ export default function Profile() {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const location = useLocation()
-  const { user, profile, isAgent, refreshProfile, signIn, signUp, signInWithProvider, sendOtp, verifyOtp, resendCode, signOut, resetPassword, passwordRecovery, updatePassword, loading: authLoading } = useAuth()
+  const { user, profile, isAgent, refreshProfile, signIn, signUp, signInWithProvider, sendOtp, verifyOtp, resendCode, signOut, resetPassword, verifyRecoveryCode, passwordRecovery, updatePassword, loading: authLoading } = useAuth()
   const stats = useProfileStats()
 
   // The moderation queue link shows only for moderators (F3); the database
@@ -36,6 +39,7 @@ export default function Profile() {
   const [deleting, setDeleting] = useState(false)
   const [deleteError, setDeleteError] = useState(false)
   const [editOpen, setEditOpen] = useState(false)
+  const [securityOpen, setSecurityOpen] = useState(false)
 
   const handleDeleteAccount = async () => {
     if (deleting) return
@@ -69,6 +73,7 @@ export default function Profile() {
   const [confirmNewPassword, setConfirmNewPassword] = useState('')
   const [showNewPw, setShowNewPw] = useState(false)
   const [recoveryDone, setRecoveryDone] = useState(false)
+  const [recoveryOthersOut, setRecoveryOthersOut] = useState(false)
   // 'google' | 'apple' | 'linkedin_oidc' while the OAuth redirect is starting
   const [providerLoading, setProviderLoading] = useState(null)
   const oauthErrorShown = useRef(false)
@@ -114,6 +119,32 @@ export default function Profile() {
   const sendingCode = useRef(false)
   const verifyingCode = useRef(false)
 
+  // A reset link lands here (redirectTo /profile). Read from window.location:
+  // supabase-js cleans the address itself, behind the router's back.
+  //  - Expired or already used: Supabase appends #error_code=otp_expired.
+  //  - Opened in another browser: ?code= stays, because the PKCE verifier
+  //    lives in the browser that asked, so no session is made.
+  // Both used to leave the person on the sign-in form with no word at all.
+  // Either way the reset form opens, where the emailed code still works.
+  // AuthConfirm sends people here with intent 'forgot' for the same form.
+  const linkChecked = useRef(false)
+  useEffect(() => {
+    if (authLoading || linkChecked.current) return
+    linkChecked.current = true
+    const href = window.location.href
+    // ?error=oauth_failed is AuthCallback's own report, handled above.
+    const linkError = new URL(href).searchParams.get('error') === 'oauth_failed' ? null : authRedirectError(href)
+    const strandedCode = !user && hasAuthCode(href)
+    if (linkError || strandedCode) {
+      setMessage(t(linkError ? linkErrorKey(linkError) : 'errors.linkOtherDevice'))
+      setOtpEmail('')
+      setOtpStep('forgot')
+      navigate('/profile', { replace: true })
+    } else if (location.state?.intent === 'forgot' && !user) {
+      setOtpStep('forgot')
+    }
+  }, [authLoading, user, location.state, navigate, t])
+
   // Resend cooldown ticker. Keyed on whether a countdown is running, not on
   // the value: depending on `cooldown` itself would clear and recreate the
   // interval on every tick. Named so the linter can check it statically.
@@ -135,8 +166,9 @@ export default function Profile() {
       // and Supabase's own /token endpoint (not this form) is the authority
       // on whether a login password is correct. Applying it to login would
       // silently lock out that account before any request is even sent.
-      if (password.length < 8) {
-        setMessage(t('errors.passwordMin'))
+      const weak = passwordStrengthError(password)
+      if (weak) {
+        setMessage(t(weak))
         return false
       }
       if (fullName.trim().length < 2) {
@@ -190,7 +222,16 @@ export default function Profile() {
         }
       } else {
         const { error } = await signIn(cleanEmail, password)
-        if (error) {
+        if (error?.code === 'email_not_confirmed') {
+          // Not a dead end: the confirmation code (or a fresh one) finishes it.
+          setOtpEmail(cleanEmail)
+          setOtpType('signup')
+          setOtpCode(['', '', '', '', '', ''])
+          setOtpError(false)
+          setCooldown(0)
+          setOtpStep('enter-code')
+          setMessage(t('auth.confirmFirst'))
+        } else if (error) {
           setMessage(friendlyError(error, t))
         } else {
           setPendingRedirect(location.state?.from || '/')
@@ -211,6 +252,13 @@ export default function Profile() {
     // only to a freshly created account — existing profiles are never
     // rewritten by signing in again.
     try { localStorage.setItem('fho_pending_role', role) } catch { /* storage blocked — role stays client */ }
+    // A provider switched off in the dashboard would replace this page with
+    // Supabase's raw JSON error; say so here instead.
+    if ((await providerEnabled(supabase, provider)) === false) {
+      setProviderLoading(null)
+      setMessage(t('errors.providerUnavailable'))
+      return
+    }
     const { error } = await signInWithProvider(provider)
     if (error) {
       setProviderLoading(null)
@@ -265,7 +313,7 @@ export default function Profile() {
     sendingCode.current = true
     setLoading(true); setMessage(''); setOtpError(false)
     try {
-      const { error } = await resendCode(otpEmail, otpType)
+      const { error } = otpType === 'recovery' ? await resetPassword(otpEmail) : await resendCode(otpEmail, otpType)
       const wait = retryAfterSeconds(error)
       if (wait) { setCooldown(wait); setMessage(t('errors.waitSeconds', { s: wait })) }
       else if (error) setMessage(friendlyError(error, t))
@@ -307,7 +355,9 @@ export default function Profile() {
     verifyingCode.current = true
     setLoading(true); setMessage('')
     try {
-      const { error } = await verifyOtp(otpEmail, code, otpType)
+      // A recovery code fires PASSWORD_RECOVERY, which brings up the
+      // new-password form below; the other codes sign in.
+      const { error } = otpType === 'recovery' ? await verifyRecoveryCode(otpEmail, code) : await verifyOtp(otpEmail, code, otpType)
       if (error) {
         setOtpError(true)
         setMessage(friendlyError(error, t))
@@ -315,7 +365,7 @@ export default function Profile() {
         otpRefs.current[0]?.focus()
       } else {
         setOtpStep(null)
-        setPendingRedirect(location.state?.from || '/')
+        if (otpType !== 'recovery') setPendingRedirect(location.state?.from || '/')
       }
     } finally {
       verifyingCode.current = false
@@ -323,31 +373,59 @@ export default function Profile() {
     }
   }
 
-  const handleForgotPassword = async () => {
-    const cleanEmail = email.trim()
-    if (!cleanEmail) { setMessage(t('auth.enterEmail')); return }
-    setEmail(cleanEmail)
+  // "Forgot?" opens its own step, with the address typed so far.
+  const openForgot = () => {
+    setOtpEmail(email.trim())
+    setOtpError(false)
     setMessage('')
-    const { error } = await resetPassword(cleanEmail)
-    setMessage(error ? friendlyError(error, t) : t('auth.resetSent'))
+    setOtpStep('forgot')
+  }
+
+  // Step A of a reset. The answer is the same whether or not the address has
+  // an account (Supabase answers 200 either way), so the page never tells a
+  // stranger who is registered. The code then goes in the usual code boxes.
+  const handleSendReset = async () => {
+    const cleanEmail = otpEmail.trim()
+    if (!EMAIL_RE.test(cleanEmail)) { setMessage(t('errors.invalidEmail')); return }
+    if (sendingCode.current) return
+    sendingCode.current = true
+    setOtpEmail(cleanEmail)
+    setLoading(true); setMessage('')
+    try {
+      const { error } = await resetPassword(cleanEmail)
+      const wait = retryAfterSeconds(error)
+      const toCode = (seconds, text) => {
+        setOtpType('recovery'); setOtpCode(['', '', '', '', '', '']); setOtpError(false)
+        setCooldown(seconds); setOtpStep('enter-code'); setMessage(text)
+      }
+      // A code went to this address moments ago and is still valid.
+      if (wait) toCode(wait, t('errors.waitSeconds', { s: wait }))
+      else if (error) setMessage(friendlyError(error, t))
+      else toCode(30, t('auth.resetCodeSent', { email: cleanEmail }))
+    } finally {
+      sendingCode.current = false
+      setLoading(false)
+    }
   }
 
   // Completes a password-recovery link. Reuses the signup password policy
   // (8-char minimum) since a fresh password set here is exactly that case,
   // not a login — see validate()'s equivalent branch.
   const handleUpdatePassword = async () => {
+    if (loading) return
     setMessage('')
-    if (newPassword.length < 8) { setMessage(t('errors.passwordMin')); return }
-    if (newPassword !== confirmNewPassword) { setMessage(t('errors.passwordMismatch')); return }
+    const invalid = newPasswordError(newPassword, confirmNewPassword)
+    if (invalid) { setMessage(t(invalid)); return }
     setLoading(true)
     try {
-      const { error } = await updatePassword(newPassword)
+      const { error, othersSignedOut } = await updatePassword(newPassword)
       if (error) {
         setMessage(friendlyError(error, t))
       } else {
         setNewPassword('')
         setConfirmNewPassword('')
         setRecoveryDone(true)
+        setRecoveryOthersOut(othersSignedOut)
         setMessage(t('auth.recoverySuccess'))
       }
     } finally {
@@ -383,6 +461,8 @@ export default function Profile() {
                     type={showNewPw ? 'text' : 'password'}
                     className="form-input"
                     placeholder={t('auth.newPassword')}
+                    aria-label={t('auth.newPassword')}
+                    autoComplete="new-password"
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleUpdatePassword()}
@@ -396,6 +476,8 @@ export default function Profile() {
                     type={showNewPw ? 'text' : 'password'}
                     className="form-input"
                     placeholder={t('auth.confirmPassword')}
+                    aria-label={t('auth.confirmPassword')}
+                    autoComplete="new-password"
                     value={confirmNewPassword}
                     onChange={(e) => setConfirmNewPassword(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleUpdatePassword()}
@@ -407,6 +489,13 @@ export default function Profile() {
               </>
             )}
             {message && <div className={`auth-message ${recoveryDone ? '' : 'auth-message--error'}`} role="status">{message}</div>}
+            {recoveryDone && recoveryOthersOut && <p className="auth-subtitle">{t('security.othersSignedOut')}</p>}
+            {/* Leaving ends the reset session: the old password stays. */}
+            {!recoveryDone && (
+              <button className="link-btn" disabled={loading} onClick={() => { setMessage(''); signOut() }}>
+                {t('auth.backToSignIn')}
+              </button>
+            )}
             {recoveryDone && (
               <button className="cta-pill" onClick={() => { setRecoveryDone(false); setMessage('') }}>
                 {t('common.done')}
@@ -425,6 +514,7 @@ export default function Profile() {
 
     const settingsRows = [
       { icon: UserPen, label: t('profile.edit.title'), onClick: () => setEditOpen(true) },
+      { icon: KeyRound, label: t('security.row'), onClick: () => setSecurityOpen(true) },
       { icon: Heart, label: t('favourites.title'), to: '/favorites', badge: stats.saved || null },
       { icon: SearchIcon, label: t('profile.savedSearches'), to: '/saved-searches', badge: stats.searches || null },
       { icon: Calendar, label: t('viewings.title'), to: '/viewings' },
@@ -502,6 +592,8 @@ export default function Profile() {
           />
         )}
 
+        {securityOpen && <ChangePasswordSheet user={user} onClose={() => setSecurityOpen(false)} />}
+
         {deleteOpen && (
           <div className="delete-account-backdrop" onClick={() => !deleting && setDeleteOpen(false)}>
             <div className="delete-account-dialog" role="dialog" aria-modal="true" onClick={e => e.stopPropagation()}>
@@ -521,6 +613,26 @@ export default function Profile() {
     )
   }
 
+  // ─── Forgot password: ask for the address ───
+  if (otpStep === 'forgot') {
+    return (
+      <div className="profile-page auth-screen">
+        <DuskHero />
+        <div className="auth-content">
+          <div className="auth-glass">
+            <button className="link-btn otp-back" onClick={() => { setOtpStep(null); setMessage('') }}><ArrowLeft size={16} /> {t('auth.backToSignIn')}</button>
+            <div className="otp-icon"><Lock size={32} /></div>
+            <h2 className="auth-title">{t('auth.forgotTitle')}</h2>
+            <p className="auth-subtitle">{t('auth.forgotSubtitle')}</p>
+            <div className="field-row"><Mail size={18} className="field-icon" /><input type="email" className="form-input" placeholder={t('auth.email')} aria-label={t('auth.email')} autoComplete="email" value={otpEmail} onChange={(e) => setOtpEmail(e.target.value)} autoFocus onKeyDown={(e) => e.key === 'Enter' && handleSendReset()} /></div>
+            <button className="cta-pill" onClick={handleSendReset} disabled={loading}>{loading ? t('common.loading') : t('auth.sendCode')}</button>
+            {message && <div className="auth-message" role="status">{message}</div>}
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   // ─── OTP: enter email ───
   if (otpStep === 'enter-email') {
     return (
@@ -532,7 +644,7 @@ export default function Profile() {
             <div className="otp-icon"><Mail size={32} /></div>
             <h2 className="auth-title">{t('auth.otpTitle')}</h2>
             <p className="auth-subtitle">{t('auth.otpSubtitle')}</p>
-            <div className="field-row"><Mail size={18} className="field-icon" /><input type="email" className="form-input" placeholder={t('auth.email')} value={otpEmail} onChange={(e) => setOtpEmail(e.target.value)} autoFocus onKeyDown={(e) => e.key === 'Enter' && handleSendOtp()} /></div>
+            <div className="field-row"><Mail size={18} className="field-icon" /><input type="email" className="form-input" placeholder={t('auth.email')} aria-label={t('auth.email')} autoComplete="email" value={otpEmail} onChange={(e) => setOtpEmail(e.target.value)} autoFocus onKeyDown={(e) => e.key === 'Enter' && handleSendOtp()} /></div>
             <button className="cta-pill" onClick={handleSendOtp} disabled={loading}>{loading ? t('common.loading') : t('auth.sendCode')}</button>
             {message && <div className="auth-message" role="status">{message}</div>}
           </div>
@@ -548,7 +660,7 @@ export default function Profile() {
         <DuskHero />
         <div className="auth-content">
           <div className="auth-glass">
-            <button className="link-btn otp-back" onClick={() => setOtpStep(otpType === 'signup' ? null : 'enter-email')}><ArrowLeft size={16} /> {t('common.back')}</button>
+            <button className="link-btn otp-back" onClick={() => setOtpStep(otpType === 'signup' ? null : otpType === 'recovery' ? 'forgot' : 'enter-email')}><ArrowLeft size={16} /> {t('common.back')}</button>
             <div className="otp-icon"><Mail size={32} /></div>
             <h2 className="auth-title">{t('auth.enterCode')}</h2>
             <p className="auth-subtitle">{t('auth.codeSentTo', { email: otpEmail })}</p>
@@ -562,6 +674,11 @@ export default function Profile() {
               {cooldown > 0 ? t('auth.resendIn', { s: cooldown }) : t('auth.resendCode')}
             </button>
             {message && <div className={`auth-message ${otpError ? 'auth-message--error' : ''}`} role={otpError ? 'alert' : 'status'}>{message}</div>}
+            {otpType === 'signup' && (
+              <button className="link-btn" onClick={() => { setOtpStep(null); setIsSignUp(false); setMessage('') }}>
+                {t('auth.signupCodeHint')}
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -591,26 +708,26 @@ export default function Profile() {
           </div>
 
           {isSignUp && (
-            <div className="field-row"><User size={18} className="field-icon" /><input type="text" className="form-input" placeholder={t('auth.fullName')} value={fullName} onChange={(e) => setFullName(e.target.value)} /></div>
+            <div className="field-row"><User size={18} className="field-icon" /><input type="text" className="form-input" placeholder={t('auth.fullName')} aria-label={t('auth.fullName')} autoComplete="name" value={fullName} onChange={(e) => setFullName(e.target.value)} /></div>
           )}
 
-          <div className="field-row"><Mail size={18} className="field-icon" /><input type="email" className="form-input" placeholder={t('auth.email')} value={email} onChange={(e) => setEmail(e.target.value)} /></div>
+          <div className="field-row"><Mail size={18} className="field-icon" /><input type="email" className="form-input" placeholder={t('auth.email')} aria-label={t('auth.email')} autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} /></div>
 
           <div className="field-row">
             <Lock size={18} className="field-icon" />
-            <input type={showPw ? 'text' : 'password'} className="form-input" placeholder={t('auth.password')} value={password} onChange={(e) => setPassword(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleAuth()} />
+            <input type={showPw ? 'text' : 'password'} className="form-input" placeholder={t('auth.password')} aria-label={t('auth.password')} autoComplete={isSignUp ? 'new-password' : 'current-password'} value={password} onChange={(e) => setPassword(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleAuth()} />
             <button className="field-eye" onClick={() => setShowPw(!showPw)} type="button" aria-label={showPw ? t('auth.hidePassword') : t('auth.showPassword')} aria-pressed={showPw}>{showPw ? <EyeOff size={18} /> : <Eye size={18} />}</button>
           </div>
 
           {isSignUp && (
             <div className="field-row">
               <Lock size={18} className="field-icon" />
-              <input type={showPw ? 'text' : 'password'} className="form-input" placeholder={t('auth.confirmPassword')} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleAuth()} />
+              <input type={showPw ? 'text' : 'password'} className="form-input" placeholder={t('auth.confirmPassword')} aria-label={t('auth.confirmPassword')} autoComplete="new-password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleAuth()} />
             </div>
           )}
 
           {isSignUp && role === 'agent' && (
-            <div className="field-row"><Building2 size={18} className="field-icon" /><input type="text" className="form-input" placeholder={t('auth.agencyName')} value={agencyName} onChange={(e) => setAgencyName(e.target.value)} /></div>
+            <div className="field-row"><Building2 size={18} className="field-icon" /><input type="text" className="form-input" placeholder={t('auth.agencyName')} aria-label={t('auth.agencyName')} autoComplete="organization" value={agencyName} onChange={(e) => setAgencyName(e.target.value)} /></div>
           )}
 
           {/* Prototype's row above the CTA: what the selected role gets you on
@@ -618,7 +735,7 @@ export default function Profile() {
           {!isSignUp && (
             <div className="auth-access-row">
               <span>{role === 'agent' ? t('auth.accessAgent') : t('auth.accessClient')}</span>
-              <button type="button" className="auth-forgot" onClick={handleForgotPassword}>
+              <button type="button" className="auth-forgot" onClick={openForgot}>
                 {t('auth.forgotShort')}
               </button>
             </div>

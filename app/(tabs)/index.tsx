@@ -147,7 +147,10 @@ export default function HomeScreen() {
                 <SkeletonCard key={i} />
               ))}
             </View>
-          ) : isError ? (
+          ) : isError && listings.length === 0 ? (
+            /* Only when nothing loaded: a failed background refetch (e.g. on
+               reconnect) keeps the error flag but also the listings, which
+               must stay on screen rather than be swapped for this card. */
             <View style={styles.errorCard}>
               <Text style={styles.errorText}>{t('common.error')}</Text>
               <TouchableOpacity accessibilityRole="button" onPress={() => refetch()} activeOpacity={0.7}>

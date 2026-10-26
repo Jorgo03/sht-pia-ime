@@ -1,5 +1,213 @@
 # Pre-Launch Audit — Shtëpia.ime (Vite web app)
 
+## ═══ PASS 20 — 2026-10-26: SIGN-IN, PASSWORDS AND AUTH EMAIL (owner master prompt) ═══
+
+**Method.** Both apps' auth code read in full (website `src/features/auth/`,
+phone `contexts/auth-context.tsx`, `app/(tabs)/profile.tsx`, both Supabase
+clients, templates, `config.toml`), installed `@supabase/auth-js` 2.105.4
+checked for the exact behaviour relied on. Three read-only finder agents were
+started and all died on the plan's usage limit with nothing returned; the
+audit was done by the lead alone. Live, read-only evidence:
+
+| Check (2026-10-26, 14:11 UTC) | Result |
+| --- | --- |
+| `GET /auth/v1/settings` (public) | `mailer_autoconfirm: true` (**Confirm email is OFF**), `disable_signup: false`, `email: true`, `google: true`, `apple: false`, `linkedin_oidc: false` |
+| One `POST /auth/v1/recover` for the QA account `claude-test@shtepia.dev` (domain does not exist, NXDOMAIN, so nobody could receive it) | **HTTP 500 `unexpected_failure` "Error sending recovery email"**: the SMTP sender still refuses (DECISIONS.md §15: Resend without a verified domain) |
+| DNS `resend.dev` (current sender `onboarding@resend.dev`) | Resend's shared test domain (SPF `include:_spf.google.com -all`, DMARC `p=reject`). Not ours; usable only for the Resend account owner's own address |
+| A domain for Shtëpia.ime | **None exists** (repo mentions `https://shtepia.ime`, not a real TLD). SPF/DKIM/DMARC for a brand sender: nothing to check yet |
+
+### Findings (verified unless marked)
+
+1. **P1 — Forgot password and email-code sign-in fail for every real user
+   today** (live 500 above). Cause: external (SMTP sender with no verified
+   domain). The apps now say so plainly (`errors.emailSendFailed`, reworded
+   from "confirmation email" to "the email", since it covers resets too).
+2. **P1 — Email confirmation is OFF in production** (owner's option A, §15).
+   Accounts are created for addresses nobody has proved they own. Beyond
+   "unverified addresses": Supabase links sign-ins that share a verified
+   email, so someone could register a stranger's address with a password
+   and still hold that password after the real owner later signs in with
+   Google (pre-account takeover; SUSPECTED, follows Supabase's documented
+   linking rules, not reproduced). Fix order in DECISIONS.md §17.
+3. **P1 — No way to change the password while signed in** (both apps).
+   Built: "Password & security".
+4. **P1 — Website: no place to type the reset code**, although the email
+   tells people to; the reset worked only through the link, and only in the
+   browser that asked (PKCE verifier). Built: a reset step with the code.
+5. **P2 — Website: a reset or confirmation link opened in another browser,
+   expired or already used, showed nothing** (`/profile`) or spun for 15 s
+   then blamed "the provider" (`/auth/callback`). auth-js leaves `?code=` in
+   place when the verifier is missing and returns no error.
+6. **P2 — Email links could be used up by mail scanners** (Outlook Safe
+   Links and similar open links): `{{ .ConfirmationURL }}` verifies on GET.
+7. **P2 — Website: Apple and LinkedIn buttons replace the page with
+   Supabase's raw JSON** (`provider is not enabled`), the providers being off.
+8. **P2 — Sign-in with an unconfirmed email was a dead end** (message, no
+   code entry or resend) in both apps.
+9. **P2 — Errors matched on English text only**; same_password, breached
+   password, ended session and no connection all read "Something went
+   wrong". The phone app had its own copy of the mapper.
+10. **P3 — Phone reset: no step asking for the address, no double-tap guard,
+    no server-wait handling** (the second email kills the first code).
+11. **P3 — Website reset state lost on reload** (back on the dashboard with
+    the old password and no form).
+12. **P3 — Phone app did not pause/resume token refresh with the app state**
+    (Supabase's React Native guidance).
+13. **P3 — Password fields had no autofill hints or labels** for password
+    managers and screen readers (both apps); website resend of a sign-up code
+    lost its redirect.
+
+Checked and fine: one Supabase client per app; PKCE on both; no token or
+password logged; ProtectedRoute waits for the profile (Pass 19); relay
+allows only `exp:`/`shtepia-ime:` (P2 still open, owner decision); role
+writes only through `claim_role` (RLS per AUDIT/DECISIONS §16); sign-in
+errors neutral ("Invalid email or password"); reset answers identical for
+unknown addresses (Supabase returns 200).
+
+### Fixed
+
+- `src/lib/authErrors.js`: error **codes** first (30 codes), then the old
+  text matches; network, ended session, breached/simple/short password,
+  same password, link expired/other device. Phone app uses this one mapper.
+- `src/features/auth/lib/password.js` (new, both apps): rules (8 chars,
+  72-byte bcrypt limit, not the current one, confirmation), sign-in methods
+  (Google-only accounts have no password), and `changePassword`: checks the
+  current password with `signInWithPassword` (which also gives the fresh
+  session "Secure password change" needs), `updateUser`, then
+  `signOut({ scope: 'others' })`.
+- **Password & security** sheet, website `ChangePasswordSheet.jsx` and phone
+  `components/profile/change-password-sheet.tsx`: current/new/confirm,
+  show/hide, rules, one request at a time, success, "other devices signed
+  out", ended-session message, "Forgot your current password?" → email code →
+  new password; Google/Apple-only accounts get an explanation, no form.
+- Reset (both apps): its own step for the address, neutral message
+  ("If an account exists…"), guarded send, server wait honoured, code entry
+  (website now too), new password with the same rules, other sessions ended
+  after a reset; website keeps the reset form across a reload.
+- `src/features/auth/lib/authLinks.js` (new) + `pages/AuthConfirm.jsx`
+  (new, `/auth/confirm`): email links carry `token_hash`, verified only when
+  the person presses the button, on any device; the token leaves the address
+  bar; only fixed routes are ever navigated to. `/profile` and
+  `/auth/callback` now explain expired, used and other-browser links at once.
+- Templates: links → `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=…`;
+  new security notice `password_changed_notification.html` (no link on
+  purpose). `config.toml` (local): password ≥ 8, secure password change on,
+  notification wired.
+- Provider switched off → "This sign-in option isn't available yet"
+  (Auth's public `/settings`), both apps.
+- Unconfirmed sign-in → code entry with resend; sign-up code screen says
+  what to do if the link was already opened. Autofill and labels on every
+  auth field. Phone: `startAutoRefresh`/`stopAutoRefresh` on AppState.
+- 40 new strings × 8 languages.
+
+### Verification
+
+| Command | Result |
+| --- | --- |
+| `npx tsc --noEmit` | clean |
+| `npm run lint` | 0 errors, 33 warnings (32 before; the new one is the same set-state-in-effect pattern) |
+| `npm test` | 311/311 (17 new: `password`, `authLinks`, `authErrors` codes, templates) |
+| `npm run build` | OK |
+| `npm run test:e2e` | 200 passed, 2 skipped (26 new: F4-H6–H9, F4-N7–N15 × 2 viewports; F4-H2/E1 updated) |
+| `npm run test:e2e:expo` | 107 passed, 13 skipped (6 new: X30–X32 × 2; X27 updated) |
+| `npx expo export -p android` | bundles |
+
+All email in tests is simulated (fake backend). **No real email was sent or
+delivered.** Not verified: a real reset/confirmation round trip in an inbox,
+Inbox vs Spam placement, SPF/DKIM/DMARC (no domain), the hosted Site URL and
+redirect list (dashboard only), the new templates in the dashboard (not yet
+pasted), native iOS/Android password autofill on a device.
+
+## ═══ PASS 19 — 2026-10-25/26: FULL AUDIT (owner master prompt) ═══
+
+**Method.** Baseline first, then four slice auditors (backend, search/map,
+listing wizard, sign-in). Each finding was re-checked against the code by
+the lead before anything was fixed. The other six slices (listing detail and
+messaging, account tools, shared core, website, build config, mobile UX) did
+**not** run: the account's usage limit stopped them twice. They were covered
+by passes 1–18, but have no fresh audit. Everything was run on the owner's
+Windows laptop, which also exposed two environment bugs (below). No Supabase
+CLI or database connection was available, so there were no live SQL tests:
+only read-only anonymous REST checks, which agreed with the policies.
+
+**Fixed in this pass** (tests named in brackets; red runs were against the
+old code)
+
+| # | Problem | Fix |
+|---|---|---|
+| 1 | Unit tests failed 4/264 on Windows: the email-template test expected `\n`, while `core.autocrlf` checks `config.toml` out with CRLF | regex accepts `\r?\n` (a3897d7) |
+| 2 | e2e a11y flaked about 1 run in 10 on `/search`: axe measured a card still in its staggered fade-in | `axeViolations()` waits for finite animations (a3897d7; 32/32 repeats) |
+| 3 | Price filters compared raw numbers although listings are priced in EUR, ALL or USD and the filter shows €: 15,000,000 ALL (≈€153k) was hidden by "max €200,000" and a 150,000 ALL rental passed "min €100,000". Both apps, the saved-search counts and the email-alert function | shared `src/features/properties/lib/priceRange.js`: euro bounds converted per currency with reference rates (1 € = 98 ALL = 1.15 USD), one PostgREST `or`; mirrored in `saved-search-alerts/logic.js` with a drift test [unit `priceRange` 11, e2e F01-H4 red→green, live PostgREST accepted it] |
+| 4 | Listings paged 20 at a time (CLAUDE.md: 24), with no tiebreak, so equal prices/dates could repeat or skip across pages | 24 in both apps, `order(id)` tiebreak, de-dup on append (web) |
+| 5 | Website "Load more": a page still loading for the previous filters was appended to the new results; a failed page silently ended the list | generation guard; on failure the button becomes Retry with a message |
+| 6 | **Sign-out while offline (or timeout, or 5xx while the project is paused) kept the session**: auth-js returns before `_removeSession()` unless /logout answers 401/403/404, so the account came back on the next launch or token refresh. Both apps | shared `src/lib/signOut.js` removes the session locally when the server call fails [unit `signOut` 4, against the real supabase-js with a failing fetch] |
+| 7 | **Phone password recovery could not be completed**: the recovery code signs the user in, and the Profile screen's `if (user)` replaced the new-password step with the dashboard | the step stays until the password is saved or left; added Back [e2e-expo X27 red→green] |
+
+**Fixed on the owner's "continue" (2026-10-26)**
+
+| # | Problem | Fix |
+|---|---|---|
+| 8 | A restored wizard draft reopened on Publish and could go live with zero photos (only the visible step was checked) | Publish checks every step and opens the first incomplete one; a restored draft reopens at Media at the latest. Both apps |
+| 9 | Surface `85,5` saved as 0 m²; `85.5` failed every save at the integer column, after the uploads | surface and baths read like the price (`normalizeAmount`); integer columns get whole numbers in `formToColumns`; rooms/years take digits only [unit `listingForm`] |
+| 10 | The listing draft was per device, so the next account got the previous agent's draft and contact details | one draft per account; the old per-device key is deleted; the phone gets web's 7-day lifetime; an untouched form is not saved, so "draft restored" no longer shows over blank fields. Both apps |
+| 11 | Signed out, the + button ran the whole wizard into "Authentication failed"; edit, `/agent-dashboard` and `/messages/[id]` spun forever | shared `components/ui/sign-in-prompt.tsx`; a thread that cannot be read says so [e2e-expo X28] |
+| 12 | A failed role lookup filed an agent's listing as a client's, for good (the ownership guard forbids correcting it) | the role comes from the signed-in profile; a failed lookup stops the save before any upload. Both apps |
+| 13 | Signed out, a heart looked saved but was never stored; a failed save never reverted (supabase-js returns `error`, it does not throw); a slow fetch could restore the previous account's hearts | sign-in prompt; revert plus message; fetch guarded by account [e2e-expo X29] |
+| 14 | Map bubbles, previews and the web popup showed € for ALL/USD listings (about 100× too high for lek); the web popup also showed an English "/mo" and raw column values | listing currency everywhere ("ALL 15M"), 999,600 reads "1M"; translated popup; legend shows only the two colours markers have [unit `compactPrice`] |
+| 15 | Android kept stale cluster/county numbers (marker drawn once) | the count is part of the marker key |
+| 16 | Explore/Home swapped a loaded list for a full-screen error when one more page or a background refetch failed | full-screen error only with nothing loaded; a footer Retry for a failed page; pages de-duplicated |
+| 17 | Listing assistant failed from the 6th question (history cut to start with an answer); failed replies were sent back as answers | shared `assistantHistory.js` in both apps; the function also drops leading non-user turns (needs a deploy) [unit `assistantHistory`] |
+| 18 | P3s: pasted `250.000,00` became 25,000,000; no minus key for basements on iPhone; a late city-centre answer moved the map back; sort label always "relevance" (both apps); zone kept when a city is typed; filter segments did not announce the selected one; Expo-web map ignored its first view; `delete-account` purged only 1,000 files per bucket (deploy); the unsubscribe link acted on GET, so link scanners unsubscribed people (deploy); the website sent agents home when their profile loaded late; viewing statuses `completed`/`no_show` had no text | each fixed where named |
+
+**Still open, code-only**
+
+| Pri | Finding | Where |
+|---|---|---|
+| P2 | OAuth relay forwards the sign-in `code` to any `exp://` host (only the scheme is checked): a crafted link could hand an Expo Go user's session to someone else. Restrict to LAN/localhost hosts and the exact callback path; whether Expo tunnels (`*.exp.direct`, which anyone can register) keep working with Google sign-in is the owner's call. Coordinate with the session working on the relay | `index.html`, `AuthCallback.jsx`, `app/+html.tsx`, `app/auth/callback.web.tsx` |
+| P3 | Failed translations at publish are not reported; hard-coded English in the media step (both need new locale keys); map and filter-sheet count show "no results"/"Loading" on a failed fetch; the Favorites screen has no error state; the push-token record is dropped before the server delete; alert emails lack `List-Unsubscribe` headers; AI search has no currency field | various |
+
+**Open, need the owner's approval (database)** — write as `supabase/pending/`
+files and test in a rolled-back transaction first, as before:
+- P2 `viewings` INSERT is unguarded (any status, any agent, ignores blocks),
+  and the UPDATE guard fails open when `agent_id` is NULL
+  (`me = NULL` is NULL in `is_host`).
+- P2 sorting by price across currencies needs a `price_eur` column (the
+  filters are fixed without one).
+- P3 `ai_usage` keeps IPs and user ids forever: add a prune job.
+- P3 no server-side length limits on names, messages, viewing notes.
+- P3 map county totals come from an unordered 200-row sample past 200
+  listings: needs an aggregate.
+
+**Verified on the final code** (Windows laptop, one suite after another)
+
+| Check | Before | After |
+|---|---|---|
+| `npm run lint` | 0 errors, 32 warnings | 0 errors, 32 warnings (none new) |
+| `npx tsc --noEmit` | clean | clean |
+| `npm test` | 260/264 | 283/283 |
+| `npm run build` | OK | OK |
+| `npm run test:e2e` | blocked (browser), then 167 + 1 flake | 174 passed, 2 skipped by design |
+| `npm run test:e2e:expo` | blocked (browser), then 93 | 95 passed, 13 skipped by design |
+| PGlite payments SQL (`supabase/tests_*.test.mjs`) | not in CI | 23/23, 31/31 |
+| `expo export -p ios -p android` | — | both bundles build |
+| `npx expo-doctor` | 19/20 | 20/20 |
+| `npm audit --omit=dev` | 5 high | unchanged: Expo CLI and ESLint tooling only (node-forge, zod), not in any bundle |
+| Live, anonymous, read-only | — | 15 GETs agree with the policies; the price `or` filter accepted |
+
+**Not verified:** anything on a physical phone (offline sign-out and
+recovery included), the live SQL tests in `supabase/tests/` (no database
+access from this machine), Edge Function changes: `saved-search-alerts`,
+`ai-listing-assistant`, `delete-account` and `saved-search-unsubscribe` take
+effect only when deployed (`supabase functions deploy <name>`); the apps'
+own fixes for the assistant and the price filters work without that.
+
+**Environment and tooling:** Playwright 1.64.1 needs Chromium build 1248
+(`npm run test:e2e:install`; the laptop had 1223/1228, so every e2e test
+failed in 3 ms). `@types/react` was 19.2.18 where SDK 58 expects ~19.3.0:
+bumped, `expo-doctor` 20/20 (was 19/20). Two Playwright runs at once share
+`test-results/` and delete each other's traces (`ENOENT … .trace`): run the
+suites one after the other.
+
 ## ═══ PASS 18 — 2026-10-24: EXPO SDK 57 → 58 ═══
 
 **Trigger:** the owner's iPhone showed "Project is incompatible with this

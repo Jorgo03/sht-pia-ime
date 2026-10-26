@@ -58,13 +58,24 @@ const BUCKETS = ['avatars', 'property-images'];
 
 /** Remove everything under `<uid>/` in a public bucket. Best-effort: a storage
  *  failure must not abort the account deletion itself, or the user is left in
- *  the "permanently inaccessible account" state the stores also reject. */
+ *  the "permanently inaccessible account" state the stores also reject.
+ *  Page by page until the folder is empty: one list() returns at most 1000
+ *  names, and everything past that used to stay public after the account was
+ *  gone (an agent with 100 listings of 10 photos). Removed names drop out of
+ *  the listing, so each round lists from the start again; the cap only stops
+ *  a folder that refuses to shrink. */
 async function purgeBucket(bucket: string, uid: string): Promise<number> {
-  const { data, error } = await admin.storage.from(bucket).list(uid, { limit: 1000 });
-  if (error || !data?.length) return 0;
-  const paths = data.map((f) => `${uid}/${f.name}`);
-  const { error: rmErr } = await admin.storage.from(bucket).remove(paths);
-  return rmErr ? 0 : paths.length;
+  let removed = 0;
+  for (let round = 0; round < 50; round++) {
+    const { data, error } = await admin.storage.from(bucket).list(uid, { limit: 1000 });
+    if (error || !data?.length) break;
+    const paths = data.map((f) => `${uid}/${f.name}`);
+    const { error: rmErr } = await admin.storage.from(bucket).remove(paths);
+    if (rmErr) break;
+    removed += paths.length;
+    if (paths.length < 1000) break;
+  }
+  return removed;
 }
 
 Deno.serve(async (req) => {

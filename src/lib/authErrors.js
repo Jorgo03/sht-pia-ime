@@ -2,12 +2,57 @@
 // without a JSX/CSS-aware loader (this repo's `npm test` is plain
 // `node --test`, no bundler). `t` is passed in rather than imported so this
 // stays decoupled from react-i18next — callers pass their own useTranslation() `t`.
+// Both apps use it; the phone app imports it through authErrors.d.ts.
 
 export const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
+// Supabase Auth's error codes (error.code in auth-js 2.x). Checked before the
+// message text below: the codes are a stable API, the English text is not.
+const CODE_KEYS = {
+  invalid_credentials: 'errors.invalidCredentials',
+  email_not_confirmed: 'errors.emailNotConfirmed',
+  user_already_exists: 'errors.userExists',
+  email_exists: 'errors.userExists',
+  email_address_invalid: 'errors.invalidEmail',
+  otp_expired: 'errors.invalidCode',
+  same_password: 'errors.passwordSame',
+  over_request_rate_limit: 'errors.rateLimited',
+  over_email_send_rate_limit: 'errors.rateLimited',
+  // Supabase's built-in mailer only writes to the project's own team.
+  email_address_not_authorized: 'errors.emailSendFailed',
+  signup_disabled: 'errors.signupDisabled',
+  email_provider_disabled: 'errors.providerNotConfigured',
+  provider_disabled: 'errors.providerNotConfigured',
+  session_expired: 'errors.sessionExpired',
+  session_not_found: 'errors.sessionExpired',
+  refresh_token_not_found: 'errors.sessionExpired',
+  refresh_token_already_used: 'errors.sessionExpired',
+  bad_jwt: 'errors.sessionExpired',
+  no_authorization: 'errors.sessionExpired',
+  reauthentication_needed: 'errors.reauthNeeded',
+  reauthentication_not_valid: 'errors.invalidCode',
+  // A link whose sign-in state is gone: expired, used, or opened elsewhere.
+  flow_state_expired: 'errors.linkExpired',
+  flow_state_not_found: 'errors.linkExpired',
+  bad_code_verifier: 'errors.linkExpired',
+  request_timeout: 'errors.network',
+}
+
 export function friendlyError(err, t) {
+  // No answer at all (offline, DNS, a timeout) or a 502-504 from a gateway:
+  // auth-js reports both as AuthRetryableFetchError. "Something went wrong"
+  // hid that it is the connection, which the person can do something about.
+  if (err?.name === 'AuthRetryableFetchError') return t('errors.network')
+  if (err?.name === 'AuthSessionMissingError') return t('errors.sessionExpired')
+  if (err?.name === 'AuthPKCECodeVerifierMissingError') return t('errors.linkOtherDevice')
+  if (err?.code === 'weak_password' || Array.isArray(err?.reasons)) {
+    const reasons = err.reasons ?? []
+    if (reasons.includes('pwned')) return t('errors.passwordPwned')
+    if (reasons.includes('characters')) return t('errors.passwordWeak')
+    return t('errors.passwordMin')
+  }
+  if (err?.code && CODE_KEYS[err.code]) return t(CODE_KEYS[err.code])
   if (!err?.message) return t('errors.generic')
-  if (err.code === 'email_address_invalid') return t('errors.invalidEmail')
   const map = {
     'Invalid login credentials': 'errors.invalidCredentials',
     'User already registered': 'errors.userExists',

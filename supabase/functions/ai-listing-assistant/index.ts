@@ -112,6 +112,10 @@ Deno.serve(async (req) => {
         role: m.role,
         content: String(m.content).slice(0, 1000),
       }));
+    // The Messages API needs the person's turn first; an even cut of an
+    // alternating chat starts with an answer (every question from the 6th
+    // failed). The apps now send a trimmed history too.
+    while (history.length > 0 && history[0].role !== 'user') history.shift();
     if (history.length === 0 || history[history.length - 1].role !== 'user') {
       return json({ error: 'empty_query' }, 400);
     }

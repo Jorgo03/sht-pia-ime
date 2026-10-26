@@ -16,10 +16,55 @@ const CORS = { 'access-control-allow-origin': '*', 'access-control-expose-header
 
 const like = (needle: string) => needle.replace(/[*%]/g, '').toLowerCase();
 
+// PostgREST logic trees, as the price range sends them
+// (src/features/properties/lib/priceRange.js):
+// or=(and(currency.eq.ALL,price.lte.19600000),and(currency.is.null,…),…).
+// Only the operators the apps put inside one; NOT IN is never true for NULL,
+// as in SQL.
+function splitTop(s: string): string[] {
+  const parts: string[] = [];
+  let depth = 0;
+  let cur = '';
+  for (const ch of s) {
+    if (ch === '(') depth++;
+    if (ch === ')') depth--;
+    if (ch === ',' && depth === 0) {
+      parts.push(cur);
+      cur = '';
+    } else cur += ch;
+  }
+  if (cur) parts.push(cur);
+  return parts;
+}
+
+function holds(row: Listing, cond: string): boolean {
+  if (cond.startsWith('and(')) return splitTop(cond.slice(4, -1)).every((c) => holds(row, c));
+  if (cond.startsWith('or(')) return splitTop(cond.slice(3, -1)).some((c) => holds(row, c));
+  const [column, ...rest] = cond.split('.');
+  let op = rest.shift();
+  const negated = op === 'not';
+  if (negated) op = rest.shift();
+  const value = rest.join('.');
+  const v = row[column];
+  if (op === 'is') return value === 'null' && v == null;
+  if (v == null) return false;
+  let r: boolean;
+  if (op === 'eq') r = String(v) === value;
+  else if (op === 'gte') r = Number(v) >= Number(value);
+  else if (op === 'lte') r = Number(v) <= Number(value);
+  else if (op === 'in') r = value.slice(1, -1).split(',').includes(String(v));
+  else throw new Error(`fake backend: operator not handled in or=(): ${op}`);
+  return negated ? !r : r;
+}
+
 function filter(rows: Listing[], params: URLSearchParams): Listing[] {
   let out = [...rows];
   for (const [column, expr] of params) {
     if (['select', 'order', 'limit', 'offset'].includes(column)) continue;
+    if (column === 'or') {
+      out = out.filter((r) => splitTop(expr.slice(1, -1)).some((c) => holds(r, c)));
+      continue;
+    }
     const dot = expr.indexOf('.');
     const op = expr.slice(0, dot);
     const value = expr.slice(dot + 1);
@@ -35,8 +80,12 @@ function filter(rows: Listing[], params: URLSearchParams): Listing[] {
   }
   const order = params.get('order');
   if (order) {
-    const [column, direction] = order.split('.');
-    out.sort((a, b) => (String(a[column]) < String(b[column]) ? -1 : 1) * (direction === 'desc' ? -1 : 1));
+    // "created_at.desc,id.asc": the first column decides; the id tiebreak
+    // never matters for fixtures, which have no ties.
+    const [column, direction] = order.split(',')[0].split('.');
+    // Numbers as numbers: as strings, a 450 rent sorts above a 100000 sale.
+    const before = (x: unknown, y: unknown) => (typeof x === 'number' && typeof y === 'number' ? x < y : String(x) < String(y));
+    out.sort((a, b) => (before(a[column], b[column]) ? -1 : 1) * (direction === 'desc' ? -1 : 1));
   }
   return out;
 }

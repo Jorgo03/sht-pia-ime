@@ -47,7 +47,7 @@
     "accessClient": "Akses për blerës dhe qiramarrës",
     "accessAgent": "Akses në portalin e agjentit",
     "forgotShort": "Harruat?",
-    "resetSent": "Kontrollo emailin për të rivendosur fjalëkalimin.",
+    "resetSent": "Nëse ka një llogari me këtë email, i dërguam një kod për të rivendosur fjalëkalimin.",
     "recoveryTitle": "Vendos një fjalëkalim të ri",
     "recoverySubtitle": "Zgjidh një fjalëkalim të ri për llogarinë tënde.",
     "newPassword": "Fjalëkalimi i ri",
@@ -85,7 +85,13 @@
     "showPassword": "Shfaq fjalëkalimin",
     "hidePassword": "Fshih fjalëkalimin",
     "codeDigit": "Shifra {{n}} nga 6",
-    "newCodeSent": "Kodi i ri u dërgua. Kodet e mëparshme nuk vlejnë më."
+    "newCodeSent": "Kodi i ri u dërgua. Kodet e mëparshme nuk vlejnë më.",
+    "forgotTitle": "Rivendos fjalëkalimin",
+    "forgotSubtitle": "Shkruaj emailin e llogarisë. Do të të dërgojmë një kod 6-shifror.",
+    "resetCodeSent": "Nëse ka një llogari për {{email}}, i dërguam një kod 6-shifror.",
+    "backToSignIn": "Kthehu te hyrja",
+    "confirmFirst": "Konfirmo fillimisht emailin: fut kodin që të dërguam ose kërko një të ri.",
+    "signupCodeHint": "E hape tashmë lidhjen në email? Atëherë emaili është konfirmuar — hyr."
   },
   "home": {
     "greetingMorning": "Mirëmëngjes",
@@ -244,7 +250,8 @@
     "inputPlaceholder": "Shkruaj një mesazh…",
     "noMessages": "Ende pa mesazhe — përshëndetu!",
     "loginPrompt": "Kyçu për të parë mesazhet",
-    "sendFailed": "Mesazhi nuk u dërgua — provo përsëri"
+    "sendFailed": "Mesazhi nuk u dërgua — provo përsëri",
+    "unavailable": "Kjo bisedë nuk është e disponueshme"
   },
   "notFound": {
     "title": "Faqja nuk u gjet",
@@ -275,10 +282,23 @@
     "invalidCode": "Kodi është i pasaktë ose nuk vlen më. Përdor kodin e fundit që të dërguam.",
     "videoInvalidType": "Lejohen vetëm video MP4 ose MOV",
     "videoTooLarge": "Video është shumë e madhe (maks. {{max}} MB)",
-    "emailSendFailed": "Nuk arritëm të dërgojmë emailin e konfirmimit. Është një problem konfigurimi i serverit, jo i llogarisë sate — kontakto administratorin.",
+    "emailSendFailed": "Nuk arritëm të dërgojmë emailin. Është një problem konfigurimi i serverit, jo i llogarisë sate — kontakto administratorin.",
     "waitSeconds": "Prit {{s}} sekonda para se të kërkosh një kod të ri.",
     "photoPrepareFailed": "Një foto nuk u përgatit dot për ngarkim. Provo përsëri ose zgjidh një foto tjetër.",
-    "listingSaveFailed": "Shpallja nuk u ruajt. Gjithçka që plotësove mbetet këtu; provo përsëri."
+    "listingSaveFailed": "Shpallja nuk u ruajt. Gjithçka që plotësove mbetet këtu; provo përsëri.",
+    "network": "Nuk u lidhëm dot me serverin. Kontrollo lidhjen dhe provo sërish.",
+    "sessionExpired": "Seanca jote mbaroi. Hyr përsëri.",
+    "passwordSame": "Zgjidh një fjalëkalim të ndryshëm nga ai aktual.",
+    "passwordPwned": "Ky fjalëkalim është shfaqur në një rrjedhje të dhënash. Zgjidh një tjetër.",
+    "passwordWeak": "Ky fjalëkalim është shumë i thjeshtë. Përziej shkronja, numra dhe simbole.",
+    "passwordTooLong": "Fjalëkalimi është shumë i gjatë. Përdor deri në 72 karaktere.",
+    "reauthNeeded": "Për sigurinë tënde, konfirmo fillimisht me një kod nga emaili.",
+    "signupDisabled": "Për momentin nuk mund të krijohen llogari të reja.",
+    "linkExpired": "Kjo lidhje ka skaduar ose është përdorur tashmë. Kërko një kod të ri.",
+    "linkInvalid": "Kjo lidhje nuk është e vlefshme. Kërko një kod të ri.",
+    "linkOtherDevice": "Kjo lidhje u hap në një shfletues tjetër nga ai ku e kërkove. Fut kodin 6-shifror nga emaili.",
+    "currentPasswordWrong": "Fjalëkalimi aktual është i pasaktë.",
+    "providerUnavailable": "Kjo mënyrë hyrjeje nuk është ende e disponueshme. Zgjidh një tjetër."
   },
   "agentDashboard": {
     "title": "Paneli i Agjentit",
@@ -557,7 +577,9 @@
       "requested": "E kërkuar",
       "confirmed": "E konfirmuar",
       "declined": "E refuzuar",
-      "cancelled": "E anuluar"
+      "cancelled": "E anuluar",
+      "completed": "E përfunduar",
+      "no_show": "Nuk u paraqit"
     }
   },
   "saved": {
@@ -702,5 +724,28 @@
   "seo": {
     "siteTitle": "Shtëpia.ime — Shtëpi në shitje dhe me qira në Shqipëri",
     "siteDescription": "Apartamente, vila dhe zyra në shitje dhe me qira në Tiranë, Durrës dhe në gjithë Shqipërinë. Kontakto direkt agjentët dhe pronarët."
+  },
+  "security": {
+    "row": "Fjalëkalimi dhe siguria",
+    "title": "Ndrysho fjalëkalimin",
+    "currentPassword": "Fjalëkalimi aktual",
+    "save": "Ruaj fjalëkalimin e ri",
+    "success": "Fjalëkalimi yt u ndryshua.",
+    "othersSignedOut": "Pajisjet e tjera u shkëputën nga llogaria.",
+    "forgotCurrent": "Harrove fjalëkalimin aktual?",
+    "codeIntro": "Do të dërgojmë një kod 6-shifror te {{email}}. Fute këtu, pastaj zgjidh fjalëkalimin e ri.",
+    "providerOnly": "Ti hyn me {{providers}}, prandaj nuk ka fjalëkalim Shtëpia.ime për të ndryshuar. Llogarinë tënde e mbron llogaria {{providers}}."
+  },
+  "authConfirm": {
+    "titleEmail": "Konfirmo emailin",
+    "titleRecovery": "Rivendos fjalëkalimin",
+    "titleEmailChange": "Konfirmo emailin e ri",
+    "intro": "Për sigurinë tënde, vazhdo me butonin më poshtë.",
+    "ctaEmail": "Konfirmo dhe hyr",
+    "ctaRecovery": "Vazhdo",
+    "ctaEmailChange": "Konfirmo emailin e ri",
+    "emailChanged": "Adresa e emailit u përditësua.",
+    "requestNew": "Kërko një kod të ri",
+    "goSignIn": "Shko te hyrja"
   }
 }

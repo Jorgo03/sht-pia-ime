@@ -47,7 +47,7 @@
     "accessClient": "Zugang für Käufer & Mieter",
     "accessAgent": "Zugang zum Makler-Portal",
     "forgotShort": "Vergessen?",
-    "resetSent": "Überprüfe deine E-Mail, um dein Passwort zurückzusetzen.",
+    "resetSent": "Falls ein Konto mit dieser E-Mail existiert, haben wir einen Code zum Zurücksetzen gesendet.",
     "recoveryTitle": "Neues Passwort festlegen",
     "recoverySubtitle": "Wähle ein neues Passwort für dein Konto.",
     "newPassword": "Neues Passwort",
@@ -85,7 +85,13 @@
     "showPassword": "Passwort anzeigen",
     "hidePassword": "Passwort verbergen",
     "codeDigit": "Ziffer {{n}} von 6",
-    "newCodeSent": "Ein neuer Code wurde gesendet. Frühere Codes gelten nicht mehr."
+    "newCodeSent": "Ein neuer Code wurde gesendet. Frühere Codes gelten nicht mehr.",
+    "forgotTitle": "Passwort zurücksetzen",
+    "forgotSubtitle": "Gib die E-Mail deines Kontos ein. Wir senden dir einen 6-stelligen Code.",
+    "resetCodeSent": "Falls ein Konto für {{email}} existiert, haben wir einen 6-stelligen Code gesendet.",
+    "backToSignIn": "Zurück zur Anmeldung",
+    "confirmFirst": "Bestätige zuerst deine E-Mail: Gib den gesendeten Code ein oder fordere einen neuen an.",
+    "signupCodeHint": "Link in der E-Mail schon geöffnet? Dann ist deine E-Mail bestätigt — melde dich an."
   },
   "home": {
     "greetingMorning": "Guten Morgen",
@@ -244,7 +250,8 @@
     "inputPlaceholder": "Nachricht schreiben…",
     "noMessages": "Noch keine Nachrichten — sag hallo!",
     "loginPrompt": "Melde dich an, um deine Nachrichten zu sehen",
-    "sendFailed": "Nachricht nicht gesendet — bitte erneut versuchen"
+    "sendFailed": "Nachricht nicht gesendet — bitte erneut versuchen",
+    "unavailable": "Dieses Gespräch ist nicht verfügbar"
   },
   "notFound": {
     "title": "Seite nicht gefunden",
@@ -299,10 +306,23 @@
     "invalidCode": "Der Code ist falsch oder nicht mehr gültig. Verwende den zuletzt gesendeten Code.",
     "videoInvalidType": "Nur MP4- oder MOV-Videos sind erlaubt",
     "videoTooLarge": "Video ist zu groß (max. {{max}} MB)",
-    "emailSendFailed": "Die Bestätigungs-E-Mail konnte nicht gesendet werden. Das ist ein Serverkonfigurationsproblem, nicht ein Problem mit deinem Konto — bitte kontaktiere den Administrator.",
+    "emailSendFailed": "Die E-Mail konnte nicht gesendet werden. Das ist ein Serverkonfigurationsproblem, nicht ein Problem mit deinem Konto — bitte kontaktiere den Administrator.",
     "waitSeconds": "Warte {{s}} Sekunden, bevor du einen neuen Code anforderst.",
     "photoPrepareFailed": "Ein Foto konnte nicht für den Upload vorbereitet werden. Versuche es erneut oder wähle ein anderes Foto.",
-    "listingSaveFailed": "Das Inserat wurde nicht gespeichert. Alle Eingaben sind noch da; versuche es erneut."
+    "listingSaveFailed": "Das Inserat wurde nicht gespeichert. Alle Eingaben sind noch da; versuche es erneut.",
+    "network": "Der Server ist nicht erreichbar. Prüfe deine Verbindung und versuche es erneut.",
+    "sessionExpired": "Deine Sitzung ist abgelaufen. Bitte melde dich erneut an.",
+    "passwordSame": "Wähle ein anderes Passwort als dein aktuelles.",
+    "passwordPwned": "Dieses Passwort ist in einem Datenleck aufgetaucht. Bitte wähle ein anderes.",
+    "passwordWeak": "Dieses Passwort ist zu einfach. Kombiniere Buchstaben, Zahlen und Zeichen.",
+    "passwordTooLong": "Das Passwort ist zu lang. Verwende höchstens 72 Zeichen.",
+    "reauthNeeded": "Bestätige zu deiner Sicherheit zuerst mit einem Code aus deiner E-Mail.",
+    "signupDisabled": "Neue Konten können gerade nicht erstellt werden.",
+    "linkExpired": "Dieser Link ist abgelaufen oder wurde schon benutzt. Fordere einen neuen Code an.",
+    "linkInvalid": "Dieser Link ist ungültig. Fordere einen neuen Code an.",
+    "linkOtherDevice": "Dieser Link wurde in einem anderen Browser geöffnet als dem, in dem du ihn angefordert hast. Gib stattdessen den 6-stelligen Code aus der E-Mail ein.",
+    "currentPasswordWrong": "Dein aktuelles Passwort ist falsch.",
+    "providerUnavailable": "Diese Anmeldeoption ist noch nicht verfügbar. Bitte wähle eine andere."
   },
   "agentDashboard": {
     "title": "Makler-Dashboard",
@@ -557,7 +577,9 @@
       "requested": "Angefragt",
       "confirmed": "Bestätigt",
       "declined": "Abgelehnt",
-      "cancelled": "Storniert"
+      "cancelled": "Storniert",
+      "completed": "Abgeschlossen",
+      "no_show": "Nicht erschienen"
     }
   },
   "saved": {
@@ -702,5 +724,28 @@
   "seo": {
     "siteTitle": "Shtëpia.ime — Immobilien zum Kauf und zur Miete in Albanien",
     "siteDescription": "Wohnungen, Villen und Büros zum Kauf und zur Miete in Tirana, Durrës und ganz Albanien. Direkt mit Maklern und Eigentümern in Kontakt treten."
+  },
+  "security": {
+    "row": "Passwort & Sicherheit",
+    "title": "Passwort ändern",
+    "currentPassword": "Aktuelles Passwort",
+    "save": "Neues Passwort speichern",
+    "success": "Dein Passwort wurde geändert.",
+    "othersSignedOut": "Deine anderen Geräte wurden abgemeldet.",
+    "forgotCurrent": "Aktuelles Passwort vergessen?",
+    "codeIntro": "Wir senden einen 6-stelligen Code an {{email}}. Gib ihn hier ein und wähle dann ein neues Passwort.",
+    "providerOnly": "Du meldest dich mit {{providers}} an, daher gibt es kein Shtëpia.ime-Passwort zum Ändern. Dein Konto wird durch dein {{providers}}-Konto geschützt."
+  },
+  "authConfirm": {
+    "titleEmail": "E-Mail bestätigen",
+    "titleRecovery": "Passwort zurücksetzen",
+    "titleEmailChange": "Neue E-Mail bestätigen",
+    "intro": "Fahre zu deiner Sicherheit mit der Schaltfläche unten fort.",
+    "ctaEmail": "Bestätigen und anmelden",
+    "ctaRecovery": "Weiter",
+    "ctaEmailChange": "Neue E-Mail bestätigen",
+    "emailChanged": "Deine E-Mail-Adresse wurde aktualisiert.",
+    "requestNew": "Neuen Code anfordern",
+    "goSignIn": "Zur Anmeldung"
   }
 }

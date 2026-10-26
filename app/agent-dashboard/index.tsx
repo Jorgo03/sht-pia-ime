@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { AppHeader } from '@/components/ui/app-header';
 import { ScreenHero } from '@/components/ui/screen-hero';
 import { GradientBackground } from '@/components/ui/gradient-background';
+import { SignInPrompt } from '@/components/ui/sign-in-prompt';
 import { type AtticoPalette, Fonts } from '@/constants/theme';
 import { useAuth } from '@/contexts/auth-context';
 import { useTheme } from '@/contexts/theme-context';
@@ -47,7 +48,7 @@ interface ClientProfile {
 export default function AgentDashboardScreen() {
   const router = useRouter();
   const { t, i18n } = useTranslation();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const [loading, setLoading] = useState(true);
@@ -139,6 +140,10 @@ export default function AgentDashboardScreen() {
     { icon: 'mail-outline', label: t('agentDashboard.statConversations'), value: stats.conversations, to: '/messages' as Href },
     { icon: 'people-outline', label: t('agentDashboard.statLeads'), value: stats.leads },
   ];
+
+  // Signed out (a deep link, or after signing out) the load never starts, so
+  // this used to be a spinner forever.
+  if (!user) return authLoading ? null : <SignInPrompt />;
 
   return (
     <GradientBackground>

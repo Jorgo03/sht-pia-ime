@@ -15,6 +15,7 @@ import Favorites from './features/favorites/pages/Favorites'
 import Profile from './features/auth/pages/Profile'
 import PropertyDetail from './features/properties/pages/PropertyDetail'
 import AuthCallback from './features/auth/pages/AuthCallback'
+import AuthConfirm from './features/auth/pages/AuthConfirm'
 import NotFound from './shared/pages/NotFound'
 import CookieConsent from './shared/CookieConsent'
 import WelcomeToast from './shared/WelcomeToast'
@@ -82,6 +83,7 @@ function AppShell() {
           <Route path="/viewings" element={<ProtectedRoute><Viewings /></ProtectedRoute>} />
           <Route path="/saved-searches" element={<ProtectedRoute><SavedSearches /></ProtectedRoute>} />
           <Route path="/auth/callback" element={<AuthCallback />} />
+          <Route path="/auth/confirm" element={<AuthConfirm />} />
           <Route path="/privacy" element={<LegalPage doc="privacy" />} />
           <Route path="/terms" element={<LegalPage doc="terms" />} />
           <Route path="/pricing" element={<Pricing />} />

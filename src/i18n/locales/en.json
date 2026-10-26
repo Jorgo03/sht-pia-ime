@@ -47,7 +47,7 @@
     "accessClient": "Buyer & renter access",
     "accessAgent": "Agent portal access",
     "forgotShort": "Forgot?",
-    "resetSent": "Check your email to reset your password.",
+    "resetSent": "If an account exists for this email, we've sent it a code to reset the password.",
     "recoveryTitle": "Set a new password",
     "recoverySubtitle": "Choose a new password for your account.",
     "newPassword": "New password",
@@ -85,7 +85,13 @@
     "showPassword": "Show password",
     "hidePassword": "Hide password",
     "codeDigit": "Digit {{n}} of 6",
-    "newCodeSent": "A new code was sent. Earlier codes no longer work."
+    "newCodeSent": "A new code was sent. Earlier codes no longer work.",
+    "forgotTitle": "Reset your password",
+    "forgotSubtitle": "Enter your account's email. We'll send you a 6-digit code.",
+    "resetCodeSent": "If an account exists for {{email}}, we've sent it a 6-digit code.",
+    "backToSignIn": "Back to sign in",
+    "confirmFirst": "Confirm your email first: enter the code we sent you, or ask for a new one.",
+    "signupCodeHint": "Already opened the link in the email? Then your email is confirmed — sign in."
   },
   "addSheet": {
     "openLabel": "Create new",
@@ -275,7 +281,8 @@
     "inputPlaceholder": "Write a message…",
     "noMessages": "No messages yet — say hello!",
     "loginPrompt": "Sign in to see your messages",
-    "sendFailed": "Message not sent — try again"
+    "sendFailed": "Message not sent — try again",
+    "unavailable": "This conversation is not available"
   },
   "property": {
     "beds": "beds",
@@ -327,10 +334,23 @@
     "invalidCode": "The code is wrong or no longer valid. Use the most recent code we sent.",
     "videoInvalidType": "Only MP4 or MOV videos are allowed",
     "videoTooLarge": "Video is too large (max {{max}} MB)",
-    "emailSendFailed": "We could not send the confirmation email. This is a server configuration problem, not a problem with your account — please contact the administrator.",
+    "emailSendFailed": "We could not send the email. This is a server configuration problem, not a problem with your account — please contact the administrator.",
     "waitSeconds": "Wait {{s}} seconds before asking for a new code.",
     "photoPrepareFailed": "A photo couldn't be prepared for upload. Try again or choose a different photo.",
-    "listingSaveFailed": "The listing wasn't saved. Everything you entered is still here; try again."
+    "listingSaveFailed": "The listing wasn't saved. Everything you entered is still here; try again.",
+    "network": "Couldn't reach the server. Check your connection and try again.",
+    "sessionExpired": "Your session has ended. Please sign in again.",
+    "passwordSame": "Choose a password different from your current one.",
+    "passwordPwned": "This password has appeared in a data breach. Please choose another one.",
+    "passwordWeak": "This password is too simple. Mix letters, numbers and symbols.",
+    "passwordTooLong": "That password is too long. Use at most 72 characters.",
+    "reauthNeeded": "For your security, confirm it's you with a code from your email first.",
+    "signupDisabled": "New accounts can't be created right now.",
+    "linkExpired": "This link has expired or has already been used. Ask for a new code.",
+    "linkInvalid": "This link isn't valid. Ask for a new code.",
+    "linkOtherDevice": "This link was opened in a different browser from the one you asked in. Enter the 6-digit code from the email instead.",
+    "currentPasswordWrong": "Your current password is incorrect.",
+    "providerUnavailable": "This sign-in option isn't available yet. Please choose another one."
   },
   "agentDashboard": {
     "title": "Agent Dashboard",
@@ -557,7 +577,9 @@
       "requested": "Requested",
       "confirmed": "Confirmed",
       "declined": "Declined",
-      "cancelled": "Cancelled"
+      "cancelled": "Cancelled",
+      "completed": "Completed",
+      "no_show": "No-show"
     }
   },
   "saved": {
@@ -702,5 +724,28 @@
   "seo": {
     "siteTitle": "Shtëpia.ime — Homes for sale and rent in Albania",
     "siteDescription": "Apartments, villas and offices for sale and rent in Tirana, Durrës and across Albania. Contact agents and owners directly."
+  },
+  "security": {
+    "row": "Password & security",
+    "title": "Change password",
+    "currentPassword": "Current password",
+    "save": "Save new password",
+    "success": "Your password has been changed.",
+    "othersSignedOut": "Your other devices have been signed out.",
+    "forgotCurrent": "Forgot your current password?",
+    "codeIntro": "We'll email a 6-digit code to {{email}}. Enter it here, then choose a new password.",
+    "providerOnly": "You sign in with {{providers}}, so there is no Shtëpia.ime password to change. Your account is protected by your {{providers}} account."
+  },
+  "authConfirm": {
+    "titleEmail": "Confirm your email",
+    "titleRecovery": "Reset your password",
+    "titleEmailChange": "Confirm your new email",
+    "intro": "For your security, continue with the button below.",
+    "ctaEmail": "Confirm and sign in",
+    "ctaRecovery": "Continue",
+    "ctaEmailChange": "Confirm new email",
+    "emailChanged": "Your email address has been updated.",
+    "requestNew": "Request a new code",
+    "goSignIn": "Go to sign in"
   }
 }

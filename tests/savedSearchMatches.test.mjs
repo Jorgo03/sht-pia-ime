@@ -1,5 +1,6 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
+import { priceRangeExpression } from '../src/features/properties/lib/priceRange.js'
 import { applySavedFilters, countMatches, markSeen, newMatchCount, setEmailAlerts } from '../src/features/saved-searches/lib/matches.js'
 
 // Saved-search "new matches" (docs/LAUNCH_TASKS.md L06). The bell used to
@@ -25,8 +26,8 @@ test('filters follow the Search page rules', () => {
     ['ilike', 'city', '%Tiranë%'],
     ['eq', 'listing_type', 'rent'],
     ['eq', 'property_type', 'apartment'],
-    ['gte', 'price', 200],
-    ['lte', 'price', 900],
+    // Euros, converted per listing currency (tests/priceRange.test.mjs).
+    ['or', priceRangeExpression('200', 900)],
     ['gte', 'beds', 2],
   ])
 })

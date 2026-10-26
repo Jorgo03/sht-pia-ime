@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Sparkles, X, Send } from 'lucide-react'
 import { askListingAssistant } from '../../../lib/ai'
+import { assistantHistory } from '../lib/assistantHistory'
 
 // Feature C — per-listing buyer assistant. Grounded server-side in this
 // listing's data only; the edge function refuses questions outside it.
@@ -25,8 +26,10 @@ export default function ListingAssistant({ property }) {
   const send = async () => {
     const content = text.trim()
     if (!content || thinking) return
-    const history = [...messages, { role: 'user', content }]
-    setMessages(history)
+    // Sent: trimmed to start with a question, without failed replies (shared
+    // with the phone app). Shown: every bubble.
+    const history = assistantHistory(messages, content)
+    setMessages(prev => [...prev, { role: 'user', content }])
     setText('')
     setThinking(true)
     const reply = await askListingAssistant(property.id, history, i18n.language)

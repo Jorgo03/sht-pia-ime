@@ -77,6 +77,7 @@ export { expect };
  * out here so the test stays green, and must be removed once fixed.
  */
 export async function axeViolations(page: Page, { include, known = [] }: { include?: string; known?: string[] } = {}) {
+  await settleAnimations(page);
   // The header wordmark is the logo: WCAG 1.4.3 exempts "text that is part
   // of a logo or brand name" from contrast, and its orange ".ime" is the brand.
   let builder = new AxeBuilder({ page }).exclude('.header-brand');
@@ -85,4 +86,22 @@ export async function axeViolations(page: Page, { include, known = [] }: { inclu
   return violations
     .filter((v) => (v.impact === 'serious' || v.impact === 'critical') && !known.includes(v.id))
     .map((v) => `${v.id}: ${v.help} (${v.nodes.length}× e.g. ${v.nodes[0]?.target.join(' ')})`);
+}
+
+/**
+ * Waits for every finite animation and transition on the page to end. axe
+ * reads computed colours, so a card still in its staggered entrance
+ * (src/styles/polish.css, fading in from transparent) reads as faint text:
+ * that failed about one run in ten on /search, on whichever card was last.
+ * Infinite ones (skeleton shimmer, spinners) never end and are skipped.
+ */
+async function settleAnimations(page: Page) {
+  await page.evaluate(() =>
+    Promise.all(
+      document
+        .getAnimations()
+        .filter((a) => a.effect?.getComputedTiming().endTime !== Infinity)
+        .map((a) => a.finished.catch(() => undefined)),
+    ),
+  );
 }

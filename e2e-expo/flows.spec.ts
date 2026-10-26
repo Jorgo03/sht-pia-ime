@@ -327,6 +327,66 @@ test.describe('email code', () => {
   });
 });
 
+// Password recovery in the app. The emailed code signs you in (verifyOtp), and
+// the signed-in dashboard used to replace the new-password step within a
+// moment, so the new password was never set.
+test('X27 forgot password: the code opens the new-password step, which stays until the password is saved', async ({ page }) => {
+  const recovered: unknown[] = [];
+  const saved: unknown[] = [];
+  await page.route('**/auth/v1/recover*', (route) => json(route, {}));
+  await page.route('**/auth/v1/verify*', (route) => {
+    recovered.push(route.request().postDataJSON());
+    return json(route, fakeSession());
+  });
+  await page.route('**/auth/v1/user*', (route) => {
+    if (route.request().method() === 'PUT') saved.push(route.request().postDataJSON());
+    return json(route, SIGNED_IN_USER);
+  });
+  await page.goto('/profile');
+  await ready(page);
+  await page.getByRole('textbox', { name: t('auth.email') }).fill('agent@example.com');
+  await page.getByRole('button', { name: t('auth.forgotShort') }).click();
+  // Its own step, with the address already typed.
+  await expect(page.getByText(t('auth.forgotTitle'))).toBeVisible();
+  await expect(page.getByRole('textbox', { name: t('auth.email') })).toHaveValue('agent@example.com');
+  await page.getByRole('button', { name: t('auth.sendCode') }).click();
+  await page.getByRole('textbox', { name: t('auth.codeDigit').replace('{{n}}', '1') }).fill('123456');
+
+  const newPassword = page.getByPlaceholder(t('auth.newPassword'));
+  await expect(newPassword).toBeVisible();
+  // Signed in by now, and the profile has loaded: the step must still be here.
+  await ready(page);
+  await expect(newPassword).toBeVisible();
+  expect(recovered[0]).toMatchObject({ email: 'agent@example.com', token: '123456', type: 'recovery' });
+
+  await newPassword.fill('NewPassword!2026');
+  await page.getByPlaceholder(t('auth.confirmPassword')).fill('NewPassword!2026');
+  await page.getByRole('button', { name: t('auth.updatePassword') }).click();
+  await expect(page.getByRole('heading', { name: t('common.profile'), level: 1 })).toBeVisible();
+  expect(saved[0]).toMatchObject({ password: 'NewPassword!2026' });
+});
+
+// Signed out, screens that need an account ask for one. The listing form used
+// to take all five steps and then fail with "Authentication failed"; the
+// dashboard waited forever.
+for (const path of ['/listing/new', '/agent-dashboard']) {
+  test(`X28 signed out, ${path} asks you to sign in`, async ({ page }) => {
+    await page.goto(path);
+    await ready(page);
+    await expect(page.getByText(t('addSheet.signInFirst'))).toBeVisible();
+    await page.getByRole('button', { name: t('common.signIn') }).click();
+    await expect(page).toHaveURL(/\/profile$/);
+  });
+}
+
+// Signed out, a heart looked saved but was never stored.
+test('X29 signed out, a heart on a card goes to sign-in instead of pretending to save', async ({ page }) => {
+  await page.goto('/');
+  await ready(page);
+  await page.getByRole('button', { name: t('common.save') }).first().click();
+  await expect(page).toHaveURL(/\/profile$/);
+});
+
 // Layout boundaries on the narrowest supported phone (docs/UI_POLISH.md):
 // no control may sit past the screen edge, and the header wordmark is either
 // clear of the header's buttons or not shown at all.
@@ -664,4 +724,80 @@ test.describe('profile photo', () => {
     expect(backend.removed).toEqual([backend.uploads[0].path]);
     expect(backend.removed).not.toContain(`${SIGNED_IN_USER.id}/avatar-1.jpg`);
   });
+});
+
+// Pass 20: change the password while signed in, in the app.
+test.describe('signed in: Password & security', () => {
+  test.use({ signedIn: true });
+  const CURRENT = 'the-current-one';
+
+  test('X30 the current password is checked first, then the new one is set and other devices signed out', async ({ page }) => {
+    const checks: Record<string, unknown>[] = [];
+    const saved: unknown[] = [];
+    const logouts: string[] = [];
+    await page.route('**/auth/v1/token*', (route) => {
+      const body = route.request().postDataJSON();
+      checks.push(body);
+      return body.password === CURRENT
+        ? json(route, fakeSession())
+        : json(route, { error_code: 'invalid_credentials', msg: 'Invalid login credentials' }, 400);
+    });
+    await page.route('**/auth/v1/user*', (route) => {
+      if (route.request().method() === 'PUT') saved.push(route.request().postDataJSON());
+      return json(route, SIGNED_IN_USER);
+    });
+    await page.route('**/auth/v1/logout*', (route) => {
+      logouts.push(route.request().url());
+      return json(route, {});
+    });
+    await page.goto('/profile');
+    await ready(page);
+    await page.getByRole('button', { name: t('security.row') }).click();
+    await expect(page.getByText(t('security.title')).first()).toBeVisible();
+
+    await page.getByLabel(t('security.currentPassword')).fill('not-it-at-all');
+    await page.getByLabel(t('auth.newPassword')).fill('a-brand-new-password');
+    await page.getByLabel(t('auth.confirmPassword')).fill('a-brand-new-password');
+    await page.getByRole('button', { name: t('security.save') }).click();
+    await expect(page.getByText(t('errors.currentPasswordWrong'))).toBeVisible();
+    expect(saved).toEqual([]);
+
+    await page.getByLabel(t('security.currentPassword')).fill(CURRENT);
+    await page.getByRole('button', { name: t('security.save') }).click();
+    await expect(page.getByText(t('security.success'))).toBeVisible();
+    await expect(page.getByText(t('security.othersSignedOut'))).toBeVisible();
+    expect(checks.at(-1)).toMatchObject({ email: SIGNED_IN_USER.email, password: CURRENT });
+    expect(saved).toHaveLength(1);
+    expect(saved[0]).toMatchObject({ password: 'a-brand-new-password' });
+    expect(logouts.some((u) => u.includes('scope=others'))).toBe(true);
+  });
+
+  test('X31 a short or mismatched new password never reaches Supabase', async ({ page }) => {
+    const calls: string[] = [];
+    await page.route('**/auth/v1/token*', (route) => { calls.push('token'); return json(route, fakeSession()); });
+    await page.goto('/profile');
+    await ready(page);
+    await page.getByRole('button', { name: t('security.row') }).click();
+    await page.getByLabel(t('security.currentPassword')).fill(CURRENT);
+    await page.getByLabel(t('auth.newPassword')).fill('short');
+    await page.getByLabel(t('auth.confirmPassword')).fill('short');
+    await page.getByRole('button', { name: t('security.save') }).click();
+    await expect(page.getByText(t('errors.passwordMin')).last()).toBeVisible();
+    await page.getByLabel(t('auth.newPassword')).fill('long-enough-one');
+    await page.getByLabel(t('auth.confirmPassword')).fill('long-enough-two');
+    await page.getByRole('button', { name: t('security.save') }).click();
+    await expect(page.getByText(t('errors.passwordMismatch'))).toBeVisible();
+    expect(calls).toEqual([]);
+  });
+});
+
+test('X32 signing in before confirming the email opens the code entry instead of a dead end', async ({ page }) => {
+  await page.route('**/auth/v1/token*', (route) => json(route, { error_code: 'email_not_confirmed', msg: 'Email not confirmed' }, 400));
+  await page.goto('/profile');
+  await ready(page);
+  await page.getByRole('textbox', { name: t('auth.email') }).fill('new.user@example.com');
+  await page.getByLabel(t('auth.password'), { exact: true }).fill('correct-horse-battery');
+  await page.getByRole('button', { name: t('auth.stepInside') }).click();
+  await expect(page.getByText(t('auth.enterCode')).first()).toBeVisible();
+  await expect(page.getByText(t('auth.signupCodeHint'))).toBeVisible();
 });

@@ -33,6 +33,7 @@ import { GradientBackground } from '@/components/ui/gradient-background';
 import { RiseIn } from '@/components/ui/motion';
 import { SelectField } from '@/components/ui/select-field';
 import { KeyboardDoneBar } from '@/components/ui/keyboard-done-bar';
+import { SignInPrompt } from '@/components/ui/sign-in-prompt';
 import { Fonts, Radii, Spacing, type AtticoPalette } from '@/constants/theme';
 import { useAuth } from '@/contexts/auth-context';
 import { useTheme } from '@/contexts/theme-context';
@@ -138,7 +139,17 @@ const MAX_FLOOR = 200;
 const MIN_YEAR = 1800;
 const MAX_YEAR = new Date().getFullYear() + 2;
 
+/**
+ * One draft per account, `fho_listing_draft_v1:<user id>`: on a shared phone
+ * the next person must never open the previous agent's listing and contact
+ * details. The bare key is the old one-per-device draft, deleted on sight.
+ */
 const DRAFT_KEY = 'fho_listing_draft_v1';
+const draftKeyFor = (userId: string) => `${DRAFT_KEY}:${userId}`;
+/** The website's draft lifetime (NewListing.jsx). */
+const DRAFT_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+/** Photos are never kept in a draft, so a restored one reopens here at the latest. */
+const MEDIA_STEP = STEPS.indexOf('media');
 
 /**
  * Photos and video in the wizard. When editing, the ones already in storage
@@ -244,22 +255,39 @@ const INITIAL_FORM: ListingForm = {
   contact_email: '',
 };
 
+/** Nothing typed or chosen yet: not worth saving, or restoring, as a draft. */
+function isPristine(form: Partial<ListingForm>, step = 0): boolean {
+  return step === 0 && JSON.stringify({ ...INITIAL_FORM, ...form }) === JSON.stringify(INITIAL_FORM);
+}
+
 /** /listing/new: a blank wizard, with draft restore. */
 export default function NewListingWizard() {
-  return <ListingWizard />;
+  return <AccountWizard />;
 }
 
 /** /listing/[id]/edit: the same wizard opened on a saved listing. */
 export function EditListingWizard() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  return <ListingWizard editId={id} />;
+  return <AccountWizard editId={id} />;
+}
+
+/**
+ * The wizard needs an account. Signed out it now asks for one; it used to let
+ * a guest fill in all five steps and then fail with "Authentication failed",
+ * and the edit route waited forever. Keyed by the account, so someone else
+ * signing in gets a fresh wizard, never the previous person's form.
+ */
+function AccountWizard({ editId }: { editId?: string }) {
+  const { user, loading } = useAuth();
+  if (!user) return loading ? null : <SignInPrompt />;
+  return <ListingWizard key={user.id} editId={editId} />;
 }
 
 function ListingWizard({ editId }: { editId?: string }) {
   const isEdit = Boolean(editId);
   const router = useRouter();
   const { t } = useTranslation();
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const queryClient = useQueryClient();
@@ -337,12 +365,17 @@ function ListingWizard({ editId }: { editId?: string }) {
     let cancelled = false;
     (async () => {
       try {
-        const raw = await AsyncStorage.getItem(DRAFT_KEY);
+        // Drafts used to be one per device, so an old one could be anyone's.
+        await AsyncStorage.removeItem(DRAFT_KEY).catch(() => {});
+        const raw = userId ? await AsyncStorage.getItem(draftKeyFor(userId)) : null;
         if (!cancelled && raw) {
-          const draft = JSON.parse(raw) as { form?: Partial<ListingForm>; step?: number };
-          if (draft?.form) {
+          const draft = JSON.parse(raw) as { form?: Partial<ListingForm>; step?: number; savedAt?: number };
+          const fresh = typeof draft?.savedAt === 'number' && Date.now() - draft.savedAt < DRAFT_TTL_MS;
+          if (draft?.form && fresh && !isPristine(draft.form, draft.step)) {
             setForm({ ...INITIAL_FORM, ...draft.form });
-            setStep(Math.min(Math.max(draft.step ?? 0, 0), STEPS.length - 1));
+            // Not past Media: a draft left on Publish has no photos any more,
+            // and reopening there let it go live with none.
+            setStep(Math.min(Math.max(draft.step ?? 0, 0), MEDIA_STEP));
             setDraftRestored(true);
           }
         }
@@ -355,22 +388,26 @@ function ListingWizard({ editId }: { editId?: string }) {
     return () => {
       cancelled = true;
     };
-  }, [isEdit]);
+  }, [isEdit, userId]);
 
   // Persist progress on every change. Photos and video hold local file URIs
   // that don't survive a restart, so — exactly like web — only the form and
   // the step are saved and media is re-added after a restore.
   useEffect(() => {
-    if (!hydrated || isEdit) return;
-    AsyncStorage.setItem(DRAFT_KEY, JSON.stringify({ form, step, savedAt: Date.now() })).catch(
-      () => {
-        /* storage full/blocked — the wizard still works, just unsaved */
-      },
-    );
-  }, [form, step, hydrated, isEdit]);
+    if (!hydrated || isEdit || !userId) return;
+    const key = draftKeyFor(userId);
+    // An untouched form is not a draft: saving one showed "draft restored"
+    // over blank fields on every later visit, even after "start fresh".
+    const write = isPristine(form, step)
+      ? AsyncStorage.removeItem(key)
+      : AsyncStorage.setItem(key, JSON.stringify({ form, step, savedAt: Date.now() }));
+    write.catch(() => {
+      /* storage full/blocked — the wizard still works, just unsaved */
+    });
+  }, [form, step, hydrated, isEdit, userId]);
 
   const discardDraft = () => {
-    AsyncStorage.removeItem(DRAFT_KEY).catch(() => {});
+    if (userId) AsyncStorage.removeItem(draftKeyFor(userId)).catch(() => {});
     setForm(INITIAL_FORM);
     setStep(0);
     setImages([]);
@@ -389,6 +426,9 @@ function ListingWizard({ editId }: { editId?: string }) {
    * must not be mistaken for the property's coordinates.
    */
   const [mapFocus, setMapFocus] = useState<{ latitude: number; longitude: number } | null>(null);
+  // The city whose centre the map is waiting for, so a slow answer for a city
+  // since changed (or a road picked meanwhile) cannot pull the map back there.
+  const cityLookup = useRef('');
 
   // Owns the language selection for BOTH text fields, plus everything that
   // makes selecting one safe: the per-language cache, staleness against the
@@ -412,23 +452,24 @@ function ListingWizard({ editId }: { editId?: string }) {
     }));
 
   // Per-step gate, field-for-field the same as web's validate().
-  const validate = (): boolean => {
+  const errorsFor = (s: number): FormErrors => {
     const errs: FormErrors = {};
 
-    if (step === 0) {
+    if (s === 0) {
       if (!form.title_i18n.sq?.trim()) errs.title = t('listing.required');
       if (!form.description_i18n.sq?.trim()) errs.description = t('listing.required');
     }
-    if (step === 1) {
+    if (s === 1) {
       if (!form.city) errs.city = t('listing.required');
     }
-    if (step === 2) {
+    if (s === 2) {
       if (!form.price || Number(form.price) <= 0) errs.price = t('listing.required');
       else if (Number(form.price) > MAX_PRICE) {
         errs.price = t('listing.valueOutOfRange', { min: 0, max: MAX_PRICE.toLocaleString() });
       }
 
-      if (!form.sqft || Number(form.sqft) <= 0) errs.sqft = t('listing.required');
+      // At least 1 m² once rounded: the column holds whole square metres.
+      if (!form.sqft || !(Number(form.sqft) >= 1)) errs.sqft = t('listing.required');
       else if (Number(form.sqft) > MAX_SQFT) {
         errs.sqft = t('listing.valueOutOfRange', { min: 1, max: MAX_SQFT.toLocaleString() });
       }
@@ -449,15 +490,35 @@ function ListingWizard({ editId }: { editId?: string }) {
         errs.year_built = t('listing.valueOutOfRange', { min: MIN_YEAR, max: MAX_YEAR });
       }
     }
-    if (step === 3) {
+    if (s === 3) {
       if (images.length < MIN_IMAGES) errs.images = t('listing.minImages', { min: MIN_IMAGES });
     }
-    if (step === 4) {
+    if (s === 4) {
       if (!form.contact_phone?.trim()) errs.phone = t('listing.required');
     }
 
+    return errs;
+  };
+
+  const validate = (): boolean => {
+    const errs = errorsFor(step);
     setErrors(errs);
     return Object.keys(errs).length === 0;
+  };
+
+  /** Publishing checks every step, not only the one on screen, and opens the
+   *  first one that is incomplete. */
+  const validateAll = (): boolean => {
+    for (let s = 0; s < STEPS.length; s++) {
+      const errs = errorsFor(s);
+      if (Object.keys(errs).length > 0) {
+        setStep(s);
+        setErrors(errs);
+        return false;
+      }
+    }
+    setErrors({});
+    return true;
   };
 
   const next = () => {
@@ -495,9 +556,9 @@ function ListingWizard({ editId }: { editId?: string }) {
   };
 
   const submit = async (status: Status) => {
-    // A draft can be finished later, so it skips the remaining step gates —
-    // same short-circuit as web's submit(asDraft).
-    if (status === 'active' && !validate()) return;
+    // A draft can be finished later, so it skips the step gates — same
+    // short-circuit as web's submit(asDraft). Publishing checks them all.
+    if (status === 'active' && !validateAll()) return;
     if (!user) {
       Alert.alert(t('common.error'), t('errors.authFailed'));
       return;
@@ -510,6 +571,17 @@ function ListingWizard({ editId }: { editId?: string }) {
     let uploadedPaths: string[] = [];
 
     try {
+      // Agent or not decides agent_id and owner_type, which the ownership
+      // guard never lets change afterwards, so a failed lookup must stop the
+      // save rather than file an agent's listing as a client's. It runs
+      // before any upload, so a failure leaves nothing behind.
+      let role = profile?.role ?? null;
+      if (!isEdit && !role) {
+        const { data, error: roleError } = await supabase.from('profiles').select('role').eq('id', user.id).single();
+        if (roleError || !data) throw roleError ?? new Error('profile role unavailable');
+        role = data.role;
+      }
+
       // Only photos added in this session are uploaded; ones already in
       // storage (editing) keep their URL and their place in the order.
       const fresh = images.filter((img) => !img.existing);
@@ -562,12 +634,7 @@ function ListingWizard({ editId }: { editId?: string }) {
       } else {
         // Only an agent's own listing carries an agent_id — a client-posted
         // one must not claim agent attribution (same rule as web).
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', user.id)
-          .single();
-        const isAgent = profile?.role === 'agent';
+        const isAgent = role === 'agent';
         newListingId.current ??= Crypto.randomUUID();
         const id = newListingId.current;
         ({ error } = await supabase.from('properties').insert({
@@ -606,7 +673,7 @@ function ListingWizard({ editId }: { editId?: string }) {
         throw error;
       }
 
-      if (!isEdit) await AsyncStorage.removeItem(DRAFT_KEY).catch(() => {});
+      if (!isEdit) await AsyncStorage.removeItem(draftKeyFor(user.id)).catch(() => {});
       if (isEdit) {
         // The save went through, so photos/video taken out of the listing are
         // no longer referenced anywhere: remove them (own folder only).
@@ -778,8 +845,9 @@ function ListingWizard({ editId }: { editId?: string }) {
             setMapFocus(null);
             // Move the map to the new city so the next pin starts from
             // somewhere plausible rather than from wherever it was left.
+            cityLookup.current = v;
             void geocodeCity({ city: v }).then((centre) => {
-              if (centre) setMapFocus(centre);
+              if (centre && cityLookup.current === v) setMapFocus(centre);
             });
           }}
         />
@@ -809,9 +877,10 @@ function ListingWizard({ editId }: { editId?: string }) {
           onChangeText={(val) => update('address', val)}
           // Picking a road frames the map; it never sets the property's
           // position. That still comes from the marker.
-          onSelectRoad={(road: RoadSuggestion) =>
-            setMapFocus({ latitude: road.latitude, longitude: road.longitude })
-          }
+          onSelectRoad={(road: RoadSuggestion) => {
+            cityLookup.current = '';
+            setMapFocus({ latitude: road.latitude, longitude: road.longitude });
+          }}
         />
       </Labeled>
 
@@ -864,10 +933,12 @@ function ListingWizard({ editId }: { editId?: string }) {
         <Field
           icon="straighten"
           placeholder="0"
-          keyboardType="numeric"
+          // Read like the price: "85,5" and "85.5" are both 85.5, "5,000" is
+          // 5000. Number("85,5") was NaN and saved as 0 m².
+          keyboardType="decimal-pad"
           value={form.sqft}
           onChangeText={(val) => {
-            update('sqft', val);
+            update('sqft', normalizeAmount(val));
             clearError('sqft');
           }}
         />
@@ -878,10 +949,11 @@ function ListingWizard({ editId }: { editId?: string }) {
           <Field
             icon="king-bed"
             placeholder="0"
-            keyboardType="numeric"
+            // Whole rooms only: the column is an integer.
+            keyboardType="number-pad"
             value={form.beds}
             onChangeText={(val) => {
-              update('beds', val);
+              update('beds', val.replace(/[^0-9]/g, ''));
               clearError('beds');
             }}
           />
@@ -890,10 +962,11 @@ function ListingWizard({ editId }: { editId?: string }) {
           <Field
             icon="bathtub"
             placeholder="0"
-            keyboardType="numeric"
+            // One decimal is allowed ("1,5"), like the price.
+            keyboardType="decimal-pad"
             value={form.baths}
             onChangeText={(val) => {
-              update('baths', val);
+              update('baths', normalizeAmount(val));
               clearError('baths');
             }}
           />
@@ -905,10 +978,11 @@ function ListingWizard({ editId }: { editId?: string }) {
           <Field
             icon="stairs"
             placeholder="0"
-            keyboardType="numeric"
+            // Basements are negative, and the iPhone's number pads have no minus.
+            keyboardType={Platform.OS === 'ios' ? 'numbers-and-punctuation' : 'numeric'}
             value={form.floor}
             onChangeText={(val) => {
-              update('floor', val);
+              update('floor', val.replace(/[^0-9-]/g, '').replace(/(?!^)-/g, ''));
               clearError('floor');
             }}
           />
@@ -917,10 +991,10 @@ function ListingWizard({ editId }: { editId?: string }) {
           <Field
             icon="layers"
             placeholder="0"
-            keyboardType="numeric"
+            keyboardType="number-pad"
             value={form.total_floors}
             onChangeText={(val) => {
-              update('total_floors', val);
+              update('total_floors', val.replace(/[^0-9]/g, ''));
               clearError('total_floors');
             }}
           />
@@ -931,10 +1005,10 @@ function ListingWizard({ editId }: { editId?: string }) {
         <Field
           icon="event"
           placeholder="2024"
-          keyboardType="numeric"
+          keyboardType="number-pad"
           value={form.year_built}
           onChangeText={(val) => {
-            update('year_built', val);
+            update('year_built', val.replace(/[^0-9]/g, ''));
             clearError('year_built');
           }}
         />

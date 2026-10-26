@@ -29,6 +29,13 @@ import { supabase } from '@/lib/supabase';
 // reaches into src/ this way for the shared locale JSON (see i18n/index.ts).
 // Its 8 unit tests in tests/authEvents.test.mjs now cover both apps.
 import { classifyAuthEvent } from '../src/lib/authEvents.js';
+// Shared with web the same way (tests/signOut.test.mjs).
+import { signOutOfDevice } from '../src/lib/signOut.js';
+import {
+  changePassword as changePasswordOnServer,
+  signOutOtherDevices,
+  type ChangePasswordResult,
+} from '@/src/features/auth/lib/password';
 
 /** Hard ceiling on how long anything may hold the splash screen. */
 const AUTH_INIT_TIMEOUT_MS = 8000;
@@ -163,8 +170,12 @@ interface AuthContextValue {
   /** Verifies the 6-digit code from the recovery e-mail, establishing a
    *  recovery session so the password can be changed in-app. */
   verifyRecoveryCode: (email: string, token: string) => Promise<{ error: Error | null }>;
-  /** Sets a new password on the active (recovery) session. */
-  updatePassword: (newPassword: string) => Promise<{ error: Error | null }>;
+  /** Sets a new password on the active (recovery) session, then ends the
+   *  account's other sessions (best effort, reported in othersSignedOut). */
+  updatePassword: (newPassword: string) => Promise<{ error: Error | null; othersSignedOut: boolean }>;
+  /** Signed in: checks the current password on the server, then sets the new
+   *  one and signs the other devices out (src/features/auth/lib/password.js). */
+  changePassword: (currentPassword: string, newPassword: string) => Promise<ChangePasswordResult>;
   /** Resolves with the sign-out error, if any. The local session is dropped
    *  regardless — callers may surface the error but must not block on it. */
   signOut: () => Promise<{ error: Error | null }>;
@@ -562,8 +573,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
    *  authorizes the change, exactly as on web. */
   const updatePassword = async (newPassword: string) => {
     const { error } = await supabase.auth.updateUser({ password: newPassword });
-    return { error: error as Error | null };
+    if (error) return { error: error as Error | null, othersSignedOut: false };
+    // Resetting a forgotten password may be locking someone else out: end
+    // every other session too, as web does.
+    return { error: null, othersSignedOut: await signOutOtherDevices(supabase) };
   };
+
+  const changePassword = (currentPassword: string, newPassword: string) =>
+    changePasswordOnServer(supabase, { email: session?.user?.email ?? '', currentPassword, newPassword });
 
   const signOut = async () => {
     // Invalidate first: a profile fetch already in flight is now stale and
@@ -572,12 +589,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // While still signed in: stop this device getting the account's pushes
     // (a shared phone must not keep receiving the previous person's).
     await forgetDevice();
-    const { error } = await supabase.auth.signOut();
-    // This previously relied solely on the SIGNED_OUT event to clear state.
-    // supabase-js drops the local session even when the server call fails
-    // (an already-revoked token is the common case), so clearing here makes
-    // sign-out synchronous rather than event-dependent — and surfaces the
-    // error instead of discarding it, matching web.
+    // supabase-js keeps the stored session when the server cannot be reached
+    // (offline, a timeout, a paused project), which brought the account back
+    // on the next launch; signOutOfDevice removes it either way.
+    const { error } = await signOutOfDevice(supabase);
+    // Cleared here too, so sign-out is synchronous rather than waiting on the
+    // SIGNED_OUT event, and the error is surfaced instead of discarded,
+    // matching web.
     setSession(null);
     setProfile(null);
     setLoading(false);
@@ -603,6 +621,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         resetPassword,
         verifyRecoveryCode,
         updatePassword,
+        changePassword,
         signOut,
       }}>
       {children}

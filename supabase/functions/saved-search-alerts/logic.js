@@ -6,6 +6,35 @@
 export const MAX_LISTINGS_PER_EMAIL = 10
 
 /**
+ * A saved search's price range is in euros, across EUR, ALL and USD listings.
+ * Copied from src/features/properties/lib/priceRange.js, because this function
+ * is deployed on its own; tests/priceRange.test.mjs keeps the two identical.
+ */
+export const UNITS_PER_EUR = Object.freeze({ EUR: 1, ALL: 98, USD: 1.15 })
+
+const bound = (value) => {
+  if (value === null || value === undefined || value === '') return null
+  const n = Number(value)
+  return Number.isFinite(n) ? n : null
+}
+
+export function priceRangeExpression(minEur, maxEur) {
+  const min = bound(minEur)
+  const max = bound(maxEur)
+  if (min === null && max === null) return null
+  const range = (rate) =>
+    [min === null ? null : `price.gte.${Math.round(min * rate)}`, max === null ? null : `price.lte.${Math.round(max * rate)}`]
+      .filter(Boolean)
+      .join(',')
+  const codes = Object.keys(UNITS_PER_EUR)
+  return [
+    ...codes.map((code) => `and(currency.eq.${code},${range(UNITS_PER_EUR[code])})`),
+    `and(currency.is.null,${range(1)})`,
+    `and(currency.not.in.(${codes.join(',')}),${range(1)})`,
+  ].join(',')
+}
+
+/**
  * The same filter rules as the apps (src/features/saved-searches/lib/matches.js
  * and the Search page). Zone applies only together with a city; the apps only
  * ever save a zone that belongs to the saved city.
@@ -17,8 +46,8 @@ export function applySavedFilters(query, filters) {
   if (f.city && f.zone) query = query.eq('zone', f.zone)
   if (f.listing_type) query = query.eq('listing_type', f.listing_type)
   if (f.type && f.type !== 'all') query = query.eq('property_type', f.type)
-  if (num(f.minPrice) !== null) query = query.gte('price', num(f.minPrice))
-  if (num(f.maxPrice) !== null) query = query.lte('price', num(f.maxPrice))
+  const price = priceRangeExpression(f.minPrice, f.maxPrice)
+  if (price) query = query.or(price)
   if (num(f.beds) !== null) query = query.gte('beds', num(f.beds))
   return query
 }

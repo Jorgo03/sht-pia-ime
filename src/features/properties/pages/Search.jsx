@@ -69,7 +69,7 @@ export default function Search() {
 
   const rangesValid = !priceInvalid && !areaInvalid
 
-  const { properties, loading, loadingMore, error, hasMore, loadMore, totalCount } = useProperties({
+  const { properties, loading, loadingMore, loadMoreFailed, error, hasMore, loadMore, totalCount } = useProperties({
     filter: propertyType || 'all',
     listingType: listingType || null,
     city: debouncedSearch || city || null,
@@ -195,7 +195,8 @@ export default function Search() {
         {/* count drives i18next's plural choice even though the string itself
             doesn't interpolate it — the number stays a separate bold span. */}
         <span><strong>{totalCount}</strong> {t('search.homesInView', { count: totalCount })}</span>
-        <span className="mono-eyebrow">{viewMode === 'map' ? t('search.mapView') : t('search.sortedByRelevance')}</span>
+        {/* The sort actually applied; it always said "relevance", which the site has no ranking for. */}
+        <span className="mono-eyebrow">{viewMode === 'map' ? t('search.mapView') : t(`search.sort.${sort}`, t('search.sort.newest'))}</span>
       </div>
 
       {loading ? (
@@ -228,9 +229,12 @@ export default function Search() {
           <div className="property-grid" style={{ padding: 0 }}>
             {properties.map(p => <PropertyCard key={p.id} property={p} />)}
           </div>
+          {hasMore && loadMoreFailed && (
+            <div className="filter-warning" role="alert"><AlertCircle size={12} /> {t('errors.generic')}</div>
+          )}
           {hasMore && (
             <button className="load-more-btn" onClick={loadMore} disabled={loadingMore}>
-              {loadingMore ? t('common.loading') : t('common.viewAll')}
+              {loadingMore ? t('common.loading') : loadMoreFailed ? t('common.retry') : t('common.viewAll')}
             </button>
           )}
         </div>

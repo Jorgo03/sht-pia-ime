@@ -48,7 +48,7 @@ function clusterIcon(cluster: Cluster, colors: AtticoPalette) {
   const single = count === 1;
   const bg = single ? markerColorFor(cluster.properties[0].listing_type) : colors.primary;
   const border = single ? '#FFFFFF' : colors.accent;
-  const label = single ? formatBubblePrice(cluster.properties[0].price) : String(count);
+  const label = single ? formatBubblePrice(cluster.properties[0].price, cluster.properties[0].currency) : String(count);
   return htmlIcon(
     `<div style="background:${bg};border:1.5px solid ${border};border-radius:${single ? 14 : 18}px;` +
       `padding:6px ${single ? 10 : 12}px;min-width:${single ? 44 : 36}px;box-sizing:border-box;text-align:center;` +
@@ -121,9 +121,13 @@ export function ExploreMap({
 
   // No +/- buttons, like the native map: pinch, scroll and double-tap zoom.
   const { el, mapRef } = useLeaflet({ zoomControl: false }, (map) => {
+    // Listen first: on a new map fitBounds fires 'moveend' synchronously, so
+    // a listener added after it never heard the first view, and the results
+    // stayed on the fixed starting box (cutting off Sarandë, Ksamil, Theth)
+    // until the first pan.
+    map.on('moveend', () => handlers.current.onRegionChangeComplete(toRegion(map)));
     map.fitBounds(toBounds(initialRegion));
     overlay.current = L.layerGroup().addTo(map);
-    map.on('moveend', () => handlers.current.onRegionChangeComplete(toRegion(map)));
     map.on('click', () => handlers.current.onMapPress());
   });
 

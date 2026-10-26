@@ -45,7 +45,12 @@ export function propertyToForm(row) {
   }
 }
 
-const optionalNumber = (value) => (value === '' || value === null || value === undefined ? null : Number(value))
+/** A whole number for an integer column, or null when blank or unreadable. */
+const optionalInteger = (value) => {
+  if (value === '' || value === null || value === undefined) return null
+  const n = Math.round(Number(value))
+  return Number.isFinite(n) ? n : null
+}
 
 /**
  * The columns a save writes, from the form plus the translated maps that
@@ -73,12 +78,15 @@ export function formToColumns(form, translated) {
     longitude: form.longitude,
     price: Number(form.price) || 0,
     currency: form.currency,
-    sqft: Number(form.sqft) || 0,
-    beds: Number(form.beds) || 0,
+    // sqft, beds, floor, total_floors and year_built are integer columns,
+    // which refuse 85.5 outright (22P02) after the photos have uploaded;
+    // baths is numeric(3,1) and keeps its half.
+    sqft: Math.round(Number(form.sqft)) || 0,
+    beds: Math.round(Number(form.beds)) || 0,
     baths: Number(form.baths) || 0,
-    floor: optionalNumber(form.floor),
-    total_floors: optionalNumber(form.total_floors),
-    year_built: optionalNumber(form.year_built),
+    floor: optionalInteger(form.floor),
+    total_floors: optionalInteger(form.total_floors),
+    year_built: optionalInteger(form.year_built),
     features: form.features,
     contact_phone: form.contact_phone || null,
     whatsapp_enabled: form.whatsapp_enabled,
@@ -121,7 +129,11 @@ export function removedMediaPaths({ before = [], after = [], userId, bucket = 'p
  * - one separator followed by exactly 3 digits ("1.500", "1,500") is
  *   thousands too;
  * - one separator followed by 1-2 digits ("1500,5", "99.99") is the decimal
- *   point, written as "."; a trailing one ("1500,") is kept while typing.
+ *   point, written as "."; a trailing one ("1500,") is kept while typing;
+ * - both kinds at once ("250.000,00", "1,200.50", as pasted from another
+ *   portal or a spreadsheet): the last is the decimal point when at most 2
+ *   digits follow it, and the others group thousands. Dropping them all
+ *   made 250.000,00 into 25,000,000.
  * Spaces and anything that is not a digit are dropped. Never converts
  * between currencies.
  */
@@ -130,8 +142,11 @@ export function normalizeAmount(text) {
   const seps = kept.match(/[.,]/g) ?? []
   if (seps.length === 0) return kept
   const digitsOnly = kept.replace(/[.,]/g, '')
+  const last = Math.max(kept.lastIndexOf('.'), kept.lastIndexOf(','))
+  const whole = kept.slice(0, last).replace(/[.,]/g, '')
+  const fraction = kept.slice(last + 1)
+  if (new Set(seps).size > 1) return fraction.length <= 2 ? `${whole}.${fraction}` : digitsOnly
   if (seps.length > 1) return digitsOnly
-  const [whole, fraction] = kept.split(/[.,]/)
   if (fraction.length === 3) return digitsOnly
   return `${whole}.${fraction.slice(0, 2)}`
 }

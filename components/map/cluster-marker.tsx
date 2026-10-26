@@ -51,7 +51,7 @@ function ClusterMarkerBase({ cluster, onPress }: Props) {
         <Text style={styles.label} numberOfLines={1}>
           {isCluster
             ? String(count)
-            : formatBubblePrice(cluster.properties[0].price)}
+            : formatBubblePrice(cluster.properties[0].price, cluster.properties[0].currency)}
         </Text>
       </View>
     </Marker>

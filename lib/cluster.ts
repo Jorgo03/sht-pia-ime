@@ -90,13 +90,22 @@ export function markerColorFor(listingType: string | null | undefined): string {
   return MARKER_COLORS[listingType ?? ''] ?? MARKER_COLORS.sale;
 }
 
-/** Compact price for a map bubble: 200000 -> "€200K", 1250000 -> "€1.3M". */
-export function formatBubblePrice(price: number): string {
-  if (price >= 1_000_000) {
-    const millions = price / 1_000_000;
+/**
+ * Compact price for a map bubble, in the listing's own currency:
+ * 200000 -> "€200K", 1250000 -> "€1.3M", 15000000 ALL -> "ALL 15M".
+ * Same rule as web's formatCompactPrice (src/lib/format.js). Every bubble
+ * used to say €, so a lek price read about 100 times too high.
+ */
+export function formatBubblePrice(price: number, currency: string | null = 'EUR'): string {
+  const code = (currency || 'EUR').toUpperCase();
+  const tag = (amount: string) => (code === 'EUR' ? `€${amount}` : code === 'USD' ? `$${amount}` : `${code} ${amount}`);
+  // Rounded before choosing the unit, so 999,600 is "1M", not "1000K".
+  const thousands = Math.round(price / 1_000);
+  if (thousands >= 1_000) {
+    const millions = Math.round(price / 100_000) / 10;
     // Drop the decimal on round values: 2.0M reads worse than 2M.
-    return `€${millions % 1 === 0 ? millions : millions.toFixed(1)}M`;
+    return tag(`${millions % 1 === 0 ? millions : millions.toFixed(1)}M`);
   }
-  if (price >= 1_000) return `€${Math.round(price / 1_000)}K`;
-  return `€${price}`;
+  if (price >= 1_000) return tag(`${thousands}K`);
+  return tag(String(price));
 }

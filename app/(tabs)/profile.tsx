@@ -41,7 +41,11 @@ import { DuskHero } from '@/components/ui/dusk-hero';
 import { GoogleLogo } from '@/components/ui/google-logo';
 import { GradientBackground } from '@/components/ui/gradient-background';
 import { OtpInput, OTP_LENGTH } from '@/components/ui/otp-input';
-import { retryAfterSeconds } from '@/src/lib/authErrors';
+// One mapper for both apps (error codes first, then Supabase's text).
+import { friendlyError as friendlyAuthError, retryAfterSeconds } from '@/src/lib/authErrors';
+import { newPasswordError, passwordStrengthError } from '@/src/features/auth/lib/password';
+import { providerEnabled } from '@/src/features/auth/lib/authLinks';
+import { ChangePasswordSheet } from '@/components/profile/change-password-sheet';
 import { useProfileStats } from '@/hooks/use-profile-stats';
 import type { ProfileFields } from '@/src/features/auth/lib/profileForm';
 import { useUnreadMessages } from '@/hooks/use-unread-messages';
@@ -52,48 +56,6 @@ type Role = 'buyer' | 'agent';
 const RESEND_COOLDOWN_S = 30;
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-/**
- * Maps raw Supabase Auth error text to a localized, user-facing message.
- * Mirrors web's `friendlyError()` in src/features/auth/pages/Profile.jsx
- * exactly (same match strings) — before this, every failure on this screen
- * surfaced Supabase's own English driver text via a bare `error.message`,
- * regardless of the user's selected language.
- */
-function friendlyAuthError(
-  err: { message?: string; code?: string } | null | undefined,
-  t: (key: string) => string,
-): string {
-  if (!err?.message) return t('errors.generic');
-  if (err.code === 'email_address_invalid') return t('errors.invalidEmail');
-  const map: Record<string, string> = {
-    'Invalid login credentials': 'errors.invalidCredentials',
-    'User already registered': 'errors.userExists',
-    'Email not confirmed': 'errors.emailNotConfirmed',
-    'Token has expired or is invalid': 'errors.invalidCode',
-    'is invalid': 'errors.invalidEmail',
-    // Supabase rejects a malformed address with code `validation_failed` and
-    // this text, matching none of the other patterns. Mirrors the web fix.
-    'Unable to validate email address': 'errors.invalidEmail',
-    // Server-side password policy, if ever set stricter than the client rule.
-    'Password should be at least': 'errors.passwordMin',
-    'For security purposes, you can only request this after': 'errors.rateLimited',
-    // Distinct from the per-identity cooldown above: Supabase's project-wide
-    // email-sending quota (code: over_email_send_rate_limit), confirmed live
-    // in production. Mirrors the web fix in src/lib/authErrors.js.
-    'email rate limit exceeded': 'errors.rateLimited',
-    // The SMTP provider refused the message, so GoTrue fails the whole
-    // request (500) and NO account is created. Matched on the shared prefix
-    // so confirmation, recovery, magic-link and invite mails all land here.
-    // Must not fall through to errors.generic ("try again") — retrying cannot
-    // succeed until server configuration changes. Mirrors src/lib/authErrors.js.
-    'Error sending': 'errors.emailSendFailed',
-    'provider is not enabled': 'errors.providerNotConfigured',
-    'Unsupported provider': 'errors.providerNotConfigured',
-  };
-  const key = Object.keys(map).find((k) => err.message!.includes(k));
-  return key ? t(map[key]) : t('errors.generic');
-}
 
 export default function ProfileScreen() {
   const router = useRouter();
@@ -185,6 +147,7 @@ export default function ProfileScreen() {
   const [resetSending, setResetSending] = useState(false);
   const [signOutOpen, setSignOutOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
+  const [securityOpen, setSecurityOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   // Local copies so TypeScript keeps the null-narrowing inside the onPress
   // closures below — narrowing of an imported binding does not survive one.
@@ -213,10 +176,10 @@ export default function ProfileScreen() {
       setDeleting(false);
     }
   };
-  // Password recovery, completed in-app: null → 'code' (enter the 6 digits
-  // from the e-mail) → 'password' (choose a new one). Mirrors the web flow,
-  // which reaches the same two steps via the PASSWORD_RECOVERY event.
-  const [recoveryStep, setRecoveryStep] = useState<'code' | 'password' | null>(null);
+  // Password recovery, completed in-app: null → 'email' (which account) →
+  // 'code' (the 6 digits from the e-mail) → 'password' (choose a new one).
+  // Mirrors the web flow.
+  const [recoveryStep, setRecoveryStep] = useState<'email' | 'code' | 'password' | null>(null);
   const [newPassword, setNewPassword] = useState('');
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
 
@@ -248,8 +211,9 @@ export default function ProfileScreen() {
       return false;
     }
     if (isSignUp) {
-      if (password.length < 8) {
-        Alert.alert(t('common.error'), t('errors.passwordMin'));
+      const weak = passwordStrengthError(password);
+      if (weak) {
+        Alert.alert(t('common.error'), t(weak));
         return false;
       }
       if (fullName.trim().length < 2) {
@@ -314,7 +278,15 @@ export default function ProfileScreen() {
     } else {
       const { error } = await signIn(cleanEmail, password);
       setLoading(false);
-      if (error) {
+      if ((error as { code?: string } | null)?.code === 'email_not_confirmed') {
+        // Not a dead end: the confirmation code (or a fresh one) finishes it.
+        setOtpType('signup');
+        setOtpCode('');
+        setOtpError(false);
+        setCooldown(0);
+        setOtpStep(true);
+        Alert.alert(t('auth.confirmFirst'));
+      } else if (error) {
         Alert.alert(t('common.error'), friendlyAuthError(error, t));
       }
     }
@@ -439,25 +411,36 @@ export default function ProfileScreen() {
   // session and the new password can be set here — no deep link, and no
   // sending the user to the web app to finish, which was a dead end for
   // anyone who only has the app installed.
+  // Step A. The answer is the same whether or not the address has an account
+  // (Supabase answers 200 either way), so the app never tells a stranger who
+  // is registered. Guarded like the other sends: a second reset email would
+  // make the first one's code stop working.
   const handleForgotPassword = async () => {
     const cleanEmail = email.trim();
     if (!EMAIL_RE.test(cleanEmail)) {
       Alert.alert(t('common.error'), t('errors.invalidEmail'));
       return;
     }
+    if (sendingCode.current) return;
+    sendingCode.current = true;
     setEmail(cleanEmail);
     setResetSending(true);
-    const { error } = await resetPassword(cleanEmail);
+    const { error } = await resetPassword(cleanEmail).finally(() => {
+      sendingCode.current = false;
+    });
     setResetSending(false);
-    if (error) {
+    const wait = retryAfterSeconds(error);
+    if (error && !wait) {
       Alert.alert(t('common.error'), friendlyAuthError(error, t));
       return;
     }
+    // A code went to this address moments ago and is still valid: go on to
+    // the code, with the resend unlocked when the server will take it.
     setOtpCode('');
     setOtpError(false);
-    setCooldown(RESEND_COOLDOWN_S);
+    setCooldown(wait ?? RESEND_COOLDOWN_S);
     setRecoveryStep('code');
-    Alert.alert(t('auth.checkEmail'), t('auth.resetSent'));
+    Alert.alert(wait ? t('errors.waitSeconds', { s: wait }) : t('auth.resetCodeSent', { email: cleanEmail }));
   };
 
   const handleVerifyRecovery = async (code: string) => {
@@ -479,16 +462,14 @@ export default function ProfileScreen() {
   };
 
   const handleSetNewPassword = async () => {
-    if (newPassword.length < 8) {
-      Alert.alert(t('common.error'), t('errors.passwordMin'));
-      return;
-    }
-    if (newPassword !== confirmNewPassword) {
-      Alert.alert(t('common.error'), t('errors.passwordMismatch'));
+    if (loading) return;
+    const invalid = newPasswordError(newPassword, confirmNewPassword);
+    if (invalid) {
+      Alert.alert(t('common.error'), t(invalid));
       return;
     }
     setLoading(true);
-    const { error } = await updatePassword(newPassword);
+    const { error, othersSignedOut } = await updatePassword(newPassword);
     setLoading(false);
     if (error) {
       Alert.alert(t('common.error'), friendlyAuthError(error, t));
@@ -499,14 +480,23 @@ export default function ProfileScreen() {
     setNewPassword('');
     setConfirmNewPassword('');
     setRecoveryStep(null);
-    Alert.alert(t('auth.recoverySuccess'));
+    Alert.alert(t('auth.recoverySuccess'), othersSignedOut ? t('security.othersSignedOut') : undefined);
   };
 
   const handleResendRecovery = async () => {
-    if (cooldown > 0 || resetSending) return;
+    if (cooldown > 0 || resetSending || sendingCode.current) return;
+    sendingCode.current = true;
     setResetSending(true);
-    const { error } = await resetPassword(email.trim());
+    const { error } = await resetPassword(email.trim()).finally(() => {
+      sendingCode.current = false;
+    });
     setResetSending(false);
+    const wait = retryAfterSeconds(error);
+    if (wait) {
+      setCooldown(wait);
+      Alert.alert(t('errors.waitSeconds', { s: wait }));
+      return;
+    }
     if (error) {
       Alert.alert(t('common.error'), friendlyAuthError(error, t));
       return;
@@ -514,7 +504,7 @@ export default function ProfileScreen() {
     setOtpCode('');
     setOtpError(false);
     setCooldown(RESEND_COOLDOWN_S);
-    Alert.alert(t('auth.otpSent'));
+    Alert.alert(t('auth.newCodeSent'));
   };
 
   const handleProvider = async (provider: Provider) => {
@@ -529,6 +519,13 @@ export default function ProfileScreen() {
       /* storage blocked — role stays buyer */
     }
     setProviderLoading(provider);
+    // A provider switched off in the dashboard fails only after the browser
+    // round trip (or as a raw error page on the web); say so before that.
+    if ((await providerEnabled(supabase, provider)) === false) {
+      setProviderLoading(null);
+      Alert.alert(t('common.error'), t('errors.providerUnavailable'));
+      return;
+    }
     const { error } = await signInWithProvider(provider);
     setProviderLoading(null);
     if (error) {
@@ -541,7 +538,10 @@ export default function ProfileScreen() {
 
   if (authLoading) return null;
 
-  if (user) {
+  // The recovery code signs the user in (verifyOtp), so the new-password step
+  // must stay on screen with a user present; the dashboard follows once the
+  // password is saved or the step is left.
+  if (user && recoveryStep !== 'password') {
     const displayName = profile?.full_name || user.user_metadata?.full_name || user.email?.split('@')[0] || '?';
     const initial = (displayName[0] ?? '?').toUpperCase();
 
@@ -603,6 +603,16 @@ export default function ProfileScreen() {
                 activeOpacity={0.7}>
                 <MaterialIcons name="edit" size={20} color={colors.textPrimary} />
                 <Text style={styles.menuRowText}>{t('profile.edit.title')}</Text>
+                <MaterialIcons name="chevron-right" size={18} color={colors.textSecondary} />
+              </TouchableOpacity>
+              <View style={styles.menuDivider} />
+              <TouchableOpacity
+                accessibilityRole="button"
+                style={styles.menuRow}
+                onPress={() => setSecurityOpen(true)}
+                activeOpacity={0.7}>
+                <MaterialIcons name="lock-outline" size={20} color={colors.textPrimary} />
+                <Text style={styles.menuRowText}>{t('security.row')}</Text>
                 <MaterialIcons name="chevron-right" size={18} color={colors.textSecondary} />
               </TouchableOpacity>
               <View style={styles.menuDivider} />
@@ -754,6 +764,11 @@ export default function ProfileScreen() {
           <NotificationsSheet key={user.id} userId={user.id} onClose={() => setNotificationsOpen(false)} />
         )}
 
+        {securityOpen && (
+          // Keyed by account, so a password typed for one never shows for another.
+          <ChangePasswordSheet key={user.id} user={user} onClose={() => setSecurityOpen(false)} />
+        )}
+
         {editOpen && (
           <EditProfileSheet
             visible
@@ -894,7 +909,40 @@ export default function ProfileScreen() {
                 </TouchableOpacity>
               </View>
 
-              {recoveryStep === 'code' ? (
+              {recoveryStep === 'email' ? (
+                /* Password recovery, step A: which account. */
+                <>
+                  <Text style={styles.otpTitle} accessibilityRole="header">{t('auth.forgotTitle')}</Text>
+                  <Text style={styles.otpSubtitle}>{t('auth.forgotSubtitle')}</Text>
+                  <View style={styles.fieldRow}>
+                    <MaterialIcons name="mail-outline" size={18} color="rgba(255,255,255,0.35)" style={styles.fieldIcon} />
+                    <TextInput
+                      style={styles.fieldInput}
+                      placeholder={t('auth.email')}
+                      placeholderTextColor="rgba(255,255,255,0.35)"
+                      value={email}
+                      onChangeText={setEmail}
+                      autoCapitalize="none"
+                      autoCorrect={false}
+                      keyboardType="email-address"
+                      textContentType="emailAddress"
+                      autoComplete="email"
+                      accessibilityLabel={t('auth.email')}
+                      onSubmitEditing={handleForgotPassword}
+                      autoFocus
+                    />
+                  </View>
+                  <TouchableOpacity accessibilityRole="button" onPress={handleForgotPassword} activeOpacity={0.85} disabled={resetSending}>
+                    <LinearGradient colors={[colors.accent, colors.accentEnd]} style={styles.ctaPill}>
+                      <Text style={styles.ctaPillText}>{resetSending ? t('common.loading') : t('auth.sendCode')}</Text>
+                      <MaterialIcons name="arrow-forward" size={18} color="#fff" />
+                    </LinearGradient>
+                  </TouchableOpacity>
+                  <TouchableOpacity accessibilityRole="button" onPress={() => setRecoveryStep(null)} style={styles.linkButton}>
+                    <Text style={styles.linkButtonText}>{t('auth.backToSignIn')}</Text>
+                  </TouchableOpacity>
+                </>
+              ) : recoveryStep === 'code' ? (
                 /* Password recovery, step 1: the 6-digit code from the
                    recovery e-mail. Verified as type 'recovery', which yields
                    a real session — no deep link needed. */
@@ -921,7 +969,7 @@ export default function ProfileScreen() {
                       {cooldown > 0 ? t('auth.resendIn', { s: cooldown }) : t('auth.resendCode')}
                     </Text>
                   </TouchableOpacity>
-                  <TouchableOpacity accessibilityRole="button" onPress={() => setRecoveryStep(null)} style={styles.linkButton}>
+                  <TouchableOpacity accessibilityRole="button" onPress={() => setRecoveryStep('email')} style={styles.linkButton}>
                     <Text style={styles.linkButtonText}>{t('common.back')}</Text>
                   </TouchableOpacity>
                 </>
@@ -941,6 +989,9 @@ export default function ProfileScreen() {
                       value={newPassword}
                       onChangeText={setNewPassword}
                       secureTextEntry={!showPassword}
+                      textContentType="newPassword"
+                      autoComplete="new-password"
+                      accessibilityLabel={t('auth.newPassword')}
                       editable={!loading}
                     />
                     <TouchableOpacity
@@ -966,6 +1017,9 @@ export default function ProfileScreen() {
                       value={confirmNewPassword}
                       onChangeText={setConfirmNewPassword}
                       secureTextEntry={!showPassword}
+                      textContentType="newPassword"
+                      autoComplete="new-password"
+                      accessibilityLabel={t('auth.confirmPassword')}
                       editable={!loading}
                     />
                   </View>
@@ -977,6 +1031,19 @@ export default function ProfileScreen() {
                       </Text>
                       <MaterialIcons name="arrow-forward" size={18} color="#fff" />
                     </LinearGradient>
+                  </TouchableOpacity>
+                  {/* Leaving keeps the old password: signed in (the code did
+                      that) if the recovery session is live, else the sign-in form. */}
+                  <TouchableOpacity
+                    accessibilityRole="button"
+                    onPress={() => {
+                      setNewPassword('');
+                      setConfirmNewPassword('');
+                      setRecoveryStep(null);
+                    }}
+                    style={styles.linkButton}
+                    disabled={loading}>
+                    <Text style={styles.linkButtonText}>{t('common.back')}</Text>
                   </TouchableOpacity>
                 </>
               ) : otpStep ? (
@@ -1010,6 +1077,17 @@ export default function ProfileScreen() {
                         : t('auth.resendCode')}
                     </Text>
                   </TouchableOpacity>
+                  {otpType === 'signup' && (
+                    <TouchableOpacity
+                      accessibilityRole="button"
+                      onPress={() => {
+                        setOtpStep(false);
+                        setIsSignUp(false);
+                      }}
+                      style={styles.linkButton}>
+                      <Text style={styles.linkButtonText}>{t('auth.signupCodeHint')}</Text>
+                    </TouchableOpacity>
+                  )}
                   <TouchableOpacity accessibilityRole="button" onPress={() => setOtpStep(false)} style={styles.linkButton}>
                     <Text style={styles.linkButtonText}>{t('common.back')}</Text>
                   </TouchableOpacity>
@@ -1026,6 +1104,9 @@ export default function ProfileScreen() {
                     value={fullName}
                     onChangeText={setFullName}
                     autoCapitalize="words"
+                    textContentType="name"
+                    autoComplete="name"
+                    accessibilityLabel={t('auth.fullName')}
                   />
                 </View>
               )}
@@ -1039,7 +1120,11 @@ export default function ProfileScreen() {
                   value={email}
                   onChangeText={setEmail}
                   autoCapitalize="none"
+                  autoCorrect={false}
                   keyboardType="email-address"
+                  textContentType={isSignUp ? 'emailAddress' : 'username'}
+                  autoComplete="email"
+                  accessibilityLabel={t('auth.email')}
                 />
               </View>
 
@@ -1052,6 +1137,10 @@ export default function ProfileScreen() {
                   value={password}
                   onChangeText={setPassword}
                   secureTextEntry={!showPassword}
+                  autoCapitalize="none"
+                  textContentType={isSignUp ? 'newPassword' : 'password'}
+                  autoComplete={isSignUp ? 'new-password' : 'current-password'}
+                  accessibilityLabel={t('auth.password')}
                 />
                 <TouchableOpacity
                   style={styles.fieldEye}
@@ -1077,6 +1166,10 @@ export default function ProfileScreen() {
                     value={confirmPassword}
                     onChangeText={setConfirmPassword}
                     secureTextEntry={!showPassword}
+                    autoCapitalize="none"
+                    textContentType="newPassword"
+                    autoComplete="new-password"
+                    accessibilityLabel={t('auth.confirmPassword')}
                   />
                 </View>
               )}
@@ -1106,12 +1199,9 @@ export default function ProfileScreen() {
                   </Text>
                   <TouchableOpacity
                     accessibilityRole="button"
-                    onPress={handleForgotPassword}
-                    disabled={resetSending}
+                    onPress={() => setRecoveryStep('email')}
                     hitSlop={8}>
-                    <Text style={styles.accessForgot}>
-                      {resetSending ? t('common.loading') : t('auth.forgotShort')}
-                    </Text>
+                    <Text style={styles.accessForgot}>{t('auth.forgotShort')}</Text>
                   </TouchableOpacity>
                 </View>
               )}

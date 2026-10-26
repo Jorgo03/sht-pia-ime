@@ -19,7 +19,10 @@ import { boundsToRegion, geometryBounds, pointInGeometry, type GeoJSONGeometry }
 import { formatPrice, getLocalizedText, priceSuffixKey } from '@/lib/format';
 import albaniaCountiesRaw from '@/data/albania-counties.json';
 
-const LEGEND_TYPES: (keyof typeof MARKER_COLORS)[] = ['sale', 'rent', 'commercial', 'land'];
+// Only the colours a bubble can have: markers are coloured by listing type,
+// so the green "commercial" and yellow "land" entries promised markers that
+// were never drawn (and had no translation).
+const LEGEND_TYPES: (keyof typeof MARKER_COLORS)[] = ['sale', 'rent'];
 
 const albaniaCounties = albaniaCountiesRaw as FeatureCollection;
 
@@ -242,7 +245,7 @@ export function MapScreenContent() {
                 {getLocalizedText(previewProperty.title_i18n, i18n.language) || previewProperty.title}
               </Text>
               <Text style={styles.previewPrice}>
-                {formatPrice(previewProperty.price, i18n.language)}
+                {formatPrice(previewProperty.price, i18n.language, previewProperty.currency)}
                 {(() => {
                   const key = priceSuffixKey(previewProperty.listing_type);
                   return key ? t(key) : '';

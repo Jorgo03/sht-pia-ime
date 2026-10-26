@@ -87,6 +87,18 @@ test('numbers typed into the form are stored as numbers', () => {
   assert.equal(cols.beds, 0)
 })
 
+test('integer columns get whole numbers, so a save is never refused for 85.5 m²', () => {
+  const form = { ...propertyToForm(ROW), sqft: '85.5', beds: '2', baths: '1.5', floor: '-1', total_floors: '7', year_built: '2019' }
+  const cols = formToColumns(form, form)
+  assert.equal(cols.sqft, 86)
+  assert.equal(cols.beds, 2)
+  assert.equal(cols.baths, 1.5, 'baths is numeric(3,1) and keeps its half')
+  assert.equal(cols.floor, -1, 'basements are negative')
+  assert.equal(cols.total_floors, 7)
+  assert.equal(cols.year_built, 2019)
+  assert.equal(formToColumns({ ...form, floor: '-' }, form).floor, null, 'a lone minus is nothing, not NaN')
+})
+
 test('the translated maps passed in win over the form (translateAll result)', () => {
   const form = propertyToForm(ROW)
   const translated = {
@@ -144,4 +156,22 @@ test('price box: separators are read as people write money, never shifting the a
   assert.equal(normalizeAmount(null), '')
   assert.equal(Number(normalizeAmount('1500,50')), 1500.5)
   assert.equal(Number(normalizeAmount('1.200.000')), 1200000)
+})
+
+test('price box: a pasted amount with both separators keeps its size', async () => {
+  const { normalizeAmount } = await import('../src/features/listings/lib/listingForm.js')
+  assert.equal(normalizeAmount('250.000,00'), '250000.00', 'not 25,000,000')
+  assert.equal(normalizeAmount('1.200,00'), '1200.00')
+  assert.equal(normalizeAmount('1,200.50'), '1200.50')
+  assert.equal(normalizeAmount('1.234.567,8'), '1234567.8')
+  assert.equal(normalizeAmount('1.200,'), '1200.', 'kept while typing')
+  assert.equal(normalizeAmount('1,200.000'), '1200000', 'three digits after the last one: thousands')
+})
+
+test('surface box: the same reading, so 85,5 m² is not saved as 0', async () => {
+  const { normalizeAmount } = await import('../src/features/listings/lib/listingForm.js')
+  assert.equal(Number(normalizeAmount('85,5')), 85.5)
+  assert.equal(Number(normalizeAmount('85.5')), 85.5)
+  assert.equal(Number(normalizeAmount('5,000')), 5000, 'a land plot')
+  assert.equal(Number(normalizeAmount('1.200')), 1200)
 })

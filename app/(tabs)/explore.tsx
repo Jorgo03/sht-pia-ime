@@ -63,11 +63,17 @@ export default function ExploreScreen() {
     isLoading: loading,
     isFetchingNextPage: loadingMore,
     isError,
+    isFetchNextPageError,
     refetch,
     hasNextPage,
     fetchNextPage,
   } = useInfinitePropertiesQuery(queryFilters);
-  const properties = useMemo(() => data?.pages.flat() ?? [], [data]);
+  // De-duplicated: a listing published while the visitor scrolls shifts the
+  // offsets by one, and the last card of a page came back on the next.
+  const properties = useMemo(() => {
+    const seen = new Set<string>();
+    return (data?.pages.flat() ?? []).filter((p) => !seen.has(p.id) && Boolean(seen.add(p.id)));
+  }, [data]);
   const { data: total = 0 } = usePropertiesCountQuery(queryFilters);
 
   // Quick All/Sale/Rent tabs stay in sync with the sheet by reading the same
@@ -96,6 +102,9 @@ export default function ExploreScreen() {
   useEffect(() => {
     const id = setTimeout(() => {
       const next = searchText.trim() || null;
+      // A zone belongs to its city (the sheet clears it the same way); kept,
+      // it was silently ignored by the query yet still counted as a filter.
+      if (next !== lastPushedCity.current) setFilter('zone', null);
       lastPushedCity.current = next;
       setFilter('city', next);
     }, 350);
@@ -112,10 +121,12 @@ export default function ExploreScreen() {
     }
   }, [filters.city]);
 
+  // After a failed page, only the footer's Retry asks again, so scrolling
+  // does not repeat a request that keeps failing.
   const loadMore = useCallback(() => {
-    if (loading || loadingMore || !hasNextPage) return;
+    if (loading || loadingMore || !hasNextPage || isFetchNextPageError) return;
     fetchNextPage();
-  }, [loading, loadingMore, hasNextPage, fetchNextPage]);
+  }, [loading, loadingMore, hasNextPage, isFetchNextPageError, fetchNextPage]);
 
   // PropertyCard's outer wrapper is `flex: 1` so it fills its grid column,
   // but RiseIn sits between it and the row and defaults to content sizing —
@@ -241,11 +252,13 @@ export default function ExploreScreen() {
           <View style={styles.loader}>
             <ActivityIndicator size="large" color={colors.accent} />
           </View>
-        ) : isError ? (
+        ) : isError && properties.length === 0 ? (
           /* Must come before the list: a failed query also yields zero rows, so
              without this the ListEmptyComponent told the visitor their filters
              matched nothing ("Try adjusting your search filters") when the
-             fetch had actually failed. Mirrors the web Search fix. */
+             fetch had actually failed. Mirrors the web Search fix. Only when
+             nothing loaded: one failed extra page used to replace a list
+             already on screen; that case gets the footer's Retry instead. */
           <View style={styles.empty}>
             <MaterialIcons name="error-outline" size={40} color={colors.textSecondary} />
             <Text style={styles.emptyTitle}>{t('errors.generic')}</Text>
@@ -290,7 +303,9 @@ export default function ExploreScreen() {
                     but this header only renders inside the list branch, so
                     the sort label is the only reachable case here. */}
                 <Text style={styles.countEyebrow}>
-                  {t('search.sortedByRelevance').toUpperCase()}
+                  {/* The sort actually applied: it always said "relevance",
+                      which this app has no ranking for. */}
+                  {t(`search.sort.${queryFilters.sort ?? 'newest'}`).toUpperCase()}
                 </Text>
               </View>
             }
@@ -319,6 +334,14 @@ export default function ExploreScreen() {
                   style={styles.footer}
                   color={colors.accent}
                 />
+              ) : isFetchNextPageError ? (
+                <View style={[styles.footer, styles.footerRetry]}>
+                  <Text style={styles.emptyHint}>{t('errors.generic')}</Text>
+                  <Pressable accessibilityRole="button" style={styles.emptyResetButton} onPress={() => fetchNextPage()}>
+                    <MaterialIcons name="restart-alt" size={14} color={colors.accent} />
+                    <Text style={styles.emptyResetText}>{t('common.retry')}</Text>
+                  </Pressable>
+                </View>
               ) : undefined
             }
           />
@@ -482,6 +505,10 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   footer: {
     paddingVertical: 20,
+  },
+  footerRetry: {
+    alignItems: 'center',
+    gap: 4,
   },
   empty: {
     paddingTop: 60,

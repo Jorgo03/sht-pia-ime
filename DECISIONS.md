@@ -865,3 +865,61 @@ objects, while user A still deletes 0 of B's files and sees 0 files in
 B's folder.
 
 No new security advisories were introduced.
+
+
+## 17. Auth email and sign-in settings: what only the owner can do — 2026-10-26
+
+Code side done in AUDIT.md Pass 20. Verified live today: Confirm email is
+**off** (`mailer_autoconfirm: true`) and a reset email to our own test
+account fails with **500 "Error sending recovery email"**, so forgot-password
+and email-code sign-in fail for everyone. No secret belongs in chat or in
+this repo; every value below is typed into the provider's own page.
+
+**Order matters.** Turning Confirm email back on before mail works would make
+sign-up impossible again (§15). So: 1 → 2 → 3 → test → 4.
+
+1. **A domain.** Buy one you control (e.g. a `.al` or `.com`); the same
+   domain later serves the website, Google branding and the app links.
+2. **Transactional email: keep Resend** (already wired into Supabase, free
+   tier 3,000/month, 100/day, fine for beta). Alternatives if you prefer:
+   Postmark (best inbox reputation, paid from the start), Brevo (EU-based,
+   free 300/day), Amazon SES (cheapest at volume, more setup). No account is
+   created or paid for without you.
+   - Resend → Domains → Add `mail.<your-domain>` (a subdomain keeps it apart
+     from any mailbox you use on the main domain).
+   - Add **exactly** the DNS records Resend shows (SPF TXT on
+     `send.mail.<domain>`, the bounce MX, DKIM TXT `resend._domainkey…`).
+     Do not invent or retype values; copy them. If the domain already has an
+     SPF record, merge, never add a second one.
+   - DMARC: TXT on `_dmarc.<your-domain>` starting with `v=DMARC1; p=none;
+     rua=mailto:<an address you read>`; move to `p=quarantine` only after a
+     few weeks of reports showing only Resend and your own mail.
+   - Wait for Resend to show the domain **Verified** (not just "records
+     added").
+3. **Supabase → Authentication → Emails → SMTP Settings**: host
+   `smtp.resend.com`, port `465` (or `587`), username `resend`, password = a
+   Resend API key with sending access only (paste it there, nowhere else),
+   sender `no-reply@mail.<your-domain>`, sender name `Shtëpia.ime`.
+   Then **Authentication → Rate limits**: emails per hour to what Resend
+   allows (e.g. 30–100, not the 2 of the built-in mailer).
+4. **Templates and notices** (Authentication → Emails): paste the four files
+   in `supabase/templates/` (confirmation, recovery, magic link, email
+   change) with the subjects in `supabase/config.toml`, and switch on
+   Security notifications → *Password changed* with
+   `password_changed_notification.html`. The new links need step 5.
+5. **URL Configuration**: Site URL = the live website's address (today the
+   Vercel production URL; later your domain). Redirect URLs must include
+   `<site>/auth/callback`, `<site>/profile`, `<site>/auth/confirm`,
+   `shtepia-ime://auth/callback`, and `http://localhost:5173/**` for
+   development. No localhost as the Site URL.
+6. **Then turn Confirm email back on** (Providers → Email). Also there:
+   **Secure password change** on, **Minimum password length 8** (the apps
+   already ask for 8), **Leaked password protection** on (rejects breached
+   passwords; the apps explain the refusal).
+7. **Optional, recommended before launch:** CAPTCHA (Turnstile, free) on
+   sign-up and reset; needs a small app change I can make once you have the
+   site key.
+8. **Test together:** give me two addresses you own (one Gmail, one
+   Outlook/other). I send one confirmation and one reset to each, and report
+   arrival, folder, and the SPF/DKIM/DMARC results from the message headers
+   — separately from "Supabase accepted it".

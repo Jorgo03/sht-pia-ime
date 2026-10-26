@@ -47,7 +47,7 @@
     "accessClient": "Accès acheteurs et locataires",
     "accessAgent": "Accès au portail agent",
     "forgotShort": "Oublié ?",
-    "resetSent": "Vérifiez votre e-mail pour réinitialiser votre mot de passe.",
+    "resetSent": "Si un compte existe pour cet e-mail, nous lui avons envoyé un code pour réinitialiser le mot de passe.",
     "recoveryTitle": "Définir un nouveau mot de passe",
     "recoverySubtitle": "Choisissez un nouveau mot de passe pour votre compte.",
     "newPassword": "Nouveau mot de passe",
@@ -85,7 +85,13 @@
     "showPassword": "Afficher le mot de passe",
     "hidePassword": "Masquer le mot de passe",
     "codeDigit": "Chiffre {{n}} sur 6",
-    "newCodeSent": "Un nouveau code a été envoyé. Les codes précédents ne fonctionnent plus."
+    "newCodeSent": "Un nouveau code a été envoyé. Les codes précédents ne fonctionnent plus.",
+    "forgotTitle": "Réinitialiser le mot de passe",
+    "forgotSubtitle": "Saisissez l’e-mail de votre compte. Nous vous enverrons un code à 6 chiffres.",
+    "resetCodeSent": "Si un compte existe pour {{email}}, nous lui avons envoyé un code à 6 chiffres.",
+    "backToSignIn": "Retour à la connexion",
+    "confirmFirst": "Confirmez d’abord votre e-mail : saisissez le code reçu ou demandez-en un nouveau.",
+    "signupCodeHint": "Vous avez déjà ouvert le lien de l’e-mail ? Votre adresse est alors confirmée : connectez-vous."
   },
   "home": {
     "greetingMorning": "Bonjour",
@@ -252,7 +258,8 @@
     "inputPlaceholder": "Écrivez un message…",
     "noMessages": "Pas encore de messages — dites bonjour !",
     "loginPrompt": "Connectez-vous pour voir vos messages",
-    "sendFailed": "Message non envoyé — réessayez"
+    "sendFailed": "Message non envoyé — réessayez",
+    "unavailable": "Cette conversation n'est pas disponible"
   },
   "notFound": {
     "title": "Page introuvable",
@@ -307,10 +314,23 @@
     "invalidCode": "Le code est incorrect ou n'est plus valable. Utilisez le dernier code envoyé.",
     "videoInvalidType": "Seules les vidéos MP4 ou MOV sont autorisées",
     "videoTooLarge": "Vidéo trop volumineuse (max {{max}} Mo)",
-    "emailSendFailed": "Nous n’avons pas pu envoyer l’e-mail de confirmation. Il s’agit d’un problème de configuration du serveur, pas de votre compte — contactez l’administrateur.",
+    "emailSendFailed": "Nous n’avons pas pu envoyer l’e-mail. Il s’agit d’un problème de configuration du serveur, pas de votre compte — contactez l’administrateur.",
     "waitSeconds": "Attendez {{s}} secondes avant de demander un nouveau code.",
     "photoPrepareFailed": "Une photo n'a pas pu être préparée pour l'envoi. Réessayez ou choisissez une autre photo.",
-    "listingSaveFailed": "L'annonce n'a pas été enregistrée. Tout ce que vous avez saisi est encore là ; réessayez."
+    "listingSaveFailed": "L'annonce n'a pas été enregistrée. Tout ce que vous avez saisi est encore là ; réessayez.",
+    "network": "Impossible de joindre le serveur. Vérifiez votre connexion et réessayez.",
+    "sessionExpired": "Votre session a expiré. Veuillez vous reconnecter.",
+    "passwordSame": "Choisissez un mot de passe différent de l’actuel.",
+    "passwordPwned": "Ce mot de passe est apparu dans une fuite de données. Choisissez-en un autre.",
+    "passwordWeak": "Ce mot de passe est trop simple. Mélangez lettres, chiffres et symboles.",
+    "passwordTooLong": "Mot de passe trop long. 72 caractères au maximum.",
+    "reauthNeeded": "Par sécurité, confirmez d’abord avec un code reçu par e-mail.",
+    "signupDisabled": "Impossible de créer de nouveaux comptes pour le moment.",
+    "linkExpired": "Ce lien a expiré ou a déjà été utilisé. Demandez un nouveau code.",
+    "linkInvalid": "Ce lien n’est pas valide. Demandez un nouveau code.",
+    "linkOtherDevice": "Ce lien a été ouvert dans un autre navigateur que celui de la demande. Saisissez plutôt le code à 6 chiffres de l’e-mail.",
+    "currentPasswordWrong": "Votre mot de passe actuel est incorrect.",
+    "providerUnavailable": "Cette option de connexion n’est pas encore disponible. Choisissez-en une autre."
   },
   "agentDashboard": {
     "title": "Tableau de bord Agent",
@@ -565,7 +585,9 @@
       "requested": "Demandée",
       "confirmed": "Confirmée",
       "declined": "Refusée",
-      "cancelled": "Annulée"
+      "cancelled": "Annulée",
+      "completed": "Terminée",
+      "no_show": "Absence"
     }
   },
   "saved": {
@@ -710,5 +732,28 @@
   "seo": {
     "siteTitle": "Shtëpia.ime — Logements à vendre et à louer en Albanie",
     "siteDescription": "Appartements, villas et bureaux à vendre et à louer à Tirana, Durrës et dans toute l'Albanie. Contactez directement agents et propriétaires."
+  },
+  "security": {
+    "row": "Mot de passe et sécurité",
+    "title": "Changer le mot de passe",
+    "currentPassword": "Mot de passe actuel",
+    "save": "Enregistrer le nouveau mot de passe",
+    "success": "Votre mot de passe a été modifié.",
+    "othersSignedOut": "Vos autres appareils ont été déconnectés.",
+    "forgotCurrent": "Mot de passe actuel oublié ?",
+    "codeIntro": "Nous enverrons un code à 6 chiffres à {{email}}. Saisissez-le ici, puis choisissez un nouveau mot de passe.",
+    "providerOnly": "Vous vous connectez avec {{providers}} : il n’y a pas de mot de passe Shtëpia.ime à changer. Votre compte est protégé par votre compte {{providers}}."
+  },
+  "authConfirm": {
+    "titleEmail": "Confirmez votre e-mail",
+    "titleRecovery": "Réinitialiser le mot de passe",
+    "titleEmailChange": "Confirmez votre nouvel e-mail",
+    "intro": "Par sécurité, continuez avec le bouton ci-dessous.",
+    "ctaEmail": "Confirmer et se connecter",
+    "ctaRecovery": "Continuer",
+    "ctaEmailChange": "Confirmer le nouvel e-mail",
+    "emailChanged": "Votre adresse e-mail a été mise à jour.",
+    "requestNew": "Demander un nouveau code",
+    "goSignIn": "Aller à la connexion"
   }
 }
