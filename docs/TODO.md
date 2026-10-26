@@ -1,6 +1,6 @@
 # Shtëpia.ime: to-do list
 
-Updated 2026-10-26, on master `e23a8ac`. Sources:
+Updated 2026-10-26, on master `02c75f8`. Sources:
 - `docs/PLANI_I_PUBLIKIMIT.md`, the step-by-step launch plan, in Albanian;
 - `AUDIT.md` passes 18–19;
 - `DECISIONS.md`.
@@ -117,7 +117,7 @@ transaction before you approve it.
 
 ## Recently done
 
-- [x] Launch animation: the logo's door opens onto a warm room, then fades into the app (`components/brand/door-splash.tsx`). Needs a look on both phones.
+- [x] Launch animation: the logo's door opens onto a warm room, then fades into the app (`components/brand/door-splash.tsx`). Seen and approved by the owner on the phone (2026-10-26).
 
 - [x] SDK 58 upgrade; the app opens in Expo Go on iPhone and Android.
 - [x] Android crash on start (`ExpoTopicSubscriptionModule`) fixed; confirmed
