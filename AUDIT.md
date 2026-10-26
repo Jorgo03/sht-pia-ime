@@ -1,5 +1,87 @@
 # Pre-Launch Audit — Shtëpia.ime (Vite web app)
 
+## ═══ PASS 19 — 2026-10-25/26: FULL AUDIT (owner master prompt) ═══
+
+**Method.** Baseline first, then four slice auditors (backend, search/map,
+listing wizard, sign-in). Each finding was re-checked against the code by
+the lead before anything was fixed. The other six slices (listing detail and
+messaging, account tools, shared core, website, build config, mobile UX) did
+**not** run: the account's usage limit stopped them twice. They were covered
+by passes 1–18, but have no fresh audit. Everything was run on the owner's
+Windows laptop, which also exposed two environment bugs (below). No Supabase
+CLI or database connection was available, so there were no live SQL tests:
+only read-only anonymous REST checks, which agreed with the policies.
+
+**Fixed in this pass** (tests named in brackets; red runs were against the
+old code)
+
+| # | Problem | Fix |
+|---|---|---|
+| 1 | Unit tests failed 4/264 on Windows: the email-template test expected `\n`, while `core.autocrlf` checks `config.toml` out with CRLF | regex accepts `\r?\n` (a3897d7) |
+| 2 | e2e a11y flaked about 1 run in 10 on `/search`: axe measured a card still in its staggered fade-in | `axeViolations()` waits for finite animations (a3897d7; 32/32 repeats) |
+| 3 | Price filters compared raw numbers although listings are priced in EUR, ALL or USD and the filter shows €: 15,000,000 ALL (≈€153k) was hidden by "max €200,000" and a 150,000 ALL rental passed "min €100,000". Both apps, the saved-search counts and the email-alert function | shared `src/features/properties/lib/priceRange.js`: euro bounds converted per currency with reference rates (1 € = 98 ALL = 1.15 USD), one PostgREST `or`; mirrored in `saved-search-alerts/logic.js` with a drift test [unit `priceRange` 11, e2e F01-H4 red→green, live PostgREST accepted it] |
+| 4 | Listings paged 20 at a time (CLAUDE.md: 24), with no tiebreak, so equal prices/dates could repeat or skip across pages | 24 in both apps, `order(id)` tiebreak, de-dup on append (web) |
+| 5 | Website "Load more": a page still loading for the previous filters was appended to the new results; a failed page silently ended the list | generation guard; on failure the button becomes Retry with a message |
+| 6 | **Sign-out while offline (or timeout, or 5xx while the project is paused) kept the session**: auth-js returns before `_removeSession()` unless /logout answers 401/403/404, so the account came back on the next launch or token refresh. Both apps | shared `src/lib/signOut.js` removes the session locally when the server call fails [unit `signOut` 4, against the real supabase-js with a failing fetch] |
+| 7 | **Phone password recovery could not be completed**: the recovery code signs the user in, and the Profile screen's `if (user)` replaced the new-password step with the dashboard | the step stays until the password is saved or left; added Back [e2e-expo X27 red→green] |
+
+**Open, code-only (recommended next, in order)**
+
+| Pri | Finding | Where |
+|---|---|---|
+| P2 | OAuth relay forwards the sign-in `code` to any `exp://` host (only the scheme is checked): a crafted link could hand an Expo Go user's session to someone else. Restrict to LAN/localhost hosts and the exact callback path; tunnels (`*.exp.direct`) are the owner's call. Coordinate with the session working on the relay | `index.html`, `AuthCallback.jsx`, `app/+html.tsx`, `app/auth/callback.web.tsx` |
+| P2 | A restored wizard draft reopens on Publish and can publish with zero photos (only the last step is validated) | `app/listing/new.tsx`, `NewListing.jsx` |
+| P2 | Surface area `85,5` saves as 0 m²; `85.5` fails every save at the integer column after uploads | `app/listing/new.tsx`, `listingForm.js` |
+| P2 | The listing draft is per device, not per account: the next person to sign in gets the previous agent's draft and contact details | `app/listing/new.tsx`, `NewListing.jsx` |
+| P2 | Signed out, the + button opens the whole wizard and ends in "Authentication failed"; `/listing/[id]/edit`, `/agent-dashboard`, `/messages/[id]` spin forever | same + screens |
+| P2 | A failed role lookup files an agent's new listing as a client's, permanently (the ownership guard forbids correcting it) | `app/listing/new.tsx`, `NewListing.jsx` |
+| P2 | Signed out, a heart tap looks saved but is never stored, with no sign-in prompt | `contexts/favorites-context.tsx` |
+| P2 | Map price bubbles and map previews show € for ALL/USD listings (both apps) | `lib/cluster.ts`, map components, `PropertyMap.jsx` |
+| P2 | Android: cluster/county count bubbles keep old numbers after a filter change (`tracksViewChanges` off, same key) | `components/map/*` |
+| P2 | Explore/Home replace the loaded list with a full-screen error when one more page or a background refetch fails | `app/(tabs)/explore.tsx`, `index.tsx` |
+| P2 | Listing assistant fails from the 6th question: `slice(-10)` starts the history with an assistant turn | `ai-listing-assistant` (deploy) + both clients |
+| P3 | Pasted `250.000,00` becomes 25,000,000; no minus key for basement floors on iPhone; stale city-centre lookup; "draft restored" over an empty form; failed translations not reported; hard-coded English in the media step; `delete-account` purges only 1,000 files; unsubscribe link acts on GET; zone kept when a city is typed; "sorted by relevance" label; filter segments lack selected state; legend promises land/commercial colours; Expo-web map ignores its first view; map/sheet show "no results" on errors; favourite errors swallowed; push-token record dropped before the server delete; web `/agent-dashboard` redirect on a slow profile; no `viewings.status.completed`/`no_show` keys | various |
+
+**Open, need the owner's approval (database)** — write as `supabase/pending/`
+files and test in a rolled-back transaction first, as before:
+- P2 `viewings` INSERT is unguarded (any status, any agent, ignores blocks),
+  and the UPDATE guard fails open when `agent_id` is NULL
+  (`me = NULL` is NULL in `is_host`).
+- P2 sorting by price across currencies needs a `price_eur` column (the
+  filters are fixed without one).
+- P3 `ai_usage` keeps IPs and user ids forever: add a prune job.
+- P3 no server-side length limits on names, messages, viewing notes.
+- P3 map county totals come from an unordered 200-row sample past 200
+  listings: needs an aggregate.
+
+**Verified on the final code** (Windows laptop, one suite after another)
+
+| Check | Before | After |
+|---|---|---|
+| `npm run lint` | 0 errors, 32 warnings | 0 errors, 32 warnings (none new) |
+| `npx tsc --noEmit` | clean | clean |
+| `npm test` | 260/264 | 283/283 |
+| `npm run build` | OK | OK |
+| `npm run test:e2e` | blocked (browser), then 167 + 1 flake | 174 passed, 2 skipped by design |
+| `npm run test:e2e:expo` | blocked (browser), then 93 | 95 passed, 13 skipped by design |
+| PGlite payments SQL (`supabase/tests_*.test.mjs`) | not in CI | 23/23, 31/31 |
+| `expo export -p ios -p android` | — | both bundles build |
+| `npx expo-doctor` | 19/20 | 20/20 |
+| `npm audit --omit=dev` | 5 high | unchanged: Expo CLI and ESLint tooling only (node-forge, zod), not in any bundle |
+| Live, anonymous, read-only | — | 15 GETs agree with the policies; the price `or` filter accepted |
+
+**Not verified:** anything on a physical phone (offline sign-out and
+recovery included), the live SQL tests in `supabase/tests/` (no database
+access from this machine), Edge Function changes (not deployed; the alerts
+copy only takes effect on the next deploy).
+
+**Environment and tooling:** Playwright 1.64.1 needs Chromium build 1248
+(`npm run test:e2e:install`; the laptop had 1223/1228, so every e2e test
+failed in 3 ms). `@types/react` was 19.2.18 where SDK 58 expects ~19.3.0:
+bumped, `expo-doctor` 20/20 (was 19/20). Two Playwright runs at once share
+`test-results/` and delete each other's traces (`ENOENT … .trace`): run the
+suites one after the other.
+
 ## ═══ PASS 18 — 2026-10-24: EXPO SDK 57 → 58 ═══
 
 **Trigger:** the owner's iPhone showed "Project is incompatible with this
