@@ -29,6 +29,8 @@ import { supabase } from '@/lib/supabase';
 // reaches into src/ this way for the shared locale JSON (see i18n/index.ts).
 // Its 8 unit tests in tests/authEvents.test.mjs now cover both apps.
 import { classifyAuthEvent } from '../src/lib/authEvents.js';
+// Shared with web the same way (tests/signOut.test.mjs).
+import { signOutOfDevice } from '../src/lib/signOut.js';
 
 /** Hard ceiling on how long anything may hold the splash screen. */
 const AUTH_INIT_TIMEOUT_MS = 8000;
@@ -572,12 +574,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // While still signed in: stop this device getting the account's pushes
     // (a shared phone must not keep receiving the previous person's).
     await forgetDevice();
-    const { error } = await supabase.auth.signOut();
-    // This previously relied solely on the SIGNED_OUT event to clear state.
-    // supabase-js drops the local session even when the server call fails
-    // (an already-revoked token is the common case), so clearing here makes
-    // sign-out synchronous rather than event-dependent — and surfaces the
-    // error instead of discarding it, matching web.
+    // supabase-js keeps the stored session when the server cannot be reached
+    // (offline, a timeout, a paused project), which brought the account back
+    // on the next launch; signOutOfDevice removes it either way.
+    const { error } = await signOutOfDevice(supabase);
+    // Cleared here too, so sign-out is synchronous rather than waiting on the
+    // SIGNED_OUT event, and the error is surfaced instead of discarded,
+    // matching web.
     setSession(null);
     setProfile(null);
     setLoading(false);

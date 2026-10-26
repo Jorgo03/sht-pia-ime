@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useRef, useState } from 'react'
 import i18n from '../../i18n/index.js'
 import { supabase } from '../../lib/supabase'
 import { classifyAuthEvent } from '../../lib/authEvents'
+import { signOutOfDevice } from '../../lib/signOut'
 
 const AuthContext = createContext(null)
 
@@ -336,12 +337,12 @@ export function AuthProvider({ children }) {
     // without this bump it would still match the current generation and
     // commit on top of the cleared state below.
     generation.current += 1
-    const { error } = await supabase.auth.signOut()
-    // supabase-js clears the local session even when the server call fails
-    // (an expired/already-revoked token is the common case), and the
-    // SIGNED_OUT event still fires — so the user is signed out locally
-    // regardless. Clearing here as well keeps it synchronous rather than
-    // waiting on the event, and the error is surfaced instead of swallowed.
+    // supabase-js keeps the stored session when the server cannot be reached
+    // (offline, a timeout, a paused project), so the account came back on the
+    // next visit; signOutOfDevice removes it either way and SIGNED_OUT fires.
+    const { error } = await signOutOfDevice(supabase)
+    // Clearing here as well keeps it synchronous rather than waiting on the
+    // event, and the error is surfaced instead of swallowed.
     setState({ user: null, session: null, profile: null, loading: false })
     setPasswordRecovery(false)
     return { error }
