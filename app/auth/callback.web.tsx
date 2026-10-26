@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { type AtticoPalette, Fonts } from '@/constants/theme';
 import { useTheme } from '@/contexts/theme-context';
 import { supabase } from '@/lib/supabase';
+import { buildRelayTarget as buildRelayFrom, isAllowedRelayTarget } from '@/src/lib/oauthRelay';
 
 // Where Google/Apple/LinkedIn sign-in returns on the website, ported from the
 // Vite site's AuthCallback.jsx. Web only (app/auth/callback.tsx sends the
@@ -14,37 +15,17 @@ import { supabase } from '@/lib/supabase';
 // Two jobs:
 // - Mobile relay fallback. app/+html.tsx forwards ?rt=<the app's address>
 //   before the bundle loads; if the browser blocked that scripted jump to a
-//   custom scheme, this shows a real link to tap. Only the app's own schemes
-//   are accepted: forwarding to http(s) would leak the sign-in code.
+//   custom scheme, this shows a real link to tap. Only the app's own
+//   callback on a private network is accepted (src/lib/oauthRelay.js):
+//   forwarding anywhere else would leak the sign-in code.
 // - A web sign-in: the Supabase client redeems ?code= on creation; wait for
 //   the session, then go home, or back to Profile after 15 s without one.
-
-const RELAY_SCHEMES = ['exp:', 'shtepia-ime:'];
 
 function buildRelayTarget(): string | null {
   // app/+html.tsx already took the code out of the address and left it here.
   const kept = (window as { __FHO_RELAY_TARGET__?: unknown }).__FHO_RELAY_TARGET__;
-  if (typeof kept === 'string') {
-    try {
-      if (RELAY_SCHEMES.includes(new URL(kept).protocol)) return kept;
-    } catch {
-      // fall through to the address
-    }
-  }
-  const params = new URLSearchParams(window.location.search);
-  const target = params.get('rt');
-  if (!target) return null;
-  let parsed: URL;
-  try {
-    parsed = new URL(target);
-  } catch {
-    return null;
-  }
-  if (!RELAY_SCHEMES.includes(parsed.protocol)) return null;
-  params.delete('rt');
-  params.forEach((value, key) => parsed.searchParams.set(key, value));
-  if (window.location.hash && window.location.hash.length > 1) parsed.hash = window.location.hash;
-  return parsed.toString();
+  if (isAllowedRelayTarget(kept)) return kept as string;
+  return buildRelayFrom(window.location.search, window.location.hash);
 }
 
 export default function AuthCallbackScreen() {

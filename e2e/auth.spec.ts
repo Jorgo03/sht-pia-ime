@@ -273,6 +273,13 @@ test.describe('mobile sign-in relay on Android', () => {
     expect(navigations.every((u) => !u.startsWith('exp:'))).toBe(true);
   });
 
+  test('F4-R3 an Expo tunnel address (anyone can register one) gets no button and keeps no code', async ({ page }) => {
+    await page.goto(`/auth/callback?rt=${encodeURIComponent('exp://u-attacker-8081.exp.direct/--/auth/callback')}&code=abc-123`);
+    await page.waitForTimeout(1000);
+    await expect(page.getByRole('link', { name: t('authCallback.openApp') })).toHaveCount(0);
+    expect(await page.evaluate(() => (window as { __FHO_RELAY_TARGET__?: unknown }).__FHO_RELAY_TARGET__)).toBeUndefined();
+  });
+
   test('F4-R2 a web address in rt is never followed and gets no button', async ({ page }) => {
     await page.goto(`/auth/callback?rt=${encodeURIComponent('https://evil.example/steal')}&code=abc-123`);
     await expect(page.getByRole('link', { name: t('authCallback.openApp') })).toHaveCount(0);

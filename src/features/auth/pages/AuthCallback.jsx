@@ -5,74 +5,25 @@ import { supabase } from "../../../lib/supabase";
 import LoadingScreen from "../../../shared/LoadingScreen";
 import "../../../styles/profile.css";
 import { authRedirectError, hasAuthCode, linkErrorKey } from "../lib/authLinks";
-
-/**
- * Schemes this page may hand an authorization code to.
- *
- * This list is a security boundary, not a convenience. The relay below
- * forwards the OAuth result to a URL supplied in a query parameter, which is
- * an open redirect unless it is constrained — and an open redirect here would
- * hand an attacker the authorization code, i.e. the account. Only the two
- * schemes belonging to this project's own mobile app are allowed:
- *
- *   exp://          Expo Go during development
- *   shtepia-ime://  dev-client and store builds (app.json `scheme`)
- *
- * http/https are deliberately absent: a web target is exactly the case that
- * would exfiltrate the code to another origin.
- */
-const RELAY_SCHEMES = ['exp:', 'shtepia-ime:'];
+import { buildRelayTarget as buildRelayFrom, isAllowedRelayTarget } from "../../../lib/oauthRelay";
 
 /**
  * Mobile OAuth relay.
  *
- * Supabase's redirect allow-list cannot express an Expo Go address —
- * `exp://<host>:<port>/--/path` is rejected even with a wildcard, verified by
- * probing the live project. But this production callback IS allow-listed, and
- * Supabase preserves extra query parameters through the redirect. So the app
- * points redirectTo here with `?rt=<its own exp:// address>`, and this page
- * forwards the result on unchanged.
+ * Supabase's redirect allow-list cannot express an Expo Go address. But this
+ * production callback IS allow-listed, and Supabase preserves extra query
+ * parameters through the redirect. So the app points redirectTo here with
+ * `?rt=<its own exp:// address>`, and this page forwards the result on.
  *
- * The same mechanism Expo's retired auth proxy used, hosted on our own domain
- * rather than a third party's.
+ * Which addresses may receive the code is a security boundary (an open relay
+ * hands over the account): see src/lib/oauthRelay.js.
  */
-function isRelayScheme(url) {
-  try {
-    return RELAY_SCHEMES.includes(new URL(url).protocol);
-  } catch {
-    return false;
-  }
-}
-
 function buildRelayTarget() {
   // index.html already took the code out of the address (so the Supabase
   // client never sees it) and left the target here.
   const kept = window.__FHO_RELAY_TARGET__;
-  if (typeof kept === "string" && isRelayScheme(kept)) return kept;
-
-  const params = new URLSearchParams(window.location.search);
-  const target = params.get('rt');
-  if (!target) return null;
-
-  let parsed;
-  try {
-    parsed = new URL(target);
-  } catch {
-    return null; // unparseable — treat as a normal web callback
-  }
-  if (!RELAY_SCHEMES.includes(parsed.protocol)) return null;
-
-  // Carry over everything Supabase returned (code, or error/error_description)
-  // except our own routing parameter, so the app sees exactly what it would
-  // have received from a direct redirect.
-  params.delete('rt');
-  for (const [key, value] of params) parsed.searchParams.set(key, value);
-  // Implicit-flow responses arrive in the fragment; pass it through untouched.
-  if (window.location.hash && window.location.hash.length > 1) {
-    parsed.hash = window.location.hash;
-  }
-
-  return parsed.toString();
+  if (isAllowedRelayTarget(kept)) return kept;
+  return buildRelayFrom(window.location.search, window.location.hash);
 }
 
 export default function AuthCallback() {
