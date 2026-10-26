@@ -21,7 +21,8 @@ for (const name of ['confirmation', 'recovery', 'magic_link', 'email_change']) {
   })
 
   test(`${name}: wired into supabase/config.toml`, () => {
-    assert.match(config, new RegExp(`\\[auth\\.email\\.template\\.${name}\\]\\nsubject = "[^"]+"\\ncontent_path = "\\./supabase/templates/${name}\\.html"`))
+    // \r?\n: a Windows checkout (core.autocrlf) gives config.toml CRLF endings.
+    assert.match(config, new RegExp(`\\[auth\\.email\\.template\\.${name}\\]\\r?\\nsubject = "[^"]+"\\r?\\ncontent_path = "\\./supabase/templates/${name}\\.html"`))
   })
 }
 
