@@ -244,7 +244,8 @@
     "inputPlaceholder": "Nachricht schreiben…",
     "noMessages": "Noch keine Nachrichten — sag hallo!",
     "loginPrompt": "Melde dich an, um deine Nachrichten zu sehen",
-    "sendFailed": "Nachricht nicht gesendet — bitte erneut versuchen"
+    "sendFailed": "Nachricht nicht gesendet — bitte erneut versuchen",
+    "unavailable": "Dieses Gespräch ist nicht verfügbar"
   },
   "notFound": {
     "title": "Seite nicht gefunden",
@@ -557,7 +558,9 @@
       "requested": "Angefragt",
       "confirmed": "Bestätigt",
       "declined": "Abgelehnt",
-      "cancelled": "Storniert"
+      "cancelled": "Storniert",
+      "completed": "Abgeschlossen",
+      "no_show": "Nicht erschienen"
     }
   },
   "saved": {

@@ -244,7 +244,8 @@
     "inputPlaceholder": "Shkruaj një mesazh…",
     "noMessages": "Ende pa mesazhe — përshëndetu!",
     "loginPrompt": "Kyçu për të parë mesazhet",
-    "sendFailed": "Mesazhi nuk u dërgua — provo përsëri"
+    "sendFailed": "Mesazhi nuk u dërgua — provo përsëri",
+    "unavailable": "Kjo bisedë nuk është e disponueshme"
   },
   "notFound": {
     "title": "Faqja nuk u gjet",
@@ -557,7 +558,9 @@
       "requested": "E kërkuar",
       "confirmed": "E konfirmuar",
       "declined": "E refuzuar",
-      "cancelled": "E anuluar"
+      "cancelled": "E anuluar",
+      "completed": "E përfunduar",
+      "no_show": "Nuk u paraqit"
     }
   },
   "saved": {

@@ -19,6 +19,7 @@ import { useTranslation } from 'react-i18next';
 
 import { ReportSheet } from '@/components/safety/report-sheet';
 import { AppHeader } from '@/components/ui/app-header';
+import { SignInPrompt } from '@/components/ui/sign-in-prompt';
 import { type AtticoPalette } from '@/constants/theme';
 import { useAuth } from '@/contexts/auth-context';
 import { KeyboardDoneBar } from '@/components/ui/keyboard-done-bar';
@@ -51,9 +52,12 @@ export default function ThreadScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const { t, i18n } = useTranslation();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
+  // The conversation could not be read: not this account's (an old
+  // notification after switching accounts), or gone.
+  const [unavailable, setUnavailable] = useState(false);
   const [conversation, setConversation] = useState<ConversationInfo | null>(null);
   const [otherName, setOtherName] = useState('?');
   const [propertyTitle, setPropertyTitle] = useState<string | null>(null);
@@ -101,7 +105,12 @@ export default function ThreadScreen() {
         .select('id, client_id, agent_id, property_id')
         .eq('id', id)
         .single();
-      if (cancelled || !convo) return;
+      if (cancelled) return;
+      if (!convo) {
+        setUnavailable(true);
+        setLoading(false);
+        return;
+      }
       setConversation(convo);
 
       const otherId = convo.client_id === user.id ? convo.agent_id : convo.client_id;
@@ -212,6 +221,21 @@ export default function ThreadScreen() {
       },
       { text: t('common.cancel'), style: 'cancel' },
     ]);
+
+  // Signed out (a notification left in the tray, a link) the load never
+  // starts, so this used to be a spinner forever.
+  if (!user) return authLoading ? null : <SignInPrompt message={t('messages.loginPrompt')} />;
+
+  if (unavailable) {
+    return (
+      <SafeAreaView style={styles.container} edges={['top']}>
+        <AppHeader onBack={() => router.back()} showControls={false} />
+        <View style={styles.center}>
+          <Text style={styles.unavailableText}>{t('messages.unavailable')}</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   if (loading) {
     return (
@@ -349,6 +373,12 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: colors.primary,
+  },
+  unavailableText: {
+    fontSize: 14,
+    color: colors.textSecondary,
+    textAlign: 'center',
+    paddingHorizontal: 32,
   },
   headerAvatar: {
     width: 36,

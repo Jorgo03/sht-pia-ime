@@ -252,7 +252,8 @@
     "inputPlaceholder": "Scrivi un messaggio…",
     "noMessages": "Ancora nessun messaggio — saluta!",
     "loginPrompt": "Accedi per vedere i tuoi messaggi",
-    "sendFailed": "Messaggio non inviato — riprova"
+    "sendFailed": "Messaggio non inviato — riprova",
+    "unavailable": "Questa conversazione non è disponibile"
   },
   "notFound": {
     "title": "Pagina non trovata",
@@ -565,7 +566,9 @@
       "requested": "Richiesta",
       "confirmed": "Confermata",
       "declined": "Rifiutata",
-      "cancelled": "Annullata"
+      "cancelled": "Annullata",
+      "completed": "Completata",
+      "no_show": "Mancata presenza"
     }
   },
   "saved": {

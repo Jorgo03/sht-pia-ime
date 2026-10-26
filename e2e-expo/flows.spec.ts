@@ -362,6 +362,27 @@ test('X27 forgot password: the code opens the new-password step, which stays unt
   expect(saved[0]).toMatchObject({ password: 'NewPassword!2026' });
 });
 
+// Signed out, screens that need an account ask for one. The listing form used
+// to take all five steps and then fail with "Authentication failed"; the
+// dashboard waited forever.
+for (const path of ['/listing/new', '/agent-dashboard']) {
+  test(`X28 signed out, ${path} asks you to sign in`, async ({ page }) => {
+    await page.goto(path);
+    await ready(page);
+    await expect(page.getByText(t('addSheet.signInFirst'))).toBeVisible();
+    await page.getByRole('button', { name: t('common.signIn') }).click();
+    await expect(page).toHaveURL(/\/profile$/);
+  });
+}
+
+// Signed out, a heart looked saved but was never stored.
+test('X29 signed out, a heart on a card goes to sign-in instead of pretending to save', async ({ page }) => {
+  await page.goto('/');
+  await ready(page);
+  await page.getByRole('button', { name: t('common.save') }).first().click();
+  await expect(page).toHaveURL(/\/profile$/);
+});
+
 // Layout boundaries on the narrowest supported phone (docs/UI_POLISH.md):
 // no control may sit past the screen edge, and the header wordmark is either
 // clear of the header's buttons or not shown at all.

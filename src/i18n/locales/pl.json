@@ -260,7 +260,8 @@
     "inputPlaceholder": "Napisz wiadomość…",
     "noMessages": "Brak wiadomości — przywitaj się!",
     "loginPrompt": "Zaloguj się, aby zobaczyć wiadomości",
-    "sendFailed": "Wiadomość nie została wysłana — spróbuj ponownie"
+    "sendFailed": "Wiadomość nie została wysłana — spróbuj ponownie",
+    "unavailable": "Ta rozmowa jest niedostępna"
   },
   "notFound": {
     "title": "Nie znaleziono strony",
@@ -573,7 +574,9 @@
       "requested": "Zgłoszona",
       "confirmed": "Potwierdzona",
       "declined": "Odrzucona",
-      "cancelled": "Anulowana"
+      "cancelled": "Anulowana",
+      "completed": "Zakończona",
+      "no_show": "Nieobecność"
     }
   },
   "saved": {

@@ -275,7 +275,8 @@
     "inputPlaceholder": "Write a message…",
     "noMessages": "No messages yet — say hello!",
     "loginPrompt": "Sign in to see your messages",
-    "sendFailed": "Message not sent — try again"
+    "sendFailed": "Message not sent — try again",
+    "unavailable": "This conversation is not available"
   },
   "property": {
     "beds": "beds",
@@ -557,7 +558,9 @@
       "requested": "Requested",
       "confirmed": "Confirmed",
       "declined": "Declined",
-      "cancelled": "Cancelled"
+      "cancelled": "Cancelled",
+      "completed": "Completed",
+      "no_show": "No-show"
     }
   },
   "saved": {
