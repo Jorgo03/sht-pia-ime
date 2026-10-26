@@ -16,7 +16,7 @@ import { useTranslation } from 'react-i18next';
 import { AppHeader } from '@/components/ui/app-header';
 import { ScreenHero } from '@/components/ui/screen-hero';
 import { GradientBackground } from '@/components/ui/gradient-background';
-import { type AtticoPalette, Fonts } from '@/constants/theme';
+import { type AtticoPalette, Fonts, Radii } from '@/constants/theme';
 import { useFavorites } from '@/contexts/favorites-context';
 import { useTheme } from '@/contexts/theme-context';
 import { Property } from '@/data/types';
@@ -30,7 +30,7 @@ import { formatPrice, getLocalizedText, priceSuffixKey } from '@/lib/format';
 export default function FavoritesScreen() {
   const router = useRouter();
   const { t, i18n } = useTranslation();
-  const { favoriteProperties, loading, toggle } = useFavorites();
+  const { favoriteProperties, loading, error, reload, toggle } = useFavorites();
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
 
@@ -55,6 +55,18 @@ export default function FavoritesScreen() {
         {loading ? (
           <View style={styles.center}>
             <ActivityIndicator size="large" color={colors.accent} />
+          </View>
+        ) : error && favoriteProperties.length === 0 ? (
+          <View style={styles.center}>
+            <MaterialIcons name="cloud-off" size={36} color={colors.textSecondary} />
+            <Text style={styles.emptyText}>{t('favourites.loadFailed')}</Text>
+            <TouchableOpacity
+              accessibilityRole="button"
+              style={styles.retryBtn}
+              onPress={reload}
+              activeOpacity={0.85}>
+              <Text style={styles.retryText}>{t('common.retry')}</Text>
+            </TouchableOpacity>
           </View>
         ) : favoriteProperties.length === 0 ? (
           <View style={styles.center}>
@@ -163,6 +175,21 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     color: colors.textSecondary,
     textAlign: 'center',
     paddingHorizontal: 24,
+  },
+  retryBtn: {
+    marginTop: 14,
+    minHeight: 44,
+    paddingHorizontal: 22,
+    borderRadius: Radii.pill,
+    borderWidth: 1,
+    borderColor: colors.accent,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  retryText: {
+    fontFamily: Fonts.sansSemiBold,
+    fontSize: 14,
+    color: colors.accentText,
   },
   list: {
     paddingHorizontal: 20,

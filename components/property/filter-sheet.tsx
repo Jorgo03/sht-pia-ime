@@ -13,7 +13,7 @@ import {
   useWindowDimensions,
   View,
 } from 'react-native';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import { GestureDetector, usePanGesture } from 'react-native-gesture-handler';
 import Animated, {
   runOnJS,
   useAnimatedStyle,
@@ -178,7 +178,7 @@ export function FilterSheet({
   // and only while the sheet is open. Shares a cache entry with Explore's
   // own count for the same filters — reopening the sheet right after
   // Explore loaded shows the number instantly, no network round-trip.
-  const { data: count } = usePropertiesCountQuery(queryFilters, visible);
+  const { data: count, isError: countFailed } = usePropertiesCountQuery(queryFilters, visible);
 
   // Drag-to-dismiss, driven by react-native-gesture-handler + reanimated
   // (both already app dependencies, so no new one added). The pan is
@@ -195,12 +195,12 @@ export function FilterSheet({
 
   const closeSheet = () => onClose();
 
-  const panGesture = Gesture.Pan()
-    .onUpdate((e) => {
+  const panGesture = usePanGesture({
+    onUpdate: (e) => {
       // eslint-disable-next-line react-hooks/immutability -- Reanimated SharedValue: assigning .value IS its API, and it is a worklet value, not React state. The compiler rule does not model SharedValue.
       translateY.value = Math.max(0, e.translationY);
-    })
-    .onEnd((e) => {
+    },
+    onDeactivate: (e) => {
       if (translateY.value > 120 || e.velocityY > 800) {
         // eslint-disable-next-line react-hooks/immutability -- Reanimated SharedValue: assigning .value IS its API, and it is a worklet value, not React state. The compiler rule does not model SharedValue.
         translateY.value = withTiming(800, { duration: 200 }, () => {
@@ -209,7 +209,8 @@ export function FilterSheet({
       } else {
         translateY.value = withSpring(0, { damping: 22, stiffness: 300 });
       }
-    });
+    },
+  });
 
   const sheetAnimatedStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: translateY.value }],
@@ -459,9 +460,12 @@ export function FilterSheet({
             style={styles.ctaGradient}
           />
           <Text style={styles.ctaText}>
-            {count == null
-              ? t('common.loading')
-              : t('search.showHomes', { count })}
+            {/* A failed count is not "loading" forever: the button still applies the filters. */}
+            {count != null
+              ? t('search.showHomes', { count })
+              : countFailed
+                ? t('search.showHomesAny')
+                : t('common.loading')}
           </Text>
         </Pressable>
           <KeyboardDoneBar />

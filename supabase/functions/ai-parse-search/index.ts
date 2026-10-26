@@ -101,8 +101,9 @@ Deno.serve(async (req) => {
         max_tokens: 300,
         system:
           'Parse real-estate search queries for an Albanian property marketplace into structured filters. ' +
-          'Queries are usually Albanian but may be any language. Prices are EUR unless stated otherwise ' +
-          '(convert "100 mijë"/"100k" to 100000). "dhoma"/"dhomë" = bedrooms; "2+1" means 2 bedrooms. ' +
+          'Queries are usually Albanian but may be any language. Give prices in the currency the user ' +
+          'named and set currency: "lekë"/"lek"/"ALL" = ALL, "$"/"dollarë"/"USD" = USD, otherwise EUR ' +
+          '(convert "100 mijë"/"100k" to 100000, "15 milionë" to 15000000). "dhoma"/"dhomë" = bedrooms; "2+1" means 2 bedrooms. ' +
           '"me qira" = rent, "në shitje"/"per shitje" = sale, "qira ditore" = daily_rent. ' +
           'Only set fields the user actually specified — never guess.',
         messages: [{ role: 'user', content: q }],
@@ -117,6 +118,7 @@ Deno.serve(async (req) => {
               property_type: { type: 'string', enum: ['apartment', 'villa', 'house', 'land', 'commercial', 'office', 'garage'] },
               min_price: { type: 'number' },
               max_price: { type: 'number' },
+              currency: { type: 'string', enum: ['EUR', 'ALL', 'USD'], description: 'Currency of min_price and max_price' },
               beds: { type: 'number', description: 'Minimum bedrooms' },
             },
           },

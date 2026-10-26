@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Plus, BarChart3, Eye, Pause, Play, Trash2, Pencil, CircleCheck } from 'lucide-react'
 import { useAuth } from '../../auth/AuthContext'
@@ -24,6 +24,9 @@ export default function MyListings() {
   const { t, i18n } = useTranslation()
   const { user } = useAuth()
   const navigate = useNavigate()
+  const location = useLocation()
+  // Languages a just-saved listing could not be translated into (NewListing).
+  const [translationFailed, setTranslationFailed] = useState(() => location.state?.translationFailed ?? [])
   const [listings, setListings] = useState([])
   const [loading, setLoading] = useState(true)
   // A failed read: shown with a retry rather than as an empty list.
@@ -88,6 +91,16 @@ export default function MyListings() {
           className="flex items-center gap-1.5 rounded-[10px] border-none bg-[linear-gradient(135deg,var(--fho-orange-1),var(--fho-orange-2))] px-4 py-2 text-[13px] font-semibold text-white"
         ><Plus size={16} /> {t('listing.newListing')}</button>
       </div>
+
+      {translationFailed.length > 0 && (
+        <div role="status" className="mb-3 flex items-start justify-between gap-3 rounded-xl border border-fho-border bg-fho-surface p-3 text-[13px] text-fho-text">
+          <span>
+            <strong className="block">{t('ai.translationPartialTitle')}</strong>
+            {t('ai.translationPartial', { langs: translationFailed.map((l) => String(l).toUpperCase()).join(', ') })}
+          </span>
+          <button type="button" onClick={() => setTranslationFailed([])} aria-label={t('common.close')} className="border-none bg-transparent p-1 text-fho-text-muted">×</button>
+        </div>
+      )}
 
       {actionError && (
         <div className="addsheet-toast" role="alert" onClick={() => setActionError(false)}>{t('errors.updateFailed')}</div>

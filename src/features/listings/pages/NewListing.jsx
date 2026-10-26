@@ -519,7 +519,8 @@ export default function NewListing() {
         const removed = removedMediaPaths({ before: originalMedia.current, after: [...imageUrls, videoUrl], userId: user.id })
         if (removed.length) await supabase.storage.from('property-images').remove(removed).catch(() => {})
       }
-      navigate('/my-listings')
+      // Saved either way; My Listings says which languages failed.
+      navigate('/my-listings', translated.failed.length ? { state: { translationFailed: translated.failed } } : undefined)
     } catch (err) {
       // Insert failed after upload succeeded — remove the now-orphaned files.
       if (!err?.uploadFailed && uploadedPaths.length) {
@@ -843,7 +844,7 @@ export default function NewListing() {
                   <div key={i} className="nl-image-thumb">
                     <img src={img.preview} alt="" />
                     {i === 0 && <span className="nl-cover-badge">{t('listing.cover')}</span>}
-                    <button className="nl-image-remove" onClick={() => removeImage(i)} aria-label={t('common.close')}><X size={12} /></button>
+                    <button className="nl-image-remove" onClick={() => removeImage(i)} aria-label={t('listing.removePhoto')}><X size={12} /></button>
                   </div>
                 ))}
               </div>
@@ -855,9 +856,9 @@ export default function NewListing() {
                   <Film size={18} style={{ color: 'var(--fho-orange-1)', flexShrink: 0 }} />
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--fho-text)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{video.existing ? t('listing.currentVideo') : video.file.name}</div>
-                    {!video.existing && <div style={{ fontSize: 11, color: 'var(--fho-text-muted)' }}>{(video.file.size / (1024 * 1024)).toFixed(1)} MB</div>}
+                    {!video.existing && <div style={{ fontSize: 11, color: 'var(--fho-text-muted)' }}>{t('listing.fileSizeMb', { size: (video.file.size / (1024 * 1024)).toFixed(1) })}</div>}
                   </div>
-                  <button className="nl-image-remove" style={{ position: 'static' }} onClick={removeVideo} aria-label={t('common.close')}><X size={12} /></button>
+                  <button className="nl-image-remove" style={{ position: 'static' }} onClick={removeVideo} aria-label={t('listing.removeVideo')}><X size={12} /></button>
                 </div>
               ) : (
                 <div

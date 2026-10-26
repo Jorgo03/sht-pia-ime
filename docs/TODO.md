@@ -1,8 +1,8 @@
 # Shtëpia.ime: to-do list
 
-Updated 2026-10-26, on master `02c75f8`. Sources:
+Updated 2026-10-26 (Pass 21). Sources:
 - `docs/PLANI_I_PUBLIKIMIT.md`, the step-by-step launch plan, in Albanian;
-- `AUDIT.md` passes 18–19;
+- `AUDIT.md` passes 18–21;
 - `DECISIONS.md`.
 
 **Who does what:** **You** (owner), **Me** (Claude), **Both** (together).
@@ -18,6 +18,10 @@ Updated 2026-10-26, on master `02c75f8`. Sources:
   - a draft;
   - the profile photo;
   - "U krye".
+- [ ] **You:** On the Samsung A23, also try Pass 21:
+  - swipe the filter sheet and the other sheets down to close them;
+  - Google sign-in on the same Wi-Fi (an Expo tunnel is now refused on
+    purpose, so use LAN or the phone hotspot).
 - [ ] **You:** On a phone, try what the other session fixed (Pass 19), which
   no phone has tested yet:
   - signing out offline;
@@ -26,22 +30,6 @@ Updated 2026-10-26, on master `02c75f8`. Sources:
 
 ## Engineering I can do now (no purchase, no approval)
 
-- [ ] **Me, P2 security:** the sign-in relay accepts any `exp://` host. Limit it
-  to local-network addresses and the exact callback path.
-  - **Decision for you:** should Google sign-in keep working over Expo tunnels
-    (`*.exp.direct`)? Anyone can register those, so allowing them is less safe.
-- [ ] **Me, P3:**
-  - report failed translations when a listing is published;
-  - translate the English text left in the photo step of the wizard;
-  - map and filter counts show "no results" when loading fails;
-  - the Favorites screen has no error state;
-  - the push-token record is dropped too early on sign-out;
-  - alert emails have no `List-Unsubscribe` header;
-  - AI search has no currency field.
-- [ ] **Me:** move the bottom sheet and filter sheet from `Gesture.Pan()`
-  (deprecated in gesture-handler 3) to `usePanGesture`.
-- [ ] **Me:** full WebCrypto on the phone, so Google sign-in uses SHA-256 PKCE
-  instead of `plain`.
 - [ ] **Me (optional):** at 320 px the step dots in the listing wizard nearly
   touch the right edge.
 
@@ -59,8 +47,12 @@ transaction before you approve it.
   - there are no server-side length limits on names, messages and viewing
     notes;
   - the map's county totals come from a 200-row sample: add an aggregate.
-- [ ] **You approve, then me:** deploy four Edge Functions: `saved-search-alerts`,
-  `ai-listing-assistant`, `delete-account` and `saved-search-unsubscribe`.
+- [ ] **You approve, then me:** deploy five Edge Functions:
+  - `saved-search-alerts` (now with the unsubscribe headers);
+  - `ai-parse-search` (now understands lekë and dollars);
+  - `ai-listing-assistant`;
+  - `delete-account`;
+  - `saved-search-unsubscribe`.
 - [ ] **You:** click the waiting Supabase confirmations:
   - delete the two test accounts;
   - `plans_by_period_months.sql`, needed before payments.
@@ -117,6 +109,17 @@ transaction before you approve it.
 
 ## Recently done
 
+- [x] Pass 21, the no-cost list (2026-10-26):
+  - the sign-in relay accepts only the app's own callback on a private
+    network;
+  - publishing reports translations that failed;
+  - the photo step is translated;
+  - Favorites and the map have error states with Retry;
+  - the push token is kept until its row is deleted;
+  - alert emails have one-click unsubscribe;
+  - AI search understands lekë and dollars;
+  - the sheets use `usePanGesture`;
+  - Google sign-in uses SHA-256 PKCE on the phone.
 - [x] Launch animation: the logo's door opens onto a warm room, then fades into the app (`components/brand/door-splash.tsx`). Seen and approved by the owner on the phone (2026-10-26).
 
 - [x] SDK 58 upgrade; the app opens in Expo Go on iPhone and Android.

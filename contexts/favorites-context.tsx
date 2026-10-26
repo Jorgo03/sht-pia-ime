@@ -19,6 +19,9 @@ interface FavoritesContextValue {
   favoriteIds: Set<string>;
   favoriteProperties: Property[];
   loading: boolean;
+  /** The last load failed; what is shown is the last good one (or nothing). */
+  error: boolean;
+  reload: () => void;
   isFavorite: (propertyId: string) => boolean;
   toggle: (propertyId: string) => void;
 }
@@ -31,6 +34,9 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
   const [favoriteIds, setFavoriteIds] = useState<Set<string>>(new Set());
   const [favoriteProperties, setFavoriteProperties] = useState<Property[]>([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
+  // The account the shown favourites belong to.
+  const loadedFor = useRef<string | null>(null);
   // The account the latest fetch is for. A slow fetch for an account that
   // has signed out since must not put its hearts back on this phone.
   const fetchingFor = useRef<string | null>(null);
@@ -39,11 +45,14 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
     const uid = user?.id ?? null;
     fetchingFor.current = uid;
     if (!uid) {
+      loadedFor.current = null;
       setFavoriteIds(new Set());
       setFavoriteProperties([]);
+      setError(false);
       return;
     }
     setLoading(true);
+    setError(false);
     try {
       const { data, error } = await supabase
         .from('favorites')
@@ -58,12 +67,17 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
         .filter(Boolean) as Property[];
       const ids = new Set(props.map((p) => p.id));
 
+      loadedFor.current = uid;
       setFavoriteIds(ids);
       setFavoriteProperties(props);
     } catch {
       if (fetchingFor.current !== uid) return;
-      setFavoriteIds(new Set());
-      setFavoriteProperties([]);
+      setError(true);
+      // A failed reload keeps this account's hearts; another account's never stay.
+      if (loadedFor.current !== uid) {
+        setFavoriteIds(new Set());
+        setFavoriteProperties([]);
+      }
     } finally {
       if (fetchingFor.current === uid) setLoading(false);
     }
@@ -152,6 +166,8 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
         favoriteIds,
         favoriteProperties,
         loading,
+        error,
+        reload: fetchFavorites,
         isFavorite: isFav,
         toggle,
       }}>

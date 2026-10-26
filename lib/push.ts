@@ -16,6 +16,7 @@ import { Platform } from 'react-native';
 import { isExpoGoAndroid, Notifications } from '@/lib/notifications-module';
 import { supabase } from '@/lib/supabase';
 import type { DevicePermission } from '@/src/features/notifications/lib/deviceState';
+import { forgetToken } from '@/src/features/notifications/lib/forgetToken';
 
 const TOKEN_KEY = 'fho_push_token';
 
@@ -124,13 +125,12 @@ export async function refreshPushRegistration(): Promise<void> {
 
 /** Forget this device for the signed-in person. Call before signing out. */
 export async function forgetDevice(): Promise<void> {
-  const token = await AsyncStorage.getItem(TOKEN_KEY).catch(() => null);
-  if (!token) return;
-  await supabase.from('push_tokens').delete().eq('token', token).then(
-    () => undefined,
-    () => undefined,
-  );
-  await AsyncStorage.removeItem(TOKEN_KEY).catch(() => {});
+  // The record is cleared only once the server row is gone; see forgetToken.
+  await forgetToken({
+    readToken: () => AsyncStorage.getItem(TOKEN_KEY),
+    deleteRow: (token) => supabase.from('push_tokens').delete().eq('token', token),
+    clearToken: () => AsyncStorage.removeItem(TOKEN_KEY),
+  });
 }
 
 /**

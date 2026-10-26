@@ -7,7 +7,7 @@ import {
   useWindowDimensions,
   View,
 } from 'react-native';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import { GestureDetector, usePanGesture } from 'react-native-gesture-handler';
 import Animated, {
   runOnJS,
   useAnimatedStyle,
@@ -65,12 +65,12 @@ export function BottomSheet({
 
   const close = () => onClose();
 
-  const pan = Gesture.Pan()
-    .onUpdate((e) => {
+  const pan = usePanGesture({
+    onUpdate: (e) => {
       // eslint-disable-next-line react-hooks/immutability -- Reanimated SharedValue: assigning .value IS its API, and it is a worklet value, not React state. The compiler rule does not model SharedValue.
       translateY.value = Math.max(0, e.translationY);
-    })
-    .onEnd((e) => {
+    },
+    onDeactivate: (e) => {
       if (translateY.value > dismissThreshold || e.velocityY > 800) {
         // eslint-disable-next-line react-hooks/immutability -- Reanimated SharedValue: assigning .value IS its API, and it is a worklet value, not React state. The compiler rule does not model SharedValue.
         translateY.value = withTiming(sheetHeight, { duration: 200 }, () => {
@@ -79,7 +79,8 @@ export function BottomSheet({
       } else {
         translateY.value = withSpring(0, { damping: 22, stiffness: 300 });
       }
-    });
+    },
+  });
 
   const sheetStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: translateY.value }],

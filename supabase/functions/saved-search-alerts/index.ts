@@ -20,7 +20,7 @@
 // see docs/ACCOUNT_AND_RELEASE_HANDOFF.md.
 
 import { createClient } from 'npm:@supabase/supabase-js@2';
-import { applySavedFilters, buildAlertEmail, dedupeKey, dispatchEnabled, windowStart } from './logic.js';
+import { applySavedFilters, buildAlertEmail, dedupeKey, dispatchEnabled, unsubscribeHeaders, windowStart } from './logic.js';
 
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
 const SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
@@ -160,7 +160,14 @@ async function send(): Promise<{ sent: number; failed: number }> {
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ from, to: [to], subject: m.subject, text: m.body_text, html: m.body_html }),
+      body: JSON.stringify({
+        from,
+        to: [to],
+        subject: m.subject,
+        text: m.body_text,
+        html: m.body_html,
+        headers: unsubscribeHeaders(m.body_text, SUPABASE_URL),
+      }),
       signal: AbortSignal.timeout(15_000),
     }).catch((e) => ({ ok: false, status: 0, text: async () => String(e) }) as Response);
     if (res.ok) {
