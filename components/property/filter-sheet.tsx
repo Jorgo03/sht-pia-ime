@@ -108,6 +108,9 @@ function Segment({
         return (
           <Pressable
             accessibilityRole="button"
+            // The active option is only drawn as a gradient; say it too, as
+            // the Chip beside it does.
+            accessibilityState={{ selected: isActive }}
             key={opt.value}
             onPress={() => onChange(opt.value)}
             style={styles.segment}>
