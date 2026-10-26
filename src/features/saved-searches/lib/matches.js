@@ -8,8 +8,9 @@
 //
 // The filter rules mirror the Search page (useProperties.applyFilters) for the
 // keys a saved search can hold: city, zone (only with its city), listing_type,
-// type, minPrice, maxPrice, beds.
+// type, minPrice, maxPrice (euros, across listing currencies), beds.
 
+import { applyPriceRange } from '../../properties/lib/priceRange.js'
 import { validZone } from '../../properties/lib/searchFilters.js'
 
 const toNumber = (value) => {
@@ -26,11 +27,8 @@ export function applySavedFilters(query, filters) {
   if (zone) query = query.eq('zone', zone)
   if (f.listing_type) query = query.eq('listing_type', f.listing_type)
   if (f.type && f.type !== 'all') query = query.eq('property_type', f.type)
-  const minPrice = toNumber(f.minPrice)
-  const maxPrice = toNumber(f.maxPrice)
+  query = applyPriceRange(query, { minPrice: f.minPrice, maxPrice: f.maxPrice })
   const beds = toNumber(f.beds)
-  if (minPrice !== null) query = query.gte('price', minPrice)
-  if (maxPrice !== null) query = query.lte('price', maxPrice)
   if (beds !== null) query = query.gte('beds', beds)
   return query
 }

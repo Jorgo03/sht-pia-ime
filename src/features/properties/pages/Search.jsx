@@ -69,7 +69,7 @@ export default function Search() {
 
   const rangesValid = !priceInvalid && !areaInvalid
 
-  const { properties, loading, loadingMore, error, hasMore, loadMore, totalCount } = useProperties({
+  const { properties, loading, loadingMore, loadMoreFailed, error, hasMore, loadMore, totalCount } = useProperties({
     filter: propertyType || 'all',
     listingType: listingType || null,
     city: debouncedSearch || city || null,
@@ -228,9 +228,12 @@ export default function Search() {
           <div className="property-grid" style={{ padding: 0 }}>
             {properties.map(p => <PropertyCard key={p.id} property={p} />)}
           </div>
+          {hasMore && loadMoreFailed && (
+            <div className="filter-warning" role="alert"><AlertCircle size={12} /> {t('errors.generic')}</div>
+          )}
           {hasMore && (
             <button className="load-more-btn" onClick={loadMore} disabled={loadingMore}>
-              {loadingMore ? t('common.loading') : t('common.viewAll')}
+              {loadingMore ? t('common.loading') : loadMoreFailed ? t('common.retry') : t('common.viewAll')}
             </button>
           )}
         </div>

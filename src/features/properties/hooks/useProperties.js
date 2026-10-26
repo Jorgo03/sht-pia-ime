@@ -1,8 +1,9 @@
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useRef } from 'react'
 import { supabase } from '../../../lib/supabase'
+import { applyPriceRange } from '../lib/priceRange'
 import { applyZoneAndRef } from '../lib/searchFilters'
 
-const PAGE_SIZE = 20
+const PAGE_SIZE = 24
 
 const SORTS = {
   newest: { column: 'created_at', ascending: false },
@@ -18,8 +19,8 @@ function applyFilters(query, { filter, listingType, city, zone, refCode, minPric
   if (filter && filter !== 'all') query = query.eq('property_type', filter)
   if (listingType) query = query.eq('listing_type', listingType)
   if (city) query = query.ilike('city', `%${city}%`)
-  if (minPrice != null) query = query.gte('price', minPrice)
-  if (maxPrice != null) query = query.lte('price', maxPrice)
+  // Euros, compared per listing currency (lib/priceRange.js).
+  query = applyPriceRange(query, { minPrice, maxPrice })
   if (beds != null) query = query.gte('beds', beds)
   if (baths != null) query = query.gte('baths', baths)
   // `sqft` is the surface column; it stores m², which is what the UI labels it.
@@ -35,7 +36,10 @@ function buildQuery(filters) {
       .from('properties')
       .select('*')
       .eq('status', 'active')
-      .order(order.column, { ascending: order.ascending }),
+      .order(order.column, { ascending: order.ascending })
+      // Rows with the same price or date have no order of their own, so the
+      // pages of one search could repeat or skip them; the id settles it.
+      .order('id', { ascending: true }),
     filters,
   )
 }
@@ -59,11 +63,19 @@ export function useProperties({ filter = 'all', listingType = null, city = null,
   const [loadingMore, setLoadingMore] = useState(false)
   const [error, setError] = useState(null)
   const [hasMore, setHasMore] = useState(false)
+  const [loadMoreFailed, setLoadMoreFailed] = useState(false)
   const [totalCount, setTotalCount] = useState(0)
+  // Bumped whenever the filters change, so a "load more" page that was still
+  // on its way for the previous filters is dropped instead of being appended
+  // to the new results.
+  const generation = useRef(0)
 
   useEffect(() => {
     let active = true
+    generation.current += 1
     setLoading(true)
+    setLoadingMore(false)
+    setLoadMoreFailed(false)
     setError(null)
 
     const filters = { filter, listingType, city, zone, refCode, minPrice, maxPrice, beds, baths, minArea, maxArea, sort }
@@ -97,19 +109,28 @@ export function useProperties({ filter = 'all', listingType = null, city = null,
 
   const loadMore = useCallback(() => {
     if (!paginate || loadingMore || !hasMore) return
+    const requested = generation.current
     setLoadingMore(true)
+    setLoadMoreFailed(false)
 
     const query = buildQuery({ filter, listingType, city, zone, refCode, minPrice, maxPrice, beds, baths, minArea, maxArea, sort })
     query.range(properties.length, properties.length + PAGE_SIZE - 1)
-      .then(({ data }) => {
-        const newItems = data || []
-        setProperties(prev => [...prev, ...newItems])
-        setHasMore(newItems.length === PAGE_SIZE)
+      .then(({ data, error: err }) => {
+        if (requested !== generation.current) return
+        if (err) {
+          // Keep hasMore, so the same button offers to try again.
+          console.error('useProperties loadMore failed:', err.message)
+          setLoadMoreFailed(true)
+        } else {
+          const newItems = data || []
+          setProperties(prev => [...prev, ...newItems.filter(p => !prev.some(q => q.id === p.id))])
+          setHasMore(newItems.length === PAGE_SIZE)
+        }
         setLoadingMore(false)
       })
   }, [filter, listingType, city, zone, refCode, minPrice, maxPrice, beds, baths, minArea, maxArea, paginate, sort, loadingMore, hasMore, properties.length])
 
-  return { properties, loading, loadingMore, error, hasMore, loadMore, totalCount }
+  return { properties, loading, loadingMore, loadMoreFailed, error, hasMore, loadMore, totalCount }
 }
 
 export function usePropertiesByIds(ids = []) {

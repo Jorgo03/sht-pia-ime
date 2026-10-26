@@ -1,9 +1,10 @@
 import { supabase } from '@/lib/supabase';
+import { applyPriceRange } from '@/src/features/properties/lib/priceRange';
 import { applyZoneAndRef } from '@/src/features/properties/lib/searchFilters';
 
 import { Property, PropertyFilters, PropertySort } from './types';
 
-export const PAGE_SIZE = 20;
+export const PAGE_SIZE = 24;
 
 /** Upper bound on markers fetched for the map — panning must never trigger an
  *  unbounded fetch, and more pins than this is unreadable anyway. */
@@ -39,8 +40,8 @@ function applyFilters(query: any, f: PropertyFilters): any {
   if (f.propertyType) q = q.eq('property_type', f.propertyType);
   if (f.listingType) q = q.eq('listing_type', f.listingType);
   if (f.city) q = q.ilike('city', `%${f.city}%`);
-  if (f.minPrice != null) q = q.gte('price', f.minPrice);
-  if (f.maxPrice != null) q = q.lte('price', f.maxPrice);
+  // The sheet's min/max are euros; listings can be priced in ALL or USD too.
+  q = applyPriceRange(q, f);
   if (f.beds != null) q = q.gte('beds', f.beds);
   if (f.baths != null) q = q.gte('baths', f.baths);
   // `sqft` holds m², matching the surface labels in the UI.
@@ -69,7 +70,10 @@ function baseQuery(filters: PropertyFilters) {
       .from('properties')
       .select(LIST_COLUMNS)
       .eq('status', 'active')
-      .order(order.column, { ascending: order.ascending }),
+      .order(order.column, { ascending: order.ascending })
+      // Ties (same price, same publish time) have no order of their own, so
+      // consecutive pages could repeat or skip them; the id settles it.
+      .order('id', { ascending: true }),
     filters,
   );
 }

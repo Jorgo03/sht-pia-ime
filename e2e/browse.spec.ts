@@ -1,4 +1,4 @@
-import { LISTINGS } from './support/fixtures';
+import { LEK_LISTING, LISTINGS } from './support/fixtures';
 import { t } from './support/i18n';
 import { expect, test } from './support/test';
 
@@ -6,7 +6,10 @@ import { expect, test } from './support/test';
 
 test('F01-H1 home shows the listings', async ({ page }) => {
   await page.goto('/');
-  for (const listing of LISTINGS) {
+  // The newest is featured and the next six fill the rail (Home.jsx); search
+  // lists every listing (F01-H2).
+  const newest = [...LISTINGS].sort((a, b) => String(b.created_at).localeCompare(String(a.created_at))).slice(0, 7);
+  for (const listing of newest) {
     await expect(page.getByRole('heading', { name: listing.title, level: 3 }).first()).toBeVisible();
   }
 });
@@ -24,6 +27,14 @@ test('F01-H3 opening a card goes to its detail page', async ({ page }) => {
   await page.getByRole('link', { name: listing.title, exact: true }).click();
   await expect(page).toHaveURL(`/property/${listing.id}`);
   await expect(page.getByRole('heading', { name: listing.title, level: 1 })).toBeVisible();
+});
+
+test('F01-H4 a price range in euros also finds a listing priced in lek', async ({ page }) => {
+  await page.goto('/search?maxPrice=200000');
+  await expect(page.getByRole('link', { name: LEK_LISTING.title, exact: true })).toBeVisible();
+  await page.goto('/search?maxPrice=120000');
+  await expect(page.getByRole('link', { name: LISTINGS[0].title, exact: true })).toBeVisible();
+  await expect(page.getByRole('link', { name: LEK_LISTING.title, exact: true })).toBeHidden();
 });
 
 test('F01-E1 search still answers when the AI search is down', async ({ page }) => {

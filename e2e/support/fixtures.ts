@@ -92,9 +92,13 @@ export const LISTINGS: Listing[] = [
   listing(5, { title: 'Apartament 1+1 nga pronari', contact_phone: '0692000005', ...owner(5) }),
   listing(6, { title: 'Apartament me tarracë', contact_phone: '+ 069 20 00 006', ...owner(6) }),
   listing(7, { title: 'Shtëpi për diasporën', contact_phone: '+39 333 000 0007', ...owner(7) }),
+  // Priced in lek: 15,000,000 ALL is about €153,000, so it belongs in a euro
+  // search up to €200,000 and not in one up to €120,000.
+  listing(8, { title: 'Apartament me çmim në lekë', currency: 'ALL', price: 15_000_000 }),
 ];
 
 export const AGENT_LISTING = LISTINGS[0];
+export const LEK_LISTING = LISTINGS[7];
 export const OWNER_LISTINGS = LISTINGS.filter((l) => !l.agent);
 export const MISSING_ID = 'e2e00000-0000-4000-b000-00000000dead';
 
