@@ -269,7 +269,8 @@
     "noMessages": "Brak wiadomości — przywitaj się!",
     "loginPrompt": "Zaloguj się, aby zobaczyć wiadomości",
     "sendFailed": "Wiadomość nie została wysłana — spróbuj ponownie",
-    "unavailable": "Ta rozmowa jest niedostępna"
+    "unavailable": "Ta rozmowa jest niedostępna",
+    "loadFailed": "Nie udało się wczytać tej rozmowy."
   },
   "notFound": {
     "title": "Nie znaleziono strony",

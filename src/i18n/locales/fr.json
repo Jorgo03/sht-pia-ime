@@ -261,7 +261,8 @@
     "noMessages": "Pas encore de messages — dites bonjour !",
     "loginPrompt": "Connectez-vous pour voir vos messages",
     "sendFailed": "Message non envoyé — réessayez",
-    "unavailable": "Cette conversation n'est pas disponible"
+    "unavailable": "Cette conversation n'est pas disponible",
+    "loadFailed": "Impossible de charger cette conversation."
   },
   "notFound": {
     "title": "Page introuvable",

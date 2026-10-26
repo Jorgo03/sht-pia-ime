@@ -118,6 +118,24 @@ Inbox vs Spam placement, SPF/DKIM/DMARC (no domain), the hosted Site URL and
 redirect list (dashboard only), the new templates in the dashboard (not yet
 pasted), native iOS/Android password autofill on a device.
 
+### Follow-up: messaging slice (one of the six Pass 19 left unaudited)
+
+- **P2 — A failed message load looked like an empty conversation**, both
+  apps (`data ?? []` → "No messages yet", no error, no retry). Fixed: shared
+  `src/features/messaging/lib/thread.js` reports the failure; both threads
+  show `messages.loadFailed` with Retry.
+- **P2 — The phone thread called a dropped connection "This conversation is
+  not available"**: only PostgREST's no-row answer (PGRST116) means that now;
+  anything else gets the retry.
+- **P3 — Thread history loaded unbounded** (CLAUDE.md: no unbounded
+  fetches): now the newest 200, shown oldest first; realtime arrivals during
+  the load are kept, never duplicated. Message box labelled (website).
+- Tests: unit `thread` (3), e2e `messages.spec.ts` M-N1 × 2. `npm test`
+  319/319, `test:e2e` 202 passed / 2 skipped, `test:e2e:expo` 107 / 13,
+  lint 0 errors, tsc clean.
+- Still unaudited: account tools, shared core/i18n, website shell, build
+  config, phone UX/a11y.
+
 ## ═══ PASS 19 — 2026-10-25/26: FULL AUDIT (owner master prompt) ═══
 
 **Method.** Baseline first, then four slice auditors (backend, search/map,

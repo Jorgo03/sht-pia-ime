@@ -253,7 +253,8 @@
     "noMessages": "Noch keine Nachrichten — sag hallo!",
     "loginPrompt": "Melde dich an, um deine Nachrichten zu sehen",
     "sendFailed": "Nachricht nicht gesendet — bitte erneut versuchen",
-    "unavailable": "Dieses Gespräch ist nicht verfügbar"
+    "unavailable": "Dieses Gespräch ist nicht verfügbar",
+    "loadFailed": "Diese Unterhaltung konnte nicht geladen werden."
   },
   "notFound": {
     "title": "Seite nicht gefunden",

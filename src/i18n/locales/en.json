@@ -284,7 +284,8 @@
     "noMessages": "No messages yet — say hello!",
     "loginPrompt": "Sign in to see your messages",
     "sendFailed": "Message not sent — try again",
-    "unavailable": "This conversation is not available"
+    "unavailable": "This conversation is not available",
+    "loadFailed": "Couldn't load this conversation."
   },
   "property": {
     "beds": "beds",
