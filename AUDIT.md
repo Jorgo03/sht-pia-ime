@@ -164,8 +164,53 @@ pasted), native iOS/Android password autofill on a device.
 - Tests: unit `thread` (3), e2e `messages.spec.ts` M-N1 × 2. `npm test`
   319/319, `test:e2e` 202 passed / 2 skipped, `test:e2e:expo` 107 / 13,
   lint 0 errors, tsc clean.
-- Still unaudited: account tools, shared core/i18n, website shell, build
-  config, phone UX/a11y.
+- The four remaining slices are covered below (2026-10-27), so all six
+  Pass 19 left open have now had an audit.
+
+### Follow-up: shared core / i18n, website shell, build config, UX/a11y (2026-10-27)
+
+- **i18n:** 8 locales, same keys apart from plural forms (pl/ru `_few`/
+  `_many`, by design, `localePlurals` test), no empty strings, `{{…}}`
+  placeholders identical in every language. One English leftover fixed:
+  sq `addSheet.agent.open.title` "Open house" → "Ditë e hapur".
+  `lib/format.ts` and `src/lib/format.js` share all five helpers CLAUDE.md
+  names; the other differences are platform-only on purpose.
+- **P2 — No security headers on either website** (live check: Vercel adds
+  only HSTS). A page with a password form could be framed by any site
+  (clickjacking). Both `vercel.json` files now send `X-Frame-Options: DENY`,
+  `Content-Security-Policy: frame-ancestors 'none'`, `X-Content-Type-Options:
+  nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`
+  (`tests/securityHeaders.test.mjs`). No full CSP: the sites load fonts,
+  Leaflet CSS and Supabase from elsewhere; a wrong CSP would blank them.
+- **P2 — Signed-in pages were never scanned for accessibility.** New scans,
+  both themes: website `/profile`, `/messages`, `/favorites`, `/viewings`,
+  `/my-listings`, `/saved-searches` (24), app the same five lists (20).
+  They found, and these now pass:
+  - Sign out (and Delete, phone) red `#dc3545`: 3.9:1 light, 4.3:1 dark →
+    `--fho-signout` / `colors.signOut` `#b42330` / `#f26d78` (≥ 5.6:1).
+  - Light status badges as text: active `#5b8a5a` 3.7:1, paused `#d4a23a`
+    2.2:1, draft `#7f7a72` 4.0:1 → `#3d6b3c`, `#8a6414`, `#66625b`
+    (≥ 5.0:1), in `theme.css` and `constants/theme.ts` together.
+  - Website saved-search match badge, white on orange 2.6:1 → dark text
+    (7.0:1). The selected-pill white-on-orange stays the open owner decision
+    (F16, `KNOWN` in the app scan).
+- Verification: `npm test` 334/334, `test:e2e` 234 passed / 2 skipped,
+  `test:e2e:expo` 133 passed / 13 skipped, lint 0 errors, tsc clean.
+  Not seen by a person: the new reds and status colours on a real screen.
+
+### Follow-up: account tools slice
+
+- **P2 — Seven account screens showed a failed load as "nothing here"**:
+  phone Viewings, My Listings, Saved searches; website Messages list, My
+  Listings, Viewings, Saved searches (`data ?? []` with the error ignored).
+  An agent whose leads failed to load was told there were none. Fixed:
+  `components/ui/load-error.tsx` and `src/shared/LoadError.jsx`
+  (`errors.loadFailed`, 8 languages, Retry) on every one.
+- Tests: e2e A-N1 × 3 pages × 2 viewports (website), X33 × 3 × 2 (app).
+  `test:e2e` 208 passed / 2 skipped, `test:e2e:expo` 112 passed / 13
+  skipped plus X24 (price row at 320px, dark) failing once in the full run,
+  then passing 3/3 alone with these changes and 1/1 without them: a flaky
+  layout measurement, not this change. `npm test` 319/319, lint 0 errors.
 
 ## ═══ PASS 19 — 2026-10-25/26: FULL AUDIT (owner master prompt) ═══
 

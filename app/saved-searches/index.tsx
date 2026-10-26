@@ -1,3 +1,4 @@
+import { LoadError } from '@/components/ui/load-error';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter, type Href } from 'expo-router';
@@ -71,6 +72,8 @@ export default function SavedSearchesScreen() {
   const [searches, setSearches] = useState<SavedSearch[]>([]);
   const [wanted, setWanted] = useState<WantedHome[]>([]);
   const [loading, setLoading] = useState(true);
+  // A failed read: shown with a retry rather than as an empty list.
+  const [loadError, setLoadError] = useState(false);
   const [actionError, setActionError] = useState(false);
   const [formOpen, setFormOpen] = useState(false);
   // Current number of matching listings per saved search (id -> count|null).
@@ -103,6 +106,12 @@ export default function SavedSearchesScreen() {
       supabase.from('saved_searches').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
       supabase.from('wanted_homes').select('*').eq('client_id', user.id).order('created_at', { ascending: false }),
     ]);
+    if (s.error || w.error) {
+      setLoadError(true);
+      setLoading(false);
+      return;
+    }
+    setLoadError(false);
     const rows: SavedSearch[] = s.data ?? [];
     setSearches(rows);
     setWanted(w.data ?? []);
@@ -269,6 +278,13 @@ export default function SavedSearchesScreen() {
           <View style={styles.center}>
             <ActivityIndicator size="large" color={colors.accent} />
           </View>
+        ) : loadError ? (
+          <LoadError
+            onRetry={() => {
+              setLoading(true);
+              load();
+            }}
+          />
         ) : (
           <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
             {tab === 'searches' ? (

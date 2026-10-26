@@ -802,7 +802,29 @@ test('X32 signing in before confirming the email opens the code entry instead of
   await expect(page.getByText(t('auth.signupCodeHint'))).toBeVisible();
 });
 
-test('X33 All/Sale/Rent: the tab lights up at once and its homes are already loaded', async ({ page }) => {
+// Pass 20, account tools in the app: a failed read is not an empty list.
+for (const [path, table] of [['/viewings', 'viewings'], ['/my-listings', 'properties'], ['/saved-searches', 'saved_searches']] as const) {
+  test.describe(`signed in, app ${path}`, () => {
+    test.use({ signedIn: true, allowConsoleErrors: [/status of 400/] });
+
+    test(`X33 ${path}: a failed load offers a retry, which loads`, async ({ page }) => {
+      let fail = true;
+      await page.route(`**/rest/v1/${table}*`, (route) => {
+        const owned = table !== 'properties' || route.request().url().includes('owner_id');
+        if (route.request().method() !== 'GET' || !fail || !owned) return route.fallback();
+        return json(route, { code: '57014', message: 'canceling statement due to statement timeout' }, 400);
+      });
+      await page.goto(path);
+      await ready(page);
+      await expect(page.getByText(t('errors.loadFailed'))).toBeVisible();
+      fail = false;
+      await page.getByRole('button', { name: t('common.retry') }).click();
+      await expect(page.getByText(t('errors.loadFailed'))).toHaveCount(0);
+    });
+  });
+}
+
+test('X35 All/Sale/Rent: the tab lights up at once and its homes are already loaded', async ({ page }) => {
   const asked: string[] = [];
   page.on('request', (r) => {
     if (r.url().includes('/rest/v1/properties')) asked.push(decodeURIComponent(r.url()));
@@ -827,7 +849,7 @@ test('X33 All/Sale/Rent: the tab lights up at once and its homes are already loa
   expect(asked.slice(before).filter((u) => u.includes('listing_type=eq.rent'))).toEqual([]);
 });
 
-test('X34 Home has no kicker above the greeting and no "editor\'s pick" label', async ({ page }) => {
+test('X36 Home has no kicker above the greeting and no "editor\'s pick" label', async ({ page }) => {
   await page.goto('/');
   await ready(page);
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible();

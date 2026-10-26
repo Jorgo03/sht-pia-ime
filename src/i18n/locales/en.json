@@ -353,7 +353,8 @@
     "linkInvalid": "This link isn't valid. Ask for a new code.",
     "linkOtherDevice": "This link was opened in a different browser from the one you asked in. Enter the 6-digit code from the email instead.",
     "currentPasswordWrong": "Your current password is incorrect.",
-    "providerUnavailable": "This sign-in option isn't available yet. Please choose another one."
+    "providerUnavailable": "This sign-in option isn't available yet. Please choose another one.",
+    "loadFailed": "Couldn't load this. Check your connection and try again."
   },
   "agentDashboard": {
     "title": "Agent Dashboard",

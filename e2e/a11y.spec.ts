@@ -32,3 +32,29 @@ for (const theme of ['light', 'dark']) {
     }
   });
 }
+
+// Pass 20: the signed-in pages had no scan at all.
+const SIGNED_IN_PATHS = ['/profile', '/messages', '/favorites', '/viewings', '/my-listings', '/saved-searches'];
+for (const theme of ['light', 'dark'] as const) {
+  test.describe(`signed in, ${theme} theme`, () => {
+    test.use({ signedIn: true });
+    test.beforeEach(async ({ page }) => {
+      await page.addInitScript((value) => {
+        try {
+          localStorage.setItem('fho_theme', value);
+        } catch {
+          // storage blocked: the app falls back to its default theme
+        }
+      }, theme);
+    });
+
+    for (const path of SIGNED_IN_PATHS) {
+      test(`A11Y signed in ${theme} ${path}`, async ({ page }) => {
+        await page.goto(path);
+        await page.waitForLoadState('networkidle');
+        await expect(page.locator('html')).toHaveAttribute('data-theme', theme);
+        expect(await axeViolations(page, { known: KNOWN })).toEqual([]);
+      });
+    }
+  });
+}

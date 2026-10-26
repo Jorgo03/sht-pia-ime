@@ -333,7 +333,8 @@
     "linkInvalid": "Ce lien n’est pas valide. Demandez un nouveau code.",
     "linkOtherDevice": "Ce lien a été ouvert dans un autre navigateur que celui de la demande. Saisissez plutôt le code à 6 chiffres de l’e-mail.",
     "currentPasswordWrong": "Votre mot de passe actuel est incorrect.",
-    "providerUnavailable": "Cette option de connexion n’est pas encore disponible. Choisissez-en une autre."
+    "providerUnavailable": "Cette option de connexion n’est pas encore disponible. Choisissez-en une autre.",
+    "loadFailed": "Chargement impossible. Vérifiez votre connexion et réessayez."
   },
   "agentDashboard": {
     "title": "Tableau de bord Agent",

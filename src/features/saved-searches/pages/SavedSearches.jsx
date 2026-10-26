@@ -8,6 +8,7 @@ import BackButton from '../../../shared/BackButton'
 import { supabase } from '../../../lib/supabase'
 import { formatPrice, formatDate } from '../../../lib/format'
 import { countMatches, markSeen, newMatchCount, setEmailAlerts } from '../lib/matches'
+import LoadError from '../../../shared/LoadError'
 
 // Email alerts are offered only once sending is configured (docs/LAUNCH_TASKS.md F13).
 const EMAIL_ALERTS = import.meta.env.VITE_EMAIL_ALERTS === 'true'
@@ -40,6 +41,8 @@ export default function SavedSearches() {
   const [searches, setSearches] = useState([])
   const [wanted, setWanted] = useState([])
   const [loading, setLoading] = useState(true)
+  // A failed read: shown with a retry rather than as an empty list.
+  const [loadError, setLoadError] = useState(false)
   const [actionError, setActionError] = useState(false)
   // Current number of matching listings per saved search (id -> count|null).
   const [matchCounts, setMatchCounts] = useState({})
@@ -55,6 +58,8 @@ export default function SavedSearches() {
       supabase.from('saved_searches').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
       supabase.from('wanted_homes').select('*').eq('client_id', user.id).order('created_at', { ascending: false }),
     ])
+    if (s.error || w.error) { setLoadError(true); setLoading(false); return }
+    setLoadError(false)
     const rows = s.data ?? []
     setSearches(rows)
     setWanted(w.data ?? [])
@@ -146,6 +151,8 @@ export default function SavedSearches() {
 
       {loading ? (
         <div style={{ padding: '2rem 0', textAlign: 'center', color: 'var(--fho-text-muted)' }}>{t('common.loading')}</div>
+      ) : loadError ? (
+        <LoadError onRetry={() => { setLoading(true); load() }} />
       ) : tab === 'searches' ? (
         searches.length === 0 ? (
           <div className="placeholder-card" style={{ marginTop: 16 }}>
@@ -167,7 +174,7 @@ export default function SavedSearches() {
                   {s.filters?.listing_type && <span>{t(`listing.type.${s.filters.listing_type}`, s.filters.listing_type)}</span>}
                 </div>
                 {s.alerts_enabled && newMatchCount(matchCounts[s.id], s.last_match_count) > 0 && (
-                  <div className="self-start rounded-full bg-fho-orange-1 px-2.5 py-0.5 text-[12px] font-semibold text-white" role="status">
+                  <div className="self-start rounded-full bg-fho-orange-1 px-2.5 py-0.5 text-[12px] font-semibold text-[#1a1714]" role="status">
                     {t('saved.newMatches', { n: newMatchCount(matchCounts[s.id], s.last_match_count) })}
                   </div>
                 )}

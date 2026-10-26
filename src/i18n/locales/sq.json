@@ -301,7 +301,8 @@
     "linkInvalid": "Kjo lidhje nuk është e vlefshme. Kërko një kod të ri.",
     "linkOtherDevice": "Kjo lidhje u hap në një shfletues tjetër nga ai ku e kërkove. Fut kodin 6-shifror nga emaili.",
     "currentPasswordWrong": "Fjalëkalimi aktual është i pasaktë.",
-    "providerUnavailable": "Kjo mënyrë hyrjeje nuk është ende e disponueshme. Zgjidh një tjetër."
+    "providerUnavailable": "Kjo mënyrë hyrjeje nuk është ende e disponueshme. Zgjidh një tjetër.",
+    "loadFailed": "Nuk u ngarkua dot. Kontrollo lidhjen dhe provo sërish."
   },
   "agentDashboard": {
     "title": "Paneli i Agjentit",
@@ -390,7 +391,7 @@
         "sub": "Organizo një vizitë prone"
       },
       "open": {
-        "title": "Open house",
+        "title": "Ditë e hapur",
         "sub": "Planifiko shfaqje publike"
       }
     },

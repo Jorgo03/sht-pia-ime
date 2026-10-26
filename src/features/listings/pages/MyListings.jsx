@@ -7,6 +7,7 @@ import BackButton from '../../../shared/BackButton'
 import { supabase } from '../../../lib/supabase'
 import { formatPrice, imageFor, getLocalizedText } from '../../../lib/format'
 import { closedStatusFor } from '../lib/listingForm'
+import LoadError from '../../../shared/LoadError'
 
 const STATUS_COLORS = {
   active: 'var(--fho-status-active, #27ae60)',
@@ -28,6 +29,9 @@ export default function MyListings() {
   const [translationFailed, setTranslationFailed] = useState(() => location.state?.translationFailed ?? [])
   const [listings, setListings] = useState([])
   const [loading, setLoading] = useState(true)
+  // A failed read: shown with a retry rather than as an empty list.
+  const [loadError, setLoadError] = useState(false)
+  const [reloadKey, setReloadKey] = useState(0)
   const [actionError, setActionError] = useState(false)
 
   const flashError = () => {
@@ -42,11 +46,12 @@ export default function MyListings() {
       .select('*')
       .or(`owner_id.eq.${user.id},agent_id.eq.${user.id}`)
       .order('created_at', { ascending: false })
-      .then(({ data }) => {
-        setListings(data || [])
+      .then(({ data, error }) => {
+        setLoadError(!!error)
+        if (!error) setListings(data || [])
         setLoading(false)
       })
-  }, [user])
+  }, [user, reloadKey])
 
   const setStatus = async (id, next) => {
     const { error } = await supabase.from('properties').update({ status: next }).eq('id', id)
@@ -103,6 +108,8 @@ export default function MyListings() {
 
       {loading ? (
         <div className="py-8 text-center text-fho-text-muted">{t('common.loading')}</div>
+      ) : loadError ? (
+        <LoadError onRetry={() => { setLoading(true); setReloadKey((k) => k + 1) }} />
       ) : listings.length === 0 ? (
         <div className="placeholder-card empty-state">
           <div className="text-[32px]">🏠</div>

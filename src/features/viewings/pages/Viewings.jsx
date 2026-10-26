@@ -6,6 +6,7 @@ import { useAuth } from '../../auth/AuthContext'
 import BackButton from '../../../shared/BackButton'
 import { supabase } from '../../../lib/supabase'
 import { getLocalizedText, formatDate } from '../../../lib/format'
+import LoadError from '../../../shared/LoadError'
 
 const STATUS_COLORS = {
   requested: 'var(--fho-status-paused, #f39c12)',
@@ -27,16 +28,20 @@ export default function Viewings() {
   const [viewings, setViewings] = useState([])
   const [profiles, setProfiles] = useState({})
   const [loading, setLoading] = useState(true)
+  // A failed read: shown with a retry rather than as an empty list.
+  const [loadError, setLoadError] = useState(false)
   const [actionError, setActionError] = useState(false)
 
   const load = useCallback(async () => {
     if (!user) { setViewings([]); setLoading(false); return }
     // RLS returns only rows where the user is the client, the agent, or the
     // property owner — no explicit filter needed.
-    const { data } = await supabase
+    setLoadError(false)
+    const { data, error } = await supabase
       .from('viewings')
       .select('*, property:properties(id, title, title_i18n, city, owner_id, agent_id)')
       .order('scheduled_at', { ascending: true })
+    if (error) { setLoadError(true); setLoading(false); return }
     const rows = data ?? []
     setViewings(rows)
 
@@ -119,6 +124,8 @@ export default function Viewings() {
 
       {loading ? (
         <div style={{ padding: '2rem 0', textAlign: 'center', color: 'var(--fho-text-muted)' }}>{t('common.loading')}</div>
+      ) : loadError ? (
+        <LoadError onRetry={() => { setLoading(true); load() }} />
       ) : viewings.length === 0 ? (
         <div className="placeholder-card" style={{ marginTop: 16 }}>
           <div className="icon"><CalendarDays size={24} /></div>

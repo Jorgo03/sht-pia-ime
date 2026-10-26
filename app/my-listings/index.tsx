@@ -1,3 +1,4 @@
+import { LoadError } from '@/components/ui/load-error';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useQueryClient } from '@tanstack/react-query';
 import { Image } from 'expo-image';
@@ -41,6 +42,8 @@ export default function MyListingsScreen() {
   const queryClient = useQueryClient();
   const [listings, setListings] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
+  // A failed read: shown with a retry rather than as an empty list.
+  const [loadError, setLoadError] = useState(false);
   const [actionError, setActionError] = useState(false);
 
   const flashError = () => {
@@ -53,11 +56,17 @@ export default function MyListingsScreen() {
       setLoading(false);
       return;
     }
-    const { data } = await supabase
+    setLoadError(false);
+    const { data, error } = await supabase
       .from('properties')
       .select('*')
       .or(`owner_id.eq.${user.id},agent_id.eq.${user.id}`)
       .order('created_at', { ascending: false });
+    if (error) {
+      setLoadError(true);
+      setLoading(false);
+      return;
+    }
     setListings(data ?? []);
     setLoading(false);
   }, [user]);
@@ -132,6 +141,13 @@ export default function MyListingsScreen() {
           <View style={styles.center}>
             <ActivityIndicator size="large" color={colors.accent} />
           </View>
+        ) : loadError ? (
+          <LoadError
+            onRetry={() => {
+              setLoading(true);
+              load();
+            }}
+          />
         ) : listings.length === 0 ? (
           <View style={styles.center}>
             <View style={styles.emptyIcon}>
