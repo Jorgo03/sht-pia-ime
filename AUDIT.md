@@ -25,22 +25,28 @@ old code)
 | 6 | **Sign-out while offline (or timeout, or 5xx while the project is paused) kept the session**: auth-js returns before `_removeSession()` unless /logout answers 401/403/404, so the account came back on the next launch or token refresh. Both apps | shared `src/lib/signOut.js` removes the session locally when the server call fails [unit `signOut` 4, against the real supabase-js with a failing fetch] |
 | 7 | **Phone password recovery could not be completed**: the recovery code signs the user in, and the Profile screen's `if (user)` replaced the new-password step with the dashboard | the step stays until the password is saved or left; added Back [e2e-expo X27 red→green] |
 
-**Open, code-only (recommended next, in order)**
+**Fixed on the owner's "continue" (2026-10-26)**
+
+| # | Problem | Fix |
+|---|---|---|
+| 8 | A restored wizard draft reopened on Publish and could go live with zero photos (only the visible step was checked) | Publish checks every step and opens the first incomplete one; a restored draft reopens at Media at the latest. Both apps |
+| 9 | Surface `85,5` saved as 0 m²; `85.5` failed every save at the integer column, after the uploads | surface and baths read like the price (`normalizeAmount`); integer columns get whole numbers in `formToColumns`; rooms/years take digits only [unit `listingForm`] |
+| 10 | The listing draft was per device, so the next account got the previous agent's draft and contact details | one draft per account; the old per-device key is deleted; the phone gets web's 7-day lifetime; an untouched form is not saved, so "draft restored" no longer shows over blank fields. Both apps |
+| 11 | Signed out, the + button ran the whole wizard into "Authentication failed"; edit, `/agent-dashboard` and `/messages/[id]` spun forever | shared `components/ui/sign-in-prompt.tsx`; a thread that cannot be read says so [e2e-expo X28] |
+| 12 | A failed role lookup filed an agent's listing as a client's, for good (the ownership guard forbids correcting it) | the role comes from the signed-in profile; a failed lookup stops the save before any upload. Both apps |
+| 13 | Signed out, a heart looked saved but was never stored; a failed save never reverted (supabase-js returns `error`, it does not throw); a slow fetch could restore the previous account's hearts | sign-in prompt; revert plus message; fetch guarded by account [e2e-expo X29] |
+| 14 | Map bubbles, previews and the web popup showed € for ALL/USD listings (about 100× too high for lek); the web popup also showed an English "/mo" and raw column values | listing currency everywhere ("ALL 15M"), 999,600 reads "1M"; translated popup; legend shows only the two colours markers have [unit `compactPrice`] |
+| 15 | Android kept stale cluster/county numbers (marker drawn once) | the count is part of the marker key |
+| 16 | Explore/Home swapped a loaded list for a full-screen error when one more page or a background refetch failed | full-screen error only with nothing loaded; a footer Retry for a failed page; pages de-duplicated |
+| 17 | Listing assistant failed from the 6th question (history cut to start with an answer); failed replies were sent back as answers | shared `assistantHistory.js` in both apps; the function also drops leading non-user turns (needs a deploy) [unit `assistantHistory`] |
+| 18 | P3s: pasted `250.000,00` became 25,000,000; no minus key for basements on iPhone; a late city-centre answer moved the map back; sort label always "relevance" (both apps); zone kept when a city is typed; filter segments did not announce the selected one; Expo-web map ignored its first view; `delete-account` purged only 1,000 files per bucket (deploy); the unsubscribe link acted on GET, so link scanners unsubscribed people (deploy); the website sent agents home when their profile loaded late; viewing statuses `completed`/`no_show` had no text | each fixed where named |
+
+**Still open, code-only**
 
 | Pri | Finding | Where |
 |---|---|---|
-| P2 | OAuth relay forwards the sign-in `code` to any `exp://` host (only the scheme is checked): a crafted link could hand an Expo Go user's session to someone else. Restrict to LAN/localhost hosts and the exact callback path; tunnels (`*.exp.direct`) are the owner's call. Coordinate with the session working on the relay | `index.html`, `AuthCallback.jsx`, `app/+html.tsx`, `app/auth/callback.web.tsx` |
-| P2 | A restored wizard draft reopens on Publish and can publish with zero photos (only the last step is validated) | `app/listing/new.tsx`, `NewListing.jsx` |
-| P2 | Surface area `85,5` saves as 0 m²; `85.5` fails every save at the integer column after uploads | `app/listing/new.tsx`, `listingForm.js` |
-| P2 | The listing draft is per device, not per account: the next person to sign in gets the previous agent's draft and contact details | `app/listing/new.tsx`, `NewListing.jsx` |
-| P2 | Signed out, the + button opens the whole wizard and ends in "Authentication failed"; `/listing/[id]/edit`, `/agent-dashboard`, `/messages/[id]` spin forever | same + screens |
-| P2 | A failed role lookup files an agent's new listing as a client's, permanently (the ownership guard forbids correcting it) | `app/listing/new.tsx`, `NewListing.jsx` |
-| P2 | Signed out, a heart tap looks saved but is never stored, with no sign-in prompt | `contexts/favorites-context.tsx` |
-| P2 | Map price bubbles and map previews show € for ALL/USD listings (both apps) | `lib/cluster.ts`, map components, `PropertyMap.jsx` |
-| P2 | Android: cluster/county count bubbles keep old numbers after a filter change (`tracksViewChanges` off, same key) | `components/map/*` |
-| P2 | Explore/Home replace the loaded list with a full-screen error when one more page or a background refetch fails | `app/(tabs)/explore.tsx`, `index.tsx` |
-| P2 | Listing assistant fails from the 6th question: `slice(-10)` starts the history with an assistant turn | `ai-listing-assistant` (deploy) + both clients |
-| P3 | Pasted `250.000,00` becomes 25,000,000; no minus key for basement floors on iPhone; stale city-centre lookup; "draft restored" over an empty form; failed translations not reported; hard-coded English in the media step; `delete-account` purges only 1,000 files; unsubscribe link acts on GET; zone kept when a city is typed; "sorted by relevance" label; filter segments lack selected state; legend promises land/commercial colours; Expo-web map ignores its first view; map/sheet show "no results" on errors; favourite errors swallowed; push-token record dropped before the server delete; web `/agent-dashboard` redirect on a slow profile; no `viewings.status.completed`/`no_show` keys | various |
+| P2 | OAuth relay forwards the sign-in `code` to any `exp://` host (only the scheme is checked): a crafted link could hand an Expo Go user's session to someone else. Restrict to LAN/localhost hosts and the exact callback path; whether Expo tunnels (`*.exp.direct`, which anyone can register) keep working with Google sign-in is the owner's call. Coordinate with the session working on the relay | `index.html`, `AuthCallback.jsx`, `app/+html.tsx`, `app/auth/callback.web.tsx` |
+| P3 | Failed translations at publish are not reported; hard-coded English in the media step (both need new locale keys); map and filter-sheet count show "no results"/"Loading" on a failed fetch; the Favorites screen has no error state; the push-token record is dropped before the server delete; alert emails lack `List-Unsubscribe` headers; AI search has no currency field | various |
 
 **Open, need the owner's approval (database)** — write as `supabase/pending/`
 files and test in a rolled-back transaction first, as before:
@@ -72,8 +78,10 @@ files and test in a rolled-back transaction first, as before:
 
 **Not verified:** anything on a physical phone (offline sign-out and
 recovery included), the live SQL tests in `supabase/tests/` (no database
-access from this machine), Edge Function changes (not deployed; the alerts
-copy only takes effect on the next deploy).
+access from this machine), Edge Function changes: `saved-search-alerts`,
+`ai-listing-assistant`, `delete-account` and `saved-search-unsubscribe` take
+effect only when deployed (`supabase functions deploy <name>`); the apps'
+own fixes for the assistant and the price filters work without that.
 
 **Environment and tooling:** Playwright 1.64.1 needs Chromium build 1248
 (`npm run test:e2e:install`; the laptop had 1223/1228, so every e2e test
