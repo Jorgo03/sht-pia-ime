@@ -20,6 +20,7 @@ import { KeyboardDoneBar } from '@/components/ui/keyboard-done-bar';
 import { useTheme } from '@/contexts/theme-context';
 import { useResponsive } from '@/hooks/use-responsive';
 import { askListingAssistant, type AssistantMessage } from '@/lib/ai';
+import { assistantHistory } from '@/src/features/properties/lib/assistantHistory';
 import { type LangCode } from '@/lib/translate';
 import { type Property } from '@/data/types';
 
@@ -72,11 +73,11 @@ export function ListingAssistant({ property }: { property: Property | null }) {
   const send = async () => {
     const content = text.trim();
     if (!content || thinking) return;
-    const history: AssistantMessage[] = [
-      ...messages.map(({ role, content: c }) => ({ role, content: c })),
-      { role: 'user', content },
-    ];
-    setMessages(history);
+    // What is sent is trimmed so it always starts with a question, without
+    // failed replies (shared with web); what is shown keeps every bubble
+    // and its `failed` flag.
+    const history = assistantHistory(messages, content);
+    setMessages((prev) => [...prev, { role: 'user', content }]);
     setText('');
     setThinking(true);
     // i18n.language is a plain string at the type level, but this app only
