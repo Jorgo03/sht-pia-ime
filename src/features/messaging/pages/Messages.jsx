@@ -8,6 +8,7 @@ import { formatRelativeTime, getLocalizedText } from '../../../lib/format'
 import { blockUser, isBlockedSendError, loadBlockedIds, unblockUser } from '../../safety/lib/safety'
 import ReportSheet from '../../safety/components/ReportSheet'
 import { loadThreadMessages } from '../lib/thread'
+import LoadError from '../../../shared/LoadError'
 
 export default function Messages() {
   const { t, i18n } = useTranslation()
@@ -20,16 +21,21 @@ export default function Messages() {
   const [profiles, setProfiles] = useState({})
   const [properties, setProperties] = useState({})
   const [loading, setLoading] = useState(true)
+  // A failed read: shown with a retry rather than as an empty list.
+  const [loadError, setLoadError] = useState(false)
   // People this user has blocked (only the blocker can see their blocks).
   const [blocked, setBlocked] = useState(() => new Set())
 
   const loadConversations = useCallback(async () => {
     if (!user) { setConversations([]); setLoading(false); return }
-    const { data } = await supabase
+    setLoadError(false)
+    const { data, error } = await supabase
       .from('conversations')
       .select('*')
       .or(`client_id.eq.${user.id},agent_id.eq.${user.id}`)
       .order('last_message_at', { ascending: false })
+    // An agent whose leads failed to load used to be told there were none.
+    if (error) { setLoadError(true); setLoading(false); return }
     const convos = data ?? []
     setConversations(convos)
 
@@ -116,6 +122,8 @@ export default function Messages() {
 
       {loading ? (
         <div style={{ padding: '2rem 0', textAlign: 'center', color: 'var(--fho-text-muted)' }}>{t('common.loading')}</div>
+      ) : loadError ? (
+        <LoadError onRetry={() => { setLoading(true); loadConversations() }} />
       ) : conversations.length === 0 ? (
         <div className="placeholder-card" style={{ marginTop: 16 }}>
           <div className="icon"><MessageCircle size={24} /></div>

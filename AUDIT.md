@@ -133,8 +133,22 @@ pasted), native iOS/Android password autofill on a device.
 - Tests: unit `thread` (3), e2e `messages.spec.ts` M-N1 × 2. `npm test`
   319/319, `test:e2e` 202 passed / 2 skipped, `test:e2e:expo` 107 / 13,
   lint 0 errors, tsc clean.
-- Still unaudited: account tools, shared core/i18n, website shell, build
-  config, phone UX/a11y.
+- Still unaudited: shared core/i18n, website shell, build config, phone
+  UX/a11y.
+
+### Follow-up: account tools slice
+
+- **P2 — Seven account screens showed a failed load as "nothing here"**:
+  phone Viewings, My Listings, Saved searches; website Messages list, My
+  Listings, Viewings, Saved searches (`data ?? []` with the error ignored).
+  An agent whose leads failed to load was told there were none. Fixed:
+  `components/ui/load-error.tsx` and `src/shared/LoadError.jsx`
+  (`errors.loadFailed`, 8 languages, Retry) on every one.
+- Tests: e2e A-N1 × 3 pages × 2 viewports (website), X33 × 3 × 2 (app).
+  `test:e2e` 208 passed / 2 skipped, `test:e2e:expo` 112 passed / 13
+  skipped plus X24 (price row at 320px, dark) failing once in the full run,
+  then passing 3/3 alone with these changes and 1/1 without them: a flaky
+  layout measurement, not this change. `npm test` 319/319, lint 0 errors.
 
 ## ═══ PASS 19 — 2026-10-25/26: FULL AUDIT (owner master prompt) ═══
 

@@ -323,7 +323,8 @@
     "linkInvalid": "Dieser Link ist ungültig. Fordere einen neuen Code an.",
     "linkOtherDevice": "Dieser Link wurde in einem anderen Browser geöffnet als dem, in dem du ihn angefordert hast. Gib stattdessen den 6-stelligen Code aus der E-Mail ein.",
     "currentPasswordWrong": "Dein aktuelles Passwort ist falsch.",
-    "providerUnavailable": "Diese Anmeldeoption ist noch nicht verfügbar. Bitte wähle eine andere."
+    "providerUnavailable": "Diese Anmeldeoption ist noch nicht verfügbar. Bitte wähle eine andere.",
+    "loadFailed": "Konnte nicht geladen werden. Prüfe deine Verbindung und versuche es erneut."
   },
   "agentDashboard": {
     "title": "Makler-Dashboard",

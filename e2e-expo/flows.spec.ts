@@ -801,3 +801,25 @@ test('X32 signing in before confirming the email opens the code entry instead of
   await expect(page.getByText(t('auth.enterCode')).first()).toBeVisible();
   await expect(page.getByText(t('auth.signupCodeHint'))).toBeVisible();
 });
+
+// Pass 20, account tools in the app: a failed read is not an empty list.
+for (const [path, table] of [['/viewings', 'viewings'], ['/my-listings', 'properties'], ['/saved-searches', 'saved_searches']] as const) {
+  test.describe(`signed in, app ${path}`, () => {
+    test.use({ signedIn: true, allowConsoleErrors: [/status of 400/] });
+
+    test(`X33 ${path}: a failed load offers a retry, which loads`, async ({ page }) => {
+      let fail = true;
+      await page.route(`**/rest/v1/${table}*`, (route) => {
+        const owned = table !== 'properties' || route.request().url().includes('owner_id');
+        if (route.request().method() !== 'GET' || !fail || !owned) return route.fallback();
+        return json(route, { code: '57014', message: 'canceling statement due to statement timeout' }, 400);
+      });
+      await page.goto(path);
+      await ready(page);
+      await expect(page.getByText(t('errors.loadFailed'))).toBeVisible();
+      fail = false;
+      await page.getByRole('button', { name: t('common.retry') }).click();
+      await expect(page.getByText(t('errors.loadFailed'))).toHaveCount(0);
+    });
+  });
+}

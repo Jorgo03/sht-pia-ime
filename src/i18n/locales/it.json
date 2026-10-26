@@ -331,7 +331,8 @@
     "linkInvalid": "Questo link non è valido. Richiedi un nuovo codice.",
     "linkOtherDevice": "Hai aperto il link in un browser diverso da quello in cui l’hai richiesto. Inserisci invece il codice a 6 cifre dell’email.",
     "currentPasswordWrong": "La password attuale non è corretta.",
-    "providerUnavailable": "Questo metodo di accesso non è ancora disponibile. Scegline un altro."
+    "providerUnavailable": "Questo metodo di accesso non è ancora disponibile. Scegline un altro.",
+    "loadFailed": "Impossibile caricare. Controlla la connessione e riprova."
   },
   "agentDashboard": {
     "title": "Dashboard Agente",

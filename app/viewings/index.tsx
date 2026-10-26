@@ -1,3 +1,4 @@
+import { LoadError } from '@/components/ui/load-error';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useRouter, type Href } from 'expo-router';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -68,6 +69,8 @@ export default function ViewingsScreen() {
   const [viewings, setViewings] = useState<Viewing[]>([]);
   const [profiles, setProfiles] = useState<Record<string, ClientProfile>>({});
   const [loading, setLoading] = useState(true);
+  // A failed read: shown with a retry rather than as an empty list.
+  const [loadError, setLoadError] = useState(false);
   const [actionError, setActionError] = useState(false);
 
   // Mirrors the web app's Viewings.jsx load() — RLS already scopes rows to
@@ -78,10 +81,16 @@ export default function ViewingsScreen() {
       setLoading(false);
       return;
     }
-    const { data } = await supabase
+    setLoadError(false);
+    const { data, error } = await supabase
       .from('viewings')
       .select('*, property:properties(id, title, title_i18n, city, owner_id, agent_id)')
       .order('scheduled_at', { ascending: true });
+    if (error) {
+      setLoadError(true);
+      setLoading(false);
+      return;
+    }
     const rows = (data ?? []) as Viewing[];
     setViewings(rows);
 
@@ -191,6 +200,13 @@ export default function ViewingsScreen() {
           <View style={styles.center}>
             <ActivityIndicator size="large" color={colors.accent} />
           </View>
+        ) : loadError ? (
+          <LoadError
+            onRetry={() => {
+              setLoading(true);
+              load();
+            }}
+          />
         ) : viewings.length === 0 ? (
           <View style={styles.center}>
             <View style={styles.emptyIcon}>

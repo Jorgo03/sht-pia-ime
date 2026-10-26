@@ -29,3 +29,24 @@ test.describe('signed in', () => {
     await expect(page.getByText(t('messages.noMessages'))).toBeVisible();
   });
 });
+
+// Pass 20, account tools: every list a signed-in person keeps says when it
+// could not be read, instead of showing "nothing here yet".
+for (const [path, table] of [['/messages', 'conversations'], ['/viewings', 'viewings'], ['/saved-searches', 'saved_searches']] as const) {
+  test.describe(`signed in, ${path}`, () => {
+    test.use({ signedIn: true, allowConsoleErrors: [/status of 400/] });
+
+    test(`A-N1 ${path}: a failed load offers a retry, which loads`, async ({ page }) => {
+      let fail = true;
+      await page.route(`**/rest/v1/${table}*`, (route) => {
+        if (route.request().method() !== 'GET' || !fail) return route.fallback();
+        return route.fulfill({ status: 400, contentType: 'application/json', headers: { 'access-control-allow-origin': '*' }, body: '{"code":"57014","message":"canceling statement due to statement timeout"}' });
+      });
+      await page.goto(path);
+      await expect(page.getByText(t('errors.loadFailed'))).toBeVisible();
+      fail = false;
+      await page.getByRole('button', { name: t('common.retry') }).click();
+      await expect(page.getByText(t('errors.loadFailed'))).toHaveCount(0);
+    });
+  });
+}
