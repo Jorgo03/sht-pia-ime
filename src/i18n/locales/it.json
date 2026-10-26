@@ -259,7 +259,8 @@
     "noMessages": "Ancora nessun messaggio — saluta!",
     "loginPrompt": "Accedi per vedere i tuoi messaggi",
     "sendFailed": "Messaggio non inviato — riprova",
-    "unavailable": "Questa conversazione non è disponibile"
+    "unavailable": "Questa conversazione non è disponibile",
+    "loadFailed": "Impossibile caricare questa conversazione."
   },
   "notFound": {
     "title": "Pagina non trovata",

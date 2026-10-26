@@ -7,6 +7,7 @@ import { supabase } from '../../../lib/supabase'
 import { formatRelativeTime, getLocalizedText } from '../../../lib/format'
 import { blockUser, isBlockedSendError, loadBlockedIds, unblockUser } from '../../safety/lib/safety'
 import ReportSheet from '../../safety/components/ReportSheet'
+import { loadThreadMessages } from '../lib/thread'
 
 export default function Messages() {
   const { t, i18n } = useTranslation()
@@ -168,6 +169,9 @@ function Thread({ conversation, other, property, meIsClient, userId, otherId, bl
   const [reportOpen, setReportOpen] = useState(false)
   const [safetyError, setSafetyError] = useState(false)
   const bottomRef = useRef(null)
+  // null while loading, then 'ok' or 'failed'; bumping reloadKey retries.
+  const [loadState, setLoadState] = useState(null)
+  const [reloadKey, setReloadKey] = useState(0)
   const menuRef = useRef(null)
 
   useEffect(() => {
@@ -197,12 +201,13 @@ function Thread({ conversation, other, property, meIsClient, userId, otherId, bl
 
   useEffect(() => {
     let cancelled = false
-    supabase
-      .from('messages')
-      .select('*')
-      .eq('conversation_id', conversation.id)
-      .order('created_at', { ascending: true })
-      .then(({ data }) => { if (!cancelled) setMessages(data ?? []) })
+    loadThreadMessages(supabase, conversation.id).then(({ messages: loaded }) => {
+      if (cancelled) return
+      if (!loaded) { setLoadState('failed'); return }
+      // Anything realtime delivered meanwhile stays, without duplicates.
+      setMessages((prev) => [...loaded, ...prev.filter((m) => !loaded.some((l) => l.id === m.id))])
+      setLoadState('ok')
+    })
     markRead()
 
     const channel = supabase
@@ -217,7 +222,7 @@ function Thread({ conversation, other, property, meIsClient, userId, otherId, bl
       .subscribe()
 
     return () => { cancelled = true; supabase.removeChannel(channel) }
-  }, [conversation.id, markRead, userId])
+  }, [conversation.id, markRead, userId, reloadKey])
 
   useEffect(() => { bottomRef.current?.scrollIntoView({ block: 'end' }) }, [messages.length])
 
@@ -284,7 +289,18 @@ function Thread({ conversation, other, property, meIsClient, userId, otherId, bl
       {reportOpen && <ReportSheet userId={otherId} onClose={() => setReportOpen(false)} />}
 
       <div className="msg-thread__scroll">
-        {messages.length === 0 && (
+        {loadState === null && messages.length === 0 && (
+          <div role="status" style={{ textAlign: 'center', color: 'var(--fho-text-muted)', fontSize: 13, padding: '2rem 0' }}>
+            {t('common.loading')}
+          </div>
+        )}
+        {loadState === 'failed' && (
+          <div role="alert" style={{ textAlign: 'center', fontSize: 13, padding: '2rem 0' }}>
+            <p style={{ color: 'var(--fho-text-muted)', marginBottom: 12 }}>{t('messages.loadFailed')}</p>
+            <button className="pill-btn" onClick={() => { setLoadState(null); setReloadKey((k) => k + 1) }}>{t('common.retry')}</button>
+          </div>
+        )}
+        {loadState === 'ok' && messages.length === 0 && (
           <div style={{ textAlign: 'center', color: 'var(--fho-text-muted)', fontSize: 13, padding: '2rem 0' }}>
             {t('messages.noMessages')}
           </div>
@@ -314,6 +330,7 @@ function Thread({ conversation, other, property, meIsClient, userId, otherId, bl
           type="text"
           value={text}
           placeholder={t('messages.inputPlaceholder')}
+          aria-label={t('messages.inputPlaceholder')}
           onChange={e => setText(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && send()}
         />

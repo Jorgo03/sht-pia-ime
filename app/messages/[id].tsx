@@ -32,6 +32,7 @@ import {
   loadBlockedIds,
   unblockUser,
 } from '@/src/features/safety/lib/safety';
+import { isNotFound, loadThreadMessages } from '@/src/features/messaging/lib/thread';
 
 interface Message {
   id: string;
@@ -68,6 +69,10 @@ export default function ThreadScreen() {
   // null, or the reason the last send failed.
   const [sendError, setSendError] = useState<null | 'failed' | 'blockedByThem'>(null);
   const [loading, setLoading] = useState(true);
+  // The load failed for a reason other than "not yours / gone" (offline,
+  // timeout): shown with a retry, which bumps reloadKey.
+  const [loadFailed, setLoadFailed] = useState(false);
+  const [reloadKey, setReloadKey] = useState(0);
   const [otherId, setOtherId] = useState<string | null>(null);
   // Whether *I* blocked the other person (only the blocker can see a block).
   const [blocked, setBlocked] = useState(false);
@@ -100,14 +105,17 @@ export default function ThreadScreen() {
     let cancelled = false;
 
     (async () => {
-      const { data: convo } = await supabase
+      const { data: convo, error: convoError } = await supabase
         .from('conversations')
         .select('id, client_id, agent_id, property_id')
         .eq('id', id)
         .single();
       if (cancelled) return;
       if (!convo) {
-        setUnavailable(true);
+        // Only "no such row" means not yours or gone; a dropped connection
+        // used to say the same and offered no way to try again.
+        if (convoError && !isNotFound(convoError)) setLoadFailed(true);
+        else setUnavailable(true);
         setLoading(false);
         return;
       }
@@ -130,13 +138,15 @@ export default function ThreadScreen() {
         setPropertyTitle(getLocalizedText(propRes.data.title_i18n, i18n.language) || propRes.data.title);
       }
 
-      const { data: msgs } = await supabase
-        .from('messages')
-        .select('*')
-        .eq('conversation_id', id)
-        .order('created_at', { ascending: true });
+      const { messages: msgs } = await loadThreadMessages<Message>(supabase, id);
       if (cancelled) return;
-      setMessages(msgs ?? []);
+      if (!msgs) {
+        setLoadFailed(true);
+        setLoading(false);
+        return;
+      }
+      // Anything realtime delivered meanwhile stays, without duplicates.
+      setMessages((prev) => [...msgs, ...prev.filter((m) => !msgs.some((l) => l.id === m.id))]);
       setLoading(false);
       markRead(convo, convo.client_id === user.id);
     })();
@@ -162,7 +172,7 @@ export default function ThreadScreen() {
     // conversationRef instead, so this effect doesn't need to restart (and
     // resubscribe the channel) every time conversation state loads/changes.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id, user, markRead]);
+  }, [id, user, markRead, reloadKey]);
 
   useEffect(() => {
     if (messages.length > 0) listRef.current?.scrollToEnd({ animated: true });
@@ -232,6 +242,29 @@ export default function ThreadScreen() {
         <AppHeader onBack={() => router.back()} showControls={false} />
         <View style={styles.center}>
           <Text style={styles.unavailableText}>{t('messages.unavailable')}</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  if (loadFailed) {
+    return (
+      <SafeAreaView style={styles.container} edges={['top']}>
+        <AppHeader onBack={() => router.back()} showControls={false} />
+        <View style={styles.center}>
+          <Text style={styles.unavailableText} accessibilityLiveRegion="polite">
+            {t('messages.loadFailed')}
+          </Text>
+          <TouchableOpacity
+            accessibilityRole="button"
+            onPress={() => {
+              setLoadFailed(false);
+              setLoading(true);
+              setReloadKey((k) => k + 1);
+            }}
+            style={styles.retryButton}>
+            <Text style={styles.retryText}>{t('common.retry')}</Text>
+          </TouchableOpacity>
         </View>
       </SafeAreaView>
     );
@@ -374,6 +407,16 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     alignItems: 'center',
     backgroundColor: colors.primary,
   },
+  retryButton: {
+    marginTop: 16,
+    minHeight: 44,
+    paddingHorizontal: 22,
+    justifyContent: 'center',
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  retryText: { fontSize: 14, fontWeight: '600', color: colors.textPrimary },
   unavailableText: {
     fontSize: 14,
     color: colors.textSecondary,

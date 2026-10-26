@@ -251,7 +251,8 @@
     "noMessages": "Ende pa mesazhe — përshëndetu!",
     "loginPrompt": "Kyçu për të parë mesazhet",
     "sendFailed": "Mesazhi nuk u dërgua — provo përsëri",
-    "unavailable": "Kjo bisedë nuk është e disponueshme"
+    "unavailable": "Kjo bisedë nuk është e disponueshme",
+    "loadFailed": "Biseda nuk u ngarkua dot."
   },
   "notFound": {
     "title": "Faqja nuk u gjet",
