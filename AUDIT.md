@@ -1,5 +1,66 @@
 # Pre-Launch Audit — Shtëpia.ime (Vite web app)
 
+## ═══ PASS 24 — 2026-10-27: CRM PHASE 1 FROM THE BSP CRM ANALYSIS (owner request) ═══
+
+**Scope.** The owner asked for "BSP CRM" (App Store id1511139974) to be
+analysed and its features brought into Shtëpia.ime. Full comparison and phases:
+`docs/BSP_CRM_ANALYSIS.md`. Phase 1 needed no database change. The phone app
+only; the website gets bug fixes only (DECISIONS.md W1).
+
+**Evidence for the analysis**:
+- Apple's public lookup API: BSP CRM 4.2.3, free, English only, 4.8 stars
+  from 42 ratings, 5 screenshots, read through a sandbox, since
+  apps.apple.com is blocked here.
+- bspvision.com: home, CRM, Mobile App, Pricing and the ERA Albania case study.
+- The live `leads` table:
+  - columns id, agent_id, name, phone, email, notes, status, created_at;
+  - status is new, contacted, qualified, lost or won;
+  - one policy, `Agents manage own leads`, ALL, `auth.uid() = agent_id`;
+  - 1 row.
+
+| What | Where | Proof |
+| --- | --- | --- |
+| Lead manager: 24 per page, status filter, database-side search (a local "069…" finds "+355 69…"; PostgREST/LIKE characters stripped), add/edit sheet, call/WhatsApp/email, next stage, inline delete confirmation (Alert does nothing on the web build) | `app/leads/index.tsx`, `components/leads/lead-sheet.tsx` | e2e-expo X39, X40 |
+| Dashboard: leads count opens `/leads`; "Sot" agenda of today's requested/confirmed viewings; every open buyer request shows how many of the agent's active listings fit, and lists them | `app/agent-dashboard/index.tsx` | e2e-expo X41 |
+| Matching rules: city ignoring accents and Albanian definite endings (Tirana = Tiranë, Durrësi = Durrës), sale/rent, budget in euros across EUR/ALL/USD with the price filter's rates, bedroom minimum; a listing without a price is unknown, not €0 | `src/features/leads/lib/leads.js` | `tests/leads.test.mjs` (5) |
+| Dashboard times forced to 24-hour: Chrome has no Albanian data and showed "05:00 PM" | dashboard | X41 |
+
+**Found on the way**:
+- Chrome lacks Albanian relative times, so chat times show "yesterday" in
+  English. This came up while filming the advert. A suggested task was created
+  for it; the app code is unchanged.
+- Root-layout registration was missing for the new route, which showed a raw
+  "leads/index" header. Fixed before commit.
+
+**Phase 2: written, not applied.**
+`supabase/pending/crm_phase2_tasks_and_lead_needs.sql` adds:
+- `agent_tasks`:
+  - RLS, so a task can point only at the agent's own lead, listing or viewing;
+  - `reminded_at` is guarded from clients;
+  - FK indexes.
+- What a lead is looking for, on `leads`, plus `updated_at`.
+- Server-side length limits (NOT VALID).
+- `task_due` added to push_outbox, and `enqueue_task_reminders()`, a security
+  definer that clients cannot execute.
+
+It was dry-run on production in a discarded transaction:
+- 1 reminder queued, and 0 on the second run;
+- the next-week task was left alone;
+- afterwards nothing persisted, which was verified.
+
+**pg_cron is not installed**: the job needs it, or push-dispatch, to call it.
+push-dispatch also needs text for `task_due`, which means a deploy.
+
+**Verification (2026-10-27, merged with master `103f1e9`)**:
+- tsc clean; lint 0 errors;
+- `npm test` 339/339;
+- build ok;
+- `test:e2e` 241 passed, 9 skipped;
+- `test:e2e:expo` 150 passed, 20 skipped;
+- `expo export -p ios -p android` ok.
+
+Not yet tried on a phone.
+
 ## ═══ PASS 23 — 2026-10-27: RESPONSIVE PASS, BOTH APPS, NO EMULATORS (owner master prompt) ═══
 
 **Scope:**

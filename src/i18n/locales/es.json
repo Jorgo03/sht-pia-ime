@@ -356,6 +356,7 @@
     "todayEmpty": "No hay visitas hoy.",
     "matches_one": "{{count}} de tus anuncios coincide",
     "matches_other": "{{count}} de tus anuncios coinciden",
+    "matches_many": "{{count}} de tus anuncios coinciden",
     "noMatches": "Ninguno de tus anuncios coincide todavía",
     "showMatches": "Mostrar",
     "hideMatches": "Ocultar"

@@ -9,6 +9,10 @@ Updated 2026-10-26 (Pass 21). Sources:
 
 ## Now: tests on your phones (free)
 
+- [ ] **You:** On the Samsung, signed in as an agent, try:
+  - Profile → agent dashboard → "Klientë potencialë": add a lead, call or
+    WhatsApp them, move them to "Kontaktuar";
+  - "Sot" and the buyer-request matches on the dashboard.
 - [ ] **You:** On the Samsung A23, sign in with Google.
   - The page should show "Hap aplikacionin". Tap it and you should come back
     signed in.
@@ -34,6 +38,14 @@ Updated 2026-10-26 (Pass 21). Sources:
   touch the right edge.
 
 ## Needs your approval (database or deploys)
+
+- [ ] **You approve, then me, CRM phase 2:**
+  - tasks with push reminders;
+  - what each lead is looking for, so leads are matched to listings.
+
+  The file is `supabase/pending/crm_phase2_tasks_and_lead_needs.sql`, already
+  dry-run. It also needs pg_cron turned on (or a push-dispatch change) and a
+  push-dispatch deploy. See `docs/BSP_CRM_ANALYSIS.md`.
 
 Each change is written to `supabase/pending/` and tested in a rolled-back
 transaction before you approve it.
@@ -109,6 +121,12 @@ transaction before you approve it.
 
 ## Recently done
 
+- [x] CRM phase 1 from the BSP CRM analysis (`docs/BSP_CRM_ANALYSIS.md`):
+  - a lead manager (`/leads`);
+  - today's agenda on the agent dashboard;
+  - buyer requests matched to your own listings.
+
+  Not tried on a phone yet.
 - [x] Pass 21, the no-cost list (2026-10-26):
   - the sign-in relay accepts only the app's own callback on a private
     network;
