@@ -21,9 +21,14 @@ const COMPACT_GAP = 12;
 /** Matches web's .compact-card: 70% of viewport, floored at 240px — not a
  *  fixed width, so it scales with screen size like the browser does.
  *  Exported so callers (Home's horizontal rail) can compute a matching
- *  `snapToInterval` instead of hand-duplicating this formula. */
+ *  `snapToInterval` instead of hand-duplicating this formula. Capped at
+ *  COMPACT_MAX_WIDTH: on an unfolded Fold (690 wide) or a spanned Duo (1114)
+ *  70% made one card fill the rail under a 130-high photo; the widest phone
+ *  (~430) stays under the cap, so phones are unchanged. */
+const COMPACT_MAX_WIDTH = 320;
+
 export function getCompactCardWidth(screenWidth: number): number {
-  return Math.max(screenWidth * 0.7, 240);
+  return Math.min(Math.max(screenWidth * 0.7, 240), COMPACT_MAX_WIDTH);
 }
 
 export function getCompactCardSnapInterval(screenWidth: number): number {

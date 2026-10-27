@@ -16,6 +16,7 @@ import { useTheme } from '@/contexts/theme-context';
 import { supabase } from '@/lib/supabase';
 import { formatRelativeTime, getLocalizedText } from '@/lib/format';
 import { loadBlockedIds } from '@/src/features/safety/lib/safety';
+import { useReadableColumn } from '@/hooks/use-responsive';
 
 interface Conversation {
   id: string;
@@ -45,6 +46,8 @@ export default function MessagesInboxScreen() {
   const { user, isAgent } = useAuth();
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
+  // A centred column on an unfolded Fold or a spanned Duo (hooks/use-responsive).
+  const readable = useReadableColumn();
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [profiles, setProfiles] = useState<Record<string, OtherProfile>>({});
   const [properties, setProperties] = useState<Record<string, PropertyStub>>({});
@@ -120,7 +123,7 @@ export default function MessagesInboxScreen() {
   if (!user) {
     return (
       <GradientBackground>
-        <SafeAreaView style={styles.container} edges={['top']}>
+        <SafeAreaView style={[styles.container, readable]} edges={['top']}>
           <AppHeader onBack={() => router.back()} />
           <View style={styles.center}>
             <Text style={styles.description}>{t('messages.loginPrompt')}</Text>
@@ -137,7 +140,7 @@ export default function MessagesInboxScreen() {
 
   return (
     <GradientBackground>
-      <SafeAreaView style={styles.container} edges={['top']}>
+      <SafeAreaView style={[styles.container, readable]} edges={['top']}>
         <AppHeader onBack={() => router.back()} />
 
         {/* Matches web's Messages.jsx screen-kicker/screen-headline hero

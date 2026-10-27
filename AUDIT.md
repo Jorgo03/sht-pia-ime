@@ -1,5 +1,54 @@
 # Pre-Launch Audit — Shtëpia.ime (Vite web app)
 
+## ═══ PASS 22 — 2026-10-27: FOLDABLE PHONES (Galaxy Fold, Galaxy Flip, Surface Duo) ═══
+
+**Scope.** The phone app on foldable screen sizes. **Method:** a throwaway
+web export with the 480 column lifted (and `IS_WEB` false) so it draws at
+native widths. 12 screens were photographed at six sizes:
+- Fold 1 cover, 280×653
+- Fold 3–5 cover, 344×882
+- Flip cover, 360×380
+- Fold open, 690×829 and 829×690
+- Duo spanned, 1114×720
+
+Controls past the screen edge were listed automatically. The export was rebuilt after the fixes. No temporary files were kept.
+
+**Why landscape matters now.** Android builds target API 36. On Android 16,
+screens 600 dp or wider (an unfolded Fold) ignore `"orientation": "portrait"`, so the app must lay out in
+landscape there. Below 600 (the Flip, the Fold cover) the lock still holds.
+
+| # | Was | Now | Proof |
+| --- | --- | --- | --- |
+| 1 | Fold cover (280): the Explore "Rent" pill ran off the edge (214–282) | Pills wrap to a second line | `components/ui/filter-tabs.tsx`; e2e X34 |
+| 2 | Fold cover (280): the wizard's fifth step dot ran off the edge (276–310) | Connectors shrink. The current step's label hides below 340, since the kicker above says the same ("BAZAT 1/5") | `app/listing/new.tsx`; e2e X34 |
+| 3 | Unfolded Fold / spanned Duo: forms, row lists, profile, chat and legal pages stretched edge to edge (text fields 1100 wide) | Content sits in a centred 640 column and the background stays full width. The column only applies above 640, so phones and the website are unchanged | `useReadableColumn()` in `hooks/use-responsive.ts`, `READABLE_MAX_WIDTH` in `constants/web-frame.ts`. Used on profile, my-listings, listing wizard, messages and thread, saved searches, viewings, agent dashboard, favourites, analytics, privacy and terms |
+| 4 | Same screens: every bottom sheet and picker stretched to the full width | Sheets are centred at up to 640 (`webColumn` renamed `sheetColumn`, which is now active on native too) | 9 sheet files |
+| 5 | Home "for you" rail: each card was 70% of the screen (~800 wide on a Duo) over a 130-high photo | Capped at 320. The widest phone (~430 × 0.7) is under the cap | `getCompactCardWidth` |
+| 6 | Listing photo viewer read `Dimensions.get` once per render, and folding left both carousels between two photos | `useWindowDimensions`, and both carousels snap back to the current photo when the width changes | `app/property/[id].tsx` |
+
+Already right, left alone:
+- Every size decision reads `useWindowDimensions` and follows fold and unfold live.
+- Expo's Android template keeps the activity alive across fold and unfold (`configChanges` includes `screenSize|smallestScreenSize|screenLayout`).
+- The unfolded Fold gets the tablet layouts: a 3-column grid and the two-column listing page.
+- The floating tab bar is already capped.
+
+**Not done, needs an owner decision.** On a Surface Duo or a half-folded Fold,
+the hinge or crease can sit across centred content. Detecting the hinge
+needs Jetpack WindowManager through a native module, which is a new
+dependency (CLAUDE.md: ask first). Without it the app treats a spanned Duo
+as one 1114-wide tablet. Microsoft also ended the Duo's updates in 2023, so a hinge-aware two-pane layout is low value.
+
+**Checked:**
+
+| Check | Result |
+|---|---|
+| `tsc` | clean |
+| `lint` | 0 errors (33 warnings, unchanged) |
+| `npm test` | 334/334 |
+| `test:e2e:expo` | 138 passed, 18 skipped (new X34 ×5, phone project) |
+
+**Still to try on a real Fold or Flip:** unfold while on a listing, open a sheet in landscape on the inner screen, and type in the wizard on the cover screen.
+
 ## ═══ PASS 21 — 2026-10-26: THE "FIXES I CAN DO NOW" LIST (owner request) ═══
 
 **Scope.** The no-cost list from `docs/TODO.md`: one P2, seven P3 and two

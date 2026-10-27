@@ -12,6 +12,7 @@ import { LEGAL_CONTACT_EMAIL } from '@/lib/legal';
 import * as en from '@/src/features/legal/content/en';
 import * as sq from '@/src/features/legal/content/sq';
 import type { LegalContact, LegalSection } from '@/src/features/legal/content/types';
+import { useReadableColumn } from '@/hooks/use-responsive';
 
 type Doc = 'privacy' | 'terms';
 
@@ -34,6 +35,8 @@ export function LegalDocument({ doc }: { doc: Doc }) {
   const router = useRouter();
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
+  // A centred column on an unfolded Fold or a spanned Duo (hooks/use-responsive).
+  const readable = useReadableColumn();
   const lang = (i18n.resolvedLanguage || i18n.language || 'sq').slice(0, 2);
   const content = lang === 'sq' ? sq : en;
   const body = content[doc];
@@ -41,7 +44,7 @@ export function LegalDocument({ doc }: { doc: Doc }) {
 
   return (
     <GradientBackground>
-      <SafeAreaView style={styles.container} edges={['top']}>
+      <SafeAreaView style={[styles.container, readable]} edges={['top']}>
         <AppHeader onBack={() => (router.canGoBack() ? router.back() : router.replace('/'))} />
         <ScrollView contentContainerStyle={styles.content}>
           <Text style={styles.title} accessibilityRole="header">{t(TITLE_KEYS[doc])}</Text>

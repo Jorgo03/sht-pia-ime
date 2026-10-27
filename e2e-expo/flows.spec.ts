@@ -447,6 +447,22 @@ test.describe('narrow phone layout', () => {
   }
 });
 
+// A Galaxy Fold's cover screen is 280 wide, narrower than any phone. The
+// Rent pill on Explore and the wizard's fifth step dot used to run off it.
+test.describe('foldable cover screen', () => {
+  test.use({ viewport: { width: 280, height: 653 }, signedIn: true });
+
+  for (const path of ['/', '/explore', '/listing/new', '/profile', `/property/${FEATURED.id}`]) {
+    test(`X34 at 280px ${path} keeps every control on screen`, async ({ page, isMobile }) => {
+      test.skip(!isMobile, 'phone project only');
+      await page.goto(path);
+      await ready(page);
+      await page.waitForTimeout(500);
+      expect(await layoutProblems(page)).toEqual([]);
+    });
+  }
+});
+
 // The listing wizard end to end in the app's web build: two photos, then
 // publish or draft (docs/PHOTO_KEYBOARD_PRICE_REPORT.md). Storage and the
 // properties table are answered here; what the app sends is recorded.

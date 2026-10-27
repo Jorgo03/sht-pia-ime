@@ -20,7 +20,8 @@ import { supabase } from '@/lib/supabase';
 import { formatDate, formatPrice } from '@/lib/format';
 import { PropertyFilters } from '@/data/types';
 import { countMatches, markSeen, newMatchCount, setEmailAlerts } from '@/src/features/saved-searches/lib/matches';
-import { webColumn } from '@/constants/web-frame';
+import { sheetColumn } from '@/constants/web-frame';
+import { useReadableColumn } from '@/hooks/use-responsive';
 
 // Email alerts are offered only once sending is configured (docs/LAUNCH_TASKS.md F13).
 const EMAIL_ALERTS = process.env.EXPO_PUBLIC_EMAIL_ALERTS === 'true';
@@ -68,6 +69,8 @@ export default function SavedSearchesScreen() {
   const { setFilter, reset: resetFilters } = useFilters();
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
+  // A centred column on an unfolded Fold or a spanned Duo (hooks/use-responsive).
+  const readable = useReadableColumn();
   const [tab, setTab] = useState<Tab>('searches');
   const [searches, setSearches] = useState<SavedSearch[]>([]);
   const [wanted, setWanted] = useState<WantedHome[]>([]);
@@ -224,7 +227,7 @@ export default function SavedSearchesScreen() {
 
   return (
     <GradientBackground>
-      <SafeAreaView style={styles.container} edges={['top']}>
+      <SafeAreaView style={[styles.container, readable]} edges={['top']}>
         <AppHeader onBack={() => router.back()} />
 
         {/* Matches web's SavedSearches.jsx screen-kicker/screen-headline hero. */}
@@ -427,7 +430,7 @@ export default function SavedSearchesScreen() {
 
       <Modal visible={formOpen} transparent animationType="slide" onRequestClose={() => setFormOpen(false)}>
         <View style={styles.modalBackdrop}>
-          <View style={[styles.modalSheet, webColumn]}>
+          <View style={[styles.modalSheet, sheetColumn]}>
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>
                 {tab === 'searches' ? t('saved.newSearch') : t('saved.newWanted')}

@@ -7,7 +7,6 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
-  Dimensions,
   FlatList,
   KeyboardAvoidingView,
   Linking,
@@ -22,6 +21,7 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  useWindowDimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
@@ -48,7 +48,7 @@ import { logActivity } from '@/lib/activity';
 import { propertyUrl } from '@/lib/site';
 import { supabase } from '@/lib/supabase';
 import { formatPrice, listingBadgeKey, priceSuffixKey, telUrl, whatsappUrl } from '@/lib/format';
-import { webColumn } from '@/constants/web-frame';
+import { sheetColumn } from '@/constants/web-frame';
 import { useAppDimensions } from '@/hooks/use-app-dimensions';
 import { PageHead } from '@/components/web/page-head';
 import { CARD_CONTAINER_A11Y } from '@/components/property/card-a11y';
@@ -86,7 +86,13 @@ export default function PropertyDetailScreen() {
   // The photo carousel is as wide as the app (the phone-width column on the
   // web); the full-screen photo viewer is as wide as the window.
   const { width: heroWidth } = useAppDimensions();
-  const screenWidth = Dimensions.get('window').width;
+  const { width: screenWidth } = useWindowDimensions();
+  // Folding or unfolding a phone changes the page width under a paged
+  // carousel; without this it is left between two photos.
+  useEffect(() => {
+    heroListRef.current?.scrollToOffset({ offset: imgIndex * heroWidth, animated: false });
+    lightboxListRef.current?.scrollToOffset({ offset: imgIndex * screenWidth, animated: false });
+  }, [heroWidth, screenWidth, imgIndex]);
   const { title, description, translating, isTranslated } = useTranslatedProperty(property, i18n.language);
 
   // Matches PropertyDetail.jsx's mount effect exactly — same two calls, same
@@ -617,7 +623,7 @@ export default function PropertyDetailScreen() {
         <KeyboardAvoidingView
           style={styles.modalBackdrop}
           behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-          <View style={[styles.modalSheet, webColumn]}>
+          <View style={[styles.modalSheet, sheetColumn]}>
             <View style={styles.modalHeader}>
               {/* requestTitle ("Request a") + requestTitleEm ("viewing") — same
                   two-key split as the web sheet's <h2>, joined with a space

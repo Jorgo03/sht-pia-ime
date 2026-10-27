@@ -14,6 +14,7 @@ import { useAuth } from '@/contexts/auth-context';
 import { useTheme } from '@/contexts/theme-context';
 import { supabase } from '@/lib/supabase';
 import { formatDate, getLocalizedText } from '@/lib/format';
+import { useReadableColumn } from '@/hooks/use-responsive';
 
 type ViewingStatus = 'requested' | 'confirmed' | 'declined' | 'cancelled';
 
@@ -66,6 +67,8 @@ export default function ViewingsScreen() {
   const { user } = useAuth();
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
+  // A centred column on an unfolded Fold or a spanned Duo (hooks/use-responsive).
+  const readable = useReadableColumn();
   const [viewings, setViewings] = useState<Viewing[]>([]);
   const [profiles, setProfiles] = useState<Record<string, ClientProfile>>({});
   const [loading, setLoading] = useState(true);
@@ -184,7 +187,7 @@ export default function ViewingsScreen() {
 
   return (
     <GradientBackground>
-      <SafeAreaView style={styles.container} edges={['top']}>
+      <SafeAreaView style={[styles.container, readable]} edges={['top']}>
         <AppHeader onBack={() => router.back()} />
 
         {/* Matches web's Viewings.jsx screen-kicker/screen-headline hero. */}

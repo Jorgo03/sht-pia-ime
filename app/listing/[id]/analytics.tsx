@@ -11,6 +11,7 @@ import { type AtticoPalette } from '@/constants/theme';
 import { useTheme } from '@/contexts/theme-context';
 import { supabase } from '@/lib/supabase';
 import { formatDate } from '@/lib/format';
+import { useReadableColumn } from '@/hooks/use-responsive';
 
 type ActivityType = 'view' | 'call' | 'message' | 'meeting' | 'favourite';
 
@@ -54,6 +55,8 @@ export default function PropertyAnalyticsScreen() {
   const { t, i18n } = useTranslation();
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
+  // A centred column on an unfolded Fold or a spanned Duo (hooks/use-responsive).
+  const readable = useReadableColumn();
 
   const [activity, setActivity] = useState<PropertyActivity[]>([]);
   const [loading, setLoading] = useState(true);
@@ -122,7 +125,7 @@ export default function PropertyAnalyticsScreen() {
 
   return (
     <GradientBackground>
-      <SafeAreaView style={styles.container} edges={['top']}>
+      <SafeAreaView style={[styles.container, readable]} edges={['top']}>
         <AppHeader onBack={() => router.back()} title={t('dashboard.title')} titleIsHeading />
 
         {loading ? (

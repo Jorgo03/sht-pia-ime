@@ -18,6 +18,7 @@ import { supabase } from '@/lib/supabase';
 import { formatPrice, getLocalizedText } from '@/lib/format';
 import { Property } from '@/data/types';
 import { closedStatusFor } from '@/src/features/listings/lib/listingForm';
+import { useReadableColumn } from '@/hooks/use-responsive';
 
 // Reads the theme's status tokens rather than hardcoding the light-theme
 // hexes — web pulls these from --fho-status-*, which swap in dark mode, so a
@@ -39,6 +40,8 @@ export default function MyListingsScreen() {
   const { user } = useAuth();
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
+  // A centred column on an unfolded Fold or a spanned Duo (hooks/use-responsive).
+  const readable = useReadableColumn();
   const queryClient = useQueryClient();
   const [listings, setListings] = useState<Property[]>([]);
   const [loading, setLoading] = useState(true);
@@ -114,7 +117,7 @@ export default function MyListingsScreen() {
 
   return (
     <GradientBackground>
-      <SafeAreaView style={styles.container} edges={['top']}>
+      <SafeAreaView style={[styles.container, readable]} edges={['top']}>
         <AppHeader onBack={() => router.back()} />
 
         {/* Matches web's MyListings.jsx: plain .page-title (not the
