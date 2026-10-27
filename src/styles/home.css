@@ -139,7 +139,9 @@
 
 .featured-card__stats {
   display: flex;
-  gap: 12px;
+  /* Three chips need ~250px; the area chip was clipped at 280-320. */
+  flex-wrap: wrap;
+  gap: 8px 12px;
   margin-bottom: 12px;
 }
 

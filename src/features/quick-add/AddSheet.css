@@ -22,7 +22,15 @@
   max-width: 480px;
   background: var(--fho-surface);
   border-radius: var(--r-2xl) var(--r-2xl) 0 0;
-  padding: 12px 20px 32px;
+  padding: 12px 20px calc(32px + env(safe-area-inset-bottom));
+  /* Pinned to the bottom, so any extra height ran off the TOP: on the 360x380
+     Flip cover the grip, title and close button sat above the viewport with
+     no way to scroll to them. Cap it and let the sheet scroll itself, as
+     .filter-sheet does. */
+  max-height: calc(100vh - 12px);
+  max-height: calc(100dvh - 12px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
   z-index: 101;
   animation: sheetSlide 350ms var(--ease-out);
 }
@@ -217,31 +225,8 @@
   color: var(--fho-orange-text);
 }
 
-/* Toast */
-
-.addsheet-toast {
-  position: fixed;
-  bottom: 92px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: var(--fho-surface);
-  border: 1px solid var(--fho-border);
-  border-radius: var(--r-pill);
-  padding: 10px 20px;
-  font-size: 13px;
-  font-weight: 500;
-  font-family: var(--font-sans);
-  color: var(--fho-text);
-  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-  z-index: 200;
-  cursor: pointer;
-  animation: toastIn 300ms var(--ease-out);
-  white-space: nowrap;
-}
-
-@keyframes toastIn {
-  from { opacity: 0; transform: translateX(-50%) translateY(12px); }
-  to { opacity: 1; transform: translateX(-50%) translateY(0); }
-}
+/* Toast: .addsheet-toast lives in globals.css only. A second copy here added
+   `white-space: nowrap`, so long messages (sq viewings.requestSuccess) ran
+   off both edges on phones up to ~450 wide. */
 
 }

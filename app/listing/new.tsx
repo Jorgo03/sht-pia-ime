@@ -21,7 +21,7 @@ import {
   type StyleProp,
   type ViewStyle,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { LocationPicker } from '@/components/listing/location-picker';
 import { RoadField } from '@/components/listing/road-field';
@@ -296,6 +296,9 @@ function ListingWizard({ editId }: { editId?: string }) {
   // The kicker above already reads "BASICS 1/5", so the current step's label
   // is the first thing to go on a Galaxy Fold cover screen (280 wide).
   const showStepLabel = useResponsive().width >= 340;
+  // The SafeAreaView only pads the top, so the footer clears the home
+  // indicator / Android edge-to-edge nav bar itself.
+  const insets = useSafeAreaInsets();
   const queryClient = useQueryClient();
 
   const [step, setStep] = useState(0);
@@ -1353,7 +1356,11 @@ function ListingWizard({ editId }: { editId?: string }) {
           <KeyboardDoneBar />
         </KeyboardAvoidingView>
 
-        <View style={styles.footer}>
+        <View
+          style={[
+            styles.footer,
+            { paddingBottom: Math.max(insets.bottom, Platform.OS === 'ios' ? 20 : 14) },
+          ]}>
           {isLast && !isEdit && (
             <Pressable
               onPress={() => submit('draft')}
@@ -1714,7 +1721,6 @@ const createStyles = (colors: AtticoPalette) =>
       gap: 10,
       paddingHorizontal: Spacing.md,
       paddingTop: 10,
-      paddingBottom: Platform.OS === 'ios' ? 20 : 14,
       borderTopWidth: 1,
       borderTopColor: colors.border,
       backgroundColor: colors.primary,

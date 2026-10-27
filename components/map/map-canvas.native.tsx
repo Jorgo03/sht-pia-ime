@@ -26,7 +26,11 @@ function MapCanvasNative(
     clusters,
     onMarkerPress,
     accentColor,
-  }: MapCanvasProps,
+    bottomInset = 0,
+  }: MapCanvasProps & {
+    /** Height of whatever floats over the map's bottom edge (the tab bar). */
+    bottomInset?: number;
+  },
   ref: React.ForwardedRef<MapCanvasHandle>,
 ) {
   const mapRef = useRef<MapView | null>(null);
@@ -41,6 +45,10 @@ function MapCanvasNative(
     <MapView
       ref={mapRef}
       style={StyleSheet.absoluteFill}
+      // The map runs under the floating tab bar: without this the Google logo
+      // (Android) and Apple's Legal link (iOS) were drawn under the pill, and a
+      // county or cluster tap centred its target partly behind it.
+      mapPadding={{ top: 0, left: 0, right: 0, bottom: bottomInset }}
       initialRegion={initialRegion as Region}
       onRegionChangeComplete={(region) => onRegionChangeComplete(region)}
       onPress={onMapPress}

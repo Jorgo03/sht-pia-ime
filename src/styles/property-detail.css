@@ -8,6 +8,9 @@
 
 .detail-hero {
   height: 360px;
+  /* 360 on every phone ~540+ tall; shorter on a 380-tall Flip cover screen
+     or in landscape, where it filled everything above the nav. */
+  height: clamp(200px, calc(100svh - 180px), 360px);
   position: relative;
   overflow: hidden;
   cursor: pointer;

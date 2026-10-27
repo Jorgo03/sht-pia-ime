@@ -111,7 +111,8 @@ export function ExploreMap({
   clusters,
   onMarkerPress,
   accentColor,
-}: MapCanvasProps & { handleRef: Ref<MapCanvasHandle>; colors: AtticoPalette }) {
+  bottomInset = 0,
+}: MapCanvasProps & { handleRef: Ref<MapCanvasHandle>; colors: AtticoPalette; bottomInset?: number }) {
   // Callbacks change identity on every parent render; the map listens once.
   const handlers = useRef({ onRegionChangeComplete, onMapPress, onCountyPress, onMarkerPress });
   useEffect(() => {
@@ -133,9 +134,23 @@ export function ExploreMap({
 
   useImperativeHandle(handleRef, () => ({
     animateToRegion: (region, durationMs = 500) => {
-      mapRef.current?.flyToBounds(toBounds(region), { duration: durationMs / 1000 });
+      // Fits the target above the tab bar, like the native map's mapPadding.
+      mapRef.current?.flyToBounds(toBounds(region), {
+        duration: durationMs / 1000,
+        paddingBottomRight: [0, bottomInset],
+      });
     },
   }));
+
+  // The attribution sat in the bottom-right corner under the floating tab
+  // bar, at every width; OpenStreetMap's licence needs it visible.
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+    map.getContainer().querySelectorAll('.leaflet-bottom').forEach((corner: HTMLElement) => {
+      corner.style.bottom = `${bottomInset}px`;
+    });
+  }, [bottomInset, mapRef]);
 
   useEffect(() => {
     const group = overlay.current;

@@ -202,8 +202,10 @@ export function FilterSheet({
     },
     onDeactivate: (e) => {
       if (translateY.value > 120 || e.velocityY > 800) {
+        // The sheet's own height, as BottomSheet does: a fixed 800 stopped
+        // ~100px short of off-screen on a 768x1024 tablet (sheet 901).
         // eslint-disable-next-line react-hooks/immutability -- Reanimated SharedValue: assigning .value IS its API, and it is a worklet value, not React state. The compiler rule does not model SharedValue.
-        translateY.value = withTiming(800, { duration: 200 }, () => {
+        translateY.value = withTiming(sheetHeight, { duration: 200 }, () => {
           runOnJS(closeSheet)();
         });
       } else {
@@ -490,6 +492,11 @@ const createStyles = (colors: AtticoPalette, sheetHeight: number = 0) => StyleSh
     // of the screen" read as the web sheet's max-height, and gives the drag
     // gesture room to move before it must dismiss.
     height: sheetHeight,
+    // Android resizes the Modal above the keyboard but the window height
+    // (and so sheetHeight) stays put: the backdrop shrank and pushed the grip,
+    // title and Reset off the top while typing a price. Clamped to the
+    // backdrop, the height stays definite and shrinks with it.
+    maxHeight: '100%',
     // Matches web's .filter-sheet: border-radius: var(--r-2xl) (28px).
     borderTopLeftRadius: 28,
     borderTopRightRadius: 28,

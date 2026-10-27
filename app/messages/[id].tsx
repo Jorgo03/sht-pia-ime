@@ -14,7 +14,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 
 import { ReportSheet } from '@/components/safety/report-sheet';
@@ -59,6 +59,10 @@ export default function ThreadScreen() {
   const styles = useMemo(() => createStyles(colors), [colors]);
   // A centred column on an unfolded Fold or a spanned Duo (hooks/use-responsive).
   const readable = useReadableColumn();
+  // The composer pads itself clear of the home indicator / Android nav bar
+  // (SafeAreaView edges below); the KAV offset takes that inset back off so
+  // the row still sits flush on the iOS keyboard.
+  const insets = useSafeAreaInsets();
   // The conversation could not be read: not this account's (an old
   // notification after switching accounts), or gone.
   const [unavailable, setUnavailable] = useState(false);
@@ -285,8 +289,11 @@ export default function ThreadScreen() {
     <KeyboardAvoidingView
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}>
-      <SafeAreaView style={[styles.container, readable]} edges={['top']}>
+      // The KAV is the screen root at y=0 (headerShown: false), so there is
+      // no nav header to offset for; the old 90 floated the composer 90pt
+      // above the keyboard.
+      keyboardVerticalOffset={Platform.OS === 'ios' ? -insets.bottom : 0}>
+      <SafeAreaView style={[styles.container, readable]} edges={['top', 'bottom']}>
         {/* The correspondent's name and avatar stay — they're the only cue as
             to who you're talking to — so they take the header's title/avatar
             slots rather than being displaced by the wordmark. Language and

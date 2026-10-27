@@ -3,7 +3,18 @@ import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter, type Href } from 'expo-router';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import {
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 
@@ -429,7 +440,9 @@ export default function SavedSearchesScreen() {
       </SafeAreaView>
 
       <Modal visible={formOpen} transparent animationType="slide" onRequestClose={() => setFormOpen(false)}>
-        <View style={styles.modalBackdrop}>
+        <KeyboardAvoidingView
+          style={styles.modalBackdrop}
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
           <View style={[styles.modalSheet, sheetColumn]}>
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>
@@ -439,108 +452,112 @@ export default function SavedSearchesScreen() {
                 <MaterialIcons name="close" size={22} color={colors.textSecondary} />
               </TouchableOpacity>
             </View>
-
-            {tab === 'searches' ? (
-              <>
-                <TextInput
-                  style={styles.input}
-                  placeholder={t('addSheet.searchName')}
-                  placeholderTextColor={colors.textSecondary}
-                  value={searchName}
-                  onChangeText={setSearchName}
-                />
-                <TextInput
-                  style={styles.input}
-                  placeholder={t('listing.city')}
-                  placeholderTextColor={colors.textSecondary}
-                  value={searchCity}
-                  onChangeText={setSearchCity}
-                />
-                <View style={styles.toggleRow}>
-                  {(['sale', 'rent'] as const).map((typ) => (
-                    <TouchableOpacity
-                      accessibilityRole="button"
-                      key={typ}
-                      style={[styles.toggle, searchType === typ && styles.toggleActive]}
-                      onPress={() => setSearchType(typ)}
-                      activeOpacity={0.7}>
-                      <Text style={[styles.toggleText, searchType === typ && styles.toggleTextActive]}>
-                        {typ === 'sale' ? t('search.sale') : t('search.rent')}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-                {/* Web's AddSheet submits are `.cta-pill`, no trailing glyph. */}
-                <PrimaryCTA
-                  label={saving ? t('common.loading') : t('common.save')}
-                  icon={null}
-                  loading={saving}
-                  onPress={submitSearch}
-                  disabled={saving || !searchName.trim()}
-                />
-              </>
-            ) : (
-              <>
-                <TextInput
-                  style={styles.input}
-                  placeholder={t('listing.city')}
-                  placeholderTextColor={colors.textSecondary}
-                  value={wantedCity}
-                  onChangeText={setWantedCity}
-                />
-                <View style={styles.toggleRow}>
-                  {(['sale', 'rent'] as const).map((typ) => (
-                    <TouchableOpacity
-                      accessibilityRole="button"
-                      key={typ}
-                      style={[styles.toggle, wantedType === typ && styles.toggleActive]}
-                      onPress={() => setWantedType(typ)}
-                      activeOpacity={0.7}>
-                      <Text style={[styles.toggleText, wantedType === typ && styles.toggleTextActive]}>
-                        {typ === 'sale' ? t('search.sale') : t('search.rent')}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-                <View style={styles.rowInputs}>
+            {/* Capped and scrolling (edit-profile-sheet's pattern): the
+                wanted form (4 inputs, toggles, CTA) pushed its header off the
+                top on 360x380, and on any phone once the keyboard opened. */}
+            <ScrollView contentContainerStyle={styles.modalBody} keyboardShouldPersistTaps="handled">
+              {tab === 'searches' ? (
+                <>
                   <TextInput
-                    style={[styles.input, styles.rowInput]}
-                    placeholder={t('addSheet.maxPrice')}
+                    style={styles.input}
+                    placeholder={t('addSheet.searchName')}
                     placeholderTextColor={colors.textSecondary}
-                    value={wantedMaxPrice}
-                    onChangeText={setWantedMaxPrice}
-                    keyboardType="numeric"
+                    value={searchName}
+                    onChangeText={setSearchName}
                   />
                   <TextInput
-                    style={[styles.input, styles.rowInput]}
-                    placeholder={t('addSheet.minBedrooms')}
+                    style={styles.input}
+                    placeholder={t('listing.city')}
                     placeholderTextColor={colors.textSecondary}
-                    value={wantedMinBeds}
-                    onChangeText={setWantedMinBeds}
-                    keyboardType="numeric"
+                    value={searchCity}
+                    onChangeText={setSearchCity}
                   />
-                </View>
-                <TextInput
-                  style={[styles.input, styles.textArea]}
-                  placeholder={t('addSheet.notes')}
-                  placeholderTextColor={colors.textSecondary}
-                  value={wantedNotes}
-                  onChangeText={setWantedNotes}
-                  multiline
-                  numberOfLines={3}
-                  textAlignVertical="top"
-                />
-                <PrimaryCTA
-                  label={saving ? t('common.loading') : t('common.save')}
-                  icon={null}
-                  loading={saving}
-                  onPress={submitWanted}
-                  disabled={saving || !wantedCity.trim()}
-                />
-              </>
-            )}
+                  <View style={styles.toggleRow}>
+                    {(['sale', 'rent'] as const).map((typ) => (
+                      <TouchableOpacity
+                        accessibilityRole="button"
+                        key={typ}
+                        style={[styles.toggle, searchType === typ && styles.toggleActive]}
+                        onPress={() => setSearchType(typ)}
+                        activeOpacity={0.7}>
+                        <Text style={[styles.toggleText, searchType === typ && styles.toggleTextActive]}>
+                          {typ === 'sale' ? t('search.sale') : t('search.rent')}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                  {/* Web's AddSheet submits are `.cta-pill`, no trailing glyph. */}
+                  <PrimaryCTA
+                    label={saving ? t('common.loading') : t('common.save')}
+                    icon={null}
+                    loading={saving}
+                    onPress={submitSearch}
+                    disabled={saving || !searchName.trim()}
+                  />
+                </>
+              ) : (
+                <>
+                  <TextInput
+                    style={styles.input}
+                    placeholder={t('listing.city')}
+                    placeholderTextColor={colors.textSecondary}
+                    value={wantedCity}
+                    onChangeText={setWantedCity}
+                  />
+                  <View style={styles.toggleRow}>
+                    {(['sale', 'rent'] as const).map((typ) => (
+                      <TouchableOpacity
+                        accessibilityRole="button"
+                        key={typ}
+                        style={[styles.toggle, wantedType === typ && styles.toggleActive]}
+                        onPress={() => setWantedType(typ)}
+                        activeOpacity={0.7}>
+                        <Text style={[styles.toggleText, wantedType === typ && styles.toggleTextActive]}>
+                          {typ === 'sale' ? t('search.sale') : t('search.rent')}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                  <View style={styles.rowInputs}>
+                    <TextInput
+                      style={[styles.input, styles.rowInput]}
+                      placeholder={t('addSheet.maxPrice')}
+                      placeholderTextColor={colors.textSecondary}
+                      value={wantedMaxPrice}
+                      onChangeText={setWantedMaxPrice}
+                      keyboardType="numeric"
+                    />
+                    <TextInput
+                      style={[styles.input, styles.rowInput]}
+                      placeholder={t('addSheet.minBedrooms')}
+                      placeholderTextColor={colors.textSecondary}
+                      value={wantedMinBeds}
+                      onChangeText={setWantedMinBeds}
+                      keyboardType="numeric"
+                    />
+                  </View>
+                  <TextInput
+                    style={[styles.input, styles.textArea]}
+                    placeholder={t('addSheet.notes')}
+                    placeholderTextColor={colors.textSecondary}
+                    value={wantedNotes}
+                    onChangeText={setWantedNotes}
+                    multiline
+                    numberOfLines={3}
+                    textAlignVertical="top"
+                  />
+                  <PrimaryCTA
+                    label={saving ? t('common.loading') : t('common.save')}
+                    icon={null}
+                    loading={saving}
+                    onPress={submitWanted}
+                    disabled={saving || !wantedCity.trim()}
+                  />
+                </>
+              )}
+            </ScrollView>
           </View>
-        </View>
+        </KeyboardAvoidingView>
         <KeyboardDoneBar />
       </Modal>
     </GradientBackground>
@@ -735,6 +752,10 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     borderTopRightRadius: 24,
     padding: 20,
     paddingBottom: 36,
+    gap: 12,
+    maxHeight: '90%',
+  },
+  modalBody: {
     gap: 12,
   },
   modalHeader: {

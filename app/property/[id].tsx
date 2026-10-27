@@ -42,7 +42,7 @@ import { useFavorites } from '@/contexts/favorites-context';
 import { useTheme } from '@/contexts/theme-context';
 import { usePropertiesQuery, usePropertyQuery } from '@/hooks/use-property-queries';
 import { addRecentlyViewed } from '@/hooks/use-recently-viewed';
-import { useResponsive } from '@/hooks/use-responsive';
+import { useReadableColumn, useResponsive } from '@/hooks/use-responsive';
 import { useTranslatedProperty } from '@/hooks/use-translated-property';
 import { logActivity } from '@/lib/activity';
 import { propertyUrl } from '@/lib/site';
@@ -69,7 +69,12 @@ export default function PropertyDetailScreen() {
   const { isFavorite, toggle } = useFavorites();
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
-  const { height: screenHeight, isTablet } = useResponsive();
+  const { height: screenHeight, width: layoutWidth, isTablet } = useResponsive();
+  // Two columns only when the right one gets a phone's width: at 600-819
+  // (Fold open 673x841) it was ~210-240px, too narrow for the agent row,
+  // price and CTA. Below that the content stacks in the readable column.
+  const split = isTablet && layoutWidth >= 820;
+  const readable = useReadableColumn();
   const favorited = isFavorite(id ?? '');
   const { data: property = null, isLoading: loading } = usePropertyQuery(id);
   const [contactMessage, setContactMessage] = useState('');
@@ -270,7 +275,12 @@ export default function PropertyDetailScreen() {
   // dominating the whole screen, so it can afford to be relatively shorter,
   // leaving more room for that content — especially in landscape, where
   // screenHeight is already constrained.
-  const imageHeight = screenHeight * (isTablet ? 0.32 : 0.42);
+  // Clamped on short screens (360x380 Flip cover, where 42% pinned the hero
+  // over most of what was left); unchanged from ~552 tall up.
+  const imageHeight = Math.min(
+    screenHeight * (isTablet ? 0.32 : 0.42),
+    Math.max(120, screenHeight - 320),
+  );
 
   const images = property.image_urls?.length ? property.image_urls : [];
   const price = formatPrice(property.price, i18n.language, property.currency);
@@ -612,10 +622,13 @@ export default function PropertyDetailScreen() {
 
       <ScrollView
         style={styles.content}
-        contentContainerStyle={styles.contentInner}
+        contentContainerStyle={[
+          styles.contentInner,
+          !split && readable && { paddingHorizontal: 24 + readable.paddingHorizontal },
+        ]}
         showsVerticalScrollIndicator={false}
         keyboardDismissMode={Platform.OS === 'ios' ? 'interactive' : 'on-drag'}>
-        {isTablet ? (
+        {split ? (
           <View style={styles.tabletSplit}>
             <View style={styles.tabletColumnLeft}>{infoContent}</View>
             <View style={styles.tabletColumnRight}>{agentAndContactContent}</View>
@@ -644,34 +657,39 @@ export default function PropertyDetailScreen() {
               </Text>
               <SheetCloseButton onPress={() => setViewingSheetOpen(false)} />
             </View>
-            <Text style={styles.modalLabel}>{t('viewings.when')}</Text>
-            <DateTimePicker
-              value={viewingDate}
-              mode="datetime"
-              display="spinner"
-              minimumDate={nextSlot()}
-              onChange={(_event, date) => date && setViewingDate(date)}
-              themeVariant="dark"
-            />
-            <TextInput
-              style={[styles.contactInput, styles.contactMessage, { marginTop: 12 }]}
-              placeholder={t('addSheet.notes')}
-              placeholderTextColor={colors.textSecondary}
-              value={viewingNotes}
-              onChangeText={setViewingNotes}
-              multiline
-              numberOfLines={3}
-              textAlignVertical="top"
-            />
-            {/* Web's ViewingRequestSheet submit is a `.cta-pill` with no
-                trailing glyph — hence icon={null}. */}
-            <PrimaryCTA
-              label={requestingViewing ? t('common.loading') : t('viewings.request')}
-              icon={null}
-              loading={requestingViewing}
-              onPress={submitViewingRequest}
-              disabled={requestingViewing}
-            />
+            {/* Capped and scrolling (edit-profile-sheet's pattern): the ~530px
+                picker + notes + CTA pushed the header off the top on 360x380,
+                and on any phone once the keyboard opened. */}
+            <ScrollView contentContainerStyle={styles.modalBody} keyboardShouldPersistTaps="handled">
+              <Text style={styles.modalLabel}>{t('viewings.when')}</Text>
+              <DateTimePicker
+                value={viewingDate}
+                mode="datetime"
+                display="spinner"
+                minimumDate={nextSlot()}
+                onChange={(_event, date) => date && setViewingDate(date)}
+                themeVariant="dark"
+              />
+              <TextInput
+                style={[styles.contactInput, styles.contactMessage, { marginTop: 12 }]}
+                placeholder={t('addSheet.notes')}
+                placeholderTextColor={colors.textSecondary}
+                value={viewingNotes}
+                onChangeText={setViewingNotes}
+                multiline
+                numberOfLines={3}
+                textAlignVertical="top"
+              />
+              {/* Web's ViewingRequestSheet submit is a `.cta-pill` with no
+                  trailing glyph — hence icon={null}. */}
+              <PrimaryCTA
+                label={requestingViewing ? t('common.loading') : t('viewings.request')}
+                icon={null}
+                loading={requestingViewing}
+                onPress={submitViewingRequest}
+                disabled={requestingViewing}
+              />
+            </ScrollView>
           </View>
         </KeyboardAvoidingView>
         <KeyboardDoneBar />
@@ -1006,9 +1024,14 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     fontWeight: '600',
     color: colors.accentText,
   },
+  // Wraps: four or five labels overran the right edge at 280-320 (and at
+  // 360 with large system text).
   amenityRow: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     justifyContent: 'space-around',
+    rowGap: 12,
+    columnGap: 8,
     paddingVertical: 16,
   },
   amenityItem: {
@@ -1188,6 +1211,10 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     borderTopRightRadius: 24,
     padding: 20,
     paddingBottom: 36,
+    gap: 12,
+    maxHeight: '90%',
+  },
+  modalBody: {
     gap: 12,
   },
   modalHeader: {

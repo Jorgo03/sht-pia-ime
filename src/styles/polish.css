@@ -208,14 +208,19 @@ input:focus-visible, textarea:focus-visible, select:focus-visible {
  * the eye are already `position: absolute` (top/right pinned to their card or
  * field); setting `position: relative` on them overrode that and dropped them
  * out of their corner into normal flow at the top-left of the card. */
-.auth-forgot {
+.auth-forgot,
+.cookie-accept,
+.assistant-panel__close {
   position: relative;
 }
 
 .mini-img .heart-mini::after,
 .compact-card__heart::after,
 .field-eye::after,
-.auth-forgot::after {
+.auth-forgot::after,
+.cookie-accept::after,
+.assistant-panel__close::after,
+.nl-image-remove::after {
   content: '';
   position: absolute;
   top: 50%;

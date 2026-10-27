@@ -55,7 +55,9 @@ export function PrimaryCTA({
           end={{ x: 1, y: 1 }}
           style={StyleSheet.absoluteFill}
         />
-        <Text style={styles.ctaLabel}>{label}</Text>
+        <Text style={styles.ctaLabel} numberOfLines={2} maxFontSizeMultiplier={1.4}>
+          {label}
+        </Text>
         {icon && !loading ? <MaterialIcons name={icon} size={18} color="#fff" /> : null}
       </Pressable>
     </Animated.View>
@@ -101,7 +103,12 @@ export function GhostBtn({
             color={onDark ? colors.cream100 : colors.textPrimary}
           />
         ) : null}
-        <Text style={[styles.ghostLabel, onDark && styles.ghostLabelOnDark]}>{label}</Text>
+        <Text
+          style={[styles.ghostLabel, onDark && styles.ghostLabelOnDark]}
+          numberOfLines={2}
+          maxFontSizeMultiplier={1.4}>
+          {label}
+        </Text>
       </Pressable>
     </Animated.View>
   );
@@ -109,8 +116,13 @@ export function GhostBtn({
 
 const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   // §3: "orange gradient pill ... with the cta shadow", 54px tall.
+  // A floor, not a fixed height: a label that wrapped (the wizard footer at
+  // 280, de/ru labels, system text at 130%+) was clipped top and bottom.
+  // One-line labels still come out exactly 54.
   cta: {
-    height: 54,
+    minHeight: 54,
+    paddingHorizontal: 20,
+    paddingVertical: 8,
     borderRadius: Radii.pill,
     flexDirection: 'row',
     alignItems: 'center',
@@ -123,12 +135,16 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     opacity: 0.45,
   },
   ctaLabel: {
+    flexShrink: 1,
+    textAlign: 'center',
     fontFamily: Fonts?.sansBold,
     fontSize: 16,
     color: '#fff',
   },
+  // Same minHeight floor as the CTA.
   ghost: {
-    height: 54,
+    minHeight: 54,
+    paddingVertical: 8,
     borderRadius: Radii.pill,
     flexDirection: 'row',
     alignItems: 'center',
@@ -144,6 +160,8 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.06)',
   },
   ghostLabel: {
+    flexShrink: 1,
+    textAlign: 'center',
     fontFamily: Fonts?.sansSemiBold,
     fontSize: 15,
     color: colors.textPrimary,
