@@ -142,6 +142,10 @@ function ThemedNavigation() {
             options={{ headerShown: false, presentation: 'card' }}
           />
           <Stack.Screen
+            name="leads/index"
+            options={{ headerShown: false, presentation: 'card' }}
+          />
+          <Stack.Screen
             name="saved-searches/index"
             options={{ headerShown: false, presentation: 'card' }}
           />

@@ -319,7 +319,14 @@
     "noPendingViewings": "Asnjë kërkesë në pritje",
     "wantedFeed": "Blerës që kërkojnë",
     "wantedFeedSub": "Kërkesa të hapura",
-    "wantedEmpty": "Asnjë kërkesë e hapur për momentin"
+    "wantedEmpty": "Asnjë kërkesë e hapur për momentin",
+    "today": "Sot",
+    "todayEmpty": "Asnjë vizitë sot.",
+    "matches_one": "{{count}} nga pronat e tua përputhet",
+    "matches_other": "{{count}} nga pronat e tua përputhen",
+    "noMatches": "Asnjë nga pronat e tua nuk përputhet ende",
+    "showMatches": "Shfaqi",
+    "hideMatches": "Fshihi"
   },
   "profile": {
     "savedSearches": "Kërkimet e ruajtura",
@@ -756,5 +763,45 @@
     "emailChanged": "Adresa e emailit u përditësua.",
     "requestNew": "Kërko një kod të ri",
     "goSignIn": "Shko te hyrja"
+  },
+  "leads": {
+    "kicker": "Klientët e tu",
+    "headlinePre": "Klientë",
+    "headlineEm": "potencialë",
+    "search": "Kërko me emër, telefon, email…",
+    "add": "Shto klient",
+    "addTitle": "Klient i ri",
+    "editTitle": "Ndrysho klientin",
+    "all": "Të gjithë",
+    "status": {
+      "new": "I ri",
+      "contacted": "Kontaktuar",
+      "qualified": "I kualifikuar",
+      "won": "Fituar",
+      "lost": "Humbur"
+    },
+    "name": "Emri",
+    "phone": "Telefoni",
+    "email": "Email",
+    "notes": "Shënime",
+    "notesHint": "p.sh. kërkon 2+1 në Tiranë, deri 150.000 €",
+    "statusLabel": "Statusi",
+    "call": "Thirr",
+    "whatsapp": "WhatsApp",
+    "sendEmail": "Email",
+    "delete": "Fshi",
+    "deleteTitle": "Ta fshij këtë klient?",
+    "deleteBody": "{{name}} do të fshihet përgjithmonë.",
+    "empty": "Ende pa klientë",
+    "emptyHint": "Shto çdo njeri që të kontakton, që asnjë mundësi të mos humbasë.",
+    "noResults": "Asnjë klient nuk përputhet me kërkimin.",
+    "nameRequired": "Shkruaj emrin e klientit.",
+    "tooLong": "Një nga fushat është shumë e gjatë.",
+    "phoneInvalid": "Ky nuk duket si numër telefoni.",
+    "emailInvalid": "Ky nuk duket si adresë email-i.",
+    "saveFailed": "Nuk u ruajt. Provo përsëri.",
+    "deleteFailed": "Nuk u fshi. Provo përsëri.",
+    "greeting": "Përshëndetje {{name}}!",
+    "added": "Shtuar më {{date}}"
   }
 }

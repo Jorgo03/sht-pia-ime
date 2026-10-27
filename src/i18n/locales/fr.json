@@ -351,7 +351,14 @@
     "noPendingViewings": "Aucune demande en attente",
     "wantedFeed": "Acheteurs en recherche",
     "wantedFeedSub": "Demandes ouvertes",
-    "wantedEmpty": "Aucune demande ouverte pour le moment"
+    "wantedEmpty": "Aucune demande ouverte pour le moment",
+    "today": "Aujourd’hui",
+    "todayEmpty": "Aucune visite aujourd’hui.",
+    "matches_one": "{{count}} de tes annonces correspond",
+    "matches_other": "{{count}} de tes annonces correspondent",
+    "noMatches": "Aucune de tes annonces ne correspond encore",
+    "showMatches": "Afficher",
+    "hideMatches": "Masquer"
   },
   "account": {
     "welcomeBack": "Bon retour, {{name}} 👋",
@@ -764,5 +771,45 @@
     "emailChanged": "Votre adresse e-mail a été mise à jour.",
     "requestNew": "Demander un nouveau code",
     "goSignIn": "Aller à la connexion"
+  },
+  "leads": {
+    "kicker": "Tes clients",
+    "headlinePre": "Clients",
+    "headlineEm": "potentiels",
+    "search": "Recherche par nom, téléphone, e-mail…",
+    "add": "Ajouter un client",
+    "addTitle": "Nouveau client",
+    "editTitle": "Modifier le client",
+    "all": "Tous",
+    "status": {
+      "new": "Nouveau",
+      "contacted": "Contacté",
+      "qualified": "Qualifié",
+      "won": "Gagné",
+      "lost": "Perdu"
+    },
+    "name": "Nom",
+    "phone": "Téléphone",
+    "email": "E-mail",
+    "notes": "Notes",
+    "notesHint": "ex. cherche un 2 chambres à Tirana, jusqu’à 150 000 €",
+    "statusLabel": "Statut",
+    "call": "Appeler",
+    "whatsapp": "WhatsApp",
+    "sendEmail": "E-mail",
+    "delete": "Supprimer",
+    "deleteTitle": "Supprimer ce client ?",
+    "deleteBody": "{{name}} sera supprimé définitivement.",
+    "empty": "Pas encore de clients",
+    "emptyHint": "Ajoute tous ceux qui te contactent, pour ne manquer aucune occasion.",
+    "noResults": "Aucun client ne correspond à la recherche.",
+    "nameRequired": "Saisis le nom du client.",
+    "tooLong": "Un des champs est trop long.",
+    "phoneInvalid": "Cela ne ressemble pas à un numéro de téléphone.",
+    "emailInvalid": "Cela ne ressemble pas à une adresse e-mail.",
+    "saveFailed": "Échec de l’enregistrement. Réessaie.",
+    "deleteFailed": "Échec de la suppression. Réessaie.",
+    "greeting": "Bonjour {{name}} !",
+    "added": "Ajouté le {{date}}"
   }
 }

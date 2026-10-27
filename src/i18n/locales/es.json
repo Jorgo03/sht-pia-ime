@@ -351,7 +351,14 @@
     "noPendingViewings": "No hay solicitudes pendientes",
     "wantedFeed": "Compradores buscando",
     "wantedFeedSub": "Solicitudes abiertas",
-    "wantedEmpty": "No hay solicitudes abiertas ahora"
+    "wantedEmpty": "No hay solicitudes abiertas ahora",
+    "today": "Hoy",
+    "todayEmpty": "No hay visitas hoy.",
+    "matches_one": "{{count}} de tus anuncios coincide",
+    "matches_other": "{{count}} de tus anuncios coinciden",
+    "noMatches": "Ninguno de tus anuncios coincide todavía",
+    "showMatches": "Mostrar",
+    "hideMatches": "Ocultar"
   },
   "account": {
     "welcomeBack": "Bienvenido de nuevo, {{name}} 👋",
@@ -764,5 +771,45 @@
     "emailChanged": "Tu dirección de correo se ha actualizado.",
     "requestNew": "Pedir un código nuevo",
     "goSignIn": "Ir a iniciar sesión"
+  },
+  "leads": {
+    "kicker": "Tus clientes",
+    "headlinePre": "Clientes",
+    "headlineEm": "potenciales",
+    "search": "Busca por nombre, teléfono, email…",
+    "add": "Añadir cliente",
+    "addTitle": "Nuevo cliente",
+    "editTitle": "Editar cliente",
+    "all": "Todos",
+    "status": {
+      "new": "Nuevo",
+      "contacted": "Contactado",
+      "qualified": "Cualificado",
+      "won": "Ganado",
+      "lost": "Perdido"
+    },
+    "name": "Nombre",
+    "phone": "Teléfono",
+    "email": "Email",
+    "notes": "Notas",
+    "notesHint": "p. ej. busca un 2 dormitorios en Tirana, hasta 150.000 €",
+    "statusLabel": "Estado",
+    "call": "Llamar",
+    "whatsapp": "WhatsApp",
+    "sendEmail": "Email",
+    "delete": "Eliminar",
+    "deleteTitle": "¿Eliminar este cliente?",
+    "deleteBody": "{{name}} se eliminará para siempre.",
+    "empty": "Aún no hay clientes",
+    "emptyHint": "Añade a todo el que te contacte, para no perder ninguna oportunidad.",
+    "noResults": "Ningún cliente coincide con la búsqueda.",
+    "nameRequired": "Escribe el nombre del cliente.",
+    "tooLong": "Uno de los campos es demasiado largo.",
+    "phoneInvalid": "No parece un número de teléfono.",
+    "emailInvalid": "No parece una dirección de email.",
+    "saveFailed": "No se pudo guardar. Inténtalo de nuevo.",
+    "deleteFailed": "No se pudo eliminar. Inténtalo de nuevo.",
+    "greeting": "¡Hola {{name}}!",
+    "added": "Añadido el {{date}}"
   }
 }

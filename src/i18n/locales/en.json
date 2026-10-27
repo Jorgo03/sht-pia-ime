@@ -371,7 +371,14 @@
     "noPendingViewings": "No pending requests",
     "wantedFeed": "Buyers looking now",
     "wantedFeedSub": "Open requests",
-    "wantedEmpty": "No open buyer requests right now"
+    "wantedEmpty": "No open buyer requests right now",
+    "today": "Today",
+    "todayEmpty": "No viewings today.",
+    "matches_one": "{{count}} of your listings matches",
+    "matches_other": "{{count}} of your listings match",
+    "noMatches": "None of your listings match yet",
+    "showMatches": "Show",
+    "hideMatches": "Hide"
   },
   "profile": {
     "savedSearches": "Saved searches",
@@ -756,5 +763,45 @@
     "emailChanged": "Your email address has been updated.",
     "requestNew": "Request a new code",
     "goSignIn": "Go to sign in"
+  },
+  "leads": {
+    "kicker": "Your clients",
+    "headlinePre": "Your",
+    "headlineEm": "leads",
+    "search": "Search by name, phone, email…",
+    "add": "Add lead",
+    "addTitle": "New lead",
+    "editTitle": "Edit lead",
+    "all": "All",
+    "status": {
+      "new": "New",
+      "contacted": "Contacted",
+      "qualified": "Qualified",
+      "won": "Won",
+      "lost": "Lost"
+    },
+    "name": "Name",
+    "phone": "Phone",
+    "email": "Email",
+    "notes": "Notes",
+    "notesHint": "e.g. wants a 2-bed in Tirana, up to €150,000",
+    "statusLabel": "Status",
+    "call": "Call",
+    "whatsapp": "WhatsApp",
+    "sendEmail": "Email",
+    "delete": "Delete",
+    "deleteTitle": "Delete this lead?",
+    "deleteBody": "{{name}} will be deleted for good.",
+    "empty": "No leads yet",
+    "emptyHint": "Add everyone who contacts you, so no opportunity slips away.",
+    "noResults": "No lead matches your search.",
+    "nameRequired": "Enter the lead's name.",
+    "tooLong": "One of the fields is too long.",
+    "phoneInvalid": "That doesn't look like a phone number.",
+    "emailInvalid": "That doesn't look like an email address.",
+    "saveFailed": "Couldn't save. Try again.",
+    "deleteFailed": "Couldn't delete. Try again.",
+    "greeting": "Hello {{name}}!",
+    "added": "Added {{date}}"
   }
 }

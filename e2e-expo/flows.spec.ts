@@ -856,3 +856,113 @@ test('X36 Home has no kicker above the greeting and no "editor\'s pick" label', 
   await expect(page.getByText(t('home.editorsPick'))).toHaveCount(0);
   await expect(page.getByText(t('home.featured'))).toBeVisible();
 });
+
+// CRM, phase 1 (docs/BSP_CRM_ANALYSIS.md): the agent's leads, today's agenda
+// and buyer requests matched against the agent's own listings.
+test.describe('signed in: CRM', () => {
+  test.use({ signedIn: true });
+
+  const LEAD = {
+    id: 'e2e00000-0000-4000-9000-000000000001',
+    agent_id: SIGNED_IN_USER.id,
+    name: 'Arben Hoxha',
+    phone: '+355 69 123 4567',
+    email: 'arben@example.com',
+    notes: 'Kërkon 2+1 në Tiranë',
+    status: 'new',
+    created_at: '2026-10-20T10:00:00+00:00',
+  };
+
+  test('X37 leads: listed, searched, added, moved forward and deleted after a confirmation', async ({ page, writes }) => {
+    const asked: string[] = [];
+    await page.route('**/rest/v1/leads*', (route) => {
+      const req = route.request();
+      if (req.method() === 'GET') {
+        asked.push(decodeURIComponent(req.url()));
+        return json(route, [LEAD]);
+      }
+      if (req.method() === 'POST') {
+        const body = req.postDataJSON();
+        writes.push({ table: 'leads', method: 'POST', query: '', body });
+        return json(route, { id: 'e2e00000-0000-4000-9000-000000000002', created_at: '2026-10-27T10:00:00+00:00', ...body }, 201);
+      }
+      const body = req.method() === 'DELETE' ? {} : req.postDataJSON();
+      writes.push({ table: 'leads', method: req.method(), query: new URL(req.url()).search, body });
+      return req.method() === 'DELETE' ? route.fulfill({ status: 204, body: '' }) : json(route, { ...LEAD, ...body });
+    });
+    await page.goto('/leads');
+    await ready(page);
+    await expect(page.getByText('Arben Hoxha')).toBeVisible();
+    expect(asked[0]).toContain(`agent_id=eq.${SIGNED_IN_USER.id}`);
+    expect(asked[0]).toMatch(/limit=24/);
+
+    // Search runs in the database; a local number also matches the international one.
+    await page.getByRole('textbox', { name: t('leads.search') }).fill('069 123');
+    await expect.poll(() => asked.at(-1)).toContain('phone.ilike.*6*9*1*2*3*');
+
+    // Add.
+    await page.getByRole('button', { name: t('leads.add') }).first().click();
+    await page.getByRole('textbox', { name: t('leads.name') }).fill('Elira Kola');
+    await page.getByRole('textbox', { name: t('leads.phone') }).fill('068 555 0000');
+    await page.getByRole('button', { name: t('common.save') }).click();
+    await expect.poll(() => writes.find((w) => w.table === 'leads' && w.method === 'POST')?.body).toMatchObject({
+      name: 'Elira Kola', phone: '068 555 0000', status: 'new', agent_id: SIGNED_IN_USER.id,
+    });
+
+    // Move forward in the pipeline: new -> contacted.
+    // The card's button, not the filter chip of the same name at the top.
+    await page.getByRole('button', { name: t('leads.status.contacted') }).last().click();
+    await expect.poll(() => writes.find((w) => w.method === 'PATCH')?.body).toEqual({ status: 'contacted' });
+
+    // Delete asks first.
+    await page.getByRole('button', { name: t('leads.delete') }).last().click();
+    await expect(page.getByText(t('leads.deleteTitle'))).toBeVisible();
+    expect(writes.some((w) => w.method === 'DELETE')).toBe(false);
+    await page.getByRole('button', { name: t('leads.delete') }).last().click();
+    await expect.poll(() => writes.some((w) => w.table === 'leads' && w.method === 'DELETE')).toBe(true);
+  });
+
+  test('X38 leads: a lead needs a name, and a bad email is refused before saving', async ({ page, writes }) => {
+    await page.route('**/rest/v1/leads*', (route) => (route.request().method() === 'GET' ? json(route, []) : route.fallback()));
+    await page.goto('/leads');
+    await ready(page);
+    await expect(page.getByText(t('leads.empty'))).toBeVisible();
+    await page.getByRole('button', { name: t('leads.add') }).first().click();
+    await page.getByRole('button', { name: t('common.save') }).click();
+    await expect(page.getByText(t('leads.nameRequired'))).toBeVisible();
+    await page.getByRole('textbox', { name: t('leads.name') }).fill('Ana');
+    await page.getByRole('textbox', { name: t('leads.email'), exact: true }).fill('ana@');
+    await page.getByRole('button', { name: t('common.save') }).click();
+    await expect(page.getByText(t('leads.emailInvalid'))).toBeVisible();
+    expect(writes.some((w) => w.table === 'leads')).toBe(false);
+  });
+
+  test('X39 dashboard: today\'s agenda, the leads link, and buyer requests matched to your listings', async ({ page }) => {
+    const today = new Date();
+    today.setHours(17, 0, 0, 0);
+    await page.route('**/rest/v1/viewings*', (route) =>
+      json(route, [{
+        id: 'e2e00000-0000-4000-8000-000000000001', client_id: CHAT_CLIENT_ID, agent_id: SIGNED_IN_USER.id,
+        scheduled_at: today.toISOString(), status: 'confirmed', notes: null,
+        property: { id: LISTINGS[0].id, title: LISTINGS[0].title, title_i18n: null, city: 'Tiranë' },
+      }]));
+    await page.route('**/rest/v1/wanted_homes*', (route) =>
+      json(route, [{
+        id: 'e2e00000-0000-4000-8000-000000000002', client_id: CHAT_CLIENT_ID, city: 'Tirana', listing_type: 'sale',
+        max_price: 110000, min_bedrooms: 2, notes: null, status: 'open', created_at: '2026-10-25T10:00:00+00:00',
+      }]));
+    await page.goto('/agent-dashboard');
+    await ready(page);
+    await expect(page.getByText(t('agentDashboard.today'), { exact: true })).toBeVisible();
+    await expect(page.getByRole('button', { name: new RegExp(`^17:00 ${escape(LISTINGS[0].title as string)}`) })).toBeVisible();
+
+    // "Tirana" matches listings in "Tiranë"; the cheap 2-bedroom sale listing fits.
+    const matchLine = page.getByText(/nga pronat e tua përputh/);
+    await expect(matchLine).toBeVisible();
+    await page.getByRole('button', { name: t('agentDashboard.showMatches') }).click();
+    await expect(page.getByRole('link', { name: LISTINGS[0].title as string })).toBeVisible();
+
+    await page.getByRole('button', { name: new RegExp(t('agentDashboard.statLeads')) }).click();
+    await expect(page).toHaveURL(/\/leads$/);
+  });
+});
