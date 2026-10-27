@@ -1,16 +1,12 @@
 # Pre-Launch Audit — Shtëpia.ime (Vite web app)
 
-## ═══ PASS 25 — 2026-10-27: CLICKABLE SIMULATOR OF THE WHOLE APP (owner request) ═══
-
-The real Expo web build, run on demo data with no backend: `simulator/`,
-`scripts/build-simulator.mjs`, `npm run build:simulator`, published as a
-private Artifact. How it works and what is not simulated: `simulator/README.md`.
+## ═══ PASS 25 — 2026-10-27: WEBSITE VIEWING TIME PICKER ═══
 
 | Finding | Class |
 |---|---|
 | Website build: the viewing-request sheet showed "Kur?" over an empty gap. `@react-native-community/datetimepicker` renders nothing on the web, so every request went out for the default slot and the time could not be chosen. `components/viewings/viewing-time-picker.{native,web}.tsx`: the store apps keep the spinner, the website gets the browser's date-time field (min = next slot, 15-minute steps). e2e X42 | FIXED |
-| Simulator: build compiled against `https://demo.supabase.co`, refuses to finish if a bundle names a real project; nothing leaves the page (scripted runs under a strict CSP logged no outbound request). Backend unit tests: `tests/simulatorBackend.test.mjs` (7) | NO ACTION REQUIRED |
-| Verified locally (390x844, strict CSP): sign-in form (wrong password, demo accounts), favourite, AI assistant, chat, viewing request and confirmation, leads, agent dashboard, 5-step listing wizard with a photo upload, persistence across reload. The hosted Artifact page itself was not opened from this sandbox | CONFIGURATION REQUIRED (owner to open the link) |
+
+A demo simulator built in this pass was removed at the owner's request.
 
 ---
 
