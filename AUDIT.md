@@ -1,5 +1,79 @@
 # Pre-Launch Audit — Shtëpia.ime (Vite web app)
 
+## ═══ PASS 23 — 2026-10-27: RESPONSIVE PASS, BOTH APPS, NO EMULATORS (owner master prompt) ═══
+
+**Scope:**
+- Both frontends from 280 to 1366 wide and down to 380 tall.
+- Folding and unfolding during a session.
+- No emulators or devices, as the owner asked. Every result below comes from a browser at simulated sizes, so none of it is hardware-verified.
+
+Commits `0aecb34` and `c334ad1`, plus this entry.
+
+**Method:**
+1. Two read-only code auditors, one per app, produced 41 findings with file:line.
+2. A website sweep checked 13 viewports × 14 routes for sideways scroll and controls past the edge, including controls clipped by `overflow: hidden`. Sizes: 280×653, 320×720, 344×882, 360×380, 360×800, 390×844, 600×800, 673×841, 768×1024, 840×900, 1024×768, 1114×720, 1366×900.
+3. An app sweep checked 14 viewports × 13 screens on a throwaway export drawn at native widths (`WEB_MAX_WIDTH` lifted, `IS_WEB` false).
+4. Three fixers worked on disjoint files, then one reviewer checked the combined diff.
+5. Both sweeps were re-run after the fixes.
+
+**Findings and status:**
+
+| App | Was | Status |
+|---|---|---|
+| Web | Signed in, the header's account button sat past the edge at 320 and at 280 | PASS (`header.css`, narrow media queries) |
+| Web | My Listings: mark-sold and delete ran off rows at ≤320 | PASS (actions wrap) |
+| Both | The six code boxes need 304px and overflowed below ~385; at 280 the outer two were cut off | PASS (boxes shrink; e2e R02) |
+| Web | Bottom sheets had no max-height; on a 380-tall Flip cover their title and close button sat above the screen | PASS (max-height 100dvh − 12, scroll, safe-area padding) |
+| Web | Bell and language menus ran off the left edge at ≤344 and could not scroll on short screens | PASS |
+| Web | Toasts were one line and could be wider than the screen; there was a duplicate rule | PASS |
+| Web | The assistant button floated outside the 480 column on wide screens | PASS |
+| Web | The map (350/500px) and listing photo (360px) were taller than a Flip cover; the map bottom was under the nav in landscape | PASS (svh clamps) |
+| Web | Inputs in two-field rows and the search row could not shrink (~180px minimum) | PASS (`min-width: 0`) |
+| Web | Wizard final footer overflowed at ≤320 / German | PASS (wraps; Back is icon-only below 360) |
+| Web | Featured stat chips were clipped at 280–320 | PASS |
+| Web | 100vh on auth, loading and app shell | PASS (svh/dvh with vh fallbacks) |
+| Web | Small touch targets (cookie accept, assistant close, photo remove) | PASS (invisible 44px hit area) |
+| App | The map preview card and map logo sat under the floating tab bar | PASS (clearance, `mapPadding`, Leaflet attribution moved) |
+| App | Wizard footer and chat composer were under the home indicator / Android nav bar; the chat offset of 90 left a gap above the keyboard | PASS in code, NOT VERIFIED on device |
+| App | Language menu (8 rows from a fixed top 96) did not fit 380 tall; on the web it was pinned to the window edge | PASS |
+| App | Viewing-request and saved-search sheets had no max-height or scroll | PASS |
+| App | Assistant panel pushed off the top by the keyboard; filter sheet on Android with the keyboard; dismiss distance hard-coded to 800 | PASS in code, NOT VERIFIED on device |
+| App | Home/Explore headline and search pinned on a 380-tall screen (~50px of list left) | PASS (native only: they scroll away below 520 tall) |
+| App | Listing two-column split at 600–819 left a ~210px right column | PASS (split from 820; stacked and readable below) |
+| App | Amenity row and price row did not wrap at ≤320 | PASS |
+| App | Home/Explore stretched edge to edge at 829–1114 | PASS (readable column) |
+| App | Tablet grid photos were 3:1 strips; the agent grid's last card stretched across the row; the Home skeleton ignored the column count | PASS |
+| App | Tab bar slots overflowed the pill at 280; unread badge and buttons clipped at large system text | PASS |
+
+**Found while testing:**
+- The first version of the short-screen layout broke the website build's hydration (React #418). The pre-rendered page has no screen height, so the server and browser drew different layouts. The short-screen layout is now native-only, and the full suite caught this.
+
+**Not done:**
+- **Hinge and posture:** no detection, per owner decision DECISIONS.md §18. The web has no reliable hinge API in this stack, and native would need a new library.
+- **Explore list + map side by side at ≥820:** a real feature, left for a separate change. The map preview card is capped at 480 meanwhile.
+- **Web keyboard mode** (`interactive-widget` / visualViewport): NOT DONE. Changing it moves the fixed nav above the keyboard site-wide, which is too risky untested. The scrollable sheets cover most of the problem.
+- **Web `env(safe-area-inset-bottom)` on the fixed nav:** NOT DONE. It needs every layer stacked above the nav moved together.
+- **Leaflet refit to Albania after a resize:** NOT DONE (low).
+
+**Checks:**
+
+| Check | Result |
+|---|---|
+| `tsc` | PASS |
+| `lint` | PASS (0 errors, 33 warnings, unchanged) |
+| `npm test` | PASS (334/334) |
+| `npm run build` | PASS |
+| `test:e2e` | PASS (234 passed, 2 skipped, before R01–R03 were added) |
+| `e2e/responsive.spec.ts` | PASS (R01 ×5 sizes, R02, R03; 2×) |
+| `test:e2e:expo` | PASS (144 passed, 20 skipped) |
+| Website sweep | PASS (182/182, 0 off-screen) |
+| App native-width sweep | PASS (182 screens, 0 off-screen; the 26 "failures" are the diagnostic build's expected #418) |
+
+**Needs real hardware:**
+- Keyboard and inset behaviour on Android edge-to-edge: the chat, the wizard footer and the filter sheet.
+- The language menu position under notches.
+- Touch feel, fold/unfold continuity in the native app, and any hinge or crease.
+
 ## ═══ PASS 22 — 2026-10-27: FOLDABLE PHONES (Galaxy Fold, Galaxy Flip, Surface Duo) ═══
 
 **Scope.** The phone app on foldable screen sizes. **Method:** a throwaway
