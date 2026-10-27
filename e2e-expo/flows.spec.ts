@@ -103,6 +103,25 @@ test.describe('signed in', () => {
       body: 'Përshëndetje, a është ende në shitje?',
     });
   });
+
+  test('X42 viewing request: the website has a date and time field, and the chosen time is sent', async ({ page, writes }) => {
+    const home = LISTINGS.find((l) => l.owner_type === 'client')!;
+    await page.goto(`/property/${home.id}`);
+    await ready(page);
+    await page.getByRole('button', { name: t('detail.scheduleViewing') }).click();
+    const when = page.getByLabel(t('viewings.when'));
+    await expect(when).toBeVisible();
+    const day = new Date(Date.now() + 3 * 86_400_000);
+    day.setHours(15, 30, 0, 0);
+    const p = (n: number) => String(n).padStart(2, '0');
+    await when.fill(`${day.getFullYear()}-${p(day.getMonth() + 1)}-${p(day.getDate())}T15:30`);
+    await page.getByRole('button', { name: t('viewings.request') }).click();
+    await expect.poll(() => writes.find((w) => w.table === 'viewings')?.method).toBe('POST');
+    expect(writes.find((w) => w.table === 'viewings')?.body).toMatchObject({
+      property_id: home.id,
+      scheduled_at: day.toISOString(),
+    });
+  });
 });
 
 test('X07 language: switching to English sticks after a reload', async ({ page }) => {

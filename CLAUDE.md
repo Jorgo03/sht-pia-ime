@@ -37,6 +37,7 @@ Web:
 - `npm run build` — production build to `dist/` (the Vite site, still production)
 - `npm run test:e2e:expo` — Playwright suite for the website built from the Expo app (`e2e-expo/`, `playwright.expo.config.ts`): exports, runs the post-build step, serves it like `deploy/expo-web/vercel.json`; same fake backend and failure rules as `test:e2e`
 - `npm run build:web-expo` then `node scripts/expo-web-postbuild.mjs <dir>` — the website built from the Expo app (`expo export -p web`), plus per-listing SEO pages, sitemap and robots; see `deploy/expo-web/README.md`
+- `npm run build:simulator` — the clickable simulator (`simulator/README.md`): the Expo web build against a pretend Supabase answered inside the page from demo data, never the real project; published as a private Artifact
 - `npm test` — Node's built-in test runner over `tests/**/*.test.mjs`; run a single file with `npm test -- tests/aiSchemas.test.mjs`
 - `npm run test:e2e` — Playwright end-to-end suite (`e2e/`, `playwright.config.ts`), phone + desktop Chromium. Builds the web app to `dist-e2e/` against a fake Supabase host; `e2e/support/backend.ts` answers every backend call in the browser, so it runs offline and never touches production. Every test fails on a page error, console error or 5xx; `e2e/a11y.spec.ts` runs axe-core, with open accessibility bugs listed by rule in `KNOWN` (remove one when it is fixed). First run on a machine: `npm run test:e2e:install`. `PW_CHROMIUM_PATH=<chrome>` reuses an existing Chromium instead
 
