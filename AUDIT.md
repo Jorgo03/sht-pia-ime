@@ -25,6 +25,8 @@ landscape there. Below 600 (the Flip, the Fold cover) the lock still holds.
 | 4 | Same screens: every bottom sheet and picker stretched to the full width | Sheets are centred at up to 640 (`webColumn` renamed `sheetColumn`, which is now active on native too) | 9 sheet files |
 | 5 | Home "for you" rail: each card was 70% of the screen (~800 wide on a Duo) over a 130-high photo | Capped at 320. The widest phone (~430 × 0.7) is under the cap | `getCompactCardWidth` |
 | 6 | Listing photo viewer read `Dimensions.get` once per render, and folding left both carousels between two photos | `useWindowDimensions`, and both carousels snap back to the current photo when the width changes | `app/property/[id].tsx` |
+| 7 | Found by the unfold test (X37): the website never fires `onMomentumScrollEnd`, so the photo index stayed 0. After a resize the carousel jumped back to photo 1, and before row 6 it had stopped between two photos | The photo is tracked `onScroll` (throttled; the setState is skipped when unchanged). The re-snap runs on a width change only and reads the index from a ref, so it never fights a swipe | e2e X37 |
+| 8 | Nothing tested state across fold and unfold | X37: swipe to photo 2 at 344, widen to 690, still photo 2 and aligned. X38: pick Rent on Explore, widen, still Rent with the same homes | `e2e-expo/flows.spec.ts` |
 
 Already right, left alone:
 - Every size decision reads `useWindowDimensions` and follows fold and unfold live.
@@ -45,7 +47,10 @@ as one 1114-wide tablet. Microsoft also ended the Duo's updates in 2023, so a hi
 | `tsc` | clean |
 | `lint` | 0 errors (33 warnings, unchanged) |
 | `npm test` | 334/334 |
-| `test:e2e:expo` | 142 passed, 18 skipped after merging master (new X34 ×5, phone project). X35 from master failed 7/8 under `--repeat-each=4 --workers=4` on master too; it now polls for the prefetch, 8/8 |
+| `test:e2e:expo` | 144 passed, 20 skipped (new X34 ×5 and X37/X38, phone project; X37/X38 10/10 under `--repeat-each=5 --workers=4`) |
+| X35 (from master) | Failed 7/8 under load on master too. It now waits for all four prefetch requests, and samples the 200 ms highlight every 20 ms (the default intervals looked only twice). 12/12 under `--repeat-each=6 --workers=6` |
+
+**Not possible here:** no Android SDK or emulator is installed on this laptop, and installing one means accepting Google's SDK licence (owner rule: never accept terms). The checks above are browser-simulated. They cover layout, overflow and state across a resize, but not touch feel or native rendering.
 
 **Still to try on a real Fold or Flip:** unfold while on a listing, open a sheet in landscape on the inner screen, and type in the wizard on the cover screen.
 

@@ -88,11 +88,23 @@ export default function PropertyDetailScreen() {
   const { width: heroWidth } = useAppDimensions();
   const { width: screenWidth } = useWindowDimensions();
   // Folding or unfolding a phone changes the page width under a paged
-  // carousel; without this it is left between two photos.
+  // carousel; without this it is left between two photos. Runs on a width
+  // change only (the index is read from a ref), so it never fights a swipe.
+  const imgIndexRef = useRef(0);
   useEffect(() => {
-    heroListRef.current?.scrollToOffset({ offset: imgIndex * heroWidth, animated: false });
-    lightboxListRef.current?.scrollToOffset({ offset: imgIndex * screenWidth, animated: false });
-  }, [heroWidth, screenWidth, imgIndex]);
+    imgIndexRef.current = imgIndex;
+  }, [imgIndex]);
+  useEffect(() => {
+    const i = imgIndexRef.current;
+    heroListRef.current?.scrollToOffset({ offset: i * heroWidth, animated: false });
+    lightboxListRef.current?.scrollToOffset({ offset: i * screenWidth, animated: false });
+  }, [heroWidth, screenWidth]);
+  // The photo in view, tracked while scrolling: the web build never fires
+  // onMomentumScrollEnd, so the index stayed 0 there and a resize jumped
+  // back to the first photo. setImgIndex skips a render when it is unchanged.
+  const trackPhoto = (pageWidth: number) => (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+    setImgIndex(Math.round(e.nativeEvent.contentOffset.x / pageWidth));
+  };
   const { title, description, translating, isTranslated } = useTranslatedProperty(property, i18n.language);
 
   // Matches PropertyDetail.jsx's mount effect exactly — same two calls, same
@@ -524,10 +536,8 @@ export default function PropertyDetailScreen() {
             pagingEnabled
             showsHorizontalScrollIndicator={false}
             keyExtractor={(uri, i) => `${uri}-${i}`}
-            onMomentumScrollEnd={(e: NativeSyntheticEvent<NativeScrollEvent>) => {
-              const idx = Math.round(e.nativeEvent.contentOffset.x / heroWidth);
-              setImgIndex(idx);
-            }}
+            onScroll={trackPhoto(heroWidth)}
+            scrollEventThrottle={32}
             renderItem={({ item }) => (
               <TouchableOpacity
                 accessibilityRole="button" accessibilityLabel={t('listing.images')}
@@ -692,9 +702,8 @@ export default function PropertyDetailScreen() {
             initialScrollIndex={imgIndex}
             getItemLayout={(_data, i) => ({ length: screenWidth, offset: screenWidth * i, index: i })}
             keyExtractor={(uri, i) => `lightbox-${uri}-${i}`}
-            onMomentumScrollEnd={(e: NativeSyntheticEvent<NativeScrollEvent>) => {
-              setImgIndex(Math.round(e.nativeEvent.contentOffset.x / screenWidth));
-            }}
+            onScroll={trackPhoto(screenWidth)}
+            scrollEventThrottle={32}
             renderItem={({ item }) => (
               <View style={{ width: screenWidth, justifyContent: 'center', alignItems: 'center' }}>
                 <Image accessibilityLabel={title} source={{ uri: item }} style={styles.lightboxImage} contentFit="contain" />
