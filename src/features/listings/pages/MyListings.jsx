@@ -142,7 +142,10 @@ export default function MyListings() {
                       {formatPrice(p.price, i18n.language, p.currency)}
                     </div>
                   </div>
-                  <div className="mt-1.5 flex gap-1.5">
+                  {/* Six 30px buttons beside a 100px photo need ~350px: on a 320
+                      phone or a 280 Fold cover screen they wrap to a second row
+                      instead of running past the edge. */}
+                  <div className="mt-1.5 flex flex-wrap gap-1.5">
                     <button onClick={() => navigate(`/property/${p.id}`)} title={t('listing.viewPublic')} aria-label={t('listing.viewPublic')} className={iconBtn}><Eye size={14} /></button>
                     <button onClick={() => navigate(`/my-listings/${p.id}/edit`)} title={t('listing.edit')} aria-label={t('listing.edit')} className={iconBtn}><Pencil size={14} /></button>
                     <button onClick={() => navigate(`/my-listings/${p.id}/dashboard`)} title={t('listing.viewDashboard')} aria-label={t('listing.viewDashboard')} className={iconBtn}><BarChart3 size={14} /></button>
