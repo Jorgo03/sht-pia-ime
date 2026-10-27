@@ -18,7 +18,8 @@ text; the platform notes are a versioned file written from the code.
 | `/assistant` accessibility (axe, light + dark) and layout at 320px and 280px | PASS. The first try put a third round button in Search's header, which ran off a Fold's 280px cover screen; it now sits at the end of the search field |
 | Full checks: `npm test` 358/358, `tsc`, `npm run lint` (0 errors), `npm run build`, e2e-expo 168 passed / 22 skipped (single-project tests) | PASS |
 | Live answers from Claude (quality, language, tool choice) | BLOCKED: `ANTHROPIC_API_KEY` in Supabase is rejected by Anthropic (Pass 26). NOT VERIFIED until the owner replaces it |
-| `ai-assistant` deployed | Not yet: needs the owner's approval |
+| `ai-assistant` deployed (owner approved; model `claude-opus-5-5`, the code default) | PASS: version 1, `verify_jwt` on; the deployed `index.ts`, `logic.js` and `knowledge.js` are byte-identical to the commit |
+| Live endpoint without a working AI key | PASS: OPTIONS 200; no JWT 401; empty question 400 `empty_query`; a real question gets 503 `ai_unavailable` after the auth, rate-limit and daily-cap steps, and the function log shows `ai-assistant error 401` (Anthropic rejects the key), with no message content logged |
 
 ---
 
