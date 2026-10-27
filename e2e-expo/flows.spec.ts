@@ -848,8 +848,10 @@ test('X35 All/Sale/Rent: the tab lights up at once and its homes are already loa
   await page.goto('/explore');
   await ready(page);
   // The other two tabs were fetched in the background, before any tap.
-  expect(asked.some((u) => u.includes('listing_type=eq.rent'))).toBe(true);
-  expect(asked.some((u) => u.includes('listing_type=eq.sale'))).toBe(true);
+  // Polled: under parallel load the prefetch can land after networkidle
+  // (7 of 8 failed with --repeat-each=4 --workers=4, on master too).
+  await expect.poll(() => asked.some((u) => u.includes('listing_type=eq.rent'))).toBe(true);
+  await expect.poll(() => asked.some((u) => u.includes('listing_type=eq.sale'))).toBe(true);
 
   const before = asked.length;
   const rent = page.getByRole('button', { name: t('search.rent'), exact: true });

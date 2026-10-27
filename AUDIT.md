@@ -45,7 +45,7 @@ as one 1114-wide tablet. Microsoft also ended the Duo's updates in 2023, so a hi
 | `tsc` | clean |
 | `lint` | 0 errors (33 warnings, unchanged) |
 | `npm test` | 334/334 |
-| `test:e2e:expo` | 138 passed, 18 skipped (new X34 ×5, phone project) |
+| `test:e2e:expo` | 142 passed, 18 skipped after merging master (new X34 ×5, phone project). X35 from master failed 7/8 under `--repeat-each=4 --workers=4` on master too; it now polls for the prefetch, 8/8 |
 
 **Still to try on a real Fold or Flip:** unfold while on a listing, open a sheet in landscape on the inner screen, and type in the wizard on the cover screen.
 
