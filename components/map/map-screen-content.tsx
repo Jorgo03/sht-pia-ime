@@ -6,6 +6,7 @@ import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from 'rea
 import { useTranslation } from 'react-i18next';
 import type { FeatureCollection } from 'geojson';
 
+import { useTabBarClearance } from '@/components/liquid-tab-bar';
 import { MapCanvas } from '@/components/map/map-canvas';
 import type { CountyGroup, MapCanvasHandle, MapRegionLike } from '@/components/map/map-canvas.types';
 import { type AtticoPalette } from '@/constants/theme';
@@ -74,6 +75,10 @@ export function MapScreenContent() {
   const { queryFilters, activeCount } = useFilters();
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
+  // The map runs to the bottom edge, under the floating tab bar: at bottom 20
+  // the preview card sat under the pill on every phone, and the map's logo and
+  // its centring treated the covered strip as visible. This is the pill's top.
+  const tabBarTop = useTabBarClearance(0);
 
   const mapRef = useRef<MapCanvasHandle | null>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -181,6 +186,7 @@ export function MapScreenContent() {
         onMarkerPress={handleMarkerPress}
         accentColor={colors.accent}
         properties={properties}
+        bottomInset={tabBarTop}
       />
 
       <View style={styles.overlay} pointerEvents="box-none">
@@ -235,7 +241,8 @@ export function MapScreenContent() {
       </View>
 
       {previewProperty && (
-        <View style={styles.previewCard} pointerEvents="box-none">
+        <View style={[styles.previewCard, { bottom: tabBarTop + 12 }]} pointerEvents="box-none">
+          <View style={styles.previewColumn} pointerEvents="box-none">
           <TouchableOpacity
             accessibilityRole="button"
             style={styles.previewTouchable}
@@ -280,6 +287,7 @@ export function MapScreenContent() {
             hitSlop={10}>
             <MaterialIcons name="close" size={16} color={colors.textPrimary} />
           </TouchableOpacity>
+          </View>
         </View>
       )}
     </View>
@@ -393,11 +401,19 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     color: colors.textSecondary,
     textTransform: 'capitalize',
   },
+  // `bottom` is set inline, just above the tab bar.
   previewCard: {
     position: 'absolute',
     left: 16,
     right: 16,
-    bottom: 20,
+    alignItems: 'center',
+  },
+  // At 829-1114 wide the card stretched edge to edge, the photo at one end and
+  // the CTA ~1000px away; capped and centred like the tab bar. Phones (<=430)
+  // are under the cap, so they are unchanged.
+  previewColumn: {
+    width: '100%',
+    maxWidth: 480,
   },
   previewTouchable: {
     flexDirection: 'row',

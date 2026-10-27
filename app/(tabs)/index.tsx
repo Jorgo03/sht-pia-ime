@@ -24,10 +24,11 @@ import { Fonts, type AtticoPalette } from '@/constants/theme';
 import { useAuth } from '@/contexts/auth-context';
 import { useFilters } from '@/contexts/filters-context';
 import { useTheme } from '@/contexts/theme-context';
-import { useResponsive } from '@/hooks/use-responsive';
+import { useReadableColumn, useResponsive } from '@/hooks/use-responsive';
 import { usePropertiesByIdsQuery, usePropertiesQuery } from '@/hooks/use-property-queries';
 import { useRecentlyViewed } from '@/hooks/use-recently-viewed';
 import { type Property } from '@/data/types';
+import { IS_WEB } from '@/constants/web-frame';
 
 // Mirrors web's Home.jsx exactly: one query, sorted newest-first (the
 // default sort), featured = properties[0], matched = properties.slice(1, 7)
@@ -77,8 +78,16 @@ export default function HomeScreen() {
   // instead of the full-screen spinner this used to force on every focus.
   const { data: listings = [], isLoading: loading, isError, refetch } = usePropertiesQuery({}, HOME_LIMIT);
   const { data: recentProperties = [] } = usePropertiesByIdsQuery(recentIds.slice(0, 6));
-  const { width: screenWidth } = useResponsive();
+  const { width: screenWidth, height: screenHeight, columns } = useResponsive();
   const snapInterval = getCompactCardSnapInterval(screenWidth);
+  // A centred column on an unfolded Fold or a spanned Duo, so the rows and
+  // search bar match the capped featured card instead of running edge to edge.
+  const readable = useReadableColumn();
+  // On a short screen (360x380 Flip cover) a pinned headline + search bar
+  // left a ~50px sliver of list; there they scroll away with the content.
+  // Native only: the web build is pre-rendered without a screen height, so a
+  // height-based layout there would not match the page and fail to hydrate.
+  const shortScreen = !IS_WEB && screenHeight < 520;
   // The nav pill floats above content rather than pushing it up, so the
   // scroll has to reserve its full footprint or the last row sits under it.
   const tabBarClearance = useTabBarClearance();
@@ -127,23 +136,37 @@ export default function HomeScreen() {
 
   const headline = firstName ? `${greeting}, ${firstName}.` : `${greeting}.`;
 
+  const searchHeader = (
+    <SearchHeader
+      headline={headline}
+      emphasis={t('home.matchesToday', { count: matchCount })}
+      onSearchPress={() => router.push('/(tabs)/explore' as Href)}
+    />
+  );
+
   return (
     <GradientBackground>
       <SafeAreaView style={styles.container} edges={['top']}>
         {/* Web's `.app-header` sits above the greeting hero on Home too. */}
         <AppHeader />
-        <SearchHeader
-          headline={headline}
-          emphasis={t('home.matchesToday', { count: matchCount })}
-          onSearchPress={() => router.push('/(tabs)/explore' as Href)}
-        />
+        {!shortScreen && <View style={readable}>{searchHeader}</View>}
         <ScrollView
-          contentContainerStyle={[styles.scroll, { paddingBottom: tabBarClearance }]}
+          contentContainerStyle={[
+            styles.scroll,
+            shortScreen && styles.scrollShort,
+            readable,
+            { paddingBottom: tabBarClearance },
+          ]}
           showsVerticalScrollIndicator={false}>
+          {shortScreen && <View style={styles.inlineHeader}>{searchHeader}</View>}
           {loading ? (
+            // The grid's own column count, two rows of it, so nothing jumps
+            // when the cards arrive (flex: 1 alone put all four on one row).
             <View style={styles.skeletonGrid}>
-              {Array.from({ length: 4 }, (_, i) => (
-                <SkeletonCard key={i} />
+              {Array.from({ length: columns * 2 }, (_, i) => (
+                <View key={i} style={[styles.skeletonCell, { width: `${100 / columns}%` }]}>
+                  <SkeletonCard />
+                </View>
               ))}
             </View>
           ) : isError && listings.length === 0 ? (
@@ -291,10 +314,22 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     paddingTop: 24,
     paddingBottom: 24,
   },
+  // Short screens: SearchHeader is the scroll's first child, and the same
+  // 24 moves below it.
+  scrollShort: {
+    paddingTop: 0,
+  },
+  inlineHeader: {
+    marginBottom: 24,
+  },
   skeletonGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     paddingHorizontal: 14,
+  },
+  // Row so the card's flex: 1 fills the cell's width, not its height.
+  skeletonCell: {
+    flexDirection: 'row',
   },
   chips: {
     paddingHorizontal: 20,

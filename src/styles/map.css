@@ -37,15 +37,14 @@
   overflow: hidden;
   border: 0.5px solid var(--fho-border);
   box-shadow: var(--fho-card-shadow);
-  height: 500px;
+  /* Follows the screen height (360x380 Flip cover, landscape): never taller
+     than the space between the header and the nav. The column is 480 wide
+     at every width, so the 350 cap holds on desktop too. */
+  height: 350px;
+  height: clamp(240px, calc(100svh - 200px), 350px);
   position: relative;
 }
 
-@media (max-width: 600px) {
-  .map-wrapper {
-    height: 350px;
-  }
-}
 
 /* Leaflet positions .leaflet-container but leaves it at z-index:auto, so it
    creates no stacking context and its children escape into the root one —

@@ -3,6 +3,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
+  Keyboard,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -16,7 +17,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Fonts, Radii, Shadows, type AtticoPalette } from '@/constants/theme';
-import { KeyboardDoneBar } from '@/components/ui/keyboard-done-bar';
+import { KEYBOARD_DONE_BAR_HEIGHT, KeyboardDoneBar } from '@/components/ui/keyboard-done-bar';
 import { useTheme } from '@/contexts/theme-context';
 import { useResponsive } from '@/hooks/use-responsive';
 import { askListingAssistant, type AssistantMessage } from '@/lib/ai';
@@ -47,9 +48,17 @@ export function ListingAssistant({ property }: { property: Property | null }) {
   const { colors } = useTheme();
   const { width: screenWidth, height: screenHeight } = useResponsive();
   const insets = useSafeAreaInsets();
+  const keyboardHeight = useKeyboardHeight();
+  // With the keyboard up the panel (plus the Done bar) is lifted above it but
+  // kept its full height, so on an iPhone SE (667) its header and close button
+  // went ~110px off the top. Window metrics do not shrink for the keyboard on
+  // either platform, so the room left above it is worked out here.
+  const roomAboveKeyboard = keyboardHeight
+    ? screenHeight - keyboardHeight - KEYBOARD_DONE_BAR_HEIGHT - insets.top - 16
+    : Infinity;
   const styles = useMemo(
-    () => createStyles(colors, screenWidth, screenHeight, insets.bottom),
-    [colors, screenWidth, screenHeight, insets.bottom],
+    () => createStyles(colors, screenWidth, screenHeight, insets.bottom, roomAboveKeyboard),
+    [colors, screenWidth, screenHeight, insets.bottom, roomAboveKeyboard],
   );
 
   const [open, setOpen] = useState(false);
@@ -189,17 +198,36 @@ export function ListingAssistant({ property }: { property: Property | null }) {
   );
 }
 
+/** The keyboard's height while it is shown, else 0. Web: always 0. */
+function useKeyboardHeight(): number {
+  const [height, setHeight] = useState(0);
+  useEffect(() => {
+    if (Platform.OS === 'web') return;
+    const ios = Platform.OS === 'ios';
+    const subs = [
+      Keyboard.addListener(ios ? 'keyboardWillShow' : 'keyboardDidShow', (e) =>
+        setHeight(e.endCoordinates.height),
+      ),
+      Keyboard.addListener(ios ? 'keyboardWillHide' : 'keyboardDidHide', () => setHeight(0)),
+    ];
+    return () => subs.forEach((s) => s.remove());
+  }, []);
+  return height;
+}
+
 const createStyles = (
   colors: AtticoPalette,
   screenWidth: number,
   screenHeight: number,
   insetBottom: number,
+  roomAboveKeyboard: number,
 ) => {
   // Same min()-style clamp web's CSS uses, just computed in JS: a compact
   // floating card, not a full-screen sheet — this is a quick-question widget
-  // that sits over the page, not a primary destination.
+  // that sits over the page, not a primary destination. The 160 floor keeps
+  // the header, one bubble and the input row on the very shortest screens.
   const panelWidth = Math.min(340, screenWidth - 32);
-  const panelHeight = Math.min(460, screenHeight - 180);
+  const panelHeight = Math.max(160, Math.min(460, screenHeight - 180, roomAboveKeyboard));
   const bottomOffset = insetBottom + 16;
 
   return StyleSheet.create({

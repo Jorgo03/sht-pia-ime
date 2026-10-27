@@ -3,6 +3,7 @@ import { Animated, StyleSheet, View } from 'react-native';
 
 import { type AtticoPalette } from '@/constants/theme';
 import { useTheme } from '@/contexts/theme-context';
+import { useResponsive } from '@/hooks/use-responsive';
 
 /** Matches web's SkeletonCard.jsx: a card-shaped placeholder (image block +
  *  two text lines) with a pulsing shimmer, shown in a grid while property
@@ -13,6 +14,7 @@ import { useTheme } from '@/contexts/theme-context';
 export function SkeletonCard() {
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
+  const { columns } = useResponsive();
   // Lazy useState rather than useRef(...).current: reading a ref during render
   // is what the React Compiler flags, and `useRef(new Animated.Value(0.4))`
   // also constructs a throwaway Animated.Value on every single render — the
@@ -34,7 +36,9 @@ export function SkeletonCard() {
 
   return (
     <View style={styles.card}>
-      <Animated.View style={[styles.block, styles.image, { opacity }]} />
+      <Animated.View
+        style={[styles.block, styles.image, columns > 2 ? styles.imageWide : styles.imagePhone, { opacity }]}
+      />
       <Animated.View style={[styles.block, styles.lineWide, { opacity }]} />
       <Animated.View style={[styles.block, styles.lineNarrow, { opacity }]} />
     </View>
@@ -55,9 +59,16 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     borderRadius: 6,
     backgroundColor: colors.glass,
   },
+  // Same photo shape as PropertyCard's grid card: 90 high on phones, 16:10
+  // once the grid has 3+ columns.
   image: {
-    height: 90,
     marginBottom: 8,
+  },
+  imagePhone: {
+    height: 90,
+  },
+  imageWide: {
+    aspectRatio: 16 / 10,
   },
   lineWide: {
     height: 14,

@@ -21,9 +21,14 @@ const COMPACT_GAP = 12;
 /** Matches web's .compact-card: 70% of viewport, floored at 240px — not a
  *  fixed width, so it scales with screen size like the browser does.
  *  Exported so callers (Home's horizontal rail) can compute a matching
- *  `snapToInterval` instead of hand-duplicating this formula. */
+ *  `snapToInterval` instead of hand-duplicating this formula. Capped at
+ *  COMPACT_MAX_WIDTH: on an unfolded Fold (690 wide) or a spanned Duo (1114)
+ *  70% made one card fill the rail under a 130-high photo; the widest phone
+ *  (~430) stays under the cap, so phones are unchanged. */
+const COMPACT_MAX_WIDTH = 320;
+
 export function getCompactCardWidth(screenWidth: number): number {
-  return Math.max(screenWidth * 0.7, 240);
+  return Math.min(Math.max(screenWidth * 0.7, 240), COMPACT_MAX_WIDTH);
 }
 
 export function getCompactCardSnapInterval(screenWidth: number): number {
@@ -50,7 +55,7 @@ function PropertyCardBase({ property, onPress, variant = 'grid' }: PropertyCardP
   const handlePress = onPress ?? (() => router.push(`/property/${property.id}` as Href));
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
-  const { width: screenWidth } = useResponsive();
+  const { width: screenWidth, columns } = useResponsive();
   const favorited = isFavorite(property.id);
   // Ports polish.css's press compression + heart pop (see components/ui/motion).
   const { pressStyle, onPressIn, onPressOut } = usePressScale();
@@ -139,7 +144,7 @@ function PropertyCardBase({ property, onPress, variant = 'grid' }: PropertyCardP
       onPressOut={onPressOut}>
       {/* Matches web's .mini-img — inset within the card's own 8px padding
           with its own smaller radius, not flush with the card edges. */}
-      <View style={styles.imageWrap}>
+      <View style={[styles.imageWrap, columns > 2 ? styles.imageWrapWide : styles.imageWrapPhone]}>
         <Image
           accessibilityLabel={title}
           source={{ uri: property.image_urls[0] }}
@@ -213,10 +218,17 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   // Matches web's .mini-img — fixed 90px, its own r-sm (10px) radius, inset
   // within the card's padding rather than sharing the card's own radius.
   imageWrap: {
-    height: 90,
     borderRadius: 10,
     overflow: 'hidden',
     marginBottom: 8,
+  },
+  imageWrapPhone: {
+    height: 90,
+  },
+  // 3+ columns (600+ wide): a column is ~260 wide, and at 90 high the photo
+  // was a 3:1 strip that cropped most of it. Phones' 2 columns keep the 90.
+  imageWrapWide: {
+    aspectRatio: 16 / 10,
   },
   image: {
     width: '100%',

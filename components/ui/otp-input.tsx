@@ -129,14 +129,20 @@ export function OtpInput({
 
 const createStyles = (colors: AtticoPalette) =>
   StyleSheet.create({
+    // Six fixed 44px boxes need 304px, more than the auth card leaves below
+    // ~386 wide (off screen at 280-344): they share the row instead, capped
+    // at 44 so wider phones look the same.
     row: {
       flexDirection: 'row',
       justifyContent: 'center',
+      alignSelf: 'stretch',
       gap: 8,
       marginVertical: 8,
     },
     box: {
-      width: 44,
+      flex: 1,
+      minWidth: 0,
+      maxWidth: 44,
       height: 52,
       borderRadius: Radii.md,
       borderWidth: 1.5,

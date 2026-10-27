@@ -243,7 +243,13 @@
   gap: 12px;
 }
 
-.nl-row .nl-field { flex: 1; }
+.nl-row .nl-field { flex: 1; min-width: 0; }
+
+/* Flex items default to their content width; inputs' is ~180px, so two in a
+   row overflowed below ~390 wide. */
+.nl-field input,
+.nl-field select,
+.nl-field textarea { min-width: 0; }
 
 /* Big tappable cards for listing type */
 
@@ -520,6 +526,9 @@
   width: 100%;
   max-width: 480px;
   display: flex;
+  /* Back + Save draft + Publish need ~330px; at 280-320 (or in German) they
+     wrap instead of running past the edge. */
+  flex-wrap: wrap;
   gap: 10px;
   padding: 16px 20px;
   background: var(--fho-surface);
@@ -527,6 +536,12 @@
   border-radius: var(--r-lg);
   box-shadow: var(--fho-card-shadow);
   z-index: 30;
+}
+
+@media (max-width: 359px) {
+  .nl-actions { padding: 12px 16px; }
+  .nl-actions .nl-btn { padding: 12px 14px; }
+  .nl-btn-label { display: none; }
 }
 
 .nl-btn {

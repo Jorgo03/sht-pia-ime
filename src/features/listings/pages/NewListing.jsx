@@ -938,7 +938,7 @@ export default function NewListing() {
         // deserves a clearer, paired Save Draft / Publish affordance rather
         // than a small anonymous corner button.
         <div className="nl-actions">
-          <button className="nl-btn nl-btn-secondary" onClick={prev}><ArrowLeft size={16} /> {t('listing.back')}</button>
+          <button className="nl-btn nl-btn-secondary" onClick={prev} aria-label={t('listing.back')}><ArrowLeft size={16} /> <span className="nl-btn-label">{t('listing.back')}</span></button>
           <div style={{ flex: 1 }} />
           {!isEdit && <button className="nl-btn nl-btn-secondary" onClick={() => submit(true)} disabled={submitting}>{t('listing.saveDraft')}</button>}
           <button className="nl-btn nl-btn-primary" onClick={() => submit(false)} disabled={submitting}>

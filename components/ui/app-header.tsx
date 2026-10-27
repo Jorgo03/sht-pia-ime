@@ -3,10 +3,21 @@ import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useMemo, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Modal, Pressable, StyleSheet, Text, View, type LayoutChangeEvent } from 'react-native';
+import {
+  Modal,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  useWindowDimensions,
+  View,
+  type LayoutChangeEvent,
+} from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ThemeToggleButton } from '@/components/ui/theme-toggle-button';
 import { Fonts, Radii, Shadows, type AtticoPalette } from '@/constants/theme';
+import { IS_WEB, WEB_MAX_WIDTH } from '@/constants/web-frame';
 import { useAuth } from '@/contexts/auth-context';
 import { useTheme } from '@/contexts/theme-context';
 import { supabase } from '@/lib/supabase';
@@ -92,6 +103,18 @@ export function AppHeader({
     [colors, onDark, onBack, floating],
   );
   const [langOpen, setLangOpen] = useState(false);
+  const insets = useSafeAreaInsets();
+  const { width: windowWidth, height: windowHeight } = useWindowDimensions();
+  // The menu hangs under the bar: the top inset, the bar's 54 (10 + 34 + 10)
+  // and web's 6px gap. A fixed 96 put it over the header on notched iPhones,
+  // and its 8 rows (~358) ran off a 360x380 Flip cover, so it now scrolls
+  // within the window. On the web the Modal covers the whole browser window,
+  // not the 480 column, so the menu is anchored to the column's right edge.
+  const menuTop = insets.top + 60;
+  const menuMaxHeight = Math.max(120, windowHeight - menuTop - insets.bottom - 24);
+  const menuRight = IS_WEB
+    ? Math.max(HEADER_GUTTER, (windowWidth - WEB_MAX_WIDTH) / 2 + HEADER_GUTTER)
+    : HEADER_GUTTER;
   // Widths of the bar, its two sides and the wordmark, so the centred
   // wordmark is shown only when it fits between equal insets. Fixed insets
   // assumed an 88px control group; language + theme is ~106px, and at 320-
@@ -210,33 +233,40 @@ export function AppHeader({
         transparent
         animationType="fade"
         onRequestClose={() => setLangOpen(false)}>
-        <Pressable style={styles.langBackdrop} onPress={() => setLangOpen(false)}>
+        <Pressable
+          style={[styles.langBackdrop, { paddingTop: menuTop, paddingRight: menuRight }]}
+          onPress={() => setLangOpen(false)}>
           <Pressable style={styles.langCard} onPress={(e) => e.stopPropagation()}>
-            {LANGUAGES.map((lang) => {
-              const active = lang.code === i18n.language;
-              return (
-                <Pressable
-                  key={lang.code}
-                  style={styles.langRowWrap}
-                  onPress={() => changeLanguage(lang.code)}
-                  accessibilityRole="button"
-                  accessibilityState={{ selected: active }}>
-                  {active ? (
-                    <LinearGradient
-                      colors={[colors.accent, colors.accentEnd]}
-                      style={styles.langRow}>
-                      <Text style={styles.langRowCode}>{lang.flag}</Text>
-                      <Text style={[styles.langRowName, styles.langRowActive]}>{lang.name}</Text>
-                    </LinearGradient>
-                  ) : (
-                    <View style={styles.langRow}>
-                      <Text style={styles.langRowCode}>{lang.flag}</Text>
-                      <Text style={styles.langRowName}>{lang.name}</Text>
-                    </View>
-                  )}
-                </Pressable>
-              );
-            })}
+            <ScrollView
+              style={{ maxHeight: menuMaxHeight }}
+              contentContainerStyle={styles.langList}
+              bounces={false}>
+              {LANGUAGES.map((lang) => {
+                const active = lang.code === i18n.language;
+                return (
+                  <Pressable
+                    key={lang.code}
+                    style={styles.langRowWrap}
+                    onPress={() => changeLanguage(lang.code)}
+                    accessibilityRole="button"
+                    accessibilityState={{ selected: active }}>
+                    {active ? (
+                      <LinearGradient
+                        colors={[colors.accent, colors.accentEnd]}
+                        style={styles.langRow}>
+                        <Text style={styles.langRowCode}>{lang.flag}</Text>
+                        <Text style={[styles.langRowName, styles.langRowActive]}>{lang.name}</Text>
+                      </LinearGradient>
+                    ) : (
+                      <View style={styles.langRow}>
+                        <Text style={styles.langRowCode}>{lang.flag}</Text>
+                        <Text style={styles.langRowName}>{lang.name}</Text>
+                      </View>
+                    )}
+                  </Pressable>
+                );
+              })}
+            </ScrollView>
           </Pressable>
         </Pressable>
       </Modal>
@@ -385,8 +415,8 @@ const createStyles = (
       backgroundColor: 'rgba(0,0,0,0.35)',
       alignItems: 'flex-end',
       justifyContent: 'flex-start',
-      paddingTop: 96,
-      paddingHorizontal: 20,
+      // paddingTop and paddingRight are set inline, from the insets and window.
+      paddingHorizontal: HEADER_GUTTER,
     },
     langCard: {
       // Web's min-width: 170px — sized to its content, not full-bleed.
@@ -396,8 +426,10 @@ const createStyles = (
       borderColor: colors.border,
       borderRadius: Radii.md,
       padding: 4,
-      gap: 2,
       ...Shadows.card,
+    },
+    langList: {
+      gap: 2,
     },
     langRowWrap: {
       borderRadius: 10,

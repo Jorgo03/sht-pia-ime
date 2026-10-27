@@ -2,8 +2,16 @@ import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, FlatList, StyleSheet, Text, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import {
+  ActivityIndicator,
+  FlatList,
+  StyleSheet,
+  Text,
+  View,
+  type DimensionValue,
+  type ViewStyle,
+} from 'react-native';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 
 import { AppHeader } from '@/components/ui/app-header';
@@ -29,6 +37,15 @@ export default function AgentProfileScreen() {
   const router = useRouter();
   const { t } = useTranslation();
   const { columns } = useResponsive();
+  // The list runs under edges={['top']}, so its end clears the home
+  // indicator / Android edge-to-edge nav bar itself.
+  const insets = useSafeAreaInsets();
+  // A lone card in a trailing row keeps one column's width instead of
+  // stretching across the row (3-4 columns from 600 wide); same as Explore.
+  const gridItemStyle = useMemo<ViewStyle>(
+    () => ({ flex: 1, maxWidth: `${100 / columns}%` as DimensionValue }),
+    [columns],
+  );
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const [agent, setAgent] = useState<AgentProfile | null>(null);
@@ -104,7 +121,7 @@ export default function AgentProfileScreen() {
             data={properties}
             keyExtractor={(item) => item.id}
             numColumns={columns}
-            contentContainerStyle={styles.list}
+            contentContainerStyle={[styles.list, { paddingBottom: 24 + insets.bottom }]}
             showsVerticalScrollIndicator={false}
             ListHeaderComponent={
               <View style={styles.agentHead}>
@@ -143,7 +160,11 @@ export default function AgentProfileScreen() {
                 <Text style={styles.emptyText}>{t('listing.noListings')}</Text>
               </View>
             }
-            renderItem={({ item }) => <PropertyCard property={item} />}
+            renderItem={({ item }) => (
+              <View style={gridItemStyle}>
+                <PropertyCard property={item} />
+              </View>
+            )}
           />
         )}
       </SafeAreaView>

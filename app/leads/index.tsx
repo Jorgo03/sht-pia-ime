@@ -24,6 +24,7 @@ import { SignInPrompt } from '@/components/ui/sign-in-prompt';
 import { Fonts, Radii, Spacing, type AtticoPalette } from '@/constants/theme';
 import { useAuth } from '@/contexts/auth-context';
 import { useTheme } from '@/contexts/theme-context';
+import { useReadableColumn } from '@/hooks/use-responsive';
 import { PAGE_SIZE } from '@/data/properties';
 import { formatDate, telUrl, whatsappUrl } from '@/lib/format';
 import { supabase } from '@/lib/supabase';
@@ -53,6 +54,7 @@ export default function LeadsScreen() {
   const { user, loading: authLoading } = useAuth();
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
+  const readable = useReadableColumn();
 
   const [leads, setLeads] = useState<Lead[]>([]);
   const [filter, setFilter] = useState<Filter>('all');
@@ -199,7 +201,7 @@ export default function LeadsScreen() {
 
   return (
     <GradientBackground>
-      <SafeAreaView style={styles.container} edges={['top']}>
+      <SafeAreaView style={[styles.container, readable]} edges={['top']}>
         <AppHeader onBack={() => router.back()} />
         <ScreenHero kicker={t('leads.kicker')} pre={t('leads.headlinePre')} em={t('leads.headlineEm')} />
 

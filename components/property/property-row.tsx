@@ -264,11 +264,16 @@ const createStyles = (colors: AtticoPalette) =>
       fontSize: 12,
       color: colors.textSecondary,
     },
+    // Wraps: at 280-320 wide the body is ~98-138px and the unshrinking
+    // price-per-m² ellipsized the price itself ("€1,2…"). Now price/m² drops
+    // to its own line instead; where both fit (phones 360+) nothing moves.
     priceRow: {
       flexDirection: 'row',
+      flexWrap: 'wrap',
       alignItems: 'baseline',
       justifyContent: 'space-between',
-      gap: 8,
+      columnGap: 8,
+      rowGap: 2,
       marginTop: 6,
     },
     price: {

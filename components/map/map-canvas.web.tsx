@@ -13,7 +13,10 @@ import type { MapCanvasHandle, MapCanvasProps } from './map-canvas.types';
  * cluster bubbles when zoomed in, the same callbacks as the native map.
  * Leaflet loads in the browser after hydration; a spinner holds its place.
  */
-function MapCanvasWeb(props: MapCanvasProps, ref: React.ForwardedRef<MapCanvasHandle>) {
+function MapCanvasWeb(
+  props: MapCanvasProps & { bottomInset?: number },
+  ref: React.ForwardedRef<MapCanvasHandle>,
+) {
   const { colors } = useTheme();
   const maps = useLeafletMaps();
   const inner = useRef<MapCanvasHandle | null>(null);

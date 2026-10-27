@@ -1,3 +1,4 @@
+import { READABLE_MAX_WIDTH } from '@/constants/web-frame';
 import { useAppDimensions } from '@/hooks/use-app-dimensions';
 
 /**
@@ -47,4 +48,17 @@ export function useResponsive(): Responsive {
   const columns = computeColumns(width, isLandscape);
 
   return { width, height, isTablet, isLandscape, columns };
+}
+
+/**
+ * Side padding that centres a screen's content in a READABLE_MAX_WIDTH
+ * column (constants/web-frame.ts) on an unfolded Fold or a spanned Duo,
+ * for the screen's outer container (its background stays full
+ * width). Null at phone widths and on the web, which is already a phone
+ * column, so nothing changes there.
+ */
+export function useReadableColumn(): { paddingHorizontal: number } | null {
+  const { width } = useAppDimensions();
+  const side = Math.floor((width - READABLE_MAX_WIDTH) / 2);
+  return side > 0 ? { paddingHorizontal: side } : null;
 }

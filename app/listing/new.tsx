@@ -21,7 +21,7 @@ import {
   type StyleProp,
   type ViewStyle,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { LocationPicker } from '@/components/listing/location-picker';
 import { RoadField } from '@/components/listing/road-field';
@@ -59,6 +59,7 @@ import {
 } from '@/lib/upload';
 import LOCATIONS from '@/src/features/properties/data/locations';
 import { zonesFor } from '@/src/features/properties/lib/searchFilters';
+import { useReadableColumn, useResponsive } from '@/hooks/use-responsive';
 
 /**
  * Multi-step listing wizard — the native counterpart to web's
@@ -290,6 +291,14 @@ function ListingWizard({ editId }: { editId?: string }) {
   const { user, profile } = useAuth();
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
+  // A centred column on an unfolded Fold or a spanned Duo (hooks/use-responsive).
+  const readable = useReadableColumn();
+  // The kicker above already reads "BASICS 1/5", so the current step's label
+  // is the first thing to go on a Galaxy Fold cover screen (280 wide).
+  const showStepLabel = useResponsive().width >= 340;
+  // The SafeAreaView only pads the top, so the footer clears the home
+  // indicator / Android edge-to-edge nav bar itself.
+  const insets = useSafeAreaInsets();
   const queryClient = useQueryClient();
 
   const [step, setStep] = useState(0);
@@ -1243,7 +1252,7 @@ function ListingWizard({ editId }: { editId?: string }) {
 
   return (
     <GradientBackground>
-      <SafeAreaView style={styles.container} edges={['top']}>
+      <SafeAreaView style={[styles.container, readable]} edges={['top']}>
         {/* Header — mono step counter left, serif step name right (web's
             .nl-step-counter / .nl-step-name). */}
         <View style={styles.header}>
@@ -1302,7 +1311,7 @@ function ListingWizard({ editId }: { editId?: string }) {
                       )}
                     </View>
                   </View>
-                  {current && <Text style={styles.stepLabel}>{t(`listing.step.${s}`)}</Text>}
+                  {current && showStepLabel && <Text style={styles.stepLabel}>{t(`listing.step.${s}`)}</Text>}
                 </Pressable>
                 {i < STEPS.length - 1 && (
                   <View style={styles.stepLine}>
@@ -1347,7 +1356,11 @@ function ListingWizard({ editId }: { editId?: string }) {
           <KeyboardDoneBar />
         </KeyboardAvoidingView>
 
-        <View style={styles.footer}>
+        <View
+          style={[
+            styles.footer,
+            { paddingBottom: Math.max(insets.bottom, Platform.OS === 'ios' ? 20 : 14) },
+          ]}>
           {isLast && !isEdit && (
             <Pressable
               onPress={() => submit('draft')}
@@ -1484,7 +1497,7 @@ const createStyles = (colors: AtticoPalette) =>
       paddingHorizontal: Spacing.md,
       paddingBottom: Spacing.sm,
     },
-    stepItem: { flexDirection: 'row', alignItems: 'center' },
+    stepItem: { flexDirection: 'row', alignItems: 'center', flexShrink: 1 },
     stepPress: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 4 },
     stepDot: {
       width: 26,
@@ -1516,6 +1529,9 @@ const createStyles = (colors: AtticoPalette) =>
     },
     stepLine: {
       width: 18,
+      // Gives way first on a narrow screen, so the fifth dot stays on it.
+      flexShrink: 1,
+      minWidth: 6,
       height: 2,
       marginHorizontal: 2,
       backgroundColor: colors.border,
@@ -1705,7 +1721,6 @@ const createStyles = (colors: AtticoPalette) =>
       gap: 10,
       paddingHorizontal: Spacing.md,
       paddingTop: 10,
-      paddingBottom: Platform.OS === 'ios' ? 20 : 14,
       borderTopWidth: 1,
       borderTopColor: colors.border,
       backgroundColor: colors.primary,

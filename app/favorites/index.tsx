@@ -21,6 +21,7 @@ import { useFavorites } from '@/contexts/favorites-context';
 import { useTheme } from '@/contexts/theme-context';
 import { Property } from '@/data/types';
 import { formatPrice, getLocalizedText, priceSuffixKey } from '@/lib/format';
+import { useReadableColumn } from '@/hooks/use-responsive';
 
 // Matches web's Favorites.jsx exactly — a vertical list of image+details
 // rows (.fav-row), not a property-card grid. Moved out of the tab bar to
@@ -33,10 +34,12 @@ export default function FavoritesScreen() {
   const { favoriteProperties, loading, error, reload, toggle } = useFavorites();
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
+  // A centred column on an unfolded Fold or a spanned Duo (hooks/use-responsive).
+  const readable = useReadableColumn();
 
   return (
     <GradientBackground>
-      <SafeAreaView style={styles.container} edges={['top']}>
+      <SafeAreaView style={[styles.container, readable]} edges={['top']}>
         {/* Was a bare "‹ Kthehu te profili" text link floating above the
             kicker, which read as loose body copy rather than chrome. Now the
             same AppHeader every other pushed screen uses (Messages, Viewings,

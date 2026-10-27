@@ -49,6 +49,9 @@ export function FilterTabs({ tabs, activeTab, onTabChange }: FilterTabsProps) {
 const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   container: {
     flexDirection: 'row',
+    // A Galaxy Fold's cover screen is 280 wide: the third pill ran off the
+    // edge instead of moving to a second line.
+    flexWrap: 'wrap',
     paddingHorizontal: 20,
     gap: 10,
     marginBottom: 20,

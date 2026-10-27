@@ -17,7 +17,7 @@ import { PrimaryCTA } from '@/components/ui/buttons';
 import { KeyboardDoneBar } from '@/components/ui/keyboard-done-bar';
 import { SheetCloseButton } from '@/components/ui/sheet-close-button';
 import { Fonts, Radii, Spacing, type AtticoPalette } from '@/constants/theme';
-import { webColumn } from '@/constants/web-frame';
+import { sheetColumn } from '@/constants/web-frame';
 import { useTheme } from '@/contexts/theme-context';
 import {
   LEAD_LIMITS,
@@ -94,7 +94,7 @@ export function LeadSheet({
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         style={styles.sheetWrap}
         pointerEvents="box-none">
-        <SafeAreaView edges={['bottom']} style={[styles.sheet, webColumn]}>
+        <SafeAreaView edges={['bottom']} style={[styles.sheet, sheetColumn]}>
           <View style={styles.grip} />
           <View style={styles.header}>
             <Text style={styles.title} accessibilityRole="header">

@@ -84,6 +84,32 @@
   .lang-label { display: none; }
 }
 
+/* Signed in, the header holds the wordmark and four buttons: about 350px at
+   the sizes above, so on a 320 phone or a 280 Galaxy Fold cover screen the
+   account button sat past the edge. Tighter spacing first, then a smaller
+   wordmark (same design) and no chevron on the language button. */
+@media (max-width: 380px) {
+  .app-header { padding: 10px 12px; gap: 8px; }
+  .header-actions { gap: 6px; }
+  .header-brand { font-size: 20px; }
+}
+
+/* Below 360 both menus anchor to the actions row's right edge instead of
+   their own button, and never get wider than the screen. */
+@media (max-width: 359px) {
+  .header-actions { position: relative; }
+  .header-actions .lang-switcher,
+  .header-actions .account-switcher { position: static; }
+  .lang-dropdown,
+  .account-dropdown { max-width: calc(100vw - 24px); }
+}
+
+@media (max-width: 340px) {
+  .header-brand { font-size: 18px; }
+  .lang-btn { padding: 7px 8px; }
+  .lang-btn .lang-chevron { display: none; }
+}
+
 .lang-dropdown {
   position: absolute;
   top: calc(100% + 6px);
@@ -95,6 +121,11 @@
   box-shadow: var(--fho-card-shadow);
   padding: 4px;
   z-index: 100;
+  /* The header is sticky, so on a short screen (360x380 Flip cover) a menu
+     taller than the viewport could never be scrolled into view. */
+  max-height: calc(100vh - 72px);
+  max-height: calc(100dvh - 72px);
+  overflow-y: auto;
   animation: dropIn 150ms var(--ease-out);
 }
 
@@ -254,6 +285,9 @@
   box-shadow: var(--fho-card-shadow);
   padding: 6px;
   z-index: 100;
+  max-height: calc(100vh - 72px);
+  max-height: calc(100dvh - 72px);
+  overflow-y: auto;
   animation: dropIn 150ms var(--ease-out);
 }
 

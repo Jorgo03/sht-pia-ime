@@ -4,6 +4,7 @@
   max-width: 480px;
   margin: 0 auto;
   min-height: 100vh;
+  min-height: 100dvh;
   background: var(--fho-bg);
   position: relative;
   padding-bottom: 100px;
@@ -137,7 +138,7 @@
 
 .cookie-banner {
   position: fixed;
-  bottom: 80px;
+  bottom: calc(80px + env(safe-area-inset-bottom));
   left: 50%;
   transform: translateX(-50%);
   width: calc(100% - 2rem);
@@ -181,12 +182,18 @@
 
 /* --- Welcome toast --- */
 
+/* Centred with left/right + auto margins rather than left:50% + translateX:
+   with left:50% the shrink-to-fit width was capped at 50vw, so
+   'Mirë se erdhe, {name}' wrapped into 2-3 lines in a 140-180px chip at
+   280-360 wide. */
 .welcome-toast {
   position: fixed;
   top: 16px;
-  left: 50%;
-  transform: translateX(-50%);
-  max-width: 400px;
+  left: 16px;
+  right: 16px;
+  margin-inline: auto;
+  width: fit-content;
+  max-width: min(400px, calc(100vw - 32px));
   padding: 12px 20px;
   background: linear-gradient(135deg, var(--fho-orange-1), var(--fho-orange-2));
   color: #fff;
@@ -200,19 +207,26 @@
 }
 
 @keyframes toastIn {
-  from { transform: translateX(-50%) translateY(-20px); opacity: 0; }
-  to { transform: translateX(-50%) translateY(0); opacity: 1; }
+  from { transform: translateY(-20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
 }
 
 /* --- AddSheet toast --- */
 
+/* Same centring as .welcome-toast, so a chip wider than a 280-360 screen
+   wraps inside a 16px gutter instead of spilling off both edges. */
 .addsheet-toast {
   position: fixed;
-  bottom: 100px;
-  left: 50%;
-  transform: translateX(-50%);
-  max-width: 380px;
+  bottom: calc(100px + env(safe-area-inset-bottom));
+  left: 16px;
+  right: 16px;
+  margin-inline: auto;
+  width: fit-content;
+  max-width: min(380px, calc(100vw - 32px));
   padding: 14px 20px;
+  border: 1px solid var(--fho-border);
+  font-family: var(--font-sans);
+  cursor: pointer;
   /* Fixed dark chip in BOTH themes, on purpose — not var(--fho-text), which
      flips to near-white in dark mode and left this near-invisible (white
      text on a white chip). --fho-text-on-dark alone already is the correct
@@ -587,10 +601,13 @@
 .msg-thread__input button:disabled { opacity: 0.5; cursor: default; }
 
 /* --- Listing assistant chat widget (Feature C) --- */
+/* right: kept inside the centred 480px column (like the nav and the
+   NewListing strip); a plain right:16px anchored to the raw viewport and left
+   the FAB/panel floating far off to the right from ~513 wide upward. */
 .assistant-fab {
   position: fixed;
-  right: 16px;
-  bottom: 96px;
+  right: max(16px, calc(50vw - 240px + 16px));
+  bottom: calc(96px + env(safe-area-inset-bottom));
   z-index: 40;
   display: flex;
   align-items: center;
@@ -608,8 +625,8 @@
 
 .assistant-panel {
   position: fixed;
-  right: 16px;
-  bottom: 96px;
+  right: max(16px, calc(50vw - 240px + 16px));
+  bottom: calc(96px + env(safe-area-inset-bottom));
   z-index: 40;
   width: min(360px, calc(100vw - 32px));
   height: min(460px, calc(100dvh - 180px));

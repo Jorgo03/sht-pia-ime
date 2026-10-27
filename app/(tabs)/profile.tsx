@@ -49,6 +49,7 @@ import { ChangePasswordSheet } from '@/components/profile/change-password-sheet'
 import { useProfileStats } from '@/hooks/use-profile-stats';
 import type { ProfileFields } from '@/src/features/auth/lib/profileForm';
 import { useUnreadMessages } from '@/hooks/use-unread-messages';
+import { useReadableColumn } from '@/hooks/use-responsive';
 
 type Role = 'buyer' | 'agent';
 
@@ -79,6 +80,8 @@ export default function ProfileScreen() {
   } = useAuth();
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
+  // A centred column on an unfolded Fold or a spanned Duo (hooks/use-responsive).
+  const readable = useReadableColumn();
   // Replaces the hardcoded 110 these scrolls used to carry — that was
   // eyeballed against one device's home-indicator inset and came up short on
   // any phone with a larger one.
@@ -547,7 +550,7 @@ export default function ProfileScreen() {
 
     return (
       <GradientBackground>
-        <SafeAreaView style={styles.flex} edges={['top']}>
+        <SafeAreaView style={[styles.flex, readable]} edges={['top']}>
           {/* The signed-in dashboard used to carry its own title row with a
               duplicate theme toggle and language pill — the shared header
               provides both, so this screen now matches web's layout instead
@@ -836,7 +839,7 @@ export default function ProfileScreen() {
           sky + lit skyline. The signed-in dashboard keeps GradientBackground,
           same split as web (DuskHero only renders on the auth branch). */}
       <DuskHero />
-      <SafeAreaView style={styles.flex} edges={['top']}>
+      <SafeAreaView style={[styles.flex, readable]} edges={['top']}>
         {/* Web shows its `.app-header` on every page including this one —
             wordmark, language, theme toggle. Mobile had only a bare floating
             language pill here, which is what stopped the two screens reading

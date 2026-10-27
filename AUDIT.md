@@ -1,5 +1,133 @@
 # Pre-Launch Audit — Shtëpia.ime (Vite web app)
 
+## ═══ PASS 23 — 2026-10-27: RESPONSIVE PASS, BOTH APPS, NO EMULATORS (owner master prompt) ═══
+
+**Scope:**
+- Both frontends from 280 to 1366 wide and down to 380 tall.
+- Folding and unfolding during a session.
+- No emulators or devices, as the owner asked. Every result below comes from a browser at simulated sizes, so none of it is hardware-verified.
+
+Commits `0aecb34` and `c334ad1`, plus this entry.
+
+**Method:**
+1. Two read-only code auditors, one per app, produced 41 findings with file:line.
+2. A website sweep checked 13 viewports × 14 routes for sideways scroll and controls past the edge, including controls clipped by `overflow: hidden`. Sizes: 280×653, 320×720, 344×882, 360×380, 360×800, 390×844, 600×800, 673×841, 768×1024, 840×900, 1024×768, 1114×720, 1366×900.
+3. An app sweep checked 14 viewports × 13 screens on a throwaway export drawn at native widths (`WEB_MAX_WIDTH` lifted, `IS_WEB` false).
+4. Three fixers worked on disjoint files, then one reviewer checked the combined diff.
+5. Both sweeps were re-run after the fixes.
+
+**Findings and status:**
+
+| App | Was | Status |
+|---|---|---|
+| Web | Signed in, the header's account button sat past the edge at 320 and at 280 | PASS (`header.css`, narrow media queries) |
+| Web | My Listings: mark-sold and delete ran off rows at ≤320 | PASS (actions wrap) |
+| Both | The six code boxes need 304px and overflowed below ~385; at 280 the outer two were cut off | PASS (boxes shrink; e2e R02) |
+| Web | Bottom sheets had no max-height; on a 380-tall Flip cover their title and close button sat above the screen | PASS (max-height 100dvh − 12, scroll, safe-area padding) |
+| Web | Bell and language menus ran off the left edge at ≤344 and could not scroll on short screens | PASS |
+| Web | Toasts were one line and could be wider than the screen; there was a duplicate rule | PASS |
+| Web | The assistant button floated outside the 480 column on wide screens | PASS |
+| Web | The map (350/500px) and listing photo (360px) were taller than a Flip cover; the map bottom was under the nav in landscape | PASS (svh clamps) |
+| Web | Inputs in two-field rows and the search row could not shrink (~180px minimum) | PASS (`min-width: 0`) |
+| Web | Wizard final footer overflowed at ≤320 / German | PASS (wraps; Back is icon-only below 360) |
+| Web | Featured stat chips were clipped at 280–320 | PASS |
+| Web | 100vh on auth, loading and app shell | PASS (svh/dvh with vh fallbacks) |
+| Web | Small touch targets (cookie accept, assistant close, photo remove) | PASS (invisible 44px hit area) |
+| App | The map preview card and map logo sat under the floating tab bar | PASS (clearance, `mapPadding`, Leaflet attribution moved) |
+| App | Wizard footer and chat composer were under the home indicator / Android nav bar; the chat offset of 90 left a gap above the keyboard | PASS in code, NOT VERIFIED on device |
+| App | Language menu (8 rows from a fixed top 96) did not fit 380 tall; on the web it was pinned to the window edge | PASS |
+| App | Viewing-request and saved-search sheets had no max-height or scroll | PASS |
+| App | Assistant panel pushed off the top by the keyboard; filter sheet on Android with the keyboard; dismiss distance hard-coded to 800 | PASS in code, NOT VERIFIED on device |
+| App | Home/Explore headline and search pinned on a 380-tall screen (~50px of list left) | PASS (native only: they scroll away below 520 tall) |
+| App | Listing two-column split at 600–819 left a ~210px right column | PASS (split from 820; stacked and readable below) |
+| App | Amenity row and price row did not wrap at ≤320 | PASS |
+| App | Home/Explore stretched edge to edge at 829–1114 | PASS (readable column) |
+| App | Tablet grid photos were 3:1 strips; the agent grid's last card stretched across the row; the Home skeleton ignored the column count | PASS |
+| App | Tab bar slots overflowed the pill at 280; unread badge and buttons clipped at large system text | PASS |
+
+**Found while testing:**
+- The first version of the short-screen layout broke the website build's hydration (React #418). The pre-rendered page has no screen height, so the server and browser drew different layouts. The short-screen layout is now native-only, and the full suite caught this.
+
+**Not done:**
+- **Hinge and posture:** no detection, per owner decision DECISIONS.md §18. The web has no reliable hinge API in this stack, and native would need a new library.
+- **Explore list + map side by side at ≥820:** a real feature, left for a separate change. The map preview card is capped at 480 meanwhile.
+- **Web keyboard mode** (`interactive-widget` / visualViewport): NOT DONE. Changing it moves the fixed nav above the keyboard site-wide, which is too risky untested. The scrollable sheets cover most of the problem.
+- **Web `env(safe-area-inset-bottom)` on the fixed nav:** NOT DONE. It needs every layer stacked above the nav moved together.
+- **Leaflet refit to Albania after a resize:** NOT DONE (low).
+
+**Checks:**
+
+| Check | Result |
+|---|---|
+| `tsc` | PASS |
+| `lint` | PASS (0 errors, 33 warnings, unchanged) |
+| `npm test` | PASS (334/334) |
+| `npm run build` | PASS |
+| `test:e2e` | PASS (234 passed, 2 skipped, before R01–R03 were added) |
+| `e2e/responsive.spec.ts` | PASS (R01 ×5 sizes, R02, R03; 2×) |
+| `test:e2e:expo` | PASS (144 passed, 20 skipped) |
+| Website sweep | PASS (182/182, 0 off-screen) |
+| App native-width sweep | PASS (182 screens, 0 off-screen; the 26 "failures" are the diagnostic build's expected #418) |
+
+**Needs real hardware:**
+- Keyboard and inset behaviour on Android edge-to-edge: the chat, the wizard footer and the filter sheet.
+- The language menu position under notches.
+- Touch feel, fold/unfold continuity in the native app, and any hinge or crease.
+
+## ═══ PASS 22 — 2026-10-27: FOLDABLE PHONES (Galaxy Fold, Galaxy Flip, Surface Duo) ═══
+
+**Scope.** The phone app on foldable screen sizes. **Method:** a throwaway
+web export with the 480 column lifted (and `IS_WEB` false) so it draws at
+native widths. 12 screens were photographed at six sizes:
+- Fold 1 cover, 280×653
+- Fold 3–5 cover, 344×882
+- Flip cover, 360×380
+- Fold open, 690×829 and 829×690
+- Duo spanned, 1114×720
+
+Controls past the screen edge were listed automatically. The export was rebuilt after the fixes. No temporary files were kept.
+
+**Why landscape matters now.** Android builds target API 36. On Android 16,
+screens 600 dp or wider (an unfolded Fold) ignore `"orientation": "portrait"`, so the app must lay out in
+landscape there. Below 600 (the Flip, the Fold cover) the lock still holds.
+
+| # | Was | Now | Proof |
+| --- | --- | --- | --- |
+| 1 | Fold cover (280): the Explore "Rent" pill ran off the edge (214–282) | Pills wrap to a second line | `components/ui/filter-tabs.tsx`; e2e X34 |
+| 2 | Fold cover (280): the wizard's fifth step dot ran off the edge (276–310) | Connectors shrink. The current step's label hides below 340, since the kicker above says the same ("BAZAT 1/5") | `app/listing/new.tsx`; e2e X34 |
+| 3 | Unfolded Fold / spanned Duo: forms, row lists, profile, chat and legal pages stretched edge to edge (text fields 1100 wide) | Content sits in a centred 640 column and the background stays full width. The column only applies above 640, so phones and the website are unchanged | `useReadableColumn()` in `hooks/use-responsive.ts`, `READABLE_MAX_WIDTH` in `constants/web-frame.ts`. Used on profile, my-listings, listing wizard, messages and thread, saved searches, viewings, agent dashboard, favourites, analytics, privacy and terms |
+| 4 | Same screens: every bottom sheet and picker stretched to the full width | Sheets are centred at up to 640 (`webColumn` renamed `sheetColumn`, which is now active on native too) | 9 sheet files |
+| 5 | Home "for you" rail: each card was 70% of the screen (~800 wide on a Duo) over a 130-high photo | Capped at 320. The widest phone (~430 × 0.7) is under the cap | `getCompactCardWidth` |
+| 6 | Listing photo viewer read `Dimensions.get` once per render, and folding left both carousels between two photos | `useWindowDimensions`, and both carousels snap back to the current photo when the width changes | `app/property/[id].tsx` |
+| 7 | Found by the unfold test (X37): the website never fires `onMomentumScrollEnd`, so the photo index stayed 0. After a resize the carousel jumped back to photo 1, and before row 6 it had stopped between two photos | The photo is tracked `onScroll` (throttled; the setState is skipped when unchanged). The re-snap runs on a width change only and reads the index from a ref, so it never fights a swipe | e2e X37 |
+| 8 | Nothing tested state across fold and unfold | X37: swipe to photo 2 at 344, widen to 690, still photo 2 and aligned. X38: pick Rent on Explore, widen, still Rent with the same homes | `e2e-expo/flows.spec.ts` |
+
+Already right, left alone:
+- Every size decision reads `useWindowDimensions` and follows fold and unfold live.
+- Expo's Android template keeps the activity alive across fold and unfold (`configChanges` includes `screenSize|smallestScreenSize|screenLayout`).
+- The unfolded Fold gets the tablet layouts: a 3-column grid and the two-column listing page.
+- The floating tab bar is already capped.
+
+**Not done, needs an owner decision.** On a Surface Duo or a half-folded Fold,
+the hinge or crease can sit across centred content. Detecting the hinge
+needs Jetpack WindowManager through a native module, which is a new
+dependency (CLAUDE.md: ask first). Without it the app treats a spanned Duo
+as one 1114-wide tablet. Microsoft also ended the Duo's updates in 2023, so a hinge-aware two-pane layout is low value.
+
+**Checked:**
+
+| Check | Result |
+|---|---|
+| `tsc` | clean |
+| `lint` | 0 errors (33 warnings, unchanged) |
+| `npm test` | 334/334 |
+| `test:e2e:expo` | 144 passed, 20 skipped (new X34 ×5 and X37/X38, phone project; X37/X38 10/10 under `--repeat-each=5 --workers=4`) |
+| X35 (from master) | Failed 7/8 under load on master too. It now waits for all four prefetch requests, and samples the 200 ms highlight every 20 ms (the default intervals looked only twice). 12/12 under `--repeat-each=6 --workers=6` |
+
+**Not possible here:** no Android SDK or emulator is installed on this laptop, and installing one means accepting Google's SDK licence (owner rule: never accept terms). The checks above are browser-simulated. They cover layout, overflow and state across a resize, but not touch feel or native rendering.
+
+**Still to try on a real Fold or Flip:** unfold while on a listing, open a sheet in landscape on the inner screen, and type in the wizard on the cover screen.
+
 ## ═══ PASS 21 — 2026-10-26: THE "FIXES I CAN DO NOW" LIST (owner request) ═══
 
 **Scope.** The no-cost list from `docs/TODO.md`: one P2, seven P3 and two

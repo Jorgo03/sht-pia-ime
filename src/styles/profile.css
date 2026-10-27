@@ -5,6 +5,9 @@
 .auth-screen {
   position: relative;
   min-height: calc(100vh - 62px);
+  /* svh: the card is docked to the bottom, so it sits above the nav with the
+     browser toolbar showing too, and does not move while the toolbar slides. */
+  min-height: calc(100svh - 62px);
   overflow: hidden;
 }
 
@@ -15,6 +18,7 @@
   flex-direction: column;
   justify-content: flex-end;
   min-height: calc(100vh - 62px);
+  min-height: calc(100svh - 62px);
   /* .liquid-nav sits at bottom:18px, height:62px (z-index:50) — the card is
      flex-end docked, so without this clearance its bottom (Sign Up link)
      renders underneath the fixed nav pill instead of above it. 18+62=80px
@@ -317,11 +321,19 @@
   margin: 8px 0;
 }
 
+@media (max-width: 383px) {
+  .otp-inputs { gap: 4px; }
+}
+
 /* The boxes always sit on the dark DuskHero art (both app themes), so the
  * state colors are theme-independent. Idle must be clearly visible — the
  * old 6%-white fill vanished against the gradient. */
 .otp-digit {
   width: 44px;
+  /* Shrinks below ~384 wide (a 280 Fold cover screen, a 320 phone), where
+     six fixed 44px boxes ran past the card and the outer two were cut off. */
+  flex: 0 1 44px;
+  min-width: 0;
   height: 52px;
   border-radius: var(--r-md);
   border: 1.5px solid rgba(255,255,255,0.38);

@@ -14,6 +14,7 @@ import { useAuth } from '@/contexts/auth-context';
 import { useTheme } from '@/contexts/theme-context';
 import { supabase } from '@/lib/supabase';
 import { formatDate, formatPrice, getLocalizedText } from '@/lib/format';
+import { useReadableColumn } from '@/hooks/use-responsive';
 import { wantedMatches } from '@/src/features/leads/lib/leads';
 
 interface Stats {
@@ -66,6 +67,8 @@ export default function AgentDashboardScreen() {
   const { user, loading: authLoading } = useAuth();
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
+  // A centred column on an unfolded Fold or a spanned Duo (hooks/use-responsive).
+  const readable = useReadableColumn();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [stats, setStats] = useState<Stats>({ listings: 0, views: 0, conversations: 0, leads: 0 });
@@ -183,7 +186,7 @@ export default function AgentDashboardScreen() {
 
   return (
     <GradientBackground>
-      <SafeAreaView style={styles.container} edges={['top']}>
+      <SafeAreaView style={[styles.container, readable]} edges={['top']}>
         <AppHeader onBack={() => router.back()} />
 
         {/* Matches web's AgentDashboard.jsx screen-kicker/screen-headline hero. */}

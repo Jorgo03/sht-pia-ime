@@ -23,7 +23,7 @@ import {
   savePreferences,
   type NotificationPreferences,
 } from '@/src/features/notifications/lib/preferences';
-import { webColumn } from '@/constants/web-frame';
+import { sheetColumn } from '@/constants/web-frame';
 
 const PLATFORM = Platform.OS === 'ios' ? 'ios' : Platform.OS === 'android' ? 'android' : 'web';
 
@@ -169,7 +169,7 @@ export function NotificationsSheet({ userId, onClose }: { userId: string; onClos
     <Modal visible transparent animationType="slide" onRequestClose={onClose}>
       <Pressable accessibilityRole="button" style={styles.backdrop} onPress={onClose} accessibilityLabel={t('common.close')} />
       <View style={styles.sheetWrap} pointerEvents="box-none">
-        <SafeAreaView edges={['bottom']} style={[styles.sheet, webColumn]}>
+        <SafeAreaView edges={['bottom']} style={[styles.sheet, sheetColumn]}>
           <View style={styles.grip} />
           <View style={styles.header}>
             <Text style={styles.title} accessibilityRole="header">

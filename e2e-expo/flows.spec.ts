@@ -447,6 +447,22 @@ test.describe('narrow phone layout', () => {
   }
 });
 
+// A Galaxy Fold's cover screen is 280 wide, narrower than any phone. The
+// Rent pill on Explore and the wizard's fifth step dot used to run off it.
+test.describe('foldable cover screen', () => {
+  test.use({ viewport: { width: 280, height: 653 }, signedIn: true });
+
+  for (const path of ['/', '/explore', '/listing/new', '/profile', `/property/${FEATURED.id}`]) {
+    test(`X34 at 280px ${path} keeps every control on screen`, async ({ page, isMobile }) => {
+      test.skip(!isMobile, 'phone project only');
+      await page.goto(path);
+      await ready(page);
+      await page.waitForTimeout(500);
+      expect(await layoutProblems(page)).toEqual([]);
+    });
+  }
+});
+
 // The listing wizard end to end in the app's web build: two photos, then
 // publish or draft (docs/PHOTO_KEYBOARD_PRICE_REPORT.md). Storage and the
 // properties table are answered here; what the app sends is recorded.
@@ -832,8 +848,14 @@ test('X35 All/Sale/Rent: the tab lights up at once and its homes are already loa
   await page.goto('/explore');
   await ready(page);
   // The other two tabs were fetched in the background, before any tap.
-  expect(asked.some((u) => u.includes('listing_type=eq.rent'))).toBe(true);
-  expect(asked.some((u) => u.includes('listing_type=eq.sale'))).toBe(true);
+  // Polled: under parallel load the prefetch can land after networkidle
+  // (7 of 8 failed with --repeat-each=4 --workers=4, on master too).
+  // Each tab is two requests (its first page and its count); wait for all
+  // four, then for them to finish, before counting what a tap asks for.
+  const sent = (type: string) => asked.filter((u) => u.includes(`listing_type=eq.${type}`)).length;
+  await expect.poll(() => sent('rent')).toBeGreaterThanOrEqual(2);
+  await expect.poll(() => sent('sale')).toBeGreaterThanOrEqual(2);
+  await page.waitForLoadState('networkidle');
 
   const before = asked.length;
   const rent = page.getByRole('button', { name: t('search.rent'), exact: true });
@@ -842,7 +864,8 @@ test('X35 All/Sale/Rent: the tab lights up at once and its homes are already loa
   const activeBg = await background(all);
   await rent.click();
   // Highlighted from the tap itself, not after the 350 ms typing debounce.
-  await expect.poll(() => background(rent), { timeout: 200 }).toBe(activeBg);
+  // Sampled every 20 ms: the default intervals (100, 250…) look only twice in 200.
+  await expect.poll(() => background(rent), { timeout: 200, intervals: [20] }).toBe(activeBg);
   const rentals = LISTINGS.filter((l) => l.listing_type === 'rent').length;
   await expect(page.getByText(/në shikim/)).toContainText(String(rentals), { timeout: 300 });
   // Shown from the prefetched cache: tapping asked the server for nothing new.
@@ -855,6 +878,58 @@ test('X36 Home has no kicker above the greeting and no "editor\'s pick" label', 
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
   await expect(page.getByText(t('home.editorsPick'))).toHaveCount(0);
   await expect(page.getByText(t('home.featured'))).toBeVisible();
+});
+
+// Unfolding a Galaxy Fold widens the window under a running app (on the web
+// the column grows from 344 to its 480 cap). What the person was doing has to
+// survive it: the photo they swiped to, and the tab they picked.
+test.describe('unfolding mid-session', () => {
+  test.use({ viewport: { width: 344, height: 882 } });
+
+  test('X37 the listing stays on the same photo, aligned, when the screen widens', async ({ page, isMobile }) => {
+    test.skip(!isMobile, 'phone project only');
+    await page.goto(`/property/${FEATURED.id}`);
+    await ready(page);
+    // The hero carousel: the horizontal scroller whose pages open the photos.
+    // Scrolls it to `page` when given; returns where it is.
+    const carousel = (to?: number) => page.evaluate(([label, to]) => {
+      const el = [...document.querySelectorAll('div')].find((d) => {
+        const s = getComputedStyle(d);
+        return (s.overflowX === 'auto' || s.overflowX === 'scroll') && d.scrollWidth > d.clientWidth
+          && d.querySelector(`[aria-label="${label}"]`);
+      });
+      // scrollLeft, not scrollTo(): the latter left this snapping scroller at 0.
+      if (el && typeof to === 'number') el.scrollLeft = to * el.clientWidth;
+      return el ? { left: Math.round(el.scrollLeft), width: el.clientWidth } : null;
+    }, [t('listing.images'), to] as const);
+    await expect.poll(() => carousel()).toEqual({ left: 0, width: 344 });
+    // Swipe to the second photo.
+    await carousel(1);
+    await expect.poll(() => carousel()).toEqual({ left: 344, width: 344 });
+    await page.waitForTimeout(600);
+
+    await page.setViewportSize({ width: 690, height: 829 });
+    // Still the second photo, a whole page in: not photo one, not half of each.
+    // Each photo is a 480 page (the column), shown through a scroller 478
+    // wide (the column's hairline edges), so page two starts at 480.
+    await expect.poll(() => carousel()).toEqual({ left: 480, width: 478 });
+  });
+
+  test('X38 Explore keeps the chosen tab and its homes when the screen widens', async ({ page, isMobile }) => {
+    test.skip(!isMobile, 'phone project only');
+    await page.goto('/explore');
+    await ready(page);
+    await page.getByRole('button', { name: t('search.rent'), exact: true }).click();
+    const rentals = LISTINGS.filter((l) => l.listing_type === 'rent').length;
+    const count = page.getByText(/në shikim/);
+    await expect(count).toContainText(String(rentals));
+    await page.setViewportSize({ width: 690, height: 829 });
+    await expect(page).toHaveURL(/\/explore/);
+    await expect(count).toContainText(String(rentals));
+    const background = (name: string) =>
+      page.getByRole('button', { name, exact: true }).evaluate((n) => getComputedStyle(n).backgroundColor);
+    expect(await background(t('search.rent'))).not.toBe(await background(t('common.all')));
+  });
 });
 
 // CRM, phase 1 (docs/BSP_CRM_ANALYSIS.md): the agent's leads, today's agenda
@@ -873,7 +948,7 @@ test.describe('signed in: CRM', () => {
     created_at: '2026-10-20T10:00:00+00:00',
   };
 
-  test('X37 leads: listed, searched, added, moved forward and deleted after a confirmation', async ({ page, writes }) => {
+  test('X39 leads: listed, searched, added, moved forward and deleted after a confirmation', async ({ page, writes }) => {
     const asked: string[] = [];
     await page.route('**/rest/v1/leads*', (route) => {
       const req = route.request();
@@ -922,7 +997,7 @@ test.describe('signed in: CRM', () => {
     await expect.poll(() => writes.some((w) => w.table === 'leads' && w.method === 'DELETE')).toBe(true);
   });
 
-  test('X38 leads: a lead needs a name, and a bad email is refused before saving', async ({ page, writes }) => {
+  test('X40 leads: a lead needs a name, and a bad email is refused before saving', async ({ page, writes }) => {
     await page.route('**/rest/v1/leads*', (route) => (route.request().method() === 'GET' ? json(route, []) : route.fallback()));
     await page.goto('/leads');
     await ready(page);
@@ -937,7 +1012,7 @@ test.describe('signed in: CRM', () => {
     expect(writes.some((w) => w.table === 'leads')).toBe(false);
   });
 
-  test('X39 dashboard: today\'s agenda, the leads link, and buyer requests matched to your listings', async ({ page }) => {
+  test('X41 dashboard: today\'s agenda, the leads link, and buyer requests matched to your listings', async ({ page }) => {
     const today = new Date();
     today.setHours(17, 0, 0, 0);
     await page.route('**/rest/v1/viewings*', (route) =>

@@ -299,7 +299,9 @@ export function LiquidTabBar({ state, descriptors, emitter, navigateToTab }: Bot
           onPress={() => select('messages', () => router.push('/messages' as Href))}>
           {unread > 0 && (
             <View style={[styles.navBadge, { backgroundColor: colors.accent }]}>
-              <Text style={styles.navBadgeText}>{unread > 9 ? '9+' : unread}</Text>
+              <Text style={styles.navBadgeText} maxFontSizeMultiplier={1.2}>
+                {unread > 9 ? '9+' : unread}
+              </Text>
             </View>
           )}
         </NavItem>
@@ -391,8 +393,13 @@ const styles = StyleSheet.create({
     top: 0,
     height: LENS_HEIGHT / 2,
   },
+  // The slots may shrink a little: four 46px tabs plus the 58px "+" slot are
+  // 242px, and on a 280 Fold cover the pill has 232, so the outer icons
+  // touched its rounded ends. From 300 wide up nothing shrinks.
   navItem: {
     width: 46,
+    flexShrink: 1,
+    minWidth: 40,
     height: 46,
     borderRadius: 14,
     alignItems: 'center',
@@ -413,6 +420,8 @@ const styles = StyleSheet.create({
   },
   navAddSlot: {
     width: NAV_ADD_SIZE,
+    flexShrink: 1,
+    minWidth: 52,
     height: NAV_ADD_SIZE,
   },
   // Same spot the button had as the pill's middle child: horizontally
@@ -436,9 +445,10 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 4,
     right: 4,
+    // minHeight + a pill radius: at 200% system text a fixed 16 clipped "9+".
     minWidth: 16,
-    height: 16,
-    borderRadius: 8,
+    minHeight: 16,
+    borderRadius: 999,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 3,
