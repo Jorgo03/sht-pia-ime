@@ -22,9 +22,9 @@ From the app folder (`sht-pia-ime`), in PowerShell or any terminal:
 
 ```powershell
 git fetch origin ad-assets
-git archive -o ad-tools.zip origin/ad-assets ad-tools
-tar -xf ad-tools.zip
-del ad-tools.zip
+git archive -o ad-tools.tar origin/ad-assets ad-tools
+tar -xf ad-tools.tar
+Remove-Item ad-tools.tar
 Add-Content .git/info/exclude "ad-tools/"   # keeps the tools out of the app's commits
 cd ad-tools; npm install; cd ..
 npm run test:e2e:install                    # Playwright's browser, if not installed yet
