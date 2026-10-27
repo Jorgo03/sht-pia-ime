@@ -1,0 +1,9 @@
+{
+  "name": "shtepia-ime-ad-tools",
+  "private": true,
+  "description": "Free tools for the Shtëpia.ime iPhone advert. Not part of the app.",
+  "dependencies": {
+    "ffmpeg-static": "5.2.0",
+    "msedge-tts": "2.1.1"
+  }
+}

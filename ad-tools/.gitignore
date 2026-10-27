@@ -1,0 +1,6 @@
+node_modules/
+scenes/
+out/
+.tts-*/
+voice.mp3
+music.mp3
