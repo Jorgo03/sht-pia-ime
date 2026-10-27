@@ -923,3 +923,18 @@ sign-up impossible again (§15). So: 1 → 2 → 3 → test → 4.
    Outlook/other). I send one confirmation and one reset to each, and report
    arrival, folder, and the SPF/DKIM/DMARC results from the message headers
    — separately from "Supabase accepted it".
+
+## 18. Foldable phones: hinge skipped, no real-device test — 2026-10-27
+
+Owner answers (AUDIT.md Pass 22):
+
+- **Hinge detection: skipped.** No new library for the Surface Duo hinge or a
+  half-folded Fold. The Duo stopped getting updates in 2023, and a fully open
+  Fold already gets the tablet layouts. Revisit only if a real user reports
+  content under the fold.
+- **Real-device test: not available.** The owner has no foldable phone, and
+  this laptop has no Android emulator (installing one means accepting Google's
+  SDK licence). Foldable support is therefore verified in the browser at
+  280, 344, 360×380, 690, 829 and 1114 wide. Tests X34, X37 and X38 cover
+  overflow and state across fold and unfold. If a foldable becomes
+  available, run the three checks listed at the end of Pass 22.
