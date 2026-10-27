@@ -1,5 +1,18 @@
 # Pre-Launch Audit — Shtëpia.ime (Vite web app)
 
+## ═══ PASS 26 — 2026-10-27: LISTING AI ASSISTANT LIVE ON EVERY PROPERTY (owner goal) ═══
+
+The chat button already shows on every active listing in both apps
+(`app/property/[id].tsx` → `components/property/listing-assistant.tsx`;
+`src/features/properties/pages/PropertyDetail.jsx` → `ListingAssistant.jsx`).
+
+| Finding | Class |
+|---|---|
+| Live test on a real listing: `ai-listing-assistant` answered 503 `ai_unavailable`. Function log: `Anthropic error 401 authentication_error: invalid x-api-key`. The `ANTHROPIC_API_KEY` Edge Function secret is revoked or wrong, so no listing could get an answer (and `translate-property` falls back to MyMemory). Owner to create a new key at console.anthropic.com and set it as the `ANTHROPIC_API_KEY` secret | CONFIGURATION REQUIRED |
+| Deployed version 5 lacked the history trim already in the repo (a chat broke from the 6th question). Deployed the repo version as v6 with the owner's approval; same model (`claude-haiku-4-5-20251001`, still active), limits and `verify_jwt` | FIXED |
+
+---
+
 ## ═══ PASS 25 — 2026-10-27: WEBSITE VIEWING TIME PICKER ═══
 
 | Finding | Class |
