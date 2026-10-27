@@ -29,6 +29,10 @@ const STAGGER_STEP_MS = 50;
 /** polish.css only defines nth-child delays up to 8 so a long "load more"
  *  list doesn't animate for seconds — later items just appear. */
 const MAX_STAGGERED_INDEX = 8;
+/** `quick`: lists the visitor flips through (Explore's All/Sale/Rent), where
+ *  the full cascade made every switch wait almost a second for the ninth
+ *  card. Same rise, about half the time. */
+const QUICK_STEP_MS = 25;
 
 const easeOut = Easing.bezier(...Motion.easeOut);
 const easeSpring = Easing.bezier(...Motion.easeSpring);
@@ -42,20 +46,23 @@ export function RiseIn({
   children,
   index = 0,
   style,
+  quick = false,
 }: {
   children: React.ReactNode;
   index?: number;
   style?: StyleProp<ViewStyle>;
+  quick?: boolean;
 }) {
   const progress = useSharedValue(0);
 
   useEffect(() => {
-    const delay = STAGGER_BASE_MS + Math.min(index, MAX_STAGGERED_INDEX) * STAGGER_STEP_MS;
+    const step = quick ? QUICK_STEP_MS : STAGGER_STEP_MS;
+    const delay = (quick ? 0 : STAGGER_BASE_MS) + Math.min(index, MAX_STAGGERED_INDEX) * step;
     progress.value = withDelay(
       delay,
-      withTiming(1, { duration: Motion.slow, easing: easeOut }),
+      withTiming(1, { duration: quick ? Motion.med : Motion.slow, easing: easeOut }),
     );
-  }, [index, progress]);
+  }, [index, progress, quick]);
 
   const animatedStyle = useAnimatedStyle(() => ({
     opacity: progress.value,

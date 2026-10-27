@@ -7,7 +7,6 @@ import { Fonts, type AtticoPalette } from '@/constants/theme';
 import { useTheme } from '@/contexts/theme-context';
 
 interface SearchHeaderProps {
-  kicker: string;
   headline: string;
   /** Rendered in accent-orange italic, appended after `headline` — mirrors
    *  web's <em> match-count segment in Home.jsx's screen-headline. */
@@ -16,22 +15,18 @@ interface SearchHeaderProps {
 }
 
 /**
- * Home's header: the "editorial" kicker+headline pattern shared by every
- * web screen (screen-kicker / screen-headline in src/styles/globals.css),
+ * Home's header: the greeting headline (web's screen-headline in
+ * src/styles/globals.css; no kicker above it, the greeting already says it),
  * plus web's full-width tappable home-search-bar — not just a small icon
  * button, so the search entry point actually reads as a search field.
  */
-export function SearchHeader({ kicker, headline, emphasis, onSearchPress }: SearchHeaderProps) {
+export function SearchHeader({ headline, emphasis, onSearchPress }: SearchHeaderProps) {
   const { t } = useTranslation();
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
 
   return (
     <View style={styles.container}>
-      <View style={styles.kickerRow}>
-        <View style={styles.kickerDash} />
-        <Text style={styles.kicker}>{kicker}</Text>
-      </View>
       <Text style={styles.headline} accessibilityRole="header">
         {headline}
         {emphasis ? <Text style={styles.headlineEmphasis}> {emphasis}</Text> : null}
@@ -54,25 +49,6 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   container: {
     paddingTop: 8,
     paddingBottom: 4,
-  },
-  kickerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    paddingHorizontal: 20,
-    marginBottom: 6,
-  },
-  kickerDash: {
-    width: 14,
-    height: 1,
-    backgroundColor: colors.accent,
-  },
-  kicker: {
-    fontFamily: Fonts?.mono,
-    fontSize: 11,
-    letterSpacing: 1.5,
-    textTransform: 'uppercase',
-    color: colors.textSecondary,
   },
   // Matches web's .screen-headline exactly (src/styles/globals.css).
   headline: {

@@ -1,4 +1,11 @@
-import { keepPreviousData, useInfiniteQuery, useQuery } from '@tanstack/react-query';
+import { useEffect } from 'react';
+import {
+  infiniteQueryOptions,
+  keepPreviousData,
+  useInfiniteQuery,
+  useQuery,
+  useQueryClient,
+} from '@tanstack/react-query';
 
 import {
   getMapProperties,
@@ -42,15 +49,42 @@ export function usePropertiesQuery(filters: PropertyFilters, limit: number = PAG
   });
 }
 
-/** Explore's paginated "load more" list. */
-export function useInfinitePropertiesQuery(filters: PropertyFilters) {
-  return useInfiniteQuery({
+const infiniteListOptions = (filters: PropertyFilters) =>
+  infiniteQueryOptions({
     queryKey: propertyKeys.infiniteList(filters),
     queryFn: ({ pageParam }) => getProperties(filters, { offset: pageParam, limit: PAGE_SIZE }),
     initialPageParam: 0,
     getNextPageParam: (lastPage, allPages) =>
       lastPage.length === PAGE_SIZE ? allPages.length * PAGE_SIZE : undefined,
   });
+
+/** Explore's paginated "load more" list. */
+export function useInfinitePropertiesQuery(filters: PropertyFilters) {
+  return useInfiniteQuery(infiniteListOptions(filters));
+}
+
+const LISTING_TABS: PropertyFilters['listingType'][] = [null, 'sale', 'rent'];
+
+/**
+ * Loads the first page of Explore's other All/Sale/Rent tabs in the
+ * background, so tapping one shows its homes at once instead of a spinner.
+ * One page each (24 rows), and only when the cache has nothing fresh: the
+ * query client's staleTime makes a repeat a no-op.
+ */
+export function usePrefetchListingTabs(filters: PropertyFilters, enabled: boolean = true) {
+  const queryClient = useQueryClient();
+  useEffect(() => {
+    if (!enabled) return;
+    for (const listingType of LISTING_TABS) {
+      if (listingType === (filters.listingType ?? null)) continue;
+      const sibling = { ...filters, listingType };
+      queryClient.prefetchInfiniteQuery(infiniteListOptions(sibling));
+      queryClient.prefetchQuery({
+        queryKey: propertyKeys.count(sibling),
+        queryFn: () => getPropertiesCount(sibling),
+      });
+    }
+  }, [enabled, filters, queryClient]);
 }
 
 /** Exact result count for a filter set — Explore's header and the filter

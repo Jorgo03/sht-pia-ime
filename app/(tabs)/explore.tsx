@@ -27,7 +27,7 @@ import { useFilters } from '@/contexts/filters-context';
 import { KeyboardDoneBar } from '@/components/ui/keyboard-done-bar';
 import { useTheme } from '@/contexts/theme-context';
 import { Property } from '@/data/types';
-import { useInfinitePropertiesQuery, usePropertiesCountQuery } from '@/hooks/use-property-queries';
+import { useInfinitePropertiesQuery, usePrefetchListingTabs, usePropertiesCountQuery } from '@/hooks/use-property-queries';
 import { useResponsive } from '@/hooks/use-responsive';
 
 export default function ExploreScreen() {
@@ -75,6 +75,8 @@ export default function ExploreScreen() {
     return (data?.pages.flat() ?? []).filter((p) => !seen.has(p.id) && Boolean(seen.add(p.id)));
   }, [data]);
   const { data: total = 0 } = usePropertiesCountQuery(queryFilters);
+  // The other tabs are ready before they are tapped.
+  usePrefetchListingTabs(queryFilters, viewMode === 'list');
 
   // Quick All/Sale/Rent tabs stay in sync with the sheet by reading the same
   // shared filter state rather than keeping their own copy.
@@ -82,8 +84,9 @@ export default function ExploreScreen() {
     () => [t('common.all'), t('search.sale'), t('search.rent')],
     [t],
   );
-  const activeTab = queryFilters.listingType
-    ? queryFilters.listingType === 'sale'
+  // The live value, not the debounced one: the tap lights up at once.
+  const activeTab = filters.listingType
+    ? filters.listingType === 'sale'
       ? listingTabs[1]
       : listingTabs[2]
     : listingTabs[0];
@@ -91,7 +94,7 @@ export default function ExploreScreen() {
   const handleTabChange = useCallback(
     (tab: string) => {
       const index = listingTabs.indexOf(tab);
-      setFilter('listingType', index === 1 ? 'sale' : index === 2 ? 'rent' : null);
+      setFilter('listingType', index === 1 ? 'sale' : index === 2 ? 'rent' : null, { immediate: true });
     },
     [listingTabs, setFilter],
   );
@@ -102,9 +105,13 @@ export default function ExploreScreen() {
   useEffect(() => {
     const id = setTimeout(() => {
       const next = searchText.trim() || null;
+      // Unchanged: writing it anyway turned a missing city into `city: null`,
+      // a new cache key, so the list loaded twice on opening and missed the
+      // prefetched All/Sale/Rent pages.
+      if (next === lastPushedCity.current) return;
       // A zone belongs to its city (the sheet clears it the same way); kept,
       // it was silently ignored by the query yet still counted as a filter.
-      if (next !== lastPushedCity.current) setFilter('zone', null);
+      setFilter('zone', null);
       lastPushedCity.current = next;
       setFilter('city', next);
     }, 350);
@@ -151,7 +158,7 @@ export default function ExploreScreen() {
   // polish.css's `.property-grid > *` nth-child delays.
   const renderItem = useCallback(
     ({ item, index }: { item: Property; index: number }) => (
-      <RiseIn index={index} style={gridItemStyle}>
+      <RiseIn index={index} style={gridItemStyle} quick>
         <PropertyCard property={item} />
       </RiseIn>
     ),

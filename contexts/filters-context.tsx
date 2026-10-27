@@ -5,6 +5,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from 'react';
 
@@ -24,9 +25,12 @@ interface FiltersContextValue {
   filters: PropertyFilters;
   /** Debounced and range-corrected — pass this to the data layer. */
   queryFilters: PropertyFilters;
+  /** `immediate` skips the debounce: for a tap (the All/Sale/Rent tabs),
+   *  where there is no typing to wait out. */
   setFilter: <K extends keyof PropertyFilters>(
     key: K,
     value: PropertyFilters[K],
+    options?: { immediate?: boolean },
   ) => void;
   reset: () => void;
   /** Facets currently set, for a badge. Excludes sort, which is always set. */
@@ -49,14 +53,24 @@ const FiltersContext = createContext<FiltersContextValue | null>(null);
 export function FiltersProvider({ children }: { children: ReactNode }) {
   const [filters, setFilters] = useState<PropertyFilters>(EMPTY);
   const [debounced, setDebounced] = useState<PropertyFilters>(EMPTY);
+  const immediate = useRef(false);
 
   useEffect(() => {
-    const id = setTimeout(() => setDebounced(filters), DEBOUNCE_MS);
+    // Cleared when the timer fires, not here, so an effect run twice (React
+    // development mode) still applies a tap at once.
+    const id = setTimeout(
+      () => {
+        immediate.current = false;
+        setDebounced(filters);
+      },
+      immediate.current ? 0 : DEBOUNCE_MS,
+    );
     return () => clearTimeout(id);
   }, [filters]);
 
   const setFilter = useCallback(
-    <K extends keyof PropertyFilters>(key: K, value: PropertyFilters[K]) => {
+    <K extends keyof PropertyFilters>(key: K, value: PropertyFilters[K], options?: { immediate?: boolean }) => {
+      if (options?.immediate) immediate.current = true;
       setFilters((prev) => ({ ...prev, [key]: value }));
     },
     [],
