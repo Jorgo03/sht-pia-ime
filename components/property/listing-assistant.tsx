@@ -1,5 +1,6 @@
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useRouter, type Href } from 'expo-router';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -45,6 +46,7 @@ import { type Property } from '@/data/types';
  */
 export function ListingAssistant({ property }: { property: Property | null }) {
   const { t, i18n } = useTranslation();
+  const router = useRouter();
   const { colors } = useTheme();
   const { width: screenWidth, height: screenHeight } = useResponsive();
   const insets = useSafeAreaInsets();
@@ -149,6 +151,20 @@ export function ListingAssistant({ property }: { property: Property | null }) {
           <View style={styles.bubble}>
             <Text style={styles.bubbleText}>{t('assistant.intro')}</Text>
           </View>
+          {/* Searching beyond this listing is the full assistant's job: open it
+              with the question ready, sent only when the person taps send. */}
+          <Pressable
+            style={styles.alternatives}
+            onPress={() => {
+              setOpen(false);
+              router.push(
+                `/assistant?property=${property.id}&q=${encodeURIComponent(t('aiAssistant.alternativesQuestion'))}` as Href,
+              );
+            }}
+            accessibilityRole="button">
+            <MaterialIcons name="travel-explore" size={15} color={colors.accentText} />
+            <Text style={styles.alternativesText}>{t('aiAssistant.alternatives')}</Text>
+          </Pressable>
           {messages.map((m, i) => (
             <View key={i} style={[styles.bubble, m.role === 'user' && styles.bubbleMine]}>
               <Text style={[styles.bubbleText, m.role === 'user' && styles.bubbleTextMine]}>
@@ -307,6 +323,18 @@ const createStyles = (
       borderBottomLeftRadius: 4,
       paddingHorizontal: 11,
       paddingVertical: 8,
+    },
+    alternatives: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 6,
+      minHeight: 36,
+      alignSelf: 'flex-start',
+    },
+    alternativesText: {
+      fontFamily: Fonts?.sansSemiBold,
+      fontSize: 13,
+      color: colors.accentText,
     },
     bubbleMine: {
       alignSelf: 'flex-end',

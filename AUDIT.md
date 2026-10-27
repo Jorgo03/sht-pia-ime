@@ -1,5 +1,27 @@
 # Pre-Launch Audit — Shtëpia.ime (Vite web app)
 
+## ═══ PASS 27 — 2026-10-27: THE SHTËPIA.IME AI ASSISTANT (owner master prompt) ═══
+
+Design and operation: docs/AI_ASSISTANT.md. In short: a chat screen
+(`app/assistant.tsx`) talks to a new Edge Function `ai-assistant`; Claude calls
+five controlled tools (search, details, compare, show cards, open a screen);
+every listing is read with the caller's own token, so `properties` RLS applies;
+cards and comparison numbers are rebuilt from the database, never from model
+text; the platform notes are a versioned file written from the code.
+
+| Check | Result |
+|---|---|
+| Audit: schema (`properties` columns and CHECKs, `features` keys, RLS policies, `ai_usage`), existing AI functions, the app's search pipeline (`data/properties.ts`, `priceRange.js`), routes | Done; reused the app's filter rules and reference currency rates (parity test) |
+| Server logic: validation, injection attempts, follow-up merging, query predicates, ranking, price per m², comparison, cards, history/state, full tool loops with a scripted model, plus the app's history and storage rules | PASS (`tests/aiAssistant.test.mjs`, 19 tests) |
+| PostgREST behaviour the query relies on (two `or` filters are ANDed, `features=cs.{...}`), checked read-only against the live REST API with the public anon key | PASS |
+| Chat screen: answer + cards → listing, follow-up sends history and state, reload keeps it, new chat clears, comparison table with "nuk është specifikuar", outage + retry, entry points (Home, Search, listing panel) | PASS (e2e-expo X43–X47, phone + desktop) |
+| `/assistant` accessibility (axe, light + dark) and layout at 320px and 280px | PASS. The first try put a third round button in Search's header, which ran off a Fold's 280px cover screen; it now sits at the end of the search field |
+| Full checks: `npm test` 358/358, `tsc`, `npm run lint` (0 errors), `npm run build`, e2e-expo 168 passed / 22 skipped (single-project tests) | PASS |
+| Live answers from Claude (quality, language, tool choice) | BLOCKED: `ANTHROPIC_API_KEY` in Supabase is rejected by Anthropic (Pass 26). NOT VERIFIED until the owner replaces it |
+| `ai-assistant` deployed | Not yet: needs the owner's approval |
+
+---
+
 ## ═══ PASS 26 — 2026-10-27: LISTING AI ASSISTANT LIVE ON EVERY PROPERTY (owner goal) ═══
 
 The chat button already shows on every active listing in both apps

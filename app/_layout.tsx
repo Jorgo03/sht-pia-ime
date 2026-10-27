@@ -153,6 +153,7 @@ function ThemedNavigation() {
             name="agent/[id]"
             options={{ headerShown: false, presentation: 'card' }}
           />
+          <Stack.Screen name="assistant" options={{ headerShown: false, presentation: 'card' }} />
           {/* Website pages; pricing, moderation and auth/callback are web
               only (their native files redirect home). */}
           <Stack.Screen name="privacy" options={{ headerShown: false }} />

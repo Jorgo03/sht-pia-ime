@@ -134,6 +134,7 @@ When asked for a feature, work in this order — tight, not padded:
 - Pending human decisions & judgment-call log → `DECISIONS.md`
 - Visual design system → `design-system/MASTER.md`
 - Figma → code mapping (tokens, components, assets, icons, translation rules) → `design-system/FIGMA_RULES.md`
+- The AI assistant (architecture, tools, limits, deploy) → `docs/AI_ASSISTANT.md`
 
 There is no `/godmode` skill file in this repo despite earlier documentation referencing one — running it will fail with "Unknown skill." The equivalent manual process (what actually shipped the audit passes in `AUDIT.md`): read-only diagnostics + live Supabase state gathered and written to `AUDIT.md` *before* any code change, findings classified (FIXED/DEFERRED/FALSE POSITIVE/NO ACTION REQUIRED/CONFIGURATION REQUIRED), only then fix — and only what the audit actually proved broken.
 

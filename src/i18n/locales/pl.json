@@ -821,5 +821,72 @@
     "deleteFailed": "Nie udało się usunąć. Spróbuj ponownie.",
     "greeting": "Dzień dobry, {{name}}!",
     "added": "Dodano {{date}}"
+  },
+  "aiAssistant": {
+    "title": "Asystent AI",
+    "subtitle": "Znajdź prawdziwe oferty, porównaj je i dowiedz się, jak działa Shtëpia.ime.",
+    "intro": "Cześć! Powiedz, czego szukasz: znajdę oferty w Shtëpia.ime, porównam je albo wyjaśnię, jak działa aplikacja.",
+    "placeholder": "Napisz wiadomość…",
+    "thinking": "Szukam…",
+    "newChat": "Nowa rozmowa",
+    "startersTitle": "Zapytaj na przykład",
+    "starters": {
+      "findApartment": "Znajdź mi mieszkanie",
+      "byBudget": "Szukaj w moim budżecie",
+      "compare": "Porównaj kilka ofert",
+      "howItWorks": "Jak działa Shtëpia.ime?",
+      "publish": "Pomóż mi opublikować ofertę"
+    },
+    "error": {
+      "unavailable": "Asystent jest teraz niedostępny. Spróbuj ponownie za chwilę.",
+      "rate_limited": "Zadano wiele pytań w tej godzinie. Spróbuj ponownie za chwilę.",
+      "refused": "Nie mogę pomóc w tej sprawie.",
+      "network": "Brak połączenia. Sprawdź internet i spróbuj ponownie."
+    },
+    "notSpecified": "Nie podano",
+    "disclaimer": "Asystent korzysta z ofert w Shtëpia.ime. Ważne szczegóły sprawdź u agenta. To nie jest porada finansowa ani prawna.",
+    "you": "Ty",
+    "entry": "Zapytaj asystenta AI",
+    "entryHint": "np. „2+1 w Tiranie do 150 000 €\"",
+    "alternatives": "Znajdź podobne lub tańsze",
+    "alternativesQuestion": "Znajdź mi oferty podobne do tej albo tańsze.",
+    "compare": {
+      "title": "Porównanie",
+      "price": "Cena",
+      "pricePerM2": "Cena za m²",
+      "area": "Powierzchnia",
+      "bedrooms": "Sypialnie",
+      "bathrooms": "Łazienki",
+      "floor": "Piętro",
+      "floorOf": "{{floor}} z {{total}}",
+      "location": "Lokalizacja",
+      "amenities": "Udogodnienia",
+      "mixedCurrencies": "Różne waluty: kwoty w euro są przybliżone.",
+      "areaNote": "Powierzchnia z ogłoszenia (m²); netto i brutto nie są podawane osobno.",
+      "best": {
+        "price": "Najtańsza",
+        "perM2": "Najniższa cena za m²",
+        "area": "Największa",
+        "beds": "Najwięcej sypialni"
+      }
+    },
+    "screens": {
+      "explore": "Otwórz wyszukiwanie",
+      "favorites": "Ulubione",
+      "saved_searches": "Zapisane wyszukiwania",
+      "messages": "Wiadomości",
+      "viewings": "Oglądanie",
+      "create_listing": "Opublikuj ofertę",
+      "my_listings": "Moje oferty",
+      "agent_dashboard": "Panel agenta",
+      "leads": "Potencjalni klienci",
+      "profile": "Profil",
+      "privacy": "Polityka prywatności",
+      "terms": "Warunki korzystania"
+    },
+    "results_one": "{{count}} oferta",
+    "results_few": "{{count}} oferty",
+    "results_many": "{{count}} ofert",
+    "results_other": "{{count}} oferty"
   }
 }

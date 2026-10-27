@@ -803,5 +803,70 @@
     "deleteFailed": "Couldn't delete. Try again.",
     "greeting": "Hello {{name}}!",
     "added": "Added {{date}}"
+  },
+  "aiAssistant": {
+    "title": "AI assistant",
+    "subtitle": "Find real listings, compare them and learn how Shtëpia.ime works.",
+    "intro": "Hi! Tell me what you are looking for and I will find listings on Shtëpia.ime, compare them, or explain how the app works.",
+    "placeholder": "Type a message…",
+    "thinking": "Searching…",
+    "newChat": "New chat",
+    "startersTitle": "Try asking",
+    "starters": {
+      "findApartment": "Find me an apartment",
+      "byBudget": "Search listings within my budget",
+      "compare": "Compare some listings for me",
+      "howItWorks": "How does Shtëpia.ime work?",
+      "publish": "Help me publish a listing"
+    },
+    "error": {
+      "unavailable": "The assistant is not available right now. Please try again a little later.",
+      "rate_limited": "You have asked a lot of questions this hour. Please try again a little later.",
+      "refused": "I can't help with this request.",
+      "network": "Could not connect. Check your internet and try again."
+    },
+    "notSpecified": "Not specified",
+    "disclaimer": "The assistant uses the listings on Shtëpia.ime. Check important details with the agent. This is not financial or legal advice.",
+    "you": "You",
+    "entry": "Ask the AI assistant",
+    "entryHint": "e.g. \"A 2+1 in Tirana up to €150k\"",
+    "alternatives": "Find similar or cheaper listings",
+    "alternativesQuestion": "Find me listings similar to this one, or cheaper.",
+    "compare": {
+      "title": "Comparison",
+      "price": "Price",
+      "pricePerM2": "Price per m²",
+      "area": "Area",
+      "bedrooms": "Bedrooms",
+      "bathrooms": "Bathrooms",
+      "floor": "Floor",
+      "floorOf": "{{floor}} of {{total}}",
+      "location": "Location",
+      "amenities": "Features",
+      "mixedCurrencies": "Different currencies: euro figures are approximate.",
+      "areaNote": "Area as listed (m²); net and gross are not recorded separately.",
+      "best": {
+        "price": "Cheapest",
+        "perM2": "Lowest per m²",
+        "area": "Largest",
+        "beds": "Most bedrooms"
+      }
+    },
+    "screens": {
+      "explore": "Open search",
+      "favorites": "Favourites",
+      "saved_searches": "Saved searches",
+      "messages": "Messages",
+      "viewings": "Viewings",
+      "create_listing": "Publish a listing",
+      "my_listings": "My listings",
+      "agent_dashboard": "Agent dashboard",
+      "leads": "Leads",
+      "profile": "Profile",
+      "privacy": "Privacy policy",
+      "terms": "Terms of use"
+    },
+    "results_one": "{{count}} listing",
+    "results_other": "{{count}} listings"
   }
 }

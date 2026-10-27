@@ -803,5 +803,70 @@
     "deleteFailed": "Nuk u fshi. Provo përsëri.",
     "greeting": "Përshëndetje {{name}}!",
     "added": "Shtuar më {{date}}"
+  },
+  "aiAssistant": {
+    "title": "Asistenti AI",
+    "subtitle": "Gjej prona reale, krahasoji dhe mëso si funksionon Shtëpia.ime.",
+    "intro": "Përshëndetje! Më trego çfarë kërkon dhe të gjej prona nga Shtëpia.ime, t'i krahasoj ose të shpjegoj si funksionon aplikacioni.",
+    "placeholder": "Shkruaj një mesazh…",
+    "thinking": "Po kërkoj…",
+    "newChat": "Bisedë e re",
+    "startersTitle": "Provo të pyesësh",
+    "starters": {
+      "findApartment": "Më gjej një apartament",
+      "byBudget": "Kërko prona sipas buxhetit tim",
+      "compare": "Më krahaso disa prona",
+      "howItWorks": "Si funksionon Shtëpia.ime?",
+      "publish": "Më ndihmo të publikoj një pronë"
+    },
+    "error": {
+      "unavailable": "Asistenti nuk është i disponueshëm tani. Provo përsëri pak më vonë.",
+      "rate_limited": "Ke bërë shumë pyetje brenda një ore. Provo përsëri pak më vonë.",
+      "refused": "Nuk mund të ndihmoj me këtë kërkesë.",
+      "network": "Nuk u lidh. Kontrollo internetin dhe provo përsëri."
+    },
+    "notSpecified": "Nuk është specifikuar",
+    "disclaimer": "Asistenti përdor të dhënat e shpalljeve në Shtëpia.ime. Verifiko detajet me agjentin. Nuk është këshillë financiare ose ligjore.",
+    "you": "Ti",
+    "entry": "Pyet asistentin AI",
+    "entryHint": "p.sh. \"Dua një 2+1 në Tiranë deri në 150 mijë €\"",
+    "alternatives": "Gjej të ngjashme ose më të lira",
+    "alternativesQuestion": "Më gjej prona të ngjashme ose më të lira se kjo pronë.",
+    "compare": {
+      "title": "Krahasimi",
+      "price": "Çmimi",
+      "pricePerM2": "Çmimi për m²",
+      "area": "Sipërfaqja",
+      "bedrooms": "Dhoma gjumi",
+      "bathrooms": "Banjo",
+      "floor": "Kati",
+      "floorOf": "{{floor}} nga {{total}}",
+      "location": "Vendndodhja",
+      "amenities": "Karakteristikat",
+      "mixedCurrencies": "Monedha të ndryshme: shifrat në euro janë të përafërta.",
+      "areaNote": "Sipërfaqja është ajo e shpalljes (m²); neto dhe bruto nuk shënohen veçmas.",
+      "best": {
+        "price": "Më e lira",
+        "perM2": "Më e lirë për m²",
+        "area": "Më e madhja",
+        "beds": "Më shumë dhoma"
+      }
+    },
+    "screens": {
+      "explore": "Hap kërkimin",
+      "favorites": "Të preferuarat",
+      "saved_searches": "Kërkimet e ruajtura",
+      "messages": "Mesazhet",
+      "viewings": "Vizitat",
+      "create_listing": "Publiko një pronë",
+      "my_listings": "Listat e mia",
+      "agent_dashboard": "Paneli i agjentit",
+      "leads": "Klientët potencialë",
+      "profile": "Profili",
+      "privacy": "Politika e privatësisë",
+      "terms": "Kushtet e përdorimit"
+    },
+    "results_one": "{{count}} pronë",
+    "results_other": "{{count}} prona"
   }
 }
