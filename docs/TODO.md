@@ -30,6 +30,10 @@ Updated 2026-10-27 (after Pass 27). Sources:
 ## Now: free, only you can do these
 
 - [ ] **You:** Anthropic Console → create an API key → Supabase → Edge Functions → Secrets → replace `ANTHROPIC_API_KEY`. No redeploy is needed. Then set a monthly spending limit in the Anthropic Console.
+- [ ] **You:** switch on LinkedIn sign-in (the app side is done; Supabase still has it off). Steps in `DECISIONS.md` §3:
+  1. a LinkedIn Page for the business, if there is none;
+  2. linkedin.com/developers/apps → Create app → Products: "Sign In with LinkedIn using OpenID Connect" → Auth: add the redirect URL `https://xzzzhlwmzotibrxdqmcm.supabase.co/auth/v1/callback`, copy the Client ID and Client Secret;
+  3. Supabase → Authentication → Sign In / Providers → **LinkedIn (OIDC)** (not the old "LinkedIn") → Enabled, paste both, Save.
 - [ ] **You:** make yourself a moderator, otherwise nobody can review reported listings. In Supabase → SQL editor:
   `insert into public.moderators(user_id) select id from auth.users where email = '<your email>';`
 - [ ] **You:** click the waiting Supabase confirmations:
