@@ -91,7 +91,7 @@ export default function PropertyDetailScreen() {
   // The photo carousel is as wide as the app (the phone-width column on the
   // web); the full-screen photo viewer is as wide as the window.
   const { width: heroWidth } = useAppDimensions();
-  const { width: screenWidth } = useWindowDimensions();
+  const { width: screenWidth, height: windowHeight } = useWindowDimensions();
   // Folding or unfolding a phone changes the page width under a paged
   // carousel; without this it is left between two photos. Runs on a width
   // change only (the index is read from a ref), so it never fights a swipe.
@@ -716,7 +716,9 @@ export default function PropertyDetailScreen() {
             onScroll={trackPhoto(screenWidth)}
             scrollEventThrottle={32}
             renderItem={({ item }) => (
-              <View style={{ width: screenWidth, justifyContent: 'center', alignItems: 'center' }}>
+              // A height in pixels: the web build wraps each cell in a row of no
+              // height, so without it the page collapses and the photo is not drawn.
+              <View style={{ width: screenWidth, height: windowHeight, justifyContent: 'center', alignItems: 'center' }}>
                 <Image accessibilityLabel={title} source={{ uri: item }} style={styles.lightboxImage} contentFit="contain" />
               </View>
             )}

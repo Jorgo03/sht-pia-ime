@@ -1,5 +1,17 @@
 # Pre-Launch Audit — Shtëpia.ime (Vite web app)
 
+## ═══ PASS 28 — 2026-10-28: TWO DEMO ACCOUNTS, EVERY SERVICE ON SCREEN (owner request) ═══
+
+The owner asked for a client and an agent account using every feature, with a
+live conversation, and a screenshot of each service. Done against the demo
+backend (the removed simulator's, rebuilt in a scratch folder, not in the
+repo): no production row was written. 32 client screens, 21 agent screens; the
+client's message, viewing request and lead reached the agent and back.
+
+| Finding | Class |
+|---|---|
+| Website build of the app: tapping a listing photo opened a black full-screen viewer with no photo. react-native-web wraps each FlatList cell in a row of no height, so the page (and the photo at 85% of it) collapsed to 0 px. Each page now gets the window height. e2e-expo X48 (red: height 0, then green, phone + desktop) | FIXED |
+
 ## ═══ PASS 27 — 2026-10-27: THE SHTËPIA.IME AI ASSISTANT (owner master prompt) ═══
 
 Design and operation: docs/AI_ASSISTANT.md. In short: a chat screen
