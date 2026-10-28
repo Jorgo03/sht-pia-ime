@@ -103,6 +103,25 @@ test.describe('signed in', () => {
       body: 'Përshëndetje, a është ende në shitje?',
     });
   });
+
+  test('X42 viewing request: the website has a date and time field, and the chosen time is sent', async ({ page, writes }) => {
+    const home = LISTINGS.find((l) => l.owner_type === 'client')!;
+    await page.goto(`/property/${home.id}`);
+    await ready(page);
+    await page.getByRole('button', { name: t('detail.scheduleViewing') }).click();
+    const when = page.getByLabel(t('viewings.when'));
+    await expect(when).toBeVisible();
+    const day = new Date(Date.now() + 3 * 86_400_000);
+    day.setHours(15, 30, 0, 0);
+    const p = (n: number) => String(n).padStart(2, '0');
+    await when.fill(`${day.getFullYear()}-${p(day.getMonth() + 1)}-${p(day.getDate())}T15:30`);
+    await page.getByRole('button', { name: t('viewings.request') }).click();
+    await expect.poll(() => writes.find((w) => w.table === 'viewings')?.method).toBe('POST');
+    expect(writes.find((w) => w.table === 'viewings')?.body).toMatchObject({
+      property_id: home.id,
+      scheduled_at: day.toISOString(),
+    });
+  });
 });
 
 test('X07 language: switching to English sticks after a reload', async ({ page }) => {
@@ -436,7 +455,7 @@ async function layoutProblems(page: Page) {
 test.describe('narrow phone layout', () => {
   test.use({ viewport: { width: 320, height: 640 }, signedIn: true });
 
-  for (const path of ['/', '/explore', '/profile', '/my-listings', '/viewings', '/agent-dashboard', '/saved-searches', `/property/${FEATURED.id}`]) {
+  for (const path of ['/', '/explore', '/profile', '/my-listings', '/viewings', '/agent-dashboard', '/saved-searches', `/property/${FEATURED.id}`, '/assistant']) {
     test(`X19 at 320px ${path} keeps every control on screen and the wordmark clear`, async ({ page, isMobile }) => {
       test.skip(!isMobile, 'phone project only');
       await page.goto(path);
@@ -452,7 +471,7 @@ test.describe('narrow phone layout', () => {
 test.describe('foldable cover screen', () => {
   test.use({ viewport: { width: 280, height: 653 }, signedIn: true });
 
-  for (const path of ['/', '/explore', '/listing/new', '/profile', `/property/${FEATURED.id}`]) {
+  for (const path of ['/', '/explore', '/listing/new', '/profile', `/property/${FEATURED.id}`, '/assistant']) {
     test(`X34 at 280px ${path} keeps every control on screen`, async ({ page, isMobile }) => {
       test.skip(!isMobile, 'phone project only');
       await page.goto(path);
@@ -929,5 +948,247 @@ test.describe('unfolding mid-session', () => {
     const background = (name: string) =>
       page.getByRole('button', { name, exact: true }).evaluate((n) => getComputedStyle(n).backgroundColor);
     expect(await background(t('search.rent'))).not.toBe(await background(t('common.all')));
+  });
+});
+
+// CRM, phase 1 (docs/BSP_CRM_ANALYSIS.md): the agent's leads, today's agenda
+// and buyer requests matched against the agent's own listings.
+test.describe('signed in: CRM', () => {
+  test.use({ signedIn: true });
+
+  const LEAD = {
+    id: 'e2e00000-0000-4000-9000-000000000001',
+    agent_id: SIGNED_IN_USER.id,
+    name: 'Arben Hoxha',
+    phone: '+355 69 123 4567',
+    email: 'arben@example.com',
+    notes: 'Kërkon 2+1 në Tiranë',
+    status: 'new',
+    created_at: '2026-10-20T10:00:00+00:00',
+  };
+
+  test('X39 leads: listed, searched, added, moved forward and deleted after a confirmation', async ({ page, writes }) => {
+    const asked: string[] = [];
+    await page.route('**/rest/v1/leads*', (route) => {
+      const req = route.request();
+      if (req.method() === 'GET') {
+        asked.push(decodeURIComponent(req.url()));
+        return json(route, [LEAD]);
+      }
+      if (req.method() === 'POST') {
+        const body = req.postDataJSON();
+        writes.push({ table: 'leads', method: 'POST', query: '', body });
+        return json(route, { id: 'e2e00000-0000-4000-9000-000000000002', created_at: '2026-10-27T10:00:00+00:00', ...body }, 201);
+      }
+      const body = req.method() === 'DELETE' ? {} : req.postDataJSON();
+      writes.push({ table: 'leads', method: req.method(), query: new URL(req.url()).search, body });
+      return req.method() === 'DELETE' ? route.fulfill({ status: 204, body: '' }) : json(route, { ...LEAD, ...body });
+    });
+    await page.goto('/leads');
+    await ready(page);
+    await expect(page.getByText('Arben Hoxha')).toBeVisible();
+    expect(asked[0]).toContain(`agent_id=eq.${SIGNED_IN_USER.id}`);
+    expect(asked[0]).toMatch(/limit=24/);
+
+    // Search runs in the database; a local number also matches the international one.
+    await page.getByRole('textbox', { name: t('leads.search') }).fill('069 123');
+    await expect.poll(() => asked.at(-1)).toContain('phone.ilike.*6*9*1*2*3*');
+
+    // Add.
+    await page.getByRole('button', { name: t('leads.add') }).first().click();
+    await page.getByRole('textbox', { name: t('leads.name') }).fill('Elira Kola');
+    await page.getByRole('textbox', { name: t('leads.phone') }).fill('068 555 0000');
+    await page.getByRole('button', { name: t('common.save') }).click();
+    await expect.poll(() => writes.find((w) => w.table === 'leads' && w.method === 'POST')?.body).toMatchObject({
+      name: 'Elira Kola', phone: '068 555 0000', status: 'new', agent_id: SIGNED_IN_USER.id,
+    });
+
+    // Move forward in the pipeline: new -> contacted.
+    // The card's button, not the filter chip of the same name at the top.
+    await page.getByRole('button', { name: t('leads.status.contacted') }).last().click();
+    await expect.poll(() => writes.find((w) => w.method === 'PATCH')?.body).toEqual({ status: 'contacted' });
+
+    // Delete asks first.
+    await page.getByRole('button', { name: t('leads.delete') }).last().click();
+    await expect(page.getByText(t('leads.deleteTitle'))).toBeVisible();
+    expect(writes.some((w) => w.method === 'DELETE')).toBe(false);
+    await page.getByRole('button', { name: t('leads.delete') }).last().click();
+    await expect.poll(() => writes.some((w) => w.table === 'leads' && w.method === 'DELETE')).toBe(true);
+  });
+
+  test('X40 leads: a lead needs a name, and a bad email is refused before saving', async ({ page, writes }) => {
+    await page.route('**/rest/v1/leads*', (route) => (route.request().method() === 'GET' ? json(route, []) : route.fallback()));
+    await page.goto('/leads');
+    await ready(page);
+    await expect(page.getByText(t('leads.empty'))).toBeVisible();
+    await page.getByRole('button', { name: t('leads.add') }).first().click();
+    await page.getByRole('button', { name: t('common.save') }).click();
+    await expect(page.getByText(t('leads.nameRequired'))).toBeVisible();
+    await page.getByRole('textbox', { name: t('leads.name') }).fill('Ana');
+    await page.getByRole('textbox', { name: t('leads.email'), exact: true }).fill('ana@');
+    await page.getByRole('button', { name: t('common.save') }).click();
+    await expect(page.getByText(t('leads.emailInvalid'))).toBeVisible();
+    expect(writes.some((w) => w.table === 'leads')).toBe(false);
+  });
+
+  test('X41 dashboard: today\'s agenda, the leads link, and buyer requests matched to your listings', async ({ page }) => {
+    const today = new Date();
+    today.setHours(17, 0, 0, 0);
+    await page.route('**/rest/v1/viewings*', (route) =>
+      json(route, [{
+        id: 'e2e00000-0000-4000-8000-000000000001', client_id: CHAT_CLIENT_ID, agent_id: SIGNED_IN_USER.id,
+        scheduled_at: today.toISOString(), status: 'confirmed', notes: null,
+        property: { id: LISTINGS[0].id, title: LISTINGS[0].title, title_i18n: null, city: 'Tiranë' },
+      }]));
+    await page.route('**/rest/v1/wanted_homes*', (route) =>
+      json(route, [{
+        id: 'e2e00000-0000-4000-8000-000000000002', client_id: CHAT_CLIENT_ID, city: 'Tirana', listing_type: 'sale',
+        max_price: 110000, min_bedrooms: 2, notes: null, status: 'open', created_at: '2026-10-25T10:00:00+00:00',
+      }]));
+    await page.goto('/agent-dashboard');
+    await ready(page);
+    await expect(page.getByText(t('agentDashboard.today'), { exact: true })).toBeVisible();
+    await expect(page.getByRole('button', { name: new RegExp(`^17:00 ${escape(LISTINGS[0].title as string)}`) })).toBeVisible();
+
+    // "Tirana" matches listings in "Tiranë"; the cheap 2-bedroom sale listing fits.
+    const matchLine = page.getByText(/nga pronat e tua përputh/);
+    await expect(matchLine).toBeVisible();
+    await page.getByRole('button', { name: t('agentDashboard.showMatches') }).click();
+    await expect(page.getByRole('link', { name: LISTINGS[0].title as string })).toBeVisible();
+
+    await page.getByRole('button', { name: new RegExp(t('agentDashboard.statLeads')) }).click();
+    await expect(page).toHaveURL(/\/leads$/);
+  });
+});
+
+// The Shtëpia.ime assistant (docs/AI_ASSISTANT.md). The ai-assistant function
+// is answered here, so these check the screen: what it sends, and that cards,
+// tables and buttons come only from the server's answer.
+test.describe('AI assistant', () => {
+  const card = (l: (typeof LISTINGS)[number]) => ({
+    id: l.id, title: l.title, title_i18n: null, price: l.price, currency: l.currency, listing_type: l.listing_type,
+    property_type: l.property_type, city: l.city, zone: null, address: l.address, sqft: l.sqft, beds: l.beds, baths: l.baths,
+    floor: 3, total_floors: 8, features: ['elevator'], image_urls: (l.image_urls as string[]).slice(0, 1), ref_code: null,
+    created_at: l.created_at, status: 'active',
+  });
+  const answer = (over: Record<string, unknown> = {}) => ({
+    reply: 'Gjeta 2 apartamente në Tiranë brenda buxhetit.',
+    cards: [card(LISTINGS[0]), card(LISTINGS[1])],
+    comparison: null,
+    screens: [],
+    state: { criteria: { city: 'Tiranë', max_price_eur: 150000, min_beds: 2 }, result_ids: [LISTINGS[0].id, LISTINGS[1].id], seen_ids: [] },
+    ...over,
+  });
+
+  test('X43 a starter question gets an answer with real listing cards that open the listing', async ({ page }) => {
+    const bodies: Record<string, unknown>[] = [];
+    await page.route('**/functions/v1/ai-assistant', (route) => {
+      bodies.push(route.request().postDataJSON());
+      return json(route, answer());
+    });
+    await page.goto('/assistant');
+    await ready(page);
+    await expect(page.getByRole('heading', { name: t('aiAssistant.title'), level: 1 })).toBeVisible();
+    await page.getByRole('button', { name: t('aiAssistant.starters.findApartment') }).click();
+    await expect(page.getByText('Gjeta 2 apartamente në Tiranë brenda buxhetit.')).toBeVisible();
+    expect(bodies[0]).toMatchObject({ messages: [{ role: 'user', content: t('aiAssistant.starters.findApartment') }], state: null, language: 'sq' });
+    for (const l of [LISTINGS[0], LISTINGS[1]]) {
+      await expect(page.getByRole('link', { name: new RegExp(escape(l.title as string)) }).first()).toBeVisible();
+    }
+    await page.getByRole('link', { name: new RegExp(escape(LISTINGS[1].title as string)) }).first().click();
+    await expect(page).toHaveURL(new RegExp(`/property/${LISTINGS[1].id}$`));
+  });
+
+  test('X44 a follow-up sends the earlier answer and the search state back; new chat clears both', async ({ page }) => {
+    const bodies: { messages: { role: string; content: string }[]; state: unknown }[] = [];
+    await page.route('**/functions/v1/ai-assistant', (route) => {
+      bodies.push(route.request().postDataJSON());
+      return json(route, bodies.length === 1 ? answer() : answer({ reply: 'Me ashensor mbetet një.', cards: [card(LISTINGS[0])] }));
+    });
+    await page.goto('/assistant');
+    await ready(page);
+    const box = page.getByRole('textbox', { name: t('aiAssistant.placeholder') });
+    await box.fill('Dua një apartament 2+1 në Tiranë deri në 150 mijë euro.');
+    await page.getByRole('button', { name: t('common.send') }).click();
+    await expect(page.getByText('Gjeta 2 apartamente në Tiranë brenda buxhetit.')).toBeVisible();
+    await box.fill('Po me ashensor?');
+    await box.press('Enter');
+    await expect(page.getByText('Me ashensor mbetet një.')).toBeVisible();
+    expect(bodies[1].messages.map((m) => m.role)).toEqual(['user', 'assistant', 'user']);
+    expect(bodies[1].state).toEqual(answer().state);
+
+    // The conversation survives a reload on this device…
+    await page.reload();
+    await ready(page);
+    await expect(page.getByText('Me ashensor mbetet një.')).toBeVisible();
+    // …until a new chat starts.
+    await page.getByRole('button', { name: t('aiAssistant.newChat') }).click();
+    await expect(page.getByText('Me ashensor mbetet një.')).toHaveCount(0);
+    await expect(page.getByRole('button', { name: t('aiAssistant.starters.compare') })).toBeVisible();
+  });
+
+  test('X45 a comparison is a table from the server, with "not specified" for missing values and screen buttons', async ({ page }) => {
+    await page.route('**/functions/v1/ai-assistant', (route) =>
+      json(route, answer({
+        reply: 'E dyta ka çmimin më të ulët për m².',
+        cards: [],
+        comparison: {
+          mixed_currencies: false,
+          items: [
+            { id: LISTINGS[0].id, title: LISTINGS[0].title, price: 150000, currency: 'EUR', price_eur_approx: 150000, area_m2: 100, price_per_m2: 1500, price_per_m2_eur_approx: 1500, bedrooms: 2, bathrooms: 1, floor: 3, building_floors: 8, city: 'Tiranë', zone: 'Blloku', features: ['elevator'], status: 'active' },
+            { id: LISTINGS[1].id, title: LISTINGS[1].title, price: 120000, currency: 'EUR', price_eur_approx: 120000, area_m2: null, price_per_m2: null, price_per_m2_eur_approx: null, bedrooms: 2, bathrooms: null, floor: null, building_floors: null, city: 'Tiranë', zone: null, features: [], status: 'active' },
+          ],
+          best: { lowest_price: LISTINGS[1].id, largest_area: null, lowest_price_per_m2: null, most_bedrooms: null },
+        },
+        screens: [{ key: 'explore', route: '/explore' }],
+      })),
+    );
+    await page.goto('/assistant');
+    await ready(page);
+    await page.getByRole('button', { name: t('aiAssistant.starters.compare') }).click();
+    await expect(page.getByText(t('aiAssistant.compare.pricePerM2'), { exact: true })).toBeVisible();
+    await expect(page.getByText(t('aiAssistant.compare.best.price'), { exact: true })).toBeVisible();
+    await expect(page.getByText(t('aiAssistant.notSpecified')).first()).toBeVisible();
+    await page.getByRole('button', { name: t('aiAssistant.screens.explore') }).click();
+    await expect(page).toHaveURL(/\/explore$/);
+  });
+
+  test('X46 when the assistant is down the chat says so, and retry asks the same question again', async ({ page }) => {
+    let calls = 0;
+    await page.route('**/functions/v1/ai-assistant', (route) => {
+      calls += 1;
+      return calls === 1 ? json(route, { error: 'ai_unavailable' }, 503) : json(route, answer());
+    });
+    await page.goto('/assistant');
+    await ready(page);
+    await page.getByRole('button', { name: t('aiAssistant.starters.howItWorks') }).click();
+    await expect(page.getByText(t('aiAssistant.error.unavailable'))).toBeVisible();
+    await page.getByRole('button', { name: t('common.retry') }).click();
+    await expect(page.getByText('Gjeta 2 apartamente në Tiranë brenda buxhetit.')).toBeVisible();
+    await expect(page.getByText(t('aiAssistant.error.unavailable'))).toHaveCount(0);
+    expect(calls).toBe(2);
+  });
+
+  test('X47 home and search lead to the assistant; a listing opens it with the question ready, not sent', async ({ page }) => {
+    let calls = 0;
+    await page.route('**/functions/v1/ai-assistant', (route) => {
+      calls += 1;
+      return json(route, answer());
+    });
+    await page.goto('/');
+    await ready(page);
+    await page.getByRole('button', { name: t('aiAssistant.entry') }).click();
+    await expect(page).toHaveURL(/\/assistant$/);
+    await page.goto('/explore');
+    await ready(page);
+    await page.getByRole('button', { name: t('aiAssistant.title') }).click();
+    await expect(page).toHaveURL(/\/assistant$/);
+    await page.goto(`/property/${LISTINGS[0].id}`);
+    await ready(page);
+    await page.getByRole('button', { name: t('assistant.title') }).click();
+    await page.getByRole('button', { name: t('aiAssistant.alternatives') }).click();
+    await expect(page).toHaveURL(new RegExp(`/assistant\\?property=${LISTINGS[0].id}`));
+    await expect(page.getByRole('textbox', { name: t('aiAssistant.placeholder') })).toHaveValue(t('aiAssistant.alternativesQuestion'));
+    expect(calls).toBe(0);
   });
 });

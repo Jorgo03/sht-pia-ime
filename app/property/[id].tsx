@@ -1,5 +1,4 @@
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import DateTimePicker from '@react-native-community/datetimepicker';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter, Href } from 'expo-router';
@@ -52,6 +51,7 @@ import { sheetColumn } from '@/constants/web-frame';
 import { useAppDimensions } from '@/hooks/use-app-dimensions';
 import { PageHead } from '@/components/web/page-head';
 import { CARD_CONTAINER_A11Y } from '@/components/property/card-a11y';
+import { ViewingTimePicker } from '@/components/viewings/viewing-time-picker';
 
 // Rounds "now + 1h" to the next half hour — same default the web app's
 // ViewingRequestSheet uses.
@@ -662,14 +662,7 @@ export default function PropertyDetailScreen() {
                 and on any phone once the keyboard opened. */}
             <ScrollView contentContainerStyle={styles.modalBody} keyboardShouldPersistTaps="handled">
               <Text style={styles.modalLabel}>{t('viewings.when')}</Text>
-              <DateTimePicker
-                value={viewingDate}
-                mode="datetime"
-                display="spinner"
-                minimumDate={nextSlot()}
-                onChange={(_event, date) => date && setViewingDate(date)}
-                themeVariant="dark"
-              />
+              <ViewingTimePicker value={viewingDate} minimumDate={nextSlot()} onChange={setViewingDate} />
               <TextInput
                 style={[styles.contactInput, styles.contactMessage, { marginTop: 12 }]}
                 placeholder={t('addSheet.notes')}

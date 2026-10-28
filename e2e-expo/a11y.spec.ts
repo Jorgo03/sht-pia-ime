@@ -11,7 +11,7 @@ import { axeViolations, expect, test } from '../e2e/support/test';
 // Vite site has the same colours on a gradient, which axe cannot measure.
 // Remove this exception when the owner decides.
 const KNOWN = ['color-contrast'];
-const PATHS = ['/', '/explore', `/property/${AGENT_LISTING.id}`, `/property/${LISTINGS[4].id}`, '/profile', '/privacy', '/terms', '/pricing'];
+const PATHS = ['/', '/explore', `/property/${AGENT_LISTING.id}`, `/property/${LISTINGS[4].id}`, '/profile', '/privacy', '/terms', '/pricing', '/assistant'];
 
 for (const scheme of ['light', 'dark'] as const) {
   test.describe(`${scheme} theme`, () => {

@@ -418,9 +418,19 @@ error. To enable:
 Button calls `signInWithProvider('linkedin_oidc')` (the current provider id;
 the old `linkedin` provider is deprecated).
 
-1. **LinkedIn Developer portal** (https://developer.linkedin.com):
+Re-checked live 2026-10-28: `/auth/v1/settings` still says
+`linkedin_oidc: false`. The app side needs no change: both apps show the
+button, the phone says "not available" instead of failing while it is off,
+and `handle_new_user` reads the name and photo LinkedIn sends (`full_name`/
+`name`, `avatar_url`).
+
+1. **LinkedIn Developer portal** (https://www.linkedin.com/developers/apps):
+   - The app must belong to a **LinkedIn Page** (a company page, e.g.
+     "Shtëpia.ime" or Future Home Orange). Create the page first if there is
+     none; its admin confirms the app.
    - Create an app, request the **"Sign In with LinkedIn using OpenID
-     Connect"** product.
+     Connect"** product (self-serve, granted at once). The Auth tab should
+     then list the scopes `openid`, `profile`, `email`.
    - Add redirect URL:
      `https://xzzzhlwmzotibrxdqmcm.supabase.co/auth/v1/callback`.
    - Copy Client ID + Client Secret.

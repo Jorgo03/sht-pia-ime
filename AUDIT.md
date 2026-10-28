@@ -1,5 +1,112 @@
 # Pre-Launch Audit — Shtëpia.ime (Vite web app)
 
+## ═══ PASS 27 — 2026-10-27: THE SHTËPIA.IME AI ASSISTANT (owner master prompt) ═══
+
+Design and operation: docs/AI_ASSISTANT.md. In short: a chat screen
+(`app/assistant.tsx`) talks to a new Edge Function `ai-assistant`; Claude calls
+five controlled tools (search, details, compare, show cards, open a screen);
+every listing is read with the caller's own token, so `properties` RLS applies;
+cards and comparison numbers are rebuilt from the database, never from model
+text; the platform notes are a versioned file written from the code.
+
+| Check | Result |
+|---|---|
+| Audit: schema (`properties` columns and CHECKs, `features` keys, RLS policies, `ai_usage`), existing AI functions, the app's search pipeline (`data/properties.ts`, `priceRange.js`), routes | Done; reused the app's filter rules and reference currency rates (parity test) |
+| Server logic: validation, injection attempts, follow-up merging, query predicates, ranking, price per m², comparison, cards, history/state, full tool loops with a scripted model, plus the app's history and storage rules | PASS (`tests/aiAssistant.test.mjs`, 19 tests) |
+| PostgREST behaviour the query relies on (two `or` filters are ANDed, `features=cs.{...}`), checked read-only against the live REST API with the public anon key | PASS |
+| Chat screen: answer + cards → listing, follow-up sends history and state, reload keeps it, new chat clears, comparison table with "nuk është specifikuar", outage + retry, entry points (Home, Search, listing panel) | PASS (e2e-expo X43–X47, phone + desktop) |
+| `/assistant` accessibility (axe, light + dark) and layout at 320px and 280px | PASS. The first try put a third round button in Search's header, which ran off a Fold's 280px cover screen; it now sits at the end of the search field |
+| Full checks: `npm test` 358/358, `tsc`, `npm run lint` (0 errors), `npm run build`, e2e-expo 168 passed / 22 skipped (single-project tests) | PASS |
+| Live answers from Claude (quality, language, tool choice) | BLOCKED: `ANTHROPIC_API_KEY` in Supabase is rejected by Anthropic (Pass 26). NOT VERIFIED until the owner replaces it |
+| `ai-assistant` deployed (owner approved; model `claude-opus-5-5`, the code default) | PASS: version 1, `verify_jwt` on; the deployed `index.ts`, `logic.js` and `knowledge.js` are byte-identical to the commit |
+| Live endpoint without a working AI key | PASS: OPTIONS 200; no JWT 401; empty question 400 `empty_query`; a real question gets 503 `ai_unavailable` after the auth, rate-limit and daily-cap steps, and the function log shows `ai-assistant error 401` (Anthropic rejects the key), with no message content logged |
+
+---
+
+## ═══ PASS 26 — 2026-10-27: LISTING AI ASSISTANT LIVE ON EVERY PROPERTY (owner goal) ═══
+
+The chat button already shows on every active listing in both apps
+(`app/property/[id].tsx` → `components/property/listing-assistant.tsx`;
+`src/features/properties/pages/PropertyDetail.jsx` → `ListingAssistant.jsx`).
+
+| Finding | Class |
+|---|---|
+| Live test on a real listing: `ai-listing-assistant` answered 503 `ai_unavailable`. Function log: `Anthropic error 401 authentication_error: invalid x-api-key`. The `ANTHROPIC_API_KEY` Edge Function secret is revoked or wrong, so no listing could get an answer (and `translate-property` falls back to MyMemory). Owner to create a new key at console.anthropic.com and set it as the `ANTHROPIC_API_KEY` secret | CONFIGURATION REQUIRED |
+| Deployed version 5 lacked the history trim already in the repo (a chat broke from the 6th question). Deployed the repo version as v6 with the owner's approval; same model (`claude-haiku-4-5-20251001`, still active), limits and `verify_jwt` | FIXED |
+
+---
+
+## ═══ PASS 25 — 2026-10-27: WEBSITE VIEWING TIME PICKER ═══
+
+| Finding | Class |
+|---|---|
+| Website build: the viewing-request sheet showed "Kur?" over an empty gap. `@react-native-community/datetimepicker` renders nothing on the web, so every request went out for the default slot and the time could not be chosen. `components/viewings/viewing-time-picker.{native,web}.tsx`: the store apps keep the spinner, the website gets the browser's date-time field (min = next slot, 15-minute steps). e2e X42 | FIXED |
+
+A demo simulator built in this pass was removed at the owner's request.
+
+---
+
+## ═══ PASS 24 — 2026-10-27: CRM PHASE 1 FROM THE BSP CRM ANALYSIS (owner request) ═══
+
+**Scope.** The owner asked for "BSP CRM" (App Store id1511139974) to be
+analysed and its features brought into Shtëpia.ime. Full comparison and phases:
+`docs/BSP_CRM_ANALYSIS.md`. Phase 1 needed no database change. The phone app
+only; the website gets bug fixes only (DECISIONS.md W1).
+
+**Evidence for the analysis**:
+- Apple's public lookup API: BSP CRM 4.2.3, free, English only, 4.8 stars
+  from 42 ratings, 5 screenshots, read through a sandbox, since
+  apps.apple.com is blocked here.
+- bspvision.com: home, CRM, Mobile App, Pricing and the ERA Albania case study.
+- The live `leads` table:
+  - columns id, agent_id, name, phone, email, notes, status, created_at;
+  - status is new, contacted, qualified, lost or won;
+  - one policy, `Agents manage own leads`, ALL, `auth.uid() = agent_id`;
+  - 1 row.
+
+| What | Where | Proof |
+| --- | --- | --- |
+| Lead manager: 24 per page, status filter, database-side search (a local "069…" finds "+355 69…"; PostgREST/LIKE characters stripped), add/edit sheet, call/WhatsApp/email, next stage, inline delete confirmation (Alert does nothing on the web build) | `app/leads/index.tsx`, `components/leads/lead-sheet.tsx` | e2e-expo X39, X40 |
+| Dashboard: leads count opens `/leads`; "Sot" agenda of today's requested/confirmed viewings; every open buyer request shows how many of the agent's active listings fit, and lists them | `app/agent-dashboard/index.tsx` | e2e-expo X41 |
+| Matching rules: city ignoring accents and Albanian definite endings (Tirana = Tiranë, Durrësi = Durrës), sale/rent, budget in euros across EUR/ALL/USD with the price filter's rates, bedroom minimum; a listing without a price is unknown, not €0 | `src/features/leads/lib/leads.js` | `tests/leads.test.mjs` (5) |
+| Dashboard times forced to 24-hour: Chrome has no Albanian data and showed "05:00 PM" | dashboard | X41 |
+
+**Found on the way**:
+- Chrome lacks Albanian relative times, so chat times show "yesterday" in
+  English. This came up while filming the advert. A suggested task was created
+  for it; the app code is unchanged.
+- Root-layout registration was missing for the new route, which showed a raw
+  "leads/index" header. Fixed before commit.
+
+**Phase 2: written, not applied.**
+`supabase/pending/crm_phase2_tasks_and_lead_needs.sql` adds:
+- `agent_tasks`:
+  - RLS, so a task can point only at the agent's own lead, listing or viewing;
+  - `reminded_at` is guarded from clients;
+  - FK indexes.
+- What a lead is looking for, on `leads`, plus `updated_at`.
+- Server-side length limits (NOT VALID).
+- `task_due` added to push_outbox, and `enqueue_task_reminders()`, a security
+  definer that clients cannot execute.
+
+It was dry-run on production in a discarded transaction:
+- 1 reminder queued, and 0 on the second run;
+- the next-week task was left alone;
+- afterwards nothing persisted, which was verified.
+
+**pg_cron is not installed**: the job needs it, or push-dispatch, to call it.
+push-dispatch also needs text for `task_due`, which means a deploy.
+
+**Verification (2026-10-27, merged with master `103f1e9`)**:
+- tsc clean; lint 0 errors;
+- `npm test` 339/339;
+- build ok;
+- `test:e2e` 241 passed, 9 skipped;
+- `test:e2e:expo` 150 passed, 20 skipped;
+- `expo export -p ios -p android` ok.
+
+Not yet tried on a phone.
+
 ## ═══ PASS 23 — 2026-10-27: RESPONSIVE PASS, BOTH APPS, NO EMULATORS (owner master prompt) ═══
 
 **Scope:**

@@ -18,6 +18,7 @@ import { Chip } from '@/components/ui/chip';
 import { GradientBackground } from '@/components/ui/gradient-background';
 import { RiseIn } from '@/components/ui/motion';
 import { AppHeader } from '@/components/ui/app-header';
+import { AssistantEntry } from '@/components/assistant/assistant-entry';
 import { SearchHeader } from '@/components/ui/search-header';
 import { SkeletonCard } from '@/components/ui/skeleton-card';
 import { Fonts, type AtticoPalette } from '@/constants/theme';
@@ -137,11 +138,14 @@ export default function HomeScreen() {
   const headline = firstName ? `${greeting}, ${firstName}.` : `${greeting}.`;
 
   const searchHeader = (
-    <SearchHeader
-      headline={headline}
-      emphasis={t('home.matchesToday', { count: matchCount })}
-      onSearchPress={() => router.push('/(tabs)/explore' as Href)}
-    />
+    <>
+      <SearchHeader
+        headline={headline}
+        emphasis={t('home.matchesToday', { count: matchCount })}
+        onSearchPress={() => router.push('/(tabs)/explore' as Href)}
+      />
+      <AssistantEntry />
+    </>
   );
 
   return (
