@@ -51,7 +51,17 @@ node marketing/launch-video/capture/capture.mjs <tmp>/expo-web dark
 
 Set `PW_CHROMIUM_PATH` to a Chrome binary if Playwright's own Chromium is not installed. Map tiles and fonts load from the internet.
 
-## Not in it yet
+## Music
 
-- **No sound.** There is no music bed or sound design; add a licensed track as an `<audio>` clip in `index.html`.
+`assets/audio/score.m4a` is an original score, synthesized in code by `audio/score.mjs` (no samples, nothing to license). It is timed to the cuts at 100 BPM: a dark swell, a low hit as the phone appears (3 s), a pulse through the app scenes (7–19 s) with a whoosh into daylight (12 s), a riser, and the final chord on the logo (21 s). To change it, edit the score section of that file and rebuild:
+
+```bash
+node marketing/launch-video/audio/score.mjs score.wav
+ffmpeg -i score.wav -af loudnorm=I=-16:TP=-1.5:LRA=11 -ar 48000 -c:a aac -b:a 192k marketing/launch-video/assets/audio/score.m4a
+```
+
+To use a licensed track instead, point the `<audio id="score">` in `index.html` at it.
+
+## Notes
+
 - The first frame is black on purpose (the brief opens in darkness). Social players use frame 0 as the thumbnail, so upload a custom cover (e.g. the 2.4 s or 24 s frame).
