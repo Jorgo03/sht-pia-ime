@@ -1,0 +1,45 @@
+<!-- Scene 2 — the reveal (3–7 s): the phone rises out of the dark with the app on it. -->
+<template>
+  <html data-composition-variables='[
+    {"id":"lead","type":"string","label":"Caption","default":"Njihuni me"},
+    {"id":"accent","type":"string","label":"Caption, orange","default":"Shtëpia.ime."}
+  ]'>
+  <div id="s2-reveal" data-composition-id="s2-reveal" data-width="1080" data-height="1920" class="scene" style="background: var(--black)">
+    <div class="glow s2-glow" style="top: 1180px"></div>
+    <div class="floor s2-floor" style="top: 1800px"></div>
+    <div class="stage">
+      <div class="phone s2-phone">
+        <div class="phone-body"><div class="screen">
+          <img class="shot" src="assets/screens/dark/home.png" alt="" />
+          <div class="island"></div><div class="glare s2-glare"></div>
+        </div></div>
+      </div>
+    </div>
+    <h1 class="caption s2-caption"></h1>
+    <script>
+      (() => {
+        const root = document.getElementById('s2-reveal');
+        const { lead, accent } = film.vars({"lead": "Njihuni me", "accent": "Shtëpia.ime."});
+        const words = film.caption(root.querySelector('.s2-caption'), lead, accent);
+        const phone = root.querySelector('.s2-phone');
+        const tl = gsap.timeline({ paused: true });
+
+        tl.fromTo('#s2-reveal .s2-glow', { opacity: 0, scale: 0.5 }, { opacity: 0.75, scale: 1, duration: 2.2, ease: 'power2.out' }, 0);
+        tl.fromTo('#s2-reveal .s2-floor', { opacity: 0 }, { opacity: 1, duration: 1.6 }, 0.6);
+        // Out of the dark: tilted back and low, settling upright.
+        tl.fromTo(phone,
+          { y: 620, scale: 0.7, rotationX: 38, rotationY: -24, rotationZ: 4, opacity: 0, filter: 'brightness(0.15)' },
+          { y: 140, scale: 0.82, rotationX: 6, rotationY: -10, rotationZ: 0, opacity: 1, filter: 'brightness(1)', duration: 2.3, ease: 'power3.out' }, 0.05);
+        // Slow orbit for the rest of the scene; scene 3 picks up this exact pose.
+        tl.to(phone, { rotationX: 2, rotationY: 6, duration: 1.65, ease: 'sine.inOut' }, 2.35);
+        film.glare(tl, '#s2-reveal .s2-glare', 1.4, 1.6);
+        film.wordsIn(tl, words, 1.0);
+        film.wordsOut(tl, words, 3.5);
+
+        window.__timelines = window.__timelines || {};
+        window.__timelines['s2-reveal'] = tl;
+      })();
+    </script>
+  </div>
+  </html>
+</template>

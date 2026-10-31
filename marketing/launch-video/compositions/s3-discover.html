@@ -1,0 +1,71 @@
+<!-- Scene 3 — discover (7–12 s): home, search, a listing, while the camera moves round the phone.
+     Starts on scene 2's last frame (same pose, same screen), so the cut is invisible. -->
+<template>
+  <html data-composition-variables='[
+    {"id":"lead","type":"string","label":"Caption","default":"Zbulo. Kërko."},
+    {"id":"accent","type":"string","label":"Caption, orange","default":"Krahaso."}
+  ]'>
+  <div id="s3-discover" data-composition-id="s3-discover" data-width="1080" data-height="1920" class="scene" style="background: var(--black)">
+    <style>
+      #s3-discover .s3-photo {
+        position: absolute; width: 560px; height: 420px; border-radius: 36px; object-fit: cover;
+        box-shadow: 0 40px 90px rgba(0, 0, 0, 0.6); opacity: 0;
+      }
+    </style>
+    <div class="glow" style="top: 1180px; opacity: 0.75"></div>
+    <div class="floor" style="top: 1800px"></div>
+    <!-- Listing photos drifting at different depths behind the phone. -->
+    <img class="s3-photo s3-p1" src="assets/photos/villa-coast.jpg" alt="" style="left: -170px; top: 560px" />
+    <img class="s3-photo s3-p2" src="assets/photos/seaside-durres.jpg" alt="" style="left: 690px; top: 860px" />
+    <img class="s3-photo s3-p3" src="assets/photos/stone-house.jpg" alt="" style="left: -120px; top: 1330px" />
+    <div class="stage">
+      <div class="phone s3-phone">
+        <div class="phone-body"><div class="screen">
+          <img class="shot s3-home" src="assets/screens/dark/home.png" alt="" />
+          <img class="shot s3-explore" src="assets/screens/dark/explore.png" alt="" style="opacity: 0" />
+          <img class="shot s3-detail" src="assets/screens/dark/detail-1.png" alt="" style="opacity: 0" />
+          <img class="shot s3-detail-more" src="assets/screens/dark/detail-1-scrolled.png" alt="" style="opacity: 0" />
+          <div class="island"></div><div class="glare s3-glare"></div>
+        </div></div>
+      </div>
+    </div>
+    <h1 class="caption s3-caption"></h1>
+    <script>
+      (() => {
+        const root = document.getElementById('s3-discover');
+        const q = (s) => root.querySelector(s);
+        const { lead, accent } = film.vars({"lead": "Zbulo. Kërko.", "accent": "Krahaso."});
+        const words = film.caption(q('.s3-caption'), lead, accent);
+        const phone = q('.s3-phone');
+        const tl = gsap.timeline({ paused: true });
+
+        // Camera: from scene 2's pose, round to the other side and a touch closer.
+        gsap.set(phone, { y: 140, scale: 0.82, rotationX: 2, rotationY: 6 });
+        tl.to(phone, { rotationY: -16, rotationX: 4, scale: 0.86, y: 150, duration: 2.6, ease: 'sine.inOut' }, 0);
+        tl.to(phone, { rotationY: 10, rotationX: 0, scale: 0.84, duration: 2.4, ease: 'sine.inOut' }, 2.6);
+
+        // Photos: in from the dark, drifting the opposite way to the camera (parallax).
+        [['.s3-p1', 0.3, -60], ['.s3-p2', 0.55, 70], ['.s3-p3', 0.8, -40]].forEach(([sel, at, dx]) => {
+          tl.fromTo(q(sel), { opacity: 0, x: -dx, scale: 0.92, filter: 'blur(10px)' },
+            { opacity: 0.55, x: dx, scale: 1, filter: 'blur(3px)', duration: 4.2, ease: 'sine.out' }, at);
+        });
+
+        // Each word lands with the screen it describes.
+        film.wordsIn(tl, [words[0]], 0.2);                         // Zbulo — home
+        film.swap(tl, q('.s3-home'), q('.s3-explore'), 1.1);
+        film.wordsIn(tl, [words[1]], 1.1);                         // Kërko — search
+        film.swap(tl, q('.s3-explore'), q('.s3-detail'), 2.5);
+        film.wordsIn(tl, words.slice(2), 2.5);                     // Krahaso — a listing
+        film.swap(tl, q('.s3-detail'), q('.s3-detail-more'), 3.6, 0.7);
+        film.glare(tl, q('.s3-glare'), 2.4, 1.4);
+
+        film.wordsOut(tl, words, 4.45);
+        tl.to(root.querySelectorAll('.s3-photo'), { opacity: 0, duration: 0.5 }, 4.45);
+
+        window.__timelines = window.__timelines || {};
+        window.__timelines['s3-discover'] = tl;
+      })();
+    </script>
+  </div>
+  </html>
+</template>

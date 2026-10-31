@@ -1,0 +1,86 @@
+/* Shared look for every Shtëpia.ime ad: tokens, captions, the phone.
+   Colours come from assets/brand/logo-guide.md and constants/theme.ts. */
+:root {
+  --black: #000;
+  --ground: #0b0806;          /* a hair warmer than black, like the app's dark --fho-bg */
+  --cream: #f1ede6;           /* the app's light background */
+  --white: #fff;
+  --orange: #ff5f1f;          /* the logo's door */
+  --orange-app: #ff6b00;      /* the app's accent */
+  --orange-text: #ff7d1a;     /* orange for text on dark */
+  --glow: rgba(255, 95, 31, 0.55);
+  --serif: 'Newsreader', Georgia, serif;
+  --sans: 'Manrope', system-ui, sans-serif;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: 1080px; height: 1920px; overflow: hidden; background: var(--black); }
+
+.scene { position: absolute; inset: 0; overflow: hidden; }
+
+/* Soft orange light behind things, never on the logo itself. */
+.glow {
+  position: absolute; left: 50%; top: 50%;
+  width: 1500px; height: 1500px; margin: -750px 0 0 -750px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--glow) 0%, rgba(255, 95, 31, 0.16) 32%, rgba(255, 95, 31, 0) 66%);
+  opacity: 0;
+}
+
+/* Captions: the app's own headline style — serif, with the last words in italic orange. */
+.caption {
+  position: absolute; left: 80px; right: 80px; top: 170px;
+  font-family: var(--serif); font-weight: 500;
+  font-size: 96px; line-height: 1.04; letter-spacing: -0.025em;
+  color: var(--white); text-align: center;
+}
+.caption em { display: block; font-style: italic; color: var(--orange-text); }
+.caption .w { display: inline-block; will-change: transform, opacity, filter; }
+.kicker {
+  font-family: var(--sans); font-weight: 700; font-size: 26px;
+  letter-spacing: 0.32em; text-transform: uppercase; color: rgba(255, 255, 255, 0.55);
+}
+
+/* The phone: a frame drawn in CSS around a real screenshot (1290x2796). */
+.stage { position: absolute; inset: 0; perspective: 2600px; perspective-origin: 50% 45%; }
+.phone {
+  position: absolute; left: 50%; top: 50%;
+  width: 640px; height: 1340px; margin: -670px 0 0 -320px;
+  transform-style: preserve-3d;
+}
+.phone-body {
+  position: absolute; inset: 0; border-radius: 96px; padding: 20px;
+  background: linear-gradient(145deg, #3a3633 0%, #141210 38%, #26221f 62%, #0c0a09 100%);
+  box-shadow:
+    inset 0 0 0 2px rgba(255, 255, 255, 0.10),
+    inset 0 0 0 9px #050404,
+    0 80px 160px rgba(0, 0, 0, 0.65),
+    0 30px 60px rgba(0, 0, 0, 0.45);
+}
+.screen {
+  position: relative; width: 600px; height: 1300px; border-radius: 76px;
+  overflow: hidden; background: #000;
+}
+.shot { position: absolute; left: 0; top: 0; width: 600px; height: 1300px; object-fit: cover; }
+.island {
+  position: absolute; top: 22px; left: 50%; width: 176px; height: 52px; margin-left: -88px;
+  border-radius: 26px; background: #000; z-index: 5;
+}
+/* A diagonal band of light that travels across the glass. */
+.glare {
+  position: absolute; inset: -40%; z-index: 6; pointer-events: none;
+  background: linear-gradient(115deg, rgba(255, 255, 255, 0) 40%, rgba(255, 255, 255, 0.16) 48%, rgba(255, 255, 255, 0.04) 53%, rgba(255, 255, 255, 0) 60%);
+  transform: translateX(-60%);
+}
+/* Reflection on the floor under the phone. */
+.floor {
+  position: absolute; left: 50%; width: 760px; height: 140px; margin-left: -380px;
+  border-radius: 50%; background: radial-gradient(ellipse, rgba(255, 95, 31, 0.28), rgba(255, 95, 31, 0) 70%);
+  filter: blur(18px);
+}
+
+/* Film grain + vignette over everything, very light. */
+.vignette {
+  position: absolute; inset: 0; pointer-events: none; z-index: 50;
+  background: radial-gradient(ellipse at 50% 45%, rgba(0, 0, 0, 0) 55%, rgba(0, 0, 0, 0.55) 100%);
+}
