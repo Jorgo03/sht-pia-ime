@@ -1192,3 +1192,15 @@ test.describe('AI assistant', () => {
     expect(calls).toBe(0);
   });
 });
+
+test('X48 a tapped photo opens full screen and is actually drawn there, not collapsed to no height', async ({ page }) => {
+  await page.goto(`/property/${FEATURED.id}`);
+  await ready(page);
+  await page.getByRole('img', { name: FEATURED.title as string }).first().click();
+  await expect(page.getByRole('button', { name: t('common.close') })).toBeVisible();
+  // The viewer's photos carry the listing title; the last ones in the page
+  // are the viewer's (it is rendered after the screen).
+  const shown = page.getByRole('img', { name: FEATURED.title as string }).last();
+  const box = await shown.boundingBox();
+  expect(box?.height ?? 0).toBeGreaterThan(200);
+});
