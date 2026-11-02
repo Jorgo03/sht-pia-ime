@@ -73,10 +73,17 @@ export function ListingAssistant({ property }: { property: Property | null }) {
     if (open) scrollRef.current?.scrollToEnd({ animated: true });
   }, [messages.length, thinking, open]);
 
+  // The listing the open conversation belongs to. A reply that comes back
+  // after the user moved to another listing is dropped, not appended to the
+  // new listing's chat — same as web.
+  const listingRef = useRef(property?.id);
+
   // Reset the conversation when the listing changes — same as web.
   useEffect(() => {
+    listingRef.current = property?.id;
     setMessages([]);
     setOpen(false);
+    setThinking(false);
   }, [property?.id]);
 
   if (!property) return null;
@@ -93,7 +100,9 @@ export function ListingAssistant({ property }: { property: Property | null }) {
     setThinking(true);
     // i18n.language is a plain string at the type level, but this app only
     // ever sets it to one of the 8 supported codes via changeLanguage.
-    const reply = await askListingAssistant(property.id, history, i18n.language as LangCode);
+    const askedAbout = property.id;
+    const reply = await askListingAssistant(askedAbout, history, i18n.language as LangCode);
+    if (listingRef.current !== askedAbout) return;
     setThinking(false);
     setMessages((prev) => [
       ...prev,

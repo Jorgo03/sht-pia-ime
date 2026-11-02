@@ -28,11 +28,19 @@ export function useUnreadMessages(): number {
       return;
     }
 
+    // Only the newest refresh may set the count, and none after this account
+    // signs out: realtime fires refreshes that can finish out of order.
+    let active = true;
+    let latest = 0;
     const refresh = async () => {
-      const { data } = await supabase
+      const run = ++latest;
+      const { data, error } = await supabase
         .from('conversations')
         .select('client_id, agent_id, unread_for_client, unread_for_agent')
         .or(`client_id.eq.${user.id},agent_id.eq.${user.id}`);
+      if (!active || run !== latest) return;
+      // A failed read keeps the last count rather than hiding unread messages.
+      if (error) return;
 
       const total = (data ?? []).reduce((sum, c) => {
         const mine = c.client_id === user.id ? c.unread_for_client : c.unread_for_agent;
@@ -49,6 +57,7 @@ export function useUnreadMessages(): number {
       .subscribe();
 
     return () => {
+      active = false;
       supabase.removeChannel(channel);
     };
     // Depends on user.id (a stable primitive), not the user object — matches

@@ -1,13 +1,7 @@
-import { Provider } from '@supabase/supabase-js';
-import { Session, User } from '@supabase/supabase-js';
+import { Provider, Session, User } from '@supabase/supabase-js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { makeRedirectUri } from 'expo-auth-session';
 import * as WebBrowser from 'expo-web-browser';
-
-// Dismisses a lingering auth session left over from a previous attempt (a
-// reload mid-flow, a backgrounded browser). Documented as required for
-// expo-auth-session flows; a no-op when there is nothing pending.
-WebBrowser.maybeCompleteAuthSession();
 import {
   createContext,
   ReactNode,
@@ -36,6 +30,11 @@ import {
   signOutOtherDevices,
   type ChangePasswordResult,
 } from '@/src/features/auth/lib/password';
+
+// Dismisses a lingering auth session left over from a previous attempt (a
+// reload mid-flow, a backgrounded browser). Documented as required for
+// expo-auth-session flows; a no-op when there is nothing pending.
+WebBrowser.maybeCompleteAuthSession();
 
 /** Hard ceiling on how long anything may hold the splash screen. */
 const AUTH_INIT_TIMEOUT_MS = 8000;
