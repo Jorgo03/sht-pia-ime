@@ -1,5 +1,36 @@
 # Pre-Launch Audit — Shtëpia.ime (Vite web app)
 
+## ═══ PASS 29 — 2026-11-03: FRONTEND AUDIT, RENDERED (owner master prompt) ═══
+
+The Expo app (the design source, W1) rendered at 280, 320, 390, 673, 768 and
+1194 wide, light and dark, 18 screens, with axe, an overflow check and a
+tap-target check, against the fictional demo listings answered in the browser
+(no production read or write). Tablet and unfolded widths come from a test
+build with `EXPO_PUBLIC_WEB_MAX_WIDTH` (new, unset in production): **browser
+rendering, not a device**. Screens and the evidence record are in
+`docs/audit/pass-29/`. The Vite site got no design work (W1).
+
+| Finding | Class |
+|---|---|
+| Chips, role badge, filter count and selected select-options drew orange text on `accentGlow` (a shadow colour): 3.7–3.9:1. Now `accentTint`, 4.7:1+ | FIXED |
+| Listing page "Chat": the suggested message is only the box's placeholder, so the button stayed disabled under a box that looked filled in. Untouched, it now sends the suggestion; WhatsApp sends the same text (it ignored typed text). e2e-expo X49, red then green | FIXED |
+| Explore cards showed price and city only, on a 90px photo strip. Now a 4:3 photo, sale/rent tag, type with place, and beds/baths/m² when present | FIXED |
+| Standalone text links ("See all", "Forgot?", sign-up switch, "Open in Google Maps") were 17–21px targets on the web, where hitSlop is ignored. `InlineTarget` token: 24px+, layout unchanged (sign-in screen looks the same) | FIXED |
+| Explore search input was a 19px strip in a 58px pill; now fills it, with an accessible name | FIXED |
+| New-listing stepper `progressbar` had no name or value | FIXED |
+| Web first load 875KB → 794KB gzip: Albanian bundled, other languages fetched on first use (`i18n/locales.web.ts`), and `expo-notifications` stubbed out of the web build. Throttled (4× CPU, 10 Mbps), median of 3: FCP 680→624 ms, LCP 1344→1224 ms. en/de load only their chunk; live switch checked | FIXED |
+| Card photos are 1600px originals for 150–320px cards (~7MB per 24 results). `thumbnailUrl` (6 unit tests) serves Supabase `/render/image/`, but that needs a paid plan: switched off until `EXPO_PUBLIC_SUPABASE_IMAGE_TRANSFORMS=1` | CONFIGURATION REQUIRED |
+| White on solid orange `#ff6b00` is 2.85:1 (`#e85d00` 3.5:1) on primary buttons, active tabs and avatars: the only axe failures left, light and dark. Brand look vs WCAG is the owner's call (TODO "Small open items") | DEFERRED (owner decision) |
+| Font sizes 9 and 10.5 brought onto the scale; the sign-in screen's 12.5 kept | FIXED |
+| Reduced motion: Reanimated defaults to `ReduceMotion.System` and reads `prefers-reduced-motion` on the web | NO ACTION REQUIRED |
+| "Off-screen" controls at every width are horizontal carousels (home rails, photo pager, lead chips) | FALSE POSITIVE |
+| 404 page without lang/title: the local test server's bare page; the deploy serves the app's own | FALSE POSITIVE |
+| `expo-doctor`: 14 packages one patch behind SDK 58's latest (drift since the bump, not this pass) | DEFERRED |
+
+Checks: lint 0 errors, tsc clean, unit 364/364, web build, e2e Vite 241 passed,
+e2e Expo 172 passed (X49 new). Not done: a real phone, tablet or Fold; native
+builds; Lighthouse (it would have read production).
+
 ## ═══ PASS 28 — 2026-10-28: TWO DEMO ACCOUNTS, EVERY SERVICE ON SCREEN (owner request) ═══
 
 The owner asked for a client and an agent account using every feature, with a
