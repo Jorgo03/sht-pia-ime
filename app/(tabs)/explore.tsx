@@ -246,6 +246,7 @@ export default function ExploreScreen() {
           value={searchText}
           onChangeText={setSearchText}
           placeholder={t('search.placeholder')}
+          accessibilityLabel={t('search.placeholder')}
           placeholderTextColor={colors.textSecondary}
           returnKeyType="search"
         />
@@ -510,7 +511,10 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     marginHorizontal: 20,
     marginBottom: 14,
     paddingHorizontal: 14,
-    paddingVertical: 12,
+    // The input fills the field's height instead of 12px of padding, so a
+    // tap anywhere on the pill lands in it (it was a 19px strip). Same
+    // 58px outer height as before.
+    minHeight: 58,
     backgroundColor: colors.glass,
     borderWidth: 1,
     borderColor: colors.border,
@@ -530,6 +534,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     // A web <input> keeps its default width otherwise and pushes the
     // assistant button off a 280px screen.
     minWidth: 0,
+    alignSelf: 'stretch',
     fontSize: 14,
     color: colors.textPrimary,
     padding: 0,

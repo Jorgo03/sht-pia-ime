@@ -35,7 +35,7 @@ import { ListingAssistant } from '@/components/property/listing-assistant';
 import { LocationPreviewMap } from '@/components/property/location-preview-map';
 import { PropertyCard } from '@/components/property/property-card';
 import { KeyboardDoneBar } from '@/components/ui/keyboard-done-bar';
-import { Fonts, type AtticoPalette } from '@/constants/theme';
+import { Fonts, InlineTarget, type AtticoPalette } from '@/constants/theme';
 import { useAuth } from '@/contexts/auth-context';
 import { useFavorites } from '@/contexts/favorites-context';
 import { useTheme } from '@/contexts/theme-context';
@@ -1013,6 +1013,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     alignItems: 'center',
     gap: 6,
     alignSelf: 'flex-start',
+    ...InlineTarget,
   },
   openMapsLinkText: {
     fontSize: 13,
