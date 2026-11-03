@@ -18,6 +18,7 @@ import {
   priceSuffixKey,
 } from '@/lib/format';
 import { CARD_CONTAINER_A11Y } from '@/components/property/card-a11y';
+import { cardImageUrl } from '@/lib/image';
 
 const IMAGE_SIZE = 108;
 
@@ -78,7 +79,7 @@ function PropertyRowBase({ property }: { property: Property }) {
         <View style={styles.imageWrap}>
           <Image
             accessibilityLabel={title}
-            source={{ uri: property.image_urls?.[0] }}
+            source={{ uri: cardImageUrl(property.image_urls?.[0], IMAGE_SIZE) }}
             recyclingKey={property.id}
             style={styles.image}
             contentFit="cover"

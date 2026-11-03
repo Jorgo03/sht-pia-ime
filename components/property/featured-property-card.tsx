@@ -11,6 +11,7 @@ import { Fonts, type AtticoPalette } from '@/constants/theme';
 import { useFavorites } from '@/contexts/favorites-context';
 import { useTheme } from '@/contexts/theme-context';
 import { useResponsive } from '@/hooks/use-responsive';
+import { cardImageUrl } from '@/lib/image';
 import { Property } from '@/data/types';
 import { formatPrice, getLocalizedText, listingBadgeKey, priceSuffixKey } from '@/lib/format';
 import { CARD_CONTAINER_A11Y } from '@/components/property/card-a11y';
@@ -72,7 +73,7 @@ function FeaturedPropertyCardBase({
       <View style={styles.imageWrap}>
         <Image
           accessibilityLabel={title}
-          source={{ uri: property.image_urls[0] }}
+          source={{ uri: cardImageUrl(property.image_urls[0], cardWidth) }}
           // Ties the loaded image to this listing, so a FlatList row reused
           // for a different property cannot flash the previous one.
           recyclingKey={property.id}
@@ -162,7 +163,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     borderRadius: 10,
   },
   badgeText: {
-    fontSize: 10.5,
+    fontSize: 11,
     fontWeight: '500',
     color: '#fff',
     letterSpacing: 1,

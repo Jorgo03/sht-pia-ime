@@ -1447,7 +1447,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   statLabel: {
     fontFamily: Fonts?.mono,
-    fontSize: 10.5,
+    fontSize: 11,
     letterSpacing: 1,
     textTransform: 'uppercase',
     color: colors.textSecondary,

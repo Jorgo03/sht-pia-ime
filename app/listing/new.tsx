@@ -1646,7 +1646,7 @@ const createStyles = (colors: AtticoPalette) =>
     },
     coverBadgeText: {
       fontFamily: Fonts?.mono,
-      fontSize: 9,
+      fontSize: 10,
       color: '#fff',
       letterSpacing: 0.4,
     },

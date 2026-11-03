@@ -14,6 +14,7 @@ import { useTheme } from '@/contexts/theme-context';
 import { useResponsive } from '@/hooks/use-responsive';
 import { Property } from '@/data/types';
 import { formatPrice, getLocalizedText, listingBadgeKey, priceSuffixKey } from '@/lib/format';
+import { cardImageUrl } from '@/lib/image';
 import { CARD_CONTAINER_A11Y } from '@/components/property/card-a11y';
 
 const COMPACT_GAP = 12;
@@ -55,7 +56,7 @@ function PropertyCardBase({ property, onPress, variant = 'grid' }: PropertyCardP
   const handlePress = onPress ?? (() => router.push(`/property/${property.id}` as Href));
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
-  const { width: screenWidth } = useResponsive();
+  const { width: screenWidth, columns } = useResponsive();
   const favorited = isFavorite(property.id);
   // Ports polish.css's press compression + heart pop (see components/ui/motion).
   const { pressStyle, onPressIn, onPressOut } = usePressScale();
@@ -77,7 +78,7 @@ function PropertyCardBase({ property, onPress, variant = 'grid' }: PropertyCardP
         <View>
           <Image
             accessibilityLabel={title}
-            source={{ uri: property.image_urls[0] }}
+            source={{ uri: cardImageUrl(property.image_urls[0], getCompactCardWidth(screenWidth)) }}
             // Ties the loaded image to this listing, so a FlatList row reused
             // for a different property cannot flash the previous one.
             recyclingKey={property.id}
@@ -161,7 +162,7 @@ function PropertyCardBase({ property, onPress, variant = 'grid' }: PropertyCardP
       <View style={styles.imageWrap}>
         <Image
           accessibilityLabel={title}
-          source={{ uri: property.image_urls[0] }}
+          source={{ uri: cardImageUrl(property.image_urls[0], screenWidth / columns) }}
           // Ties the loaded image to this listing, so a FlatList row reused
           // for a different property cannot flash the previous one.
           recyclingKey={property.id}
