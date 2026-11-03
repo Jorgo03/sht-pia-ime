@@ -4,14 +4,9 @@ import { getLocales } from 'expo-localization';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
 
-import sq from '../src/i18n/locales/sq.json';
-import en from '../src/i18n/locales/en.json';
-import de from '../src/i18n/locales/de.json';
-import it from '../src/i18n/locales/it.json';
-import es from '../src/i18n/locales/es.json';
-import pl from '../src/i18n/locales/pl.json';
-import ru from '../src/i18n/locales/ru.json';
-import fr from '../src/i18n/locales/fr.json';
+// Native bundles every language; the web bundles Albanian and fetches the
+// others on first use (i18n/locales.ts and locales.web.ts).
+import { bundledResources, loadLocale } from './locales';
 
 const STORAGE_KEY = 'fho_lang';
 const SUPPORTED = ['sq', 'en', 'de', 'it', 'es', 'pl', 'ru', 'fr'] as const;
@@ -76,20 +71,27 @@ export async function applyPreferredLanguage(): Promise<void> {
   if (lng !== i18n.language) await i18n.changeLanguage(lng);
 }
 
+// i18next's backend hook: asked for a language that is not bundled, it
+// loads it before changeLanguage resolves, so the page keeps its current
+// language until the new one is in (useSuspense is off: nothing blanks).
+const localeBackend = {
+  type: 'backend' as const,
+  init: () => {},
+  read: (lng: string, _ns: string, callback: (err: unknown, data: Record<string, unknown> | null) => void) => {
+    if (!loadLocale) return callback(new Error('no loader'), null);
+    loadLocale(lng).then((data) => callback(null, data), (err) => callback(err, null));
+  },
+};
+
+if (loadLocale) i18n.use(localeBackend);
+
 i18n
   .use(languageDetector)
   .use(initReactI18next)
   .init({
-    resources: {
-      sq: { translation: sq },
-      en: { translation: en },
-      de: { translation: de },
-      it: { translation: it },
-      es: { translation: es },
-      pl: { translation: pl },
-      ru: { translation: ru },
-      fr: { translation: fr },
-    },
+    resources: bundledResources,
+    // With a backend, languages missing from `resources` are fetched.
+    partialBundledLanguages: !!loadLocale,
     fallbackLng: 'sq',
     supportedLngs: [...SUPPORTED],
     interpolation: {
