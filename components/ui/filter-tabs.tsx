@@ -65,8 +65,8 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     backgroundColor: colors.glass,
   },
   activeTab: {
-    backgroundColor: colors.accentFill,
-    borderColor: colors.accentFill,
+    backgroundColor: colors.accent,
+    borderColor: colors.accent,
   },
   tabText: {
     fontSize: 14,

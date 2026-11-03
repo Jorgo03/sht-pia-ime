@@ -118,7 +118,7 @@ export function ListingAssistant({ property }: { property: Property | null }) {
         accessibilityRole="button"
         accessibilityLabel={t('assistant.title')}>
         <LinearGradient
-          colors={[colors.accentFill, colors.accentFillEnd]}
+          colors={[colors.accent, colors.accentEnd]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={StyleSheet.absoluteFill}
@@ -208,7 +208,7 @@ export function ListingAssistant({ property }: { property: Property | null }) {
             accessibilityRole="button"
             accessibilityLabel={t('common.send')}>
             <LinearGradient
-              colors={[colors.accentFill, colors.accentFillEnd]}
+              colors={[colors.accent, colors.accentEnd]}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
               style={StyleSheet.absoluteFill}
@@ -347,7 +347,7 @@ const createStyles = (
     },
     bubbleMine: {
       alignSelf: 'flex-end',
-      backgroundColor: colors.accentFill,
+      backgroundColor: colors.accent,
       borderWidth: 0,
       borderRadius: 12,
       borderBottomRightRadius: 4,

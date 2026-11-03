@@ -83,7 +83,7 @@ Earlier IDs, kept for history. Status updated 2026-10-21.
 | L07 | F17 | Removed photos kept | VERIFIED | As F17. |
 | L08 | F18 | Legacy phone form | VERIFIED | As F18. |
 | L09 | F16 | Nested interactive cards | VERIFIED | axe. |
-| L10 | F16 | Contrast | VERIFIED (white-on-orange fixed 2026-11-03, darker fill) | As F16. |
+| L10 | F16 | Contrast | VERIFIED except white-on-orange (owner) | As F16. |
 | L11 | F16 | Phone image labels | VERIFIED (export) | — |
 | L12 | F12 | Phone editing grant | VERIFIED | Applied `20261021002731`. |
 | L13 | F20 | Anon helpers | VERIFIED | Applied `20261021002739`. |

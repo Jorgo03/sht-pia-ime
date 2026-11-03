@@ -178,7 +178,7 @@ const createStyles = (colors: AtticoPalette) =>
       justifyContent: 'center',
     },
     tabActive: {
-      backgroundColor: colors.accentFill,
+      backgroundColor: colors.accentEnd,
       borderColor: 'transparent',
     },
     tabFilled: {

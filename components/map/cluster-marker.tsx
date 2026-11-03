@@ -62,7 +62,7 @@ export const ClusterMarker = memo(ClusterMarkerBase);
 
 const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   bubble: {
-    backgroundColor: colors.accentFill,
+    backgroundColor: colors.accent,
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 14,

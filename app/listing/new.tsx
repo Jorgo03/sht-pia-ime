@@ -742,7 +742,7 @@ function ListingWizard({ editId }: { editId?: string }) {
                 <View style={[styles.radio, active && styles.radioActive]}>
                   {active && (
                     <LinearGradient
-                      colors={[colors.accentFill, colors.accentFillEnd]}
+                      colors={[colors.accent, colors.accentEnd]}
                       start={{ x: 0, y: 0 }}
                       end={{ x: 1, y: 1 }}
                       style={StyleSheet.absoluteFill}
@@ -1301,7 +1301,7 @@ function ListingWizard({ editId }: { editId?: string }) {
                     <View style={[styles.stepDot, current && styles.stepDotCurrent]}>
                       {(completed || current) && (
                         <LinearGradient
-                          colors={[colors.accentFill, colors.accentFillEnd]}
+                          colors={[colors.accent, colors.accentEnd]}
                           start={{ x: 0, y: 0 }}
                           end={{ x: 1, y: 1 }}
                           style={[StyleSheet.absoluteFill, styles.stepDotFill]}
@@ -1642,7 +1642,7 @@ const createStyles = (colors: AtticoPalette) =>
       paddingHorizontal: 6,
       paddingVertical: 2,
       borderRadius: 4,
-      backgroundColor: colors.accentFill,
+      backgroundColor: colors.accentEnd,
     },
     coverBadgeText: {
       fontFamily: Fonts?.mono,

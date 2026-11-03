@@ -59,7 +59,7 @@ export function KeyboardDoneBar() {
           accessibilityHint={t('common.closeKeyboard')}
           style={({ pressed }) => [styles.button, pressed && styles.pressed]}>
           <LinearGradient
-            colors={[colors.accentFill, colors.accentFillEnd]}
+            colors={[colors.accent, colors.accentEnd]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={StyleSheet.absoluteFill}

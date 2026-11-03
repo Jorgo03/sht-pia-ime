@@ -22,7 +22,7 @@ export function AssistantEntry() {
       accessibilityLabel={t('aiAssistant.entry')}
       accessibilityHint={t('aiAssistant.entryHint')}>
       <View style={styles.icon}>
-        <LinearGradient colors={[colors.accentFill, colors.accentFillEnd]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={StyleSheet.absoluteFill} />
+        <LinearGradient colors={[colors.accent, colors.accentEnd]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={StyleSheet.absoluteFill} />
         <MaterialIcons name="auto-awesome" size={16} color="#fff" />
       </View>
       <View style={styles.text}>

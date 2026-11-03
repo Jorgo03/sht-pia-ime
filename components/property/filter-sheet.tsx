@@ -118,7 +118,7 @@ function Segment({
               // Matches web's .segment.active — a diagonal gradient fill,
               // not a flat accent color.
               <LinearGradient
-                colors={[colors.accentFill, colors.accentFillEnd]}
+                colors={[colors.accent, colors.accentEnd]}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
                 style={StyleSheet.absoluteFill}
@@ -456,7 +456,7 @@ export function FilterSheet({
 
         <Pressable accessibilityRole="button" style={styles.cta} onPress={onClose}>
           <LinearGradient
-            colors={[colors.accentFill, colors.accentFillEnd]}
+            colors={[colors.accent, colors.accentEnd]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={styles.ctaGradient}

@@ -195,7 +195,7 @@ export default function MessagesInboxScreen() {
                   style={[styles.row, myUnread > 0 && styles.rowUnread]}
                   activeOpacity={0.7}
                   onPress={() => router.push(`/messages/${item.id}` as Href)}>
-                  <LinearGradient colors={[colors.accentFill, colors.accentFillEnd]} style={styles.avatar}>
+                  <LinearGradient colors={[colors.accent, colors.accentEnd]} style={styles.avatar}>
                     <Text style={styles.avatarText}>{name[0]?.toUpperCase() || '?'}</Text>
                   </LinearGradient>
                   <View style={styles.rowBody}>
@@ -290,7 +290,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     width: 46,
     height: 46,
     borderRadius: 23,
-    backgroundColor: colors.accentFill,
+    backgroundColor: colors.accent,
     justifyContent: 'center',
     alignItems: 'center',
   },

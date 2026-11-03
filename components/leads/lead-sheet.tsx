@@ -233,7 +233,7 @@ const createStyles = (colors: AtticoPalette) =>
       borderColor: colors.border,
       backgroundColor: colors.surface2,
     },
-    chipActive: { backgroundColor: colors.accentFill, borderColor: colors.accentFill },
+    chipActive: { backgroundColor: colors.accent, borderColor: colors.accent },
     chipText: { fontFamily: Fonts.sansSemiBold, fontSize: 13, color: colors.textPrimary },
     chipTextActive: { color: '#fff' },
     error: { fontFamily: Fonts.sans, fontSize: 13, color: colors.error },

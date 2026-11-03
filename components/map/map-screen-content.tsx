@@ -328,7 +328,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     fontWeight: '700',
   },
   badge: {
-    backgroundColor: colors.accentFill,
+    backgroundColor: colors.accent,
     borderRadius: 999,
     minWidth: 20,
     paddingHorizontal: 6,
@@ -461,7 +461,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: colors.accentFill,
+    backgroundColor: colors.accent,
     borderRadius: 999,
     paddingHorizontal: 12,
     paddingVertical: 8,

@@ -314,7 +314,7 @@ export default function ThreadScreen() {
             </TouchableOpacity>
           }
           avatar={
-            <LinearGradient colors={[colors.accentFill, colors.accentFillEnd]} style={styles.headerAvatar}>
+            <LinearGradient colors={[colors.accent, colors.accentEnd]} style={styles.headerAvatar}>
               <Text style={styles.headerAvatarText}>{otherName[0]?.toUpperCase() || '?'}</Text>
             </LinearGradient>
           }
@@ -350,7 +350,7 @@ export default function ThreadScreen() {
               </>
             );
             return mine ? (
-              <LinearGradient colors={[colors.accentFill, colors.accentFillEnd]} style={[styles.bubble, styles.bubbleMine]}>
+              <LinearGradient colors={[colors.accent, colors.accentEnd]} style={[styles.bubble, styles.bubbleMine]}>
                 {body}
               </LinearGradient>
             ) : (
@@ -393,7 +393,7 @@ export default function ThreadScreen() {
             disabled={sending || !text.trim()}
             activeOpacity={0.8}
             style={(!text.trim() || sending) && styles.sendButtonDisabled}>
-            <LinearGradient colors={[colors.accentFill, colors.accentFillEnd]} style={styles.sendButton}>
+            <LinearGradient colors={[colors.accent, colors.accentEnd]} style={styles.sendButton}>
               <MaterialIcons name="send" size={18} color="#fff" />
             </LinearGradient>
           </TouchableOpacity>
@@ -437,7 +437,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: colors.accentFill,
+    backgroundColor: colors.accent,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -481,7 +481,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   bubbleMine: {
     alignSelf: 'flex-end',
-    backgroundColor: colors.accentFill,
+    backgroundColor: colors.accent,
     borderTopLeftRadius: 14,
     borderTopRightRadius: 14,
     borderBottomLeftRadius: 14,
@@ -532,7 +532,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: colors.accentFill,
+    backgroundColor: colors.accent,
     justifyContent: 'center',
     alignItems: 'center',
   },

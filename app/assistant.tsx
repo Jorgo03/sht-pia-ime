@@ -274,7 +274,7 @@ export default function AssistantScreen() {
               disabled={sending || !text.trim()}
               accessibilityRole="button"
               accessibilityLabel={t('common.send')}>
-              <LinearGradient colors={[colors.accentFill, colors.accentFillEnd]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={StyleSheet.absoluteFill} />
+              <LinearGradient colors={[colors.accent, colors.accentEnd]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={StyleSheet.absoluteFill} />
               <MaterialIcons name="send" size={18} color="#fff" />
             </Pressable>
           </View>
@@ -380,7 +380,7 @@ const createStyles = (colors: AtticoPalette) =>
     },
     bubbleMine: {
       alignSelf: 'flex-end',
-      backgroundColor: colors.accentFill,
+      backgroundColor: colors.accent,
       borderWidth: 0,
       borderRadius: 16,
       borderBottomRightRadius: 4,

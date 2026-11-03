@@ -365,7 +365,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     backgroundColor: colors.glass,
   },
   segmentItem: { flex: 1, alignItems: 'center', paddingVertical: 10, borderRadius: 10 },
-  segmentItemOn: { backgroundColor: colors.accentFill },
+  segmentItemOn: { backgroundColor: colors.accent },
   segmentText: { fontFamily: Fonts?.sansSemiBold, fontSize: 13, color: colors.textSecondary },
   segmentTextOn: { color: '#fff' },
   list: { gap: 12 },

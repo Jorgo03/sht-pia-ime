@@ -57,7 +57,7 @@ It is **not ready for release**:
 | `npx expo export --clear` (android, ios, web; fake backend) | succeeds; no production URL in the bundles |
 | `npx expo prebuild` (scratch copy) | succeeds; Maps key only when the variable is set; Apple sign-in and push entitlements present; no camera/microphone |
 | `npx expo-doctor` | 19/21; the 2 failures need `exp.host`, blocked from this sandbox |
-| axe on the phone app's web export | no contrast failures (white-on-orange fixed 2026-11-03 with a darker fill) |
+| axe on the phone app's web export | only white-on-orange contrast remains (brand decision) |
 
 **Not verified:** any physical phone or store build; Sign in with Apple
 against Apple; the Android map; real email delivery; push delivery; Paysera

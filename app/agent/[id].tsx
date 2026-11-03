@@ -210,7 +210,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     width: 64,
     height: 64,
     borderRadius: 32,
-    backgroundColor: colors.accentFill,
+    backgroundColor: colors.accent,
     justifyContent: 'center',
     alignItems: 'center',
   },
