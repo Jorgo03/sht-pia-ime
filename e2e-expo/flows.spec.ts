@@ -1204,3 +1204,21 @@ test('X48 a tapped photo opens full screen and is actually drawn there, not coll
   const box = await shown.boundingBox();
   expect(box?.height ?? 0).toBeGreaterThan(200);
 });
+
+test.describe('signed in, a listing someone else posted', () => {
+  test.use({ signedIn: true });
+
+  test('X49 "Chat" with the suggested message untouched sends that message, not nothing', async ({ page, writes }) => {
+    // The box shows the suggestion as its placeholder; the button was
+    // disabled until something was typed, under a box that looked filled in.
+    const listing = LISTINGS.find((l) => !l.agent)!;
+    const suggested = t('property.whatsappMessage').replace('{{title}}', listing.title);
+    await page.goto(`/property/${listing.id}`);
+    await ready(page);
+    const chat = page.getByRole('button', { name: t('detail.chatInApp') });
+    await expect(chat).toBeEnabled();
+    await chat.click();
+    await expect.poll(() => writes.find((w) => w.table === 'messages')?.method).toBe('POST');
+    expect(writes.find((w) => w.table === 'messages')?.body).toMatchObject({ body: suggested });
+  });
+});

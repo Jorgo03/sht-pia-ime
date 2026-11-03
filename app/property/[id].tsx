@@ -150,10 +150,16 @@ export default function PropertyDetailScreen() {
   const canReport = !isOwnListing && !(user && property && user.id === property.owner_id);
   const [reportOpen, setReportOpen] = useState(false);
 
+  // The box shows a suggested message as its placeholder. Sending with
+  // nothing typed sends that suggestion: the button used to stay disabled
+  // under a box that looked filled in, which read as a broken button.
+  const suggestedMessage = t('property.whatsappMessage', { title });
+  const messageToSend = contactMessage.trim() || suggestedMessage;
+
   const handleSendMessage = async () => {
     if (!property) return;
     if (!user) return requireSignIn();
-    if (!contactMessage.trim() || !agentId || agentId === user.id) return;
+    if (!messageToSend || !agentId || agentId === user.id) return;
 
     setSendingMessage(true);
     // Matches the web app's startChat(): find-or-create the conversation,
@@ -179,7 +185,7 @@ export default function PropertyDetailScreen() {
     if (conversationId) {
       await supabase
         .from('messages')
-        .insert({ conversation_id: conversationId, sender_id: user.id, body: contactMessage.trim() });
+        .insert({ conversation_id: conversationId, sender_id: user.id, body: messageToSend });
       logActivity(property.id, 'message');
       setContactMessage('');
       setMessageSent(true);
@@ -211,9 +217,10 @@ export default function PropertyDetailScreen() {
 
   const handleWhatsApp = () => {
     if (!property || !contactPhone) return;
-    const message = t('property.whatsappMessage', { title });
+    // What the box holds, or the suggestion when nothing was typed: the same
+    // message the in-app chat button sends.
     logActivity(property.id, 'message');
-    Linking.openURL(whatsappUrl(contactPhone, message));
+    Linking.openURL(whatsappUrl(contactPhone, messageToSend));
   };
 
   const openViewingSheet = () => {
@@ -481,7 +488,7 @@ export default function PropertyDetailScreen() {
           </View>
           <TextInput
             style={[styles.contactInput, styles.contactMessage]}
-            placeholder={t('property.whatsappMessage', { title })}
+            placeholder={suggestedMessage}
             placeholderTextColor={colors.textSecondary}
             value={contactMessage}
             onChangeText={setContactMessage}
@@ -495,7 +502,7 @@ export default function PropertyDetailScreen() {
             <ActionButton
               title={sendingMessage ? t('common.loading') : t('detail.chatInApp')}
               onPress={handleSendMessage}
-              disabled={sendingMessage || !contactMessage.trim()}
+              disabled={sendingMessage}
             />
           )}
           {contactPhone ? (
