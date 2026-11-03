@@ -166,7 +166,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     paddingHorizontal: 18,
   },
   optionActive: {
-    backgroundColor: colors.accentGlow,
+    backgroundColor: colors.accentTint,
   },
   optionText: {
     fontFamily: Fonts?.sans,

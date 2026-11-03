@@ -180,6 +180,17 @@ export const Control = {
 } as const;
 
 /**
+ * A text link that stands alone ("See all", "Forgot?") is drawn ~17px tall.
+ * hitSlop grows the tap area on a phone but is ignored on the web, so this
+ * grows it with padding and gives the space back with a negative margin:
+ * a target of 24px+ (WCAG 2.5.8) with the layout unchanged.
+ */
+export const InlineTarget = {
+  paddingVertical: 10,
+  marginVertical: -10,
+} as const;
+
+/**
  * Shadows — ShtepiaShadows from §4, used verbatim (these are already written
  * as RN shadow props in the handoff, not CSS, so no translation needed).
  */

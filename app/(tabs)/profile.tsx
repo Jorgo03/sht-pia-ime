@@ -26,7 +26,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 
-import { type AtticoPalette, Fonts, Radii } from '@/constants/theme';
+import { type AtticoPalette, Fonts, InlineTarget, Radii } from '@/constants/theme';
 import { useAuth } from '@/contexts/auth-context';
 import { useFavorites } from '@/contexts/favorites-context';
 import { KeyboardDoneBar } from '@/components/ui/keyboard-done-bar';
@@ -1203,6 +1203,7 @@ export default function ProfileScreen() {
                   <TouchableOpacity
                     accessibilityRole="button"
                     onPress={() => setRecoveryStep('email')}
+                    style={InlineTarget}
                     hitSlop={8}>
                     <Text style={styles.accessForgot}>{t('auth.forgotShort')}</Text>
                   </TouchableOpacity>
@@ -1403,7 +1404,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 4,
     borderRadius: 999,
-    backgroundColor: colors.accentGlow,
+    backgroundColor: colors.accentTint,
   },
   roleBadgeText: {
     fontFamily: Fonts?.mono,
@@ -1788,9 +1789,13 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     fontSize: 13,
     color: '#f5f0e8',
   },
+  // Same position as a 4px top padding, with a target tall enough to tap.
   linkButton: {
     alignItems: 'center',
-    paddingTop: 4,
+    paddingTop: 12,
+    marginTop: -8,
+    paddingBottom: 12,
+    marginBottom: -12,
   },
   linkButtonText: {
     fontSize: 13,

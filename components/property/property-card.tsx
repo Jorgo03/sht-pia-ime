@@ -13,7 +13,7 @@ import { useFavorites } from '@/contexts/favorites-context';
 import { useTheme } from '@/contexts/theme-context';
 import { useResponsive } from '@/hooks/use-responsive';
 import { Property } from '@/data/types';
-import { formatPrice, getLocalizedText, priceSuffixKey } from '@/lib/format';
+import { formatPrice, getLocalizedText, listingBadgeKey, priceSuffixKey } from '@/lib/format';
 import { CARD_CONTAINER_A11Y } from '@/components/property/card-a11y';
 
 const COMPACT_GAP = 12;
@@ -55,7 +55,7 @@ function PropertyCardBase({ property, onPress, variant = 'grid' }: PropertyCardP
   const handlePress = onPress ?? (() => router.push(`/property/${property.id}` as Href));
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
-  const { width: screenWidth, columns } = useResponsive();
+  const { width: screenWidth } = useResponsive();
   const favorited = isFavorite(property.id);
   // Ports polish.css's press compression + heart pop (see components/ui/motion).
   const { pressStyle, onPressIn, onPressOut } = usePressScale();
@@ -129,11 +129,25 @@ function PropertyCardBase({ property, onPress, variant = 'grid' }: PropertyCardP
     );
   }
 
-  // Matches web's PropertyCard default ("mini-card") variant exactly —
-  // used for Explore's results grid. No badge, no title: just image+heart,
-  // then price, then location, in that order. Web's grid card genuinely
-  // doesn't show the property title at all; this isn't a simplification,
-  // it's what the reference implementation does.
+  // Explore's results grid. The photo carries the listing type (sale/rent);
+  // under it come the price, the property type with the place, and the
+  // rooms and size — each only when the listing has it, so a sparse listing
+  // shows a shorter card rather than zeros or dashes.
+  const typeLabel = property.property_type
+    ? t(`search.${property.property_type}`, { defaultValue: property.property_type })
+    : '';
+  const place = property.city ?? property.address;
+  const specs = [
+    property.beds ? { icon: 'bed' as const, value: String(property.beds) } : null,
+    property.baths ? { icon: 'bathtub' as const, value: String(property.baths) } : null,
+    property.sqft ? { icon: 'square-foot' as const, value: `${property.sqft} m²` } : null,
+  ].filter((x): x is { icon: 'bed' | 'bathtub' | 'square-foot'; value: string } => x !== null);
+  const specsLabel = [
+    property.beds ? `${property.beds} ${t('property.bedsCount', { count: property.beds })}` : '',
+    property.baths ? `${property.baths} ${t('property.bathsCount', { count: property.baths })}` : '',
+    property.sqft ? `${property.sqft} m²` : '',
+  ].filter(Boolean).join(', ');
+
   return (
     <Animated.View style={[styles.cardOuter, pressStyle]}>
     <Pressable
@@ -144,7 +158,7 @@ function PropertyCardBase({ property, onPress, variant = 'grid' }: PropertyCardP
       onPressOut={onPressOut}>
       {/* Matches web's .mini-img — inset within the card's own 8px padding
           with its own smaller radius, not flush with the card edges. */}
-      <View style={[styles.imageWrap, columns > 2 ? styles.imageWrapWide : styles.imageWrapPhone]}>
+      <View style={styles.imageWrap}>
         <Image
           accessibilityLabel={title}
           source={{ uri: property.image_urls[0] }}
@@ -172,6 +186,11 @@ function PropertyCardBase({ property, onPress, variant = 'grid' }: PropertyCardP
             />
           </Animated.View>
         </TouchableOpacity>
+        <View style={styles.typeBadge} pointerEvents="none">
+          <Text style={styles.typeBadgeText} numberOfLines={1}>
+            {t(listingBadgeKey(property.listing_type))}
+          </Text>
+        </View>
       </View>
       <View style={styles.info}>
         {/* Matches web's .mini-price — price and suffix share one plain text
@@ -179,16 +198,26 @@ function PropertyCardBase({ property, onPress, variant = 'grid' }: PropertyCardP
         <Text
           style={styles.price}
           accessibilityRole="link"
-          accessibilityLabel={`${title}, ${price}${suffix}`}
+          accessibilityLabel={[title, `${price}${suffix}`, specsLabel].filter(Boolean).join(', ')}
           onPress={handlePress}>
           {price}{suffix}
         </Text>
         <View style={styles.locationRow}>
           <MaterialIcons name="location-on" size={11} color={colors.textSecondary} />
           <Text style={styles.location} numberOfLines={1}>
-            {property.city ?? property.address}
+            {[typeLabel, place].filter(Boolean).join(' · ')}
           </Text>
         </View>
+        {specs.length > 0 && (
+          <View style={styles.specRow} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+            {specs.map((sp) => (
+              <View key={sp.icon} style={styles.spec}>
+                <MaterialIcons name={sp.icon} size={11} color={colors.textSecondary} />
+                <Text style={styles.specText}>{sp.value}</Text>
+              </View>
+            ))}
+          </View>
+        )}
       </View>
     </Pressable>
     </Animated.View>
@@ -217,18 +246,47 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   // Matches web's .mini-img — fixed 90px, its own r-sm (10px) radius, inset
   // within the card's padding rather than sharing the card's own radius.
+  // 4:3 at every width: the photo is what people choose a home by. The old
+  // fixed 90px on phones was a ~2:1 strip that cropped rooms to a band.
   imageWrap: {
+    aspectRatio: 4 / 3,
     borderRadius: 10,
     overflow: 'hidden',
     marginBottom: 8,
   },
-  imageWrapPhone: {
-    height: 90,
+  // Sale / rent, on a dark glass chip so it reads on any photo.
+  typeBadge: {
+    position: 'absolute',
+    top: 6,
+    left: 6,
+    maxWidth: '70%',
+    paddingHorizontal: 7,
+    paddingVertical: 3,
+    borderRadius: 999,
+    backgroundColor: 'rgba(20,17,14,0.72)',
   },
-  // 3+ columns (600+ wide): a column is ~260 wide, and at 90 high the photo
-  // was a 3:1 strip that cropped most of it. Phones' 2 columns keep the 90.
-  imageWrapWide: {
-    aspectRatio: 16 / 10,
+  typeBadgeText: {
+    fontFamily: Fonts?.sansSemiBold,
+    fontSize: 10,
+    letterSpacing: 0.3,
+    color: '#fff',
+  },
+  specRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    columnGap: 8,
+    rowGap: 2,
+    marginTop: 3,
+  },
+  spec: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 2,
+  },
+  specText: {
+    fontFamily: Fonts?.sansMedium,
+    fontSize: 11,
+    color: colors.textSecondary,
   },
   image: {
     width: '100%',

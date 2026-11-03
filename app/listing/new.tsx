@@ -1274,7 +1274,12 @@ function ListingWizard({ editId }: { editId?: string }) {
         {/* Stepper — completed steps get a check in a gradient dot, the current
             one a scaled gradient dot with a tint ring, and each connector
             fills as it's passed. */}
-        <View style={styles.stepper} accessibilityRole="progressbar">
+        <View
+          style={styles.stepper}
+          accessibilityRole="progressbar"
+          // A progress bar needs a name and a value for screen readers.
+          accessibilityLabel={`${t('listing.step.' + STEPS[step])} ${step + 1}/${STEPS.length}`}
+          accessibilityValue={{ min: 1, max: STEPS.length, now: step + 1 }}>
           {STEPS.map((s, i) => {
             const completed = i < step;
             const current = i === step;

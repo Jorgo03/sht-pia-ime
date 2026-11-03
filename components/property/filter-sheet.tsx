@@ -580,7 +580,7 @@ const createStyles = (colors: AtticoPalette, sheetHeight: number = 0) => StyleSh
     backgroundColor: colors.glass,
   },
   chipActive: {
-    backgroundColor: colors.accentGlow,
+    backgroundColor: colors.accentTint,
     borderColor: colors.accent,
   },
   chipText: {

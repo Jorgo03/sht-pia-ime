@@ -9,7 +9,7 @@ import { AppHeader } from '@/components/ui/app-header';
 import { ScreenHero } from '@/components/ui/screen-hero';
 import { GradientBackground } from '@/components/ui/gradient-background';
 import { SignInPrompt } from '@/components/ui/sign-in-prompt';
-import { type AtticoPalette, Fonts } from '@/constants/theme';
+import { type AtticoPalette, Fonts, InlineTarget } from '@/constants/theme';
 import { useAuth } from '@/contexts/auth-context';
 import { useTheme } from '@/contexts/theme-context';
 import { supabase } from '@/lib/supabase';
@@ -269,7 +269,7 @@ export default function AgentDashboardScreen() {
             <View style={styles.section}>
               <View style={styles.sectionHead}>
                 <Text style={styles.sectionTitle}>{t('agentDashboard.pendingViewings')}</Text>
-                <TouchableOpacity accessibilityRole="button" onPress={() => router.push('/viewings' as Href)}>
+                <TouchableOpacity accessibilityRole="button" onPress={() => router.push('/viewings' as Href)} style={InlineTarget}>
                   <Text style={styles.sectionLink}>{t('home.seeAll')}</Text>
                 </TouchableOpacity>
               </View>

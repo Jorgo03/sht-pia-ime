@@ -88,7 +88,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 5,
     borderRadius: 999,
-    backgroundColor: colors.accentGlow,
+    backgroundColor: colors.accentTint,
   },
   filtersChipText: {
     fontSize: 12,

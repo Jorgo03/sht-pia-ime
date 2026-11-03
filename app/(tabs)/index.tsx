@@ -21,7 +21,7 @@ import { AppHeader } from '@/components/ui/app-header';
 import { AssistantEntry } from '@/components/assistant/assistant-entry';
 import { SearchHeader } from '@/components/ui/search-header';
 import { SkeletonCard } from '@/components/ui/skeleton-card';
-import { Fonts, type AtticoPalette } from '@/constants/theme';
+import { Fonts, InlineTarget, type AtticoPalette } from '@/constants/theme';
 import { useAuth } from '@/contexts/auth-context';
 import { useFilters } from '@/contexts/filters-context';
 import { useTheme } from '@/contexts/theme-context';
@@ -211,6 +211,7 @@ export default function HomeScreen() {
                     <TouchableOpacity
                       accessibilityRole="button"
                       onPress={() => router.push('/(tabs)/explore' as Href)}
+                      style={InlineTarget}
                       activeOpacity={0.7}>
                       <Text style={styles.seeAll}>{t('home.seeAll')}</Text>
                     </TouchableOpacity>
@@ -254,7 +255,7 @@ export default function HomeScreen() {
                 <View style={styles.section}>
                   <View style={styles.sectionHeader}>
                     <Text style={styles.sectionTitle}>{t('search.sort.newest')}</Text>
-                    <TouchableOpacity accessibilityRole="button" onPress={() => openExplore(newestType)} activeOpacity={0.7}>
+                    <TouchableOpacity accessibilityRole="button" onPress={() => openExplore(newestType)} style={InlineTarget} activeOpacity={0.7}>
                       <Text style={styles.seeAll}>{t('home.seeAll')}</Text>
                     </TouchableOpacity>
                   </View>
