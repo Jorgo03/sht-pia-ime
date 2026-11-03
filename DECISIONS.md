@@ -5,6 +5,18 @@ AUDIT.md was fixed; see the final report for the change log.
 
 ---
 
+## ═══ COLOUR — 2026-11-03 ═══
+
+### C1. White text on orange: keep the brand orange (DECIDED by owner, 2026-11-03)
+
+White on `#ff6b00` is 2.85:1 and on `#e85d00` 3.5:1, below WCAG AA (4.5:1).
+A darker fill (`#c24e00` → `#a84300`, white 4.8:1) was built and passed axe
+(commit d97b961), but the owner did not like the look and it was reverted
+(ba2d0c2). The brand orange stays; these remain the only known axe failures.
+To revisit, `git revert ba2d0c2` brings the darker fill back.
+
+---
+
 ## ═══ ONE CODEBASE — 2026-10-21 ═══
 
 ### W1. The Expo app is the source of truth; the website becomes its web build (DECIDED by owner)

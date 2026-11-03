@@ -20,7 +20,7 @@ rendering, not a device**. Screens and the evidence record are in
 | New-listing stepper `progressbar` had no name or value | FIXED |
 | Web first load 875KB → 794KB gzip: Albanian bundled, other languages fetched on first use (`i18n/locales.web.ts`), and `expo-notifications` stubbed out of the web build. Throttled (4× CPU, 10 Mbps), median of 3: FCP 680→624 ms, LCP 1344→1224 ms. en/de load only their chunk; live switch checked | FIXED |
 | Card photos are 1600px originals for 150–320px cards (~7MB per 24 results). `thumbnailUrl` (6 unit tests) serves Supabase `/render/image/`, but that needs a paid plan: switched off until `EXPO_PUBLIC_SUPABASE_IMAGE_TRANSFORMS=1` | CONFIGURATION REQUIRED |
-| White on solid orange `#ff6b00` is 2.85:1 (`#e85d00` 3.5:1) on primary buttons, active tabs and avatars: the only axe failures left, light and dark. Brand look vs WCAG is the owner's call (TODO "Small open items") | DEFERRED (owner decision) |
+| White on solid orange `#ff6b00` is 2.85:1 (`#e85d00` 3.5:1) on primary buttons, active tabs and avatars: the only axe failures left, light and dark. Owner keeps the brand orange (DECISIONS.md C1); a darker `#c24e00` fill was tried (axe 0 failures) and reverted at the owner's request | NO ACTION (owner decision) |
 | Font sizes 9 and 10.5 brought onto the scale; the sign-in screen's 12.5 kept | FIXED |
 | Reduced motion: Reanimated defaults to `ReduceMotion.System` and reads `prefers-reduced-motion` on the web | NO ACTION REQUIRED |
 | "Off-screen" controls at every width are horizontal carousels (home rails, photo pager, lead chips) | FALSE POSITIVE |
