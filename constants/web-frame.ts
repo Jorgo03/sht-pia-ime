@@ -5,7 +5,10 @@ import { Platform, type ViewStyle } from 'react-native';
  * centred on wide screens (it should look like the app, not a stretched
  * page). Native builds never use any of this.
  */
-export const WEB_MAX_WIDTH = 480;
+// EXPO_PUBLIC_WEB_MAX_WIDTH is for test builds only: a wider column lets a
+// browser draw the tablet and unfolded-foldable layouts, which native devices
+// get from their real width. Production builds leave it unset.
+export const WEB_MAX_WIDTH = Number(process.env.EXPO_PUBLIC_WEB_MAX_WIDTH) || 480;
 
 export const IS_WEB = Platform.OS === 'web';
 
