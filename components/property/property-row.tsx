@@ -200,7 +200,7 @@ const createStyles = (colors: AtticoPalette) =>
       borderRadius: 999,
     },
     badgeSale: {
-      backgroundColor: colors.accent,
+      backgroundColor: colors.accentFill,
     },
     badgeRent: {
       backgroundColor: 'rgba(20,16,12,0.72)',

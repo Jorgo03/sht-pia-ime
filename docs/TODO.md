@@ -110,7 +110,7 @@ Each database change is written to `supabase/pending/` and tested in a rolled-ba
 
 ## Small open items
 
-- [ ] **You decide:** white text on solid orange is below the contrast guideline (2.4–3.4:1) on buttons and selected chips: keep the brand look or darken the orange.
+- [x] White text on solid orange (2.4–3.4:1): owner chose the darker orange 2026-11-03. Fills behind white use `accentFill` `#c24e00` → `accentFillEnd` `#a84300` (4.8:1 / 6.1:1); DECISIONS.md C1.
 - [ ] **You decide:** the "Ali Demi" listing's type and price do not match (postponed since 2026-10-16).
 - [ ] **Me:** Chrome has no Albanian relative times, so chat times on the website say "yesterday" in English.
 

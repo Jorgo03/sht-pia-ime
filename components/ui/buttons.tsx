@@ -50,7 +50,7 @@ export function PrimaryCTA({
         accessibilityState={{ disabled: inert }}
         style={[styles.cta, inert && styles.ctaDisabled]}>
         <LinearGradient
-          colors={[colors.accent, colors.accentEnd]}
+          colors={[colors.accentFill, colors.accentFillEnd]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={StyleSheet.absoluteFill}

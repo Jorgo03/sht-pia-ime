@@ -251,7 +251,7 @@ export default function SavedSearchesScreen() {
         <View style={styles.tabRow}>
           <TouchableOpacity accessibilityRole="button" onPress={() => setTab('searches')} activeOpacity={0.85} style={styles.segmentWrap}>
             {tab === 'searches' ? (
-              <LinearGradient colors={[colors.accent, colors.accentEnd]} style={styles.tab}>
+              <LinearGradient colors={[colors.accentFill, colors.accentFillEnd]} style={styles.tab}>
                 <Text style={[styles.tabText, styles.tabTextActive]}>
                   {t('saved.tabSearches')} ({searches.length})
                 </Text>
@@ -264,7 +264,7 @@ export default function SavedSearchesScreen() {
           </TouchableOpacity>
           <TouchableOpacity accessibilityRole="button" onPress={() => setTab('wanted')} activeOpacity={0.85} style={styles.segmentWrap}>
             {tab === 'wanted' ? (
-              <LinearGradient colors={[colors.accent, colors.accentEnd]} style={styles.tab}>
+              <LinearGradient colors={[colors.accentFill, colors.accentFillEnd]} style={styles.tab}>
                 <Text style={[styles.tabText, styles.tabTextActive]}>
                   {t('saved.tabWanted')} ({wanted.length})
                 </Text>
@@ -661,7 +661,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     fontSize: 12,
     fontWeight: '600',
     color: '#fff',
-    backgroundColor: colors.accent,
+    backgroundColor: colors.accentFill,
     borderRadius: 999,
     paddingHorizontal: 10,
     paddingVertical: 3,
@@ -803,8 +803,8 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     borderColor: colors.border,
   },
   toggleActive: {
-    backgroundColor: colors.accent,
-    borderColor: colors.accent,
+    backgroundColor: colors.accentFill,
+    borderColor: colors.accentFill,
   },
   toggleText: {
     fontSize: 13,

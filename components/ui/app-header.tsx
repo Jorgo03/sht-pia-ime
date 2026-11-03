@@ -252,7 +252,7 @@ export function AppHeader({
                     accessibilityState={{ selected: active }}>
                     {active ? (
                       <LinearGradient
-                        colors={[colors.accent, colors.accentEnd]}
+                        colors={[colors.accentFill, colors.accentFillEnd]}
                         style={styles.langRow}>
                         <Text style={styles.langRowCode}>{lang.flag}</Text>
                         <Text style={[styles.langRowName, styles.langRowActive]}>{lang.name}</Text>

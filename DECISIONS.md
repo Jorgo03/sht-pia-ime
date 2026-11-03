@@ -5,6 +5,26 @@ AUDIT.md was fixed; see the final report for the change log.
 
 ---
 
+## ═══ COLOUR — 2026-11-03 ═══
+
+### C1. White text on orange: darker fill (DECIDED by owner, 2026-11-03)
+
+White on the brand orange `#ff6b00` is 2.85:1 and on `#e85d00` 3.5:1, below
+WCAG AA (4.5:1 for text, 3:1 for icons). Choice offered: keep the brand look or
+darken the orange. **Owner chose the darker orange.**
+
+- New tokens in `constants/theme.ts`, both themes: `accentFill` `#c24e00`
+  (white 4.8:1) and `accentFillEnd` `#a84300` (6.1:1). Every fill that holds
+  white text or a white icon uses them: primary buttons and gradients, the
+  sign-in role switch and "Hyr brenda", active tabs and chips, avatars, badges,
+  chat bubbles, map markers, the + tab button.
+- `accent` `#ff6b00` is unchanged and still used where nothing white sits on
+  it: dots, dashes, the wizard's step connector, rings, and orange text and
+  icons on dark (`accentText` is unchanged too).
+- The logo and the sign-in screen's layout, copy and background are unchanged;
+  only its two orange fills are darker.
+- The Vite site (`src/`, bug fixes only) was not restyled.
+
 ## ═══ ONE CODEBASE — 2026-10-21 ═══
 
 ### W1. The Expo app is the source of truth; the website becomes its web build (DECIDED by owner)

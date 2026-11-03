@@ -102,7 +102,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     fontFamily: Fonts?.sansBold,
     fontSize: 15,
     color: '#fff',
-    backgroundColor: colors.accent,
+    backgroundColor: colors.accentFill,
     borderRadius: 999,
     paddingHorizontal: 30,
     paddingVertical: 14,

@@ -298,7 +298,7 @@ export function LiquidTabBar({ state, descriptors, emitter, navigateToTab }: Bot
           onLayout={measure('messages')}
           onPress={() => select('messages', () => router.push('/messages' as Href))}>
           {unread > 0 && (
-            <View style={[styles.navBadge, { backgroundColor: colors.accent }]}>
+            <View style={[styles.navBadge, { backgroundColor: colors.accentFill }]}>
               <Text style={styles.navBadgeText} maxFontSizeMultiplier={1.2}>
                 {unread > 9 ? '9+' : unread}
               </Text>
@@ -334,7 +334,7 @@ export function LiquidTabBar({ state, descriptors, emitter, navigateToTab }: Bot
         <LinearGradient
           // Matches web's --fho-orange-1 → --fho-orange-2 gradient exactly
           // (src/styles/theme.css); RN's palette only exposes the first stop.
-          colors={[colors.accent, colors.accentEnd]}
+          colors={[colors.accentFill, colors.accentFillEnd]}
           style={styles.navAddGradient}>
           <Feather name="plus" size={26} strokeWidth={2.5} color="#fff" />
         </LinearGradient>

@@ -564,7 +564,7 @@ export default function ProfileScreen() {
               {typeof profile?.avatar_url === 'string' && profile.avatar_url ? (
                 <Image source={{ uri: profile.avatar_url }} style={styles.avatar} contentFit="cover" accessibilityLabel={displayName} />
               ) : (
-                <LinearGradient colors={[colors.accent, colors.accentEnd]} style={styles.avatar}>
+                <LinearGradient colors={[colors.accentFill, colors.accentFillEnd]} style={styles.avatar}>
                   <Text style={styles.avatarText}>{initial}</Text>
                 </LinearGradient>
               )}
@@ -936,7 +936,7 @@ export default function ProfileScreen() {
                     />
                   </View>
                   <TouchableOpacity accessibilityRole="button" onPress={handleForgotPassword} activeOpacity={0.85} disabled={resetSending}>
-                    <LinearGradient colors={[colors.accent, colors.accentEnd]} style={styles.ctaPill}>
+                    <LinearGradient colors={[colors.accentFill, colors.accentFillEnd]} style={styles.ctaPill}>
                       <Text style={styles.ctaPillText}>{resetSending ? t('common.loading') : t('auth.sendCode')}</Text>
                       <MaterialIcons name="arrow-forward" size={18} color="#fff" />
                     </LinearGradient>
@@ -1028,7 +1028,7 @@ export default function ProfileScreen() {
                   </View>
 
                   <TouchableOpacity accessibilityRole="button" onPress={handleSetNewPassword} activeOpacity={0.85} disabled={loading}>
-                    <LinearGradient colors={[colors.accent, colors.accentEnd]} style={styles.ctaPill}>
+                    <LinearGradient colors={[colors.accentFill, colors.accentFillEnd]} style={styles.ctaPill}>
                       <Text style={styles.ctaPillText}>
                         {loading ? t('common.loading') : t('auth.updatePassword')}
                       </Text>
@@ -1211,7 +1211,7 @@ export default function ProfileScreen() {
               )}
 
               <TouchableOpacity accessibilityRole="button" onPress={handleAuth} activeOpacity={0.85} disabled={loading}>
-                <LinearGradient colors={[colors.accent, colors.accentEnd]} style={styles.ctaPill}>
+                <LinearGradient colors={[colors.accentFill, colors.accentFillEnd]} style={styles.ctaPill}>
                   {/* Prototype CTA copy: "Step inside" on sign-in,
                       "Create account" on sign-up — not the bare verbs. */}
                   <Text style={styles.ctaPillText}>
@@ -1476,7 +1476,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     color: colors.textPrimary,
   },
   menuBadge: {
-    backgroundColor: colors.accent,
+    backgroundColor: colors.accentFill,
     borderRadius: 999,
     minWidth: 20,
     height: 20,
@@ -1673,7 +1673,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     borderRadius: 999,
   },
   roleBtnActive: {
-    backgroundColor: colors.accent,
+    backgroundColor: colors.accentFill,
   },
   roleBtnText: {
     fontSize: 14,

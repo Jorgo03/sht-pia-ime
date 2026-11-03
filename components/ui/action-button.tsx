@@ -41,7 +41,7 @@ export function ActionButton({
 
 const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   button: {
-    backgroundColor: colors.accent,
+    backgroundColor: colors.accentFill,
     paddingVertical: 16,
     paddingHorizontal: 32,
     borderRadius: 28,

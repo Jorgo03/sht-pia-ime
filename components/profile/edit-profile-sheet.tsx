@@ -167,7 +167,7 @@ export function EditProfileSheet({
               {photoUrl ? (
                 <Image source={{ uri: photoUrl }} style={styles.photo} contentFit="cover" accessibilityLabel={t('profile.edit.photo')} />
               ) : (
-                <LinearGradient colors={[colors.accent, colors.accentEnd]} style={styles.photo}>
+                <LinearGradient colors={[colors.accentFill, colors.accentFillEnd]} style={styles.photo}>
                   <Text style={styles.photoInitial}>{initial}</Text>
                 </LinearGradient>
               )}

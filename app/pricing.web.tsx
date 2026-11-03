@@ -237,7 +237,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   planName: { fontFamily: Fonts?.serif, fontSize: 22, fontWeight: '500', color: colors.textPrimary },
   segment: { flexDirection: 'row', gap: 4, padding: 3, borderRadius: 12, backgroundColor: colors.primaryLight },
   segmentItem: { flex: 1, alignItems: 'center', paddingVertical: 9, borderRadius: 10 },
-  segmentItemOn: { backgroundColor: colors.accent },
+  segmentItemOn: { backgroundColor: colors.accentFill },
   segmentText: { fontFamily: Fonts?.sansSemiBold, fontSize: 13, color: colors.textSecondary },
   segmentTextOn: { color: '#fff' },
   price: { fontFamily: Fonts?.sansBold, fontSize: 26, color: colors.textPrimary },

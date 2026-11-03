@@ -430,7 +430,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 12,
-    backgroundColor: colors.accent,
+    backgroundColor: colors.accentFill,
   },
   retryButtonText: {
     fontSize: 14,

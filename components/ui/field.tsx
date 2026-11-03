@@ -126,7 +126,7 @@ export function RoleToggle<T extends string>({
       {segmentWidth > 0 && (
         <Animated.View style={[styles.togglePill, pillStyle]}>
           <LinearGradient
-            colors={[colors.accent, colors.accentEnd]}
+            colors={[colors.accentFill, colors.accentFillEnd]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={[StyleSheet.absoluteFill, { borderRadius: Radii.pill }]}

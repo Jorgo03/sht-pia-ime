@@ -473,7 +473,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     justifyContent: 'center',
   },
   viewToggleButtonActive: {
-    backgroundColor: colors.accent,
+    backgroundColor: colors.accentFill,
   },
   mapWrap: {
     flex: 1,
@@ -496,7 +496,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     paddingHorizontal: 5,
     paddingVertical: 1,
     borderRadius: 999,
-    backgroundColor: colors.accent,
+    backgroundColor: colors.accentFill,
     alignItems: 'center',
   },
   badgeText: {

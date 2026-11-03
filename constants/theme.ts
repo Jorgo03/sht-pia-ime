@@ -38,6 +38,12 @@ export const AtticoColorsDark = {
   accent: '#ff6b00', // ShtepiaColors.orange (design handoff §4)
   accentEnd: '#e85d00', // --fho-orange-2 — the gradient's end stop + accent text
   accentDeep: '#cc5200', // --fho-orange-deep
+  // Fills behind white text or icons (buttons, active tabs, avatars, badges): white is
+  // 4.8:1 on accentFill and 6.0:1 on accentFillEnd (WCAG AA). White on accent is 2.9:1,
+  // so accent itself is kept for orange on dark, rings, dots and dashes. Owner decision
+  // 2026-11-03 (DECISIONS.md).
+  accentFill: '#c24e00',
+  accentFillEnd: '#a84300',
   accentTint: 'rgba(255,107,0,0.12)', // dark-theme form of ShtepiaColors.orangeTint
   accentLight: '#ffb380', // --fho-orange-soft
   accentText: '#ff7d1a', // --fho-orange-text (dark): orange for text, 5.4–7.7:1 on every dark surface
@@ -91,6 +97,12 @@ export const AtticoColorsLight: AtticoPalette = {
   accent: '#ff6b00', // ShtepiaColors.orange (design handoff §4) (same both themes)
   accentEnd: '#e85d00', // --fho-orange-2 (same both themes)
   accentDeep: '#cc5200', // --fho-orange-deep (same both themes)
+  // Fills behind white text or icons (buttons, active tabs, avatars, badges): white is
+  // 4.8:1 on accentFill and 6.0:1 on accentFillEnd (WCAG AA). White on accent is 2.9:1,
+  // so accent itself is kept for orange on dark, rings, dots and dashes. Owner decision
+  // 2026-11-03 (DECISIONS.md).
+  accentFill: '#c24e00',
+  accentFillEnd: '#a84300',
   accentTint: '#fff1e6', // ShtepiaColors.orangeTint (§4) — a solid cream, not the dark theme's translucent orange
   accentLight: '#ffb380', // --fho-orange-soft (same both themes)
   accentText: '#b34700', // --fho-orange-text (light): orange for text, 4.7–5.5:1 on every cream (BUG-008)

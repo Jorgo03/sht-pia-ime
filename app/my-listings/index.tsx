@@ -131,7 +131,7 @@ export default function MyListingsScreen() {
             activeOpacity={0.85}
             style={styles.newListingTouch}
             hitSlop={6}>
-            <LinearGradient colors={[colors.accent, colors.accentEnd]} style={styles.newListingPill}>
+            <LinearGradient colors={[colors.accentFill, colors.accentFillEnd]} style={styles.newListingPill}>
               <MaterialIcons name="add" size={16} color="#fff" />
               <Text style={styles.newListingPillText}>{t('listing.newListing')}</Text>
             </LinearGradient>
