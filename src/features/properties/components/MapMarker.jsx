@@ -1,5 +1,6 @@
 import L from 'leaflet'
 import { formatCompactPrice } from '../../../lib/format'
+import { escapeHtml } from '../../../lib/escapeHtml'
 
 const COLORS = {
   sale: '#FF7A40',
@@ -51,7 +52,7 @@ export function getPriceMarkerIcon(listingType, price, currency) {
 
   const icon = L.divIcon({
     className: 'price-marker-icon',
-    html: `<div class="price-marker" style="background:${color}">${label}</div>`,
+    html: `<div class="price-marker" style="background:${escapeHtml(color)}">${escapeHtml(label)}</div>`,
     iconSize: [0, 0],
     iconAnchor: [0, 0],
     popupAnchor: [0, -18],
@@ -72,7 +73,7 @@ export function getCountMarkerIcon(count) {
 
   const icon = L.divIcon({
     className: 'county-marker-icon',
-    html: `<div class="county-marker">${count}</div>`,
+    html: `<div class="county-marker">${escapeHtml(count)}</div>`,
     iconSize: [0, 0],
     iconAnchor: [0, 0],
   })

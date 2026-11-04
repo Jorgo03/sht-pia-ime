@@ -1,5 +1,15 @@
 # Pre-Launch Audit — Shtëpia.ime (Vite web app)
 
+## ═══ PASS 34 — 2026-11-04: XSS AND SAFE QUERIES (owner goal) ═══
+
+| Check | Result |
+|---|---|
+| Raw HTML sinks | None, apart from the page shell (`app/+html.tsx`), which injects only its own two constants; no `innerHTML`, `document.write`, `eval` or `new Function` anywhere |
+| Hand-built HTML | App map markers already escaped (`esc`). FIXED: the website's map markers (`MapMarker.jsx`) inserted the price label unescaped; now `escapeHtml` (`src/lib/escapeHtml.js`). SEO pages (`scripts/expo-web/seo.mjs`) and alert emails escape every field; the unsubscribe page uses only a validated ID |
+| Links from data | Phone and WhatsApp links keep digits only; map link uses numbers; lead email link is always `mailto:` and the database now checks email format; sign-in return link validated; payment link comes from the server |
+| Queries | Values go to Supabase as parameters. Text filters (`.or`) hold only the signed-in account ID, numbers (price range), or text stripped of filter syntax (lead search, AI keywords). No raw SQL in any server function; database functions take typed parameters |
+| Guard | `tests/xssAndQueries.test.mjs` fails on a new HTML sink, an unescaped marker value, or a text filter with typed input that skips a vetted builder; it also proves the lead search and price filter cannot add conditions |
+
 ## ═══ PASS 33 — 2026-11-04: HTTPS EVERYWHERE, FORMS CHECKED ON THE SERVER (owner goal) ═══
 
 | Check | Result |
