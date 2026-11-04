@@ -23,6 +23,7 @@ import { supabase } from '@/lib/supabase';
 import { Property } from '@/data/types';
 import { useResponsive } from '@/hooks/use-responsive';
 import { PageHead } from '@/components/web/page-head';
+import { debugWarn } from '@/lib/debug';
 
 interface AgentProfile {
   id: string;
@@ -73,7 +74,7 @@ export default function AgentProfileScreen() {
       // Both errors were previously discarded, so a network failure or an RLS
       // denial was indistinguishable from "this agent does not exist".
       if (profileRes.error) {
-        console.error('AgentProfile: profile fetch failed:', profileRes.error.message);
+        debugWarn('AgentProfile profile', profileRes.error);
         setError(true);
       } else {
         setAgent(profileRes.data);
@@ -81,7 +82,7 @@ export default function AgentProfileScreen() {
       if (propsRes.error) {
         // Non-fatal: the agent still renders, just with no listings. Logged so
         // an empty portfolio caused by a failed query is not read as "no homes".
-        console.error('AgentProfile: listings fetch failed:', propsRes.error.message);
+        debugWarn('AgentProfile listings', propsRes.error);
       } else {
         setProperties(propsRes.data || []);
       }

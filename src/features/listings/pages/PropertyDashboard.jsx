@@ -5,6 +5,7 @@ import { ArrowLeft, Phone, MessageCircle, Calendar, Eye, Heart, RotateCcw } from
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
 import { supabase } from '../../../lib/supabase'
 import { formatDate } from '../../../lib/format'
+import { debugWarn } from '../../../lib/debug'
 
 const TYPES = ['view', 'call', 'message', 'meeting', 'favourite']
 const TYPE_ICONS = { call: Phone, message: MessageCircle, meeting: Calendar, view: Eye, favourite: Heart }
@@ -42,7 +43,7 @@ export default function PropertyDashboard() {
         // leads — an agent would conclude their listing was getting no
         // interest rather than that the fetch broke.
         if (err) {
-          console.error('PropertyDashboard: activity fetch failed:', err.message)
+          debugWarn('PropertyDashboard activity', err)
           setError(true)
         } else {
           setActivity(data || [])

@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback, useRef } from 'react'
 import { supabase } from '../../../lib/supabase'
 import { applyPriceRange } from '../lib/priceRange'
 import { applyZoneAndRef } from '../lib/searchFilters'
+import { debugWarn } from '../../../lib/debug'
 
 const PAGE_SIZE = 24
 
@@ -88,7 +89,7 @@ export function useProperties({ filter = 'all', listingType = null, city = null,
         // Same rule as useProperty(): the driver's text describes our schema
         // and is English-only, so it stays in the console for debugging and
         // the UI shows a localized message instead.
-        console.error('useProperties failed:', err.message)
+        debugWarn('useProperties', err)
         setError(true)
       } else {
         setProperties(data || [])
@@ -119,7 +120,7 @@ export function useProperties({ filter = 'all', listingType = null, city = null,
         if (requested !== generation.current) return
         if (err) {
           // Keep hasMore, so the same button offers to try again.
-          console.error('useProperties loadMore failed:', err.message)
+          debugWarn('useProperties loadMore', err)
           setLoadMoreFailed(true)
         } else {
           const newItems = data || []
@@ -194,7 +195,7 @@ export function useProperty(id) {
           // The real message stays available for debugging, but never reaches
           // the UI: it is untranslated and describes our database, not
           // anything the visitor can act on.
-          console.error('useProperty failed:', err.message)
+          debugWarn('useProperty', err)
           setError(true)
         } else {
           setProperty(data)

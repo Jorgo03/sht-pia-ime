@@ -1,5 +1,15 @@
 # Pre-Launch Audit — Shtëpia.ime (Vite web app)
 
+## ═══ PASS 39 — 2026-11-05: PRODUCTION MODE, NO DEBUG OUTPUT (owner goal) ═══
+
+| Check | Result |
+|---|---|
+| Production mode | Both sites build in production mode (`vite build`; `expo export -p web`, no `--dev`); no source maps in either build. Live check: the website serves no `.map` files and its code points to none |
+| Error screens | Both apps show a short translated message and a retry button; the error itself is never on screen. Crashes are reported, redacted, to the private `client_errors` table |
+| Debug output | FIXED: 15 places printed raw database errors to the browser console in production (agent profile, messages, fonts, auth start-up, favorites, listings, listing dashboard, sign-in callback). All now go through the development-only loggers (`lib/debug.ts`, new `src/lib/debug.js`), which print nothing in production and redact personal data |
+| Server functions | Every function answers with a short code (`unauthorized`, `rate_limited`, `not_found`…); details go to `console.error`, i.e. Supabase's private function logs |
+| Guard | `tests/productionMode.test.mjs` |
+
 ## ═══ PASS 38 — 2026-11-04: ADMIN ACTIONS AND PRICES ON THE SERVER (owner goal) ═══
 
 No change was needed; verified live and guarded.

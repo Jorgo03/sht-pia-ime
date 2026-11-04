@@ -17,6 +17,7 @@ import { supabase } from '@/lib/supabase';
 import { formatRelativeTime, getLocalizedText } from '@/lib/format';
 import { loadBlockedIds } from '@/src/features/safety/lib/safety';
 import { useReadableColumn } from '@/hooks/use-responsive';
+import { debugWarn } from '@/lib/debug';
 
 interface Conversation {
   id: string;
@@ -74,7 +75,7 @@ export default function MessagesInboxScreen() {
     // empty state — an agent whose leads failed to load was told they had no
     // conversations at all.
     if (convoError) {
-      console.error('Messages: conversation fetch failed:', convoError.message);
+      debugWarn('Messages', convoError);
       setError(true);
       setLoading(false);
       return;

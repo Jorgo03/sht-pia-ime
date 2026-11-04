@@ -36,6 +36,7 @@ import {
   signOutOtherDevices,
   type ChangePasswordResult,
 } from '@/src/features/auth/lib/password';
+import { debugWarn } from '@/lib/debug';
 
 // Dismisses a lingering auth session left over from a previous attempt (a
 // reload mid-flow, a backgrounded browser). Documented as required for
@@ -337,7 +338,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (!active) return;
       setLoading((current) => {
         if (current) {
-          console.warn('Auth init exceeded %dms; opening the app anyway.', AUTH_INIT_TIMEOUT_MS);
+          debugWarn('auth', `init exceeded ${AUTH_INIT_TIMEOUT_MS}ms; opening the app anyway`);
         }
         return false;
       });

@@ -5,6 +5,7 @@ import { classifyAuthEvent } from '../../lib/authEvents'
 import { signOutOfDevice } from '../../lib/signOut'
 import { changePassword as changePasswordOnServer, signOutOtherDevices } from './lib/password'
 import { createLoginThrottle, isWrongPassword, THROTTLE_STORAGE_KEY, tooManyAttemptsError } from './lib/loginThrottle'
+import { debugWarn } from '../../lib/debug'
 
 const AuthContext = createContext(null)
 
@@ -227,7 +228,7 @@ export function AuthProvider({ children }) {
       if (!active) return
       setState((s) => {
         if (!s.loading) return s
-        console.warn(`Auth init exceeded ${AUTH_INIT_TIMEOUT_MS}ms; rendering anyway.`)
+        debugWarn('auth', `init exceeded ${AUTH_INIT_TIMEOUT_MS}ms; rendering anyway`)
         return { ...s, loading: false }
       })
     }, AUTH_INIT_TIMEOUT_MS)

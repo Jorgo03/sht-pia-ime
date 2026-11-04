@@ -41,6 +41,7 @@ import { LaunchDoorSplash } from '@/components/brand/door-splash';
 import { PushBridge } from '@/components/push-bridge';
 import { IS_WEB, WEB_MAX_WIDTH } from '@/constants/web-frame';
 import { RouteHead } from '@/components/web/page-head';
+import { debugWarn } from '@/lib/debug';
 
 export const unstable_settings = {
   anchor: '(tabs)',
@@ -260,7 +261,7 @@ export default function RootLayout() {
       // each icon's own lazy loader (see createIconSet.js) gets a second
       // independent attempt, so a transient failure here degrades to
       // blank icons rather than blocking the whole app.
-      console.error('Font preload failed, icons will lazy-load individually as a fallback:', fontError);
+      debugWarn('Font preload failed, icons load one by one instead', fontError);
     }
   }, [fontError]);
 

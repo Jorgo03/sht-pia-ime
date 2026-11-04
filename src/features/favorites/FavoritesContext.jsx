@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useState } from 'react'
 import { useAuth } from '../auth/AuthContext'
 import { supabase } from '../../lib/supabase'
+import { debugWarn } from '../../lib/debug'
 
 const FavoritesContext = createContext(null)
 
@@ -105,7 +106,7 @@ export function FavoritesProvider({ children }) {
       }
 
       if (error) {
-        console.error('[Favorites] toggle failed:', error.message)
+        debugWarn('Favorites toggle', error)
         fetchFavorites()
       }
     },

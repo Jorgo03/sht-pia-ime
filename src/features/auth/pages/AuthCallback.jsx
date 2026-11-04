@@ -6,6 +6,7 @@ import LoadingScreen from "../../../shared/LoadingScreen";
 import "../../../styles/profile.css";
 import { authRedirectError, hasAuthCode, linkErrorKey } from "../lib/authLinks";
 import { buildRelayTarget as buildRelayFrom, isAllowedRelayTarget } from "../../../lib/oauthRelay";
+import { debugWarn } from '../../../lib/debug'
 
 /**
  * Mobile OAuth relay.
@@ -104,7 +105,7 @@ export default function AuthCallback() {
         // OAuth providers may still be processing the callback.
         // onAuthStateChange below will handle SIGNED_IN if it arrives.
       } catch (error) {
-        console.error("Auth callback session error:", error);
+        debugWarn('Auth callback', error);
 
         if (!mounted || settled.current) return;
 
