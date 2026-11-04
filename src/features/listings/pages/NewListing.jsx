@@ -14,6 +14,8 @@ import { translatePropertyContent } from '../../../lib/translate'
 import { geocodeCity } from '../../../lib/roadSearch'
 import { formToColumns, propertyToForm, removedMediaPaths } from '../lib/listingForm'
 import { zonesFor } from '../../properties/lib/searchFilters'
+import { FORM_LIMITS, isValidEmail } from '../../../lib/formLimits'
+import { isValidPhone } from '../../auth/lib/profileForm'
 import '../../../styles/map.css'
 import '../../../styles/new-listing.css'
 
@@ -401,7 +403,10 @@ export default function NewListing() {
       if (images.length < MIN_IMAGES) errs.images = t('listing.minImages', { min: MIN_IMAGES })
     }
     if (s === 4) {
+      // The same formats the database checks (properties_contact_*_format).
       if (!form.contact_phone?.trim()) errs.phone = t('listing.required')
+      else if (!isValidPhone(form.contact_phone)) errs.phone = t('profile.edit.phoneInvalid')
+      if (!isValidEmail(form.contact_email)) errs.email = t('errors.invalidEmail')
     }
     return errs
   }
@@ -634,6 +639,7 @@ export default function NewListing() {
               />
               <input
                 type="text"
+                maxLength={FORM_LIMITS.listingTitle}
                 value={translation.title}
                 onChange={e => {
                   translation.editTitle(e.target.value)
@@ -654,6 +660,7 @@ export default function NewListing() {
               <label>{t('listing.description')}</label>
               <textarea
                 rows={4}
+                maxLength={FORM_LIMITS.listingDescription}
                 value={translation.description}
                 onChange={e => {
                   translation.editDescription(e.target.value)
@@ -694,7 +701,7 @@ export default function NewListing() {
                 city={form.city}
                 value={form.address}
                 placeholder={t('listing.addressPlaceholder')}
-                onChange={val => update('address', val)}
+                onChange={val => update('address', val.slice(0, FORM_LIMITS.listingAddress))}
                 // Picking a road frames the map; it never sets the property's
                 // position. That still comes from the marker.
                 onSelectRoad={road => { cityLookup.current = ''; setMapFocus({ latitude: road.latitude, longitude: road.longitude }) }}
@@ -882,7 +889,7 @@ export default function NewListing() {
           <>
             <div className="nl-field">
               <label>{t('listing.phone')}</label>
-              <input type="tel" value={form.contact_phone} onChange={e => update('contact_phone', e.target.value)} placeholder="+355 69..." />
+              <input type="tel" value={form.contact_phone} onChange={e => { update('contact_phone', e.target.value); if (errors.phone) setErrors(prev => ({ ...prev, phone: undefined })) }} placeholder="+355 69..." />
               {errors.phone && <span className="nl-error">{errors.phone}</span>}
             </div>
             <div className="nl-field">
@@ -893,7 +900,8 @@ export default function NewListing() {
             </div>
             <div className="nl-field">
               <label>{t('listing.email')}</label>
-              <input type="email" value={form.contact_email} onChange={e => update('contact_email', e.target.value)} placeholder="john.doe@gmail.com" />
+              <input type="email" maxLength={FORM_LIMITS.email} value={form.contact_email} onChange={e => { update('contact_email', e.target.value); if (errors.email) setErrors(prev => ({ ...prev, email: undefined })) }} placeholder="john.doe@gmail.com" />
+              {errors.email && <span className="nl-error">{errors.email}</span>}
             </div>
             {errors.submit && <div className="nl-error" style={{ marginBottom: 12 }}>{errors.submit}</div>}
           </>

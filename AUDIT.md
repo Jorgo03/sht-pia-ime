@@ -10,7 +10,8 @@
 | Server checks now | FIXED, live (migration `server_form_checks`, repo `supabase/migrations/20261104210000_server_form_checks.sql`): 34 CHECK rules on listings (title, description, address, city, price, size, rooms, floors, year, currency, ≤20 https photos, https video, email and phone format, map position), messages (1–4000), viewings (notes, duration), leads (name, phone, email, notes), wanted homes (city, notes, budget, bedrooms), saved searches (name, filter size), profiles (name, agency, bio). Existing rows all pass (validated) |
 | Trial | Before applying, in a transaction that was cancelled: a good listing saved; 11 bad entries refused (negative price, 201-char title, blank title, `http` photo, bad email, empty and 4001-char messages, nameless lead, negative budget, 121-char search name, 81-char profile name); nothing left behind |
 | Forms match | `src/lib/formLimits.js` holds the limits; the listing form now checks phone and email format and caps title, description and address; message, viewing-note, saved-search and wanted-home inputs capped; `tests/formLimits.test.mjs` fails if the forms and the database drift apart |
-| Left | The Vite site's listing form (bug fixes only) does not pre-check the new phone/email/length rules: the server refuses them and the form shows its generic save error |
+| Website listing form | FIXED: the Vite site's form checks phone and email format and caps title, description, address and email, like the app (e2e 241 passed) |
+| Live | Checked after the push redeployed: real-estate-app-hazel-seven.vercel.app sends `Strict-Transport-Security: max-age=63072000` and CSP `upgrade-insecure-requests`; `http://` answers 308 to `https://` |
 
 ## ═══ PASS 32 — 2026-11-04: USERS SEE ONLY THEIR OWN DATA (owner goal) ═══
 
