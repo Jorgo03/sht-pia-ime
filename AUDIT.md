@@ -1,5 +1,22 @@
 # Pre-Launch Audit — Shtëpia.ime (Vite web app)
 
+## ═══ PASS 30 — 2026-11-04: LOGIN AND PASSWORD STORAGE (owner goal) ═══
+
+Read-only, counts only: no password or hash was read or printed.
+
+| Check | Result |
+|---|---|
+| Sign-up, sign-in, email code, reset, change password (both apps) | All through Supabase Auth (`contexts/auth-context.tsx`, `src/features/auth/AuthContext.jsx`); nothing local or faked |
+| Live `auth.users` | 16 accounts: 8 with a password, **8/8 bcrypt** (`$2a# Pre-Launch Audit — Shtëpia.ime (Vite web app)
+
+/`$2b# Pre-Launch Audit — Shtëpia.ime (Vite web app)
+
+), 0 in any other format; 8 Google/Apple/email-code with none |
+| Password copies outside Auth | 0 password-like columns in app tables; 0 rows with a password-like key in account metadata or any of the 9 JSON columns; 0 queued emails mentioning a password |
+| Client code | No password written to device storage, a log or a table; same rules on phone and web (8+ chars, max 72 bytes, bcrypt's limit) |
+| Guard | `tests/passwordNeverStored.test.mjs` fails if code ever stores, logs or inserts a password |
+| Leaked-password protection (Supabase advisor) | Off. CONFIGURATION REQUIRED: owner turns on "Prevent use of leaked passwords" in the dashboard (may need a paid plan) |
+
 ## ═══ PASS 29 — 2026-11-03: FRONTEND AUDIT, RENDERED (owner master prompt) ═══
 
 The Expo app (the design source, W1) rendered at 280, 320, 390, 673, 768 and
