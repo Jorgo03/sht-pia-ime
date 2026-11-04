@@ -237,8 +237,11 @@ export function AppHeader({
           style={[styles.langBackdrop, { paddingTop: menuTop, paddingRight: menuRight }]}
           onPress={() => setLangOpen(false)}>
           <Pressable style={styles.langCard} onPress={(e) => e.stopPropagation()}>
+            {/* flexGrow 0: a ScrollView grows by default, which stretched the
+                card to menuMaxHeight (the whole screen) on iOS instead of
+                fitting its rows; it still scrolls when the rows don't fit. */}
             <ScrollView
-              style={{ maxHeight: menuMaxHeight }}
+              style={{ flexGrow: 0, maxHeight: menuMaxHeight }}
               contentContainerStyle={styles.langList}
               bounces={false}>
               {LANGUAGES.map((lang) => {
