@@ -45,6 +45,8 @@ export function friendlyError(err, t) {
   if (err?.name === 'AuthRetryableFetchError') return t('errors.network')
   if (err?.name === 'AuthSessionMissingError') return t('errors.sessionExpired')
   if (err?.name === 'AuthPKCECodeVerifierMissingError') return t('errors.linkOtherDevice')
+  // The app's own sign-in limit (features/auth/lib/loginThrottle.js).
+  if (err?.code === 'too_many_attempts') return t('errors.tooManyAttempts', { seconds: err.waitSeconds ?? 60 })
   if (err?.code === 'weak_password' || Array.isArray(err?.reasons)) {
     const reasons = err.reasons ?? []
     if (reasons.includes('pwned')) return t('errors.passwordPwned')

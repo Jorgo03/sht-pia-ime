@@ -342,7 +342,8 @@
     "linkOtherDevice": "Link otwarto w innej przeglądarce niż ta, w której o niego proszono. Wpisz 6-cyfrowy kod z e-maila.",
     "currentPasswordWrong": "Obecne hasło jest nieprawidłowe.",
     "providerUnavailable": "Ta metoda logowania nie jest jeszcze dostępna. Wybierz inną.",
-    "loadFailed": "Nie udało się wczytać. Sprawdź połączenie i spróbuj ponownie."
+    "loadFailed": "Nie udało się wczytać. Sprawdź połączenie i spróbuj ponownie.",
+    "tooManyAttempts": "Zbyt wiele błędnych prób. Spróbuj ponownie za {{seconds}} s."
   },
   "agentDashboard": {
     "title": "Panel Agenta",

@@ -26,6 +26,12 @@ import { classifyAuthEvent } from '../src/lib/authEvents.js';
 // Shared with web the same way (tests/signOut.test.mjs).
 import { signOutOfDevice } from '../src/lib/signOut.js';
 import {
+  createLoginThrottle,
+  isWrongPassword,
+  THROTTLE_STORAGE_KEY,
+  tooManyAttemptsError,
+} from '@/src/features/auth/lib/loginThrottle';
+import {
   changePassword as changePasswordOnServer,
   signOutOtherDevices,
   type ChangePasswordResult,
@@ -181,6 +187,17 @@ interface AuthContextValue {
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
+
+// The web build keeps the count across reloads in localStorage; the phone
+// apps keep it in memory, for as long as the app runs.
+const loginThrottle = createLoginThrottle(
+  Platform.OS === 'web' && typeof localStorage !== 'undefined'
+    ? {
+        load: () => localStorage.getItem(THROTTLE_STORAGE_KEY),
+        save: (v) => localStorage.setItem(THROTTLE_STORAGE_KEY, v),
+      }
+    : {},
+);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
@@ -368,10 +385,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signIn = async (email: string, password: string) => {
+    // Password guessing waits here first (src/features/auth/lib/loginThrottle.js).
+    const gate = loginThrottle.check(email);
+    if (!gate.allowed) return { error: tooManyAttemptsError(gate.waitMs) as Error };
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
+    if (isWrongPassword(error)) loginThrottle.fail(email);
+    else if (!error) loginThrottle.succeed(email);
     return { error: error as Error | null };
   };
 

@@ -4,8 +4,15 @@ import { supabase } from '../../lib/supabase'
 import { classifyAuthEvent } from '../../lib/authEvents'
 import { signOutOfDevice } from '../../lib/signOut'
 import { changePassword as changePasswordOnServer, signOutOtherDevices } from './lib/password'
+import { createLoginThrottle, isWrongPassword, THROTTLE_STORAGE_KEY, tooManyAttemptsError } from './lib/loginThrottle'
 
 const AuthContext = createContext(null)
+
+// Kept in localStorage so reloading the page does not reset the count.
+const loginThrottle = createLoginThrottle({
+  load: () => localStorage.getItem(THROTTLE_STORAGE_KEY),
+  save: (v) => localStorage.setItem(THROTTLE_STORAGE_KEY, v),
+})
 
 // Survives a reload in the middle of a password reset: the recovery session is
 // restored as an ordinary INITIAL_SESSION, which used to drop the person onto
@@ -283,7 +290,12 @@ export function AuthProvider({ children }) {
 
   const signIn = async (email, password) => {
     try { localStorage.removeItem('fho_pending_role') } catch { /* ignore */ }
+    // Password guessing waits here first (lib/loginThrottle.js).
+    const gate = loginThrottle.check(email)
+    if (!gate.allowed) return { error: tooManyAttemptsError(gate.waitMs) }
     const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+    if (isWrongPassword(error)) loginThrottle.fail(email)
+    else if (!error) loginThrottle.succeed(email)
     if (!error && data?.user) showWelcome(data.user)
     return { error }
   }

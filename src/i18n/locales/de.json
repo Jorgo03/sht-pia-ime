@@ -326,7 +326,8 @@
     "linkOtherDevice": "Dieser Link wurde in einem anderen Browser geöffnet als dem, in dem du ihn angefordert hast. Gib stattdessen den 6-stelligen Code aus der E-Mail ein.",
     "currentPasswordWrong": "Dein aktuelles Passwort ist falsch.",
     "providerUnavailable": "Diese Anmeldeoption ist noch nicht verfügbar. Bitte wähle eine andere.",
-    "loadFailed": "Konnte nicht geladen werden. Prüfe deine Verbindung und versuche es erneut."
+    "loadFailed": "Konnte nicht geladen werden. Prüfe deine Verbindung und versuche es erneut.",
+    "tooManyAttempts": "Zu viele falsche Versuche. Versuchen Sie es in {{seconds}} Sekunden erneut."
   },
   "agentDashboard": {
     "title": "Makler-Dashboard",
