@@ -2,7 +2,7 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": null,
   "installCommand": "cd ../.. && npm ci",
-  "buildCommand": "cd ../.. && npm run build:web-expo -- --output-dir deploy/expo-web/dist && node scripts/expo-web-postbuild.mjs deploy/expo-web/dist",
+  "buildCommand": "cd ../.. && NODE_ENV=production npm run build:web-expo -- --output-dir deploy/expo-web/dist && node scripts/expo-web-postbuild.mjs deploy/expo-web/dist",
   "outputDirectory": "dist",
   "cleanUrls": true,
   "trailingSlash": false,

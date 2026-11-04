@@ -24,11 +24,13 @@ function files(dir) {
 
 test('both sites build in production mode without source maps', () => {
   const pkg = JSON.parse(read('package.json'))
-  assert.equal(pkg.scripts.build, 'vite build')
+  // Production mode set explicitly, not left to a default (owner goal 10).
+  assert.equal(pkg.scripts.build, 'vite build --mode production')
   assert.doesNotMatch(pkg.scripts['build:web-expo'], /--dev\b|--source-maps|--no-minify/)
   assert.doesNotMatch(read('vite.config.js'), /sourcemap:\s*true/)
   const deploy = JSON.parse(read('deploy/expo-web/vercel.json'))
   assert.doesNotMatch(deploy.buildCommand, /--dev\b|--source-maps|--no-minify/)
+  assert.match(deploy.buildCommand, /NODE_ENV=production npm run build:web-expo/)
 })
 
 test('error screens never show the error itself', () => {
