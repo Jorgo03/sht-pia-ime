@@ -5,7 +5,7 @@
 | Check | Result |
 |---|---|
 | Sign-in limit in the apps | FIXED: `src/features/auth/lib/loginThrottle.js`, used by `signIn()` in both apps: 5 wrong passwords per account per minute, then that account waits out the minute; 10 per device per minute across accounts; a growing wait after each failure (1, 2, 4, 8 s, max 30 s); a correct password clears it. Only wrong passwords count. Kept across reloads on the web (localStorage), in memory on phones. Message "too many wrong attempts, try again in N seconds" in all 8 languages (`errors.tooManyAttempts`). Tests: `tests/loginThrottle.test.mjs` |
-| Sign-in limit on the server | CONFIGURATION REQUIRED: the app limit can be skipped by a bot calling Supabase directly. Supabase Auth's per-IP limit is the server control: owner sets Dashboard → Authentication → Rate Limits → sign-ups and sign-ins to 25 per 5 minutes per IP (5 a minute). Not readable or changeable from here |
+| Sign-in limit on the server | DONE by owner 2026-11-04: Supabase Auth sign-ups and sign-ins limited to 25 per 5 minutes per IP (about 5 a minute). A per-account server limit needs the Teams plan (Password Verification hook) |
 | CSRF | NO ACTION REQUIRED, now guarded: no cookies anywhere; sessions in localStorage / AsyncStorage; every request carries an `Authorization` header the app adds, which a browser never adds to another site's request. Functions without a user token check their caller another way: payments (Paysera RSA signature), scheduled jobs (secret), unsubscribe (secret link token; GET only shows a confirm button). `tests/csrf.test.mjs` fails if cookie login appears or a function stops checking |
 
 ## ═══ PASS 34 — 2026-11-04: XSS AND SAFE QUERIES (owner goal) ═══
