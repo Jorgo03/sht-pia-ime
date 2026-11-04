@@ -1,5 +1,14 @@
 # Pre-Launch Audit — Shtëpia.ime (Vite web app)
 
+## ═══ PASS 36 — 2026-11-04: COOKIES AND RESET LINKS (owner goal) ═══
+
+| Check | Result |
+|---|---|
+| Session cookies | NO ACTION REQUIRED: there are none. Checked live: the website sets no cookie on any page; sessions are in localStorage / AsyncStorage and sent as an `Authorization` header (Pass 35), so HttpOnly / Secure / SameSite have nothing to apply to. The only cookie seen is Supabase's own Cloudflare bot cookie `__cf_bm`, already HttpOnly and Secure. A stolen-token risk is an XSS risk, covered in Pass 34; `tests/csrf.test.mjs` fails if cookie sessions are added |
+| Reset links: single use | Supabase consumes a reset link or code when it is used (docs: one-time use) |
+| Reset links: expiry | CONFIGURATION REQUIRED: was 3600 s (owner's screenshot of Authentication → Sign In / Providers → Email). Owner sets **Email OTP Expiration** to **900** (15 minutes) |
+| After a reset | Both apps end every other session when the new password is set; the website keeps "mid-reset" in sessionStorage, cleared on success, sign-out or closing the tab. `tests/passwordReset.test.mjs` |
+
 ## ═══ PASS 35 — 2026-11-04: SIGN-IN RATE LIMIT AND CSRF (owner goal) ═══
 
 | Check | Result |
