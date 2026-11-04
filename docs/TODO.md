@@ -110,6 +110,8 @@ Each database change is written to `supabase/pending/` and tested in a rolled-ba
 
 ## Small open items
 
+- [ ] **When Supabase goes Pro:** turn on Authentication → Email → "Prevent use of leaked passwords" (fails on the free plan, AUDIT.md Pass 30), and set `EXPO_PUBLIC_SUPABASE_IMAGE_TRANSFORMS=1` for card thumbnails (Pass 29).
+
 - [x] White text on solid orange (2.4–3.4:1, below the contrast guideline): owner keeps the brand orange `#ff6b00` (2026-11-03, DECISIONS.md C1). A darker fill was tried and reverted.
 - [ ] **You decide:** the "Ali Demi" listing's type and price do not match (postponed since 2026-10-16).
 - [ ] **Me:** Chrome has no Albanian relative times, so chat times on the website say "yesterday" in English.
