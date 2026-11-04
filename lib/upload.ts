@@ -5,6 +5,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { debugWarn } from '@/lib/debug';
 import { supabase } from '@/lib/supabase';
 import { AVATAR_SIZE_PX, AVATAR_SOURCE_TYPES } from '@/src/features/auth/lib/avatar';
+import { extensionFor } from '@/src/lib/uploadNames';
 import {
   chooseUploadSource,
   readBytes,
@@ -254,8 +255,8 @@ export async function uploadPropertyVideo(
 ): Promise<{ url: string; path: string }> {
   const bytes = await readLocal(video.uri);
 
-  const ext = video.fileName.split('.').pop()?.toLowerCase() || 'mp4';
-  const path = `${userId}/video-${randomName()}.${ext}`;
+  // Named from the checked type, never the person's file name (src/lib/uploadNames.js).
+  const path = `${userId}/video-${randomName()}.${extensionFor(video.mimeType) ?? 'mp4'}`;
 
   const { error } = await supabase.storage.from(BUCKET).upload(path, bytes, {
     contentType: video.mimeType,

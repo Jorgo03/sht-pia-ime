@@ -16,6 +16,7 @@ import { formToColumns, propertyToForm, removedMediaPaths } from '../lib/listing
 import { zonesFor } from '../../properties/lib/searchFilters'
 import { FORM_LIMITS, isValidEmail } from '../../../lib/formLimits'
 import { isValidPhone } from '../../auth/lib/profileForm'
+import { uploadPath } from '../../../lib/uploadNames'
 import '../../../styles/map.css'
 import '../../../styles/new-listing.css'
 
@@ -110,7 +111,8 @@ const MIN_IMAGES = 1
 
 // Storage-side validation: the file picker's accept="image/*" is only a
 // hint — anything can be dropped in. Enforce type + size before upload.
-const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/avif', 'image/gif']
+// The storage bucket's own list (lib/uploadNames.js); AVIF was offered here but refused by the bucket.
+const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
 const MAX_IMAGE_MB = 10
 
 // Video: MP4/MOV only, capped at Supabase's default per-object limit.
@@ -444,8 +446,8 @@ export default function NewListing() {
     for (const img of images) {
       // Already in storage (editing): keep its place in the order.
       if (img.existing) { urls.push(img.url); continue }
-      const ext = img.file.name.split('.').pop()
-      const path = `${user.id}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
+      // Named from the checked type, never the person's file name (lib/uploadNames.js).
+      const path = uploadPath(user.id, img.file.type)
       const { error } = await supabase.storage.from('property-images').upload(path, img.file)
       if (error) {
         if (paths.length) await supabase.storage.from('property-images').remove(paths).catch(() => {})
@@ -482,8 +484,7 @@ export default function NewListing() {
       // upload aborts the submit and removes everything already uploaded.
       let videoUrl = video?.existing ? video.url : null
       if (video && !video.existing) {
-        const ext = video.file.name.split('.').pop()
-        const path = `${user.id}/video-${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
+        const path = uploadPath(user.id, video.file.type, { prefix: 'video-' })
         const { error: vErr } = await supabase.storage.from('property-images').upload(path, video.file)
         if (vErr) {
           if (uploadedPaths.length) await supabase.storage.from('property-images').remove(uploadedPaths).catch(() => {})

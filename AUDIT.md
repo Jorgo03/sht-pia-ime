@@ -1,5 +1,15 @@
 # Pre-Launch Audit — Shtëpia.ime (Vite web app)
 
+## ═══ PASS 37 — 2026-11-04: UPLOADS (owner goal) ═══
+
+| Check | Result |
+|---|---|
+| Types and size on the server | Already set on the buckets (checked live): `avatars` JPEG/PNG/WebP, 2 MB; `property-images` JPEG/PNG/WebP/GIF/MP4/MOV, 50 MB. HTML, SVG, scripts and anything else are refused by storage itself |
+| Types in the forms | FIXED: the website offered AVIF, which the bucket refuses (a vague failure); now the bucket's list. Both apps check type and size before uploading (photos 10 MB, video 50 MB, avatar 2 MB) |
+| Renamed | Every file is stored as `<account id>/<time>-<random>.<ext>`. FIXED: the website (photos and video) and the app (video) took the extension from the person's file name; now from the checked type (`src/lib/uploadNames.js`) |
+| Stored outside the app, never run | In Supabase Storage buckets, not the app or website; each account can only write its own folder (Pass 32); files are only ever shown as images or video, and the database only accepts https photo/video links (Pass 33) |
+| Guard | `tests/uploads.test.mjs`: allowed types equal the bucket's, nothing runnable is allowed, names are random and type-based, the forms offer only bucket types |
+
 ## ═══ PASS 36 — 2026-11-04: COOKIES AND RESET LINKS (owner goal) ═══
 
 | Check | Result |
