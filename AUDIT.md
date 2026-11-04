@@ -1,5 +1,17 @@
 # Pre-Launch Audit — Shtëpia.ime (Vite web app)
 
+## ═══ PASS 38 — 2026-11-04: ADMIN ACTIONS AND PRICES ON THE SERVER (owner goal) ═══
+
+No change was needed; verified live and guarded.
+
+| Check | Result |
+|---|---|
+| Admin actions | Hiding a listing and resolving a report run only through `moderate_listing` / `resolve_report`, which check `is_moderator()` in the database before anything else; no other write path; anonymous visitors cannot call them; no one can add themselves to `moderators` |
+| Live trial as an ordinary user | In a cancelled transaction (`supabase/tests/admin_and_prices.sql`): hide a listing, resolve a report, become a moderator, change a plan price, give themselves a promotion or an agency plan, mark a listing promoted, lift a moderator's hold, republish a held listing, change their role, claim a role late, record a payment: **all blocked by the database**. Ordinary listing edits still work. Nothing was kept |
+| Prices | Checkout (still off, `supabase/pending/prepaid_checkout.sql`): the browser sends only which plan and which listing; `create_checkout_order` copies price, currency and period from `public.plans`, checks the agent role and listing ownership, and limits 10 checkouts an hour. Orders cannot be written by users. A payment is activated only if the amount and currency match the order, once per payment event, by the server alone |
+| Guard | `tests/adminAndPrices.test.mjs` |
+| Note | `moderators` is empty: nobody can moderate yet. Adding one is a one-line insert by the owner in the SQL editor |
+
 ## ═══ PASS 37 — 2026-11-04: UPLOADS (owner goal) ═══
 
 | Check | Result |
