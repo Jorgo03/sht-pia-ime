@@ -1,5 +1,22 @@
 # Pre-Launch Audit — Shtëpia.ime (Vite web app)
 
+## ═══ PASS 32 — 2026-11-04: USERS SEE ONLY THEIR OWN DATA (owner goal) ═══
+
+Read-only against the live project: policies read, then each role tested
+inside rolled-back transactions (`supabase/tests/rls_isolation.sql`, re-runnable).
+No change was needed.
+
+| Check | Result |
+|---|---|
+| Row-level security | On for all 25 tables; 5 server-only tables (AI usage, payments, email/push queues, alert deliveries) have no policy, so no user can read them |
+| A buyer, as themselves | 0 rows of other people's favorites, saved searches, chats, messages, viewings, leads, devices, settings, blocks, wanted homes, promotions, subscriptions, reports. The only other people visible are the 2 who contacted them about their own listings; the only activity is on their own 2 listings |
+| An agent, as themselves | 0 rows of other agents' leads, chats or viewings, other users' favorites or saved searches, or unpublished listings |
+| A signed-out visitor | Only the active listings (3), agent profiles and active plans; 0 private rows; buyer profiles not readable at all |
+| Edits | Triggers stop anyone reassigning a listing, chat or viewing, or setting promotion or moderation; profile edits limited to name, photo, phone, agency and language; role change only within 5 minutes of sign-up, buyer/agent only |
+| Server functions | Moderator functions check `is_moderator()`; the wanted-home lookup answers only agents |
+| Photos | Public by design; upload, change and delete only in your own folder |
+| Public by design | Active listings (with their contact phone/email), agent profiles, open wanted homes to agents |
+
 ## ═══ PASS 31 — 2026-11-04: API KEYS STAY ON THE SERVER (owner goal) ═══
 
 No key value was printed; tokens were checked by decoding their role only.
