@@ -53,6 +53,7 @@ import { useAppDimensions } from '@/hooks/use-app-dimensions';
 import { PageHead } from '@/components/web/page-head';
 import { CARD_CONTAINER_A11Y } from '@/components/property/card-a11y';
 import { ViewingTimePicker } from '@/components/viewings/viewing-time-picker';
+import { FORM_LIMITS } from '@/src/lib/formLimits';
 
 // Rounds "now + 1h" to the next half hour — same default the web app's
 // ViewingRequestSheet uses.
@@ -507,6 +508,7 @@ export default function PropertyDetailScreen() {
             placeholderTextColor={colors.textSecondary}
             value={contactMessage}
             onChangeText={setContactMessage}
+            maxLength={FORM_LIMITS.message}
             multiline
             numberOfLines={4}
             textAlignVertical="top"
@@ -691,6 +693,7 @@ export default function PropertyDetailScreen() {
                 placeholderTextColor={colors.textSecondary}
                 value={viewingNotes}
                 onChangeText={setViewingNotes}
+                maxLength={FORM_LIMITS.viewingNotes}
                 multiline
                 numberOfLines={3}
                 textAlignVertical="top"

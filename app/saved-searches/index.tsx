@@ -32,6 +32,7 @@ import { formatDate, formatPrice } from '@/lib/format';
 import { PropertyFilters } from '@/data/types';
 import { countMatches, markSeen, newMatchCount, setEmailAlerts } from '@/src/features/saved-searches/lib/matches';
 import { sheetColumn } from '@/constants/web-frame';
+import { FORM_LIMITS, inIntRange } from '@/src/lib/formLimits';
 import { useReadableColumn } from '@/hooks/use-responsive';
 
 // Email alerts are offered only once sending is configured (docs/LAUNCH_TASKS.md F13).
@@ -217,6 +218,10 @@ export default function SavedSearchesScreen() {
 
   const submitWanted = async () => {
     if (!wantedCity.trim() || !user) return;
+    // The same ranges the database checks (wanted_homes_*_range).
+    if (!inIntRange(wantedMaxPrice, 1, FORM_LIMITS.maxPrice) || !inIntRange(wantedMinBeds, 0, FORM_LIMITS.maxBedrooms)) {
+      return flashError();
+    }
     setSaving(true);
     const { error } = await supabase.from('wanted_homes').insert({
       client_id: user.id,
@@ -463,6 +468,7 @@ export default function SavedSearchesScreen() {
                     placeholder={t('addSheet.searchName')}
                     placeholderTextColor={colors.textSecondary}
                     value={searchName}
+                    maxLength={FORM_LIMITS.savedSearchName}
                     onChangeText={setSearchName}
                   />
                   <TextInput
@@ -470,6 +476,7 @@ export default function SavedSearchesScreen() {
                     placeholder={t('listing.city')}
                     placeholderTextColor={colors.textSecondary}
                     value={searchCity}
+                    maxLength={FORM_LIMITS.city}
                     onChangeText={setSearchCity}
                   />
                   <View style={styles.toggleRow}>
@@ -502,6 +509,7 @@ export default function SavedSearchesScreen() {
                     placeholder={t('listing.city')}
                     placeholderTextColor={colors.textSecondary}
                     value={wantedCity}
+                    maxLength={FORM_LIMITS.city}
                     onChangeText={setWantedCity}
                   />
                   <View style={styles.toggleRow}>
@@ -541,6 +549,7 @@ export default function SavedSearchesScreen() {
                     placeholder={t('addSheet.notes')}
                     placeholderTextColor={colors.textSecondary}
                     value={wantedNotes}
+                    maxLength={FORM_LIMITS.wantedNotes}
                     onChangeText={setWantedNotes}
                     multiline
                     numberOfLines={3}

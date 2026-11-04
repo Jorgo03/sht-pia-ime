@@ -6,9 +6,13 @@ import { readFileSync } from 'node:fs'
 // basic security headers on every page. Without them another site could load
 // the sign-in or password pages inside a hidden frame (clickjacking); Vercel
 // itself only adds HSTS. Checked live 2026-10-27: HSTS was the only one.
+// HTTPS is also asked for explicitly (owner, 2026-11-04): HSTS for two years
+// on any domain the site moves to, and upgrade-insecure-requests so a stray
+// http:// link on a page is fetched over HTTPS.
 const REQUIRED = {
+  'Strict-Transport-Security': 'max-age=63072000',
   'X-Frame-Options': 'DENY',
-  'Content-Security-Policy': "frame-ancestors 'none'",
+  'Content-Security-Policy': "frame-ancestors 'none'; upgrade-insecure-requests",
   'X-Content-Type-Options': 'nosniff',
   'Referrer-Policy': 'strict-origin-when-cross-origin',
 }

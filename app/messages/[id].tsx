@@ -33,6 +33,7 @@ import {
   unblockUser,
 } from '@/src/features/safety/lib/safety';
 import { isNotFound, loadThreadMessages } from '@/src/features/messaging/lib/thread';
+import { FORM_LIMITS } from '@/src/lib/formLimits';
 import { useReadableColumn } from '@/hooks/use-responsive';
 
 interface Message {
@@ -384,6 +385,7 @@ export default function ThreadScreen() {
             placeholderTextColor={colors.textSecondary}
             value={text}
             onChangeText={setText}
+            maxLength={FORM_LIMITS.message}
             onSubmitEditing={send}
             returnKeyType="send"
           />

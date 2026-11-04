@@ -45,6 +45,8 @@ import { geocodeCity, type RoadSuggestion } from '@/src/lib/roadSearch';
 import { useListingTranslation } from '@/src/features/listings/hooks/useListingTranslation';
 import { formToColumns, normalizeAmount, propertyToForm, removedMediaPaths } from '@/src/features/listings/lib/listingForm';
 import type { TranslationMeta } from '@/src/lib/translationCore';
+import { FORM_LIMITS, isValidEmail } from '@/src/lib/formLimits';
+import { isValidPhone } from '@/src/features/auth/lib/profileForm';
 import {
   MAX_IMAGES,
   MAX_VIDEO_MB,
@@ -196,6 +198,7 @@ interface FormErrors {
   images?: string;
   video?: string;
   phone?: string;
+  email?: string;
   submit?: string;
 }
 
@@ -503,7 +506,10 @@ function ListingWizard({ editId }: { editId?: string }) {
       if (images.length < MIN_IMAGES) errs.images = t('listing.minImages', { min: MIN_IMAGES });
     }
     if (s === 4) {
+      // The same formats the database checks (properties_contact_*_format).
       if (!form.contact_phone?.trim()) errs.phone = t('listing.required');
+      else if (!isValidPhone(form.contact_phone)) errs.phone = t('profile.edit.phoneInvalid');
+      if (!isValidEmail(form.contact_email)) errs.email = t('errors.invalidEmail');
     }
 
     return errs;
@@ -803,6 +809,7 @@ function ListingWizard({ editId }: { editId?: string }) {
           }
           placeholderTextColor={colors.textSecondary}
           value={translation.title}
+          maxLength={FORM_LIMITS.listingTitle}
           onChangeText={(val) => {
             translation.editTitle(val);
             clearError('title');
@@ -823,6 +830,7 @@ function ListingWizard({ editId }: { editId?: string }) {
           }
           placeholderTextColor={colors.textSecondary}
           value={translation.description}
+          maxLength={FORM_LIMITS.listingDescription}
           onChangeText={(val) => {
             translation.editDescription(val);
             clearError('description');
@@ -891,7 +899,7 @@ function ListingWizard({ editId }: { editId?: string }) {
           city={form.city}
           value={form.address}
           placeholder={t('listing.addressPlaceholder')}
-          onChangeText={(val) => update('address', val)}
+          onChangeText={(val) => update('address', val.slice(0, FORM_LIMITS.listingAddress))}
           // Picking a road frames the map; it never sets the property's
           // position. That still comes from the marker.
           onSelectRoad={(road: RoadSuggestion) => {
@@ -1165,15 +1173,19 @@ function ListingWizard({ editId }: { editId?: string }) {
         <Text style={styles.checkLabel}>WhatsApp</Text>
       </Pressable>
 
-      <Labeled styles={styles} label={t('listing.email')}>
+      <Labeled styles={styles} label={t('listing.email')} error={errors.email}>
         <Field
           icon="mail"
           placeholder="john.doe@gmail.com"
           keyboardType="email-address"
           autoCapitalize="none"
           textContentType="emailAddress"
+          maxLength={FORM_LIMITS.email}
           value={form.contact_email}
-          onChangeText={(val) => update('contact_email', val)}
+          onChangeText={(val) => {
+            update('contact_email', val);
+            clearError('email');
+          }}
         />
       </Labeled>
 
