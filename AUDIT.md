@@ -1,5 +1,18 @@
 # Pre-Launch Audit — Shtëpia.ime (Vite web app)
 
+## ═══ PASS 31 — 2026-11-04: API KEYS STAY ON THE SERVER (owner goal) ═══
+
+No key value was printed; tokens were checked by decoding their role only.
+
+| Check | Result |
+|---|---|
+| Variables bundled into the app and website (`EXPO_PUBLIC_*`, `VITE_*`) | Only the Supabase URL, the anon key, site and legal URLs, and on/off switches |
+| The bundled Supabase key | role `anon` for project xzzzhlwmzotibrxdqmcm in `.env` and `.env.local`: public by design, RLS protects the data |
+| Built website (`dist/`) and Expo web export | No Anthropic, Stripe, AWS, private-key or service-role strings; the only token is the anon key |
+| Server secrets | Read with `Deno.env.get` only inside the 10 Edge Functions (Anthropic, service role, Paysera, push, email) |
+| Git | No `.env` file ever committed; the one key-shaped string in history is a 33-character fake in `tests/errorReport.test.mjs`, used to test that crash reports blank keys out |
+| Guard | `tests/noSecretsInClient.test.mjs` fails if a secret-named variable gets a public prefix, or a real key or non-anon token is written into app, website or config code |
+
 ## ═══ PASS 30 — 2026-11-04: LOGIN AND PASSWORD STORAGE (owner goal) ═══
 
 Read-only, counts only: no password or hash was read or printed.
