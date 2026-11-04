@@ -13,8 +13,11 @@ reply with `[[CONTACT]]`; the server strips it and returns `{ reply, contact: tr
 agent's card under that reply, with Call, WhatsApp and Profile, using the same
 phone and actions as the listing page (`components/property/listing-assistant.tsx`).
 The card also shows when the assistant is down. No phone number passes through
-the model. e2e: X50, X51. **Needs a deploy of `ai-listing-assistant`** before the
-live server sends `contact`; until then the card appears only on an outage.
+the model. e2e: X50, X51. Deployed 2026-11-04 (function version 7). On that day
+every AI call failed with Anthropic 401 "invalid x-api-key": the
+`ANTHROPIC_API_KEY` secret must be replaced with a valid key (section 0 of
+DECISIONS.md) before either assistant answers; until then the listing chat
+says it cannot answer and shows the contact card.
 
 ## Architecture
 
