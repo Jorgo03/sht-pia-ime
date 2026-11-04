@@ -15,6 +15,19 @@ A darker fill (`#c24e00` → `#a84300`, white 4.8:1) was built and passed axe
 (ba2d0c2). The brand orange stays; these remain the only known axe failures.
 To revisit, `git revert ba2d0c2` brings the darker fill back.
 
+### C2. AI chat parked (DECIDED by owner, 2026-11-04)
+
+The owner wants AI chat later, not now. Hidden behind `AI_CHAT_ENABLED = false`
+in `constants/features.ts`: the Home "Pyet asistentin AI" entry, the Search ✦
+button, the `/assistant` screen (redirects Home) and the chat on each listing.
+The Vite site's listing chat is off too (`aiAssistant: false` in `src/lib/flags.js`).
+Kept: all the code, the `ai-assistant` and `ai-listing-assistant` Edge Functions
+(nothing calls them now), the locale strings and the tests (the AI chat e2e
+tests skip while the switch is off; X52 checks nothing shows). Not chat, so
+unchanged: AI search, listing translation, the agent's listing-writing help.
+To bring it back: set both switches to true, and replace `ANTHROPIC_API_KEY`
+first (it was rejected with 401 on 2026-11-04).
+
 ---
 
 ## ═══ ONE CODEBASE — 2026-10-21 ═══

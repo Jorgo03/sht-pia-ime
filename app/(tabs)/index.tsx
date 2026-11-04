@@ -19,6 +19,7 @@ import { GradientBackground } from '@/components/ui/gradient-background';
 import { RiseIn } from '@/components/ui/motion';
 import { AppHeader } from '@/components/ui/app-header';
 import { AssistantEntry } from '@/components/assistant/assistant-entry';
+import { AI_CHAT_ENABLED } from '@/constants/features';
 import { SearchHeader } from '@/components/ui/search-header';
 import { SkeletonCard } from '@/components/ui/skeleton-card';
 import { Fonts, InlineTarget, type AtticoPalette } from '@/constants/theme';
@@ -144,7 +145,7 @@ export default function HomeScreen() {
         emphasis={t('home.matchesToday', { count: matchCount })}
         onSearchPress={() => router.push('/(tabs)/explore' as Href)}
       />
-      <AssistantEntry />
+      {AI_CHAT_ENABLED && <AssistantEntry />}
     </>
   );
 

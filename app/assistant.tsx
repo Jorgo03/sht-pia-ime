@@ -1,7 +1,7 @@
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useLocalSearchParams, useRouter, type Href } from 'expo-router';
+import { Redirect, useLocalSearchParams, useRouter, type Href } from 'expo-router';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -19,6 +19,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ComparisonTable } from '@/components/assistant/comparison-table';
+import { AI_CHAT_ENABLED } from '@/constants/features';
 import { PropertyRow } from '@/components/property/property-row';
 import { AppHeader } from '@/components/ui/app-header';
 import { GradientBackground } from '@/components/ui/gradient-background';
@@ -62,7 +63,14 @@ const nextId = () => `${Date.now().toString(36)}-${(counter++).toString(36)}`;
  * server; this screen only renders them. The conversation stays on this
  * device (30 days), per account.
  */
-export default function AssistantScreen() {
+// Parked with every AI chat (constants/features.ts): an old link or a typed
+// /assistant lands on Home instead of a chat that is switched off.
+export default function AssistantRoute() {
+  if (!AI_CHAT_ENABLED) return <Redirect href="/" />;
+  return <AssistantScreen />;
+}
+
+function AssistantScreen() {
   const router = useRouter();
   const { t, i18n } = useTranslation();
   const { user } = useAuth();

@@ -30,6 +30,7 @@ import { useTheme } from '@/contexts/theme-context';
 import { Property } from '@/data/types';
 import { useInfinitePropertiesQuery, usePrefetchListingTabs, usePropertiesCountQuery } from '@/hooks/use-property-queries';
 import { useReadableColumn, useResponsive } from '@/hooks/use-responsive';
+import { AI_CHAT_ENABLED } from '@/constants/features';
 import { IS_WEB } from '@/constants/web-frame';
 
 export default function ExploreScreen() {
@@ -258,14 +259,16 @@ export default function ExploreScreen() {
         {/* Describing the home in words is the assistant's job: it sits at
             the end of the search field, which fits any width (a third round
             button beside the title ran off a Fold's 280px cover screen). */}
-        <Pressable
-          accessibilityRole="button"
-          accessibilityLabel={t('aiAssistant.title')}
-          onPress={() => router.push('/assistant' as Href)}
-          hitSlop={10}
-          style={styles.assistantButton}>
-          <MaterialIcons name="auto-awesome" size={18} color={colors.accent} />
-        </Pressable>
+        {AI_CHAT_ENABLED && (
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={t('aiAssistant.title')}
+            onPress={() => router.push('/assistant' as Href)}
+            hitSlop={10}
+            style={styles.assistantButton}>
+            <MaterialIcons name="auto-awesome" size={18} color={colors.accent} />
+          </Pressable>
+        )}
       </View>
 
       <FilterTabs

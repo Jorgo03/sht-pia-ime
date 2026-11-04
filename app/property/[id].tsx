@@ -32,6 +32,7 @@ import { AppHeader } from '@/components/ui/app-header';
 import { ActionButton } from '@/components/ui/action-button';
 import { PrimaryCTA } from '@/components/ui/buttons';
 import { ListingAssistant, type ListingContact } from '@/components/property/listing-assistant';
+import { AI_CHAT_ENABLED } from '@/constants/features';
 import { LocationPreviewMap } from '@/components/property/location-preview-map';
 import { PropertyCard } from '@/components/property/property-card';
 import { KeyboardDoneBar } from '@/components/ui/keyboard-done-bar';
@@ -754,7 +755,9 @@ export default function PropertyDetailScreen() {
 
       {/* Web gates this on `status === 'active'` too — a paused/draft/sold
           listing shouldn't invite questions the agent isn't fielding. */}
-      {property.status === 'active' && <ListingAssistant property={property} contact={assistantContact} />}
+      {AI_CHAT_ENABLED && property.status === 'active' && (
+        <ListingAssistant property={property} contact={assistantContact} />
+      )}
     </View>
   );
 }

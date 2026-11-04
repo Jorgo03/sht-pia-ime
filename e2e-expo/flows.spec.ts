@@ -2,6 +2,7 @@ import type { Page, Route } from '@playwright/test';
 
 import { AGENT, CHAT_CLIENT_ID, CONVERSATIONS, LISTINGS } from '../e2e/support/fixtures';
 import { fakeSession, SIGNED_IN_USER } from '../e2e/support/backend';
+import { AI_CHAT_ENABLED } from '../constants/features';
 import { t } from '../e2e/support/i18n';
 import { axeViolations, expect, test } from '../e2e/support/test';
 
@@ -1065,6 +1066,7 @@ test.describe('signed in: CRM', () => {
 // is answered here, so these check the screen: what it sends, and that cards,
 // tables and buttons come only from the server's answer.
 test.describe('AI assistant', () => {
+  test.skip(!AI_CHAT_ENABLED, 'AI chat is parked (constants/features.ts)');
   const card = (l: (typeof LISTINGS)[number]) => ({
     id: l.id, title: l.title, title_i18n: null, price: l.price, currency: l.currency, listing_type: l.listing_type,
     property_type: l.property_type, city: l.city, zone: null, address: l.address, sqft: l.sqft, beds: l.beds, baths: l.baths,
@@ -1227,6 +1229,7 @@ test.describe('signed in, a listing someone else posted', () => {
 // not hold the answer (the server sends contact: true), or the assistant is
 // down, the seller's contact is shown under the reply instead of a dead end.
 test.describe('listing assistant hands over to the seller', () => {
+  test.skip(!AI_CHAT_ENABLED, 'AI chat is parked (constants/features.ts)');
   const ask = async (page: Page, question: string) => {
     await page.getByPlaceholder(t('assistant.placeholder')).fill(question);
     await page.getByRole('button', { name: t('common.send') }).click();
@@ -1266,5 +1269,25 @@ test.describe('listing assistant hands over to the seller', () => {
     await ask(page, 'A ka ashensor?');
     await expect(page.getByText(t('assistant.unavailable'))).toBeVisible();
     await expect(callButton(page)).toBeVisible();
+  });
+});
+
+// AI chat is parked (DECISIONS.md C2): none of its entry points shows, and an
+// old /assistant link lands on Home.
+test.describe('AI chat switched off', () => {
+  test.skip(AI_CHAT_ENABLED, 'AI chat is switched on');
+
+  test('X52 no AI chat on Home, Search or a listing, and /assistant goes Home', async ({ page }) => {
+    await page.goto('/');
+    await ready(page);
+    await expect(page.getByText(t('aiAssistant.entry'))).toHaveCount(0);
+    await page.goto('/explore');
+    await ready(page);
+    await expect(page.getByRole('button', { name: t('aiAssistant.title') })).toHaveCount(0);
+    await page.goto(`/property/${FEATURED.id}`);
+    await ready(page);
+    await expect(page.getByRole('button', { name: t('assistant.title') })).toHaveCount(0);
+    await page.goto('/assistant');
+    await expect(page).toHaveURL(/\/$/);
   });
 });

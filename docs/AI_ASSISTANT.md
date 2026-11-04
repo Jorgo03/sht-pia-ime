@@ -1,5 +1,9 @@
 # The Shtëpia.ime AI assistant
 
+> **Parked 2026-11-04** (DECISIONS.md C2): both chats are hidden behind
+> `AI_CHAT_ENABLED` in `constants/features.ts`. Everything below still describes
+> the code as it is, ready to switch back on.
+
 A chat in the phone app (and the website built from it) that answers questions
 about the app and finds, ranks and compares real listings. Built 2026-10-27
 (AUDIT.md Pass 27). The per-listing assistant on a listing page
