@@ -44,7 +44,26 @@ import { type Property } from '@/data/types';
  * the floating LiquidTabBar is never mounted underneath it — the FAB only
  * needs to clear the safe-area inset, not a nav pill.
  */
-export function ListingAssistant({ property }: { property: Property | null }) {
+/** The seller's contact, shown under a reply the listing data cannot answer. */
+export interface ListingContact {
+  name: string;
+  agency?: string | null;
+  /** A phone exists, so Call and WhatsApp are offered. */
+  canCall: boolean;
+  onCall: () => void;
+  onWhatsApp: () => void;
+  onProfile?: () => void;
+}
+
+type ChatMessage = AssistantMessage & { failed?: boolean; contact?: boolean };
+
+export function ListingAssistant({
+  property,
+  contact,
+}: {
+  property: Property | null;
+  contact?: ListingContact | null;
+}) {
   const { t, i18n } = useTranslation();
   const router = useRouter();
   const { colors } = useTheme();
@@ -64,7 +83,7 @@ export function ListingAssistant({ property }: { property: Property | null }) {
   );
 
   const [open, setOpen] = useState(false);
-  const [messages, setMessages] = useState<(AssistantMessage & { failed?: boolean })[]>([]);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [text, setText] = useState('');
   const [thinking, setThinking] = useState(false);
   const scrollRef = useRef<ScrollViewInstance>(null);
@@ -101,12 +120,19 @@ export function ListingAssistant({ property }: { property: Property | null }) {
     // i18n.language is a plain string at the type level, but this app only
     // ever sets it to one of the 8 supported codes via changeLanguage.
     const askedAbout = property.id;
-    const reply = await askListingAssistant(askedAbout, history, i18n.language as LangCode);
+    const answer = await askListingAssistant(askedAbout, history, i18n.language as LangCode);
     if (listingRef.current !== askedAbout) return;
     setThinking(false);
+    // Not in the listing, or no answer at all: either way the person is
+    // handed to the seller rather than left with a dead end.
     setMessages((prev) => [
       ...prev,
-      { role: 'assistant', content: reply ?? t('assistant.unavailable'), failed: reply == null },
+      {
+        role: 'assistant',
+        content: answer?.reply ?? t(answer ? 'assistant.notInListing' : 'assistant.unavailable'),
+        failed: answer == null,
+        contact: answer == null || answer.contact,
+      },
     ]);
   };
 
@@ -175,10 +201,13 @@ export function ListingAssistant({ property }: { property: Property | null }) {
             <Text style={styles.alternativesText}>{t('aiAssistant.alternatives')}</Text>
           </Pressable>
           {messages.map((m, i) => (
-            <View key={i} style={[styles.bubble, m.role === 'user' && styles.bubbleMine]}>
-              <Text style={[styles.bubbleText, m.role === 'user' && styles.bubbleTextMine]}>
-                {m.content}
-              </Text>
+            <View key={i} style={styles.turn}>
+              <View style={[styles.bubble, m.role === 'user' && styles.bubbleMine]}>
+                <Text style={[styles.bubbleText, m.role === 'user' && styles.bubbleTextMine]}>
+                  {m.content}
+                </Text>
+              </View>
+              {m.contact && contact ? <ContactCard contact={contact} styles={styles} /> : null}
             </View>
           ))}
           {thinking && (
@@ -220,6 +249,48 @@ export function ListingAssistant({ property }: { property: Property | null }) {
       </View>
       <KeyboardDoneBar />
     </KeyboardAvoidingView>
+  );
+}
+
+/** Who to ask, with Call / WhatsApp when there is a phone and the profile when there is one. */
+function ContactCard({
+  contact,
+  styles,
+}: {
+  contact: ListingContact;
+  styles: ReturnType<typeof createStyles>;
+}) {
+  const { t } = useTranslation();
+  const { colors } = useTheme();
+  const actions: { key: string; icon: 'phone' | 'chat' | 'person'; label: string; onPress: () => void }[] = [];
+  if (contact.canCall) {
+    actions.push({ key: 'call', icon: 'phone', label: t('property.call'), onPress: contact.onCall });
+    actions.push({ key: 'wa', icon: 'chat', label: 'WhatsApp', onPress: contact.onWhatsApp });
+  }
+  if (contact.onProfile) {
+    actions.push({ key: 'profile', icon: 'person', label: t('assistant.viewProfile'), onPress: contact.onProfile });
+  }
+  return (
+    <View style={styles.contactCard}>
+      <Text style={styles.contactTitle}>{t('assistant.contactTitle')}</Text>
+      <Text style={styles.contactName} numberOfLines={1}>
+        {contact.name}
+        {contact.agency ? <Text style={styles.contactAgency}>{` · ${contact.agency}`}</Text> : null}
+      </Text>
+      <View style={styles.contactActions}>
+        {actions.map((a) => (
+          <Pressable
+            key={a.key}
+            style={styles.contactBtn}
+            onPress={a.onPress}
+            accessibilityRole="button"
+            accessibilityLabel={`${a.label}, ${contact.name}`}>
+            <MaterialIcons name={a.icon} size={15} color={colors.accentText} />
+            <Text style={styles.contactBtnText}>{a.label}</Text>
+          </Pressable>
+        ))}
+      </View>
+    </View>
   );
 }
 
@@ -332,6 +403,53 @@ const createStyles = (
       borderBottomLeftRadius: 4,
       paddingHorizontal: 11,
       paddingVertical: 8,
+    },
+    turn: {
+      gap: 6,
+    },
+    contactCard: {
+      alignSelf: 'stretch',
+      gap: 4,
+      padding: 10,
+      borderRadius: 12,
+      borderWidth: 1,
+      borderColor: colors.border,
+      backgroundColor: colors.primaryLight,
+    },
+    contactTitle: {
+      fontFamily: Fonts?.mono,
+      fontSize: 11,
+      letterSpacing: 0.5,
+      color: colors.textSecondary,
+    },
+    contactName: {
+      fontFamily: Fonts?.sansSemiBold,
+      fontSize: 14,
+      color: colors.textPrimary,
+    },
+    contactAgency: {
+      fontFamily: Fonts?.sans,
+      color: colors.textSecondary,
+    },
+    contactActions: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: 6,
+      marginTop: 4,
+    },
+    contactBtn: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 5,
+      minHeight: 36,
+      paddingHorizontal: 12,
+      borderRadius: Radii.pill,
+      backgroundColor: colors.accentTint,
+    },
+    contactBtnText: {
+      fontFamily: Fonts?.sansSemiBold,
+      fontSize: 13,
+      color: colors.accentText,
     },
     alternatives: {
       flexDirection: 'row',

@@ -567,7 +567,10 @@
     "placeholder": "Stelle eine Frage…",
     "thinking": "Denkt nach…",
     "unavailable": "Ich kann gerade nicht antworten. Bitte kontaktiere den Verkäufer über die Inseratsseite.",
-    "disclaimer": "KI-Antworten basieren nur auf Inseratsdaten — wichtige Details mit dem Verkäufer klären."
+    "disclaimer": "KI-Antworten basieren nur auf Inseratsdaten — wichtige Details mit dem Verkäufer klären.",
+    "contactTitle": "Fragen Sie direkt beim Anbieter",
+    "notInListing": "Das steht nicht im Inserat.",
+    "viewProfile": "Profil"
   },
   "viewings": {
     "title": "Besichtigungen",

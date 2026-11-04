@@ -7,8 +7,11 @@
 //
 // Model: claude-haiku-4-5-20251001 (high-volume, cheap).
 // Auth: anon allowed (listing pages are public). Rate limit: 30/hour per key.
+// Reply: { reply, contact }. contact is true when the answer is not in the
+// listing data; the app then shows the owner's or agent's contact.
 
 import { createClient } from 'npm:@supabase/supabase-js@2';
+import { CONTACT_RULE, parseReply } from './reply.js';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -135,8 +138,8 @@ Deno.serve(async (req) => {
           `You answer questions about ONE listing. Reply in ${langName}, briefly (1-3 sentences unless asked for detail).\n\n` +
           `LISTING DATA (your ONLY source of truth):\n${JSON.stringify(property)}\n\n` +
           `Rules:\n` +
-          `- Answer ONLY from the listing data above. If the answer is not in the data, say you don't have that ` +
-          `information and suggest contacting the seller through the listing page.\n` +
+          `- Answer ONLY from the listing data above.\n` +
+          `${CONTACT_RULE}\n` +
           `- Never invent neighborhood facts, distances, schools, prices, or legal details.\n` +
           `- No financial, legal, or investment advice. No negotiating on the seller's behalf.\n` +
           `- You may do simple arithmetic on the data (e.g. price per m²), labeling it as calculated.\n` +
@@ -155,7 +158,10 @@ Deno.serve(async (req) => {
     const text = data.content?.find((b: { type: string }) => b.type === 'text')?.text;
     if (!text) return json({ error: 'ai_unavailable' }, 503);
 
-    return json({ reply: text });
+    // An empty reply (only the marker) is sent as null; the app fills in a
+    // "the listing doesn't say" line above the contact card.
+    const { reply, contact } = parseReply(text);
+    return json({ reply: reply || null, contact });
   } catch (err) {
     console.error('ai-listing-assistant error', err);
     return json({ error: 'ai_unavailable' }, 503);

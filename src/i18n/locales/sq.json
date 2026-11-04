@@ -567,7 +567,10 @@
     "placeholder": "Bëj një pyetje…",
     "thinking": "Duke menduar…",
     "unavailable": "Nuk mund të përgjigjem tani. Kontakto shitësin përmes faqes së shpalljes.",
-    "disclaimer": "Përgjigjet e AI bazohen vetëm në të dhënat e shpalljes — verifiko detajet e rëndësishme me shitësin."
+    "disclaimer": "Përgjigjet e AI bazohen vetëm në të dhënat e shpalljes — verifiko detajet e rëndësishme me shitësin.",
+    "contactTitle": "Pyete drejtpërdrejt shitësin",
+    "notInListing": "Shpallja nuk e përmend këtë.",
+    "viewProfile": "Profili"
   },
   "viewings": {
     "title": "Vizitat",

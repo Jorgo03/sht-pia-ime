@@ -31,7 +31,7 @@ import { ReportSheet } from '@/components/safety/report-sheet';
 import { AppHeader } from '@/components/ui/app-header';
 import { ActionButton } from '@/components/ui/action-button';
 import { PrimaryCTA } from '@/components/ui/buttons';
-import { ListingAssistant } from '@/components/property/listing-assistant';
+import { ListingAssistant, type ListingContact } from '@/components/property/listing-assistant';
 import { LocationPreviewMap } from '@/components/property/location-preview-map';
 import { PropertyCard } from '@/components/property/property-card';
 import { KeyboardDoneBar } from '@/components/ui/keyboard-done-bar';
@@ -303,6 +303,20 @@ export default function PropertyDetailScreen() {
     : '';
   const agent = property.agent;
   const agentInitial = agent?.full_name?.[0]?.toUpperCase() || 'A';
+  // Shown in the listing assistant when the listing does not hold the answer:
+  // the same phone and actions as the contact section below. Not on your own
+  // listing, and not when there is neither a phone nor a profile to open.
+  const assistantContact: ListingContact | null =
+    isOwnListing || (!contactPhone && !agent?.id)
+      ? null
+      : {
+          name: agent?.full_name || t('auth.agent'),
+          agency: agent?.agency_name ?? null,
+          canCall: !!contactPhone,
+          onCall: handleCall,
+          onWhatsApp: handleWhatsApp,
+          onProfile: agent?.id ? () => router.push(`/agent/${agent.id}` as Href) : undefined,
+        };
   const features = property.features ?? [];
   const pricePerSqm = property.sqft && property.sqft > 0 ? Math.round(property.price / property.sqft) : null;
 
@@ -740,7 +754,7 @@ export default function PropertyDetailScreen() {
 
       {/* Web gates this on `status === 'active'` too — a paused/draft/sold
           listing shouldn't invite questions the agent isn't fielding. */}
-      {property.status === 'active' && <ListingAssistant property={property} />}
+      {property.status === 'active' && <ListingAssistant property={property} contact={assistantContact} />}
     </View>
   );
 }

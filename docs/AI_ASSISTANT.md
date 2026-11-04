@@ -3,7 +3,18 @@
 A chat in the phone app (and the website built from it) that answers questions
 about the app and finds, ranks and compares real listings. Built 2026-10-27
 (AUDIT.md Pass 27). The per-listing assistant on a listing page
-(`ai-listing-assistant`) is separate and unchanged, apart from a link into this one.
+(`ai-listing-assistant`) is separate, apart from a link into this one.
+
+**Listing assistant: hand-over to the seller (2026-11-04).** It answers only
+from the one listing's data. When the answer is not there, the model ends its
+reply with `[[CONTACT]]`; the server strips it and returns `{ reply, contact: true }`
+(`supabase/functions/ai-listing-assistant/reply.js`, tests in
+`tests/listingAssistantReply.test.mjs`). The app then shows the owner's or
+agent's card under that reply, with Call, WhatsApp and Profile, using the same
+phone and actions as the listing page (`components/property/listing-assistant.tsx`).
+The card also shows when the assistant is down. No phone number passes through
+the model. e2e: X50, X51. **Needs a deploy of `ai-listing-assistant`** before the
+live server sends `contact`; until then the card appears only on an outage.
 
 ## Architecture
 

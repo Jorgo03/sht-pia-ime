@@ -576,7 +576,10 @@
     "placeholder": "Posez une question…",
     "thinking": "Réflexion…",
     "unavailable": "Je ne peux pas répondre pour le moment. Contactez le vendeur via la page de l'annonce.",
-    "disclaimer": "Les réponses de l'IA reposent uniquement sur les données de l'annonce — vérifiez les détails importants avec le vendeur."
+    "disclaimer": "Les réponses de l'IA reposent uniquement sur les données de l'annonce — vérifiez les détails importants avec le vendeur.",
+    "contactTitle": "Demandez directement au vendeur",
+    "notInListing": "L’annonce ne le précise pas.",
+    "viewProfile": "Profil"
   },
   "viewings": {
     "title": "Visites",

@@ -585,7 +585,10 @@
     "placeholder": "Zadaj pytanie…",
     "thinking": "Myślę…",
     "unavailable": "Nie mogę teraz odpowiedzieć. Skontaktuj się ze sprzedawcą przez stronę ogłoszenia.",
-    "disclaimer": "Odpowiedzi AI opierają się wyłącznie na danych ogłoszenia — ważne szczegóły potwierdź u sprzedawcy."
+    "disclaimer": "Odpowiedzi AI opierają się wyłącznie na danych ogłoszenia — ważne szczegóły potwierdź u sprzedawcy.",
+    "contactTitle": "Zapytaj bezpośrednio sprzedawcę",
+    "notInListing": "Ogłoszenie tego nie podaje.",
+    "viewProfile": "Profil"
   },
   "viewings": {
     "title": "Wizyty",

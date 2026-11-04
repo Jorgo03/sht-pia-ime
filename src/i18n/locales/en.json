@@ -567,7 +567,10 @@
     "placeholder": "Ask a question…",
     "thinking": "Thinking…",
     "unavailable": "I can't answer right now. Please contact the seller via the listing page.",
-    "disclaimer": "AI answers are based only on listing data — verify important details with the seller."
+    "disclaimer": "AI answers are based only on listing data — verify important details with the seller.",
+    "contactTitle": "Ask the seller directly",
+    "notInListing": "The listing doesn’t say.",
+    "viewProfile": "Profile"
   },
   "viewings": {
     "title": "Viewings",

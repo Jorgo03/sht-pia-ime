@@ -1,6 +1,6 @@
 import type { Page, Route } from '@playwright/test';
 
-import { CHAT_CLIENT_ID, CONVERSATIONS, LISTINGS } from '../e2e/support/fixtures';
+import { AGENT, CHAT_CLIENT_ID, CONVERSATIONS, LISTINGS } from '../e2e/support/fixtures';
 import { fakeSession, SIGNED_IN_USER } from '../e2e/support/backend';
 import { t } from '../e2e/support/i18n';
 import { axeViolations, expect, test } from '../e2e/support/test';
@@ -1220,5 +1220,51 @@ test.describe('signed in, a listing someone else posted', () => {
     await chat.click();
     await expect.poll(() => writes.find((w) => w.table === 'messages')?.method).toBe('POST');
     expect(writes.find((w) => w.table === 'messages')?.body).toMatchObject({ body: suggested });
+  });
+});
+
+// The listing assistant answers only from the listing. When the listing does
+// not hold the answer (the server sends contact: true), or the assistant is
+// down, the seller's contact is shown under the reply instead of a dead end.
+test.describe('listing assistant hands over to the seller', () => {
+  const ask = async (page: Page, question: string) => {
+    await page.getByPlaceholder(t('assistant.placeholder')).fill(question);
+    await page.getByRole('button', { name: t('common.send') }).click();
+  };
+  const callButton = (page: Page) => page.getByRole('button', { name: `${t('property.call')}, ${AGENT.full_name}` });
+
+  test('X50 an answer the listing lacks shows the agent with Call and WhatsApp; an answer it has does not', async ({ page }) => {
+    let turn = 0;
+    await page.route('**/functions/v1/ai-listing-assistant', (route) =>
+      route.request().method() === 'OPTIONS'
+        ? route.fulfill({ status: 204, headers: { ...CORS, 'access-control-allow-headers': '*' } })
+        : json(route, ++turn === 1
+          ? { reply: 'Shpallja nuk e thotë nëse ka parkim.', contact: true }
+          : { reply: 'Ka 2 dhoma gjumi.', contact: false }),
+    );
+    await page.goto(`/property/${FEATURED.id}`);
+    await ready(page);
+    await page.getByRole('button', { name: t('assistant.title') }).click();
+
+    await ask(page, 'A ka parkim?');
+    await expect(page.getByText('Shpallja nuk e thotë nëse ka parkim.')).toBeVisible();
+    await expect(page.getByText(t('assistant.contactTitle'))).toHaveCount(1);
+    await expect(callButton(page)).toBeVisible();
+    await expect(page.getByRole('button', { name: `WhatsApp, ${AGENT.full_name}` })).toBeVisible();
+    await expect(page.getByRole('button', { name: `${t('assistant.viewProfile')}, ${AGENT.full_name}` })).toBeVisible();
+
+    await ask(page, 'Sa dhoma ka?');
+    await expect(page.getByText('Ka 2 dhoma gjumi.')).toBeVisible();
+    await expect(page.getByText(t('assistant.contactTitle'))).toHaveCount(1);
+  });
+
+  test('X51 when the assistant is down the seller is still offered', async ({ page }) => {
+    // The fake backend answers every Edge Function with 503 ai_unavailable.
+    await page.goto(`/property/${FEATURED.id}`);
+    await ready(page);
+    await page.getByRole('button', { name: t('assistant.title') }).click();
+    await ask(page, 'A ka ashensor?');
+    await expect(page.getByText(t('assistant.unavailable'))).toBeVisible();
+    await expect(callButton(page)).toBeVisible();
   });
 });
