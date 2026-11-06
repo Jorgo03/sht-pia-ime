@@ -289,10 +289,10 @@
     "loadFailed": "Couldn't load this conversation."
   },
   "property": {
-    "beds": "beds",
+    "beds": "Bedrooms",
     "bedsCount_one": "bed",
     "bedsCount_other": "beds",
-    "baths": "baths",
+    "baths": "Bathrooms",
     "bathsCount_one": "bath",
     "bathsCount_other": "baths",
     "sqft": "m²",

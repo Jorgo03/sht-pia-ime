@@ -338,36 +338,50 @@ export function useListingTranslation<F extends TranslatableForm>({
       fingerprint,
     })
 
-    for (const lang of targets) {
-      // Invalidate any run still in flight for this language, so a response
-      // from a tab the agent opened a moment ago cannot land after this pass
-      // and overwrite it.
-      runIdRef.current += 1
-      latestRunRef.current.set(lang, runIdRef.current)
-      inFlightRef.current.delete(lang)
-      setPending(lang, true)
+    // All languages at once, not one after another: saving used to wait for up
+    // to seven translations in a row (each a round trip, and on the free
+    // fallback engine several), which made "save draft" feel stuck on a phone.
+    // Each language is independent; results are merged in target order below.
+    const results = await Promise.all(
+      targets.map(async (lang) => {
+        // Invalidate any run still in flight for this language, so a response
+        // from a tab the agent opened a moment ago cannot land after this pass
+        // and overwrite it.
+        runIdRef.current += 1
+        latestRunRef.current.set(lang, runIdRef.current)
+        inFlightRef.current.delete(lang)
+        setPending(lang, true)
 
-      try {
-        const result = await translate({
-          title: sourceTitle,
-          description: sourceDescription,
-          targetLanguage: lang,
-          sourceLanguage: SOURCE_LANG,
-        })
-        titles = mergeTranslation(titles, lang, result.title)
-        descriptions = mergeTranslation(descriptions, lang, result.description)
-        meta = markGenerated(meta, lang, fingerprint)
-        filled.push(lang)
-      } catch (err) {
-        // A language the engine could not produce must not cost the agent
-        // their listing. Record it and carry on; the caller publishes what it
-        // has and reports what is missing.
-        const code = (err as { code?: string })?.code ?? 'unavailable'
-        setErrors((prev) => ({ ...prev, [lang]: code }))
+        try {
+          const result = await translate({
+            title: sourceTitle,
+            description: sourceDescription,
+            targetLanguage: lang,
+            sourceLanguage: SOURCE_LANG,
+          })
+          return { lang, result }
+        } catch (err) {
+          // A language the engine could not produce must not cost the agent
+          // their listing. Record it and carry on; the caller publishes what it
+          // has and reports what is missing.
+          const code = (err as { code?: string })?.code ?? 'unavailable'
+          setErrors((prev) => ({ ...prev, [lang]: code }))
+          return { lang, result: null }
+        } finally {
+          setPending(lang, false)
+        }
+      }),
+    )
+
+    for (const { lang, result } of results) {
+      if (!result) {
         failed.push(lang)
-      } finally {
-        setPending(lang, false)
+        continue
       }
+      titles = mergeTranslation(titles, lang, result.title)
+      descriptions = mergeTranslation(descriptions, lang, result.description)
+      meta = markGenerated(meta, lang, fingerprint)
+      filled.push(lang)
     }
 
     // One write at the end rather than seven: the form is being submitted, so

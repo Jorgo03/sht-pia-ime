@@ -199,11 +199,11 @@
     "loadFailed": "Impossible de charger vos biens enregistrés."
   },
   "property": {
-    "beds": "ch.",
+    "beds": "Chambres",
     "bedsCount_one": "ch.",
     "bedsCount_many": "ch.",
     "bedsCount_other": "ch.",
-    "baths": "sdb",
+    "baths": "Salles de bain",
     "bathsCount_one": "sdb",
     "bathsCount_many": "sdb",
     "bathsCount_other": "sdb",

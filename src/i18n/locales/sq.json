@@ -194,10 +194,10 @@
     "loadFailed": "Shtëpitë e ruajtura nuk u ngarkuan."
   },
   "property": {
-    "beds": "dhoma",
+    "beds": "Dhomë",
     "bedsCount_one": "dhomë",
     "bedsCount_other": "dhoma",
-    "baths": "banjo",
+    "baths": "Banjo",
     "bathsCount_one": "banjo",
     "bathsCount_other": "banjo",
     "sqft": "m²",

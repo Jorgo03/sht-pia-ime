@@ -204,12 +204,12 @@
     "loadFailed": "Не удалось загрузить сохранённые объекты."
   },
   "property": {
-    "beds": "комн.",
+    "beds": "Комнаты",
     "bedsCount_one": "комн.",
     "bedsCount_few": "комн.",
     "bedsCount_many": "комн.",
     "bedsCount_other": "комн.",
-    "baths": "ванные",
+    "baths": "Ванные",
     "bathsCount_one": "ванная",
     "bathsCount_few": "ванные",
     "bathsCount_many": "ванных",

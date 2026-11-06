@@ -199,11 +199,11 @@
     "loadFailed": "No se han podido cargar tus viviendas guardadas."
   },
   "property": {
-    "beds": "hab.",
+    "beds": "Habitaciones",
     "bedsCount_one": "hab.",
     "bedsCount_many": "hab.",
     "bedsCount_other": "hab.",
-    "baths": "baños",
+    "baths": "Baños",
     "bathsCount_one": "baño",
     "bathsCount_many": "baños",
     "bathsCount_other": "baños",

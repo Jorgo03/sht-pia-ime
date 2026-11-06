@@ -199,11 +199,11 @@
     "loadFailed": "Non è stato possibile caricare le case salvate."
   },
   "property": {
-    "beds": "camere",
+    "beds": "Camere",
     "bedsCount_one": "camera",
     "bedsCount_many": "camere",
     "bedsCount_other": "camere",
-    "baths": "bagni",
+    "baths": "Bagni",
     "bathsCount_one": "bagno",
     "bathsCount_many": "bagni",
     "bathsCount_other": "bagni",

@@ -987,11 +987,11 @@ function ListingWizard({ editId }: { editId?: string }) {
           <Field
             icon="bathtub"
             placeholder="0"
-            // One decimal is allowed ("1,5"), like the price.
-            keyboardType="decimal-pad"
+            // Whole bathrooms only (owner, real-device test 2026-11-06).
+            keyboardType="number-pad"
             value={form.baths}
             onChangeText={(val) => {
-              update('baths', normalizeAmount(val));
+              update('baths', val.replace(/[^0-9]/g, ''));
               clearError('baths');
             }}
           />
@@ -1003,11 +1003,13 @@ function ListingWizard({ editId }: { editId?: string }) {
           <Field
             icon="stairs"
             placeholder="0"
-            // Basements are negative, and the iPhone's number pads have no minus.
-            keyboardType={Platform.OS === 'ios' ? 'numbers-and-punctuation' : 'numeric'}
+            // Whole numbers on the number pad, like rooms and total floors
+            // (owner, real-device test 2026-11-06). The pad has no minus, so a
+            // basement cannot be typed here; the ground floor is 0.
+            keyboardType="number-pad"
             value={form.floor}
             onChangeText={(val) => {
-              update('floor', val.replace(/[^0-9-]/g, '').replace(/(?!^)-/g, ''));
+              update('floor', val.replace(/[^0-9]/g, ''));
               clearError('floor');
             }}
           />
