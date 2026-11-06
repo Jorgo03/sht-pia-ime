@@ -123,6 +123,9 @@ export default function ProfileScreen() {
   // and a double-tap on the same one can't fire a second redirect — mirrors
   // web's single `providerLoading` state rather than one flag per provider.
   const [providerLoading, setProviderLoading] = useState<Provider | null>(null);
+  // Width of the sign-in provider buttons' row: one column below 300px.
+  const [socialRowWidth, setSocialRowWidth] = useState(0);
+  const socialOneColumn = socialRowWidth > 0 && socialRowWidth < 300;
   // Email-code (OTP) flow — web's equivalent lives in Profile.jsx's
   // handleGoogleOtp/otpStep state.
   const [otpSending, setOtpSending] = useState(false);
@@ -1235,17 +1238,22 @@ export default function ProfileScreen() {
                   and the prototype's is the same 1fr 1fr pair — these were
                   stacked full-width here, which read as two primary actions
                   instead of one row of alternatives. */}
-              <View style={styles.socialRow}>
+              <View
+                style={styles.socialRow}
+                onLayout={(e) => {
+                  const w = Math.round(e.nativeEvent.layout.width);
+                  setSocialRowWidth((prev) => (prev === w ? prev : w));
+                }}>
                 <TouchableOpacity
                   accessibilityRole="button"
-                  style={styles.socialButton}
+                  style={[styles.socialButton, socialOneColumn && styles.socialButtonFull]}
                   onPress={() => handleProvider('google' as Provider)}
                   activeOpacity={0.8}
                   disabled={!!providerLoading}>
                   <GoogleLogo size={18} />
                   {/* Full label, allowed to wrap to a second line — that's
                       what web does in the same half-width cell. */}
-                  <Text style={styles.socialLabel}>
+                  <Text style={styles.socialLabel} numberOfLines={1}>
                     {providerLoading === 'google' ? t('common.loading') : t('auth.continueWithGoogle')}
                   </Text>
                 </TouchableOpacity>
@@ -1272,41 +1280,42 @@ export default function ProfileScreen() {
                       Dashboard config lands. */}
                 <TouchableOpacity
                   accessibilityRole="button"
-                  style={styles.socialButton}
+                  style={[styles.socialButton, socialOneColumn && styles.socialButtonFull]}
                   onPress={() => handleProvider('apple' as Provider)}
                   activeOpacity={0.8}
                   disabled={!!providerLoading}>
                   <Ionicons name="logo-apple" size={19} color="#f5f0e8" />
-                  <Text style={styles.socialLabel}>
+                  <Text style={styles.socialLabel} numberOfLines={1}>
                     {providerLoading === 'apple' ? t('common.loading') : t('auth.continueWithApple')}
                   </Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
                   accessibilityRole="button"
-                  style={styles.socialButton}
+                  style={[styles.socialButton, socialOneColumn && styles.socialButtonFull]}
                   onPress={() => handleProvider('linkedin_oidc' as Provider)}
                   activeOpacity={0.8}
                   disabled={!!providerLoading}>
                   <Ionicons name="logo-linkedin" size={18} color="#0A66C2" />
-                  <Text style={styles.socialLabel}>
+                  <Text style={styles.socialLabel} numberOfLines={1}>
                     {providerLoading === 'linkedin_oidc' ? t('common.loading') : t('auth.continueWithLinkedIn')}
                   </Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
                   accessibilityRole="button"
-                  style={styles.socialButton}
+                  style={[styles.socialButton, socialOneColumn && styles.socialButtonFull]}
                   onPress={handleSendOtp}
                   activeOpacity={0.8}
+                  accessibilityLabel={t('auth.signInWithEmail')}
                   disabled={otpSending}>
                   {/* Was colors.textPrimary — near-black in the light theme,
                       which made the icon vanish against the dark glass card.
                       The card is dark in both themes, so this is fixed cream
                       like its own label. */}
                   <MaterialIcons name="mail-outline" size={18} color="#f5f0e8" />
-                  <Text style={styles.socialLabel}>
-                    {otpSending ? t('common.loading') : t('auth.signInWithEmail')}
+                  <Text style={styles.socialLabel} numberOfLines={1}>
+                    {otpSending ? t('common.loading') : t('auth.emailCode')}
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -1768,6 +1777,9 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     flexWrap: 'wrap',
     gap: 8,
   },
+  // Every button the same height with its label on one line: the long
+  // email-code label wrapped to 2-4 lines and made its row taller than the
+  // first (60px vs 45px on a phone, 96px on a 280px Fold cover screen).
   socialButton: {
     width: '47%',
     flexGrow: 1,
@@ -1775,12 +1787,18 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
+    minHeight: 48,
     paddingVertical: 11,
     paddingHorizontal: 12,
     borderRadius: Radii.md,
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.10)',
     backgroundColor: 'rgba(255,255,255,0.06)',
+  },
+  // Under 300px of card (a Fold cover screen) the labels no longer fit two
+  // across, so each button takes its own row.
+  socialButtonFull: {
+    width: '100%',
   },
   socialLabel: {
     // Shrinks and wraps inside the half-width cell instead of overflowing it.

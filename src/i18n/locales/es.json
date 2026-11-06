@@ -91,7 +91,8 @@
     "resetCodeSent": "Si existe una cuenta para {{email}}, le hemos enviado un código de 6 dígitos.",
     "backToSignIn": "Volver a iniciar sesión",
     "confirmFirst": "Primero confirma tu correo: introduce el código que te enviamos o pide uno nuevo.",
-    "signupCodeHint": "¿Ya abriste el enlace del correo? Entonces tu correo está confirmado: inicia sesión."
+    "signupCodeHint": "¿Ya abriste el enlace del correo? Entonces tu correo está confirmado: inicia sesión.",
+    "emailCode": "Código email"
   },
   "home": {
     "greetingMorning": "Buenos días",

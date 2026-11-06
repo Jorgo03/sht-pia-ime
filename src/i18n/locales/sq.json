@@ -91,7 +91,8 @@
     "resetCodeSent": "Nëse ka një llogari për {{email}}, i dërguam një kod 6-shifror.",
     "backToSignIn": "Kthehu te hyrja",
     "confirmFirst": "Konfirmo fillimisht emailin: fut kodin që të dërguam ose kërko një të ri.",
-    "signupCodeHint": "E hape tashmë lidhjen në email? Atëherë emaili është konfirmuar — hyr."
+    "signupCodeHint": "E hape tashmë lidhjen në email? Atëherë emaili është konfirmuar — hyr.",
+    "emailCode": "Kod me email"
   },
   "home": {
     "greetingMorning": "Mirëmëngjes",

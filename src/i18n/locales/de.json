@@ -91,7 +91,8 @@
     "resetCodeSent": "Falls ein Konto für {{email}} existiert, haben wir einen 6-stelligen Code gesendet.",
     "backToSignIn": "Zurück zur Anmeldung",
     "confirmFirst": "Bestätige zuerst deine E-Mail: Gib den gesendeten Code ein oder fordere einen neuen an.",
-    "signupCodeHint": "Link in der E-Mail schon geöffnet? Dann ist deine E-Mail bestätigt — melde dich an."
+    "signupCodeHint": "Link in der E-Mail schon geöffnet? Dann ist deine E-Mail bestätigt — melde dich an.",
+    "emailCode": "E-Mail-Code"
   },
   "home": {
     "greetingMorning": "Guten Morgen",

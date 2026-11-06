@@ -91,7 +91,8 @@
     "resetCodeSent": "If an account exists for {{email}}, we've sent it a 6-digit code.",
     "backToSignIn": "Back to sign in",
     "confirmFirst": "Confirm your email first: enter the code we sent you, or ask for a new one.",
-    "signupCodeHint": "Already opened the link in the email? Then your email is confirmed — sign in."
+    "signupCodeHint": "Already opened the link in the email? Then your email is confirmed — sign in.",
+    "emailCode": "Email code"
   },
   "addSheet": {
     "openLabel": "Create new",

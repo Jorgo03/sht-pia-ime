@@ -91,7 +91,8 @@
     "resetCodeSent": "Se esiste un account per {{email}}, abbiamo inviato un codice a 6 cifre.",
     "backToSignIn": "Torna all’accesso",
     "confirmFirst": "Prima conferma la tua email: inserisci il codice inviato o richiedine uno nuovo.",
-    "signupCodeHint": "Hai già aperto il link nell’email? Allora l’email è confermata: accedi."
+    "signupCodeHint": "Hai già aperto il link nell’email? Allora l’email è confermata: accedi.",
+    "emailCode": "Codice email"
   },
   "home": {
     "greetingMorning": "Buongiorno",

@@ -91,7 +91,8 @@
     "resetCodeSent": "Jeśli istnieje konto dla {{email}}, wysłaliśmy 6-cyfrowy kod.",
     "backToSignIn": "Wróć do logowania",
     "confirmFirst": "Najpierw potwierdź e-mail: wpisz wysłany kod lub poproś o nowy.",
-    "signupCodeHint": "Link z e-maila już otwarty? Wtedy adres jest potwierdzony — zaloguj się."
+    "signupCodeHint": "Link z e-maila już otwarty? Wtedy adres jest potwierdzony — zaloguj się.",
+    "emailCode": "Kod e-mail"
   },
   "home": {
     "greetingMorning": "Dzień dobry",
