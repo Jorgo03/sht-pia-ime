@@ -26,6 +26,13 @@ Supabase reachable with the app's anon key (3 active listings).
      as jorgo03)
    - **Neither works:** turn on the iPhone's **Personal Hotspot**, join it from
      the laptop, then `npm start`
+   - **For trying the app as a user** (you or a friend, not developing),
+     add `:fast`: `npm run expo:tunnel:qr:fast` or `npm run expo:go:qr:fast`.
+     It sends the finished, compressed app instead of the development one: a
+     fraction of the download, and much quicker on the phone. Red error
+     screens do not show in this mode.
+   - Do not use plain `npx expo start`: its QR code is for a development
+     build, not Expo Go.
 4. A page with a QR code opens in your browser. Wait for it to turn green.
 5. On the iPhone, open the **Camera**, point it at the QR code, tap the
    **Open in Expo Go** banner.

@@ -68,6 +68,9 @@ const metro = spawn(
     '--go',
     `--port=${port}`,
     ...(argv.includes('--clear') ? ['--clear'] : []),
+    // `npm run expo:go:qr:fast`: production JavaScript (no dev checks,
+    // minified), a fraction of the download and much faster on the phone.
+    ...argv.filter((a) => a === '--no-dev' || a === '--minify'),
   ],
   { stdio: 'inherit', env: { ...process.env } },
 );

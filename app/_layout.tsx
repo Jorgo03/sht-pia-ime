@@ -20,10 +20,10 @@ import { QueryClientProvider } from '@tanstack/react-query';
 // As of SDK 56, expo-router no longer allows importing @react-navigation/*
 // directly (Metro throws) — it re-exports what's still needed itself.
 import { DarkTheme, DefaultTheme, Stack, ThemeProvider as NavigationThemeProvider } from 'expo-router';
-import { useFonts } from 'expo-font';
+import { loadAsync as loadFontsAsync, useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { Platform, StyleSheet, View, useWindowDimensions } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import 'react-native-reanimated';
@@ -59,6 +59,27 @@ export { AppErrorBoundary as ErrorBoundary } from '@/components/ui/error-boundar
 // warning (Expo's own template code guards it the same way), not a real
 // error, so it's the one intentional swallow in this file.
 SplashScreen.preventAutoHideAsync().catch(() => {});
+
+/**
+ * Longest the first screen waits for its fonts. In Expo Go every font is a
+ * separate download from the laptop, through the tunnel when testing away
+ * from home, and a stalled one never settles: with no limit the phone sat on
+ * the blank splash (2026-11-07). Text drawn before a font arrives uses the
+ * system font until the next render; icons load themselves (createIconSet).
+ */
+const FONT_GATE_TIMEOUT_MS = 4000;
+
+/**
+ * Loaded after the first screen, not before it: Ionicons draws only the Apple
+ * and LinkedIn logos on Profile (390 KB), and these weights are in
+ * constants/theme.ts's Fonts but no screen uses them yet.
+ */
+const LATER_FONTS = {
+  ...Ionicons.font,
+  Manrope_500Medium,
+  Manrope_800ExtraBold,
+  Newsreader_500Medium_Italic,
+};
 
 // Redacted crash reports to client_errors (docs/LAUNCH_TASKS.md F11); a no-op
 // in development.
@@ -180,6 +201,12 @@ function ThemedNavigation() {
  */
 function AppGate({ fontsReady }: { fontsReady: boolean }) {
   const { loading: authLoading } = useAuth();
+  const [fontWaitOver, setFontWaitOver] = useState(false);
+  useEffect(() => {
+    if (Platform.OS === 'web') return;
+    const timer = setTimeout(() => setFontWaitOver(true), FONT_GATE_TIMEOUT_MS);
+    return () => clearTimeout(timer);
+  }, []);
   // Web has no native splash screen (nothing to hold up) and, critically,
   // Expo Router's static export renders this tree in Node to produce each
   // route's static HTML — there `useFonts`/the Supabase session promise
@@ -187,10 +214,12 @@ function AppGate({ fontsReady }: { fontsReady: boolean }) {
   // isn't "still loading," it's permanently `false`, which blanked every
   // exported page. The race this gate exists to prevent is native-only
   // (LAN asset requests, iOS/Android session storage) — skip it on web.
-  const ready = Platform.OS === 'web' || (fontsReady && !authLoading);
+  const ready = Platform.OS === 'web' || ((fontsReady || fontWaitOver) && !authLoading);
 
   useEffect(() => {
-    if (ready) SplashScreen.hideAsync();
+    if (!ready) return;
+    SplashScreen.hideAsync();
+    loadFontsAsync(LATER_FONTS).catch((e) => debugWarn('Later fonts failed to load', e));
   }, [ready]);
 
   // Web: the page hydrated in Albanian (what was pre-rendered); now switch to
@@ -240,17 +269,16 @@ export default function RootLayout() {
   // Fonts export) through the same gate, so the design-brief requirement
   // "do not show the UI before required fonts have loaded" is enforced by
   // construction rather than left to chance.
+  //
+  // Only what the first screens draw blocks the splash (8 files); the rest
+  // follows in LATER_FONTS, and FONT_GATE_TIMEOUT_MS caps the wait.
   const [fontsLoaded, fontError] = useFonts({
     ...MaterialIcons.font,
-    ...Ionicons.font,
     Newsreader_500Medium,
-    Newsreader_500Medium_Italic,
     Newsreader_600SemiBold,
     Manrope_400Regular,
-    Manrope_500Medium,
     Manrope_600SemiBold,
     Manrope_700Bold,
-    Manrope_800ExtraBold,
     JetBrainsMono_400Regular,
     JetBrainsMono_500Medium,
   });

@@ -345,7 +345,16 @@ let metroExited = false;
 function startMetro() {
   metro = spawn(
     process.execPath,
-    [path.join(__dirname, 'start-expo-lan.cjs'), '--tunnel', '--go', `--port=${port}`],
+    [
+      path.join(__dirname, 'start-expo-lan.cjs'),
+      '--tunnel',
+      '--go',
+      `--port=${port}`,
+      // `npm run expo:tunnel:qr:fast`: production JavaScript (no dev checks,
+      // minified). Through the tunnel the full dev bundle (13 MB) is what
+      // keeps the phone on a blank screen; this is a fraction of it.
+      ...argv.filter((a) => a === '--no-dev' || a === '--minify' || a === '--clear'),
+    ],
     { stdio: 'inherit', env: { ...process.env } },
   );
 
