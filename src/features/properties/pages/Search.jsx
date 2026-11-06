@@ -1,11 +1,10 @@
-import { useState, useMemo, useEffect, useCallback } from 'react'
+import { useState, useMemo, useEffect, useCallback, lazy, Suspense } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Search as SearchIcon, SlidersHorizontal, LayoutGrid, Map as MapIcon, RotateCcw, SearchX, Sparkles, Maximize2, AlertCircle, MapPin, Hash } from 'lucide-react'
 import { parseSearchQuery } from '../../../lib/ai'
 import { isEnabled } from '../../../lib/flags'
 import PropertyCard from '../components/PropertyCard'
-import PropertyMap from '../components/PropertyMap'
 import FilterBar from '../components/FilterBar'
 import SkeletonCard from '../../../shared/SkeletonCard'
 import { useProperties } from '../hooks/useProperties'
@@ -17,6 +16,9 @@ import {
   PRICE_MIN, PRICE_STEP, AREA_MAX,
 } from '../data/filterOptions'
 import '../../../styles/search.css'
+
+// Leaflet is heavy and only the map view needs it.
+const PropertyMap = lazy(() => import('../components/PropertyMap'))
 
 function useDebounced(value, delay = 400) {
   const [debounced, setDebounced] = useState(value)
@@ -223,7 +225,11 @@ export default function Search() {
           {activeCount > 0 && <button className="empty-reset-btn" onClick={resetFilters}><RotateCcw size={14} /> {t('search.reset')}</button>}
         </div>
       ) : viewMode === 'map' ? (
-        <div style={{ padding: '0 1.25rem' }}><PropertyMap properties={properties} /></div>
+        <div style={{ padding: '0 1.25rem' }}>
+          <Suspense fallback={<div style={{ height: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--fho-text-muted)' }}>{t('common.loading')}</div>}>
+            <PropertyMap properties={properties} />
+          </Suspense>
+        </div>
       ) : (
         <div style={{ padding: '0 1.25rem' }}>
           <div className="property-grid" style={{ padding: 0 }}>
