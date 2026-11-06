@@ -99,3 +99,28 @@ test('malformed or non-JSON bodies yield null rather than throwing', () => {
   assert.equal(parseNgrokTunnels(JSON.stringify({ tunnels: 'nope' })), null)
   assert.equal(parseNgrokTunnels(JSON.stringify({ tunnels: [{ public_url: 'not a url' }] })), null)
 })
+
+// Since @expo/cli 58.1.19 the tunnel is Expo's own (*.on.expo.app) and there
+// is no ngrok agent to ask: the QR script now reads the public host from the
+// running server's manifest, which is what phones are actually given.
+const { parseManifestHost } = require('../scripts/expo-tunnel-qr.cjs')
+
+test('the manifest names the tunnel host phones are given', () => {
+  const manifest = (url, hostUri) => JSON.stringify({ launchAsset: { url }, extra: { expoClient: { hostUri } } })
+  assert.equal(
+    parseManifestHost(manifest('https://c-jorgo03-t1zil1-abc.on.expo.app/node_modules/expo-router/entry.bundle?platform=android')),
+    'c-jorgo03-t1zil1-abc.on.expo.app',
+  )
+  assert.equal(parseManifestHost(manifest('', 'xyz-jorgo03-8081.exp.direct')), 'xyz-jorgo03-8081.exp.direct')
+})
+
+test('a LAN, loopback or missing host is not a tunnel yet', () => {
+  const manifest = (url) => JSON.stringify({ launchAsset: { url } })
+  assert.equal(parseManifestHost(manifest('http://192.168.0.5:8081/entry.bundle')), null)
+  assert.equal(parseManifestHost(manifest('http://10.0.0.7:8081/entry.bundle')), null)
+  assert.equal(parseManifestHost(manifest('http://172.20.1.2:8081/entry.bundle')), null)
+  assert.equal(parseManifestHost(manifest('http://127.0.0.1:8081/entry.bundle')), null)
+  assert.equal(parseManifestHost(manifest('http://localhost:8081/entry.bundle')), null)
+  assert.equal(parseManifestHost('not json'), null)
+  assert.equal(parseManifestHost('{}'), null)
+})

@@ -178,6 +178,68 @@ function parseNgrokTunnels(json) {
   }
 }
 
+/**
+ * The public host the running Expo server hands to phones, from its own
+ * manifest (the URL Expo Go downloads the app from).
+ *
+ * Since @expo/cli 58.1.19 the tunnel is Expo's own (@expo/ws-tunnel, hosts
+ * like c-<user>-<id>.on.expo.app) and there is no ngrok agent to ask; the
+ * name derived below for ngrok (.exp.direct) then never answers, so no QR was
+ * drawn even though the tunnel was live. Asking the server works for either
+ * tunnel. A LAN, loopback or empty host means the tunnel is not up yet.
+ *
+ * @param {string} json raw manifest body
+ * @returns {string|null}
+ */
+function parseManifestHost(json) {
+  let manifest;
+  try {
+    manifest = JSON.parse(json);
+  } catch {
+    return null;
+  }
+  const fromAsset = (() => {
+    try {
+      return new URL(manifest?.launchAsset?.url ?? '').host;
+    } catch {
+      return '';
+    }
+  })();
+  const host = (fromAsset || manifest?.extra?.expoClient?.hostUri || '').split('/')[0];
+  const name = host.replace(/:\d+$/, '');
+  if (!name || name === 'localhost' || /^(127\.|10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.)/.test(name) || !name.includes('.')) {
+    return null;
+  }
+  return host;
+}
+
+/** Ask the local Expo server which public host it gives phones. */
+function manifestTunnelHostname() {
+  return new Promise((resolve) => {
+    const req = http.get(
+      {
+        host: '127.0.0.1',
+        port,
+        path: '/',
+        timeout: 20_000,
+        headers: { 'expo-platform': 'android', accept: 'application/expo+json,application/json' },
+      },
+      (res) => {
+        let body = '';
+        res.on('data', (c) => {
+          body += c;
+        });
+        res.on('end', () => resolve(parseManifestHost(body)));
+      },
+    );
+    req.on('error', () => resolve(null));
+    req.on('timeout', () => {
+      req.destroy();
+      resolve(null);
+    });
+  });
+}
+
 /** Ask the running ngrok agent what it published. Null when it is not up. */
 function ngrokPublicHostname(webPort = 4040) {
   return new Promise((resolve) => {
@@ -203,7 +265,9 @@ function ngrokPublicHostname(webPort = 4040) {
 async function tunnelHostname() {
   const settings = await ProjectSettings.readAsync(process.cwd());
   const randomness = settings.urlRandomness;
-  if (!randomness) return { error: 'no urlRandomness recorded yet (it is written on the first tunnel run)' };
+  // Only the old ngrok tunnel names itself from this; Expo's own tunnel does
+  // not, and the server's manifest says the real host either way.
+  if (!randomness) return { hostname: null };
 
   let user = null;
   try {
@@ -226,7 +290,7 @@ async function tunnelHostname() {
 /* ------------------------------------------------------------------- run */
 
 // Exported for tests. Everything below is the CLI, and must not run on require.
-module.exports = { classifyTunnelResponse, parseNgrokTunnels, tunnelHostname };
+module.exports = { classifyTunnelResponse, parseNgrokTunnels, parseManifestHost, tunnelHostname };
 
 if (require.main !== module) return;
 
@@ -333,10 +397,15 @@ process.on('SIGTERM', () => metro?.kill('SIGTERM'));
       console.log(`\n[expo:tunnel:qr] Local server up. Waiting for the tunnel…`);
     }
 
-    // The agent's own answer wins over the derived name: it reports what ngrok
-    // actually registered, so it stays right even if the stored randomness was
-    // reset after a collision and the derived name has gone stale.
-    const hostname = (await ngrokPublicHostname()) ?? derivedHostname;
+    // The server's own manifest wins: it is the address phones are actually
+    // given, for Expo's tunnel and ngrok alike. Then ngrok's agent, then the
+    // derived ngrok name (stale if the stored randomness was reset).
+    const hostname =
+      (await manifestTunnelHostname()) ?? (await ngrokPublicHostname()) ?? derivedHostname;
+    if (!hostname) {
+      await sleep(POLL_MS);
+      continue;
+    }
 
     const probe = await tunnelUp(hostname);
     if (probe.ok) {
