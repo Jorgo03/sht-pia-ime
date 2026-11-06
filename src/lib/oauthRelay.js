@@ -11,8 +11,10 @@
 // - exp:// to this device or a private network (home Wi-Fi, a phone hotspot),
 //   on exactly the app's callback path. ngrok tunnels (*.exp.direct) are
 //   refused on purpose: anyone can register one (owner decision 2026-10-26);
-// - exp:// to the owner's own Expo tunnel, c-jorgo03-<id>-<id>.on.expo.app,
-//   no port, same path. Those names are signed by Expo's server for one
+// - exp:// or exps:// to the owner's own Expo tunnel,
+//   c-jorgo03-<id>-<id>.on.expo.app, no port, same path. The tunnel is
+//   https, so Expo Go's own address for it is exps:// (seen in the auth logs
+//   2026-11-07: accepting only exp:// sent that sign-in to the website). Those names are signed by Expo's server for one
 //   account (@expo/cli AsyncWsTunnel -> createSignedTunnelUrlAsync); names
 //   anyone can choose live on boltexpo.dev instead. An Android tester away
 //   from the owner's Wi-Fi can only reach the app through it, and without it
@@ -39,9 +41,10 @@ function isPrivateHost(h) {
 export function isAppCallback(u) {
   if (!u || u.username || u.password) return false
   if (u.protocol === 'shtepia-ime:') return u.hostname === 'auth' && u.pathname === '/callback'
-  if (u.protocol !== 'exp:') return false
+  if (u.protocol !== 'exp:' && u.protocol !== 'exps:') return false
   if (u.pathname !== '/--/auth/callback') return false
-  return isPrivateHost(u.hostname) || (!u.port && OWNER_TUNNEL.test(u.hostname))
+  if (!u.port && OWNER_TUNNEL.test(u.hostname)) return true
+  return u.protocol === 'exp:' && isPrivateHost(u.hostname)
 }
 
 /**

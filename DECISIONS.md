@@ -68,7 +68,10 @@ anyone can register. The tunnel Expo now uses has names of the form
 `c-<account>-<id>-<id>.on.expo.app`, issued by Expo's server for one account
 (`createSignedTunnelUrlAsync`; names a user picks go to `boltexpo.dev`). The
 relay now also accepts exactly `c-jorgo03-<id>-<id>.on.expo.app`, no port, on
-the app's callback path. Remaining risk: whoever can start a tunnel as the
+the app's callback path, as `exp://` or `exps://`. The tunnel is https, so
+Expo Go's address for it is `exps://`: the first version accepted only
+`exp://`, and the auth logs (2026-11-07 23:44) show that sign-in still ending
+on the website. Remaining risk: whoever can start a tunnel as the
 jorgo03 Expo account. Takes effect when the website is next deployed from
 master. A development build (`shtepia-ime://`) never needs the relay. To
 reverse: delete the `OWNER_TUNNEL` line in the module and in both inline

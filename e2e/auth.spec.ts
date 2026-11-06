@@ -277,7 +277,9 @@ test.describe('mobile sign-in relay on Android', () => {
   // owner's tunnel. Refusing it signed them in on the website instead
   // (2026-11-06, DECISIONS.md W3); Expo signs these names for one account.
   test('F4-R4 the owner\'s own Expo tunnel gets the button back to the app', async ({ page }) => {
-    const tunnel = 'exp://c-jorgo03-t1zil1-mw5ijj2z2arsescp.on.expo.app/--/auth/callback';
+    // exps://: the tunnel is https, and that is the address Expo Go sends
+    // (Supabase auth logs, 2026-11-07).
+    const tunnel = 'exps://c-jorgo03-t1zil1-mw5me89njc9fazob.on.expo.app/--/auth/callback';
     await page.goto(`/auth/callback?rt=${encodeURIComponent(tunnel)}&code=abc-123`);
     const button = page.getByRole('link', { name: t('authCallback.openApp') });
     await expect(button).toBeVisible();

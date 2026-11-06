@@ -16,6 +16,7 @@ const ALLOWED = [
   'exp://localhost:8081/--/auth/callback',
   'shtepia-ime://auth/callback', // dev-client and store builds
   'exp://c-jorgo03-t1zil1-mw5ijj2z2arsescp.on.expo.app/--/auth/callback', // the owner's Expo tunnel
+  'exps://c-jorgo03-t1zil1-mw5me89njc9fazob.on.expo.app/--/auth/callback', // the same, as Expo Go names it (https)
 ]
 const REFUSED = [
   'exp://u-attacker-8081.exp.direct/--/auth/callback', // Expo tunnel: anyone can register one
@@ -36,6 +37,10 @@ const REFUSED = [
   'exp://c-jorgo03-t1zil1-mw5ijj2z2arsescp.on.expo.app/--/other', // wrong path
   'exp://a-jorgo03-t1zil1-mw5ijj2z2arsescp.on.expo.app/--/auth/callback', // not the signed namespace
   'exp://jorgo03.boltexpo.dev/--/auth/callback', // a name anyone can choose
+  'exps://192.168.1.20:8081/--/auth/callback', // exps only for the owner's tunnel
+  'exps://c-someone-t1zil1-mw5me89njc9fazob.on.expo.app/--/auth/callback',
+  'exps://c-jorgo03-t1zil1-mw5me89njc9fazob.on.expo.app/--/other',
+  'expx://c-jorgo03-t1zil1-mw5me89njc9fazob.on.expo.app/--/auth/callback',
   'exp://user@c-jorgo03-t1zil1-mw5ijj2z2arsescp.on.expo.app/--/auth/callback',
 ]
 
