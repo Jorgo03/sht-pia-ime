@@ -35,6 +35,14 @@ If the phone says it cannot connect: you are on a network that blocks
 devices from reaching each other; use the tunnel or the hotspot. If you see
 `ERR_NGROK_3200`: the tunnel stopped; run the command again.
 
+**"Failed to download remote update"** (Android Expo Go) means the phone
+could not download the app from the laptop: nothing was running, the laptop
+is on another network now, or an old QR / Expo Go's "recently opened" entry
+was used. It is not a bug in the app. Start the server again and scan a fresh
+QR. Someone who is **not on your Wi-Fi** (a friend at home) can only open it
+through the tunnel (`npm run expo:tunnel:qr`), and only while your laptop
+keeps that command running.
+
 ## Checks
 
 | # | Area | Do this | Expect | Result |
