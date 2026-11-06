@@ -22,6 +22,16 @@
       "autoPort": false
     },
     {
+      "name": "mobile-go",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "run",
+        "expo:go"
+      ],
+      "port": 8081,
+      "autoPort": false
+    },
+    {
       "name": "mobile-tunnel",
       "runtimeExecutable": "npm",
       "runtimeArgs": [

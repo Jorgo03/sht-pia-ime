@@ -1,5 +1,23 @@
 # Pre-Launch Audit — Shtëpia.ime (Vite web app)
 
+## ═══ PASS 40 — 2026-11-06: EXPO GO COMPATIBILITY, IOS AND ANDROID (owner master mission) ═══
+
+Architecture: hybrid. The Expo app (`app/`, expo-router, SDK 58, RN 0.88) is the phone app and, through React Native Web, its own website; the Vite site (`src/`) is separate and unchanged. Shared: `src/lib`, `src/features/*/lib`, the locale files. No physical device or simulator was used: everything below is static checks, real bundle builds and the live dev server.
+
+| Check | Result |
+|---|---|
+| Dependencies vs Expo Go SDK 58 | FIXED: 15 packages a patch behind (incl. react-native 0.88.0 → 0.88.1, expo ~58.0.23, safe-area-context ~5.11.1) aligned with `npx expo install --fix`; `expo-router` (excluded from the check) bumped by hand to ~58.0.30, the version `expo/bundledNativeModules.json` names. `expo install --check`: up to date |
+| Config | FIXED: `expo-image` and `expo-web-browser` config plugins added to app.json (the CLI could not write them into app.config.js). `expo-doctor` **20/20** |
+| Native modules | All in Expo Go SDK 58 (expo-*, react-native-maps, reanimated + worklets, gesture-handler, screens, svg, safe-area, datetimepicker, async-storage). `expo-dev-client` stays for dev builds; `npm start` runs `--go` |
+| iOS / Android bundles | `expo export` iOS (2267 modules) and Android (2311) both compile to Hermes bytecode |
+| Web-only code in phone bundles | None of the website's libraries (Leaflet, three, Konva, React Router, Recharts, Google Maps JS, react-dom) is in the Android bundle (from its source map). Every `window` / `document` / `localStorage` use among the 153 project files shipped to phones is inside a web-only branch or a function that never runs on a phone |
+| Live dev server | `npm run expo:go`: manifests for iOS and Android report `exposdk:58.0.0`, the LAN host (192.168.0.5:8081) and the icon; both dev bundles served HTTP 200 (iOS 13.2 MB / 2431 modules, Android 13.3 MB / 2448) |
+| Found while testing | Metro runs out of memory (4 GB) if a browser keeps loading `http://localhost:8081/`: each page view rebuilds and server-renders the web app. Phones never request that page; the in-app preview pane's readiness check did. Use the website commands for the web, not port 8081 |
+| Regression | tsc clean, lint 0 errors, unit 413/413, website build OK, e2e website 241 + app 164 passed |
+| Expo Go limits (by design) | Android push notifications (removed from Expo Go in SDK 53; the app skips them there). Apple Sign-In inside Expo Go uses Expo Go's identity, not the app's (needs a dev build to verify). Google sign-in has an Expo Go relay path (fixed on a Samsung A23, SDK 58) |
+| Small tidy-up | The web-only route files (`pricing.web.tsx` and friends) are present but unreachable in the phone bundles; the phone routes redirect home. Exclude them from native bundles before store submission |
+| Not verified here | A QR scan on a real phone, simulators, native runtime behaviour (maps, camera/photo picker, background return, Apple/Google sign-in on device) |
+
 ## ═══ PASS 39 — 2026-11-05: PRODUCTION MODE, NO DEBUG OUTPUT (owner goal) ═══
 
 | Check | Result |
