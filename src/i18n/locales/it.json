@@ -883,5 +883,11 @@
     "results_one": "{{count}} immobile",
     "results_many": "{{count}} immobili",
     "results_other": "{{count}} immobili"
+  },
+  "time": {
+    "justNow": "adesso",
+    "minutesAgo": "{{n}} min fa",
+    "hoursAgo": "{{n}} h fa",
+    "daysAgo": "{{n}} g fa"
   }
 }

@@ -893,5 +893,11 @@
     "results_few": "{{count}} объекта",
     "results_many": "{{count}} объектов",
     "results_other": "{{count}} объекта"
+  },
+  "time": {
+    "justNow": "только что",
+    "minutesAgo": "{{n}} мин назад",
+    "hoursAgo": "{{n}} ч назад",
+    "daysAgo": "{{n}} дн. назад"
   }
 }

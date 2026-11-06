@@ -873,5 +873,11 @@
     },
     "results_one": "{{count}} listing",
     "results_other": "{{count}} listings"
+  },
+  "time": {
+    "justNow": "just now",
+    "minutesAgo": "{{n}} min ago",
+    "hoursAgo": "{{n}} h ago",
+    "daysAgo": "{{n}} d ago"
   }
 }

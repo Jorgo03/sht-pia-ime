@@ -873,5 +873,11 @@
     },
     "results_one": "{{count}} Angebot",
     "results_other": "{{count}} Angebote"
+  },
+  "time": {
+    "justNow": "gerade eben",
+    "minutesAgo": "vor {{n}} Min.",
+    "hoursAgo": "vor {{n}} Std.",
+    "daysAgo": "vor {{n}} T."
   }
 }

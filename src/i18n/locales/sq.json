@@ -873,5 +873,11 @@
     },
     "results_one": "{{count}} pronë",
     "results_other": "{{count}} prona"
+  },
+  "time": {
+    "justNow": "tani",
+    "minutesAgo": "{{n}} min më parë",
+    "hoursAgo": "{{n}} orë më parë",
+    "daysAgo": "{{n}} ditë më parë"
   }
 }

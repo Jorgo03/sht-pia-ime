@@ -1,3 +1,5 @@
+import { t as translate } from 'i18next';
+
 const GRADIENTS = [
   'linear-gradient(135deg, #a08868 0%, #7a5d3f 50%, #4a3520 100%)',
   'linear-gradient(135deg, #9eb09a, #5f7158)',
@@ -87,7 +89,20 @@ export function formatDate(dateStr: string | null | undefined, lang: string = 's
 export function formatRelativeTime(iso: string | null | undefined, locale: string = 'sq'): string {
   if (!iso) return '';
   const diff = (Date.now() - new Date(iso).getTime()) / 1000;
-  const rtf = new Intl.RelativeTimeFormat(locale, { numeric: 'auto' });
+  // Hermes, the phones' JavaScript engine, has no Intl.RelativeTimeFormat:
+  // calling it crashed the Messages screen on a real device. Browsers have
+  // it, so the web keeps the exact wording; phones use the app's own
+  // translations (time.*), worded so the number needs no plural form.
+  const Rtf = (Intl as { RelativeTimeFormat?: typeof Intl.RelativeTimeFormat }).RelativeTimeFormat;
+  if (typeof Rtf !== 'function') {
+    const say = (key: string, n?: number) => translate(key, { n, lng: locale });
+    if (diff < 60) return say('time.justNow');
+    if (diff < 3600) return say('time.minutesAgo', Math.floor(diff / 60));
+    if (diff < 86400) return say('time.hoursAgo', Math.floor(diff / 3600));
+    if (diff < 604800) return say('time.daysAgo', Math.floor(diff / 86400));
+    return formatDate(iso);
+  }
+  const rtf = new Rtf(locale, { numeric: 'auto' });
   if (diff < 60) return rtf.format(-Math.floor(diff), 'second');
   if (diff < 3600) return rtf.format(-Math.floor(diff / 60), 'minute');
   if (diff < 86400) return rtf.format(-Math.floor(diff / 3600), 'hour');

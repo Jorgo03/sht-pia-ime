@@ -883,5 +883,11 @@
     "results_one": "{{count}} inmueble",
     "results_many": "{{count}} inmuebles",
     "results_other": "{{count}} inmuebles"
+  },
+  "time": {
+    "justNow": "ahora",
+    "minutesAgo": "hace {{n}} min",
+    "hoursAgo": "hace {{n}} h",
+    "daysAgo": "hace {{n}} d"
   }
 }

@@ -883,5 +883,11 @@
     "results_one": "{{count}} bien",
     "results_many": "{{count}} biens",
     "results_other": "{{count}} biens"
+  },
+  "time": {
+    "justNow": "à l'instant",
+    "minutesAgo": "il y a {{n}} min",
+    "hoursAgo": "il y a {{n}} h",
+    "daysAgo": "il y a {{n}} j"
   }
 }
