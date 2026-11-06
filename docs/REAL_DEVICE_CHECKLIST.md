@@ -43,6 +43,12 @@ QR. Someone who is **not on your Wi-Fi** (a friend at home) can only open it
 through the tunnel (`npm run expo:tunnel:qr`), and only while your laptop
 keeps that command running.
 
+**Android friends: open it inside Expo Go**, with Expo Go's own **Scan QR
+code** button, or **Enter URL manually** and the full `exp://c-…on.expo.app`
+link. Not in a browser, and not shortened: a page saying *Unsupported
+namespace "jorgo03"* means the leading `c-` was lost. Opening the link in a
+browser also makes the laptop build the website, which can stall the server.
+
 ## Checks
 
 | # | Area | Do this | Expect | Result |
