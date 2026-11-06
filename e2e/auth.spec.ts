@@ -273,6 +273,25 @@ test.describe('mobile sign-in relay on Android', () => {
     expect(navigations.every((u) => !u.startsWith('exp:'))).toBe(true);
   });
 
+  // A tester away from the owner's Wi-Fi reaches Expo Go only through the
+  // owner's tunnel. Refusing it signed them in on the website instead
+  // (2026-11-06, DECISIONS.md W3); Expo signs these names for one account.
+  test('F4-R4 the owner\'s own Expo tunnel gets the button back to the app', async ({ page }) => {
+    const tunnel = 'exp://c-jorgo03-t1zil1-mw5ijj2z2arsescp.on.expo.app/--/auth/callback';
+    await page.goto(`/auth/callback?rt=${encodeURIComponent(tunnel)}&code=abc-123`);
+    const button = page.getByRole('link', { name: t('authCallback.openApp') });
+    await expect(button).toBeVisible();
+    await expect(button).toHaveAttribute('href', `${tunnel}?code=abc-123`);
+    await expect(page).toHaveURL(/\/auth\/callback$/);
+  });
+
+  test('F4-R5 another account\'s Expo tunnel gets no button and keeps no code', async ({ page }) => {
+    await page.goto(`/auth/callback?rt=${encodeURIComponent('exp://c-someone-t1zil1-mw5ijj2z2arsescp.on.expo.app/--/auth/callback')}&code=abc-123`);
+    await page.waitForTimeout(1000);
+    await expect(page.getByRole('link', { name: t('authCallback.openApp') })).toHaveCount(0);
+    expect(await page.evaluate(() => (window as { __FHO_RELAY_TARGET__?: unknown }).__FHO_RELAY_TARGET__)).toBeUndefined();
+  });
+
   test('F4-R3 an Expo tunnel address (anyone can register one) gets no button and keeps no code', async ({ page }) => {
     await page.goto(`/auth/callback?rt=${encodeURIComponent('exp://u-attacker-8081.exp.direct/--/auth/callback')}&code=abc-123`);
     await page.waitForTimeout(1000);

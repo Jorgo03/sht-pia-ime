@@ -9,12 +9,22 @@
 // attacker starts a sign-in with their own PKCE verifier and rt pointing at a
 // server of theirs, sends the link, and receives the victim's code. So only:
 // - exp:// to this device or a private network (home Wi-Fi, a phone hotspot),
-//   on exactly the app's callback path. Expo tunnels (*.exp.direct) are
+//   on exactly the app's callback path. ngrok tunnels (*.exp.direct) are
 //   refused on purpose: anyone can register one (owner decision 2026-10-26);
+// - exp:// to the owner's own Expo tunnel, c-jorgo03-<id>-<id>.on.expo.app,
+//   no port, same path. Those names are signed by Expo's server for one
+//   account (@expo/cli AsyncWsTunnel -> createSignedTunnelUrlAsync); names
+//   anyone can choose live on boltexpo.dev instead. An Android tester away
+//   from the owner's Wi-Fi can only reach the app through it, and without it
+//   Google sign-in ended on the website (2026-11-06, DECISIONS.md W3);
 // - shtepia-ime://auth/callback, the dev-client and store builds' own scheme.
 //
 // The two inline copies in index.html and app/+html.tsx must give the same
 // answers; tests/oauthRelay.test.mjs runs them against this one.
+
+// Exactly the shape Expo signs for the account (c-<account>-<id>-<id>), so
+// an account named "jorgo03-x" has one part too many and is refused.
+const OWNER_TUNNEL = /^c-jorgo03-[a-z0-9]+-[a-z0-9]+\.on\.expo\.app$/
 
 function isPrivateHost(h) {
   if (h === 'localhost' || h === '[::1]') return true
@@ -30,7 +40,8 @@ export function isAppCallback(u) {
   if (!u || u.username || u.password) return false
   if (u.protocol === 'shtepia-ime:') return u.hostname === 'auth' && u.pathname === '/callback'
   if (u.protocol !== 'exp:') return false
-  return u.pathname === '/--/auth/callback' && isPrivateHost(u.hostname)
+  if (u.pathname !== '/--/auth/callback') return false
+  return isPrivateHost(u.hostname) || (!u.port && OWNER_TUNNEL.test(u.hostname))
 }
 
 /**

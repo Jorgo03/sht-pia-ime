@@ -52,6 +52,28 @@ stays in production with bug fixes only, and the `deploy/expo-web` preview
 `src/`) is off. All work now goes to finishing the Expo app and releasing it
 on the App Store and Google Play.
 
+### W3. The Google/LinkedIn sign-in relay accepts the owner's own Expo tunnel (JUDGMENT CALL, 2026-11-06, owner may reverse)
+
+Symptom: on Android, through `npm run expo:tunnel:qr`, Google sign-in left
+the tester on the Vercel website instead of returning to Expo Go. Cause:
+Expo Go's `exp://` address cannot be allow-listed in Supabase, so the app
+sends the sign-in through the website's `/auth/callback?rt=<app address>`,
+and the relay (`src/lib/oauthRelay.js` and its two inline copies) refused
+every tunnel host. The page then signed the tester in on the website. On the
+owner's Wi-Fi (an iPhone at `exp://192.168.x.x`) the relay forwards, which is
+why iOS worked.
+
+The 2026-10-26 refusal stands for ngrok tunnels (`*.exp.direct`), whose names
+anyone can register. The tunnel Expo now uses has names of the form
+`c-<account>-<id>-<id>.on.expo.app`, issued by Expo's server for one account
+(`createSignedTunnelUrlAsync`; names a user picks go to `boltexpo.dev`). The
+relay now also accepts exactly `c-jorgo03-<id>-<id>.on.expo.app`, no port, on
+the app's callback path. Remaining risk: whoever can start a tunnel as the
+jorgo03 Expo account. Takes effect when the website is next deployed from
+master. A development build (`shtepia-ime://`) never needs the relay. To
+reverse: delete the `OWNER_TUNNEL` line in the module and in both inline
+copies.
+
 ## ═══ MONETISATION — 2026-10-14 ═══
 
 ### M1. Paid products: listing promotion AND agency monthly plans (DECIDED by owner)

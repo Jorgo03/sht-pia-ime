@@ -28,6 +28,7 @@ const OAUTH_RELAY = `(function () {
     if (u.protocol === 'shtepia-ime:') return u.hostname === 'auth' && u.pathname === '/callback';
     if (u.protocol !== 'exp:' || u.pathname !== '/--/auth/callback') return false;
     var h = u.hostname;
+    if (!u.port && /^c-jorgo03-[a-z0-9]+-[a-z0-9]+\\.on\\.expo\\.app$/.test(h)) return true;
     if (h === 'localhost' || h === '[::1]') return true;
     var m = /^(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})$/.exec(h);
     if (!m) return false;

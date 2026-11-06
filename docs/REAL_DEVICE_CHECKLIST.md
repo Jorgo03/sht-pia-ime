@@ -49,6 +49,23 @@ link. Not in a browser, and not shortened: a page saying *Unsupported
 namespace "jorgo03"* means the leading `c-` was lost. Opening the link in a
 browser also makes the laptop build the website, which can stall the server.
 
+**Android: Google or LinkedIn sign-in.** Chrome opens for the sign-in, then
+shows a page with a button to return to the app. Tap it, and choose Expo Go
+if asked. This works on your Wi-Fi and through your own tunnel (since the
+website deploy after 2026-11-06). If Chrome stays on the website signed in,
+the website has not been redeployed yet: use email and password or the email
+code meanwhile. In sign-up and reset emails, type the **6-digit code** into
+the app. The link under it confirms on the website instead, which also works,
+but leaves you in Chrome.
+
+**Without Expo Go (Android test APK).** A development build owns the
+`shtepia-ime://` address, so sign-in returns to it directly, with no website
+in between. Free on Android: `npx eas-cli build -p android --profile
+development` (needs `npx expo login`). EAS builds it in the cloud and gives a
+link to the `.apk`. Install it on the phone, then start the server with
+`npx expo start --dev-client` (or `--tunnel`) and open the project from the
+installed app. The free EAS plan has a monthly build quota and a queue.
+
 ## Checks
 
 | # | Area | Do this | Expect | Result |
