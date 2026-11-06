@@ -5,6 +5,41 @@ tried on a physical phone, a simulator or an emulator. The detailed audit
 history is AUDIT.md (Passes 29–40 are the security, frontend and Expo Go work
 this builds on).
 
+## Final verified results (full regression, 2026-11-06, after all fixes)
+
+| Check | Passed | Failed | Skipped | Blocked |
+|---|---|---|---|---|
+| Type check (`tsc --noEmit`) | clean | 0 | – | – |
+| Lint (`npm run lint`) | 0 errors (34 warnings, pre-existing) | 0 | – | – |
+| Unit tests (`npm test`) | 413 | 0 | 0 | – |
+| Website production build | built | 0 | – | – |
+| Website browser tests (`npm run test:e2e`) | 241 | 0 | 9 | – |
+| App browser tests (`npm run test:e2e:expo`) | 170 | 0 | 36 | – |
+| Live database: client + agent lifecycle | 17 steps | 0 | – | – |
+| Live database: isolation, admin and prices, form rules | all refused as intended | 0 | – | – |
+
+Skipped is by design, not hidden failures: layout tests that run on only one
+of the two screen-size projects (phone or desktop), and 14 tests of the AI
+chat, which is parked. Blocked items are outside the suites and listed in H:
+real-phone use, LinkedIn's final step, the AI key, payments, push.
+
+No failure was caused by the application, so nothing needed fixing after the
+run. The one application bug this round (web confirmations) was fixed and
+retested before it (X53–X55; X53 fails on the old code).
+
+**The live lifecycle test left no trace.** Checked after the run: no listing,
+chat, message, viewing, favourite, activity row, queued push or queued email
+was created today. Its triggers (`handle_new_message`, `push_on_message`,
+`push_on_viewing`, `queue_push`) only write inside the same transaction
+(`push_outbox`), none makes a web call or opens a second connection, and
+pg_net is not installed, so nothing could leave the cancelled transaction.
+
+## Testing now / before production / later
+
+| Needed now, for testing | Needed before production | Can wait |
+|---|---|---|
+| Nothing to buy. `npm start` + Expo Go on your phone; the website on its vercel.app address | Supabase Pro (pausing, backups) · Vercel Pro (commercial use) · a domain · Apple Developer (TestFlight, App Store) · Google Play (start its 14-day closed test about a month before launch) · SMTP check · legal review · real-phone pass | AI chat (new key) · leaked-password protection and card thumbnails (come with Pro) · payments (decision M2) · removing web-only code from phone bundles |
+
 ## A. Executive summary
 
 - **What works:** browsing, search, filters, listing pages, favourites,
@@ -144,5 +179,5 @@ Nothing here is a reason to buy today.
 | iOS readiness | 55 | Bundle builds; no developer account, no TestFlight, Apple Sign-In unverified |
 | Android readiness | 55 | Bundle builds; no Play account, 14-day closed test not started |
 | Performance | 70 | 794 KB first load; full-size photos until Pro thumbnails |
-| Automated testing | 85 | ~415 unit, ~405 browser tests, 4 live-database scripts; no device tests |
+| Automated testing | 85 | 413 unit, 411 browser tests passing (0 failed), 4 live-database scripts; no device tests |
 | Production readiness | 60 | Blocked by plan choices (pausing, backups, commercial terms), store accounts, SMTP check, legal review |
