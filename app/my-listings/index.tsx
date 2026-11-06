@@ -5,7 +5,7 @@ import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter, type Href } from 'expo-router';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, Alert, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 
@@ -19,6 +19,7 @@ import { formatPrice, getLocalizedText } from '@/lib/format';
 import { Property } from '@/data/types';
 import { closedStatusFor } from '@/src/features/listings/lib/listingForm';
 import { useReadableColumn } from '@/hooks/use-responsive';
+import { confirmAction } from '@/lib/confirm';
 
 // Reads the theme's status tokens rather than hardcoding the light-theme
 // hexes — web pulls these from --fho-status-*, which swap in dark mode, so a
@@ -96,24 +97,22 @@ export default function MyListingsScreen() {
   const toggleStatus = (id: string, current: string) =>
     setStatus(id, current === 'active' ? 'paused' : 'active');
 
-  const confirmDelete = (id: string) => {
-    Alert.alert(t('listing.confirmDelete'), '', [
-      { text: t('common.cancel'), style: 'cancel' },
-      {
-        text: t('listing.delete'),
-        style: 'destructive',
-        onPress: async () => {
-          const { error } = await supabase.from('properties').delete().eq('id', id);
-          if (error) {
-            flashError();
-            return;
-          }
-          setListings((prev) => prev.filter((p) => p.id !== id));
-          queryClient.invalidateQueries({ queryKey: ['properties'] });
-        },
+  const confirmDelete = (id: string) =>
+    confirmAction({
+      title: t('listing.confirmDelete'),
+      confirmText: t('listing.delete'),
+      cancelText: t('common.cancel'),
+      destructive: true,
+      onConfirm: async () => {
+        const { error } = await supabase.from('properties').delete().eq('id', id);
+        if (error) {
+          flashError();
+          return;
+        }
+        setListings((prev) => prev.filter((p) => p.id !== id));
+        queryClient.invalidateQueries({ queryKey: ['properties'] });
       },
-    ]);
-  };
+    });
 
   return (
     <GradientBackground>

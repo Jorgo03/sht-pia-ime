@@ -7,7 +7,9 @@ import {
   Alert,
   FlatList,
   KeyboardAvoidingView,
+  Modal,
   Platform,
+  Pressable,
   StyleSheet,
   Text,
   TextInput,
@@ -18,6 +20,7 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useTranslation } from 'react-i18next';
 
 import { ReportSheet } from '@/components/safety/report-sheet';
+import { confirmAction } from '@/lib/confirm';
 import { AppHeader } from '@/components/ui/app-header';
 import { SignInPrompt } from '@/components/ui/sign-in-prompt';
 import { type AtticoPalette } from '@/constants/theme';
@@ -85,6 +88,8 @@ export default function ThreadScreen() {
   // Whether *I* blocked the other person (only the blocker can see a block).
   const [blocked, setBlocked] = useState(false);
   const [reportOpen, setReportOpen] = useState(false);
+  // The web's Report / Block menu (phones use the native Alert sheet).
+  const [menuOpen, setMenuOpen] = useState(false);
   const [safetyError, setSafetyError] = useState(false);
   const listRef = useRef<FlatList<Message>>(null);
   // The postgres_changes handler below is created once when the effect
@@ -214,22 +219,27 @@ export default function ThreadScreen() {
       else setSafetyError(true);
       return;
     }
-    Alert.alert(t('safety.blockUser'), t('safety.blockConfirm', { name: otherName }), [
-      { text: t('common.cancel'), style: 'cancel' },
-      {
-        text: t('safety.blockUser'),
-        style: 'destructive',
-        onPress: async () => {
-          if (await blockUser(supabase, otherId)) setBlocked(true);
-          else setSafetyError(true);
-        },
+    confirmAction({
+      title: t('safety.blockUser'),
+      message: t('safety.blockConfirm', { name: otherName }),
+      confirmText: t('safety.blockUser'),
+      cancelText: t('common.cancel'),
+      destructive: true,
+      onConfirm: async () => {
+        if (await blockUser(supabase, otherId)) setBlocked(true);
+        else setSafetyError(true);
       },
-    ]);
+    });
   };
 
   // A native action sheet would need a new library; an Alert with options is
-  // the built-in equivalent on both platforms.
-  const openMenu = () =>
+  // the built-in equivalent on phones. react-native-web's Alert.alert does
+  // nothing, so the web opens the same two choices as a small menu instead.
+  const openMenu = () => {
+    if (Platform.OS === 'web') {
+      setMenuOpen(true);
+      return;
+    }
     Alert.alert(otherName, undefined, [
       { text: t('safety.reportUser'), onPress: () => setReportOpen(true) },
       {
@@ -239,6 +249,7 @@ export default function ThreadScreen() {
       },
       { text: t('common.cancel'), style: 'cancel' },
     ]);
+  };
 
   // Signed out (a notification left in the tray, a link) the load never
   // starts, so this used to be a spinner forever.
@@ -402,6 +413,38 @@ export default function ThreadScreen() {
         </View>
         )}
         <ReportSheet visible={reportOpen} userId={otherId} onClose={() => setReportOpen(false)} />
+        {Platform.OS === 'web' && (
+          <Modal visible={menuOpen} transparent animationType="fade" onRequestClose={() => setMenuOpen(false)}>
+            <Pressable style={styles.menuBackdrop} onPress={() => setMenuOpen(false)} accessibilityLabel={t('common.cancel')}>
+              <View style={styles.menuCard} accessibilityRole="menu">
+                <Text style={styles.menuTitle} numberOfLines={1}>{otherName}</Text>
+                <TouchableOpacity
+                  accessibilityRole="menuitem"
+                  style={styles.menuItem}
+                  onPress={() => {
+                    setMenuOpen(false);
+                    setReportOpen(true);
+                  }}>
+                  <Text style={styles.menuItemText}>{t('safety.reportUser')}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  accessibilityRole="menuitem"
+                  style={styles.menuItem}
+                  onPress={() => {
+                    setMenuOpen(false);
+                    void toggleBlock();
+                  }}>
+                  <Text style={[styles.menuItemText, !blocked && styles.menuItemDanger]}>
+                    {blocked ? t('safety.unblockUser') : t('safety.blockUser')}
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity accessibilityRole="menuitem" style={styles.menuItem} onPress={() => setMenuOpen(false)}>
+                  <Text style={styles.menuItemCancel}>{t('common.cancel')}</Text>
+                </TouchableOpacity>
+              </View>
+            </Pressable>
+          </Modal>
+        )}
         <KeyboardDoneBar />
       </SafeAreaView>
     </KeyboardAvoidingView>
@@ -409,6 +452,44 @@ export default function ThreadScreen() {
 }
 
 const createStyles = (colors: AtticoPalette) => StyleSheet.create({
+  menuBackdrop: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 24,
+  },
+  menuCard: {
+    width: '100%',
+    maxWidth: 320,
+    borderRadius: 16,
+    paddingVertical: 8,
+    backgroundColor: colors.primaryLight,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  menuTitle: {
+    paddingHorizontal: 18,
+    paddingVertical: 10,
+    fontSize: 13,
+    color: colors.textSecondary,
+  },
+  menuItem: {
+    minHeight: 48,
+    justifyContent: 'center',
+    paddingHorizontal: 18,
+  },
+  menuItemText: {
+    fontSize: 16,
+    color: colors.textPrimary,
+  },
+  menuItemDanger: {
+    color: colors.signOut,
+  },
+  menuItemCancel: {
+    fontSize: 16,
+    color: colors.textSecondary,
+  },
   container: {
     flex: 1,
     backgroundColor: colors.primary,

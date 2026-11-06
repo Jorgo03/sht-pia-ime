@@ -105,6 +105,13 @@ async function properties(route: Route, url: URL, store: Listing[], writes: Writ
     for (const row of rows) Object.assign(row, body);
     return route.fulfill({ status: 204, headers: CORS, body: '' });
   }
+  if (req.method() === 'DELETE') {
+    // A delete removes the rows from this page's copy, so the app's next read
+    // no longer finds them.
+    writes.push({ table: 'properties', method: 'DELETE', query: url.search, body: {} });
+    for (const row of rows) store.splice(store.indexOf(row), 1);
+    return route.fulfill({ status: 204, headers: CORS, body: '' });
+  }
   if (req.method() === 'HEAD') return route.fulfill({ status: 200, headers: { ...CORS, 'content-range': `*/${rows.length}` }, body: '' });
 
   const offset = Number(url.searchParams.get('offset') ?? 0);

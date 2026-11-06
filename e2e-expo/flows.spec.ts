@@ -1291,3 +1291,59 @@ test.describe('AI chat switched off', () => {
     await expect(page).toHaveURL(/\/$/);
   });
 });
+
+// react-native-web's Alert.alert is an empty function: dialogs built on it
+// never appeared in the web build, so these actions silently did nothing
+// (docs/PRE_PURCHASE_QA.md). lib/confirm.ts asks with the browser's dialog.
+test.describe('web confirmations actually ask and act', () => {
+  test.describe('signed in', () => {
+    test.use({ signedIn: true });
+
+    test('X53 deleting a listing asks first: cancel keeps it, confirm deletes it', async ({ page, writes }) => {
+      await page.goto('/my-listings');
+      await ready(page);
+      const deletes = page.getByRole('button', { name: t('listing.delete') });
+      await expect(deletes.first()).toBeVisible();
+      const before = await deletes.count();
+      expect(before).toBeGreaterThan(0);
+
+      page.once('dialog', (d) => d.dismiss());
+      await deletes.first().click();
+      await page.waitForTimeout(300);
+      expect(writes.filter((w) => w.method === 'DELETE')).toHaveLength(0);
+
+      page.once('dialog', (d) => d.accept());
+      await deletes.first().click();
+      await expect.poll(() => writes.filter((w) => w.table === 'properties' && w.method === 'DELETE').length).toBe(1);
+      expect(writes.find((w) => w.method === 'DELETE')?.query).toMatch(/id=eq\./);
+      await expect(deletes).toHaveCount(before - 1);
+    });
+
+    test('X55 the chat menu opens on the web with Report and Block', async ({ page }) => {
+      await page.route(`**/rest/v1/profiles*id=eq.${CHAT_CLIENT_ID}*`, (route) =>
+        json(route, { full_name: 'Ana Klientja', agency_name: null }),
+      );
+      await page.goto(`/messages/${CONVERSATIONS[0].id}`);
+      await ready(page);
+      await page.getByRole('button', { name: t('safety.menu') }).click();
+      await expect(page.getByRole('menuitem', { name: t('safety.reportUser') })).toBeVisible();
+      await expect(page.getByRole('menuitem', { name: t('safety.blockUser') })).toBeVisible();
+      await page.getByRole('menuitem', { name: t('common.cancel') }).click();
+      await expect(page.getByRole('menuitem', { name: t('safety.reportUser') })).toHaveCount(0);
+    });
+  });
+
+  test('X54 signed out, booking a viewing asks to sign in and goes there', async ({ page }) => {
+    await page.goto(`/property/${FEATURED.id}`);
+    await ready(page);
+    const message = new Promise<string>((resolve) =>
+      page.once('dialog', (d) => {
+        resolve(d.message());
+        void d.accept();
+      }),
+    );
+    await page.getByRole('button', { name: t('detail.scheduleViewing') }).click();
+    expect(await message).toContain(t('favourites.loginPrompt'));
+    await expect(page).toHaveURL(/\/profile$/);
+  });
+});

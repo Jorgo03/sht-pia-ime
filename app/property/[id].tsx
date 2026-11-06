@@ -54,6 +54,7 @@ import { PageHead } from '@/components/web/page-head';
 import { CARD_CONTAINER_A11Y } from '@/components/property/card-a11y';
 import { ViewingTimePicker } from '@/components/viewings/viewing-time-picker';
 import { FORM_LIMITS } from '@/src/lib/formLimits';
+import { confirmAction } from '@/lib/confirm';
 
 // Rounds "now + 1h" to the next half hour — same default the web app's
 // ViewingRequestSheet uses.
@@ -136,15 +137,16 @@ export default function PropertyDetailScreen() {
     [similarRaw, property?.id],
   );
 
-  const requireSignIn = () => {
-    Alert.alert(t('favourites.loginPrompt'), '', [
-      { text: t('common.cancel'), style: 'cancel' },
-      // common.signIn, not auth.signIn: the auth namespace has signInTitle /
-      // signInWith / signInWithEmail but never a bare signIn, so this button
-      // rendered the literal text "auth.signIn" in every language.
-      { text: t('common.signIn'), onPress: () => router.push('/(tabs)/profile' as Href) },
-    ]);
-  };
+  // common.signIn, not auth.signIn: the auth namespace has signInTitle /
+  // signInWith / signInWithEmail but never a bare signIn, so this button
+  // rendered the literal text "auth.signIn" in every language.
+  const requireSignIn = () =>
+    confirmAction({
+      title: t('favourites.loginPrompt'),
+      confirmText: t('common.signIn'),
+      cancelText: t('common.cancel'),
+      onConfirm: () => router.push('/(tabs)/profile' as Href),
+    });
 
   const agentId = property?.agent?.id || property?.agent_id || property?.owner_id || null;
   const isOwnListing = !!user && !!agentId && user.id === agentId;
