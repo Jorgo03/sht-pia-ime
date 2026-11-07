@@ -1,6 +1,6 @@
 import { supabase } from '@/lib/supabase';
 import { applyPriceRange } from '@/src/features/properties/lib/priceRange';
-import { applyZoneAndRef } from '@/src/features/properties/lib/searchFilters';
+import { applyFreeText, applyZoneAndRef } from '@/src/features/properties/lib/searchFilters';
 
 import { Property, PropertyFilters, PropertySort } from './types';
 
@@ -39,7 +39,9 @@ function applyFilters(query: any, f: PropertyFilters): any {
   let q = query;
   if (f.propertyType) q = q.eq('property_type', f.propertyType);
   if (f.listingType) q = q.eq('listing_type', f.listingType);
-  if (f.city) q = q.ilike('city', `%${f.city}%`);
+  // Free text searches city, zone and address — a partial road name
+  // ("Kavaj") must find listings even though it is not a city name.
+  q = applyFreeText(q, f.city);
   // The sheet's min/max are euros; listings can be priced in ALL or USD too.
   q = applyPriceRange(q, f);
   if (f.beds != null) q = q.gte('beds', f.beds);

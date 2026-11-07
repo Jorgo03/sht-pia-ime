@@ -2,14 +2,73 @@
 // website and the phone app so both read, show and query them the same way.
 import LOCATIONS from '../data/locations.js'
 
-/** Zones of a city, or [] for an unknown / empty city. */
-export function zonesFor(city) {
-  return LOCATIONS.find((l) => l.city === city)?.zones ?? []
+/**
+ * Case- and diacritic-insensitive form: "TIRANA" / "Tiranë" / "tirane" all
+ * become "tirane". People type the road/city name partially and without the
+ * right ë/ç — exact matching made the zone list vanish until the full
+ * official name was typed.
+ */
+function norm(s) {
+  return String(s ?? '')
+    .trim()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/\s+/g, ' ')
 }
 
-/** A zone only counts when it belongs to the chosen city. */
+/**
+ * Zones for a city. Exact (normalized) match first; otherwise a partial
+ * prefix/substring city ("Tir", "tirane") returns the matched cities' zones
+ * so the zone dropdown appears while typing instead of after the full name.
+ * An unrelated name ("Atlantis") still returns [].
+ */
+export function zonesFor(city) {
+  const wanted = norm(city)
+  if (!wanted) return []
+  const exact = LOCATIONS.find((l) => norm(l.city) === wanted)
+  if (exact) return exact.zones
+  if (wanted.length < 2) return []
+  const seen = new Set()
+  const out = []
+  for (const l of LOCATIONS) {
+    const name = norm(l.city)
+    if (name.startsWith(wanted) || name.includes(wanted)) {
+      for (const z of l.zones) {
+        if (!seen.has(z)) {
+          seen.add(z)
+          out.push(z)
+        }
+      }
+    }
+  }
+  return out
+}
+
+/**
+ * A zone only counts when it belongs to the chosen city. Accepts partial
+ * road/zone names ("Kavaj", "rruga e kavajes" without diacritics) and
+ * resolves them to the canonical zone, so typing part of a road name filters
+ * instead of being silently dropped. A partial that matches more than one
+ * different zone (e.g. "Qendër" exists in many cities) stays null unless the
+ * city narrows it to one.
+ */
 export function validZone(city, zone) {
-  return Boolean(zone) && zonesFor(city).includes(zone) ? zone : null
+  if (!zone) return null
+  const wanted = norm(zone)
+  if (!wanted) return null
+  const candidates = city ? zonesFor(city) : []
+  const pool = candidates.length ? candidates : LOCATIONS.flatMap((l) => l.zones)
+  const exact = pool.find((z) => norm(z) === wanted)
+  if (exact) return exact
+  if (wanted.length >= 2) {
+    const hits = [...new Set(pool.filter((z) => {
+      const n = norm(z)
+      return n.startsWith(wanted) || n.includes(wanted)
+    }))]
+    if (hits.length === 1) return hits[0]
+  }
+  return null
 }
 
 /** "SH-1A2B3C4D" as shown on a listing, from the ref_code column. */
@@ -42,4 +101,33 @@ export function applyZoneAndRef(query, { city, zone, ref } = {}) {
   const r = normalizeRef(ref)
   if (r) query = query.eq('ref_code', r)
   return query
+}
+
+/**
+ * Free-text search must find a road/zone partial ("Kavaj") as well as a full
+ * city name. The old query did `ilike('city', '%term%')` only, so typing part
+ * of a road name matched nothing because road names live in `zone` /
+ * `address`, not `city`. Searching all three with OR makes "Kavaj" return
+ * listings in "Rruga e Kavajës". PostgREST's `or()` syntax splits on commas
+ * and parentheses and treats %/_ as wildcards, so those are stripped — a term
+ * that survives empty (only wildcards) applies no filter at all.
+ */
+export function cleanFreeText(term) {
+  return String(term ?? '')
+    .replace(/[%_,()]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
+export function freeTextFilter(term) {
+  const cleaned = cleanFreeText(term)
+  if (!cleaned) return null
+  const p = `%${cleaned}%`
+  return `city.ilike.${p},zone.ilike.${p},address.ilike.${p}`
+}
+
+export function applyFreeText(query, term) {
+  const filter = freeTextFilter(term)
+  if (!filter) return query
+  return query.or(filter)
 }

@@ -107,9 +107,19 @@ if (hostOverride) {
 // port off it: getTunnelUrlComponents() takes the port from the parsed tunnel
 // URL, which for an https .exp.direct host is empty.
 const hostType = tunnelHost ? 'tunnel' : 'lan';
+
+// BundlerInfo is @expo/cli's internal contract. Since @expo/cli 58.1.19 it
+// expects getter methods (`getPort()`, `getTunnelUrl()`, …), not plain
+// properties — the old `{ port }` shape throws
+// `TypeError: this.bundlerInfo.getPort is not a function` at QR time,
+// after Metro is already up. Keep `port` too for any older CLI that still
+// reads the property directly.
 const bundlerInfo = {
   port,
+  getPort: () => port,
   getTunnelUrl: () => (tunnelHost ? `https://${tunnelHost}` : null),
+  getProxyUrl: () => process.env.EXPO_PACKAGER_PROXY_URL ?? null,
+  getHostnameOverride: () => process.env.REACT_NATIVE_PACKAGER_HOSTNAME ?? null,
 };
 
 const scheme = target === 'go' ? 'exp' : Array.isArray(exp.scheme) ? exp.scheme[0] : exp.scheme;

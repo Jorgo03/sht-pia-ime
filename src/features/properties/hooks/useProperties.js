@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback, useRef } from 'react'
 import { supabase } from '../../../lib/supabase'
 import { applyPriceRange } from '../lib/priceRange'
-import { applyZoneAndRef } from '../lib/searchFilters'
+import { applyFreeText, applyZoneAndRef } from '../lib/searchFilters'
 import { debugWarn } from '../../../lib/debug'
 
 const PAGE_SIZE = 24
@@ -19,7 +19,9 @@ const SORTS = {
 function applyFilters(query, { filter, listingType, city, zone, refCode, minPrice, maxPrice, beds, baths, minArea, maxArea }) {
   if (filter && filter !== 'all') query = query.eq('property_type', filter)
   if (listingType) query = query.eq('listing_type', listingType)
-  if (city) query = query.ilike('city', `%${city}%`)
+  // Free text searches city, zone and address — a partial road name
+  // ("Kavaj") must find listings even though it is not a city name.
+  query = applyFreeText(query, city)
   // Euros, compared per listing currency (lib/priceRange.js).
   query = applyPriceRange(query, { minPrice, maxPrice })
   if (beds != null) query = query.gte('beds', beds)

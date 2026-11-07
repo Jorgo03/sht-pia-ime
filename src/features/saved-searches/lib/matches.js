@@ -11,7 +11,7 @@
 // type, minPrice, maxPrice (euros, across listing currencies), beds.
 
 import { applyPriceRange } from '../../properties/lib/priceRange.js'
-import { validZone } from '../../properties/lib/searchFilters.js'
+import { applyFreeText, validZone } from '../../properties/lib/searchFilters.js'
 
 const toNumber = (value) => {
   if (value === null || value === undefined || value === '') return null
@@ -22,7 +22,7 @@ const toNumber = (value) => {
 /** Apply a saved search's filters to a Supabase query on `properties`. */
 export function applySavedFilters(query, filters) {
   const f = filters ?? {}
-  if (f.city) query = query.ilike('city', `%${f.city}%`)
+  query = applyFreeText(query, f.city)
   const zone = validZone(f.city, f.zone)
   if (zone) query = query.eq('zone', zone)
   if (f.listing_type) query = query.eq('listing_type', f.listing_type)

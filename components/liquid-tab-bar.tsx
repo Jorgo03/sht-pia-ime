@@ -26,6 +26,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Shadows } from '@/constants/theme';
 import { useTheme } from '@/contexts/theme-context';
 import { useUnreadMessages } from '@/hooks/use-unread-messages';
+import { buildInboxHref, tokenForTab } from '@/src/features/messaging/lib/return-route';
 
 /** The pill's own height and its offset from the bottom edge — exported so
  *  scrollable tab screens can reserve the right amount of space instead of
@@ -167,6 +168,21 @@ export function LiquidTabBar({ state, descriptors, emitter, navigateToTab }: Bot
   const messagesActive = pathname?.startsWith('/messages') ?? false;
   const activeKey: TabKey = messagesActive ? 'messages' : (activeRouteName as TabKey);
 
+  // Messages is an overlay on the tabs, not a tab (module doc above): the
+  // Tabs underneath stay mounted, so leaving Messages pops back to the
+  // exact tab on this press — Home/Search/Profile, with its scroll and
+  // state intact — on Android and iOS alike. The token remembers which
+  // one it was so the inbox can replace to it when there is no history to
+  // pop (deep link, cold start). No fetch happens here: opening Messages
+  // is a plain push, and its data loads inside the screen.
+  const openMessages = () => {
+    // The pill hides under a pushed screen, so this only guards the
+    // double-tap race before the push covers it — otherwise each tap
+    // would stack another /messages the back button had to unwind.
+    if (messagesActive) return;
+    router.push(buildInboxHref(tokenForTab(activeRouteName)) as Href);
+  };
+
   // Where each tab sits inside the pill, measured on layout, so the lens can
   // travel to it whatever the screen width.
   const [slots, setSlots] = useState<Partial<Record<TabKey, { x: number; width: number }>>>({});
@@ -296,7 +312,7 @@ export function LiquidTabBar({ state, descriptors, emitter, navigateToTab }: Bot
           color={iconColor(activeKey === 'messages')}
           label={t('common.messages')}
           onLayout={measure('messages')}
-          onPress={() => select('messages', () => router.push('/messages' as Href))}>
+          onPress={() => select('messages', openMessages)}>
           {unread > 0 && (
             <View style={[styles.navBadge, { backgroundColor: colors.accent }]}>
               <Text style={styles.navBadgeText} maxFontSizeMultiplier={1.2}>

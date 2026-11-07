@@ -38,11 +38,32 @@ export function priceRangeExpression(minEur, maxEur) {
  * The same filter rules as the apps (src/features/saved-searches/lib/matches.js
  * and the Search page). Zone applies only together with a city; the apps only
  * ever save a zone that belongs to the saved city.
+ *
+ * Free text searches city, zone and address — a partial road name ("Kavaj")
+ * must match listings in "Rruga e Kavajës". Same cleaning as the apps'
+ * applyFreeText (src/features/properties/lib/searchFilters.js): PostgREST's
+ * or() splits on commas/parentheses and treats %/_ as wildcards, so they are
+ * stripped. Copied here because this function deploys standalone.
  */
+export function cleanFreeText(term) {
+  return String(term ?? '')
+    .replace(/[%_,()]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
+export function freeTextFilter(term) {
+  const cleaned = cleanFreeText(term)
+  if (!cleaned) return null
+  const p = `%${cleaned}%`
+  return `city.ilike.${p},zone.ilike.${p},address.ilike.${p}`
+}
+
 export function applySavedFilters(query, filters) {
   const f = filters ?? {}
   const num = (v) => (v === null || v === undefined || v === '' || !Number.isFinite(Number(v)) ? null : Number(v))
-  if (f.city) query = query.ilike('city', `%${f.city}%`)
+  const freeText = freeTextFilter(f.city)
+  if (freeText) query = query.or(freeText)
   if (f.city && f.zone) query = query.eq('zone', f.zone)
   if (f.listing_type) query = query.eq('listing_type', f.listing_type)
   if (f.type && f.type !== 'all') query = query.eq('property_type', f.type)

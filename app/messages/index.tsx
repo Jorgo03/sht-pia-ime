@@ -1,7 +1,7 @@
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useRouter, type Href } from 'expo-router';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useLocalSearchParams, useRouter, type Href } from 'expo-router';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
@@ -18,6 +18,11 @@ import { formatRelativeTime, getLocalizedText } from '@/lib/format';
 import { loadBlockedIds } from '@/src/features/safety/lib/safety';
 import { useReadableColumn } from '@/hooks/use-responsive';
 import { debugWarn } from '@/lib/debug';
+import {
+  buildThreadHref,
+  parseReturnToken,
+  resolveGoBackAction,
+} from '@/src/features/messaging/lib/return-route';
 
 interface Conversation {
   id: string;
@@ -41,36 +46,91 @@ interface PropertyStub {
   title_i18n: Record<string, string> | null;
 }
 
+interface InboxCache {
+  userId: string;
+  conversations: Conversation[];
+  profiles: Record<string, OtherProfile>;
+  properties: Record<string, PropertyStub>;
+  blocked: Set<string>;
+}
+
+// The last full inbox, so reopening Messages shows the previous list
+// instantly and refreshes it in the background instead of holding the
+// screen on a spinner for two round trips every time. Keyed by account
+// and cleared on sign-out — a shared phone never shows the previous
+// person's conversations.
+let inboxCache: InboxCache | null = null;
+
 export default function MessagesInboxScreen() {
   const router = useRouter();
+  const { from } = useLocalSearchParams<{ from?: string }>();
   const { t, i18n } = useTranslation();
   const { user, isAgent } = useAuth();
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
   // A centred column on an unfolded Fold or a spanned Duo (hooks/use-responsive).
   const readable = useReadableColumn();
-  const [conversations, setConversations] = useState<Conversation[]>([]);
-  const [profiles, setProfiles] = useState<Record<string, OtherProfile>>({});
-  const [properties, setProperties] = useState<Record<string, PropertyStub>>({});
-  const [loading, setLoading] = useState(true);
+  // Messages is an overlay on the tabs: pop when there is history (exact
+  // tab, scroll and state underneath, Android and iOS alike), otherwise
+  // replace to the tab this was opened from — never a hardcoded Home.
+  const goBack = useCallback(() => {
+    const action = resolveGoBackAction({ canGoBack: router.canGoBack(), from });
+    if (action.kind === 'back') router.back();
+    else router.replace(action.href as Href);
+  }, [router, from]);
+  const initial = user && inboxCache?.userId === user.id ? inboxCache : null;
+  const [conversations, setConversations] = useState<Conversation[]>(() => initial?.conversations ?? []);
+  const [profiles, setProfiles] = useState<Record<string, OtherProfile>>(() => initial?.profiles ?? {});
+  const [properties, setProperties] = useState<Record<string, PropertyStub>>(() => initial?.properties ?? {});
+  // Cached inbox: no spinner, the list is already there. First open: the
+  // header and hero render at once and only the list area loads.
+  const [loading, setLoading] = useState(() => !initial);
   const [error, setError] = useState(false);
+  // True once names and titles have arrived (or came from cache). Until
+  // then the list shows skeleton rows, not rows named '?' — the history
+  // (conversations) is already there, only its labels are still loading.
+  const [detailsReady, setDetailsReady] = useState(() => !!initial);
   // People this user has blocked, tagged in the list.
-  const [blocked, setBlocked] = useState<Set<string>>(() => new Set());
+  const [blocked, setBlocked] = useState<Set<string>>(() => initial?.blocked ?? new Set());
+  // Only the newest refresh may apply its details — realtime can fire
+  // several while one is still awaiting the batched lookups.
+  const loadSeq = useRef(0);
+  // A different account on an already-mounted screen (sign-out → sign-in
+  // without leaving) must never see the previous person's list, even
+  // briefly, from state or from the cache above.
+  const lastUserId = useRef(user?.id);
+  useEffect(() => {
+    const next = user?.id;
+    if (next && lastUserId.current && next !== lastUserId.current && inboxCache?.userId !== next) {
+      setConversations([]);
+      setProfiles({});
+      setProperties({});
+      setBlocked(new Set());
+      setDetailsReady(false);
+      setLoading(true);
+    }
+    lastUserId.current = next;
+  }, [user?.id]);
 
   // Mirrors the web app's Messages.jsx loadConversations() exactly — same
-  // query, same batched profile/property lookups for the list preview.
+  // query, same batched profile/property lookups for the list preview —
+  // split in two so the list renders on the first answer instead of
+  // holding the whole screen on a spinner until the second.
   const loadConversations = useCallback(async () => {
     if (!user) {
+      inboxCache = null;
       setConversations([]);
       setLoading(false);
       return;
     }
+    const run = ++loadSeq.current;
     setError(false);
     const { data, error: convoError } = await supabase
       .from('conversations')
       .select('*')
       .or(`client_id.eq.${user.id},agent_id.eq.${user.id}`)
       .order('last_message_at', { ascending: false });
+    if (run !== loadSeq.current) return;
     // The error was previously discarded, so a failed fetch fell through to the
     // empty state — an agent whose leads failed to load was told they had no
     // conversations at all.
@@ -81,7 +141,10 @@ export default function MessagesInboxScreen() {
       return;
     }
     const convos = data ?? [];
+    // Stage one: the list (and the hero counts) is correct now; names and
+    // titles fill in from stage two as background data.
     setConversations(convos);
+    setLoading(false);
 
     const otherIds = [...new Set(convos.map((c) => (c.client_id === user.id ? c.agent_id : c.client_id)))];
     const propIds = [...new Set(convos.map((c) => c.property_id).filter(Boolean))] as string[];
@@ -95,10 +158,20 @@ export default function MessagesInboxScreen() {
         : Promise.resolve({ data: [] as PropertyStub[] }),
       loadBlockedIds(supabase),
     ]);
+    if (run !== loadSeq.current) return;
+    const nextProfiles = Object.fromEntries((profRes.data ?? []).map((p) => [p.id, p]));
+    const nextProperties = Object.fromEntries((propRes.data ?? []).map((p) => [p.id, p]));
     setBlocked(blockedIds);
-    setProfiles(Object.fromEntries((profRes.data ?? []).map((p) => [p.id, p])));
-    setProperties(Object.fromEntries((propRes.data ?? []).map((p) => [p.id, p])));
-    setLoading(false);
+    setProfiles(nextProfiles);
+    setProperties(nextProperties);
+    setDetailsReady(true);
+    inboxCache = {
+      userId: user.id,
+      conversations: convos,
+      profiles: nextProfiles,
+      properties: nextProperties,
+      blocked: blockedIds,
+    };
   }, [user]);
 
   useEffect(() => {
@@ -125,7 +198,7 @@ export default function MessagesInboxScreen() {
     return (
       <GradientBackground>
         <SafeAreaView style={[styles.container, readable]} edges={['top']}>
-          <AppHeader onBack={() => router.back()} />
+          <AppHeader onBack={goBack} />
           <View style={styles.center}>
             <Text style={styles.description}>{t('messages.loginPrompt')}</Text>
             {/* Sign-in lives on the Profile tab; without this the screen was
@@ -142,7 +215,7 @@ export default function MessagesInboxScreen() {
   return (
     <GradientBackground>
       <SafeAreaView style={[styles.container, readable]} edges={['top']}>
-        <AppHeader onBack={() => router.back()} />
+        <AppHeader onBack={goBack} />
 
         {/* Matches web's Messages.jsx screen-kicker/screen-headline hero
             exactly, including the agent-vs-client copy split. */}
@@ -154,11 +227,15 @@ export default function MessagesInboxScreen() {
           em={isAgent ? t('messages.agent.headlineEm') : t('messages.client.headlineEm')}
         />
 
-        {loading ? (
+        {/* Only the list area loads: the header and hero above are already
+            there, so opening Messages never waits on the network — and a
+            refresh that fails keeps the previous list instead of swapping
+            it for an error. */}
+        {loading && conversations.length === 0 ? (
           <View style={styles.center}>
             <ActivityIndicator size="large" color={colors.accent} />
           </View>
-        ) : error ? (
+        ) : error && conversations.length === 0 ? (
           <View style={styles.center}>
             <View style={styles.emptyIcon}>
               <MaterialIcons name="error-outline" size={40} color={colors.accent} />
@@ -175,6 +252,20 @@ export default function MessagesInboxScreen() {
             </View>
             <Text style={styles.subtitle}>{t('messages.empty')}</Text>
             <Text style={styles.description}>{t('messages.emptyHint')}</Text>
+          </View>
+        ) : !detailsReady ? (
+          // Rows confirmed, labels still loading: placeholder rows keep the
+          // list's shape instead of flashing rows named '?'.
+          <View style={styles.list} accessibilityLiveRegion="polite">
+            {[0, 1, 2, 3, 4].map((n) => (
+              <View key={n} style={styles.skeletonRow}>
+                <View style={styles.skeletonAvatar} />
+                <View style={styles.skeletonBody}>
+                  <View style={styles.skeletonLineWide} />
+                  <View style={styles.skeletonLineNarrow} />
+                </View>
+              </View>
+            ))}
           </View>
         ) : (
           <FlatList
@@ -195,7 +286,7 @@ export default function MessagesInboxScreen() {
                   accessibilityRole="button"
                   style={[styles.row, myUnread > 0 && styles.rowUnread]}
                   activeOpacity={0.7}
-                  onPress={() => router.push(`/messages/${item.id}` as Href)}>
+                  onPress={() => router.push(buildThreadHref(item.id, parseReturnToken(from)) as Href)}>
                   <LinearGradient colors={[colors.accent, colors.accentEnd]} style={styles.avatar}>
                     <Text style={styles.avatarText}>{name[0]?.toUpperCase() || '?'}</Text>
                   </LinearGradient>
@@ -272,6 +363,37 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   list: {
     paddingHorizontal: 20,
     paddingBottom: 24,
+  },
+  skeletonRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    paddingVertical: 14,
+    paddingHorizontal: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+  },
+  skeletonAvatar: {
+    width: 46,
+    height: 46,
+    borderRadius: 23,
+    backgroundColor: colors.glass,
+  },
+  skeletonBody: {
+    flex: 1,
+    gap: 8,
+  },
+  skeletonLineWide: {
+    height: 14,
+    width: '60%',
+    borderRadius: 7,
+    backgroundColor: colors.glass,
+  },
+  skeletonLineNarrow: {
+    height: 12,
+    width: '40%',
+    borderRadius: 6,
+    backgroundColor: colors.glass,
   },
   row: {
     flexDirection: 'row',

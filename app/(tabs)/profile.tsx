@@ -50,6 +50,7 @@ import { useProfileStats } from '@/hooks/use-profile-stats';
 import type { ProfileFields } from '@/src/features/auth/lib/profileForm';
 import { useUnreadMessages } from '@/hooks/use-unread-messages';
 import { useReadableColumn } from '@/hooks/use-responsive';
+import { buildInboxHref } from '@/src/features/messaging/lib/return-route';
 
 type Role = 'buyer' | 'agent';
 
@@ -652,7 +653,7 @@ export default function ProfileScreen() {
               <TouchableOpacity
                 accessibilityRole="button"
                 style={styles.menuRow}
-                onPress={() => router.push('/messages' as Href)}
+                onPress={() => router.push(buildInboxHref('profile') as Href)}
                 activeOpacity={0.7}>
                 <MaterialIcons name="search" size={20} color={colors.textPrimary} />
                 <Text style={styles.menuRowText}>{t('common.messages')}</Text>

@@ -36,6 +36,7 @@ import {
   unblockUser,
 } from '@/src/features/safety/lib/safety';
 import { isNotFound, loadThreadMessages } from '@/src/features/messaging/lib/thread';
+import { resolveGoBackAction } from '@/src/features/messaging/lib/return-route';
 import { FORM_LIMITS } from '@/src/lib/formLimits';
 import { useReadableColumn } from '@/hooks/use-responsive';
 
@@ -55,7 +56,7 @@ interface ConversationInfo {
 }
 
 export default function ThreadScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const { id, from } = useLocalSearchParams<{ id: string; from?: string }>();
   const router = useRouter();
   const { t, i18n } = useTranslation();
   const { user, loading: authLoading } = useAuth();
@@ -101,6 +102,17 @@ export default function ThreadScreen() {
   useEffect(() => {
     conversationRef.current = conversation;
   }, [conversation]);
+
+  // Same overlay return as the inbox: pop to the inbox (which stays
+  // mounted under this thread, so its scroll is intact), or replace to
+  // the remembered tab when there is no history — a notification
+  // cold start, a deep link. Android and iOS both go through the router,
+  // so hardware back and swipe back land in the same place.
+  const goBack = useCallback(() => {
+    const action = resolveGoBackAction({ canGoBack: router.canGoBack(), from });
+    if (action.kind === 'back') router.back();
+    else router.replace(action.href as Href);
+  }, [router, from]);
 
   const markRead = useCallback(
     (convo: ConversationInfo, isClient: boolean) => {
@@ -258,7 +270,7 @@ export default function ThreadScreen() {
   if (unavailable) {
     return (
       <SafeAreaView style={[styles.container, readable]} edges={['top']}>
-        <AppHeader onBack={() => router.back()} showControls={false} />
+        <AppHeader onBack={goBack} showControls={false} />
         <View style={styles.center}>
           <Text style={styles.unavailableText}>{t('messages.unavailable')}</Text>
         </View>
@@ -269,7 +281,7 @@ export default function ThreadScreen() {
   if (loadFailed) {
     return (
       <SafeAreaView style={[styles.container, readable]} edges={['top']}>
-        <AppHeader onBack={() => router.back()} showControls={false} />
+        <AppHeader onBack={goBack} showControls={false} />
         <View style={styles.center}>
           <Text style={styles.unavailableText} accessibilityLiveRegion="polite">
             {t('messages.loadFailed')}
@@ -291,9 +303,14 @@ export default function ThreadScreen() {
 
   if (loading) {
     return (
-      <View style={styles.center}>
-        <ActivityIndicator size="large" color={colors.accent} />
-      </View>
+      <SafeAreaView style={[styles.container, readable]} edges={['top', 'bottom']}>
+        {/* The header and the way back render at once; only the bubbles
+            wait on the network — never a blank spinner with no chrome. */}
+        <AppHeader onBack={goBack} showControls={false} title={otherName} titleIsHeading />
+        <View style={styles.center}>
+          <ActivityIndicator size="large" color={colors.accent} />
+        </View>
+      </SafeAreaView>
     );
   }
 
@@ -311,7 +328,7 @@ export default function ThreadScreen() {
             slots rather than being displaced by the wordmark. Language and
             theme are off for room; both are a tap away on Profile. */}
         <AppHeader
-          onBack={() => router.back()}
+          onBack={goBack}
           showControls={false}
           title={otherName}
           titleIsHeading

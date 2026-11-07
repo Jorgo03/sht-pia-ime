@@ -23,7 +23,7 @@ test('filters follow the Search page rules', () => {
   const { calls, q } = recorder()
   applySavedFilters(q, { city: 'Tiranë', listing_type: 'rent', type: 'apartment', minPrice: '200', maxPrice: 900, beds: 2 })
   assert.deepEqual(calls, [
-    ['ilike', 'city', '%Tiranë%'],
+    ['or', 'city.ilike.%Tiranë%,zone.ilike.%Tiranë%,address.ilike.%Tiranë%'],
     ['eq', 'listing_type', 'rent'],
     ['eq', 'property_type', 'apartment'],
     // Euros, converted per listing currency (tests/priceRange.test.mjs).
@@ -37,9 +37,9 @@ test('a zone is applied only together with its own city', () => {
   applySavedFilters(q, { city: 'Tiranë', zone: 'Blloku' })
   applySavedFilters(q, { city: 'Durrës', zone: 'Blloku' })
   assert.deepEqual(calls, [
-    ['ilike', 'city', '%Tiranë%'],
+    ['or', 'city.ilike.%Tiranë%,zone.ilike.%Tiranë%,address.ilike.%Tiranë%'],
     ['eq', 'zone', 'Blloku'],
-    ['ilike', 'city', '%Durrës%'],
+    ['or', 'city.ilike.%Durrës%,zone.ilike.%Durrës%,address.ilike.%Durrës%'],
   ])
 })
 

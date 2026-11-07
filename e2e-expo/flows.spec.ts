@@ -94,7 +94,7 @@ test.describe('signed in', () => {
     await page.goto('/messages');
     await ready(page);
     await page.getByRole('button', { name: new RegExp(escape(LISTINGS[0].title as string)) }).click();
-    await expect(page).toHaveURL(new RegExp(`/messages/${CONVERSATIONS[0].id}$`));
+    await expect(page).toHaveURL(new RegExp(`/messages/${CONVERSATIONS[0].id}(\\?.*)?$`));
     await expect(page.getByRole('heading', { name: 'Ana Klientja', level: 1 })).toBeVisible();
     await page.getByRole('textbox', { name: t('messages.inputPlaceholder') }).fill('Përshëndetje, a është ende në shitje?');
     await page.getByRole('button', { name: t('common.send') }).click();
