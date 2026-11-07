@@ -6,6 +6,7 @@ import { signOutOfDevice } from '../../lib/signOut'
 import { changePassword as changePasswordOnServer, signOutOtherDevices } from './lib/password'
 import { createLoginThrottle, isWrongPassword, THROTTLE_STORAGE_KEY, tooManyAttemptsError } from './lib/loginThrottle'
 import { existingAccountError, isExistingAccount, isUnverifiedEmailUser } from './lib/signupCode'
+import { oauthQueryParams } from './lib/oauthOptions'
 import { debugWarn } from '../../lib/debug'
 
 const AuthContext = createContext(null)
@@ -354,11 +355,13 @@ export function AuthProvider({ children }) {
       provider,
       options: {
         redirectTo: `${window.location.origin}/auth/callback`,
-        // Deliberately NO extra queryParams. access_type=offline +
-        // prompt=consent forced Google's legacy consent screen on every
-        // sign-in, which is prone to hanging on a blank page — and the
-        // Google refresh token it grants is unused (Supabase manages its
-        // own session; the app never calls Google APIs directly).
+        // Google: the account chooser every time (prompt=select_account)
+        // and nothing more. Never access_type=offline + prompt=consent: that
+        // forced Google's legacy consent screen on every sign-in, which is
+        // prone to hanging on a blank page, and the Google refresh token it
+        // grants is unused (Supabase manages its own session; the app never
+        // calls Google APIs directly). See lib/oauthOptions.js.
+        queryParams: oauthQueryParams(provider),
       },
     })
     return { error }

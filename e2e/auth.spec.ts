@@ -447,6 +447,23 @@ test('F4-N12 a provider switched off in Supabase gets a plain message, not its r
   await expect(page).toHaveURL(/\/profile$/);
 });
 
+test('F4-N16 Continue with Google asks Google for its account chooser, never the consent screen', async ({ page }) => {
+  await page.route('**/auth/v1/settings*', (route) => json(route, 200, { external: { email: true, google: true, apple: false, linkedin_oidc: false } }));
+  let authorizeUrl = '';
+  await page.route('**/auth/v1/authorize*', (route) => {
+    authorizeUrl = route.request().url();
+    return route.fulfill({ status: 200, contentType: 'text/html', body: '<!doctype html><title>Google</title><p>google</p>' });
+  });
+  await page.goto('/profile');
+  await page.getByRole('button', { name: t('auth.continueWithGoogle') }).click();
+  await expect.poll(() => authorizeUrl).not.toBe('');
+  const q = new URL(authorizeUrl).searchParams;
+  expect(q.get('provider')).toBe('google');
+  expect(q.get('prompt')).toBe('select_account');
+  expect(q.has('access_type')).toBe(false);
+  expect(q.get('redirect_to')).toMatch(/\/auth\/callback$/);
+});
+
 // ---------- Pass 20: change the password while signed in ----------
 
 test.describe('signed in: Password & security', () => {

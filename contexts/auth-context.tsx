@@ -29,6 +29,7 @@ import { classifyAuthEvent } from '../src/lib/authEvents.js';
 // Shared with web the same way (tests/signOut.test.mjs).
 import { signOutOfDevice } from '../src/lib/signOut.js';
 import { expoGoCallback, isAllowedRelayTarget } from '../src/lib/oauthRelay.js';
+import { oauthQueryParams } from '@/src/features/auth/lib/oauthOptions';
 import {
   createLoginThrottle,
   isWrongPassword,
@@ -431,7 +432,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const origin = typeof window !== 'undefined' ? window.location.origin : '';
       const { error } = await supabase.auth.signInWithOAuth({
         provider,
-        options: { redirectTo: origin },
+        options: { redirectTo: origin, queryParams: oauthQueryParams(provider) },
       });
       return { error: error as Error | null };
     }
@@ -502,6 +503,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       options: {
         redirectTo,
         skipBrowserRedirect: true,
+        // Google's account chooser every time (src/features/auth/lib/oauthOptions.js).
+        queryParams: oauthQueryParams(provider),
       },
     });
 

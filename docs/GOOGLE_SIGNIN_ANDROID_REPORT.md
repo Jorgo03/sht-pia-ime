@@ -72,6 +72,38 @@ Any other address goes back to the page without `rt`, so the code never
 leaves for an address that isn't allowed. The page and its button stay as
 the fallback. Unit tests: `tests/authRelayFunction.test.mjs` (3).
 
+## Account chooser every time (2026-11-08)
+
+**Why Google picked an account by itself:** no prompt was sent, so Google
+followed its default. When one Google account is already signed in on the
+phone or in the browser and has used the app before, Google signs in with
+it and shows no chooser.
+
+**Change:** every Google sign-in now sends `prompt=select_account` (only
+that: not `prompt=consent`, which forced the permission screen and could
+hang, and not `access_type=offline`). One shared helper,
+`src/features/auth/lib/oauthOptions.js`, used by the three Google sign-in
+calls: the phone app, the app's web build (`contexts/auth-context.tsx`) and
+the website (`src/features/auth/AuthContext.jsx`). The return path, deep
+links and session handling are unchanged. Choosing an account does not
+change who it is: Supabase matches the Google identity to the same user, so
+no duplicate account.
+
+**Supabase / Google Cloud:** no change. Checked live: asking Supabase's
+`/authorize` for Google with `prompt=select_account` produces a Google
+address that carries `prompt=select_account`, with Google returning to
+Supabase's own `/auth/v1/callback` as before.
+
+**Tests:** unit `tests/oauthOptions.test.mjs` (3: Google gets only
+`select_account`, other providers nothing, every Google call in both apps
+passes it and none asks for consent or offline access). Website e2e
+**F4-N16** (tapping Google opens `/authorize` with `provider=google`,
+`prompt=select_account`, no `access_type`, the usual `redirect_to`), phone
+and desktop. Full website auth suite 68/68. **Not tested** (no device, no
+real Google account here): the chooser itself with one or several accounts,
+picking a different account, cancelling the chooser, sign-out and sign-in
+again, Android return to the app, iOS.
+
 ## Configuration
 
 - **Expo config:** none. The scheme `shtepia-ime` is already in `app.json`;
