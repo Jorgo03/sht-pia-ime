@@ -54,7 +54,7 @@ begin
   names := names || 'P3 owner hands the listing to someone else'::text; expected := expected || '42501'::text; actual := actual || got;
 
   begin
-    update public.properties set title = 'rls-test edited', price = 2, image_urls = array['u'] where id = pid;
+    update public.properties set title = 'rls-test edited', price = 2, image_urls = array['https://example.com/rls-test.jpg'] where id = pid;
     get diagnostics n = row_count; got := 'rows=' || n;
   exception when others then got := sqlstate; end;
   names := names || 'P4 owner edits their listing'::text; expected := expected || 'rows=1'::text; actual := actual || got;

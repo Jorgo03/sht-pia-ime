@@ -16,6 +16,7 @@ runs a `DELETE`.
 | `rls_push_notifications.sql` | Push tokens, notification preferences, outbox (migration `20261021051557`) | `passed=11/11` |
 | `rls_moderation.sql` | Moderators, the review queue, listing holds (migration `20261021052850`) | `passed=12/12` |
 | `rls_moderation_read.sql` | Moderators read reported listings and accounts, read-only (migration `20261021053224`) | `passed=6/6` |
+| `rls_insert_guards.sql` | New viewings and conversations: listing's agent or owner only, viewings start requested and in the future, server-set counters (migration `20261107225617`) | `passed=9/9` |
 
 Run one in the Supabase SQL editor, with the Supabase MCP `execute_sql` tool,
 or with `psql "$DATABASE_URL" -f <file>`. The "error" you get back is the
@@ -27,7 +28,11 @@ inside the rolled-back transaction. Re-run them after any migration that
 touches `properties`, `conversations`, `viewings`, `messages`,
 `content_reports` or `user_blocks`.
 
-Last run against `xzzzhlwmzotibrxdqmcm`: 2026-10-20, 15/15, 18/18 and 8/8,
+2026-11-07, after migration `20261107225617`: `rls_insert_guards.sql` 9/9 and
+`rls_ownership_guards.sql` 15/15. P4 of the latter now saves an https photo
+link: since `server_form_checks` the database refuses the old `'u'`.
+
+Earlier run against `xzzzhlwmzotibrxdqmcm`: 2026-10-20, 15/15, 18/18 and 8/8,
 with no rows, grants or constraints left behind (checked afterwards). On
 2026-10-21 every file in the table passed with the counts shown, each right
 after its migration; `rls_ownership_guards.sql` and `rls_moderation.sql` were

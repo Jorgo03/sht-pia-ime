@@ -1,8 +1,8 @@
 # QA audit report, 2026-11-07
 
-The audit found **no P0 or P1 issues**. It found three P2 issues: one is
-fixed and verified, and the other two have a tested fix that is waiting for
-the owner's approval to apply to the database.
+The audit found **no P0 or P1 issues**. It found three P2 issues, and all
+three are fixed and verified. The two database fixes were applied to the
+live database on the owner's approval (migration `20261107225617`).
 
 Nothing ran on a real phone. No device or simulator is available here, and
 iOS can't be built on Windows, so the iOS and Android columns come from
@@ -16,8 +16,8 @@ Details: [BUG_REPORT.md](BUG_REPORT.md) · per-platform coverage:
 
 | ID | Priority | Problem | Web | Expo web build | iOS | Android | Status |
 |---|---|---|---|---|---|---|---|
-| QA-01 | P2 | Anyone signed in can bypass the app and create a viewing that is already "confirmed", addressed to any account, or dated in the past. Doing so also sends that account a notification. | backend | backend | backend | backend | **Fix ready, not applied** |
-| QA-02 | P2 | A conversation can be opened with any account, with no listing attached (duplicates possible), or with fake unread counts. | backend | backend | backend | backend | **Fix ready, not applied** |
+| QA-01 | P2 | Anyone signed in can bypass the app and create a viewing that is already "confirmed", addressed to any account, or dated in the past. Doing so also sends that account a notification. | backend | backend | backend | backend | **FIXED, applied, verified live** |
+| QA-02 | P2 | A conversation can be opened with any account, with no listing attached (duplicates possible), or with fake unread counts. | backend | backend | backend | backend | **FIXED, applied, verified live** |
 | QA-03 | P2 | Phone listing screen: a message the server refused still showed "sent ✓" and erased what you typed. | not affected | FIXED, verified (X63) | fixed in code, not run on a device | fixed in code, not run on a device | **FIXED** |
 | QA-04 | P3 | The apps and the email say the code lasts 10 minutes. AUDIT.md Pass 36 says the dashboard was set to 900 s, so the server accepts it for 15. | config | config | config | config | Owner setting |
 | QA-05 | P3 | The 5-wrong-codes limit only exists in the apps. Supabase itself limits attempts per IP. | backend | backend | backend | backend | Accepted risk |
@@ -32,12 +32,19 @@ Both were reproduced on the live database inside blocks that always end by
 undoing every change. Afterwards nothing was left behind: no functions,
 triggers, rows or notifications (checked).
 
-The new check, `supabase/tests/rls_insert_guards.sql`, passes **2/9** today.
-With the fix added inside the same undone block it passes **9/9**, and the
-requests the apps actually send are still accepted.
+The new check, `supabase/tests/rls_insert_guards.sql`, passed **2/9** before
+the fix (that is the bug). With the fix added inside the same undone block it
+passed **9/9**, and the requests the apps actually send were still accepted.
 
-The fix is in `supabase/pending/guard_conversation_viewing_insert.sql`. The
-owner's rule is no database changes without asking, so it is not applied.
+On the owner's approval the fix was applied as migration `20261107225617`
+(`supabase/migrations/20261107225617_guard_conversation_viewing_insert.sql`).
+Live afterwards:
+
+- `rls_insert_guards.sql`: **9/9**.
+- The existing `rls_ownership_guards.sql`: **15/15**. Its check P4 had gone
+  stale: since the 2026-11-04 server form checks, listings accept only
+  `https` photo links, and the test saved the link `'u'`. The test now uses
+  an `https` link. This was not caused by the new guards.
 
 ## What held up
 
@@ -66,12 +73,14 @@ Full run details: [TEST_RESULTS.md](TEST_RESULTS.md)
   in across restarts, and multiple devices.
 - X63 was not run against the old code to watch it fail first.
 
-## Commit
+## Commits
 
-The fix and both reports are commit `c1ffda2`, pushed to `frontend/pass-28`
-and `master`.
+Everything is pushed to `frontend/pass-28` and `master`: the app fix and
+reports (`c1ffda2`), this report, the test results, and the applied
+migration.
 
 ## Owner decisions
 
-1. Approve applying the QA-01/QA-02 fix to the live database.
-2. Set Email OTP Expiration to 600 in the Supabase dashboard.
+1. ~~Approve applying the QA-01/QA-02 fix to the live database.~~ Done
+   2026-11-07.
+2. Set Email OTP Expiration to 600 in the Supabase dashboard (QA-04).

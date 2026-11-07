@@ -21,8 +21,8 @@ parked surface · **P4** cosmetic or accepted risk.
 
 | ID | P | Area | Platform | Status |
 |---|---|---|---|---|
-| QA-01 | P2 | Viewings: a new request can be created already confirmed, sent to any account, or dated in the past | Backend (all clients and direct API) | FIX READY, NOT APPLIED (owner approval needed) |
-| QA-02 | P2 | Conversations: can be opened with any account, with no listing, or with preset unread counts | Backend (all clients and direct API) | FIX READY, NOT APPLIED (owner approval needed) |
+| QA-01 | P2 | Viewings: a new request can be created already confirmed, sent to any account, or dated in the past | Backend (all clients and direct API) | FIXED, applied (migration `20261107225617`), verified live 9/9 |
+| QA-02 | P2 | Conversations: can be opened with any account, with no listing, or with preset unread counts | Backend (all clients and direct API) | FIXED, applied (migration `20261107225617`), verified live 9/9 |
 | QA-03 | P2 | Phone listing screen: a refused chat message showed "sent" and erased the text | iOS, Android, Expo web build | FIXED, verified in Expo-web e2e (X63) |
 | QA-04 | P3 | Sign-up code: the apps and the email say 10 minutes, the live server accepts it for 15 | Auth configuration | CONFIGURATION REQUIRED (owner) |
 | QA-05 | P3 | The 5-wrong-codes cap and the 10-minute window are enforced in the apps only | Auth (direct API) | ACCEPTED RISK, documented |
@@ -31,9 +31,8 @@ parked surface · **P4** cosmetic or accepted risk.
 | QA-08 | P4 | Leaked-password protection is off | Auth configuration | KNOWN (needs a paid plan, AUDIT.md Pass 30) |
 | QA-09 | P4 | White text on solid orange fails contrast (2.85–3.5:1) | Both apps | KNOWN (owner keeps the brand orange, DECISIONS.md C1) |
 
-No P0 or P1 issue was found. Both P2 backend issues have a tested fix waiting
-only for the owner to approve applying it (owner rule: no migration without
-asking).
+No P0 or P1 issue was found. All three P2 issues are fixed. The two backend
+fixes were applied on the owner's approval (2026-11-07).
 
 ## Details
 
@@ -44,8 +43,8 @@ asking).
 - **Expected:** a new viewing always starts as `requested`, goes to the listing's agent or owner, and is in the future.
 - **Actual (live, rolled back):** all three accepted. The insert also queues a "viewing requested" push to whatever `agent_id` was given.
 - **Root cause:** migration `20261015205024` (S-9) guards only UPDATEs (`viewings_guard_update`). The INSERT policy checks only `client_id = auth.uid()`.
-- **Fix:** `supabase/pending/guard_conversation_viewing_insert.sql`: a BEFORE INSERT trigger, SECURITY INVOKER like the existing guards, checked only for roles `anon` and `authenticated`. It requires status `requested`, a visible listing, an agent that is the listing's agent or owner (or none), and a time no more than 10 minutes in the past. Both apps already send exactly this.
-- **Verification:** `supabase/tests/rls_insert_guards.sql`. Before the fix: 2/9. With the fix created inside the same rolled-back block: **9/9**, including the apps' own request still being accepted. **Not applied:** to apply, approve it, run it as a migration, then re-run the test (expect 9/9).
+- **Fix:** `supabase/migrations/20261107225617_guard_conversation_viewing_insert.sql`: a BEFORE INSERT trigger, SECURITY INVOKER like the existing guards, checked only for roles `anon` and `authenticated`. It requires status `requested`, a visible listing, an agent that is the listing's agent or owner (or none), and a time no more than 10 minutes in the past. Both apps already send exactly this.
+- **Verification:** `supabase/tests/rls_insert_guards.sql`. Before the fix: 2/9. With the fix created inside the same rolled-back block: **9/9**, including the apps' own request still being accepted. **Applied** 2026-11-07 on the owner's approval as migration `20261107225617`. Live afterwards: `rls_insert_guards.sql` 9/9 and `rls_ownership_guards.sql` 15/15 (that test's P4 used a non-https photo link that the 2026-11-04 form checks refuse; it now uses an https link).
 
 ### QA-02 · P2 · A conversation can be opened with anyone
 
@@ -55,7 +54,7 @@ asking).
 - **Actual (live, rolled back):** all accepted, including two identical conversations with no listing. The unique key `(client_id, agent_id, property_id)` treats NULL as distinct. Each message sent into such a conversation queues a push to the chosen account, so it is an unsolicited-message channel to any account whose id is known. Blocks still apply.
 - **Root cause:** `conversations_guard_parties` (S-8) is UPDATE-only. The INSERT policy checks only `client_id`.
 - **Fix:** the same pending file: listing required and visible, agent = the listing's agent or owner, no conversation with yourself, counters and times set by the server.
-- **Verification:** as QA-01 (checks 5–9 of `rls_insert_guards.sql`). **Not applied.**
+- **Verification:** as QA-01 (checks 5–9 of `rls_insert_guards.sql`). **Applied**, live 9/9.
 
 ### QA-03 · P2 · A refused listing-chat message showed "sent"
 

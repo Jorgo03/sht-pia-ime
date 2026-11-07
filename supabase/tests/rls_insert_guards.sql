@@ -1,8 +1,8 @@
 -- Insert guards for conversations and viewings
--- (supabase/pending/guard_conversation_viewing_insert.sql; BUG_REPORT.md QA-01, QA-02).
+-- (migration 20261107225617; BUG_REPORT.md QA-01, QA-02).
 -- One DO block that always ends in `raise exception 'RESULTS …'`, so every
--- write is rolled back. Expected after the guards are applied: passed=9/9.
--- Before they are applied, checks 1, 2, 3, 5, 6, 7 and 9 fail (2/9): that is the bug.
+-- write is rolled back. Expected: passed=9/9 (live 2026-11-07 after applying).
+-- Without the guards, checks 1, 2, 3, 5, 6, 7 and 9 fail (2/9): that was the bug.
 do $$
 declare
   prop uuid; owner uuid; agent uuid; buyer uuid; stranger uuid;

@@ -63,7 +63,7 @@ MISSING DEVICE OR ENVIRONMENT.
 | Session persistence across restarts, multiple devices | NOT TESTED | NOT TESTED | BLOCKED | BLOCKED | — | Needs real devices and real Auth |
 | Google / Apple sign-in | NOT TESTED | NOT TESTED | BLOCKED | BLOCKED | — | Provider consoles and devices |
 | RLS ownership: messages, conversations, viewings, leads, favourites, dashboard data (Klient and Agjent) | — | — | — | — | PASS (policies read) | Policies read live today. The full role-by-role isolation run is AUDIT.md Pass 32 (2026-11-04, not re-run) |
-| INSERT ownership (direct API) | — | — | — | — | **FAIL** (QA-01, QA-02) | `supabase/tests/rls_insert_guards.sql`: 2/9 now, 9/9 with the fix (rolled back) |
+| INSERT ownership (direct API) | — | — | — | — | **FAIL → FIXED** (QA-01, QA-02) | `supabase/tests/rls_insert_guards.sql`: 2/9 before; 9/9 live after migration `20261107225617` |
 | SECURITY DEFINER functions callable by users | — | — | — | — | PASS | Bodies read: `claim_role`, `register_push_token`; anon can execute none |
 
 ## 4–5. iOS and Android compatibility

@@ -32,13 +32,15 @@ conversations or push rows (checked).
 | Reproduction of QA-01 / QA-02 (viewing pre-confirmed, to a stranger, in the past; conversation with a stranger; duplicate no-listing conversations) | all 4 accepted: bugs confirmed |
 | `supabase/tests/rls_insert_guards.sql`, guards not applied | 2/9 (expected: shows the bug) |
 | Same file with the pending guards created in the same rolled-back block | **9/9** |
+| After applying migration `20261107225617` (owner approved): `rls_insert_guards.sql` | **9/9** |
+| After applying: `rls_ownership_guards.sql` | 14/15 at first. P4 used the photo link `'u'`, which the 2026-11-04 `properties_images_check` refuses (stale test data, confirmed by changing only that value). With an https link: **15/15** |
 
 ## New regression tests
 
 | Test | Covers | Result |
 |---|---|---|
 | e2e-expo X63 | QA-03: a refused listing-chat message shows "Message not sent", keeps the text, no tick | passed (phone and desktop). Not run against the old code. |
-| `supabase/tests/rls_insert_guards.sql` | QA-01, QA-02 | 9/9 with the fix, rolled back; re-run after the migration is applied |
+| `supabase/tests/rls_insert_guards.sql` | QA-01, QA-02 | 9/9 live after the migration was applied |
 
 ## Not run
 

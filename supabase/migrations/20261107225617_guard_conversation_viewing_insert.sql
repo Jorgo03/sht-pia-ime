@@ -1,6 +1,7 @@
 -- Insert guards for conversations and viewings (QA audit 2026-11-07, BUG_REPORT.md
--- QA-01 and QA-02). PENDING: not applied. Needs the owner's approval, then
--- apply as a migration and run supabase/tests/rls_insert_guards.sql (expect 9/9).
+-- QA-01 and QA-02). Applied 2026-11-07 on the owner's approval ("Yes, apply
+-- them") as migration 20261107225617. Live after applying:
+-- supabase/tests/rls_insert_guards.sql 9/9, rls_ownership_guards.sql 15/15.
 --
 -- Migration 20261015205024 (S-8, S-9) guards UPDATEs only. On INSERT the RLS
 -- policies check just `client_id = auth.uid()`, so a signed-in user could
