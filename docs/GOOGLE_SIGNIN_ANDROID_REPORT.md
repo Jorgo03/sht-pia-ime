@@ -48,6 +48,30 @@ Unchanged: cancel still returns silently, the code is still exchanged once
 (PKCE `exchangeCodeForSession`), the session is still stored by the Supabase
 client (AsyncStorage), and roles and dashboards follow the profile as before.
 
+## Second cause, found after the first fix (2026-11-08)
+
+The owner tried again and still ended on the Vercel page. Supabase's log for
+those attempts (23:20 UTC) shows the **right** address this time,
+`rt=exp://192.168.0.8:8081/--/auth/callback`, but no code exchange from the
+phone followed. So the website received the code and did not get it back to
+Expo Go.
+
+Why: the website handed the code on with a script after the page loaded.
+Android's Chrome refuses a script that opens an app link without a tap, so
+on Android the page showed an "Open the app" button and waited (a known
+limit, noted in `index.html` since 2026-10-25). That page is the Vercel page
+the owner saw.
+
+Fix: `/auth/callback?rt=…` is now rewritten (`vercel.json`) to a Vercel
+function, `api/auth-relay.js`, which answers with a **302 redirect** to the
+app address. A redirect continues the chain that began with the tap on the
+Google account, and Chrome lets that chain open the app. This is how Expo's
+old sign-in proxy returned to `exp://`. The function uses the same
+allow-list as the page (`buildRelayTarget` in `src/lib/oauthRelay.js`).
+Any other address goes back to the page without `rt`, so the code never
+leaves for an address that isn't allowed. The page and its button stay as
+the fallback. Unit tests: `tests/authRelayFunction.test.mjs` (3).
+
 ## Configuration
 
 - **Expo config:** none. The scheme `shtepia-ime` is already in `app.json`;
@@ -57,7 +81,9 @@ client (AsyncStorage), and roles and dashboards follow the profile as before.
   Configuration → Redirect URLs (an earlier pass recorded it as honoured;
   the live settings cannot be read with the tools here).
 - **Google Cloud:** none.
-- **Vercel:** none. The website's relay page is unchanged.
+- **Vercel:** no dashboard setting. The new function (`api/auth-relay.js`)
+  and the rewrite in `vercel.json` deploy with the website on a push to
+  `master`.
 
 ## Tests
 
