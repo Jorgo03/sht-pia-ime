@@ -55,7 +55,9 @@ owner's rule is no database changes without asking, so it is not applied.
 | Type-check (`tsc`) | clean |
 | Lint | 0 errors (34 warnings) |
 | Expo web e2e | **186 passed**, 36 skipped, 0 failed (was 184; plus X63 on both screen sizes) |
-| Vite website e2e | still running when this report was written; final numbers go in `TEST_RESULTS.md` |
+| Vite website e2e | **259 passed**, 9 skipped, 0 failed (same as before) |
+
+Full run details: [TEST_RESULTS.md](TEST_RESULTS.md)
 
 ## Not tested here
 
