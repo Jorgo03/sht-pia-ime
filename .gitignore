@@ -39,3 +39,6 @@ blob-report/
 dist-expo/
 dist-e2e-expo/
 playwright-report-expo/
+
+# JetBrains IDE settings (per machine)
+.idea/
