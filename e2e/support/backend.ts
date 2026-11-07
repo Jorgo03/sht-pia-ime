@@ -53,6 +53,8 @@ function holds(row: Listing, cond: string): boolean {
   else if (op === 'gte') r = Number(v) >= Number(value);
   else if (op === 'lte') r = Number(v) <= Number(value);
   else if (op === 'in') r = value.slice(1, -1).split(',').includes(String(v));
+  // Partial city/title search: or=(city.ilike.*tir*,title.ilike.*tir*).
+  else if (op === 'ilike') r = String(v).toLowerCase().includes(like(value));
   else throw new Error(`fake backend: operator not handled in or=(): ${op}`);
   return negated ? !r : r;
 }
