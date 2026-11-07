@@ -1,6 +1,11 @@
 {
   "rewrites": [
     {
+      "source": "/auth/callback",
+      "has": [{ "type": "query", "key": "rt" }],
+      "destination": "/api/auth-relay"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
