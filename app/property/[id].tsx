@@ -83,6 +83,7 @@ export default function PropertyDetailScreen() {
   const [contactMessage, setContactMessage] = useState('');
   const [sendingMessage, setSendingMessage] = useState(false);
   const [messageSent, setMessageSent] = useState(false);
+  const [messageError, setMessageError] = useState(false);
   const [viewingSheetOpen, setViewingSheetOpen] = useState(false);
   const [viewingDate, setViewingDate] = useState<Date>(nextSlot());
   const [viewingNotes, setViewingNotes] = useState('');
@@ -166,38 +167,53 @@ export default function PropertyDetailScreen() {
     if (!messageToSend || !agentId || agentId === user.id) return;
 
     setSendingMessage(true);
+    setMessageError(false);
     // Matches the web app's startChat(): find-or-create the conversation,
     // then insert the message — same tables, same shape.
-    const { data: existing } = await supabase
-      .from('conversations')
-      .select('id')
-      .eq('property_id', property.id)
-      .eq('client_id', user.id)
-      .eq('agent_id', agentId)
-      .maybeSingle();
-
-    let conversationId = existing?.id;
-    if (!conversationId) {
-      const { data: created } = await supabase
+    const findConversation = async () => {
+      const { data } = await supabase
         .from('conversations')
-        .insert({ property_id: property.id, client_id: user.id, agent_id: agentId })
         .select('id')
-        .single();
-      conversationId = created?.id;
-    }
+        .eq('property_id', property.id)
+        .eq('client_id', user.id)
+        .eq('agent_id', agentId)
+        .maybeSingle();
+      return data?.id as string | undefined;
+    };
 
-    if (conversationId) {
-      await supabase
-        .from('messages')
-        .insert({ conversation_id: conversationId, sender_id: user.id, body: messageToSend });
+    try {
+      let conversationId = await findConversation();
+      if (!conversationId) {
+        const { data: created } = await supabase
+          .from('conversations')
+          .insert({ property_id: property.id, client_id: user.id, agent_id: agentId })
+          .select('id')
+          .single();
+        // A second tap that lost the race hits the unique key: the
+        // conversation exists now, so use it.
+        conversationId = created?.id ?? (await findConversation());
+      }
+
+      // The message itself can still be refused (offline, a block, the
+      // server's length check): say so and keep the text, never "sent".
+      const { error: sendFailed } = conversationId
+        ? await supabase
+            .from('messages')
+            .insert({ conversation_id: conversationId, sender_id: user.id, body: messageToSend })
+        : { error: true };
+      if (sendFailed) {
+        setMessageError(true);
+        return;
+      }
       logActivity(property.id, 'message');
       setContactMessage('');
       setMessageSent(true);
       setTimeout(() => setMessageSent(false), 3000);
-    } else {
-      Alert.alert(t('common.error'), t('errors.generic'));
+    } catch {
+      setMessageError(true);
+    } finally {
+      setSendingMessage(false);
     }
-    setSendingMessage(false);
   };
 
   const handleShare = () => {
@@ -524,6 +540,11 @@ export default function PropertyDetailScreen() {
               disabled={sendingMessage}
             />
           )}
+          {messageError ? (
+            <Text style={styles.sendError} accessibilityLiveRegion="polite">
+              {t('messages.sendFailed')}
+            </Text>
+          ) : null}
           {contactPhone ? (
             <TouchableOpacity accessibilityRole="button" style={styles.whatsappButton} onPress={handleWhatsApp} activeOpacity={0.8}>
               <MaterialIcons name="chat" size={18} color={colors.accent} />
@@ -1181,6 +1202,12 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     color: colors.accentText,
     fontWeight: '600',
     paddingVertical: 14,
+  },
+  sendError: {
+    textAlign: 'center',
+    fontSize: 12,
+    color: colors.error,
+    paddingVertical: 4,
   },
   whatsappButton: {
     flexDirection: 'row',

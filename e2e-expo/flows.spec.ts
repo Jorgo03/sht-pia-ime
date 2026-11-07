@@ -1226,6 +1226,30 @@ test.describe('signed in, a listing someone else posted', () => {
   });
 });
 
+test.describe('signed in, the listing chat message is refused', () => {
+  test.use({ signedIn: true, allowConsoleErrors: [/status of 403/] });
+
+  test('X63 a refused message says it was not sent and keeps the text, never "sent"', async ({ page }) => {
+    // QA-03: the insert's error was ignored, so a refused message (a block,
+    // offline, the server's checks) still showed the "sent" tick.
+    await page.route('**/rest/v1/messages*', (route) =>
+      route.request().method() === 'POST'
+        ? route.fulfill({ status: 403, contentType: 'application/json', headers: CORS, body: JSON.stringify({ code: '42501', message: 'new row violates row-level security policy' }) })
+        : route.fallback(),
+    );
+    const listing = LISTINGS.find((l) => !l.agent)!;
+    await page.goto(`/property/${listing.id}`);
+    await ready(page);
+    const box = page.getByPlaceholder(t('property.whatsappMessage').replace('{{title}}', listing.title));
+    await box.fill('A është ende në shitje?');
+    await page.getByRole('button', { name: t('detail.chatInApp') }).click();
+    await expect(page.getByText(t('messages.sendFailed'))).toBeVisible();
+    await expect(page.getByText(`${t('detail.message')} ✓`)).toHaveCount(0);
+    await expect(box).toHaveValue('A është ende në shitje?');
+    await expect(page.getByRole('button', { name: t('detail.chatInApp') })).toBeEnabled();
+  });
+});
+
 // The listing assistant answers only from the listing. When the listing does
 // not hold the answer (the server sends contact: true), or the assistant is
 // down, the seller's contact is shown under the reply instead of a dead end.
