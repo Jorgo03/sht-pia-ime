@@ -69,6 +69,33 @@ export function buildRelayTarget(search, hash) {
   return parsed.toString()
 }
 
+/**
+ * Expo Go's own sign-in return address, built from the origin it loaded the
+ * app's code from: http://192.168.0.8:8081 -> exp://192.168.0.8:8081/--/auth/callback,
+ * https://<tunnel> -> exps://<tunnel>/--/auth/callback. null when there is no
+ * usable origin.
+ *
+ * Not makeRedirectUri(): that trusts Constants.executionEnvironment, and on a
+ * Samsung in Expo Go (SDK 58) that does not report Expo Go, so it answered
+ * with the store build's shtepia-ime://auth/callback. Expo Go does not own
+ * that scheme: the website relayed the code to an address nothing on the
+ * phone answers and Google sign-in ended on the website (Supabase auth log
+ * 2026-11-07 23:10 UTC). The origin is the address Expo Go really reached, so
+ * it also holds behind a tunnel.
+ */
+export function expoGoCallback(bundleOrigin) {
+  if (!bundleOrigin) return null
+  let u
+  try {
+    u = new URL(bundleOrigin)
+  } catch {
+    return null
+  }
+  if (u.protocol !== 'http:' && u.protocol !== 'https:') return null
+  if (!u.hostname || u.username || u.password) return null
+  return `${u.protocol === 'https:' ? 'exps' : 'exp'}://${u.host}/--/auth/callback`
+}
+
 /** A kept target (window.__FHO_RELAY_TARGET__) is trusted only if it still passes. */
 export function isAllowedRelayTarget(url) {
   if (typeof url !== 'string') return false

@@ -13,6 +13,9 @@ import {
 import { Platform } from 'react-native';
 
 import { isRunningInExpoGo } from 'expo';
+// Internal re-export, the same one expo-linking and expo-asset use: the
+// address the running bundle was really loaded from.
+import { getBundleOrigin } from 'expo/internal/bundle-origin';
 
 import { signInWithAppleNative } from '@/lib/apple-auth';
 import { forgetDevice } from '@/lib/push';
@@ -25,6 +28,7 @@ import { supabase } from '@/lib/supabase';
 import { classifyAuthEvent } from '../src/lib/authEvents.js';
 // Shared with web the same way (tests/signOut.test.mjs).
 import { signOutOfDevice } from '../src/lib/signOut.js';
+import { expoGoCallback, isAllowedRelayTarget } from '../src/lib/oauthRelay.js';
 import {
   createLoginThrottle,
   isWrongPassword,
@@ -447,7 +451,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // session ends with no callback. That failure is indistinguishable from
     // a user cancelling, which is exactly why the exact value is logged
     // below rather than guessed at.
-    const appRedirect = makeRedirectUri({ path: 'auth/callback' });
+    //
+    // Except in Expo Go: there makeRedirectUri can answer with the store
+    // build's shtepia-ime://auth/callback (it trusts executionEnvironment,
+    // which a Samsung in Expo Go misreports), an address Expo Go cannot
+    // receive, and sign-in ended on the website. Expo Go's return address is
+    // built from the origin it loaded the code from instead
+    // (src/lib/oauthRelay.js expoGoCallback).
+    const madeRedirect = makeRedirectUri({ path: 'auth/callback' });
+    const appRedirect = IS_EXPO_GO
+      ? expoGoCallback(getBundleOrigin()) ?? (/^exps?:\/\//.test(madeRedirect) ? madeRedirect : null)
+      : madeRedirect;
+
+    // Under Expo Go the website relay only hands the code to an allowed
+    // address (oauthRelay.isAppCallback). Anything else would sign the person
+    // in on the website and leave the app signed out, so refuse up front
+    // rather than send them on a sign-in that cannot come back.
+    if (IS_EXPO_GO && !isAllowedRelayTarget(appRedirect)) {
+      oauthDebug('Expo Go return address cannot receive a sign-in', { appRedirect, madeRedirect });
+      return { error: new Error('expo_go_return_address_not_allowed') };
+    }
+    if (!appRedirect) {
+      return { error: new Error('no_app_return_address') };
+    }
 
     // Expo Go's address cannot be allow-listed. Verified against the live
     // project by binding a redirect_to to an OAuth state and replaying the

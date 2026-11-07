@@ -2,7 +2,7 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import fs from 'node:fs'
 import vm from 'node:vm'
-import { buildRelayTarget, isAllowedRelayTarget, isAppCallback } from '../src/lib/oauthRelay.js'
+import { buildRelayTarget, expoGoCallback, isAllowedRelayTarget, isAppCallback } from '../src/lib/oauthRelay.js'
 
 // The mobile sign-in relay forwards a Google sign-in code to the address in
 // ?rt=. An open relay is an account takeover, so only the app's own callback
@@ -49,6 +49,23 @@ test('only the app callback on a private network, or the app scheme, is allowed'
   for (const u of REFUSED) assert.equal(isAppCallback(new URL(u)), false, u)
   assert.equal(isAllowedRelayTarget('not a url'), false)
   assert.equal(isAllowedRelayTarget(undefined), false)
+})
+
+test('Expo Go returns to the address it loaded the app from, never the store scheme', () => {
+  // Home Wi-Fi: http on the LAN, port kept.
+  assert.equal(expoGoCallback('http://192.168.0.8:8081'), 'exp://192.168.0.8:8081/--/auth/callback')
+  // The owner's tunnel is https, so Expo Go answers on exps://, no port.
+  const tunnel = 'c-jorgo03-t1zil1-mw5mtwkokmxdeuwu.on.expo.app'
+  assert.equal(expoGoCallback(`https://${tunnel}`), `exps://${tunnel}/--/auth/callback`)
+  // Both pass the relay's allow-list, so the website hands the code back.
+  assert.equal(isAllowedRelayTarget(expoGoCallback('http://192.168.0.8:8081')), true)
+  assert.equal(isAllowedRelayTarget(expoGoCallback(`https://${tunnel}`)), true)
+  // A path or query on the origin is not carried over.
+  assert.equal(expoGoCallback('http://10.0.0.5:8081/index.bundle?platform=android'), 'exp://10.0.0.5:8081/--/auth/callback')
+  // No usable origin: null, so the caller can refuse instead of guessing.
+  for (const bad of [null, undefined, '', 'not a url', 'file:///data/app/index.bundle', 'http://user:pw@192.168.0.8:8081']) {
+    assert.equal(expoGoCallback(bad), null, String(bad))
+  }
 })
 
 test('the forwarded address carries the code and drops rt', () => {
