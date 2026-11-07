@@ -92,7 +92,12 @@
     "backToSignIn": "Wróć do logowania",
     "confirmFirst": "Najpierw potwierdź e-mail: wpisz wysłany kod lub poproś o nowy.",
     "signupCodeHint": "Link z e-maila już otwarty? Wtedy adres jest potwierdzony — zaloguj się.",
-    "emailCode": "Kod e-mail"
+    "emailCode": "Kod e-mail",
+    "verifyEmailTitle": "Zweryfikuj swój e-mail",
+    "verifyEmailSubtitle": "Wysłaliśmy 6-cyfrowy kod weryfikacyjny na Twój adres e-mail.",
+    "verifyAccount": "Zweryfikuj konto",
+    "codeExpiresIn": "Kod wygasa za {{time}}",
+    "officeName": "Nazwa biura"
   },
   "home": {
     "greetingMorning": "Dzień dobry",
@@ -344,7 +349,11 @@
     "currentPasswordWrong": "Obecne hasło jest nieprawidłowe.",
     "providerUnavailable": "Ta metoda logowania nie jest jeszcze dostępna. Wybierz inną.",
     "loadFailed": "Nie udało się wczytać. Sprawdź połączenie i spróbuj ponownie.",
-    "tooManyAttempts": "Zbyt wiele błędnych prób. Spróbuj ponownie za {{seconds}} s."
+    "tooManyAttempts": "Zbyt wiele błędnych prób. Spróbuj ponownie za {{seconds}} s.",
+    "codeIncorrect": "Nieprawidłowy kod weryfikacyjny. Spróbuj ponownie.",
+    "codeExpired": "Twój kod weryfikacyjny wygasł. Poproś o nowy.",
+    "codeAttempts": "Zbyt wiele błędnych prób. Poproś o nowy kod.",
+    "officeRequired": "Podaj nazwę swojego biura."
   },
   "agentDashboard": {
     "title": "Panel Agenta",

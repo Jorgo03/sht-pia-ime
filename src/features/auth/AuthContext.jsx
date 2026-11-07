@@ -5,6 +5,7 @@ import { classifyAuthEvent } from '../../lib/authEvents'
 import { signOutOfDevice } from '../../lib/signOut'
 import { changePassword as changePasswordOnServer, signOutOtherDevices } from './lib/password'
 import { createLoginThrottle, isWrongPassword, THROTTLE_STORAGE_KEY, tooManyAttemptsError } from './lib/loginThrottle'
+import { existingAccountError, isExistingAccount, isUnverifiedEmailUser } from './lib/signupCode'
 import { debugWarn } from '../../lib/debug'
 
 const AuthContext = createContext(null)
@@ -149,6 +150,13 @@ export function AuthProvider({ children }) {
         setState({ user: null, session: null, profile: null, loading: false })
         return
       }
+      // An unconfirmed email address opens nothing behind sign-in
+      // (lib/signupCode.js). Dropped locally, not revoked.
+      if (isUnverifiedEmailUser(session.user)) {
+        setState({ user: null, session: null, profile: null, loading: false })
+        supabase.auth.signOut({ scope: 'local' }).catch(() => {})
+        return
+      }
       // Started once, awaited with a ceiling, and still honoured if it lands
       // late — so a slow network delays the profile, never the whole app.
       const user = session.user
@@ -286,6 +294,9 @@ export function AuthProvider({ children }) {
     // which strands a successfully registered, already-signed-in user on a
     // dead end. That setting is a dashboard toggle the app cannot see, so the
     // session is the only reliable signal.
+    // A registered address gets a look-alike answer and no email; saying so
+    // beats a code screen waiting for a code that never comes.
+    if (!error && isExistingAccount(data)) return { error: existingAccountError(), needsConfirmation: false }
     return { error, needsConfirmation: !error && !data?.session }
   }
 

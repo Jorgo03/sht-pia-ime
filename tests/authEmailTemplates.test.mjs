@@ -2,6 +2,8 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 
+import { CODE_TTL_S } from '../src/features/auth/lib/signupCode.js'
+
 // F4: the auth emails. Both apps confirm sign-up, email sign-in and phone
 // password recovery with a typed 6-digit code (verifyOtp), so a template
 // without {{ .Token }} would strand every new user. The link goes to the
@@ -39,14 +41,27 @@ test('the code length the apps expect matches the config', () => {
   assert.match(config, /otp_length = 6/)
 })
 
-test('the expiry the emails state matches the configured one, not a guess', () => {
+test('the expiry the emails state matches the configured one and the countdown in the apps', () => {
   const seconds = Number(/\[auth\.email\][\s\S]*?otp_expiry = (\d+)/.exec(config)[1])
-  assert.equal(seconds, 3600, 'the templates say 1 hour; change them together with otp_expiry')
+  assert.equal(seconds, CODE_TTL_S, 'signupCode.js CODE_TTL_S, otp_expiry and the templates change together')
+  assert.equal(seconds, 600, 'the templates say 10 minutes')
   for (const name of ['confirmation', 'magic_link', 'recovery']) {
     const html = readFileSync(new URL(`../supabase/templates/${name}.html`, import.meta.url), 'utf8')
-    assert.match(html, /1 ore/, `${name}: Albanian expiry`)
-    assert.match(html, /1 hour/, `${name}: English expiry`)
+    assert.match(html, /10 minutash/, `${name}: Albanian expiry`)
+    assert.match(html, /10 minutes/, `${name}: English expiry`)
+    assert.doesNotMatch(html, /1 ore|1 hour/, `${name}: no stale expiry`)
   }
+})
+
+test('the sign-up email: app name, logo, the code, its expiry and a do-not-share warning', () => {
+  const html = read('confirmation')
+  assert.match(html, /Shtëpia<span[^>]*>\.ime<\/span>/)
+  assert.match(html, /background:#e85d00[^"]*">S<\/td>/, 'the logo mark, drawn without an image')
+  assert.match(html, /Your verification code is:/)
+  assert.match(html, /Kodi yt i verifikimit është:/)
+  assert.match(html, /Do not share this code/)
+  assert.match(html, /Mos ia trego këtë kod askujt/)
+  assert.match(config, /\[auth\.email\][\s\S]*?enable_confirmations = true/)
 })
 
 test('password_changed: a security notice with no link to follow, wired into config.toml', () => {

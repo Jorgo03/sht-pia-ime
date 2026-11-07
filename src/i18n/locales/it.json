@@ -92,7 +92,12 @@
     "backToSignIn": "Torna all’accesso",
     "confirmFirst": "Prima conferma la tua email: inserisci il codice inviato o richiedine uno nuovo.",
     "signupCodeHint": "Hai già aperto il link nell’email? Allora l’email è confermata: accedi.",
-    "emailCode": "Codice email"
+    "emailCode": "Codice email",
+    "verifyEmailTitle": "Verifica la tua email",
+    "verifyEmailSubtitle": "Ti abbiamo inviato un codice di verifica di 6 cifre al tuo indirizzo email.",
+    "verifyAccount": "Verifica account",
+    "codeExpiresIn": "Il codice scade tra {{time}}",
+    "officeName": "Nome dell'ufficio"
   },
   "home": {
     "greetingMorning": "Buongiorno",
@@ -336,7 +341,11 @@
     "currentPasswordWrong": "La password attuale non è corretta.",
     "providerUnavailable": "Questo metodo di accesso non è ancora disponibile. Scegline un altro.",
     "loadFailed": "Impossibile caricare. Controlla la connessione e riprova.",
-    "tooManyAttempts": "Troppi tentativi errati. Riprova tra {{seconds}} secondi."
+    "tooManyAttempts": "Troppi tentativi errati. Riprova tra {{seconds}} secondi.",
+    "codeIncorrect": "Codice di verifica errato. Riprova.",
+    "codeExpired": "Il tuo codice di verifica è scaduto. Richiedine uno nuovo.",
+    "codeAttempts": "Troppi tentativi errati. Richiedi un nuovo codice.",
+    "officeRequired": "Inserisci il nome del tuo ufficio."
   },
   "agentDashboard": {
     "title": "Dashboard Agente",

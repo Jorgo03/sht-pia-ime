@@ -92,7 +92,12 @@
     "backToSignIn": "Retour à la connexion",
     "confirmFirst": "Confirmez d’abord votre e-mail : saisissez le code reçu ou demandez-en un nouveau.",
     "signupCodeHint": "Vous avez déjà ouvert le lien de l’e-mail ? Votre adresse est alors confirmée : connectez-vous.",
-    "emailCode": "Code e-mail"
+    "emailCode": "Code e-mail",
+    "verifyEmailTitle": "Vérifiez votre e-mail",
+    "verifyEmailSubtitle": "Nous avons envoyé un code de vérification à 6 chiffres à votre adresse e-mail.",
+    "verifyAccount": "Vérifier le compte",
+    "codeExpiresIn": "Le code expire dans {{time}}",
+    "officeName": "Nom du bureau"
   },
   "home": {
     "greetingMorning": "Bonjour",
@@ -336,7 +341,11 @@
     "currentPasswordWrong": "Votre mot de passe actuel est incorrect.",
     "providerUnavailable": "Cette option de connexion n’est pas encore disponible. Choisissez-en une autre.",
     "loadFailed": "Chargement impossible. Vérifiez votre connexion et réessayez.",
-    "tooManyAttempts": "Trop de tentatives incorrectes. Réessayez dans {{seconds}} secondes."
+    "tooManyAttempts": "Trop de tentatives incorrectes. Réessayez dans {{seconds}} secondes.",
+    "codeIncorrect": "Code de vérification incorrect. Veuillez réessayer.",
+    "codeExpired": "Votre code de vérification a expiré. Veuillez en demander un nouveau.",
+    "codeAttempts": "Trop de tentatives incorrectes. Veuillez demander un nouveau code.",
+    "officeRequired": "Veuillez saisir le nom de votre bureau."
   },
   "agentDashboard": {
     "title": "Tableau de bord Agent",

@@ -92,7 +92,12 @@
     "backToSignIn": "Volver a iniciar sesión",
     "confirmFirst": "Primero confirma tu correo: introduce el código que te enviamos o pide uno nuevo.",
     "signupCodeHint": "¿Ya abriste el enlace del correo? Entonces tu correo está confirmado: inicia sesión.",
-    "emailCode": "Código email"
+    "emailCode": "Código email",
+    "verifyEmailTitle": "Verifica tu correo electrónico",
+    "verifyEmailSubtitle": "Te hemos enviado un código de verificación de 6 dígitos a tu correo electrónico.",
+    "verifyAccount": "Verificar cuenta",
+    "codeExpiresIn": "El código caduca en {{time}}",
+    "officeName": "Nombre de la oficina"
   },
   "home": {
     "greetingMorning": "Buenos días",
@@ -336,7 +341,11 @@
     "currentPasswordWrong": "Tu contraseña actual no es correcta.",
     "providerUnavailable": "Esta opción de acceso aún no está disponible. Elige otra.",
     "loadFailed": "No se pudo cargar. Revisa tu conexión e inténtalo de nuevo.",
-    "tooManyAttempts": "Demasiados intentos fallidos. Inténtalo de nuevo en {{seconds}} segundos."
+    "tooManyAttempts": "Demasiados intentos fallidos. Inténtalo de nuevo en {{seconds}} segundos.",
+    "codeIncorrect": "Código de verificación incorrecto. Inténtalo de nuevo.",
+    "codeExpired": "Tu código de verificación ha caducado. Solicita uno nuevo.",
+    "codeAttempts": "Demasiados intentos incorrectos. Solicita un código nuevo.",
+    "officeRequired": "Introduce el nombre de tu oficina."
   },
   "agentDashboard": {
     "title": "Panel del Agente",

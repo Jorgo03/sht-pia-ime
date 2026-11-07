@@ -92,7 +92,12 @@
     "backToSignIn": "Zurück zur Anmeldung",
     "confirmFirst": "Bestätige zuerst deine E-Mail: Gib den gesendeten Code ein oder fordere einen neuen an.",
     "signupCodeHint": "Link in der E-Mail schon geöffnet? Dann ist deine E-Mail bestätigt — melde dich an.",
-    "emailCode": "E-Mail-Code"
+    "emailCode": "E-Mail-Code",
+    "verifyEmailTitle": "Bestätige deine E-Mail",
+    "verifyEmailSubtitle": "Wir haben einen 6-stelligen Bestätigungscode an deine E-Mail-Adresse gesendet.",
+    "verifyAccount": "Konto bestätigen",
+    "codeExpiresIn": "Der Code läuft ab in {{time}}",
+    "officeName": "Name des Büros"
   },
   "home": {
     "greetingMorning": "Guten Morgen",
@@ -328,7 +333,11 @@
     "currentPasswordWrong": "Dein aktuelles Passwort ist falsch.",
     "providerUnavailable": "Diese Anmeldeoption ist noch nicht verfügbar. Bitte wähle eine andere.",
     "loadFailed": "Konnte nicht geladen werden. Prüfe deine Verbindung und versuche es erneut.",
-    "tooManyAttempts": "Zu viele falsche Versuche. Versuchen Sie es in {{seconds}} Sekunden erneut."
+    "tooManyAttempts": "Zu viele falsche Versuche. Versuchen Sie es in {{seconds}} Sekunden erneut.",
+    "codeIncorrect": "Falscher Bestätigungscode. Bitte versuche es erneut.",
+    "codeExpired": "Dein Bestätigungscode ist abgelaufen. Bitte fordere einen neuen an.",
+    "codeAttempts": "Zu viele falsche Versuche. Bitte fordere einen neuen Code an.",
+    "officeRequired": "Bitte gib den Namen deines Büros ein."
   },
   "agentDashboard": {
     "title": "Makler-Dashboard",

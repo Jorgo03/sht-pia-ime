@@ -92,7 +92,12 @@
     "backToSignIn": "Back to sign in",
     "confirmFirst": "Confirm your email first: enter the code we sent you, or ask for a new one.",
     "signupCodeHint": "Already opened the link in the email? Then your email is confirmed — sign in.",
-    "emailCode": "Email code"
+    "emailCode": "Email code",
+    "verifyEmailTitle": "Verify Your Email",
+    "verifyEmailSubtitle": "We've sent a 6-digit verification code to your email address.",
+    "verifyAccount": "Verify Account",
+    "codeExpiresIn": "Code expires in {{time}}",
+    "officeName": "Office Name"
   },
   "addSheet": {
     "openLabel": "Create new",
@@ -356,7 +361,11 @@
     "currentPasswordWrong": "Your current password is incorrect.",
     "providerUnavailable": "This sign-in option isn't available yet. Please choose another one.",
     "loadFailed": "Couldn't load this. Check your connection and try again.",
-    "tooManyAttempts": "Too many wrong attempts. Try again in {{seconds}} seconds."
+    "tooManyAttempts": "Too many wrong attempts. Try again in {{seconds}} seconds.",
+    "codeIncorrect": "Incorrect verification code. Please try again.",
+    "codeExpired": "Your verification code has expired. Please request a new one.",
+    "codeAttempts": "Too many incorrect attempts. Please request a new code.",
+    "officeRequired": "Please enter your office name."
   },
   "agentDashboard": {
     "title": "Agent Dashboard",

@@ -36,6 +36,11 @@ import {
   signOutOtherDevices,
   type ChangePasswordResult,
 } from '@/src/features/auth/lib/password';
+import {
+  existingAccountError,
+  isExistingAccount,
+  isUnverifiedEmailUser,
+} from '@/src/features/auth/lib/signupCode';
 import { debugWarn } from '@/lib/debug';
 
 // Dismisses a lingering auth session left over from a previous attempt (a
@@ -263,6 +268,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setLoading(false);
         return;
       }
+      // An unconfirmed email address opens nothing behind sign-in
+      // (src/features/auth/lib/signupCode.js). Dropped locally: the token
+      // stays unused rather than being revoked for a person still mid-signup.
+      if (isUnverifiedEmailUser(s.user)) {
+        setSession(null);
+        setProfile(null);
+        setLoading(false);
+        supabase.auth.signOut({ scope: 'local' }).catch(() => {});
+        return;
+      }
 
       // Started once, awaited with a ceiling, and still honoured if it lands
       // late — so a slow network delays the profile, never the whole app.
@@ -379,6 +394,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // there is a session and no mail is ever sent. Sending everyone to the
     // code screen strands an already-signed-in user on a dead end.
     // Mirrors src/features/auth/AuthContext.jsx.
+    // A registered address gets a look-alike answer and no email; saying so
+    // beats a code screen waiting for a code that never comes.
+    if (!error && isExistingAccount(data)) {
+      return { error: existingAccountError() as Error, needsConfirmation: false };
+    }
     return {
       error: error as Error | null,
       needsConfirmation: !error && !data?.session,

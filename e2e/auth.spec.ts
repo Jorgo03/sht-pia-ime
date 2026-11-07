@@ -65,7 +65,9 @@ test('F4-H1 sign-up sends the name and role, then the emailed code signs you in'
   await page.getByPlaceholder(t('auth.confirmPassword')).fill(PASSWORD);
   await page.getByRole('button', { name: t('auth.createAccount') }).click();
 
-  await expect(page.getByRole('heading', { name: t('auth.enterCode') })).toBeVisible();
+  await expect(page.getByRole('heading', { name: t('auth.verifyEmailTitle') })).toBeVisible();
+  await expect(page.getByText(t('auth.verifyEmailSubtitle'))).toBeVisible();
+  await expect(page.getByText(t('auth.codeExpiresIn').replace('{{time}}', '10:00'))).toBeVisible();
   expect(await axeViolations(page)).toEqual([]);
   const signup = log.find((s) => s.path === 'signup')!;
   expect(signup.body).toMatchObject({ email: EMAIL, password: PASSWORD, data: { role: 'buyer', full_name: 'Ana Hoxha' } });
@@ -77,7 +79,7 @@ test('F4-H1 sign-up sends the name and role, then the emailed code signs you in'
   expect(log.find((s) => s.path === 'verify')?.body).toMatchObject({ email: EMAIL, token: '123456', type: 'signup' });
 });
 
-test('F4-N1 a wrong or expired code says so and clears the boxes', async ({ page }) => {
+test('F4-N1 a wrong code says so and clears the boxes', async ({ page }) => {
   const log: Sent[] = [];
   await authRoute(page, 'signup', () => [200, { id: SIGNED_IN_USER.id, aud: 'authenticated', email: EMAIL }], log);
   await authRoute(page, 'verify', () => [403, { code: 'otp_expired', msg: 'Token has expired or is invalid' }], log);
@@ -88,7 +90,7 @@ test('F4-N1 a wrong or expired code says so and clears the boxes', async ({ page
   await page.getByPlaceholder(t('auth.confirmPassword')).fill(PASSWORD);
   await page.getByRole('button', { name: t('auth.createAccount') }).click();
   await typeCode(page, '000000');
-  await expect(page.getByText(t('errors.invalidCode'))).toBeVisible();
+  await expect(page.getByText(t('errors.codeIncorrect'))).toBeVisible();
   await expect(page.getByRole('textbox', { name: t('auth.codeDigit').replace('{{n}}', '1') })).toHaveValue('');
   await expect(page).toHaveURL(/\/profile$/);
 });
@@ -543,4 +545,147 @@ test.describe('signed in with Google only', () => {
     await expect(dialog.getByText(t('security.providerOnly').replaceAll('{{providers}}', 'Google'))).toBeVisible();
     await expect(dialog.getByLabel(t('security.currentPassword'))).toHaveCount(0);
   });
+});
+
+// Sign-up verification (owner spec 2026-11-07): Office Name for agents, the
+// "Verify your email" step with a 10-minute countdown, wrong and expired
+// codes told apart, a cap on wrong guesses, resend, a registered address
+// stopped at the form, and nothing behind sign-in for an unverified address.
+// Supabase holds the code (hashed, single use); these check what the website
+// sends and shows.
+async function fillSignUp(page: Page, { agent = false, office = '' } = {}) {
+  if (agent) await page.getByRole('button', { name: t('auth.roleAgent') }).click();
+  await page.getByRole('textbox', { name: t('auth.fullName') }).fill('Ana Hoxha');
+  await page.getByRole('textbox', { name: t('auth.email') }).fill(EMAIL);
+  await page.getByPlaceholder(t('auth.password'), { exact: true }).fill(PASSWORD);
+  await page.getByPlaceholder(t('auth.confirmPassword')).fill(PASSWORD);
+  if (agent) await page.getByRole('textbox', { name: t('auth.officeName') }).fill(office);
+  await page.getByRole('button', { name: t('auth.createAccount') }).click();
+}
+
+const PENDING = { id: SIGNED_IN_USER.id, aud: 'authenticated', email: EMAIL, identities: [{ provider: 'email' }] };
+const REFUSED: [number, unknown] = [403, { code: 'otp_expired', msg: 'Token has expired or is invalid' }];
+
+test('F4-V1 an agent signs up with an office, verifies with the code and lands signed in', async ({ page }) => {
+  const log: Sent[] = [];
+  await authRoute(page, 'signup', () => [200, PENDING], log);
+  await authRoute(page, 'verify', () => [200, fakeSession()], log);
+  await openSignUp(page);
+  // The office is required for an agent, and checked before anything is sent.
+  await fillSignUp(page, { agent: true, office: ' ' });
+  await expect(page.getByText(t('errors.officeRequired'))).toBeVisible();
+  expect(log).toEqual([]);
+
+  await page.getByRole('textbox', { name: t('auth.officeName') }).fill(' Zyra Tirana ');
+  await page.getByRole('button', { name: t('auth.createAccount') }).click();
+  await expect(page.getByRole('heading', { name: t('auth.verifyEmailTitle') })).toBeVisible();
+  expect(log[0].body).toMatchObject({ email: EMAIL, data: { role: 'agent', full_name: 'Ana Hoxha', agency_name: 'Zyra Tirana' } });
+  await expect(page.getByText(EMAIL)).toBeVisible();
+
+  const verify = page.getByRole('button', { name: t('auth.verifyAccount') });
+  await typeCode(page, '12345');
+  await expect(verify).toBeDisabled();
+  await typeCode(page, '123456');
+  await expect(page).toHaveURL(/\/$/);
+  expect(log.filter((s) => s.path === 'verify')).toHaveLength(1);
+  expect(log.find((s) => s.path === 'verify')?.body).toMatchObject({ email: EMAIL, token: '123456', type: 'signup' });
+});
+
+test('F4-V2 a wrong code says so; pasting the right one verifies', async ({ page }) => {
+  const log: Sent[] = [];
+  let calls = 0;
+  await authRoute(page, 'signup', () => [200, PENDING], log);
+  await authRoute(page, 'verify', () => (++calls === 1 ? REFUSED : [200, fakeSession()]), log);
+  await openSignUp(page);
+  await fillSignUp(page);
+  await typeCode(page, '000000');
+  await expect(page.getByRole('alert')).toHaveText(t('errors.codeIncorrect'));
+  // All six digits in one paste, as a code copied from the email arrives.
+  await page.getByRole('textbox', { name: t('auth.codeDigit').replace('{{n}}', '1') }).evaluate((el, code) => {
+    const data = new DataTransfer();
+    data.setData('text/plain', code);
+    el.dispatchEvent(new ClipboardEvent('paste', { clipboardData: data, bubbles: true, cancelable: true }));
+  }, '654321');
+  await expect(page).toHaveURL(/\/$/);
+  expect(log.filter((s) => s.path === 'verify').map((s) => s.body.token)).toEqual(['000000', '654321']);
+});
+
+test('F4-V3 after five wrong codes the sixth is not sent: a new code is needed', async ({ page }) => {
+  const log: Sent[] = [];
+  await authRoute(page, 'signup', () => [200, PENDING], log);
+  await authRoute(page, 'verify', () => REFUSED, log);
+  await openSignUp(page);
+  await fillSignUp(page);
+  for (let i = 1; i <= 5; i++) {
+    await typeCode(page, `00000${i}`);
+    await expect.poll(() => log.filter((s) => s.path === 'verify').length).toBe(i);
+  }
+  await expect(page.getByRole('alert')).toHaveText(t('errors.codeAttempts'));
+  await typeCode(page, '000006');
+  await expect(page.getByRole('alert')).toHaveText(t('errors.codeAttempts'));
+  expect(log.filter((s) => s.path === 'verify')).toHaveLength(5);
+});
+
+test('F4-V4 an expired code is not sent and says so; a resent code starts a new 10 minutes', async ({ page }) => {
+  const log: Sent[] = [];
+  await page.clock.install();
+  await authRoute(page, 'signup', () => [200, PENDING], log);
+  await authRoute(page, 'resend', () => [200, {}], log);
+  await authRoute(page, 'verify', () => [200, fakeSession()], log);
+  await openSignUp(page);
+  await fillSignUp(page);
+  await expect(page.getByText(t('auth.codeExpiresIn').replace('{{time}}', '10:00'))).toBeVisible();
+  await page.clock.runFor('09:00');
+  await expect(page.getByText(t('auth.codeExpiresIn').replace('{{time}}', '1:00'))).toBeVisible();
+  await page.clock.runFor('01:01');
+  await expect(page.getByRole('alert')).toHaveText(t('errors.codeExpired'));
+  await expect(page.getByRole('button', { name: t('auth.verifyAccount') })).toBeDisabled();
+  await typeCode(page, '123456');
+  await expect(page.getByRole('alert')).toHaveText(t('errors.codeExpired'));
+  expect(log.filter((s) => s.path === 'verify')).toEqual([]);
+
+  await page.getByRole('button', { name: t('auth.resendCode') }).click();
+  await expect(page.getByText(t('auth.newCodeSent'))).toBeVisible();
+  expect(log.find((s) => s.path === 'resend')?.body).toMatchObject({ email: EMAIL, type: 'signup' });
+  await expect(page.getByText(t('auth.codeExpiresIn').replace('{{time}}', '10:00'))).toBeVisible();
+  await typeCode(page, '123456');
+  await expect(page).toHaveURL(/\/$/);
+});
+
+test('F4-V5 an address that already has an account is stopped at the form', async ({ page }) => {
+  const log: Sent[] = [];
+  // Supabase's answer for a registered address: a look-alike user with no
+  // identities, no session and no email sent.
+  await authRoute(page, 'signup', () => [200, { id: 'decoy', aud: 'authenticated', email: EMAIL, identities: [] }], log);
+  await openSignUp(page);
+  await fillSignUp(page);
+  await expect(page.getByText(t('errors.userExists'))).toBeVisible();
+  await expect(page.getByRole('button', { name: t('auth.createAccount') })).toBeVisible();
+  await expect(page.getByRole('heading', { name: t('auth.verifyEmailTitle') })).toHaveCount(0);
+});
+
+test('F4-V6 nothing behind sign-in opens before the email is verified', async ({ page }) => {
+  const log: Sent[] = [];
+  await authRoute(page, 'signup', () => [200, PENDING], log);
+  await openSignUp(page);
+  await fillSignUp(page);
+  await expect(page.getByRole('heading', { name: t('auth.verifyEmailTitle') })).toBeVisible();
+  // The pending account has no session: the dashboard sends you to sign in.
+  await page.goto('/my-listings');
+  await expect(page).toHaveURL('/profile');
+  await expect(page.getByRole('button', { name: t('auth.stepInside') })).toBeVisible();
+});
+
+test('F4-V7 a stored session for an unverified address is refused and dropped', async ({ page }) => {
+  const unverified = { ...SIGNED_IN_USER, email_confirmed_at: undefined };
+  await page.addInitScript(
+    ([key, session]) => localStorage.setItem(key, session),
+    [SESSION_STORAGE_KEY, JSON.stringify({ ...fakeSession(), user: unverified })] as const,
+  );
+  await page.route('**/auth/v1/user*', (route) => json(route, 200, unverified));
+  await page.route('**/auth/v1/logout*', (route) => route.fulfill({ status: 204, headers: CORS, body: '' }));
+  await page.goto('/my-listings');
+  await expect(page).toHaveURL('/profile');
+  await expect(page.getByRole('button', { name: t('auth.stepInside') })).toBeVisible();
+  await expect.poll(() => page.evaluate((key) => localStorage.getItem(key), SESSION_STORAGE_KEY)).toBeNull();
 });

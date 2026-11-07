@@ -156,6 +156,8 @@ export const SIGNED_IN_USER = {
   email: 'agent@example.com',
   user_metadata: { full_name: AGENT.full_name },
   app_metadata: { provider: 'email' },
+  // A confirmed address: the apps refuse a session without one (signupCode.js).
+  email_confirmed_at: '2026-01-01T00:00:00Z',
   created_at: '2026-01-01T00:00:00Z',
 };
 

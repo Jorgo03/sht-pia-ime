@@ -8,6 +8,7 @@ import DuskHero from '../components/DuskHero'
 import EditProfileSheet from '../components/EditProfileSheet'
 import ChangePasswordSheet from '../components/ChangePasswordSheet'
 import { newPasswordError, passwordStrengthError } from '../lib/password'
+import { blockedCodeKey, codeExpiry, formatCountdown, rejectedCodeKey, secondsLeft } from '../lib/signupCode'
 import { authRedirectError, hasAuthCode, linkErrorKey, providerEnabled } from '../lib/authLinks'
 import Avatar from '../../../shared/Avatar'
 import { EMAIL_RE, friendlyError, retryAfterSeconds } from '../../../lib/authErrors'
@@ -112,6 +113,17 @@ export default function Profile() {
   const [otpType, setOtpType] = useState('email')
   const [otpError, setOtpError] = useState(false)
   const [cooldown, setCooldown] = useState(0)
+  // The code's 10-minute life and wrong-guess count (lib/signupCode.js); the
+  // expiry is null when the code was sent before this page asked for it.
+  const [codeExpiresAt, setCodeExpiresAt] = useState(null)
+  const [codeAttempts, setCodeAttempts] = useState(0)
+  const [clock, setClock] = useState(() => Date.now())
+  const startCode = (fresh) => {
+    const now = Date.now()
+    setClock(now)
+    setCodeAttempts(0)
+    setCodeExpiresAt(fresh ? codeExpiry(now) : null)
+  }
   const otpRefs = useRef([])
   // Set synchronously, before the button re-renders as busy: a double click
   // would otherwise send two codes (the second invalidates the first) or
@@ -155,6 +167,16 @@ export default function Profile() {
     return () => clearInterval(id)
   }, [isCoolingDown])
 
+  // Code expiry countdown, while a code with a known expiry is on screen.
+  const onCodeStep = otpStep === 'enter-code'
+  useEffect(() => {
+    if (!onCodeStep || codeExpiresAt == null) return
+    const id = setInterval(() => setClock(Date.now()), 1000)
+    return () => clearInterval(id)
+  }, [onCodeStep, codeExpiresAt])
+  const codeLeft = onCodeStep ? secondsLeft(codeExpiresAt, clock) : null
+  const codeExpired = codeLeft === 0
+
   const validate = () => {
     if (!EMAIL_RE.test(email.trim())) {
       setMessage(t('errors.invalidEmail'))
@@ -177,6 +199,11 @@ export default function Profile() {
       }
       if (password !== confirmPassword) {
         setMessage(t('errors.passwordMismatch'))
+        return false
+      }
+      // The office is part of an agent's account; buyers have none.
+      if (role === 'agent' && agencyName.trim().length < 2) {
+        setMessage(t('errors.officeRequired'))
         return false
       }
     } else if (!password) {
@@ -213,7 +240,8 @@ export default function Profile() {
           setOtpError(false)
           setOtpStep('enter-code')
           setCooldown(30)
-          setMessage(t('auth.checkEmail'))
+          // The "Verify your email" step says where the code went.
+          startCode(true)
         } else {
           // Email confirmation is off: signUp already returned a session, so
           // the account exists and is signed in. Sending this user to the code
@@ -230,6 +258,7 @@ export default function Profile() {
           setOtpError(false)
           setCooldown(0)
           setOtpStep('enter-code')
+          startCode(false)
           setMessage(t('auth.confirmFirst'))
         } else if (error) {
           setMessage(friendlyError(error, t))
@@ -295,9 +324,9 @@ export default function Profile() {
       const { error } = await sendOtp(cleanEmail)
       const wait = retryAfterSeconds(error)
       // A code went to this address moments ago and is still valid.
-      if (wait) { setOtpStep('enter-code'); setOtpError(false); setCooldown(wait); setMessage(t('errors.waitSeconds', { s: wait })) }
+      if (wait) { setOtpStep('enter-code'); setOtpError(false); setCooldown(wait); startCode(false); setMessage(t('errors.waitSeconds', { s: wait })) }
       else if (error) setMessage(friendlyError(error, t))
-      else { setOtpStep('enter-code'); setOtpError(false); setCooldown(30); setMessage(t('auth.otpSent')) }
+      else { setOtpStep('enter-code'); setOtpError(false); setCooldown(30); startCode(true); setMessage(t('auth.otpSent')) }
     } finally {
       sendingCode.current = false
       setLoading(false)
@@ -317,7 +346,7 @@ export default function Profile() {
       const wait = retryAfterSeconds(error)
       if (wait) { setCooldown(wait); setMessage(t('errors.waitSeconds', { s: wait })) }
       else if (error) setMessage(friendlyError(error, t))
-      else { setCooldown(30); setOtpCode(['', '', '', '', '', '']); setMessage(t('auth.newCodeSent')) }
+      else { setCooldown(30); setOtpCode(['', '', '', '', '', '']); startCode(true); setMessage(t('auth.newCodeSent')) }
     } finally {
       sendingCode.current = false
       setLoading(false)
@@ -352,6 +381,15 @@ export default function Profile() {
 
   const handleVerifyOtp = async (code) => {
     if (verifyingCode.current) return
+    // An expired code, or one past the wrong-guess cap, would only be refused
+    // and spend the per-IP verification budget: ask for a new one instead.
+    const blocked = blockedCodeKey({ expiresAt: codeExpiresAt, attempts: codeAttempts })
+    if (blocked) {
+      setOtpError(true)
+      setMessage(t(blocked))
+      setOtpCode(['', '', '', '', '', ''])
+      return
+    }
     verifyingCode.current = true
     setLoading(true); setMessage('')
     try {
@@ -359,8 +397,11 @@ export default function Profile() {
       // new-password form below; the other codes sign in.
       const { error } = otpType === 'recovery' ? await verifyRecoveryCode(otpEmail, code) : await verifyOtp(otpEmail, code, otpType)
       if (error) {
+        const attempts = codeAttempts + 1
+        setCodeAttempts(attempts)
+        const key = rejectedCodeKey(error, { expiresAt: codeExpiresAt, attempts })
         setOtpError(true)
-        setMessage(friendlyError(error, t))
+        setMessage(key ? t(key) : friendlyError(error, t))
         setOtpCode(['', '', '', '', '', ''])
         otpRefs.current[0]?.focus()
       } else {
@@ -394,14 +435,14 @@ export default function Profile() {
     try {
       const { error } = await resetPassword(cleanEmail)
       const wait = retryAfterSeconds(error)
-      const toCode = (seconds, text) => {
+      const toCode = (seconds, text, fresh) => {
         setOtpType('recovery'); setOtpCode(['', '', '', '', '', '']); setOtpError(false)
-        setCooldown(seconds); setOtpStep('enter-code'); setMessage(text)
+        setCooldown(seconds); setOtpStep('enter-code'); startCode(fresh); setMessage(text)
       }
       // A code went to this address moments ago and is still valid.
-      if (wait) toCode(wait, t('errors.waitSeconds', { s: wait }))
+      if (wait) toCode(wait, t('errors.waitSeconds', { s: wait }), false)
       else if (error) setMessage(friendlyError(error, t))
-      else toCode(30, t('auth.resetCodeSent', { email: cleanEmail }))
+      else toCode(30, t('auth.resetCodeSent', { email: cleanEmail }), true)
     } finally {
       sendingCode.current = false
       setLoading(false)
@@ -662,18 +703,36 @@ export default function Profile() {
           <div className="auth-glass">
             <button className="link-btn otp-back" onClick={() => setOtpStep(otpType === 'signup' ? null : otpType === 'recovery' ? 'forgot' : 'enter-email')}><ArrowLeft size={16} /> {t('common.back')}</button>
             <div className="otp-icon"><Mail size={32} /></div>
-            <h2 className="auth-title">{t('auth.enterCode')}</h2>
-            <p className="auth-subtitle">{t('auth.codeSentTo', { email: otpEmail })}</p>
+            {otpType === 'signup' ? (
+              <>
+                <h2 className="auth-title">{t('auth.verifyEmailTitle')}</h2>
+                <p className="auth-subtitle">{t('auth.verifyEmailSubtitle')}</p>
+                <p className="auth-subtitle"><strong>{otpEmail}</strong></p>
+              </>
+            ) : (
+              <>
+                <h2 className="auth-title">{t('auth.enterCode')}</h2>
+                <p className="auth-subtitle">{t('auth.codeSentTo', { email: otpEmail })}</p>
+              </>
+            )}
             <div className="otp-inputs" onPaste={handleOtpPaste}>
               {otpCode.map((digit, i) => (
                 <input key={i} ref={(el) => (otpRefs.current[i] = el)} type="text" inputMode="numeric" autoComplete={i === 0 ? 'one-time-code' : 'off'} aria-label={t('auth.codeDigit', { n: i + 1 })} maxLength={1} className={`otp-digit ${digit ? 'filled' : ''} ${otpError ? 'error' : ''}`} value={digit} onChange={(e) => handleOtpChange(i, e.target.value)} onKeyDown={(e) => handleOtpKeyDown(i, e)} autoFocus={i === 0} />
               ))}
             </div>
-            {loading && <p className="auth-subtitle">{t('common.loading')}</p>}
+            {codeLeft > 0 && <p className="auth-subtitle">{t('auth.codeExpiresIn', { time: formatCountdown(codeLeft) })}</p>}
+            {/* Once the code has expired that is the news, over any earlier info line. */}
+            {codeExpired && !otpError ? (
+              <div className="auth-message auth-message--error" role="alert">{t('errors.codeExpired')}</div>
+            ) : message && (
+              <div className={`auth-message ${otpError ? 'auth-message--error' : ''}`} role={otpError ? 'alert' : 'status'}>{message}</div>
+            )}
+            <button className="cta-pill" onClick={() => handleVerifyOtp(otpCode.join(''))} disabled={loading || codeExpired || otpCode.some((d) => d === '')}>
+              {loading ? t('common.loading') : t('auth.verifyAccount')}
+            </button>
             <button className="link-btn" onClick={handleResend} disabled={loading || cooldown > 0}>
               {cooldown > 0 ? t('auth.resendIn', { s: cooldown }) : t('auth.resendCode')}
             </button>
-            {message && <div className={`auth-message ${otpError ? 'auth-message--error' : ''}`} role={otpError ? 'alert' : 'status'}>{message}</div>}
             {otpType === 'signup' && (
               <button className="link-btn" onClick={() => { setOtpStep(null); setIsSignUp(false); setMessage('') }}>
                 {t('auth.signupCodeHint')}
@@ -727,7 +786,7 @@ export default function Profile() {
           )}
 
           {isSignUp && role === 'agent' && (
-            <div className="field-row"><Building2 size={18} className="field-icon" /><input type="text" className="form-input" placeholder={t('auth.agencyName')} aria-label={t('auth.agencyName')} autoComplete="organization" value={agencyName} onChange={(e) => setAgencyName(e.target.value)} /></div>
+            <div className="field-row"><Building2 size={18} className="field-icon" /><input type="text" className="form-input" placeholder={t('auth.officeName')} aria-label={t('auth.officeName')} autoComplete="organization" value={agencyName} onChange={(e) => setAgencyName(e.target.value)} /></div>
           )}
 
           {/* Prototype's row above the CTA: what the selected role gets you on

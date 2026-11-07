@@ -92,7 +92,12 @@
     "backToSignIn": "Kthehu te hyrja",
     "confirmFirst": "Konfirmo fillimisht emailin: fut kodin që të dërguam ose kërko një të ri.",
     "signupCodeHint": "E hape tashmë lidhjen në email? Atëherë emaili është konfirmuar — hyr.",
-    "emailCode": "Kod me email"
+    "emailCode": "Kod me email",
+    "verifyEmailTitle": "Verifiko email-in",
+    "verifyEmailSubtitle": "Të dërguam një kod verifikimi 6-shifror në adresën tënde të email-it.",
+    "verifyAccount": "Verifiko llogarinë",
+    "codeExpiresIn": "Kodi skadon pas {{time}}",
+    "officeName": "Emri i zyrës"
   },
   "home": {
     "greetingMorning": "Mirëmëngjes",
@@ -304,7 +309,11 @@
     "currentPasswordWrong": "Fjalëkalimi aktual është i pasaktë.",
     "providerUnavailable": "Kjo mënyrë hyrjeje nuk është ende e disponueshme. Zgjidh një tjetër.",
     "loadFailed": "Nuk u ngarkua dot. Kontrollo lidhjen dhe provo sërish.",
-    "tooManyAttempts": "Shumë përpjekje të gabuara. Provo përsëri pas {{seconds}} sekondash."
+    "tooManyAttempts": "Shumë përpjekje të gabuara. Provo përsëri pas {{seconds}} sekondash.",
+    "codeIncorrect": "Kodi i verifikimit është i pasaktë. Provo sërish.",
+    "codeExpired": "Kodi i verifikimit ka skaduar. Kërko një kod të ri.",
+    "codeAttempts": "Shumë përpjekje të pasakta. Kërko një kod të ri.",
+    "officeRequired": "Shkruaj emrin e zyrës."
   },
   "agentDashboard": {
     "title": "Paneli i Agjentit",

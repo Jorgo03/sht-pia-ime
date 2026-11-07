@@ -43,6 +43,13 @@ import { GradientBackground } from '@/components/ui/gradient-background';
 import { OtpInput, OTP_LENGTH } from '@/components/ui/otp-input';
 // One mapper for both apps (error codes first, then Supabase's text).
 import { friendlyError as friendlyAuthError, retryAfterSeconds } from '@/src/lib/authErrors';
+import {
+  blockedCodeKey,
+  codeExpiry,
+  formatCountdown,
+  rejectedCodeKey,
+  secondsLeft,
+} from '@/src/features/auth/lib/signupCode';
 import { newPasswordError, passwordStrengthError } from '@/src/features/auth/lib/password';
 import { providerEnabled } from '@/src/features/auth/lib/authLinks';
 import { ChangePasswordSheet } from '@/components/profile/change-password-sheet';
@@ -143,6 +150,17 @@ export default function ProfileScreen() {
   // Reddens the six boxes together after a rejected code, cleared on the next
   // keystroke — same signal web gives via `.otp-digit.error`.
   const [otpError, setOtpError] = useState(false);
+  // The sign-up code's 10-minute life and wrong-guess count
+  // (src/features/auth/lib/signupCode.js). The expiry is null when the code
+  // was sent before this screen opened, so its start is unknown.
+  const [codeExpiresAt, setCodeExpiresAt] = useState<number | null>(null);
+  const [codeAttempts, setCodeAttempts] = useState(0);
+  const [clock, setClock] = useState(() => Date.now());
+  // Said on the code screen itself rather than in Alert.alert, which
+  // react-native-web leaves empty: the website build showed nothing at all.
+  const [codeNotice, setCodeNotice] = useState<{ text: string; tone: 'error' | 'info' } | null>(null);
+  // The sign-in / sign-up form's own message, for the same reason.
+  const [formError, setFormError] = useState<string | null>(null);
   // Seconds left on the resend lock. Web starts this at 30 on every send so a
   // user can't hammer the endpoint into a Supabase rate-limit.
   const [cooldown, setCooldown] = useState(0);
@@ -200,6 +218,36 @@ export default function ProfileScreen() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cooldown > 0]);
 
+  // Code expiry countdown: one interval while a code with a known expiry is
+  // on screen.
+  useEffect(() => {
+    if (!otpStep || codeExpiresAt == null) return;
+    const id = setInterval(() => setClock(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, [otpStep, codeExpiresAt]);
+  const codeLeft = otpStep ? secondsLeft(codeExpiresAt, clock) : null;
+  const codeExpired = codeLeft === 0;
+  // Once the code has expired that is the news, over any earlier info line.
+  const shownNotice =
+    codeExpired && codeNotice?.tone !== 'error'
+      ? { text: t('errors.codeExpired'), tone: 'error' as const }
+      : codeNotice;
+
+  // Opens code entry. `fresh` when this screen just had the code sent, so
+  // its expiry is known; `resendWait` locks the resend button that long.
+  const openCodeEntry = (type: 'email' | 'signup', resendWait: number, fresh: boolean) => {
+    const now = Date.now();
+    setOtpType(type);
+    setOtpCode('');
+    setOtpError(false);
+    setCodeNotice(null);
+    setCodeAttempts(0);
+    setClock(now);
+    setCodeExpiresAt(fresh ? codeExpiry(now) : null);
+    setCooldown(resendWait);
+    setOtpStep(true);
+  };
+
   // Mirrors web's validate(): same rules, same order, so the two apps reject
   // (and word) a bad submission identically. Previously this screen only
   // checked for non-empty fields — a malformed email or a 3-character
@@ -213,29 +261,22 @@ export default function ProfileScreen() {
   // password showed "at least 8 characters" instead of a login-appropriate
   // message — same defect web's Profile.jsx had, fixed there first.
   const validateAuth = (): boolean => {
-    if (!EMAIL_RE.test(email.trim())) {
-      Alert.alert(t('common.error'), t('errors.invalidEmail'));
-      return false;
-    }
-    if (isSignUp) {
-      const weak = passwordStrengthError(password);
-      if (weak) {
-        Alert.alert(t('common.error'), t(weak));
-        return false;
+    const problem = (() => {
+      if (!EMAIL_RE.test(email.trim())) return 'errors.invalidEmail';
+      if (isSignUp) {
+        const weak = passwordStrengthError(password);
+        if (weak) return weak;
+        if (fullName.trim().length < 2) return 'errors.nameRequired';
+        if (password !== confirmPassword) return 'errors.passwordMismatch';
+        // The office is part of an agent's account; buyers have none.
+        if (role === 'agent' && agencyName.trim().length < 2) return 'errors.officeRequired';
+      } else if (!password) {
+        return 'errors.passwordRequired';
       }
-      if (fullName.trim().length < 2) {
-        Alert.alert(t('common.error'), t('errors.nameRequired'));
-        return false;
-      }
-      if (password !== confirmPassword) {
-        Alert.alert(t('common.error'), t('errors.passwordMismatch'));
-        return false;
-      }
-    } else if (!password) {
-      Alert.alert(t('common.error'), t('errors.passwordRequired'));
-      return false;
-    }
-    return true;
+      return null;
+    })();
+    setFormError(problem ? t(problem) : null);
+    return !problem;
   };
 
   const handleAuth = async () => {
@@ -266,17 +307,13 @@ export default function ProfileScreen() {
       });
       setLoading(false);
       if (error) {
-        Alert.alert(t('common.error'), friendlyAuthError(error, t));
+        // Includes an address that already has an account (auth-context's
+        // isExistingAccount): stay on the form, nothing was sent.
+        setFormError(friendlyAuthError(error, t));
       } else if (needsConfirmation) {
-        // Straight to code entry, same as web: the confirmation email carries
-        // a 6-digit code, and previously this only showed an alert and left
-        // the user on the signup form with no way to enter it.
-        setOtpType('signup');
-        setOtpCode('');
-        setOtpError(false);
-        setCooldown(RESEND_COOLDOWN_S);
-        setOtpStep(true);
-        Alert.alert('OK', t('auth.checkEmail'));
+        // The pending account exists and its code is on the way: the
+        // "Verify your email" step, with the code's 10 minutes counting.
+        openCodeEntry('signup', RESEND_COOLDOWN_S, true);
       }
       // Otherwise email confirmation is off and signUp already returned a
       // session: the auth listener swaps this screen to the signed-in profile
@@ -287,14 +324,10 @@ export default function ProfileScreen() {
       setLoading(false);
       if ((error as { code?: string } | null)?.code === 'email_not_confirmed') {
         // Not a dead end: the confirmation code (or a fresh one) finishes it.
-        setOtpType('signup');
-        setOtpCode('');
-        setOtpError(false);
-        setCooldown(0);
-        setOtpStep(true);
-        Alert.alert(t('auth.confirmFirst'));
+        openCodeEntry('signup', 0, false);
+        setCodeNotice({ text: t('auth.confirmFirst'), tone: 'info' });
       } else if (error) {
-        Alert.alert(t('common.error'), friendlyAuthError(error, t));
+        setFormError(friendlyAuthError(error, t));
       }
     }
   };
@@ -327,23 +360,15 @@ export default function ProfileScreen() {
     if (wait) {
       // A code went to this address moments ago and is still valid: go to
       // code entry, and unlock "resend" when the server will accept it.
-      setOtpType('email');
-      setOtpCode('');
-      setOtpError(false);
-      setCooldown(wait);
-      setOtpStep(true);
-      Alert.alert(t('errors.waitSeconds', { s: wait }));
+      openCodeEntry('email', wait, false);
+      setCodeNotice({ text: t('errors.waitSeconds', { s: wait }), tone: 'info' });
       return;
     }
     if (error) {
       Alert.alert(t('common.error'), friendlyAuthError(error, t));
       return;
     }
-    setOtpType('email');
-    setOtpCode('');
-    setOtpError(false);
-    setCooldown(RESEND_COOLDOWN_S);
-    setOtpStep(true);
+    openCodeEntry('email', RESEND_COOLDOWN_S, true);
   };
 
   // Resend is a distinct call from the first send: a code that came from a
@@ -355,7 +380,7 @@ export default function ProfileScreen() {
     // Same guard web has: `email` can be blank if the screen re-rendered
     // between steps, and resending with an empty address 400s.
     if (!EMAIL_RE.test(email.trim())) {
-      Alert.alert(t('common.error'), t('errors.invalidEmail'));
+      setCodeNotice({ text: t('errors.invalidEmail'), tone: 'error' });
       return;
     }
     if (sendingCode.current) return;
@@ -368,11 +393,11 @@ export default function ProfileScreen() {
     const wait = retryAfterSeconds(error);
     if (wait) {
       setCooldown(wait);
-      Alert.alert(t('errors.waitSeconds', { s: wait }));
+      setCodeNotice({ text: t('errors.waitSeconds', { s: wait }), tone: 'info' });
       return;
     }
     if (error) {
-      Alert.alert(t('common.error'), friendlyAuthError(error, t));
+      setCodeNotice({ text: friendlyAuthError(error, t), tone: 'error' });
       return;
     }
     // Success was previously silent — the only signal was the link text
@@ -383,12 +408,11 @@ export default function ProfileScreen() {
     // The stale digits are cleared too: a resend invalidates the previous
     // code, so leaving the old (often wrong) ones on screen invites the user
     // to submit a code that can no longer succeed.
-    setOtpCode('');
-    setOtpError(false);
-    setCooldown(RESEND_COOLDOWN_S);
+    // A new code: a new 10 minutes and a new allowance of wrong guesses.
+    openCodeEntry(otpType, RESEND_COOLDOWN_S, true);
     // Says that earlier codes stopped working: entering the first email's
     // code after a resend is the common way to hit "wrong or expired".
-    Alert.alert(t('auth.newCodeSent'));
+    setCodeNotice({ text: t('auth.newCodeSent'), tone: 'info' });
   };
 
   // Takes the code as an argument rather than reading `otpCode` — the
@@ -396,14 +420,27 @@ export default function ProfileScreen() {
   // flushed, so the state value would still be 5 digits here.
   const handleVerifyOtp = async (code: string) => {
     if (code.length < OTP_LENGTH || verifyingCode.current) return;
+    // An expired code, or one past the wrong-guess cap, would only be refused
+    // and spend the per-IP verification budget: ask for a new one instead.
+    const blocked = blockedCodeKey({ expiresAt: codeExpiresAt, attempts: codeAttempts });
+    if (blocked) {
+      setCodeNotice({ text: t(blocked), tone: 'error' });
+      setOtpCode('');
+      setOtpError(true);
+      return;
+    }
     verifyingCode.current = true;
     setOtpVerifying(true);
+    setCodeNotice(null);
     const { error } = await verifyOtp(email, code, otpType).finally(() => {
       verifyingCode.current = false;
     });
     setOtpVerifying(false);
     if (error) {
-      Alert.alert(t('common.error'), friendlyAuthError(error, t));
+      const attempts = codeAttempts + 1;
+      setCodeAttempts(attempts);
+      const key = rejectedCodeKey(error, { expiresAt: codeExpiresAt, attempts });
+      setCodeNotice({ text: key ? t(key) : friendlyAuthError(error, t), tone: 'error' });
       setOtpCode('');
       setOtpError(true);
       return;
@@ -1059,8 +1096,15 @@ export default function ProfileScreen() {
                    verification fires automatically once 6 digits land (web
                    does the same from handleOtpChange, no submit button). */
                 <>
-                  <Text style={styles.otpTitle}>{t('auth.enterCode')}</Text>
-                  <Text style={styles.otpSubtitle}>{t('auth.codeSentTo', { email })}</Text>
+                  {/* A sign-up gets the "Verify your email" step; an email
+                      sign-in code keeps its own wording. */}
+                  <Text style={styles.otpTitle} accessibilityRole="header">
+                    {otpType === 'signup' ? t('auth.verifyEmailTitle') : t('auth.enterCode')}
+                  </Text>
+                  <Text style={styles.otpSubtitle}>
+                    {otpType === 'signup' ? t('auth.verifyEmailSubtitle') : t('auth.codeSentTo', { email })}
+                  </Text>
+                  {otpType === 'signup' && <Text style={styles.otpEmail}>{email}</Text>}
                   <OtpInput
                     value={otpCode}
                     error={otpError}
@@ -1071,7 +1115,32 @@ export default function ProfileScreen() {
                     }}
                     onComplete={handleVerifyOtp}
                   />
-                  {otpVerifying && <Text style={styles.otpSubtitle}>{t('common.loading')}</Text>}
+                  {shownNotice && (
+                    <Text
+                      style={[styles.otpNotice, shownNotice.tone === 'error' && styles.otpNoticeError]}
+                      accessibilityRole="alert"
+                      accessibilityLiveRegion="polite">
+                      {shownNotice.text}
+                    </Text>
+                  )}
+                  {codeLeft != null && codeLeft > 0 && (
+                    <Text style={styles.otpSubtitle}>
+                      {t('auth.codeExpiresIn', { time: formatCountdown(codeLeft) })}
+                    </Text>
+                  )}
+                  <TouchableOpacity
+                    accessibilityRole="button"
+                    accessibilityState={{ disabled: otpCode.length < OTP_LENGTH || otpVerifying || codeExpired }}
+                    onPress={() => handleVerifyOtp(otpCode)}
+                    activeOpacity={0.85}
+                    disabled={otpCode.length < OTP_LENGTH || otpVerifying || codeExpired}
+                    style={(otpCode.length < OTP_LENGTH || codeExpired) && styles.ctaDisabled}>
+                    <LinearGradient colors={[colors.accent, colors.accentEnd]} style={styles.ctaPill}>
+                      <Text style={styles.ctaPillText}>
+                        {otpVerifying ? t('common.loading') : t('auth.verifyAccount')}
+                      </Text>
+                    </LinearGradient>
+                  </TouchableOpacity>
                   <TouchableOpacity
                     accessibilityRole="button"
                     onPress={handleResendOtp}
@@ -1186,11 +1255,14 @@ export default function ProfileScreen() {
                   <MaterialIcons name="business" size={18} color="rgba(255,255,255,0.35)" style={styles.fieldIcon} />
                   <TextInput
                     style={styles.fieldInput}
-                    placeholder={t('auth.agencyName')}
+                    placeholder={t('auth.officeName')}
                     placeholderTextColor="rgba(255,255,255,0.35)"
                     value={agencyName}
                     onChangeText={setAgencyName}
                     autoCapitalize="words"
+                    textContentType="organizationName"
+                    autoComplete="organization"
+                    accessibilityLabel={t('auth.officeName')}
                   />
                 </View>
               )}
@@ -1212,6 +1284,15 @@ export default function ProfileScreen() {
                     <Text style={styles.accessForgot}>{t('auth.forgotShort')}</Text>
                   </TouchableOpacity>
                 </View>
+              )}
+
+              {formError && (
+                <Text
+                  style={[styles.otpNotice, styles.otpNoticeError]}
+                  accessibilityRole="alert"
+                  accessibilityLiveRegion="polite">
+                  {formError}
+                </Text>
               )}
 
               <TouchableOpacity accessibilityRole="button" onPress={handleAuth} activeOpacity={0.85} disabled={loading}>
@@ -1323,7 +1404,10 @@ export default function ProfileScreen() {
 
               <TouchableOpacity
                 accessibilityRole="button"
-                onPress={() => setIsSignUp(!isSignUp)}
+                onPress={() => {
+                  setIsSignUp(!isSignUp);
+                  setFormError(null);
+                }}
                 style={styles.linkButton}>
                 <Text style={styles.linkButtonText}>
                   {isSignUp ? t('auth.hasAccount') : t('auth.noAccount')}{' '}
@@ -1594,6 +1678,26 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     fontSize: 13,
     color: 'rgba(255,255,255,0.55)',
     textAlign: 'center',
+  },
+  otpEmail: {
+    fontFamily: Fonts?.sansBold,
+    fontSize: 14,
+    color: '#fff',
+    textAlign: 'center',
+  },
+  // The card is dark in both themes, so these are fixed rather than themed.
+  otpNotice: {
+    fontFamily: Fonts?.sans,
+    fontSize: 13,
+    lineHeight: 18,
+    color: 'rgba(255,255,255,0.8)',
+    textAlign: 'center',
+  },
+  otpNoticeError: {
+    color: '#ffb4a8',
+  },
+  ctaDisabled: {
+    opacity: 0.5,
   },
 
   // Sign-out confirmation sheet.
