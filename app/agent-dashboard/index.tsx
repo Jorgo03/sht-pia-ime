@@ -228,6 +228,20 @@ export default function AgentDashboardScreen() {
               ))}
             </View>
 
+            {/* The agent's private performance report (docs/PERFORMANCE_REPORT.md). */}
+            <TouchableOpacity
+              accessibilityRole="button"
+              style={styles.reportRow}
+              onPress={() => router.push('/performance' as Href)}
+              activeOpacity={0.7}>
+              <MaterialIcons name="insights" size={22} color={colors.accent} />
+              <View style={styles.reportText}>
+                <Text style={styles.reportTitle}>{t('performance.entry')}</Text>
+                <Text style={styles.statLabel}>{t('performance.entrySub')}</Text>
+              </View>
+              <MaterialIcons name="chevron-right" size={22} color={colors.textSecondary} />
+            </TouchableOpacity>
+
             <View style={styles.section}>
               <View style={styles.sectionHead}>
                 <Text style={styles.sectionTitle}>{t('agentDashboard.today')}</Text>
@@ -477,6 +491,28 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     fontSize: 11,
     color: colors.textSecondary,
     textAlign: 'center',
+  },
+  reportRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    minHeight: 64,
+    backgroundColor: colors.primaryLight,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: colors.border,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+  },
+  reportText: {
+    flex: 1,
+    gap: 2,
+    alignItems: 'flex-start',
+  },
+  reportTitle: {
+    fontFamily: Fonts.sansSemiBold,
+    fontSize: 15,
+    color: colors.textPrimary,
   },
   section: {
     gap: 10,

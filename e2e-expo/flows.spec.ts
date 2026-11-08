@@ -1,6 +1,6 @@
 import type { Page, Route } from '@playwright/test';
 
-import { AGENT, CHAT_CLIENT_ID, CONVERSATIONS, LISTINGS } from '../e2e/support/fixtures';
+import { AGENT, CHAT_CLIENT_ID, CONVERSATIONS, LISTINGS, PERFORMANCE_REPORT } from '../e2e/support/fixtures';
 import { fakeSession, SESSION_STORAGE_KEY, SIGNED_IN_USER } from '../e2e/support/backend';
 import { AI_CHAT_ENABLED } from '../constants/features';
 import { t } from '../e2e/support/i18n';
@@ -496,7 +496,7 @@ async function layoutProblems(page: Page) {
 test.describe('narrow phone layout', () => {
   test.use({ viewport: { width: 320, height: 640 }, signedIn: true });
 
-  for (const path of ['/', '/explore', '/profile', '/my-listings', '/viewings', '/agent-dashboard', '/saved-searches', `/property/${FEATURED.id}`, '/assistant']) {
+  for (const path of ['/', '/explore', '/profile', '/my-listings', '/viewings', '/agent-dashboard', '/performance', '/saved-searches', `/property/${FEATURED.id}`, '/assistant']) {
     test(`X19 at 320px ${path} keeps every control on screen and the wordmark clear`, async ({ page, isMobile }) => {
       test.skip(!isMobile, 'phone project only');
       await page.goto(path);
@@ -512,7 +512,7 @@ test.describe('narrow phone layout', () => {
 test.describe('foldable cover screen', () => {
   test.use({ viewport: { width: 280, height: 653 }, signedIn: true });
 
-  for (const path of ['/', '/explore', '/listing/new', '/profile', `/property/${FEATURED.id}`, '/assistant']) {
+  for (const path of ['/', '/explore', '/listing/new', '/profile', '/performance', `/property/${FEATURED.id}`, '/assistant']) {
     test(`X34 at 280px ${path} keeps every control on screen`, async ({ page, isMobile }) => {
       test.skip(!isMobile, 'phone project only');
       await page.goto(path);
@@ -1623,5 +1623,161 @@ test.describe('sign-up verification', () => {
     await ready(page);
     await expect(page.getByText(t('addSheet.signInFirst'))).toBeVisible();
     await expect.poll(() => page.evaluate((key) => localStorage.getItem(key), SESSION_STORAGE_KEY)).toBeNull();
+  });
+});
+
+// Raporti im (docs/PERFORMANCE_REPORT.md): the agent's private performance
+// report. The database's own privacy checks are supabase/tests/
+// rls_performance_report.sql; these check what the app shows and sends.
+test.describe('performance report', () => {
+  test.use({ signedIn: true });
+  const reportCalls = (writes: { table: string; body: Record<string, unknown> }[]) =>
+    writes.filter((w) => w.table === 'rpc/my_performance_report');
+
+  test('X66 the dashboard opens the report, which shows counts and sends no agent id', async ({ page, writes }) => {
+    await page.goto('/agent-dashboard');
+    await ready(page);
+    await page.getByRole('button', { name: new RegExp(escape(t('performance.entry'))) }).click();
+    await expect(page).toHaveURL(/\/performance$/);
+    await expect(page.getByRole('heading', { name: t('performance.sections.deals') })).toBeVisible();
+    const { deals, contact, viewings } = PERFORMANCE_REPORT;
+    await expect(page.getByLabel(`${t('performance.metrics.transactions')}: ${deals.sales + deals.rentals}`)).toBeVisible();
+    await expect(page.getByLabel(`${t('performance.metrics.messagesSent')}: ${contact.messages_sent}`)).toBeVisible();
+    await expect(page.getByLabel(`${t('performance.metrics.viewingsCancelled')}: ${viewings.cancelled}`)).toBeVisible();
+    await expect(page.getByText(t('performance.privateNote'))).toBeVisible();
+    // Achievements from the all-time counts: 12 listings is past ten.
+    await expect(page.getByText(t('performance.achievements.tenListings'))).toBeVisible();
+    // The report is asked for with a period and a time zone, never an id.
+    const calls = reportCalls(writes);
+    expect(calls.length).toBeGreaterThan(0);
+    for (const c of calls) expect(Object.keys(c.body).sort()).toEqual(['p_from', 'p_to', 'p_tz']);
+  });
+
+  test('X67 each period sends its own dates; a backwards custom range is refused', async ({ page, writes }) => {
+    await page.goto('/performance');
+    await ready(page);
+    const last = () => reportCalls(writes).at(-1)?.body ?? {};
+    // Opens on this month: from the 1st, up to now.
+    await expect.poll(() => reportCalls(writes).length).toBeGreaterThan(0);
+    expect(new Date(last().p_from as string).getDate()).toBe(1);
+    expect(last().p_to).toBeNull();
+
+    await page.getByRole('button', { name: t('performance.periods.all'), exact: true }).click();
+    await expect.poll(() => last().p_from).toBeNull();
+
+    await page.getByRole('button', { name: t('performance.periods.week'), exact: true }).click();
+    await expect.poll(() => (last().p_from ? new Date(last().p_from as string).getDay() : -1)).toBe(1);
+
+    await page.getByRole('button', { name: t('performance.periods.custom'), exact: true }).click();
+    await page.getByLabel(t('performance.from'), { exact: true }).fill('2026-10-01');
+    await page.getByLabel(t('performance.to'), { exact: true }).fill('2026-10-31');
+    // Whole days: 1 October up to the start of 1 November.
+    await expect.poll(() => last().p_to).toBe(new Date(2026, 10, 1).toISOString());
+    expect(last().p_from).toBe(new Date(2026, 9, 1).toISOString());
+
+    const before = reportCalls(writes).length;
+    await page.getByLabel(t('performance.from'), { exact: true }).fill('2026-11-05');
+    await expect(page.getByText(t('performance.customInvalid'))).toBeVisible();
+    await page.waitForTimeout(300);
+    expect(reportCalls(writes)).toHaveLength(before);
+  });
+
+  test('X68 the before estimate is the agent own, kept apart, and saved only once confirmed', async ({ page, writes }) => {
+    await page.goto('/performance');
+    await ready(page);
+    await expect(page.getByText(t('performance.impact.disclaimer'))).toBeVisible();
+    // Two of the four estimates were never entered: shown as such, not as 0.
+    await expect(page.getByText(t('performance.impact.notEntered'), { exact: true })).toHaveCount(2);
+
+    await page.getByRole('button', { name: t('performance.impact.edit') }).click();
+    const sales = page.getByRole('textbox', { name: t('performance.impact.rows.sales') });
+    const confirm = page.getByRole('checkbox', { name: t('performance.baseline.confirm') });
+    const save = page.getByRole('button', { name: t('performance.baseline.save') });
+    const saved = () => writes.filter((w) => w.table === 'agent_performance_baselines');
+
+    await sales.fill('abc');
+    await confirm.click();
+    await save.click();
+    await expect(page.getByText(t('performance.baseline.invalid'))).toBeVisible();
+
+    await sales.fill('3');
+    await confirm.click(); // unticked again
+    await save.click();
+    await expect(page.getByText(t('performance.baseline.mustConfirm'))).toBeVisible();
+    expect(saved()).toHaveLength(0);
+
+    await confirm.click();
+    await save.click();
+    await expect.poll(() => saved().length).toBe(1);
+    expect(saved()[0].body).toEqual({
+      agent_id: SIGNED_IN_USER.id,
+      monthly_rentals: null,
+      monthly_sales: 3,
+      monthly_inquiries: 2,
+      monthly_viewings: null,
+    });
+  });
+
+  test('X69 a client signed in gets no report and asks for none', async ({ page, writes }) => {
+    await page.route('**/rest/v1/profiles*', (route) => {
+      const row = { id: SIGNED_IN_USER.id, role: 'buyer', full_name: 'Ana Klientja', agency_name: null, avatar_url: null, preferred_language: 'sq' };
+      const one = (route.request().headers()['accept'] ?? '').includes('vnd.pgrst.object');
+      return json(route, one ? row : [row]);
+    });
+    await page.goto('/performance');
+    await ready(page);
+    await expect(page.getByText(t('performance.agentsOnly'))).toBeVisible();
+    await page.waitForTimeout(300);
+    expect(reportCalls(writes)).toHaveLength(0);
+  });
+
+  test('X70 marking a listing sold asks first: cancel changes nothing, confirm marks it', async ({ page, writes }) => {
+    await page.goto('/my-listings');
+    await ready(page);
+    const mark = page.getByRole('button', { name: t('listing.markSold') }).first();
+    await expect(mark).toBeVisible();
+    const marked = () => writes.filter((w) => w.table === 'properties' && w.method === 'PATCH' && w.body.status === 'sold');
+
+    page.once('dialog', (d) => {
+      expect(d.message()).toContain(t('listing.confirmSoldTitle'));
+      return d.dismiss();
+    });
+    await mark.click();
+    await page.waitForTimeout(300);
+    expect(marked()).toHaveLength(0);
+
+    page.once('dialog', (d) => d.accept());
+    await mark.click();
+    await expect.poll(() => marked().length).toBe(1);
+  });
+
+  test('X71 a confirmed viewing whose time has passed can be recorded as completed', async ({ page, writes }) => {
+    const base = {
+      property_id: LISTINGS[0].id,
+      client_id: CHAT_CLIENT_ID,
+      agent_id: SIGNED_IN_USER.id,
+      duration_minutes: 30,
+      notes: null,
+      created_at: '2026-10-01T09:00:00Z',
+      property: null,
+    };
+    await page.route('**/rest/v1/viewings*', (route) =>
+      route.request().method() === 'GET'
+        ? json(route, [
+            { ...base, id: 'e2e00000-0000-4000-d000-0000000000a1', scheduled_at: new Date(Date.now() - 86_400_000).toISOString(), status: 'confirmed' },
+            { ...base, id: 'e2e00000-0000-4000-d000-0000000000a2', scheduled_at: new Date(Date.now() + 86_400_000).toISOString(), status: 'confirmed' },
+          ])
+        : route.fallback(),
+    );
+    await page.goto('/viewings');
+    await ready(page);
+    // Only the past one offers it.
+    await expect(page.getByRole('button', { name: t('viewings.markCompleted') })).toHaveCount(1);
+    await expect(page.getByRole('button', { name: t('viewings.markNoShow') })).toHaveCount(1);
+    await page.getByRole('button', { name: t('viewings.markCompleted') }).click();
+    await expect
+      .poll(() => writes.filter((w) => w.table === 'viewings' && w.method === 'PATCH').map((w) => w.body.status))
+      .toEqual(['completed']);
+    await expect(page.getByText(t('viewings.status.completed'))).toBeVisible();
   });
 });

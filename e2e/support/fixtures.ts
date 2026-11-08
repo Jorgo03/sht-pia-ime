@@ -130,3 +130,30 @@ export const SAVED_SEARCHES = [
     created_at: '2026-10-01T09:00:00+00:00',
   },
 ];
+
+// What my_performance_report() answers for the signed-in agent: counts only
+// (docs/PERFORMANCE_REPORT.md). The "before" estimate leaves two values empty.
+export const PERFORMANCE_REPORT = {
+  since: '2026-01-15T10:00:00Z',
+  time_zone: 'Europe/Tirane',
+  listings: { published: 3, published_total: 12, active_now: 4, paused_now: 1 },
+  deals: { sales: 2, rentals: 1, sales_total: 5, rentals_total: 7 },
+  viewings: { scheduled: 6, completed: 4, cancelled: 1, completed_total: 11 },
+  contact: { inquiries: 9, inquiries_total: 40, messages_sent: 57, clients_answered: 8 },
+  leads: { added: 3, won: 1 },
+  monthly: Array.from({ length: 10 }, (_, i) => ({
+    month: `2026-${String(i + 1).padStart(2, '0')}`,
+    listings: i % 3,
+    transactions: i === 9 ? 3 : i % 2,
+    viewings: i % 4,
+    inquiries: i + 1,
+  })),
+  baseline: {
+    monthly_rentals: null,
+    monthly_sales: 0.5,
+    monthly_inquiries: 2,
+    monthly_viewings: null,
+    created_at: '2026-10-01T09:00:00Z',
+    updated_at: '2026-10-01T09:00:00Z',
+  },
+};

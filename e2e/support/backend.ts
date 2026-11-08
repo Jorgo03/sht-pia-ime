@@ -1,6 +1,6 @@
 import type { Page, Route } from '@playwright/test';
 
-import { AGENT, CONVERSATIONS, LISTINGS, SAVED_SEARCHES, type Listing } from './fixtures';
+import { AGENT, CONVERSATIONS, LISTINGS, PERFORMANCE_REPORT, SAVED_SEARCHES, type Listing } from './fixtures';
 
 // A stand-in for Supabase, served from inside the browser. The app under test
 // is built against https://e2e.supabase.co, which does not exist, and every
@@ -209,6 +209,15 @@ export async function mockBackend(page: Page, { signedIn = false, writes = [] as
         try { body = route.request().postDataJSON() ?? {}; } catch { /* binary upload */ }
         writes.push({ table: 'storage', method, query: url.pathname, body });
         return json(route, 200, method === 'DELETE' ? [] : { Key: url.pathname });
+      }
+      if (url.pathname === '/rest/v1/rpc/my_performance_report') {
+        // Like the database: agents only, and the arguments are recorded so a
+        // test can check no agent id is ever sent.
+        if (!signedIn) return json(route, 401, { code: '42501', message: 'performance reports are for agents only' });
+        let body: Record<string, unknown> = {};
+        try { body = route.request().postDataJSON() ?? {}; } catch { /* no body */ }
+        writes.push({ table: 'rpc/my_performance_report', method, query: url.search, body });
+        return json(route, 200, PERFORMANCE_REPORT);
       }
       if (url.pathname.startsWith('/rest/v1/properties')) return properties(route, url, store, writes);
       if (url.pathname.startsWith('/rest/v1/profiles')) return profiles(route, url, writes);

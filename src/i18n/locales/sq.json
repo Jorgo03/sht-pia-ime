@@ -520,7 +520,10 @@
     "zoneNone": "Pa lagje",
     "fileSizeMb": "{{size}} MB",
     "removePhoto": "Hiq foton",
-    "removeVideo": "Hiq videon"
+    "removeVideo": "Hiq videon",
+    "confirmSoldTitle": "Ta shënoni si të shitur?",
+    "confirmRentedTitle": "Ta shënoni si të dhënë me qira?",
+    "confirmClosedHint": "Shënojeni vetëm kur marrëveshja është përfunduar. Do të llogaritet në raportin tuaj; nëse e zhbëni brenda 7 ditëve, nuk llogaritet."
   },
   "dashboard": {
     "title": "Paneli i pronës",
@@ -612,7 +615,9 @@
       "cancelled": "E anuluar",
       "completed": "E përfunduar",
       "no_show": "Nuk u paraqit"
-    }
+    },
+    "markCompleted": "U krye",
+    "markNoShow": "Nuk erdhi"
   },
   "saved": {
     "kicker": "Kërkimet dhe kërkesat",
@@ -890,5 +895,101 @@
     "minutesAgo": "{{n}} min më parë",
     "hoursAgo": "{{n}} orë më parë",
     "daysAgo": "{{n}} ditë më parë"
+  },
+  "performance": {
+    "entry": "Raporti im i performancës",
+    "entrySub": "Rezultatet tuaja, të dukshme vetëm për ju",
+    "kicker": "Raporti im",
+    "headlinePre": "Performanca",
+    "headlineEm": "ime.",
+    "privateNote": "Ky raport shihet vetëm nga ju. Nuk krahasohet me agjentë të tjerë dhe nuk shfaqet në profilin tuaj.",
+    "agentsOnly": "Raporti i performancës është vetëm për agjentët.",
+    "period": "Periudha",
+    "periods": {
+      "week": "Këtë javë",
+      "month": "Këtë muaj",
+      "3m": "3 muajt e fundit",
+      "6m": "6 muajt e fundit",
+      "year": "Këtë vit",
+      "all": "Gjithë kohën",
+      "custom": "Zgjidh datat"
+    },
+    "from": "Nga",
+    "to": "Deri",
+    "customInvalid": "Data e fillimit duhet të jetë para ose e njëjtë me datën e mbarimit.",
+    "sections": {
+      "properties": "Pronat e mia",
+      "clients": "Klientët e mi",
+      "deals": "Transaksionet e përfunduara",
+      "activity": "Aktiviteti im",
+      "history": "Ecuria ime",
+      "impact": "Ndikimi i Shtëpia.ime në rezultatet e mia",
+      "achievements": "Arritjet e mia"
+    },
+    "metrics": {
+      "published": "Prona të publikuara",
+      "activeNow": "Aktive tani",
+      "pausedNow": "Të pezulluara tani",
+      "inquiries": "Kërkesa të reja nga klientët",
+      "clientsAnswered": "Klientë të kontaktuar",
+      "leadsAdded": "Kontakte të shtuara",
+      "leadsWon": "Kontakte të fituara",
+      "viewingsScheduled": "Shikime të planifikuara",
+      "viewingsCompleted": "Shikime të kryera",
+      "viewingsCancelled": "Shikime të anuluara",
+      "sales": "Shitje",
+      "rentals": "Dhënie me qira",
+      "transactions": "Gjithsej",
+      "messagesSent": "Mesazhe të dërguara"
+    },
+    "notes": {
+      "snapshot": "Pronat aktive dhe të pezulluara tregojnë gjendjen e sotme.",
+      "deals": "Llogariten pronat që keni shënuar si të shitura ose të dhëna me qira. Një shënim i zhbërë brenda 7 ditëve nuk llogaritet. Vlera e transaksioneve nuk tregohet: aplikacioni ruan vetëm çmimin e kërkuar.",
+      "leadsWon": "Kontaktet e fituara janë nga ato të shtuara në këtë periudhë."
+    },
+    "history": {
+      "since": "Në Shtëpia.ime që nga {{date}}",
+      "listings": "Prona",
+      "transactions": "Transaksione",
+      "viewings": "Shikime",
+      "inquiries": "Kërkesa",
+      "chartLabel": "{{metric}} për muaj",
+      "empty": "Ende nuk ka aktivitet për t’u treguar."
+    },
+    "impact": {
+      "intro": "Krahasoni mesataren mujore që regjistron aplikacioni me vlerësimin tuaj për periudhën para Shtëpia.ime.",
+      "disclaimer": "Shifrat \"para\" janë vlerësimi juaj, jo të dhëna të aplikacionit. Ky është një krahasim, jo provë që ndryshimi vjen nga Shtëpia.ime.",
+      "before": "Para (vlerësimi juaj)",
+      "now": "Tani (e regjistruar)",
+      "difference": "Ndryshimi",
+      "notEntered": "Pa vlerësim",
+      "enter": "Shto vlerësimin tuaj",
+      "edit": "Ndrysho vlerësimin",
+      "updated": "Vlerësimi juaj, më {{date}}",
+      "rows": {
+        "rentals": "Dhënie me qira në muaj",
+        "sales": "Shitje në muaj",
+        "inquiries": "Kërkesa nga klientët në muaj",
+        "viewings": "Shikime të kryera në muaj"
+      }
+    },
+    "baseline": {
+      "title": "Para Shtëpia.ime",
+      "hint": "Sa kishit mesatarisht në muaj para se të përdornit Shtëpia.ime? Lërini bosh ato që nuk i dini.",
+      "confirm": "Konfirmoj që këto janë vlerësimi im.",
+      "save": "Ruaj vlerësimin",
+      "invalid": "Shkruani një numër nga 0 deri në 1000.",
+      "mustConfirm": "Konfirmoni vlerësimin para se ta ruani.",
+      "saveFailed": "Vlerësimi nuk u ruajt. Provoni përsëri."
+    },
+    "achievements": {
+      "firstListing": "Prona e parë e publikuar",
+      "firstTransaction": "Transaksioni i parë i përfunduar",
+      "tenListings": "10 prona të publikuara",
+      "tenViewings": "10 shikime të kryera",
+      "tenTransactions": "10 transaksione të përfunduara",
+      "progress": "{{value}} nga {{target}}",
+      "done": "Arritur"
+    }
   }
 }

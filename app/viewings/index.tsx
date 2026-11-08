@@ -16,7 +16,7 @@ import { supabase } from '@/lib/supabase';
 import { formatDate, getLocalizedText } from '@/lib/format';
 import { useReadableColumn } from '@/hooks/use-responsive';
 
-type ViewingStatus = 'requested' | 'confirmed' | 'declined' | 'cancelled';
+type ViewingStatus = 'requested' | 'confirmed' | 'declined' | 'cancelled' | 'completed' | 'no_show';
 
 interface ViewingProperty {
   id: string;
@@ -52,6 +52,8 @@ function statusColor(colors: AtticoPalette, status: ViewingStatus): string {
     confirmed: colors.statusActive,
     declined: colors.statusSold,
     cancelled: colors.statusDraft,
+    completed: colors.statusActive,
+    no_show: colors.statusSold,
   };
   return map[status] ?? colors.statusDraft;
 }
@@ -75,6 +77,8 @@ export default function ViewingsScreen() {
   // A failed read: shown with a retry rather than as an empty list.
   const [loadError, setLoadError] = useState(false);
   const [actionError, setActionError] = useState(false);
+  // When the list was loaded: which confirmed viewings are already past.
+  const [loadedAt, setLoadedAt] = useState(() => Date.now());
 
   // Mirrors the web app's Viewings.jsx load() — RLS already scopes rows to
   // where the user is the client, the agent, or the property owner.
@@ -95,6 +99,7 @@ export default function ViewingsScreen() {
       return;
     }
     const rows = (data ?? []) as Viewing[];
+    setLoadedAt(Date.now());
     setViewings(rows);
 
     const clientIds = [...new Set(rows.filter((v) => v.client_id !== user.id).map((v) => v.client_id))];
@@ -171,6 +176,21 @@ export default function ViewingsScreen() {
               <TouchableOpacity accessibilityRole="button" style={styles.actionButton} onPress={() => setStatus(v.id, 'declined')} activeOpacity={0.7}>
                 <MaterialIcons name="close" size={14} color={colors.textPrimary} />
                 <Text style={styles.actionButtonText}>{t('viewings.decline')}</Text>
+              </TouchableOpacity>
+            </>
+          )}
+          {/* Once a confirmed viewing's time has passed, its agent records
+              whether it happened: the report counts only completed ones, and
+              the database refuses this earlier or from anyone else. */}
+          {isIncoming && v.status === 'confirmed' && new Date(v.scheduled_at).getTime() <= loadedAt && (
+            <>
+              <TouchableOpacity accessibilityRole="button" style={styles.actionButton} onPress={() => setStatus(v.id, 'completed')} activeOpacity={0.7}>
+                <MaterialIcons name="done-all" size={14} color={colors.textPrimary} />
+                <Text style={styles.actionButtonText}>{t('viewings.markCompleted')}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity accessibilityRole="button" style={styles.actionButton} onPress={() => setStatus(v.id, 'no_show')} activeOpacity={0.7}>
+                <MaterialIcons name="person-off" size={14} color={colors.textPrimary} />
+                <Text style={styles.actionButtonText}>{t('viewings.markNoShow')}</Text>
               </TouchableOpacity>
             </>
           )}

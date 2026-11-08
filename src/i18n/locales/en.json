@@ -520,7 +520,10 @@
     "zoneNone": "No neighborhood",
     "fileSizeMb": "{{size}} MB",
     "removePhoto": "Remove photo",
-    "removeVideo": "Remove video"
+    "removeVideo": "Remove video",
+    "confirmSoldTitle": "Mark as sold?",
+    "confirmRentedTitle": "Mark as rented?",
+    "confirmClosedHint": "Only do this once the deal is complete. It counts in your report; undone within 7 days, it does not."
   },
   "dashboard": {
     "title": "Property Dashboard",
@@ -612,7 +615,9 @@
       "cancelled": "Cancelled",
       "completed": "Completed",
       "no_show": "No-show"
-    }
+    },
+    "markCompleted": "Completed",
+    "markNoShow": "No-show"
   },
   "saved": {
     "kicker": "Searches & requests",
@@ -890,5 +895,101 @@
     "minutesAgo": "{{n}} min ago",
     "hoursAgo": "{{n}} h ago",
     "daysAgo": "{{n}} d ago"
+  },
+  "performance": {
+    "entry": "My performance report",
+    "entrySub": "Your results, visible only to you",
+    "kicker": "My report",
+    "headlinePre": "My",
+    "headlineEm": "performance.",
+    "privateNote": "Only you can see this report. It is not compared with other agents and does not appear on your profile.",
+    "agentsOnly": "The performance report is for agents only.",
+    "period": "Period",
+    "periods": {
+      "week": "This week",
+      "month": "This month",
+      "3m": "Last 3 months",
+      "6m": "Last 6 months",
+      "year": "This year",
+      "all": "All time",
+      "custom": "Pick dates"
+    },
+    "from": "From",
+    "to": "To",
+    "customInvalid": "The start date must be on or before the end date.",
+    "sections": {
+      "properties": "My properties",
+      "clients": "My clients",
+      "deals": "Completed transactions",
+      "activity": "My activity",
+      "history": "My progress",
+      "impact": "Shtëpia.ime and my results",
+      "achievements": "My achievements"
+    },
+    "metrics": {
+      "published": "Properties published",
+      "activeNow": "Active now",
+      "pausedNow": "Paused now",
+      "inquiries": "New client inquiries",
+      "clientsAnswered": "Clients contacted",
+      "leadsAdded": "Leads added",
+      "leadsWon": "Leads won",
+      "viewingsScheduled": "Viewings scheduled",
+      "viewingsCompleted": "Viewings completed",
+      "viewingsCancelled": "Viewings cancelled",
+      "sales": "Sales",
+      "rentals": "Rentals",
+      "transactions": "Total",
+      "messagesSent": "Messages sent"
+    },
+    "notes": {
+      "snapshot": "Active and paused show today’s state.",
+      "deals": "Counts the properties you marked as sold or rented. A mark undone within 7 days is not counted. Transaction value is not shown: the app only stores the asking price.",
+      "leadsWon": "Leads won are among those added in this period."
+    },
+    "history": {
+      "since": "On Shtëpia.ime since {{date}}",
+      "listings": "Properties",
+      "transactions": "Transactions",
+      "viewings": "Viewings",
+      "inquiries": "Inquiries",
+      "chartLabel": "{{metric}} per month",
+      "empty": "No activity to show yet."
+    },
+    "impact": {
+      "intro": "Compare the monthly average the app records with your own estimate for the time before Shtëpia.ime.",
+      "disclaimer": "The \"before\" figures are your estimate, not app data. This is a comparison, not proof that Shtëpia.ime caused the change.",
+      "before": "Before (your estimate)",
+      "now": "Now (recorded)",
+      "difference": "Change",
+      "notEntered": "No estimate",
+      "enter": "Add your estimate",
+      "edit": "Edit estimate",
+      "updated": "Your estimate, {{date}}",
+      "rows": {
+        "rentals": "Rentals per month",
+        "sales": "Sales per month",
+        "inquiries": "Client inquiries per month",
+        "viewings": "Viewings completed per month"
+      }
+    },
+    "baseline": {
+      "title": "Before Shtëpia.ime",
+      "hint": "On average, how many per month did you have before using Shtëpia.ime? Leave blank what you do not know.",
+      "confirm": "I confirm these are my own estimates.",
+      "save": "Save estimate",
+      "invalid": "Enter a number from 0 to 1000.",
+      "mustConfirm": "Confirm the estimate before saving it.",
+      "saveFailed": "The estimate was not saved. Try again."
+    },
+    "achievements": {
+      "firstListing": "First property published",
+      "firstTransaction": "First completed transaction",
+      "tenListings": "10 properties published",
+      "tenViewings": "10 viewings completed",
+      "tenTransactions": "10 completed transactions",
+      "progress": "{{value}} of {{target}}",
+      "done": "Reached"
+    }
   }
 }

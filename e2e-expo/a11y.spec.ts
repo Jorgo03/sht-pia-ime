@@ -28,7 +28,7 @@ for (const scheme of ['light', 'dark'] as const) {
 }
 
 // Pass 20: the signed-in screens had no scan at all.
-const SIGNED_IN_PATHS = ['/messages', '/favorites', '/viewings', '/my-listings', '/saved-searches'];
+const SIGNED_IN_PATHS = ['/messages', '/favorites', '/viewings', '/my-listings', '/saved-searches', '/agent-dashboard', '/performance'];
 test.describe('signed in', () => {
   test.use({ signedIn: true });
   for (const scheme of ['light', 'dark'] as const) {

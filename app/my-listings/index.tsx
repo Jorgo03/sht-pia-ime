@@ -97,6 +97,17 @@ export default function MyListingsScreen() {
   const toggleStatus = (id: string, current: string) =>
     setStatus(id, current === 'active' ? 'paused' : 'active');
 
+  // Sold / rented counts as a completed transaction in the agent's report,
+  // so it is asked for, not one tap (docs/PERFORMANCE_REPORT.md).
+  const confirmClosed = (id: string, next: 'sold' | 'rented') =>
+    confirmAction({
+      title: next === 'sold' ? t('listing.confirmSoldTitle') : t('listing.confirmRentedTitle'),
+      message: t('listing.confirmClosedHint'),
+      confirmText: next === 'sold' ? t('listing.markSold') : t('listing.markRented'),
+      cancelText: t('common.cancel'),
+      onConfirm: () => setStatus(id, next),
+    });
+
   const confirmDelete = (id: string) =>
     confirmAction({
       title: t('listing.confirmDelete'),
@@ -234,7 +245,7 @@ export default function MyListingsScreen() {
                         <TouchableOpacity
                           style={styles.iconButton}
                         hitSlop={4}
-                          onPress={() => setStatus(item.id, closedStatusFor(item.listing_type))}
+                          onPress={() => confirmClosed(item.id, closedStatusFor(item.listing_type))}
                           accessibilityRole="button"
                           accessibilityLabel={
                             closedStatusFor(item.listing_type) === 'sold'

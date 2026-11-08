@@ -486,7 +486,10 @@
     "zoneNone": "Bez dzielnicy",
     "fileSizeMb": "{{size}} MB",
     "removePhoto": "Usuń zdjęcie",
-    "removeVideo": "Usuń wideo"
+    "removeVideo": "Usuń wideo",
+    "confirmSoldTitle": "Oznaczyć jako sprzedane?",
+    "confirmRentedTitle": "Oznaczyć jako wynajęte?",
+    "confirmClosedHint": "Zrób to dopiero po zakończeniu transakcji. Liczy się w Twoim raporcie; cofnięte w ciągu 7 dni nie liczy się."
   },
   "dashboard": {
     "title": "Dashboard nieruchomości",
@@ -630,7 +633,9 @@
       "cancelled": "Anulowana",
       "completed": "Zakończona",
       "no_show": "Nieobecność"
-    }
+    },
+    "markCompleted": "Odbyło się",
+    "markNoShow": "Nie przyszedł"
   },
   "saved": {
     "kicker": "Wyszukiwania i zapytania",
@@ -910,5 +915,101 @@
     "minutesAgo": "{{n}} min temu",
     "hoursAgo": "{{n}} godz. temu",
     "daysAgo": "{{n}} d. temu"
+  },
+  "performance": {
+    "entry": "Mój raport wyników",
+    "entrySub": "Twoje wyniki, widoczne tylko dla Ciebie",
+    "kicker": "Mój raport",
+    "headlinePre": "Moje",
+    "headlineEm": "wyniki.",
+    "privateNote": "Tylko Ty widzisz ten raport. Nie jest porównywany z innymi agentami i nie pojawia się w Twoim profilu.",
+    "agentsOnly": "Raport wyników jest tylko dla agentów.",
+    "period": "Okres",
+    "periods": {
+      "week": "Ten tydzień",
+      "month": "Ten miesiąc",
+      "3m": "Ostatnie 3 miesiące",
+      "6m": "Ostatnie 6 miesięcy",
+      "year": "Ten rok",
+      "all": "Cały czas",
+      "custom": "Wybierz daty"
+    },
+    "from": "Od",
+    "to": "Do",
+    "customInvalid": "Data początkowa musi być wcześniejsza lub równa końcowej.",
+    "sections": {
+      "properties": "Moje nieruchomości",
+      "clients": "Moi klienci",
+      "deals": "Zakończone transakcje",
+      "activity": "Moja aktywność",
+      "history": "Moje postępy",
+      "impact": "Shtëpia.ime a moje wyniki",
+      "achievements": "Moje osiągnięcia"
+    },
+    "metrics": {
+      "published": "Opublikowane nieruchomości",
+      "activeNow": "Aktywne teraz",
+      "pausedNow": "Wstrzymane teraz",
+      "inquiries": "Nowe zapytania klientów",
+      "clientsAnswered": "Klienci, z którymi się kontaktowano",
+      "leadsAdded": "Dodane kontakty",
+      "leadsWon": "Pozyskane kontakty",
+      "viewingsScheduled": "Zaplanowane oglądania",
+      "viewingsCompleted": "Odbyte oglądania",
+      "viewingsCancelled": "Odwołane oglądania",
+      "sales": "Sprzedaże",
+      "rentals": "Wynajmy",
+      "transactions": "Razem",
+      "messagesSent": "Wysłane wiadomości"
+    },
+    "notes": {
+      "snapshot": "Aktywne i wstrzymane pokazują stan na dziś.",
+      "deals": "Liczone są nieruchomości oznaczone jako sprzedane lub wynajęte. Cofnięte w ciągu 7 dni nie są liczone. Wartość transakcji nie jest pokazywana: aplikacja zapisuje tylko cenę ofertową.",
+      "leadsWon": "Pozyskane kontakty pochodzą z dodanych w tym okresie."
+    },
+    "history": {
+      "since": "W Shtëpia.ime od {{date}}",
+      "listings": "Nieruchomości",
+      "transactions": "Transakcje",
+      "viewings": "Oglądania",
+      "inquiries": "Zapytania",
+      "chartLabel": "{{metric}} na miesiąc",
+      "empty": "Brak aktywności do pokazania."
+    },
+    "impact": {
+      "intro": "Porównaj średnią miesięczną zapisaną przez aplikację z własnym szacunkiem z czasu przed Shtëpia.ime.",
+      "disclaimer": "Wartości „przed” to Twój szacunek, nie dane aplikacji. To porównanie, a nie dowód, że zmianę spowodowała Shtëpia.ime.",
+      "before": "Przed (Twój szacunek)",
+      "now": "Teraz (zapisane)",
+      "difference": "Zmiana",
+      "notEntered": "Brak szacunku",
+      "enter": "Dodaj swój szacunek",
+      "edit": "Zmień szacunek",
+      "updated": "Twój szacunek, {{date}}",
+      "rows": {
+        "rentals": "Wynajmy na miesiąc",
+        "sales": "Sprzedaże na miesiąc",
+        "inquiries": "Zapytania klientów na miesiąc",
+        "viewings": "Odbyte oglądania na miesiąc"
+      }
+    },
+    "baseline": {
+      "title": "Przed Shtëpia.ime",
+      "hint": "Ile średnio miesięcznie miałeś przed korzystaniem z Shtëpia.ime? Zostaw puste to, czego nie wiesz.",
+      "confirm": "Potwierdzam, że to moje własne szacunki.",
+      "save": "Zapisz szacunek",
+      "invalid": "Wpisz liczbę od 0 do 1000.",
+      "mustConfirm": "Potwierdź szacunek przed zapisaniem.",
+      "saveFailed": "Nie zapisano szacunku. Spróbuj ponownie."
+    },
+    "achievements": {
+      "firstListing": "Pierwsza opublikowana nieruchomość",
+      "firstTransaction": "Pierwsza zakończona transakcja",
+      "tenListings": "10 opublikowanych nieruchomości",
+      "tenViewings": "10 odbytych oglądań",
+      "tenTransactions": "10 zakończonych transakcji",
+      "progress": "{{value}} z {{target}}",
+      "done": "Osiągnięte"
+    }
   }
 }
