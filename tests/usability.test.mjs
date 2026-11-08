@@ -50,3 +50,10 @@ test('deleting a saved search or a wanted home asks first', () => {
 test('Messages in the Profile menu has a message picture', () => {
   assert.match(read('app/(tabs)/profile.tsx'), /name="chat-bubble-outline"[^\n]*\n\s*<Text style=\{styles\.menuRowText\}>\{t\('common\.messages'\)\}/)
 })
+
+test('over a dark header the status bar icons are light, only while that screen is on top', () => {
+  const header = read('components/ui/app-header.tsx')
+  assert.ok(header.includes('(onDark || floating) && <LightStatusBarWhileFocused />'))
+  assert.ok(header.includes('focused ? <StatusBar style="light" /> : null'))
+  assert.match(header, /paddingTop: 16/)
+})

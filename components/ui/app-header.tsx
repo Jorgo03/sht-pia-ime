@@ -1,6 +1,8 @@
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useIsFocused } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
 import { useMemo, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -55,6 +57,17 @@ const LANGUAGES = [
  * both themes. Everywhere else it follows the palette, exactly like web's
  * theme-driven `--fho-surface`.
  */
+/**
+ * Light clock and battery icons over a dark header. The app-wide status bar
+ * (app/_layout.tsx) follows the theme, so in light mode it drew dark icons on
+ * the always-dark sign-in screen and over listing photos. Only while focused:
+ * tabs stay mounted, and a hidden screen must not keep the icons white.
+ */
+function LightStatusBarWhileFocused() {
+  const focused = useIsFocused();
+  return focused ? <StatusBar style="light" /> : null;
+}
+
 export function AppHeader({
   /** Right-most slot — web puts the avatar (signed in) or a person icon
    *  (signed out) here. Omit it on the account screen itself, where it would
@@ -110,7 +123,7 @@ export function AppHeader({
   // and its 8 rows (~358) ran off a 360x380 Flip cover, so it now scrolls
   // within the window. On the web the Modal covers the whole browser window,
   // not the 480 column, so the menu is anchored to the column's right edge.
-  const menuTop = insets.top + 60;
+  const menuTop = insets.top + 66;
   const menuMaxHeight = Math.max(120, windowHeight - menuTop - insets.bottom - 24);
   const menuRight = IS_WEB
     ? Math.max(HEADER_GUTTER, (windowWidth - WEB_MAX_WIDTH) / 2 + HEADER_GUTTER)
@@ -143,6 +156,7 @@ export function AppHeader({
 
   return (
     <View style={styles.header} onLayout={track('bar')}>
+      {(onDark || floating) && <LightStatusBarWhileFocused />}
       {/* A floating header lets the hero image show through, so it gets no
           blur layer and no tint — only the controls sit on top. */}
       {!floating && (
@@ -310,7 +324,9 @@ const createStyles = (
       // they're already touching.
       gap: 8,
       paddingHorizontal: HEADER_GUTTER,
-      paddingVertical: 10,
+      // More above than below: clear of the phone's clock and battery.
+      paddingTop: 16,
+      paddingBottom: 10,
       // The floating variant is chrome over a photo — a border would draw a
       // line across the image.
       borderBottomWidth: floating ? 0 : StyleSheet.hairlineWidth,
