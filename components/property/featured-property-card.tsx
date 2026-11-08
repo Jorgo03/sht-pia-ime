@@ -140,11 +140,16 @@ function FeaturedPropertyCardBase({
 export const FeaturedPropertyCard = memo(FeaturedPropertyCardBase);
 
 const createStyles = (colors: AtticoPalette) => StyleSheet.create({
+  // One border on the card itself, as on the smaller cards below: a border on
+  // the body alone was cut off where the card's rounded corners clipped it.
   card: {
     borderRadius: 20,
     overflow: 'hidden',
     alignSelf: 'center',
     marginHorizontal: CARD_MARGIN,
+    backgroundColor: colors.primaryLight,
+    borderWidth: 1,
+    borderColor: colors.border,
   },
   imageWrap: {
     height: IMAGE_HEIGHT,
@@ -157,16 +162,17 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     position: 'absolute',
     top: 14,
     left: 14,
-    backgroundColor: 'rgba(0,0,0,0.4)',
-    paddingHorizontal: 10,
+    // The same dark chip as the grid cards: a clear edge on any photo.
+    backgroundColor: 'rgba(20,17,14,0.72)',
+    paddingHorizontal: 12,
     paddingVertical: 5,
-    borderRadius: 10,
+    borderRadius: 999,
   },
   badgeText: {
     fontSize: 12,
-    fontFamily: Fonts.sansMedium,
+    fontFamily: Fonts.sansSemiBold,
     color: '#fff',
-    letterSpacing: 1,
+    letterSpacing: 0.6,
     textTransform: 'uppercase',
   },
   heartButton: {
@@ -185,16 +191,9 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     shadowOffset: { width: 0, height: 3 },
     elevation: 3,
   },
-  // Matches web's .featured-card__body — the border wraps only the body,
-  // not the image above it (border-top: none), unlike a border around the
-  // whole card.
   body: {
-    backgroundColor: colors.primaryLight,
     paddingHorizontal: 18,
     paddingVertical: 16,
-    borderWidth: 1,
-    borderTopWidth: 0,
-    borderColor: colors.border,
   },
   name: {
     fontFamily: Fonts?.serif,
@@ -232,8 +231,9 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     fontSize: 12,
     color: colors.textSecondary,
   },
+  // The same upright font as every other card's price.
   price: {
-    fontFamily: Fonts?.serifItalic,
+    fontFamily: Fonts?.serif,
     fontSize: 22,
     color: colors.accentText,
   },

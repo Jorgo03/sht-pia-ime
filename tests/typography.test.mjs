@@ -59,6 +59,19 @@ test('no phone-app style sets fontStyle: Android fakes a slant, iOS ignores it',
   assert.deepEqual(italics, [], 'use Fonts.serifItalic, the real italic file')
 })
 
+test('no price is italic, so a price reads the same on every card and both phones', () => {
+  const italicPrices = []
+  for (const f of files) {
+    const src = fs.readFileSync(f, 'utf8')
+    for (const m of src.matchAll(/\b\w*[pP]rice\w*:\s*\{[^{}]*\}/g)) {
+      if (/serifItalic/.test(m[0])) italicPrices.push(`${path.relative(root, f)}: ${m[0].split(':')[0]}`)
+    }
+  }
+  assert.deepEqual(italicPrices, [])
+  const card = fs.readFileSync(path.join(root, 'components/property/featured-property-card.tsx'), 'utf8')
+  assert.match(card, /\bprice:\s*\{\s*fontFamily: Fonts\?\.serif,/)
+})
+
 test('every font file the styles name is loaded before or right after first paint', () => {
   const theme = fs.readFileSync(path.join(root, 'constants/theme.ts'), 'utf8')
   const layout = fs.readFileSync(path.join(root, 'app/_layout.tsx'), 'utf8')
