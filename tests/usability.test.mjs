@@ -57,5 +57,5 @@ test('over a dark header the status bar icons are light, only while that screen 
   assert.ok(header.includes('focused ? <StatusBar style="light" /> : null'))
   assert.match(header, /HEADER_TOP_PADDING = 16/)
   // The bar's colour runs up behind the clock and battery.
-  assert.match(header, /marginTop: -insets.top, paddingTop: insets.top + HEADER_TOP_PADDING/)
+  assert.ok(header.includes('marginTop: -insets.top, paddingTop: insets.top + HEADER_TOP_PADDING'))
 })
