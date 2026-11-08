@@ -2,7 +2,7 @@ import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useFocusEffect, useRouter, type Href } from 'expo-router';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, BackHandler, FlatList, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 
@@ -68,6 +68,18 @@ export default function MessagesInboxScreen() {
   // A real tab: the bottom menu stays on screen and the person chooses
   // where to go next. Nothing here sends them anywhere by itself.
   const tabBarClearance = useTabBarClearance();
+
+  // Android's own back button would otherwise jump to Home (the tab
+  // navigator's default). Here the person picks the next tab from the menu,
+  // as on iPhone, so back stays put. Only while this list is on screen: an
+  // open chat is a screen above it, and its back still returns here.
+  useFocusEffect(
+    useCallback(() => {
+      if (Platform.OS !== 'android') return undefined;
+      const sub = BackHandler.addEventListener('hardwareBackPress', () => true);
+      return () => sub.remove();
+    }, []),
+  );
   const initial = user && inboxCache?.userId === user.id ? inboxCache : null;
   const [conversations, setConversations] = useState<Conversation[]>(() => initial?.conversations ?? []);
   const [profiles, setProfiles] = useState<Record<string, OtherProfile>>(() => initial?.profiles ?? {});
