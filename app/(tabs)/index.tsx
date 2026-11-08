@@ -10,6 +10,8 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 
+import { AgentRail } from '@/components/home/agent-rail';
+import { CityRail } from '@/components/home/city-rail';
 import { useTabBarClearance } from '@/components/liquid-tab-bar';
 import { NotificationInvite } from '@/components/notifications/notification-invite';
 import { FeaturedPropertyCard } from '@/components/property/featured-property-card';
@@ -27,7 +29,12 @@ import { Fonts, InlineTarget, type AtticoPalette } from '@/constants/theme';
 import { useFilters } from '@/contexts/filters-context';
 import { useTheme } from '@/contexts/theme-context';
 import { useReadableColumn, useResponsive } from '@/hooks/use-responsive';
-import { usePropertiesByIdsQuery, usePropertiesQuery } from '@/hooks/use-property-queries';
+import {
+  useAgentDirectoryQuery,
+  useCityTilesQuery,
+  usePropertiesByIdsQuery,
+  usePropertiesQuery,
+} from '@/hooks/use-property-queries';
 import { useRecentlyViewed } from '@/hooks/use-recently-viewed';
 import { type Property } from '@/data/types';
 import { IS_WEB } from '@/constants/web-frame';
@@ -40,6 +47,9 @@ const HOME_LIMIT = 24;
 
 /** Rows shown before the "see all" button hands over to Explore. */
 const NEWEST_VISIBLE = 8;
+
+/** Agencies shown on Home before "see all" opens the directory. */
+const AGENTS_VISIBLE = 10;
 
 type ListingType = Property['listing_type'];
 // Sale first, then the rentals: the order buyers in this market look in.
@@ -59,6 +69,8 @@ export default function HomeScreen() {
   // instead of the full-screen spinner this used to force on every focus.
   const { data: listings = [], isLoading: loading, isError, refetch } = usePropertiesQuery({}, HOME_LIMIT);
   const { data: recentProperties = [] } = usePropertiesByIdsQuery(recentIds.slice(0, 6));
+  const cityTiles = useCityTilesQuery();
+  const { data: agents = [] } = useAgentDirectoryQuery();
   const { width: screenWidth, height: screenHeight, columns } = useResponsive();
   const snapInterval = getCompactCardSnapInterval(screenWidth);
   // A centred column on an unfolded Fold or a spanned Duo, so the rows and
@@ -107,6 +119,12 @@ export default function HomeScreen() {
   // rentals instead of on everything.
   const openExplore = (listingType: ListingType | null) => {
     setFilter('listingType', listingType, { immediate: true });
+    router.push('/(tabs)/explore' as Href);
+  };
+
+  const openCity = (city: string) => {
+    setFilter('zone', null, { immediate: true });
+    setFilter('city', city, { immediate: true });
     router.push('/(tabs)/explore' as Href);
   };
 
@@ -180,6 +198,21 @@ export default function HomeScreen() {
                 </>
               )}
 
+              {(cityTiles.isLoading || cityTiles.isError || (cityTiles.data?.length ?? 0) > 0) && (
+                <View style={styles.section}>
+                  <View style={styles.sectionHeader}>
+                    <Text style={styles.sectionTitle}>{t('home.exploreCities')}</Text>
+                  </View>
+                  <CityRail
+                    tiles={cityTiles.data ?? []}
+                    loading={cityTiles.isLoading}
+                    failed={cityTiles.isError}
+                    onRetry={() => void cityTiles.refetch()}
+                    onSelect={openCity}
+                  />
+                </View>
+              )}
+
               {matched.length > 0 && (
                 <View style={styles.section}>
                   <View style={styles.sectionHeader}>
@@ -204,6 +237,23 @@ export default function HomeScreen() {
                       </RiseIn>
                     ))}
                   </ScrollView>
+                </View>
+              )}
+
+              {agents.length > 0 && (
+                <View style={styles.section}>
+                  <View style={styles.sectionHeader}>
+                    <Text style={styles.sectionTitle}>{t('home.agencies')}</Text>
+                    <TouchableOpacity
+                      accessibilityRole="button"
+                      accessibilityLabel={`${t('home.agencies')}: ${t('home.seeAll')}`}
+                      onPress={() => router.push('/agents' as Href)}
+                      style={InlineTarget}
+                      activeOpacity={0.7}>
+                      <Text style={styles.seeAll}>{t('home.seeAll')}</Text>
+                    </TouchableOpacity>
+                  </View>
+                  <AgentRail agents={agents.slice(0, AGENTS_VISIBLE)} onSelect={(id) => router.push(`/agent/${id}` as Href)} />
                 </View>
               )}
 

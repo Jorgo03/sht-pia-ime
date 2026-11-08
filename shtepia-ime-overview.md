@@ -66,6 +66,9 @@ set they return `503 ai_unavailable` and the client falls back to non-AI paths.
 | Viewings scheduling (request on property page, manage at `/viewings`) | live (pass 2) |
 | Agent dashboard (stats + pending viewings + wanted-homes feed) | live v1 (pass 2) |
 | Search sorting (newest / price ↑↓) | live (pass 2) |
+| Explore by city (Home tiles with live counts) | live |
+| Agencies and agents directory (`/agents`, Home rail) | live; built from active listings, app only |
+| Compare up to 3 homes side by side (`/compare`) | live; picks stored on the device, app only |
 | Smart recommendations, photo tagging, price insight | not started (price insight flagged in DECISIONS.md) |
 
 ## Open Business Questions

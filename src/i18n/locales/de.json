@@ -141,7 +141,9 @@
         "lead": "Entdecke",
         "accent": "deine nächste Chance."
       }
-    ]
+    ],
+    "exploreCities": "Nach Stadt entdecken",
+    "agencies": "Agenturen und Makler"
   },
   "search": {
     "title": "Immobilien suchen",
@@ -1080,5 +1082,32 @@
       "progress": "{{value}} von {{target}}",
       "done": "Erreicht"
     }
+  },
+  "agents": {
+    "headlinePre": "Agenturen",
+    "headlineEm": "und Makler",
+    "searchPlaceholder": "Nach Name suchen",
+    "empty": "Noch keine Agenturen",
+    "emptyHint": "Agenturen erscheinen hier, sobald sie ein Inserat veröffentlichen.",
+    "noResults": "Niemand mit diesem Namen",
+    "loadMore": "Mehr laden"
+  },
+  "compare": {
+    "add": "Vergleichen",
+    "added": "Im Vergleich",
+    "open": "Vergleichen · {{total}}",
+    "headlinePre": "Immobilien",
+    "headlineEm": "vergleichen",
+    "empty": "Noch nichts zum Vergleichen",
+    "emptyHint": "Öffne eine Immobilie und tippe auf Vergleichen. Du kannst bis zu drei hinzufügen.",
+    "browse": "Immobilien ansehen",
+    "remove": "Aus dem Vergleich entfernen",
+    "clear": "Vergleich leeren",
+    "addAnother": "Hinzufügen",
+    "yearBuilt": "Baujahr",
+    "type": "Typ",
+    "loadFailed": "Der Vergleich konnte nicht geladen werden.",
+    "yes": "Ja",
+    "no": "Nein"
   }
 }

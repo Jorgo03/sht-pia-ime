@@ -1,4 +1,12 @@
 import { supabase } from '@/lib/supabase';
+import {
+  HIGHLIGHT_CITIES,
+  joinAgents,
+  rankCityTiles,
+  tallyAgents,
+  type AgentEntry,
+  type CityTile,
+} from '@/src/features/properties/lib/discovery';
 import { applyPriceRange } from '@/src/features/properties/lib/priceRange';
 import { applyFreeText, applyZoneAndRef } from '@/src/features/properties/lib/searchFilters';
 
@@ -114,6 +122,69 @@ export async function getPropertiesCount(
 
   if (error) throw error;
   return count ?? 0;
+}
+
+/**
+ * One small query per city, through the same filter as Explore, so a tile's
+ * count is exactly what tapping it shows. The newest listing lends its photo.
+ */
+export async function getCityTiles(): Promise<CityTile[]> {
+  const tiles = await Promise.all(
+    HIGHLIGHT_CITIES.map(async (city) => {
+      const { data, count, error } = await applyFilters(
+        supabase
+          .from('properties')
+          .select('image_urls', { count: 'exact' })
+          .eq('status', 'active')
+          .order('created_at', { ascending: false }),
+        { city },
+      ).limit(1);
+      if (error) throw error;
+      return { city, count: count ?? 0, photo: (data?.[0]?.image_urls?.[0] as string | undefined) ?? null };
+    }),
+  );
+  return rankCityTiles(tiles);
+}
+
+/** Bounds the scan behind the directory, and the profiles asked for after it. */
+const AGENT_SCAN_LIMIT = 1000;
+
+/**
+ * Agencies and agents with live listings. Built from the listings because
+ * `profiles.role` is not readable by signed-out visitors, and because a
+ * directory entry with nothing to show is no use to anyone.
+ */
+export async function getAgentDirectory(): Promise<AgentEntry[]> {
+  const { data, error } = await supabase
+    .from('properties')
+    .select('agent_id')
+    .eq('status', 'active')
+    .not('agent_id', 'is', null)
+    .limit(AGENT_SCAN_LIMIT);
+  if (error) throw error;
+  const tally = tallyAgents(data);
+  if (tally.length === 0) return [];
+  const { data: profiles, error: profilesError } = await supabase
+    .from('profiles')
+    .select('id, full_name, agency_name, avatar_url')
+    .in('id', tally.map((a) => a.id));
+  if (profilesError) throw profilesError;
+  return joinAgents(tally, profiles);
+}
+
+/** What the comparison shows beyond a card's columns. */
+const COMPARE_COLUMNS = `${LIST_COLUMNS}, zone, features, floor, total_floors, year_built`;
+
+export type CompareHome = Property & { floor: number | null; total_floors: number | null };
+
+/** In the order the homes were picked. A listing no longer on sale is absent. */
+export async function getCompareProperties(ids: string[]): Promise<CompareHome[]> {
+  if (!ids.length) return [];
+  const { data, error } = await supabase.from('properties').select(COMPARE_COLUMNS).in('id', ids).eq('status', 'active');
+  if (error) throw error;
+  const rows = (data ?? []) as unknown as CompareHome[];
+  const byId = new Map(rows.map((p) => [p.id, p]));
+  return ids.map((id) => byId.get(id)).filter((p): p is CompareHome => !!p);
 }
 
 /** Listings that can actually be placed on the map, capped at MAP_MARKER_LIMIT. */

@@ -143,7 +143,9 @@
         "lead": "Odkryj",
         "accent": "kolejną okazję."
       }
-    ]
+    ],
+    "exploreCities": "Odkrywaj według miasta",
+    "agencies": "Agencje i agenci"
   },
   "search": {
     "title": "Szukaj nieruchomości",
@@ -1100,5 +1102,32 @@
       "progress": "{{value}} z {{target}}",
       "done": "Osiągnięte"
     }
+  },
+  "agents": {
+    "headlinePre": "Agencje",
+    "headlineEm": "i agenci",
+    "searchPlaceholder": "Szukaj po nazwie",
+    "empty": "Nie ma jeszcze agencji",
+    "emptyHint": "Agencje pojawią się tutaj po opublikowaniu ogłoszenia.",
+    "noResults": "Nikt o tej nazwie",
+    "loadMore": "Załaduj więcej"
+  },
+  "compare": {
+    "add": "Porównaj",
+    "added": "W porównaniu",
+    "open": "Porównaj · {{total}}",
+    "headlinePre": "Porównaj",
+    "headlineEm": "nieruchomości",
+    "empty": "Nie ma jeszcze nieruchomości do porównania",
+    "emptyHint": "Otwórz nieruchomość i dotknij Porównaj. Możesz dodać maksymalnie trzy.",
+    "browse": "Przeglądaj nieruchomości",
+    "remove": "Usuń z porównania",
+    "clear": "Wyczyść porównanie",
+    "addAnother": "Dodaj",
+    "yearBuilt": "Rok budowy",
+    "type": "Typ",
+    "loadFailed": "Nie udało się załadować porównania.",
+    "yes": "Tak",
+    "no": "Nie"
   }
 }

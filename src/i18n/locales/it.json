@@ -142,7 +142,9 @@
         "lead": "Scopri",
         "accent": "la prossima opportunità."
       }
-    ]
+    ],
+    "exploreCities": "Esplora per città",
+    "agencies": "Agenzie e agenti"
   },
   "search": {
     "title": "Cerca immobili",
@@ -1090,5 +1092,32 @@
       "progress": "{{value}} su {{target}}",
       "done": "Raggiunto"
     }
+  },
+  "agents": {
+    "headlinePre": "Agenzie",
+    "headlineEm": "e agenti",
+    "searchPlaceholder": "Cerca per nome",
+    "empty": "Ancora nessuna agenzia",
+    "emptyHint": "Le agenzie compaiono qui quando pubblicano un annuncio.",
+    "noResults": "Nessuno con questo nome",
+    "loadMore": "Carica altri"
+  },
+  "compare": {
+    "add": "Confronta",
+    "added": "Nel confronto",
+    "open": "Confronta · {{total}}",
+    "headlinePre": "Confronta",
+    "headlineEm": "gli immobili",
+    "empty": "Ancora nessun immobile da confrontare",
+    "emptyHint": "Apri un immobile e tocca Confronta. Puoi aggiungerne fino a tre.",
+    "browse": "Sfoglia gli immobili",
+    "remove": "Rimuovi dal confronto",
+    "clear": "Svuota il confronto",
+    "addAnother": "Aggiungi",
+    "yearBuilt": "Anno di costruzione",
+    "type": "Tipo",
+    "loadFailed": "Impossibile caricare il confronto.",
+    "yes": "Sì",
+    "no": "No"
   }
 }

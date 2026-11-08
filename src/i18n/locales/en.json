@@ -193,7 +193,9 @@
         "lead": "Discover",
         "accent": "your next opportunity."
       }
-    ]
+    ],
+    "exploreCities": "Explore by city",
+    "agencies": "Agencies and agents"
   },
   "search": {
     "title": "Search properties",
@@ -1080,5 +1082,32 @@
       "progress": "{{value}} of {{target}}",
       "done": "Reached"
     }
+  },
+  "agents": {
+    "headlinePre": "Agencies",
+    "headlineEm": "and agents",
+    "searchPlaceholder": "Search by name",
+    "empty": "No agencies yet",
+    "emptyHint": "Agencies appear here once they publish a listing.",
+    "noResults": "No one by that name",
+    "loadMore": "Load more"
+  },
+  "compare": {
+    "add": "Compare",
+    "added": "In comparison",
+    "open": "Compare · {{total}}",
+    "headlinePre": "Compare",
+    "headlineEm": "homes",
+    "empty": "No homes to compare yet",
+    "emptyHint": "Open a home and tap Compare. You can add up to three.",
+    "browse": "Browse homes",
+    "remove": "Remove from comparison",
+    "clear": "Clear comparison",
+    "addAnother": "Add a home",
+    "yearBuilt": "Year built",
+    "type": "Type",
+    "loadFailed": "The comparison couldn't be loaded.",
+    "yes": "Yes",
+    "no": "No"
   }
 }

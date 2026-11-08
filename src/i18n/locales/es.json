@@ -142,7 +142,9 @@
         "lead": "Descubre",
         "accent": "tu próxima oportunidad."
       }
-    ]
+    ],
+    "exploreCities": "Explora por ciudad",
+    "agencies": "Agencias y agentes"
   },
   "search": {
     "title": "Buscar propiedades",
@@ -1090,5 +1092,32 @@
       "progress": "{{value}} de {{target}}",
       "done": "Logrado"
     }
+  },
+  "agents": {
+    "headlinePre": "Agencias",
+    "headlineEm": "y agentes",
+    "searchPlaceholder": "Buscar por nombre",
+    "empty": "Aún no hay agencias",
+    "emptyHint": "Las agencias aparecen aquí cuando publican un anuncio.",
+    "noResults": "Nadie con ese nombre",
+    "loadMore": "Cargar más"
+  },
+  "compare": {
+    "add": "Comparar",
+    "added": "En comparación",
+    "open": "Comparar · {{total}}",
+    "headlinePre": "Compara",
+    "headlineEm": "viviendas",
+    "empty": "Aún no hay viviendas que comparar",
+    "emptyHint": "Abre una vivienda y toca Comparar. Puedes añadir hasta tres.",
+    "browse": "Ver viviendas",
+    "remove": "Quitar de la comparación",
+    "clear": "Vaciar la comparación",
+    "addAnother": "Añadir",
+    "yearBuilt": "Año de construcción",
+    "type": "Tipo",
+    "loadFailed": "No se pudo cargar la comparación.",
+    "yes": "Sí",
+    "no": "No"
   }
 }

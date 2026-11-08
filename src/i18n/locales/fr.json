@@ -142,7 +142,9 @@
         "lead": "Découvrez",
         "accent": "votre prochaine chance."
       }
-    ]
+    ],
+    "exploreCities": "Explorer par ville",
+    "agencies": "Agences et agents"
   },
   "search": {
     "title": "Rechercher des biens",
@@ -1090,5 +1092,32 @@
       "progress": "{{value}} sur {{target}}",
       "done": "Atteint"
     }
+  },
+  "agents": {
+    "headlinePre": "Agences",
+    "headlineEm": "et agents",
+    "searchPlaceholder": "Rechercher par nom",
+    "empty": "Pas encore d’agences",
+    "emptyHint": "Les agences apparaissent ici dès qu’elles publient une annonce.",
+    "noResults": "Personne à ce nom",
+    "loadMore": "Charger plus"
+  },
+  "compare": {
+    "add": "Comparer",
+    "added": "En comparaison",
+    "open": "Comparer · {{total}}",
+    "headlinePre": "Comparer",
+    "headlineEm": "les biens",
+    "empty": "Aucun bien à comparer pour l’instant",
+    "emptyHint": "Ouvrez un bien et touchez Comparer. Vous pouvez en ajouter jusqu’à trois.",
+    "browse": "Parcourir les biens",
+    "remove": "Retirer de la comparaison",
+    "clear": "Effacer la comparaison",
+    "addAnother": "Ajouter",
+    "yearBuilt": "Année de construction",
+    "type": "Type",
+    "loadFailed": "Impossible de charger la comparaison.",
+    "yes": "Oui",
+    "no": "Non"
   }
 }

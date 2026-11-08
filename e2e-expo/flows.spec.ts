@@ -665,6 +665,66 @@ test.describe('email code', () => {
   });
 });
 
+// Ideas taken from comparable apps, in this app's own design.
+test.describe('discovery', () => {
+  test('X94 a city tile shows only that city when opened', async ({ page }) => {
+    await page.goto('/');
+    await ready(page);
+    await expect(page.getByText(t('home.exploreCities'))).toBeVisible();
+    await page.getByRole('button', { name: /^Durrës,/ }).click();
+    await expect(page).toHaveURL(/\/explore/);
+    // Home stays mounted behind the tab, so its cards are still in the page:
+    // the count is Explore's own.
+    await expect(page.getByText(/në shikim/)).toContainText('1');
+    await expect(page.getByText('Apartament pranë plazhit').first()).toBeVisible();
+  });
+
+  test('X95 the agencies directory lists, searches and opens an agent', async ({ page }) => {
+    await page.goto('/agents');
+    await ready(page);
+    const row = page.getByRole('button', { name: new RegExp(`^${AGENT.agency_name}`) });
+    await expect(row).toBeVisible();
+    const search = page.getByRole('textbox', { name: t('agents.searchPlaceholder') });
+    await search.fill('nobody like this');
+    await expect(page.getByText(t('agents.noResults'))).toBeVisible();
+    await search.fill('test agjenci');
+    await row.click();
+    await expect(page).toHaveURL(new RegExp(`/agent/${AGENT.id}`));
+  });
+
+  test('X96 compare: picks persist, the best is marked, a home can be removed', async ({ page }) => {
+    const add = page.getByRole('button', { name: t('compare.add'), exact: true });
+    await page.goto(`/property/${LISTINGS[0].id}`);
+    await ready(page);
+    await add.click();
+    await expect(page.getByRole('button', { name: t('compare.added'), exact: true })).toBeVisible();
+    await page.goto(`/property/${LISTINGS[1].id}`);
+    await ready(page);
+    await add.click();
+    await page.goto('/compare');
+    await ready(page);
+    await expect(page.getByRole('link', { name: LISTINGS[0].title })).toBeVisible();
+    await expect(page.getByRole('link', { name: LISTINGS[1].title })).toBeVisible();
+    await expect(page.getByText(t('aiAssistant.compare.best.price'), { exact: true })).toHaveCount(1);
+    await page.getByRole('button', { name: `${t('compare.remove')}: ${LISTINGS[1].title}` }).click();
+    await expect(page.getByRole('link', { name: LISTINGS[1].title })).toHaveCount(0);
+    await expect(page.getByText(t('aiAssistant.compare.best.price'), { exact: true })).toHaveCount(0);
+  });
+
+  test('X97 compare: nothing picked says how to start; a pick shows the pill on Home', async ({ page }) => {
+    await page.goto('/compare');
+    await ready(page);
+    await expect(page.getByText(t('compare.empty'))).toBeVisible();
+    await page.goto(`/property/${LISTINGS[0].id}`);
+    await ready(page);
+    await page.getByRole('button', { name: t('compare.add'), exact: true }).click();
+    await page.goto('/');
+    await ready(page);
+    await page.getByRole('button', { name: t('compare.open').replace('{{total}}', '1') }).click();
+    await expect(page).toHaveURL(/\/compare/);
+  });
+});
+
 // Signing in with an emailed code. What matters: the code screen only ever
 // follows a request the server accepted, and a failure says so plainly.
 test.describe('email code sign-in', () => {

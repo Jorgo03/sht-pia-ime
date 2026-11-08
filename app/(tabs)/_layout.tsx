@@ -1,8 +1,10 @@
 import { Tabs } from 'expo-router';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { StyleSheet, View } from 'react-native';
 
 import { LiquidTabBar } from '@/components/liquid-tab-bar';
+import { ComparePill } from '@/components/property/compare-pill';
 
 // Home, Search, Messages and Profile are real tabs (state-preserving,
 // switched via the floating pill below), so the menu stays on screen in
@@ -15,13 +17,18 @@ export default function TabLayout() {
   const { t } = useTranslation();
 
   return (
-    <Tabs
-      tabBar={(props) => <LiquidTabBar {...props} />}
-      screenOptions={{ headerShown: false }}>
-      <Tabs.Screen name="index" options={{ title: t('common.home') }} />
-      <Tabs.Screen name="explore" options={{ title: t('common.search') }} />
-      <Tabs.Screen name="messages" options={{ title: t('common.messages') }} />
-      <Tabs.Screen name="profile" options={{ title: t('common.profile') }} />
-    </Tabs>
+    <View style={styles.fill}>
+      <Tabs
+        tabBar={(props) => <LiquidTabBar {...props} />}
+        screenOptions={{ headerShown: false }}>
+        <Tabs.Screen name="index" options={{ title: t('common.home') }} />
+        <Tabs.Screen name="explore" options={{ title: t('common.search') }} />
+        <Tabs.Screen name="messages" options={{ title: t('common.messages') }} />
+        <Tabs.Screen name="profile" options={{ title: t('common.profile') }} />
+      </Tabs>
+      <ComparePill />
+    </View>
   );
 }
+
+const styles = StyleSheet.create({ fill: { flex: 1 } });

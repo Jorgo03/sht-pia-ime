@@ -8,6 +8,9 @@ import {
 } from '@tanstack/react-query';
 
 import {
+  getAgentDirectory,
+  getCityTiles,
+  getCompareProperties,
   getMapProperties,
   getProperties,
   getPropertiesByIds,
@@ -33,6 +36,9 @@ export const propertyKeys = {
   map: (filters: PropertyFilters) => ['properties', 'map', filters] as const,
   byIds: (ids: string[]) => ['properties', 'by-ids', ids] as const,
   detail: (id: string) => ['properties', 'detail', id] as const,
+  cityTiles: () => ['properties', 'city-tiles'] as const,
+  agents: () => ['properties', 'agents'] as const,
+  compare: (ids: string[]) => ['properties', 'compare', ids] as const,
 };
 
 /** A single fixed-size page — Home's "Matched"/"Featured" source, and
@@ -115,6 +121,25 @@ export function usePropertiesByIdsQuery(ids: string[]) {
   return useQuery({
     queryKey: propertyKeys.byIds(ids),
     queryFn: () => getPropertiesByIds(ids),
+    enabled: ids.length > 0,
+  });
+}
+
+/** Home's "by city" tiles. */
+export function useCityTilesQuery() {
+  return useQuery({ queryKey: propertyKeys.cityTiles(), queryFn: getCityTiles });
+}
+
+/** Home's agencies rail and the full directory: one query, one cache entry. */
+export function useAgentDirectoryQuery() {
+  return useQuery({ queryKey: propertyKeys.agents(), queryFn: getAgentDirectory });
+}
+
+/** The homes picked for comparison. */
+export function useComparePropertiesQuery(ids: string[]) {
+  return useQuery({
+    queryKey: propertyKeys.compare(ids),
+    queryFn: () => getCompareProperties(ids),
     enabled: ids.length > 0,
   });
 }

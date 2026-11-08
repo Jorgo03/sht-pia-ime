@@ -134,6 +134,13 @@ async function profiles(route: Route, url: URL, writes: Write[]) {
     writes.push({ table: 'profiles', method, query: url.search, body });
     return route.fulfill({ status: 204, headers: CORS, body: '' });
   }
+  // The agencies directory asks for many at once: id=in.(a,b,c).
+  const inList = /^in\.\((.*)\)$/.exec(url.searchParams.get('id') ?? '');
+  if (inList) {
+    const ids = inList[1].replace(/"/g, '').split(',');
+    const found = new Map(LISTINGS.flatMap((l) => (l.agent && ids.includes(l.agent.id) ? [[l.agent.id, l.agent] as const] : [])));
+    return json(route, 200, [...found.values()]);
+  }
   const id = (url.searchParams.get('id') ?? '').replace(/^eq\./, '');
   const agent = LISTINGS.map((l) => l.agent).find((a) => a?.id === id);
   const row = agent ? { ...agent, role: 'agent' } : null;

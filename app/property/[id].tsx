@@ -48,6 +48,7 @@ import { useTranslatedProperty } from '@/hooks/use-translated-property';
 import { logActivity } from '@/lib/activity';
 import { propertyUrl } from '@/lib/site';
 import { supabase } from '@/lib/supabase';
+import { useCompare } from '@/contexts/compare-context';
 import { formatPrice, listingBadgeKey, priceSuffixKey, telUrl, whatsappUrl } from '@/lib/format';
 import { sheetColumn } from '@/constants/web-frame';
 import { useAppDimensions } from '@/hooks/use-app-dimensions';
@@ -153,6 +154,7 @@ export default function PropertyDetailScreen() {
 
   const agentId = property?.agent?.id || property?.agent_id || property?.owner_id || null;
   const isOwnListing = !!user && !!agentId && user.id === agentId;
+  const compare = useCompare();
   // Report is never offered on your own listing (owner or agent).
   const canReport = !isOwnListing && !(user && property && user.id === property.owner_id);
   const [reportOpen, setReportOpen] = useState(false);
@@ -587,6 +589,17 @@ export default function PropertyDetailScreen() {
             </Text>
           )}
         </View>
+        {/* A full list opens the comparison, where one can be taken out. */}
+        <TouchableOpacity
+          accessibilityRole="button"
+          accessibilityLabel={compare.has(property.id) ? t('compare.added') : t('compare.add')}
+          accessibilityState={{ selected: compare.has(property.id) }}
+          style={[styles.compareBtn, compare.has(property.id) && styles.compareBtnOn]}
+          onPress={() => (compare.full && !compare.has(property.id) ? router.push('/compare' as Href) : compare.toggle(property.id))}
+          activeOpacity={0.75}>
+          <MaterialIcons name={compare.has(property.id) ? 'check' : 'compare-arrows'} size={18} color={colors.accentText} />
+          <Text style={styles.compareBtnText}>{compare.has(property.id) ? t('compare.added') : t('compare.add')}</Text>
+        </TouchableOpacity>
       </View>
 
       {!isOwnListing && (
@@ -1273,6 +1286,25 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 24,
+  },
+  compareBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    minHeight: 44,
+    paddingHorizontal: 14,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: colors.glass,
+  },
+  compareBtnOn: {
+    borderColor: colors.accent,
+  },
+  compareBtnText: {
+    fontFamily: Fonts.sansSemiBold,
+    fontSize: 13,
+    color: colors.accentText,
   },
   priceLabel: {
     fontFamily: Fonts.sans,

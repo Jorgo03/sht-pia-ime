@@ -31,6 +31,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { applyPreferredLanguage } from '@/i18n';
 
 import { AuthProvider, useAuth } from '@/contexts/auth-context';
+import { CompareProvider } from '@/contexts/compare-context';
 import { FavoritesProvider } from '@/contexts/favorites-context';
 import { FiltersProvider } from '@/contexts/filters-context';
 import { ThemeProvider, useTheme } from '@/contexts/theme-context';
@@ -181,6 +182,8 @@ function ThemedNavigation() {
             name="agent/[id]"
             options={{ headerShown: false, presentation: 'card' }}
           />
+          <Stack.Screen name="agents/index" options={{ headerShown: false, presentation: 'card' }} />
+          <Stack.Screen name="compare" options={{ headerShown: false, presentation: 'card' }} />
           <Stack.Screen name="assistant" options={{ headerShown: false, presentation: 'card' }} />
           {/* Website pages; pricing, moderation and auth/callback are web
               only (their native files redirect home). */}
@@ -243,6 +246,7 @@ function AppGate({ fontsReady }: { fontsReady: boolean }) {
   return (
     <>
       <FavoritesProvider>
+        <CompareProvider>
         {/* Above the navigator so the list and map tabs share one filter state. */}
         <FiltersProvider>
           <ThemeProvider>
@@ -253,6 +257,7 @@ function AppGate({ fontsReady }: { fontsReady: boolean }) {
             </NotificationsProvider>
           </ThemeProvider>
         </FiltersProvider>
+        </CompareProvider>
       </FavoritesProvider>
       {/* The door opening, over the first screen as the native splash hides
           (phones only, once per launch). The app is already mounted beneath

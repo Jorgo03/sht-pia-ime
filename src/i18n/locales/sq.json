@@ -141,7 +141,9 @@
         "lead": "Zbulo mundësinë",
         "accent": "e radhës."
       }
-    ]
+    ],
+    "exploreCities": "Eksploro qytetet",
+    "agencies": "Agjenci dhe agjentë"
   },
   "search": {
     "title": "Kërko pronë",
@@ -1080,5 +1082,32 @@
       "progress": "{{value}} nga {{target}}",
       "done": "Arritur"
     }
+  },
+  "agents": {
+    "headlinePre": "Agjencitë",
+    "headlineEm": "dhe agjentët",
+    "searchPlaceholder": "Kërko sipas emrit",
+    "empty": "Ende pa agjenci",
+    "emptyHint": "Agjencitë shfaqen këtu sapo të publikojnë një pronë.",
+    "noResults": "Askush me këtë emër",
+    "loadMore": "Ngarko më shumë"
+  },
+  "compare": {
+    "add": "Krahaso",
+    "added": "Në krahasim",
+    "open": "Krahaso · {{total}}",
+    "headlinePre": "Krahaso",
+    "headlineEm": "pronat",
+    "empty": "Ende asnjë pronë për krahasim",
+    "emptyHint": "Hap një pronë dhe shtyp Krahaso. Mund të shtosh deri në tre.",
+    "browse": "Shfleto pronat",
+    "remove": "Hiq nga krahasimi",
+    "clear": "Pastro krahasimin",
+    "addAnother": "Shto pronë",
+    "yearBuilt": "Viti i ndërtimit",
+    "type": "Lloji",
+    "loadFailed": "Krahasimi nuk u ngarkua.",
+    "yes": "Po",
+    "no": "Jo"
   }
 }
