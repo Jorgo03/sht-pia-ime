@@ -219,13 +219,15 @@ export default function NotificationsScreen() {
 const createStyles = (colors: AtticoPalette) =>
   StyleSheet.create({
     container: { flex: 1 },
-    controls: { paddingHorizontal: 20, gap: 10, paddingBottom: 12 },
+    controls: { paddingBottom: 4 },
     markAll: {
       flexDirection: 'row',
       alignItems: 'center',
       alignSelf: 'flex-end',
       gap: 6,
       minHeight: 44,
+      marginTop: -10,
+      marginRight: 20,
     },
     markAllText: { fontSize: 14, fontFamily: Fonts.sansSemiBold, color: colors.accentText },
     list: { paddingHorizontal: 20, paddingBottom: 32, gap: 10 },
@@ -239,7 +241,7 @@ const createStyles = (colors: AtticoPalette) =>
       borderRadius: 16,
       borderWidth: 1,
       borderColor: colors.border,
-      backgroundColor: colors.surface,
+      backgroundColor: colors.primaryLight,
     },
     rowUnread: { borderColor: colors.accent },
     rowMain: { flex: 1, flexDirection: 'row', alignItems: 'flex-start', gap: 10, padding: 14, minHeight: 64 },

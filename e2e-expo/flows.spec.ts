@@ -55,7 +55,6 @@ test('X03 sign in with email and password', async ({ page }) => {
   await page.goto('/profile');
   await ready(page);
   await page.getByRole('textbox', { name: t('auth.email') }).fill('agent@example.com');
-  await page.getByRole('button', { name: t('auth.usePassword'), exact: true }).click();
   await page.getByRole('textbox', { name: t('auth.password') }).fill('correct-horse-battery');
   await page.getByRole('button', { name: t('auth.stepInside') }).click();
   await expect(page.getByRole('heading', { name: t('common.profile'), level: 1 })).toBeVisible();
@@ -344,6 +343,32 @@ test.describe('notification centre', () => {
     await expect(page.getByText(t('notifications.unreadTag'), { exact: true })).toBeVisible();
   });
 
+  // The card was white in the dark theme, with near-white text on it.
+  test('X93 a notification title can be read in both themes', async ({ page }) => {
+    for (const scheme of ['dark', 'light'] as const) {
+      await page.emulateMedia({ colorScheme: scheme });
+      await seed(page);
+      await page.goto('/notifications');
+      await ready(page);
+      const ratio = await page.getByText(t('notifications.kinds.message.title'), { exact: true }).evaluate((el) => {
+        const rgb = (c: string) => c.match(/[\d.]+/g)!.map(Number);
+        const lum = ([r, g, b]: number[]) => {
+          const f = (v: number) => ((v /= 255) <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4);
+          return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b);
+        };
+        let box: Element | null = el;
+        let bg = 'rgba(0, 0, 0, 0)';
+        while (box && /rgba\(.*, 0\)|transparent/.test(bg)) {
+          bg = getComputedStyle(box).backgroundColor;
+          box = box.parentElement;
+        }
+        const [a, b] = [lum(rgb(getComputedStyle(el).color)), lum(rgb(bg))].sort((x, y) => y - x);
+        return (a + 0.05) / (b + 0.05);
+      });
+      expect(ratio, scheme).toBeGreaterThanOrEqual(4.5);
+    }
+  });
+
   test('X82 mark one, mark all, and a tap opens the conversation', async ({ page }) => {
     const writes: { table: string; method: string; query: string }[] = [];
     await seed(page, writes, 2);
@@ -620,6 +645,7 @@ test.describe('email code', () => {
     await page.goto('/profile');
     await ready(page);
     await page.getByRole('textbox', { name: t('auth.email') }).fill('new.user@example.com');
+    await page.getByRole('button', { name: t('auth.signInWithEmail') }).click();
     await page.getByRole('button', { name: t('auth.continue') }).dblclick();
     await expect(page.getByRole('heading', { name: t('auth.checkInbox') })).toBeVisible();
     expect(sent).toHaveLength(1);
@@ -632,13 +658,14 @@ test.describe('email code', () => {
     await page.goto('/profile');
     await ready(page);
     await page.getByRole('textbox', { name: t('auth.email') }).fill('new.user@example.com');
+    await page.getByRole('button', { name: t('auth.signInWithEmail') }).click();
     await page.getByRole('button', { name: t('auth.continue') }).click();
     await expect(page.getByRole('heading', { name: t('auth.checkInbox') })).toBeVisible();
     await expect(page.getByRole('button', { name: new RegExp(t('auth.resendIn').replace('{{s}}', '4[12]')) })).toBeDisabled();
   });
 });
 
-// Signing in starts with the email. What matters: the code screen only ever
+// Signing in with an emailed code. What matters: the code screen only ever
 // follows a request the server accepted, and a failure says so plainly.
 test.describe('email code sign-in', () => {
   test.use({ allowConsoleErrors: [/status of 403/, /status of 500/] });
@@ -649,15 +676,20 @@ test.describe('email code sign-in', () => {
     await page.goto('/profile');
     await ready(page);
     await page.getByRole('textbox', { name: t('auth.email') }).fill(address);
+    await page.getByRole('button', { name: t('auth.signInWithEmail') }).click();
     await page.getByRole('button', { name: t('auth.continue') }).click();
   }
 
-  test('X87 asks for the email first, and a bad address never reaches the server', async ({ page }) => {
+  test('X87 the form opens on the password, the code is one tap away, and a bad address never reaches the server', async ({ page }) => {
     const sent: unknown[] = [];
     await page.route('**/auth/v1/otp*', (route) => {
       sent.push(route.request().postDataJSON());
       return json(route, {});
     });
+    await page.goto('/profile');
+    await ready(page);
+    await expect(page.getByLabel(t('auth.password'), { exact: true })).toBeVisible();
+    await expect(page.getByRole('button', { name: t('auth.stepInside') })).toBeVisible();
     await askForCode(page, 'not-an-email');
     await expect(page.getByLabel(t('auth.password'), { exact: true })).toHaveCount(0);
     await expect(page.getByText(t('errors.invalidEmail'))).toBeVisible();
@@ -716,7 +748,7 @@ test.describe('email code sign-in', () => {
     await page.getByRole('button', { name: t('common.back') }).click();
     await page.reload();
     await ready(page);
-    await expect(page.getByRole('button', { name: t('auth.continue') })).toBeVisible();
+    await expect(page.getByRole('button', { name: t('auth.stepInside') })).toBeVisible();
     await expect(inbox(page)).toHaveCount(0);
   });
 
@@ -756,7 +788,6 @@ test('X27 forgot password: the code opens the new-password step, which stays unt
   await page.goto('/profile');
   await ready(page);
   await page.getByRole('textbox', { name: t('auth.email') }).fill('agent@example.com');
-  await page.getByRole('button', { name: t('auth.usePassword'), exact: true }).click();
   await page.getByRole('button', { name: t('auth.forgotShort') }).click();
   // Its own step, with the address already typed.
   await expect(page.getByText(t('auth.forgotTitle'))).toBeVisible();
@@ -1224,7 +1255,6 @@ test('X32 signing in before confirming the email opens the code entry instead of
   await page.goto('/profile');
   await ready(page);
   await page.getByRole('textbox', { name: t('auth.email') }).fill('new.user@example.com');
-  await page.getByRole('button', { name: t('auth.usePassword'), exact: true }).click();
   await page.getByLabel(t('auth.password'), { exact: true }).fill('correct-horse-battery');
   await page.getByRole('button', { name: t('auth.stepInside') }).click();
   await expect(page.getByRole('heading', { name: t('auth.verifyEmailTitle') })).toBeVisible();

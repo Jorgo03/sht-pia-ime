@@ -68,5 +68,8 @@ receiving mail service decides.
 
 1. Real delivery proven with Gmail, Outlook and one other provider.
 2. Existing accounts proven to reach their own data with a code.
-3. Confirm email on, then the password option removed.
+3. Confirm email on.
 4. A domain and Resend replace Gmail: only section 2 changes.
+
+Sign-in stays on email and password by default, with the code one tap away
+(DECISIONS.md §19).

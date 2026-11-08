@@ -127,10 +127,10 @@ export default function ProfileScreen() {
   const [fullName, setFullName] = useState('');
   const [agencyName, setAgencyName] = useState('');
   const [isSignUp, setIsSignUp] = useState(false);
-  // Signing in starts with the email and a code. The password form stays one
-  // tap away until email delivery has been proven with real mailboxes.
-  const [usePassword, setUsePassword] = useState(false);
-  const emailFirst = !isSignUp && !usePassword;
+  // Signing in opens on email and password (owner decision, DECISIONS.md §19);
+  // the emailed code is one tap away.
+  const [useEmailCode, setUseEmailCode] = useState(false);
+  const emailFirst = !isSignUp && useEmailCode;
   const [role, setRole] = useState<Role>('buyer');
   const [loading, setLoading] = useState(false);
   // Tracks which provider button is mid-redirect, so the others stay usable
@@ -241,6 +241,7 @@ export default function ProfileScreen() {
           return;
         }
         setEmail(pending.email);
+        setUseEmailCode(true);
         setOtpType('email');
         setCodeExpiresAt(pending.expiresAt);
         setClock(Date.now());
@@ -1379,7 +1380,7 @@ export default function ProfileScreen() {
                 accessibilityRole="button"
                 onPress={() => {
                   setIsSignUp(!isSignUp);
-                  setUsePassword(false);
+                  setUseEmailCode(false);
                   setFormError(null);
                 }}
                 style={styles.linkButton}>
@@ -1472,7 +1473,7 @@ export default function ProfileScreen() {
                     isSignUp
                       ? handleSendOtp
                       : () => {
-                          setUsePassword(!usePassword);
+                          setUseEmailCode(!useEmailCode);
                           setFormError(null);
                         }
                   }

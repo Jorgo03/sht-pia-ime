@@ -83,7 +83,7 @@ const createStyles = (colors: AtticoPalette) =>
       borderRadius: 18,
       borderWidth: 1,
       borderColor: colors.border,
-      backgroundColor: colors.surface,
+      backgroundColor: colors.primaryLight,
     },
     head: {
       flexDirection: 'row',

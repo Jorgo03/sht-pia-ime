@@ -1004,9 +1004,9 @@ Owner answers (AUDIT.md Pass 22):
 Owner decision. Login codes are to go through a dedicated Gmail account over
 Supabase SMTP (steps in `docs/EMAIL_LOGIN_SETUP.md`), replacing Resend without
 a verified domain. Supabase keeps generating and checking the codes: no second
-code system. The apps ask for the email first; the password form stays one tap
-away until real delivery and existing-account login are proven, and only then
-is it removed. Per-code wrong-guess limits exist only in the app, because
+code system. The app opens on email and password, with the emailed code one tap
+away: the owner tried an email-first screen the same day and chose to keep the
+password as the default. Per-code wrong-guess limits exist only in the app, because
 Supabase has no per-code limit and clients can call its verify endpoint
 directly; the server-side limit is per IP (Token verifications). Delivery
 events, bounce webhooks and SPF/DKIM/DMARC on our own name wait for a domain.
