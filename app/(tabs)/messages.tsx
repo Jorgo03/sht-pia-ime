@@ -202,11 +202,6 @@ export default function MessagesInboxScreen() {
     };
   }, [user, loadConversations]);
 
-  const unreadTotal = conversations.reduce(
-    (sum, c) => sum + ((c.client_id === user?.id ? c.unread_for_client : c.unread_for_agent) ?? 0),
-    0,
-  );
-
   if (!user) {
     return (
       <GradientBackground>
@@ -233,9 +228,6 @@ export default function MessagesInboxScreen() {
         {/* Matches web's Messages.jsx screen-kicker/screen-headline hero
             exactly, including the agent-vs-client copy split. */}
         <ScreenHero
-          kicker={isAgent
-                ? t('messages.agent.kicker', { leads: conversations.length, newToday: unreadTotal })
-                : t('messages.client.kicker', { count: conversations.length, unread: unreadTotal })}
           pre={isAgent ? t('messages.agent.headlinePre') : t('messages.client.headlinePre')}
           em={isAgent ? t('messages.agent.headlineEm') : t('messages.client.headlineEm')}
         />

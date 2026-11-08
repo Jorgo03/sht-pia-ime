@@ -212,7 +212,6 @@ export default function ViewingsScreen() {
 
         {/* Matches web's Viewings.jsx screen-kicker/screen-headline hero. */}
         <ScreenHero
-          kicker={t('viewings.kicker')}
           pre={t('viewings.headlinePre')}
           em={t('viewings.headlineEm')}
         />

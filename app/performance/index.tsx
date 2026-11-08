@@ -83,7 +83,7 @@ export default function PerformanceScreen() {
       <SafeAreaView style={[styles.container, readable]} edges={['top']}>
         <AppHeader onBack={() => router.back()} />
         <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-          <ScreenHero kicker={t('performance.kicker')} pre={t('performance.headlinePre')} em={t('performance.headlineEm')} />
+          <ScreenHero pre={t('performance.headlinePre')} em={t('performance.headlineEm')} />
 
           {profile && !isAgent ? (
             <View style={styles.card}>

@@ -129,7 +129,6 @@ export default function NotificationsScreen() {
       <SafeAreaView style={[styles.container, readable]} edges={['top']}>
         <AppHeader onBack={() => (router.canGoBack() ? router.back() : router.replace('/' as Href))} />
         <ScreenHero
-          kicker={t('notifications.title')}
           pre={t('notifications.headlinePre')}
           em={t('notifications.headlineEm')}
         />

@@ -50,7 +50,6 @@ export default function FavoritesScreen() {
         <AppHeader onBack={() => router.push('/(tabs)/profile' as Href)} />
 
         <ScreenHero
-          kicker={loading ? t('common.loading') : t('favourites.savedCount', { count: favoriteProperties.length })}
           pre={t('favourites.headlinePre')}
           em={t('favourites.headlineEm')}
         />

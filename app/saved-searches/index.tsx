@@ -267,7 +267,6 @@ export default function SavedSearchesScreen() {
 
         {/* Matches web's SavedSearches.jsx screen-kicker/screen-headline hero. */}
         <ScreenHero
-          kicker={t('saved.kicker')}
           pre={t('saved.headlinePre')}
           em={t('saved.headlineEm')}
         />

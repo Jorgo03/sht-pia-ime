@@ -203,7 +203,7 @@ export default function LeadsScreen() {
     <GradientBackground>
       <SafeAreaView style={[styles.container, readable]} edges={['top']}>
         <AppHeader onBack={() => router.back()} />
-        <ScreenHero kicker={t('leads.kicker')} pre={t('leads.headlinePre')} em={t('leads.headlineEm')} />
+        <ScreenHero pre={t('leads.headlinePre')} em={t('leads.headlineEm')} />
 
         <View style={styles.searchRow}>
           <View style={styles.searchBox}>

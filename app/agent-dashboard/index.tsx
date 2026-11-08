@@ -191,7 +191,6 @@ export default function AgentDashboardScreen() {
 
         {/* Matches web's AgentDashboard.jsx screen-kicker/screen-headline hero. */}
         <ScreenHero
-          kicker={t('agentDashboard.kicker')}
           pre={t('agentDashboard.headlinePre')}
           em={t('agentDashboard.headlineEm')}
         />
