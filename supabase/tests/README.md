@@ -17,6 +17,7 @@ runs a `DELETE`.
 | `rls_moderation.sql` | Moderators, the review queue, listing holds (migration `20261021052850`) | `passed=12/12` |
 | `rls_moderation_read.sql` | Moderators read reported listings and accounts, read-only (migration `20261021053224`) | `passed=6/6` |
 | `rls_insert_guards.sql` | New viewings and conversations: listing's agent or owner only, viewings start requested and in the future, server-set counters (migration `20261107225617`) | `passed=9/9` |
+| `rls_performance_report.sql` | Raporti im: each agent sees only their own report and baseline, clients and signed-out visitors get none, the status history cannot be written directly, viewings complete only by their agent after their time, and the counting rules (corrections, duplicates, periods) (migration `20261108005947`) | `passed=22/22` |
 
 Run one in the Supabase SQL editor, with the Supabase MCP `execute_sql` tool,
 or with `psql "$DATABASE_URL" -f <file>`. The "error" you get back is the
@@ -27,6 +28,9 @@ They pick existing accounts and rows as test subjects and change them only
 inside the rolled-back transaction. Re-run them after any migration that
 touches `properties`, `conversations`, `viewings`, `messages`,
 `content_reports` or `user_blocks`.
+
+2026-11-08, after migration `20261108005947`: `rls_performance_report.sql`
+22/22, with no fixture rows left behind (checked afterwards).
 
 2026-11-07, after migration `20261107225617`: `rls_insert_guards.sql` 9/9 and
 `rls_ownership_guards.sql` 15/15. P4 of the latter now saves an https photo
