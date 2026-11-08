@@ -7,7 +7,7 @@
 import type { BottomTabBarProps } from 'expo-router/build/react-navigation/bottom-tabs/types';
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useRouter, usePathname, type Href } from 'expo-router';
+import { useRouter, type Href } from 'expo-router';
 import Feather from '@expo/vector-icons/Feather';
 import * as Haptics from 'expo-haptics';
 import { useEffect, useState, type ComponentProps } from 'react';
@@ -26,7 +26,6 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Shadows, Fonts } from '@/constants/theme';
 import { useTheme } from '@/contexts/theme-context';
 import { useUnreadMessages } from '@/hooks/use-unread-messages';
-import { buildInboxHref, tokenForTab } from '@/src/features/messaging/lib/return-route';
 
 /** The pill's own height and its offset from the bottom edge — exported so
  *  scrollable tab screens can reserve the right amount of space instead of
@@ -132,15 +131,13 @@ export function useTabBarClearance(extraGap: number = 12) {
  * docked full-width bar), Home/Search/Profile as plain icons, an elevated
  * gradient "+" circle in the center going straight to the listing wizard,
  * and a Messages icon with an unread badge — same 5-item layout as
- * src/shared/BottomNav.jsx. Home/Search/Profile are real tabs (state
- * preserved by the underlying Tabs navigator); Create and Messages are
- * stack pushes on top of it, exactly like BottomNav.jsx's own `/new-listing`
- * and `/messages` links aren't separate router "tabs" on web either.
+ * src/shared/BottomNav.jsx. Home/Search/Messages/Profile are real tabs
+ * (state preserved by the underlying Tabs navigator); Create is a stack
+ * push on top of it.
  */
 export function LiquidTabBar({ state, descriptors, emitter, navigateToTab }: BottomTabBarProps) {
   const router = useRouter();
   const { t } = useTranslation();
-  const pathname = usePathname();
   const { colors, theme } = useTheme();
   const insets = useSafeAreaInsets();
   const unread = useUnreadMessages();
@@ -162,26 +159,7 @@ export function LiquidTabBar({ state, descriptors, emitter, navigateToTab }: Bot
   };
 
   const iconColor = (active: boolean) => (active ? activeColor : colors.textSecondary);
-  // Messages is a stack push outside the Tabs navigator, so it never appears
-  // in `state` — web's NavLink highlights it by URL match instead, so this
-  // does the same via the actual route pathname.
-  const messagesActive = pathname?.startsWith('/messages') ?? false;
-  const activeKey: TabKey = messagesActive ? 'messages' : (activeRouteName as TabKey);
-
-  // Messages is an overlay on the tabs, not a tab (module doc above): the
-  // Tabs underneath stay mounted, so leaving Messages pops back to the
-  // exact tab on this press — Home/Search/Profile, with its scroll and
-  // state intact — on Android and iOS alike. The token remembers which
-  // one it was so the inbox can replace to it when there is no history to
-  // pop (deep link, cold start). No fetch happens here: opening Messages
-  // is a plain push, and its data loads inside the screen.
-  const openMessages = () => {
-    // The pill hides under a pushed screen, so this only guards the
-    // double-tap race before the push covers it — otherwise each tap
-    // would stack another /messages the back button had to unwind.
-    if (messagesActive) return;
-    router.push(buildInboxHref(tokenForTab(activeRouteName)) as Href);
-  };
+  const activeKey = activeRouteName as TabKey;
 
   // Where each tab sits inside the pill, measured on layout, so the lens can
   // travel to it whatever the screen width.
@@ -312,7 +290,7 @@ export function LiquidTabBar({ state, descriptors, emitter, navigateToTab }: Bot
           color={iconColor(activeKey === 'messages')}
           label={t('common.messages')}
           onLayout={measure('messages')}
-          onPress={() => select('messages', openMessages)}>
+          onPress={() => select('messages', () => go('messages'))}>
           {unread > 0 && (
             <View style={[styles.navBadge, { backgroundColor: colors.accent }]}>
               <Text style={styles.navBadgeText} maxFontSizeMultiplier={1.2}>

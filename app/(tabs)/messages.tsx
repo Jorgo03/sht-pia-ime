@@ -1,11 +1,12 @@
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useLocalSearchParams, useRouter, type Href } from 'expo-router';
+import { useFocusEffect, useRouter, type Href } from 'expo-router';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 
+import { useTabBarClearance } from '@/components/liquid-tab-bar';
 import { ActionButton } from '@/components/ui/action-button';
 import { AppHeader } from '@/components/ui/app-header';
 import { ScreenHero } from '@/components/ui/screen-hero';
@@ -18,11 +19,6 @@ import { formatRelativeTime, getLocalizedText } from '@/lib/format';
 import { loadBlockedIds } from '@/src/features/safety/lib/safety';
 import { useReadableColumn } from '@/hooks/use-responsive';
 import { debugWarn } from '@/lib/debug';
-import {
-  buildThreadHref,
-  parseReturnToken,
-  resolveGoBackAction,
-} from '@/src/features/messaging/lib/return-route';
 
 interface Conversation {
   id: string;
@@ -63,21 +59,15 @@ let inboxCache: InboxCache | null = null;
 
 export default function MessagesInboxScreen() {
   const router = useRouter();
-  const { from } = useLocalSearchParams<{ from?: string }>();
   const { t, i18n } = useTranslation();
   const { user, isAgent } = useAuth();
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
   // A centred column on an unfolded Fold or a spanned Duo (hooks/use-responsive).
   const readable = useReadableColumn();
-  // Messages is an overlay on the tabs: pop when there is history (exact
-  // tab, scroll and state underneath, Android and iOS alike), otherwise
-  // replace to the tab this was opened from — never a hardcoded Home.
-  const goBack = useCallback(() => {
-    const action = resolveGoBackAction({ canGoBack: router.canGoBack(), from });
-    if (action.kind === 'back') router.back();
-    else router.replace(action.href as Href);
-  }, [router, from]);
+  // A real tab: the bottom menu stays on screen and the person chooses
+  // where to go next. Nothing here sends them anywhere by itself.
+  const tabBarClearance = useTabBarClearance();
   const initial = user && inboxCache?.userId === user.id ? inboxCache : null;
   const [conversations, setConversations] = useState<Conversation[]>(() => initial?.conversations ?? []);
   const [profiles, setProfiles] = useState<Record<string, OtherProfile>>(() => initial?.profiles ?? {});
@@ -174,9 +164,14 @@ export default function MessagesInboxScreen() {
     };
   }, [user]);
 
-  useEffect(() => {
-    loadConversations();
-  }, [loadConversations]);
+  // On every visit, not only the first: a tab stays mounted between visits.
+  // One fetch per focus; while it is open the realtime channel below keeps
+  // it current.
+  useFocusEffect(
+    useCallback(() => {
+      loadConversations();
+    }, [loadConversations]),
+  );
 
   useEffect(() => {
     if (!user) return;
@@ -198,13 +193,13 @@ export default function MessagesInboxScreen() {
     return (
       <GradientBackground>
         <SafeAreaView style={[styles.container, readable]} edges={['top']}>
-          <AppHeader onBack={goBack} />
+          <AppHeader />
           <View style={styles.center}>
             <Text style={styles.description}>{t('messages.loginPrompt')}</Text>
             {/* Sign-in lives on the Profile tab; without this the screen was
-                a dead end with only a back arrow. */}
+                a dead end. */}
             <View style={styles.signInButton}>
-              <ActionButton title={t('common.signIn')} onPress={() => router.push('/(tabs)/profile' as Href)} />
+              <ActionButton title={t('common.signIn')} onPress={() => router.navigate('/(tabs)/profile' as Href)} />
             </View>
           </View>
         </SafeAreaView>
@@ -215,7 +210,7 @@ export default function MessagesInboxScreen() {
   return (
     <GradientBackground>
       <SafeAreaView style={[styles.container, readable]} edges={['top']}>
-        <AppHeader onBack={goBack} />
+        <AppHeader />
 
         {/* Matches web's Messages.jsx screen-kicker/screen-headline hero
             exactly, including the agent-vs-client copy split. */}
@@ -271,7 +266,7 @@ export default function MessagesInboxScreen() {
           <FlatList
             data={conversations}
             keyExtractor={(item) => item.id}
-            contentContainerStyle={styles.list}
+            contentContainerStyle={[styles.list, { paddingBottom: tabBarClearance }]}
             showsVerticalScrollIndicator={false}
             renderItem={({ item }) => {
               const otherId = item.client_id === user.id ? item.agent_id : item.client_id;
@@ -286,7 +281,7 @@ export default function MessagesInboxScreen() {
                   accessibilityRole="button"
                   style={[styles.row, myUnread > 0 && styles.rowUnread]}
                   activeOpacity={0.7}
-                  onPress={() => router.push(buildThreadHref(item.id, parseReturnToken(from)) as Href)}>
+                  onPress={() => router.push(`/messages/${item.id}` as Href)}>
                   <LinearGradient colors={[colors.accent, colors.accentEnd]} style={styles.avatar}>
                     <Text style={styles.avatarText}>{name[0]?.toUpperCase() || '?'}</Text>
                   </LinearGradient>

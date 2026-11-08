@@ -16,7 +16,6 @@ import { supabase } from '@/lib/supabase';
 import { formatDate, formatPrice, getLocalizedText } from '@/lib/format';
 import { useReadableColumn } from '@/hooks/use-responsive';
 import { wantedMatches } from '@/src/features/leads/lib/leads';
-import { buildInboxHref } from '@/src/features/messaging/lib/return-route';
 
 interface Stats {
   listings: number;
@@ -177,7 +176,7 @@ export default function AgentDashboardScreen() {
   const statCards: { icon: keyof typeof MaterialIcons.glyphMap; label: string; value: number; to?: Href }[] = [
     { icon: 'apartment', label: t('agentDashboard.statListings'), value: stats.listings, to: '/my-listings' as Href },
     { icon: 'visibility', label: t('agentDashboard.statViews'), value: stats.views },
-    { icon: 'mail-outline', label: t('agentDashboard.statConversations'), value: stats.conversations, to: buildInboxHref('agent') as Href },
+    { icon: 'mail-outline', label: t('agentDashboard.statConversations'), value: stats.conversations, to: '/messages' as Href },
     { icon: 'people-outline', label: t('agentDashboard.statLeads'), value: stats.leads, to: '/leads' as Href },
   ];
 
@@ -219,7 +218,8 @@ export default function AgentDashboardScreen() {
                   key={card.label}
                   style={styles.statCard}
                   disabled={!card.to}
-                  onPress={() => card.to && router.push(card.to)}
+                  // Messages is a tab under this screen: go down to it, not a second copy on top.
+                  onPress={() => card.to && (card.to === '/messages' ? router.dismissTo(card.to) : router.push(card.to))}
                   activeOpacity={card.to ? 0.7 : 1}>
                   <MaterialIcons name={card.icon} size={20} color={colors.accent} />
                   <Text style={styles.statValue}>{card.value}</Text>

@@ -36,7 +36,6 @@ import {
   unblockUser,
 } from '@/src/features/safety/lib/safety';
 import { isNotFound, loadThreadMessages } from '@/src/features/messaging/lib/thread';
-import { resolveGoBackAction } from '@/src/features/messaging/lib/return-route';
 import { FORM_LIMITS } from '@/src/lib/formLimits';
 import { useReadableColumn } from '@/hooks/use-responsive';
 
@@ -56,7 +55,7 @@ interface ConversationInfo {
 }
 
 export default function ThreadScreen() {
-  const { id, from } = useLocalSearchParams<{ id: string; from?: string }>();
+  const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const { t, i18n } = useTranslation();
   const { user, loading: authLoading } = useAuth();
@@ -103,16 +102,13 @@ export default function ThreadScreen() {
     conversationRef.current = conversation;
   }, [conversation]);
 
-  // Same overlay return as the inbox: pop to the inbox (which stays
-  // mounted under this thread, so its scroll is intact), or replace to
-  // the remembered tab when there is no history — a notification
-  // cold start, a deep link. Android and iOS both go through the router,
-  // so hardware back and swipe back land in the same place.
+  // Back to the inbox, whose bottom menu leads anywhere. With no history (a
+  // notification cold start, a deep link) there is nothing to pop, so the
+  // inbox is opened instead.
   const goBack = useCallback(() => {
-    const action = resolveGoBackAction({ canGoBack: router.canGoBack(), from });
-    if (action.kind === 'back') router.back();
-    else router.replace(action.href as Href);
-  }, [router, from]);
+    if (router.canGoBack()) router.back();
+    else router.replace('/messages' as Href);
+  }, [router]);
 
   const markRead = useCallback(
     (convo: ConversationInfo, isClient: boolean) => {
