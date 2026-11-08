@@ -78,7 +78,8 @@ seven → Newsreader, every file loaded, `ru` is the only locale needing it);
 e2e-expo **X64**: on Home, switching to Русский through the app's menu
 leaves no element drawn in Newsreader and none of Newsreader's text is
 Cyrillic; switching back to Shqip brings Newsreader back; no reload
-(browser rendering, phone and desktop widths).
+(browser rendering, phone and desktop widths). Full Expo-web e2e suite after
+this change: **188 passed, 0 failed**, 36 skipped. Unit 446/446.
 
 ## Tests
 
