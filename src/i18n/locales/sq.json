@@ -100,6 +100,8 @@
     "officeName": "Emri i zyrës"
   },
   "home": {
+    "brandHeadline": "Shtëpia e duhur,",
+    "brandHeadlineAccent": "fillon këtu.",
     "greetingMorning": "Mirëmëngjes",
     "greetingAfternoon": "Mirëdita",
     "greetingEvening": "Mirëmbrëma",

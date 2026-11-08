@@ -8,15 +8,15 @@ import { useTheme } from '@/contexts/theme-context';
 
 interface SearchHeaderProps {
   headline: string;
-  /** Rendered in accent-orange italic, appended after `headline` — mirrors
-   *  web's <em> match-count segment in Home.jsx's screen-headline. */
+  /** Rendered in accent-orange italic, appended after `headline` (with a
+   *  space) — the brand headline's ending, e.g. "fillon këtu.". */
   emphasis?: string;
   onSearchPress?: () => void;
 }
 
 /**
- * Home's header: the greeting headline (web's screen-headline in
- * src/styles/globals.css; no kicker above it, the greeting already says it),
+ * Home's header: the brand headline (web's screen-headline in
+ * src/styles/globals.css; no kicker above it, the headline already says it),
  * plus web's full-width tappable home-search-bar — not just a small icon
  * button, so the search entry point actually reads as a search field.
  */
@@ -59,9 +59,11 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     letterSpacing: -0.75,
     color: colors.textPrimary,
   },
+  // The italic family itself rather than a fontStyle override, which made
+  // the browser and Android slant the upright file. In Russian this answers
+  // with Manrope (Newsreader has no Cyrillic), like the rest of the headline.
   headlineEmphasis: {
-    fontFamily: Fonts?.serif,
-    fontStyle: 'italic',
+    fontFamily: Fonts?.serifItalic,
     color: colors.accentText,
   },
   searchBar: {

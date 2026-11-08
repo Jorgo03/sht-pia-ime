@@ -1,5 +1,5 @@
 import { useFocusEffect, useRouter, type Href } from 'expo-router';
-import { useCallback, useMemo, useState, useSyncExternalStore } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import {
   ScrollView,
   StyleSheet,
@@ -23,7 +23,6 @@ import { AI_CHAT_ENABLED } from '@/constants/features';
 import { SearchHeader } from '@/components/ui/search-header';
 import { SkeletonCard } from '@/components/ui/skeleton-card';
 import { Fonts, InlineTarget, type AtticoPalette } from '@/constants/theme';
-import { useAuth } from '@/contexts/auth-context';
 import { useFilters } from '@/contexts/filters-context';
 import { useTheme } from '@/contexts/theme-context';
 import { useReadableColumn, useResponsive } from '@/hooks/use-responsive';
@@ -45,30 +44,9 @@ type ListingType = Property['listing_type'];
 // Sale first, then the rentals: the order buyers in this market look in.
 const LISTING_TYPE_ORDER: ListingType[] = ['sale', 'rent', 'daily_rent'];
 
-// Device-local hour, not UTC — 6-12 morning, 12-19 afternoon, else evening.
-// The previous version only split morning/evening (hour < 12), which
-// silently mislabeled both the afternoon and the 00:00-05:59 window.
-function getGreeting(hour: number, t: (key: string) => string): string {
-  if (hour >= 6 && hour < 12) return t('home.greetingMorning');
-  if (hour >= 12 && hour < 19) return t('home.greetingAfternoon');
-  return t('home.greetingEvening');
-}
-
-// The website's pages are pre-rendered when the site is built, so the hour
-// in that HTML is the build's, not the visitor's; a different greeting in the
-// browser is a hydration mismatch (React #418) that throws the page away and
-// re-renders it. The server snapshot (noon: "Mirëdita", which Albanian uses
-// all day) is what both sides render first; React then switches to the
-// visitor's own hour straight after hydrating. Native has no pre-render and
-// reads the clock directly.
-const subscribeNever = () => () => {};
-const currentHour = () => new Date().getHours();
-const buildHour = () => 12;
-
 export default function HomeScreen() {
   const router = useRouter();
   const { t } = useTranslation();
-  const { user } = useAuth();
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const { recentIds, reload: reloadRecent } = useRecentlyViewed();
@@ -93,11 +71,6 @@ export default function HomeScreen() {
   // The nav pill floats above content rather than pushing it up, so the
   // scroll has to reserve its full footprint or the last row sits under it.
   const tabBarClearance = useTabBarClearance();
-
-  const hour = useSyncExternalStore(subscribeNever, currentHour, buildHour);
-  const greeting = getGreeting(hour, t);
-  const firstName = user?.user_metadata?.full_name?.split(' ')[0] || user?.email?.split('@')[0] || '';
-  const matchCount = listings.length;
 
   // Recently Viewed reads AsyncStorage, not the network — refreshing it on
   // focus is free and needs no cache-staleness tradeoff, unlike `listings`.
@@ -136,13 +109,14 @@ export default function HomeScreen() {
     router.push('/(tabs)/explore' as Href);
   };
 
-  const headline = firstName ? `${greeting}, ${firstName}.` : `${greeting}.`;
-
+  // A fixed brand line, not a greeting: the same for every visitor at every
+  // hour, so the pre-rendered web page and the browser always agree. Two keys
+  // so each language decides where its accent ending starts.
   const searchHeader = (
     <>
       <SearchHeader
-        headline={headline}
-        emphasis={t('home.matchesToday', { count: matchCount })}
+        headline={t('home.brandHeadline')}
+        emphasis={t('home.brandHeadlineAccent')}
         onSearchPress={() => router.push('/(tabs)/explore' as Href)}
       />
       {AI_CHAT_ENABLED && <AssistantEntry />}
@@ -152,7 +126,7 @@ export default function HomeScreen() {
   return (
     <GradientBackground>
       <SafeAreaView style={styles.container} edges={['top']}>
-        {/* Web's `.app-header` sits above the greeting hero on Home too. */}
+        {/* Web's `.app-header` sits above the headline on Home too. */}
         <AppHeader />
         {!shortScreen && <View style={readable}>{searchHeader}</View>}
         <ScrollView
@@ -186,7 +160,7 @@ export default function HomeScreen() {
             </View>
           ) : listings.length === 0 ? (
             /* Home had no empty state: with zero listings it rendered the
-               greeting and then nothing at all. Distinct from the error branch
+               headline and then nothing at all. Distinct from the error branch
                above, which means the fetch failed rather than genuinely
                returning no homes. Mirrors the web Home. */
             <View style={styles.errorCard}>

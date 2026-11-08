@@ -152,6 +152,8 @@
     "saveError": "Couldn't save. Please try again."
   },
   "home": {
+    "brandHeadline": "The right home",
+    "brandHeadlineAccent": "starts here.",
     "greetingMorning": "Good morning",
     "greetingAfternoon": "Good afternoon",
     "greetingEvening": "Good evening",

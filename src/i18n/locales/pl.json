@@ -100,6 +100,8 @@
     "officeName": "Nazwa biura"
   },
   "home": {
+    "brandHeadline": "Właściwy dom",
+    "brandHeadlineAccent": "zaczyna się tutaj.",
     "greetingMorning": "Dzień dobry",
     "greetingAfternoon": "Dobre popołudnie",
     "greetingEvening": "Dobry wieczór",

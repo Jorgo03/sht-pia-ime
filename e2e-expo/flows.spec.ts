@@ -223,15 +223,20 @@ test.describe('not found', () => {
 test.describe('time of day', () => {
   test.use({ timezoneId: 'Europe/Tirane' });
 
-  // The pages are pre-rendered at build time; a greeting chosen from the
-  // build's clock broke hydration (React #418) for visitors at another hour.
-  // The guard fails the test on that page error.
-  for (const [when, key] of [['09:00', 'home.greetingMorning'], ['20:30', 'home.greetingEvening']] as const) {
-    test(`X12 at ${when} the greeting follows the visitor's clock and the pages hydrate`, async ({ page }) => {
+  // The pages are pre-rendered at build time; Home used to greet by the
+  // build's clock, which broke hydration (React #418) for visitors at another
+  // hour. It now shows one fixed brand headline: the same at every hour, no
+  // greeting, and the guard still fails the test on a hydration page error.
+  for (const when of ['09:00', '20:30']) {
+    test(`X12 at ${when} Home shows the brand headline, no greeting, and the pages hydrate`, async ({ page }) => {
       await page.clock.setFixedTime(new Date(`2026-10-21T${when}:00+02:00`));
       await page.goto('/');
       await ready(page);
-      await expect(page.getByText(t(key)).first()).toBeVisible();
+      const heading = page.getByRole('heading', { level: 1 });
+      await expect(heading).toHaveText(`${t('home.brandHeadline')} ${t('home.brandHeadlineAccent')}`);
+      for (const key of ['home.greetingMorning', 'home.greetingAfternoon', 'home.greetingEvening']) {
+        await expect(page.getByText(t(key))).toHaveCount(0);
+      }
       await page.goto('/privacy');
       await ready(page);
       await expect(page.getByRole('heading', { name: t('legal.privacyPolicy'), level: 1 })).toBeVisible();
@@ -928,7 +933,56 @@ test('X35 All/Sale/Rent: the tab lights up at once and its homes are already loa
   expect(asked.slice(before).filter((u) => u.includes('listing_type=eq.rent'))).toEqual([]);
 });
 
-test('X36 Home has no kicker above the greeting and no "editor\'s pick" label', async ({ page }) => {
+// The brand headline wraps inside the screen at every width and in both
+// themes, with only its accent ending in orange. Signed in, so a name from the
+// account would show here if the old personal greeting came back.
+test.describe('brand headline', () => {
+  test.use({ signedIn: true });
+
+  for (const width of [280, 320, 390, 480]) {
+    for (const scheme of ['light', 'dark'] as const) {
+      test(`X65 at ${width}px, ${scheme}: the headline wraps on screen with an orange ending`, async ({ page, isMobile }, info) => {
+        test.skip(!isMobile, 'phone project only');
+        await page.setViewportSize({ width, height: 760 });
+        await page.emulateMedia({ colorScheme: scheme });
+        await page.goto('/');
+        await ready(page);
+        const heading = page.getByRole('heading', { level: 1 });
+        await expect(heading).toHaveText(`${t('home.brandHeadline')} ${t('home.brandHeadlineAccent')}`);
+        await expect(heading).not.toContainText(SIGNED_IN_USER.user_metadata.full_name.split(' ')[0]);
+        const m = await heading.evaluate((el, accent) => {
+          const span = Array.from(el.querySelectorAll('span')).find((s) => s.textContent?.trim() === accent) as HTMLElement;
+          const r = el.getBoundingClientRect();
+          const rgb = (c: string) => c.match(/\d+/g)!.slice(0, 3).map(Number);
+          return {
+            left: r.left, right: r.right, viewport: window.innerWidth,
+            pageScrolls: document.documentElement.scrollWidth > window.innerWidth,
+            overflows: el.scrollWidth > el.clientWidth,
+            lines: Math.round(r.height / parseFloat(getComputedStyle(el).lineHeight)),
+            accentRight: span ? Math.max(...Array.from(span.getClientRects()).map((x) => x.right)) : null,
+            headlineColor: rgb(getComputedStyle(el).color),
+            accentColor: span ? rgb(getComputedStyle(span).color) : null,
+            accentFont: span ? getComputedStyle(span).fontFamily : null,
+          };
+        }, t('home.brandHeadlineAccent'));
+        await info.attach('headline.json', { body: JSON.stringify(m, null, 2), contentType: 'application/json' });
+        expect(m.pageScrolls).toBe(false);
+        expect(m.overflows).toBe(false);
+        expect(m.left).toBeGreaterThanOrEqual(0);
+        expect(m.right).toBeLessThanOrEqual(m.viewport);
+        expect(m.accentRight).not.toBeNull();
+        expect(m.accentRight!).toBeLessThanOrEqual(m.viewport);
+        // Orange: red well above blue, and not the colour of the rest.
+        const [r, , b] = m.accentColor!;
+        expect(r - b).toBeGreaterThan(100);
+        expect(m.accentColor).not.toEqual(m.headlineColor);
+        expect(m.accentFont).toMatch(/Newsreader/);
+      });
+    }
+  }
+});
+
+test('X36 Home has no kicker above the headline and no "editor\'s pick" label', async ({ page }) => {
   await page.goto('/');
   await ready(page);
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
