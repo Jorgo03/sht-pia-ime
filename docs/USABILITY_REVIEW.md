@@ -69,4 +69,15 @@ send the agent a message) would show more than further review can.
 
 `tests/usability.test.mjs` (no text under 12, menu words, delete asks first,
 Messages icon). e2e-expo X74 (delete asks), X75 (listing words), X76 (menu
-words, sign-up in view). Results of the full run are in the commit message.
+words, sign-up in view).
+
+| Suite | Result |
+|---|---|
+| Unit `npm test` | 459/459 |
+| `tsc --noEmit` | clean |
+| Lint | 0 errors (33 warnings, none new) |
+| App web build e2e, phone and desktop widths | 232 passed, 0 failed, 46 skipped (first attempt stopped before any test: Windows locked a build folder; the re-run is this result) |
+| Website e2e (shared wording) | 261 passed, 0 failed, 9 skipped |
+| iOS and Android bundles (`expo export`) | compile |
+| On a real iPhone or Android phone | **not tested** |
+| With a real older user | **not tested** |
