@@ -63,10 +63,10 @@ between iPhone and Samsung. Manrope and JetBrains Mono do have Cyrillic.
 | Test | Result |
 |---|---|
 | `tests/typography.test.mjs` | 3/3 |
-| Unit `npm test` | see the commit message |
+| Unit `npm test` | 443/443 |
 | `tsc --noEmit` | clean |
 | ESLint `app/` `components/` | 0 errors (11 old `setState`-in-effect warnings) |
-| Expo-web e2e (every screen, phone and desktop widths, axe) | see the commit message |
+| Expo-web e2e (every screen, phone and desktop widths, axe) | 185 passed, 36 skipped, 1 failed: X35 on phone, a 200 ms timing check. Re-run alone 4× per viewport: **8/8 passed**, so it is timing under the full suite's load, not the fonts |
 | **On a Samsung, an iPhone or an emulator** | **NOT TESTED**: no device or emulator here. Compare the same screens on both phones to confirm |
 
 Not changed, by design: Android's extra font padding
