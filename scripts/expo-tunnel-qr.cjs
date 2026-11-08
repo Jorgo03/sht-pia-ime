@@ -47,6 +47,7 @@ const slugify = require('slugify');
 // Expo's own internals, and the SDK 57 bump moved a sibling package out of the
 // top level, breaking exactly this pattern in expo-qr.cjs.
 const { requireFromExpo } = require('./require-from-expo.cjs');
+const { warmBundles } = require('./warm-bundles.cjs');
 
 const { ProjectSettings } = requireFromExpo(
   '@expo/cli/build/src/start/project/settings',
@@ -418,6 +419,9 @@ process.on('SIGTERM', () => metro?.kill('SIGTERM'));
 
     const probe = await tunnelUp(hostname);
     if (probe.ok) {
+      // Same reason as expo-go-qr.cjs: never hand a phone a cold build.
+      await warmBundles({ port, argv, tag: 'expo:tunnel:qr', isStopped: () => metroExited });
+      if (metroExited) return;
       console.log('[expo:tunnel:qr] Tunnel is live and serving — opening the QR code.\n');
       spawn(
         process.execPath,

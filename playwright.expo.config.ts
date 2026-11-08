@@ -11,6 +11,13 @@ import { defineConfig, devices } from '@playwright/test';
 
 const PORT = 4174;
 
+// The export below uses --clear so the fake backend address cannot come from
+// a cached build. Metro's cache lives in the temp folder, so with the shared
+// one that also wiped the cache the phone dev server relies on: the next
+// phone start rebuilt everything (7 minutes) and timed out. Its own folder
+// keeps a test run from touching the phone's cache.
+const E2E_TEMP = `${process.env.TEMP ?? process.env.TMPDIR ?? '/tmp'}/shtepia-e2e-expo-temp`;
+
 export default defineConfig({
   testDir: './e2e-expo',
   fullyParallel: true,
@@ -31,6 +38,7 @@ export default defineConfig({
   ],
   webServer: {
     command:
+      `node -e "require('fs').mkdirSync(require('os').tmpdir(),{recursive:true})" && ` +
       `npx expo export -p web --clear --output-dir dist-e2e-expo && ` +
       `node scripts/expo-web-postbuild.mjs dist-e2e-expo && ` +
       `node scripts/expo-web/serve.cjs dist-e2e-expo ${PORT}`,
@@ -39,6 +47,9 @@ export default defineConfig({
     timeout: 600_000,
     env: {
       CI: '1',
+      TEMP: E2E_TEMP,
+      TMP: E2E_TEMP,
+      TMPDIR: E2E_TEMP,
       EXPO_PUBLIC_SUPABASE_URL: 'https://e2e.supabase.co',
       EXPO_PUBLIC_SUPABASE_ANON_KEY: 'e2e-anon-key',
       EXPO_PUBLIC_SITE_URL: '',

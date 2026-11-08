@@ -27,6 +27,7 @@
 const http = require('http');
 const path = require('path');
 const { spawn } = require('child_process');
+const { warmBundles } = require('./warm-bundles.cjs');
 
 const argv = process.argv.slice(2);
 const portArg = argv.find((a) => a.startsWith('--port='));
@@ -94,6 +95,10 @@ process.on('SIGTERM', () => metro.kill('SIGTERM'));
       // before it finishes announcing itself, and opening a browser into the
       // middle of that makes the terminal output confusing to read.
       await sleep(1500);
+      // Built before the code is drawn: a phone asking during a cold build
+      // gives up with "Could not connect to development server".
+      await warmBundles({ port, argv, tag: 'expo:go:qr', isStopped: () => metroExited });
+      if (metroExited) return;
       console.log('\n[expo:go:qr] Dev server is up — opening the QR code.\n');
       spawn(process.execPath, [path.join(__dirname, 'expo-qr.cjs'), `--port=${port}`], {
         stdio: 'inherit',
