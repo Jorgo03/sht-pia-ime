@@ -98,7 +98,11 @@
     "verifyEmailSubtitle": "Te hemos enviado un código de verificación de 6 dígitos a tu correo electrónico.",
     "verifyAccount": "Verificar cuenta",
     "codeExpiresIn": "El código caduca en {{time}}",
-    "officeName": "Nombre de la oficina"
+    "officeName": "Nombre de la oficina",
+    "continue": "Continuar",
+    "checkInbox": "Revisa tu correo",
+    "usePassword": "Contraseña",
+    "spamHint": "Si no has recibido el correo, revisa la carpeta de spam o solicita un código nuevo."
   },
   "home": {
     "greetingMorning": "Buenos días",
@@ -351,7 +355,7 @@
     "invalidCode": "El código es incorrecto o ya no es válido. Usa el último código que te enviamos.",
     "videoInvalidType": "Solo se permiten vídeos MP4 o MOV",
     "videoTooLarge": "El vídeo es demasiado grande (máx. {{max}} MB)",
-    "emailSendFailed": "No hemos podido enviar el correo. Es un problema de configuración del servidor, no de tu cuenta: contacta con el administrador.",
+    "emailSendFailed": "No hemos podido enviar el código de verificación. Inténtalo de nuevo en unos minutos.",
     "waitSeconds": "Espera {{s}} segundos antes de pedir un código nuevo.",
     "photoPrepareFailed": "No se pudo preparar una foto para subirla. Inténtalo de nuevo o elige otra foto.",
     "listingSaveFailed": "El anuncio no se guardó. Todo lo que escribiste sigue aquí; inténtalo de nuevo.",

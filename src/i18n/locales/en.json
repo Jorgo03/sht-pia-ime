@@ -98,7 +98,11 @@
     "verifyEmailSubtitle": "We've sent a 6-digit verification code to your email address.",
     "verifyAccount": "Verify Account",
     "codeExpiresIn": "Code expires in {{time}}",
-    "officeName": "Office Name"
+    "officeName": "Office Name",
+    "continue": "Continue",
+    "checkInbox": "Check your email",
+    "usePassword": "Password",
+    "spamHint": "If you haven't received the email, check your Spam/Junk folder or request a new code."
   },
   "addSheet": {
     "openLabel": "Create new",
@@ -371,7 +375,7 @@
     "invalidCode": "The code is wrong or no longer valid. Use the most recent code we sent.",
     "videoInvalidType": "Only MP4 or MOV videos are allowed",
     "videoTooLarge": "Video is too large (max {{max}} MB)",
-    "emailSendFailed": "We could not send the email. This is a server configuration problem, not a problem with your account — please contact the administrator.",
+    "emailSendFailed": "We couldn't send the verification code. Please try again in a few minutes.",
     "waitSeconds": "Wait {{s}} seconds before asking for a new code.",
     "photoPrepareFailed": "A photo couldn't be prepared for upload. Try again or choose a different photo.",
     "listingSaveFailed": "The listing wasn't saved. Everything you entered is still here; try again.",

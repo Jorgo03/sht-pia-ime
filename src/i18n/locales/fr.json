@@ -98,7 +98,11 @@
     "verifyEmailSubtitle": "Nous avons envoyé un code de vérification à 6 chiffres à votre adresse e-mail.",
     "verifyAccount": "Vérifier le compte",
     "codeExpiresIn": "Le code expire dans {{time}}",
-    "officeName": "Nom du bureau"
+    "officeName": "Nom du bureau",
+    "continue": "Continuer",
+    "checkInbox": "Vérifiez vos e-mails",
+    "usePassword": "Mot de passe",
+    "spamHint": "Si vous n’avez pas reçu l’e-mail, vérifiez votre dossier Spam ou demandez un nouveau code."
   },
   "home": {
     "greetingMorning": "Bonjour",
@@ -351,7 +355,7 @@
     "invalidCode": "Le code est incorrect ou n'est plus valable. Utilisez le dernier code envoyé.",
     "videoInvalidType": "Seules les vidéos MP4 ou MOV sont autorisées",
     "videoTooLarge": "Vidéo trop volumineuse (max {{max}} Mo)",
-    "emailSendFailed": "Nous n’avons pas pu envoyer l’e-mail. Il s’agit d’un problème de configuration du serveur, pas de votre compte — contactez l’administrateur.",
+    "emailSendFailed": "Nous n’avons pas pu envoyer le code de vérification. Réessayez dans quelques minutes.",
     "waitSeconds": "Attendez {{s}} secondes avant de demander un nouveau code.",
     "photoPrepareFailed": "Une photo n'a pas pu être préparée pour l'envoi. Réessayez ou choisissez une autre photo.",
     "listingSaveFailed": "L'annonce n'a pas été enregistrée. Tout ce que vous avez saisi est encore là ; réessayez.",

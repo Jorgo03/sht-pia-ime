@@ -55,6 +55,7 @@ test('X03 sign in with email and password', async ({ page }) => {
   await page.goto('/profile');
   await ready(page);
   await page.getByRole('textbox', { name: t('auth.email') }).fill('agent@example.com');
+  await page.getByRole('button', { name: t('auth.usePassword'), exact: true }).click();
   await page.getByRole('textbox', { name: t('auth.password') }).fill('correct-horse-battery');
   await page.getByRole('button', { name: t('auth.stepInside') }).click();
   await expect(page.getByRole('heading', { name: t('common.profile'), level: 1 })).toBeVisible();
@@ -619,8 +620,8 @@ test.describe('email code', () => {
     await page.goto('/profile');
     await ready(page);
     await page.getByRole('textbox', { name: t('auth.email') }).fill('new.user@example.com');
-    await page.getByRole('button', { name: t('auth.signInWithEmail') }).dblclick();
-    await expect(page.getByText(t('auth.enterCode')).first()).toBeVisible();
+    await page.getByRole('button', { name: t('auth.continue') }).dblclick();
+    await expect(page.getByRole('heading', { name: t('auth.checkInbox') })).toBeVisible();
     expect(sent).toHaveLength(1);
   });
 
@@ -631,9 +632,109 @@ test.describe('email code', () => {
     await page.goto('/profile');
     await ready(page);
     await page.getByRole('textbox', { name: t('auth.email') }).fill('new.user@example.com');
-    await page.getByRole('button', { name: t('auth.signInWithEmail') }).click();
-    await expect(page.getByText(t('auth.enterCode')).first()).toBeVisible();
+    await page.getByRole('button', { name: t('auth.continue') }).click();
+    await expect(page.getByRole('heading', { name: t('auth.checkInbox') })).toBeVisible();
     await expect(page.getByRole('button', { name: new RegExp(t('auth.resendIn').replace('{{s}}', '4[12]')) })).toBeDisabled();
+  });
+});
+
+// Signing in starts with the email. What matters: the code screen only ever
+// follows a request the server accepted, and a failure says so plainly.
+test.describe('email code sign-in', () => {
+  test.use({ allowConsoleErrors: [/status of 403/, /status of 500/] });
+  const ADDRESS = 'agent@example.com';
+  const inbox = (page: Page) => page.getByRole('heading', { name: t('auth.checkInbox') });
+
+  async function askForCode(page: Page, address = ADDRESS) {
+    await page.goto('/profile');
+    await ready(page);
+    await page.getByRole('textbox', { name: t('auth.email') }).fill(address);
+    await page.getByRole('button', { name: t('auth.continue') }).click();
+  }
+
+  test('X87 asks for the email first, and a bad address never reaches the server', async ({ page }) => {
+    const sent: unknown[] = [];
+    await page.route('**/auth/v1/otp*', (route) => {
+      sent.push(route.request().postDataJSON());
+      return json(route, {});
+    });
+    await askForCode(page, 'not-an-email');
+    await expect(page.getByLabel(t('auth.password'), { exact: true })).toHaveCount(0);
+    await expect(page.getByText(t('errors.invalidEmail'))).toBeVisible();
+    await expect(inbox(page)).toHaveCount(0);
+    expect(sent).toEqual([]);
+  });
+
+  test('X88 the code screen waits for the server, then shows the address, the spam hint and a locked resend', async ({ page }) => {
+    let release = () => {};
+    const held = new Promise<void>((r) => (release = r));
+    await page.route('**/auth/v1/otp*', async (route) => {
+      await held;
+      return json(route, {});
+    });
+    await askForCode(page);
+    await expect(page.getByRole('button', { name: t('common.loading') })).toBeVisible();
+    await expect(inbox(page)).toHaveCount(0);
+    release();
+    await expect(inbox(page)).toBeVisible();
+    await expect(page.getByText(ADDRESS, { exact: true })).toBeVisible();
+    await expect(page.getByText(t('auth.spamHint'))).toBeVisible();
+    await expect(page.getByRole('button', { name: new RegExp(t('auth.resendIn').replace('{{s}}', '(59|60)')) })).toBeDisabled();
+  });
+
+  test('X89 a failed send stays on the form with a plain message', async ({ page }) => {
+    await page.route('**/auth/v1/otp*', (route) => json(route, { error_code: 'unexpected_failure', msg: 'Error sending magic link email' }, 500));
+    await askForCode(page);
+    await expect(page.getByText(t('errors.emailSendFailed'))).toBeVisible();
+    await expect(page.getByText('Error sending magic link email')).toHaveCount(0);
+    await expect(inbox(page)).toHaveCount(0);
+  });
+
+  test('X90 the code signs in as an email code, for that address; a wrong one is refused first', async ({ page }) => {
+    const verified: Array<Record<string, unknown>> = [];
+    await page.route('**/auth/v1/otp*', (route) => json(route, {}));
+    await page.route('**/auth/v1/verify*', (route) => {
+      verified.push(route.request().postDataJSON());
+      return verified.length === 1 ? json(route, CODE_REFUSED, 403) : json(route, fakeSession());
+    });
+    await page.route('**/auth/v1/user*', (route) => json(route, SIGNED_IN_USER));
+    await askForCode(page);
+    await page.getByRole('textbox', { name: digit(1) }).fill('000000');
+    await expect(page.getByText(t('errors.codeIncorrect'))).toBeVisible();
+    await page.getByRole('textbox', { name: digit(1) }).fill('654321');
+    await expect(page.getByRole('heading', { name: t('common.profile'), level: 1 })).toBeVisible();
+    expect(verified[1]).toMatchObject({ email: ADDRESS, token: '654321', type: 'email' });
+  });
+
+  test('X91 closing and reopening returns to the code screen; Back forgets it', async ({ page }) => {
+    await page.route('**/auth/v1/otp*', (route) => json(route, {}));
+    await askForCode(page);
+    await expect(inbox(page)).toBeVisible();
+    await page.reload();
+    await expect(inbox(page)).toBeVisible();
+    await expect(page.getByText(ADDRESS, { exact: true })).toBeVisible();
+    await page.getByRole('button', { name: t('common.back') }).click();
+    await page.reload();
+    await ready(page);
+    await expect(page.getByRole('button', { name: t('auth.continue') })).toBeVisible();
+    await expect(inbox(page)).toHaveCount(0);
+  });
+
+  test('X92 resend unlocks after the wait, confirms, and keeps only the new code on screen', async ({ page }) => {
+    const sent: unknown[] = [];
+    await page.clock.install();
+    await page.route('**/auth/v1/otp*', (route) => {
+      sent.push(route.request().postDataJSON());
+      return json(route, {});
+    });
+    await askForCode(page);
+    await expect(inbox(page)).toBeVisible();
+    await page.getByRole('textbox', { name: digit(1) }).fill('1');
+    await page.clock.runFor('01:01');
+    await page.getByRole('button', { name: t('auth.resendCode') }).click();
+    await expect(page.getByText(t('auth.newCodeSent'))).toBeVisible();
+    await expect(page.getByRole('textbox', { name: digit(1) })).toHaveValue('');
+    expect(sent).toHaveLength(2);
   });
 });
 
@@ -655,6 +756,7 @@ test('X27 forgot password: the code opens the new-password step, which stays unt
   await page.goto('/profile');
   await ready(page);
   await page.getByRole('textbox', { name: t('auth.email') }).fill('agent@example.com');
+  await page.getByRole('button', { name: t('auth.usePassword'), exact: true }).click();
   await page.getByRole('button', { name: t('auth.forgotShort') }).click();
   // Its own step, with the address already typed.
   await expect(page.getByText(t('auth.forgotTitle'))).toBeVisible();
@@ -1122,6 +1224,7 @@ test('X32 signing in before confirming the email opens the code entry instead of
   await page.goto('/profile');
   await ready(page);
   await page.getByRole('textbox', { name: t('auth.email') }).fill('new.user@example.com');
+  await page.getByRole('button', { name: t('auth.usePassword'), exact: true }).click();
   await page.getByLabel(t('auth.password'), { exact: true }).fill('correct-horse-battery');
   await page.getByRole('button', { name: t('auth.stepInside') }).click();
   await expect(page.getByRole('heading', { name: t('auth.verifyEmailTitle') })).toBeVisible();

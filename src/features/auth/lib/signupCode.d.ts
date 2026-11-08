@@ -1,5 +1,11 @@
 export declare const CODE_TTL_S: number;
 export declare const MAX_CODE_ATTEMPTS: number;
+export declare const RESEND_WAIT_S: number;
+export declare function pendingCodeNote(email: string, now?: number): string;
+export declare function restorableCode(
+  raw: string | null,
+  now?: number,
+): { email: string; expiresAt: number; resendWait: number } | null;
 export declare function codeExpiry(now?: number): number;
 export declare function secondsLeft(expiresAt: number | null, now?: number): number | null;
 export declare function formatCountdown(seconds: number): string;

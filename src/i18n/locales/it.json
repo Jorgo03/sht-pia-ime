@@ -98,7 +98,11 @@
     "verifyEmailSubtitle": "Ti abbiamo inviato un codice di verifica di 6 cifre al tuo indirizzo email.",
     "verifyAccount": "Verifica account",
     "codeExpiresIn": "Il codice scade tra {{time}}",
-    "officeName": "Nome dell'ufficio"
+    "officeName": "Nome dell'ufficio",
+    "continue": "Continua",
+    "checkInbox": "Controlla la tua email",
+    "usePassword": "Password",
+    "spamHint": "Se non hai ricevuto l’email, controlla la cartella Spam o richiedi un nuovo codice."
   },
   "home": {
     "greetingMorning": "Buongiorno",
@@ -351,7 +355,7 @@
     "invalidCode": "Il codice è errato o non è più valido. Usa l'ultimo codice che ti abbiamo inviato.",
     "videoInvalidType": "Sono consentiti solo video MP4 o MOV",
     "videoTooLarge": "Video troppo grande (max {{max}} MB)",
-    "emailSendFailed": "Non siamo riusciti a inviare l’email. È un problema di configurazione del server, non del tuo account — contatta l’amministratore.",
+    "emailSendFailed": "Non siamo riusciti a inviare il codice di verifica. Riprova tra qualche minuto.",
     "waitSeconds": "Attendi {{s}} secondi prima di chiedere un nuovo codice.",
     "photoPrepareFailed": "Non è stato possibile preparare una foto per il caricamento. Riprova o scegli un'altra foto.",
     "listingSaveFailed": "L'annuncio non è stato salvato. Tutto ciò che hai inserito è ancora qui; riprova.",

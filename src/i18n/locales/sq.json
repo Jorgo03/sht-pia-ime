@@ -98,7 +98,11 @@
     "verifyEmailSubtitle": "Të dërguam një kod verifikimi 6-shifror në adresën tënde të email-it.",
     "verifyAccount": "Verifiko llogarinë",
     "codeExpiresIn": "Kodi skadon pas {{time}}",
-    "officeName": "Emri i zyrës"
+    "officeName": "Emri i zyrës",
+    "continue": "Vazhdo",
+    "checkInbox": "Kontrollo email-in",
+    "usePassword": "Fjalëkalim",
+    "spamHint": "Nëse nuk e ke marrë email-in, kontrollo dosjen Spam ose Junk, ose kërko një kod të ri."
   },
   "home": {
     "greetingMorning": "Mirëmëngjes",
@@ -319,7 +323,7 @@
     "invalidCode": "Kodi është i pasaktë ose nuk vlen më. Përdor kodin e fundit që të dërguam.",
     "videoInvalidType": "Lejohen vetëm video MP4 ose MOV",
     "videoTooLarge": "Video është shumë e madhe (maks. {{max}} MB)",
-    "emailSendFailed": "Nuk arritëm të dërgojmë emailin. Është një problem konfigurimi i serverit, jo i llogarisë sate — kontakto administratorin.",
+    "emailSendFailed": "Nuk arritëm ta dërgojmë kodin e verifikimit. Provo sërish pas pak minutash.",
     "waitSeconds": "Prit {{s}} sekonda para se të kërkosh një kod të ri.",
     "photoPrepareFailed": "Një foto nuk u përgatit dot për ngarkim. Provo përsëri ose zgjidh një foto tjetër.",
     "listingSaveFailed": "Shpallja nuk u ruajt. Gjithçka që plotësove mbetet këtu; provo përsëri.",

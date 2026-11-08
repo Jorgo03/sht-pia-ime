@@ -10,6 +10,9 @@ import {
   isExistingAccount,
   isUnverifiedEmailUser,
   MAX_CODE_ATTEMPTS,
+  pendingCodeNote,
+  RESEND_WAIT_S,
+  restorableCode,
   rejectedCodeKey,
   secondsLeft,
 } from '../src/features/auth/lib/signupCode.js'
@@ -70,4 +73,19 @@ test('only an email account without a confirmed address is refused a session', (
   assert.equal(isUnverifiedEmailUser({ confirmed_at: '2026-01-01T00:00:00Z' }), false)
   assert.equal(isUnverifiedEmailUser({ app_metadata: { provider: 'google' } }), false)
   assert.equal(isUnverifiedEmailUser(null), false)
+})
+
+test('a code in progress is restored only while it can still work', () => {
+  const sentAt = 1_000_000
+  const note = pendingCodeNote('a@b.al', sentAt)
+  assert.doesNotMatch(note, /token|code/i, 'the address and the time only')
+  assert.deepEqual(restorableCode(note, sentAt + 10_000), { email: 'a@b.al', expiresAt: sentAt + CODE_TTL_S * 1000, resendWait: RESEND_WAIT_S - 10 })
+  assert.equal(restorableCode(note, sentAt + RESEND_WAIT_S * 1000 + 5).resendWait, 0, 'the resend is open again')
+  assert.equal(restorableCode(note, sentAt + CODE_TTL_S * 1000), null, 'expired')
+  assert.equal(restorableCode(note, sentAt - 1), null, 'a clock moved backwards proves nothing')
+  for (const bad of ['', 'nonsense', 'null', '{}', '{"email":"","sentAt":1}', '{"email":"a@b.al"}']) assert.equal(restorableCode(bad, sentAt), null, bad)
+})
+
+test('the resend wait is within 30 to 60 seconds and not shorter than the server allows', () => {
+  assert.equal(RESEND_WAIT_S, 60)
 })

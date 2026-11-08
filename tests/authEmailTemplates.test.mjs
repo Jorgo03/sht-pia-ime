@@ -19,7 +19,9 @@ for (const name of ['confirmation', 'recovery', 'magic_link', 'email_change']) {
     assert.match(html, /\{\{ \.Token \}\}/)
     const type = { confirmation: 'email', recovery: 'recovery', magic_link: 'email', email_change: 'email_change' }[name]
     const hrefs = [...html.matchAll(/href="([^"]*)"/g)].map((m) => m[1])
-    assert.ok(hrefs.length > 0)
+    // The sign-in email is a code to type: nothing to click.
+    if (name === 'magic_link') assert.equal(hrefs.length, 0)
+    else assert.ok(hrefs.length > 0)
     for (const href of hrefs) {
       assert.equal(href, `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&amp;type=${type}`)
     }
@@ -62,6 +64,17 @@ test('the sign-up email: app name, logo, the code, its expiry and a do-not-share
   assert.match(html, /Do not share this code/)
   assert.match(html, /Mos ia trego këtë kod askujt/)
   assert.match(config, /\[auth\.email\][\s\S]*?enable_confirmations = true/)
+})
+
+test('the sign-in email: title, the code, expiry, a do-not-share warning and no technical detail', () => {
+  const html = read('magic_link')
+  assert.match(html, /Your Login Verification Code/)
+  assert.match(html, /Kodi yt i verifikimit është:/)
+  assert.match(html, /This code expires in 10 minutes\./)
+  assert.match(html, /Do not share this code/)
+  assert.match(html, /Mos ia trego këtë kod askujt/)
+  assert.match(html, /you can safely ignore this email/)
+  assert.doesNotMatch(html, /TokenHash|SiteURL/)
 })
 
 test('password_changed: a security notice with no link to follow, wired into config.toml', () => {

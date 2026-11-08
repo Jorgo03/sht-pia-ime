@@ -47,7 +47,10 @@ import {
   blockedCodeKey,
   codeExpiry,
   formatCountdown,
+  pendingCodeNote,
   rejectedCodeKey,
+  RESEND_WAIT_S as RESEND_COOLDOWN_S,
+  restorableCode,
   secondsLeft,
 } from '@/src/features/auth/lib/signupCode';
 import { newPasswordError, passwordStrengthError } from '@/src/features/auth/lib/password';
@@ -61,7 +64,7 @@ import { useReadableColumn } from '@/hooks/use-responsive';
 type Role = 'buyer' | 'agent';
 
 /** Seconds the resend link stays locked after a code goes out — same 30 web uses. */
-const RESEND_COOLDOWN_S = 30;
+const PENDING_CODE_KEY = 'fho_pending_code';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -124,6 +127,10 @@ export default function ProfileScreen() {
   const [fullName, setFullName] = useState('');
   const [agencyName, setAgencyName] = useState('');
   const [isSignUp, setIsSignUp] = useState(false);
+  // Signing in starts with the email and a code. The password form stays one
+  // tap away until email delivery has been proven with real mailboxes.
+  const [usePassword, setUsePassword] = useState(false);
+  const emailFirst = !isSignUp && !usePassword;
   const [role, setRole] = useState<Role>('buyer');
   const [loading, setLoading] = useState(false);
   // Tracks which provider button is mid-redirect, so the others stay usable
@@ -216,6 +223,39 @@ export default function ProfileScreen() {
     return () => clearInterval(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cooldown > 0]);
+
+  const forgetPendingCode = () => {
+    AsyncStorage.removeItem(PENDING_CODE_KEY).catch(() => {});
+  };
+
+  // Back to the code screen after the system closed the app while the person
+  // read the email (signupCode.js restorableCode).
+  useEffect(() => {
+    let alive = true;
+    AsyncStorage.getItem(PENDING_CODE_KEY)
+      .then((raw) => {
+        if (!alive || !raw) return;
+        const pending = restorableCode(raw);
+        if (!pending) {
+          AsyncStorage.removeItem(PENDING_CODE_KEY).catch(() => {});
+          return;
+        }
+        setEmail(pending.email);
+        setOtpType('email');
+        setCodeExpiresAt(pending.expiresAt);
+        setClock(Date.now());
+        setCooldown(pending.resendWait);
+        setOtpStep(true);
+      })
+      .catch(() => {});
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (user) AsyncStorage.removeItem(PENDING_CODE_KEY).catch(() => {});
+  }, [user]);
 
   // Code expiry countdown: one interval while a code with a known expiry is
   // on screen.
@@ -335,10 +375,11 @@ export default function ProfileScreen() {
   // swaps the form to code entry rather than navigating away.
   const handleSendOtp = async () => {
     const cleanEmail = email.trim();
-    if (!cleanEmail) {
-      Alert.alert(t('common.error'), t('auth.enterEmail'));
+    if (!EMAIL_RE.test(cleanEmail)) {
+      setFormError(t(cleanEmail ? 'errors.invalidEmail' : 'auth.enterEmail'));
       return;
     }
+    setFormError(null);
     setEmail(cleanEmail);
     // OTP signups carry no role metadata either — same stash-and-apply path
     // as OAuth (see auth-context's applyPendingRole), and overwriting here
@@ -363,10 +404,13 @@ export default function ProfileScreen() {
       setCodeNotice({ text: t('errors.waitSeconds', { s: wait }), tone: 'info' });
       return;
     }
+    // Only a request Supabase accepted reaches the code screen. A refusal
+    // stays here with a plain message, never the server's own wording.
     if (error) {
-      Alert.alert(t('common.error'), friendlyAuthError(error, t));
+      setFormError(friendlyAuthError(error, t));
       return;
     }
+    AsyncStorage.setItem(PENDING_CODE_KEY, pendingCodeNote(cleanEmail)).catch(() => {});
     openCodeEntry('email', RESEND_COOLDOWN_S, true);
   };
 
@@ -408,6 +452,9 @@ export default function ProfileScreen() {
     // code, so leaving the old (often wrong) ones on screen invites the user
     // to submit a code that can no longer succeed.
     // A new code: a new 10 minutes and a new allowance of wrong guesses.
+    if (otpType === 'email') {
+      AsyncStorage.setItem(PENDING_CODE_KEY, pendingCodeNote(email.trim())).catch(() => {});
+    }
     openCodeEntry(otpType, RESEND_COOLDOWN_S, true);
     // Says that earlier codes stopped working: entering the first email's
     // code after a resend is the common way to hit "wrong or expired".
@@ -446,6 +493,7 @@ export default function ProfileScreen() {
     }
     // A successful verify puts a session in place; AuthProvider's
     // onAuthStateChange swaps this screen to the signed-in dashboard.
+    forgetPendingCode();
     setOtpStep(false);
   };
 
@@ -1098,12 +1146,10 @@ export default function ProfileScreen() {
                   {/* A sign-up gets the "Verify your email" step; an email
                       sign-in code keeps its own wording. */}
                   <Text style={styles.otpTitle} accessibilityRole="header">
-                    {otpType === 'signup' ? t('auth.verifyEmailTitle') : t('auth.enterCode')}
+                    {otpType === 'signup' ? t('auth.verifyEmailTitle') : t('auth.checkInbox')}
                   </Text>
-                  <Text style={styles.otpSubtitle}>
-                    {otpType === 'signup' ? t('auth.verifyEmailSubtitle') : t('auth.codeSentTo', { email })}
-                  </Text>
-                  {otpType === 'signup' && <Text style={styles.otpEmail}>{email}</Text>}
+                  <Text style={styles.otpSubtitle}>{t('auth.verifyEmailSubtitle')}</Text>
+                  <Text style={styles.otpEmail}>{email}</Text>
                   <OtpInput
                     value={otpCode}
                     error={otpError}
@@ -1152,6 +1198,7 @@ export default function ProfileScreen() {
                         : t('auth.resendCode')}
                     </Text>
                   </TouchableOpacity>
+                  <Text style={styles.otpNotice}>{t('auth.spamHint')}</Text>
                   {otpType === 'signup' && (
                     <TouchableOpacity
                       accessibilityRole="button"
@@ -1163,7 +1210,13 @@ export default function ProfileScreen() {
                       <Text style={styles.linkButtonText}>{t('auth.signupCodeHint')}</Text>
                     </TouchableOpacity>
                   )}
-                  <TouchableOpacity accessibilityRole="button" onPress={() => setOtpStep(false)} style={styles.linkButton}>
+                  <TouchableOpacity
+                    accessibilityRole="button"
+                    onPress={() => {
+                      forgetPendingCode();
+                      setOtpStep(false);
+                    }}
+                    style={styles.linkButton}>
                     <Text style={styles.linkButtonText}>{t('common.back')}</Text>
                   </TouchableOpacity>
                 </>
@@ -1200,9 +1253,11 @@ export default function ProfileScreen() {
                   textContentType={isSignUp ? 'emailAddress' : 'username'}
                   autoComplete="email"
                   accessibilityLabel={t('auth.email')}
+                  onSubmitEditing={emailFirst ? handleSendOtp : undefined}
                 />
               </View>
 
+              {!emailFirst && (
               <View style={styles.fieldRow}>
                 <MaterialIcons name="lock-outline" size={18} color="rgba(255,255,255,0.8)" style={styles.fieldIcon} />
                 <TextInput
@@ -1230,6 +1285,7 @@ export default function ProfileScreen() {
                   />
                 </TouchableOpacity>
               </View>
+              )}
 
               {isSignUp && (
                 <View style={styles.fieldRow}>
@@ -1273,15 +1329,17 @@ export default function ProfileScreen() {
               {!isSignUp && (
                 <View style={styles.accessRow}>
                   <Text style={styles.accessText} numberOfLines={2}>
-                    {role === 'agent' ? t('auth.accessAgent') : t('auth.accessClient')}
+                    {emailFirst ? t('auth.otpSubtitle') : role === 'agent' ? t('auth.accessAgent') : t('auth.accessClient')}
                   </Text>
-                  <TouchableOpacity
-                    accessibilityRole="button"
-                    onPress={() => setRecoveryStep('email')}
-                    style={InlineTarget}
-                    hitSlop={8}>
-                    <Text style={styles.accessForgot}>{t('auth.forgotShort')}</Text>
-                  </TouchableOpacity>
+                  {!emailFirst && (
+                    <TouchableOpacity
+                      accessibilityRole="button"
+                      onPress={() => setRecoveryStep('email')}
+                      style={InlineTarget}
+                      hitSlop={8}>
+                      <Text style={styles.accessForgot}>{t('auth.forgotShort')}</Text>
+                    </TouchableOpacity>
+                  )}
                 </View>
               )}
 
@@ -1294,16 +1352,22 @@ export default function ProfileScreen() {
                 </Text>
               )}
 
-              <TouchableOpacity accessibilityRole="button" onPress={handleAuth} activeOpacity={0.85} disabled={loading}>
+              <TouchableOpacity
+                accessibilityRole="button"
+                onPress={emailFirst ? handleSendOtp : handleAuth}
+                activeOpacity={0.85}
+                disabled={loading || otpSending}>
                 <LinearGradient colors={[colors.accent, colors.accentEnd]} style={styles.ctaPill}>
                   {/* Prototype CTA copy: "Step inside" on sign-in,
                       "Create account" on sign-up — not the bare verbs. */}
                   <Text style={styles.ctaPillText}>
-                    {loading
+                    {loading || (emailFirst && otpSending)
                       ? t('common.loading')
                       : isSignUp
                         ? t('auth.createAccount')
-                        : t('auth.stepInside')}
+                        : emailFirst
+                          ? t('auth.continue')
+                          : t('auth.stepInside')}
                   </Text>
                   <MaterialIcons name="arrow-forward" size={18} color="#fff" />
                 </LinearGradient>
@@ -1315,6 +1379,7 @@ export default function ProfileScreen() {
                 accessibilityRole="button"
                 onPress={() => {
                   setIsSignUp(!isSignUp);
+                  setUsePassword(false);
                   setFormError(null);
                 }}
                 style={styles.linkButton}>
@@ -1403,17 +1468,24 @@ export default function ProfileScreen() {
                 <TouchableOpacity
                   accessibilityRole="button"
                   style={[styles.socialButton, socialOneColumn && styles.socialButtonFull]}
-                  onPress={handleSendOtp}
+                  onPress={
+                    isSignUp
+                      ? handleSendOtp
+                      : () => {
+                          setUsePassword(!usePassword);
+                          setFormError(null);
+                        }
+                  }
                   activeOpacity={0.8}
-                  accessibilityLabel={t('auth.signInWithEmail')}
+                  accessibilityLabel={emailFirst ? t('auth.usePassword') : t('auth.signInWithEmail')}
                   disabled={otpSending}>
                   {/* Was colors.textPrimary — near-black in the light theme,
                       which made the icon vanish against the dark glass card.
                       The card is dark in both themes, so this is fixed cream
                       like its own label. */}
-                  <MaterialIcons name="mail-outline" size={18} color="#f5f0e8" />
+                  <MaterialIcons name={emailFirst ? 'lock-outline' : 'mail-outline'} size={18} color="#f5f0e8" />
                   <Text style={styles.socialLabel} numberOfLines={1}>
-                    {otpSending ? t('common.loading') : t('auth.emailCode')}
+                    {emailFirst ? t('auth.usePassword') : otpSending ? t('common.loading') : t('auth.emailCode')}
                   </Text>
                 </TouchableOpacity>
               </View>

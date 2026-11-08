@@ -98,7 +98,11 @@
     "verifyEmailSubtitle": "Wir haben einen 6-stelligen Bestätigungscode an deine E-Mail-Adresse gesendet.",
     "verifyAccount": "Konto bestätigen",
     "codeExpiresIn": "Der Code läuft ab in {{time}}",
-    "officeName": "Name des Büros"
+    "officeName": "Name des Büros",
+    "continue": "Weiter",
+    "checkInbox": "Prüfe deine E-Mails",
+    "usePassword": "Passwort",
+    "spamHint": "Falls du die E-Mail nicht erhalten hast, prüfe deinen Spam-Ordner oder fordere einen neuen Code an."
   },
   "home": {
     "greetingMorning": "Guten Morgen",
@@ -343,7 +347,7 @@
     "invalidCode": "Der Code ist falsch oder nicht mehr gültig. Verwende den zuletzt gesendeten Code.",
     "videoInvalidType": "Nur MP4- oder MOV-Videos sind erlaubt",
     "videoTooLarge": "Video ist zu groß (max. {{max}} MB)",
-    "emailSendFailed": "Die E-Mail konnte nicht gesendet werden. Das ist ein Serverkonfigurationsproblem, nicht ein Problem mit deinem Konto — bitte kontaktiere den Administrator.",
+    "emailSendFailed": "Der Bestätigungscode konnte nicht gesendet werden. Bitte versuche es in ein paar Minuten erneut.",
     "waitSeconds": "Warte {{s}} Sekunden, bevor du einen neuen Code anforderst.",
     "photoPrepareFailed": "Ein Foto konnte nicht für den Upload vorbereitet werden. Versuche es erneut oder wähle ein anderes Foto.",
     "listingSaveFailed": "Das Inserat wurde nicht gespeichert. Alle Eingaben sind noch da; versuche es erneut.",

@@ -19,6 +19,11 @@ export const CODE_TTL_S = 600
 /** Wrong codes allowed before the screen asks for a new one. */
 export const MAX_CODE_ATTEMPTS = 5
 
+/** Seconds before another code can be requested. Supabase refuses a second
+ *  code to one address inside its own 60-second window, so a shorter timer
+ *  would only offer a button that gets turned down. */
+export const RESEND_WAIT_S = 60
+
 /**
  * When the code just sent stops working, as epoch ms. Only for a code this
  * screen asked for itself: when one was sent earlier (a sign-in before
@@ -26,6 +31,28 @@ export const MAX_CODE_ATTEMPTS = 5
  * caller keeps `null` rather than showing a countdown that may be wrong.
  */
 export const codeExpiry = (now = Date.now()) => now + CODE_TTL_S * 1000
+
+/**
+ * The note kept on the phone while a code is on its way: reading the email can
+ * mean the system closes the app, and the person should come back to the code
+ * screen rather than an empty form. The address only, never the code.
+ */
+export const pendingCodeNote = (email, now = Date.now()) => JSON.stringify({ email, sentAt: now })
+
+/** What that note can restore, or null when it is unusable or the code has expired. */
+export function restorableCode(raw, now = Date.now()) {
+  let note
+  try {
+    note = JSON.parse(raw)
+  } catch {
+    return null
+  }
+  const { email, sentAt } = note ?? {}
+  if (typeof email !== 'string' || !email || !Number.isFinite(sentAt) || sentAt > now) return null
+  const expiresAt = sentAt + CODE_TTL_S * 1000
+  if (now >= expiresAt) return null
+  return { email, expiresAt, resendWait: Math.max(0, Math.ceil((sentAt + RESEND_WAIT_S * 1000 - now) / 1000)) }
+}
 
 /** Whole seconds left, 0 once expired, null when the expiry is unknown. */
 export function secondsLeft(expiresAt, now = Date.now()) {

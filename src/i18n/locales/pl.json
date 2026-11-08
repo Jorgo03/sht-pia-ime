@@ -98,7 +98,11 @@
     "verifyEmailSubtitle": "Wysłaliśmy 6-cyfrowy kod weryfikacyjny na Twój adres e-mail.",
     "verifyAccount": "Zweryfikuj konto",
     "codeExpiresIn": "Kod wygasa za {{time}}",
-    "officeName": "Nazwa biura"
+    "officeName": "Nazwa biura",
+    "continue": "Dalej",
+    "checkInbox": "Sprawdź e-mail",
+    "usePassword": "Hasło",
+    "spamHint": "Jeśli e-mail nie dotarł, sprawdź folder Spam lub poproś o nowy kod."
   },
   "home": {
     "greetingMorning": "Dzień dobry",
@@ -359,7 +363,7 @@
     "invalidCode": "Kod jest nieprawidłowy lub już nieważny. Użyj ostatniego kodu, który wysłaliśmy.",
     "videoInvalidType": "Dozwolone są tylko filmy MP4 lub MOV",
     "videoTooLarge": "Wideo jest za duże (maks. {{max}} MB)",
-    "emailSendFailed": "Nie udało się wysłać e-maila. To problem z konfiguracją serwera, nie z Twoim kontem — skontaktuj się z administratorem.",
+    "emailSendFailed": "Nie udało się wysłać kodu weryfikacyjnego. Spróbuj ponownie za kilka minut.",
     "waitSeconds": "Poczekaj {{s}} s, zanim poprosisz o nowy kod.",
     "photoPrepareFailed": "Nie udało się przygotować zdjęcia do wysłania. Spróbuj ponownie lub wybierz inne zdjęcie.",
     "listingSaveFailed": "Ogłoszenie nie zostało zapisane. Wszystko, co wpisałeś, nadal tu jest; spróbuj ponownie.",
