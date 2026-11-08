@@ -8,9 +8,11 @@ interface FilterTabsProps {
   tabs: string[];
   activeTab?: string;
   onTabChange?: (tab: string) => void;
+  /** Tighter pills, for labels that would otherwise wrap on a phone. */
+  compact?: boolean;
 }
 
-export function FilterTabs({ tabs, activeTab, onTabChange }: FilterTabsProps) {
+export function FilterTabs({ tabs, activeTab, onTabChange, compact = false }: FilterTabsProps) {
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
   // Controlled when `activeTab` is supplied, so an external reset actually
@@ -25,7 +27,7 @@ export function FilterTabs({ tabs, activeTab, onTabChange }: FilterTabsProps) {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, compact && styles.containerCompact]}>
       {tabs.map((tab) => {
         const isActive = selected === tab;
         return (
@@ -33,7 +35,7 @@ export function FilterTabs({ tabs, activeTab, onTabChange }: FilterTabsProps) {
             accessibilityRole="button"
             accessibilityState={{ selected: isActive }}
             key={tab}
-            style={[styles.tab, isActive && styles.activeTab]}
+            style={[styles.tab, compact && styles.tabCompact, isActive && styles.activeTab]}
             onPress={() => handlePress(tab)}
             activeOpacity={0.7}>
             <Text style={[styles.tabText, isActive && styles.activeTabText]}>
@@ -55,6 +57,12 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     paddingHorizontal: 20,
     gap: 10,
     marginBottom: 20,
+  },
+  containerCompact: {
+    gap: 8,
+  },
+  tabCompact: {
+    paddingHorizontal: 14,
   },
   tab: {
     paddingHorizontal: 20,

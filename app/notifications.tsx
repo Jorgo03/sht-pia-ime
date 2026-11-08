@@ -135,6 +135,7 @@ export default function NotificationsScreen() {
         />
         <View style={styles.controls}>
           <FilterTabs
+            compact
             tabs={[labels.all, labels.unread, labels.read]}
             activeTab={labels[filter]}
             onTabChange={(tab) => changeFilter((Object.keys(labels) as Filter[]).find((k) => labels[k] === tab) ?? 'all')}
