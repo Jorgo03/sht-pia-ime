@@ -105,6 +105,45 @@ test.describe('signed in', () => {
     });
   });
 
+  for (const start of [
+    { path: '/', urlEnd: /\/$/, tab: () => t('common.home'), from: 'home' },
+    { path: '/explore', urlEnd: /\/explore$/, tab: () => t('common.search'), from: 'search' },
+    { path: '/profile', urlEnd: /\/profile$/, tab: () => t('common.profile'), from: 'profile' },
+  ]) {
+    test(`X72 Messages from ${start.path}, into a conversation and back twice, lands on the same tab, current screen`, async ({ page }) => {
+      await page.route(`**/rest/v1/profiles*id=eq.${CHAT_CLIENT_ID}*`, (route) =>
+        json(route, { full_name: 'Ana Klientja', agency_name: null }),
+      );
+      await page.goto(start.path);
+      await ready(page);
+      const tab = (name: string) => page.getByRole('tab', { name, exact: true });
+      // What is drawn: each tab's icon, in its highlighted or plain colour.
+      const icon = (name: string) => tab(name).evaluate((el) => {
+        let n: Element = el;
+        while (n.firstElementChild) n = n.firstElementChild;
+        return getComputedStyle(n).color;
+      });
+      const startIcon = await icon(start.tab());
+      const messagesIcon = await icon(t('common.messages'));
+      expect(startIcon).not.toBe(messagesIcon);
+
+      await tab(t('common.messages')).click();
+      await expect(page).toHaveURL(new RegExp(`/messages\\?from=${start.from}$`));
+      await page.getByRole('button', { name: new RegExp(escape(LISTINGS[0].title as string)) }).click();
+      await expect(page).toHaveURL(new RegExp(`/messages/${CONVERSATIONS[0].id}(\\?.*)?$`));
+      await expect(page.getByRole('heading', { name: 'Ana Klientja', level: 1 })).toBeVisible();
+
+      await page.getByRole('button', { name: t('common.back') }).last().click();
+      await expect(page).toHaveURL(/\/messages(\?.*)?$/);
+      await page.getByRole('button', { name: t('common.back') }).last().click();
+
+      await expect(page).toHaveURL(start.urlEnd);
+      await expect.poll(() => icon(start.tab())).toBe(startIcon);
+      await expect.poll(() => icon(t('common.messages'))).toBe(messagesIcon);
+      if (start.path === '/') await expect(page.getByText(t('home.brandHeadline')).last()).toBeVisible();
+    });
+  }
+
   test('X42 viewing request: the website has a date and time field, and the chosen time is sent', async ({ page, writes }) => {
     const home = LISTINGS.find((l) => l.owner_type === 'client')!;
     await page.goto(`/property/${home.id}`);
