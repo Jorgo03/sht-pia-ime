@@ -81,7 +81,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     alignItems: 'center',
     gap: 10,
     marginHorizontal: 20,
-    marginTop: 18,
+    marginTop: 12,
     paddingHorizontal: 16,
     paddingVertical: 14,
     backgroundColor: colors.glass,

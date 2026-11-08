@@ -64,8 +64,9 @@ test('after the last phrase it returns to the first, with nothing on screen', ()
 test('lead and accent split at the right place while typing', () => {
   const p = P[0]
   assert.deepEqual(visibleParts(p, 2), { lead: 'Nj', accent: '' })
-  assert.deepEqual(visibleParts(p, p.graphemes.length), { lead: 'Një, ', accent: 'dy.' })
-  assert.deepEqual(visibleParts(p, 999), { lead: 'Një, ', accent: 'dy.' })
+  assert.deepEqual(visibleParts(p, p.graphemes.length), { lead: 'Një,\n', accent: 'dy.' })
+  assert.deepEqual(visibleParts(p, 999), { lead: 'Një,\n', accent: 'dy.' })
+  assert.equal(p.full, 'Një, dy.', 'a screen reader hears one sentence')
 })
 
 test('timing is organic but bounded, and rests about 2 to 3 seconds', () => {

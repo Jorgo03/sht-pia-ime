@@ -56,10 +56,13 @@ export function preparePhrases(phrases) {
     .map((p) => ({ lead: String(p?.lead ?? '').trim(), accent: String(p?.accent ?? '').trim() }))
     .filter((p) => p.lead || p.accent)
     .map((p) => {
-      const lead = p.lead && p.accent ? `${p.lead} ` : p.lead
+      // The accent always starts its own line: every phrase then fills the
+      // height reserved for the tallest one, with no empty line under it.
+      const lead = p.lead && p.accent ? `${p.lead}\n` : p.lead
       const leadGraphemes = segmentGraphemes(lead)
       const graphemes = [...leadGraphemes, ...segmentGraphemes(p.accent)]
-      return { lead: p.lead, accent: p.accent, full: lead + p.accent, graphemes, leadLength: leadGraphemes.length }
+      const full = [p.lead, p.accent].filter(Boolean).join(' ')
+      return { lead: p.lead, accent: p.accent, full, graphemes, leadLength: leadGraphemes.length }
     })
 }
 

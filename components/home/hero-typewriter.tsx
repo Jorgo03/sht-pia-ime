@@ -84,7 +84,7 @@ export function HeroTypewriter({
   if (phrases.length === 0) return null;
 
   const first = phrases[0];
-  const parts = animated ? visibleParts(phrases[state.index], state.count) : { lead: `${first.lead}${first.accent ? ' ' : ''}`, accent: first.accent };
+  const parts = animated ? visibleParts(phrases[state.index], state.count) : { lead: `${first.lead}${first.accent ? '\n' : ''}`, accent: first.accent };
   // iOS honours this; Android and the web read the direction from the text and the page.
   const direction: TextStyle = Platform.OS === 'ios' ? { writingDirection: isRtlLanguage(language) ? 'rtl' : 'ltr' } : {};
   const cursor = animated ? (
@@ -105,7 +105,7 @@ export function HeroTypewriter({
           <View key={p.full} style={i === 0 ? undefined : styles.overlay} onLayout={measure}>
             <Text style={[textStyle, direction]}>
               {p.lead}
-              {p.accent ? <Text style={accentStyle}> {p.accent}</Text> : null}
+              {p.accent ? <Text style={accentStyle}>{`\n${p.accent}`}</Text> : null}
               {animated ? '|' : null}
             </Text>
           </View>
