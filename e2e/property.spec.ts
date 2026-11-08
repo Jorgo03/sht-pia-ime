@@ -15,6 +15,30 @@ test('F02-H5 price per m² shows on a home for sale and not on a rental', async 
   await expect(perSqm).toHaveCount(0);
 });
 
+test('F02-H6 Published by: an agent shows name, office and phone', async ({ page }) => {
+  await page.goto(`/property/${AGENT_LISTING.id}`);
+  await expect(strip(page).getByText(t('detail.publishedBy'))).toBeVisible();
+  await expect(strip(page).getByText(AGENT.full_name as string, { exact: true })).toBeVisible();
+  await expect(strip(page).getByText(AGENT.agency_name as string, { exact: true })).toBeVisible();
+  await expect(strip(page).getByRole('link', { name: t('property.call') })).toContainText(AGENT_LISTING.contact_phone as string);
+});
+
+test('F02-H7 Published by: a client shows name and phone and no office, even if one comes back', async ({ page }) => {
+  await page.route('**/rest/v1/rpc/listing_publisher*', (route) => route.fulfill({ status: 200, contentType: 'application/json', headers: { 'access-control-allow-origin': '*' }, body: JSON.stringify([{ kind: 'client', full_name: 'Besnik Leka', phone: '+355693334444', agency_name: 'Should Not Show' }]) }));
+  await page.goto(`/property/${LISTINGS.find((l) => !l.agent)!.id}`);
+  await expect(strip(page).getByText('Besnik Leka', { exact: true })).toBeVisible();
+  await expect(strip(page).getByRole('link', { name: t('property.call') })).toHaveAttribute('href', 'tel:+355693334444');
+  await expect(strip(page).getByText('Should Not Show')).toHaveCount(0);
+});
+
+test('F02-H8 Published by: missing details leave no blanks or undefined', async ({ page }) => {
+  await page.route('**/rest/v1/rpc/listing_publisher*', (route) => route.fulfill({ status: 200, contentType: 'application/json', headers: { 'access-control-allow-origin': '*' }, body: JSON.stringify([{ kind: 'client', full_name: null, phone: null, agency_name: null }]) }));
+  await page.goto(`/property/${LISTINGS.find((l) => !l.agent)!.id}`);
+  await expect(strip(page).getByText(t('detail.owner'), { exact: true })).toBeVisible();
+  await expect(page.locator('body')).not.toContainText('undefined');
+  await expect(page.locator('body')).not.toContainText('null');
+});
+
 test('F02-H1 agent listing: profile, chat, call and WhatsApp', async ({ page }) => {
   await page.goto(`/property/${AGENT_LISTING.id}`);
   await expect(page.getByRole('heading', { name: AGENT_LISTING.title, level: 1 })).toBeVisible();

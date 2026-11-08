@@ -247,7 +247,8 @@
     "linkCopied": "Link copiato",
     "unavailable": "Questo annuncio non è più disponibile",
     "unavailableHint": "Potrebbe essere stato venduto, affittato o rimosso dall'agente.",
-    "reference": "Rif."
+    "reference": "Rif.",
+    "publishedBy": "Pubblicato da"
   },
   "messages": {
     "subtitle": "Conversazioni con agenti",

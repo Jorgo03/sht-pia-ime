@@ -210,6 +210,19 @@ export async function mockBackend(page: Page, { signedIn = false, writes = [] as
         writes.push({ table: 'storage', method, query: url.pathname, body });
         return json(route, 200, method === 'DELETE' ? [] : { Key: url.pathname });
       }
+      if (url.pathname === '/rest/v1/rpc/listing_publisher') {
+        let body: { p_property?: string } = {};
+        try { body = route.request().postDataJSON() ?? {}; } catch { /* no body */ }
+        const listing = LISTINGS.find((l) => l.id === body.p_property);
+        if (!listing) return json(route, 200, []);
+        const agent = listing.agent;
+        return json(route, 200, [{
+          kind: agent ? 'agent' : 'client',
+          full_name: agent?.full_name ?? null,
+          phone: listing.contact_phone ?? agent?.phone ?? null,
+          agency_name: agent?.agency_name ?? null,
+        }]);
+      }
       if (url.pathname === '/rest/v1/rpc/my_performance_report') {
         // Like the database: agents only, and the arguments are recorded so a
         // test can check no agent id is ever sent.

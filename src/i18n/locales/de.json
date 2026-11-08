@@ -240,7 +240,8 @@
     "linkCopied": "Link kopiert",
     "unavailable": "Dieses Inserat ist nicht mehr verfügbar",
     "unavailableHint": "Es wurde möglicherweise verkauft, vermietet oder vom Makler entfernt.",
-    "reference": "Ref."
+    "reference": "Ref.",
+    "publishedBy": "Veröffentlicht von"
   },
   "messages": {
     "subtitle": "Gespräche mit Maklern",

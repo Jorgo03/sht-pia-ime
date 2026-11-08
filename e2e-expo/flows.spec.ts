@@ -238,6 +238,39 @@ test('X76 the bottom menu says what each button is, and sign-up is in view witho
   expect(join!.y).toBeLessThan(others!.y);
 });
 
+test.describe('Published by', () => {
+  const publisher = (page: Page, row: object) =>
+    page.route('**/rest/v1/rpc/listing_publisher*', (route) => json(route, [row]));
+  const open = async (page: Page, id: string) => {
+    await page.goto(`/property/${id}`);
+    await ready(page);
+    await expect(page.getByRole('heading', { name: t('detail.publishedBy') })).toBeVisible();
+  };
+
+  test('X78 an agent shows name, office and a phone that calls', async ({ page }) => {
+    await publisher(page, { kind: 'agent', full_name: 'Arta Hoxha', phone: '+355691112222', agency_name: 'Future Home Orange' });
+    await open(page, FEATURED.id);
+    await expect(page.getByText('Arta Hoxha', { exact: true })).toBeVisible();
+    await expect(page.getByText('Future Home Orange', { exact: true })).toBeVisible();
+    await expect(page.getByRole('button', { name: `${t('property.call')}, +355691112222` })).toBeVisible();
+  });
+
+  test('X79 a client shows name and phone and no office, even if one comes back', async ({ page }) => {
+    await publisher(page, { kind: 'client', full_name: 'Besnik Leka', phone: '+355693334444', agency_name: 'Should Not Show' });
+    await open(page, LISTINGS.find((l) => !l.agent)!.id);
+    await expect(page.getByText('Besnik Leka', { exact: true })).toBeVisible();
+    await expect(page.getByRole('button', { name: `${t('property.call')}, +355693334444` })).toBeVisible();
+    await expect(page.getByText('Should Not Show')).toHaveCount(0);
+  });
+
+  test('X80 a client with no name on file reads as the owner, with no blanks', async ({ page }) => {
+    await publisher(page, { kind: 'client', full_name: null, phone: '+355693334444', agency_name: null });
+    await open(page, LISTINGS.find((l) => !l.agent)!.id);
+    await expect(page.getByText(t('detail.owner'), { exact: true }).first()).toBeVisible();
+    await expect(page.locator('body')).not.toContainText('undefined');
+  });
+});
+
 test('X77 price per m² shows on a home for sale and not on a rental', async ({ page }) => {
   const perSqm = page.getByText(/≈.*\/m²/);
   await page.goto(`/property/${LISTINGS.find((l) => l.listing_type === 'sale')!.id}`);

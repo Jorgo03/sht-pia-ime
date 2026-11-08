@@ -40,6 +40,7 @@ import { Fonts, InlineTarget, type AtticoPalette } from '@/constants/theme';
 import { useAuth } from '@/contexts/auth-context';
 import { useFavorites } from '@/contexts/favorites-context';
 import { useTheme } from '@/contexts/theme-context';
+import { useListingPublisher } from '@/hooks/use-listing-publisher';
 import { usePropertiesQuery, usePropertyQuery } from '@/hooks/use-property-queries';
 import { addRecentlyViewed } from '@/hooks/use-recently-viewed';
 import { useReadableColumn, useResponsive } from '@/hooks/use-responsive';
@@ -80,6 +81,7 @@ export default function PropertyDetailScreen() {
   const readable = useReadableColumn();
   const favorited = isFavorite(id ?? '');
   const { data: property = null, isLoading: loading } = usePropertyQuery(id);
+  const publisher = useListingPublisher(property);
   const [contactMessage, setContactMessage] = useState('');
   const [sendingMessage, setSendingMessage] = useState(false);
   const [messageSent, setMessageSent] = useState(false);
@@ -225,9 +227,9 @@ export default function PropertyDetailScreen() {
     Share.share(Platform.OS === 'ios' ? { message: title, url } : { message: `${title}\n${url}` }).catch(() => {});
   };
 
-  // Listing-level contact override wins over the agent's own profile phone —
-  // matches web's `phone` derivation in PropertyDetail.jsx exactly.
-  const contactPhone = property?.contact_phone?.replace(/\s/g, '') || property?.agent?.phone?.replace(/\s/g, '') || null;
+  // The number the "Published by" card shows, so the card, Call and WhatsApp
+  // can never disagree.
+  const contactPhone = publisher.phone?.replace(/\s/g, '') || null;
 
   const handleCall = () => {
     if (!property || !contactPhone) return;
@@ -322,7 +324,10 @@ export default function PropertyDetailScreen() {
     ? t(`search.${property.property_type}`, { defaultValue: property.property_type })
     : '';
   const agent = property.agent;
-  const agentInitial = agent?.full_name?.[0]?.toUpperCase() || 'A';
+  // A name is not always on file: say what they are rather than show nothing.
+  const publisherName = publisher.name ?? t(publisher.kind === 'agent' ? 'auth.agent' : 'detail.owner');
+  const publisherInitial = publisherName[0]?.toUpperCase() || '?';
+  const openAgent = agent ? () => router.push(`/agent/${agent.id}` as Href) : undefined;
   // Shown in the listing assistant when the listing does not hold the answer:
   // the same phone and actions as the contact section below. Not on your own
   // listing, and not when there is neither a phone nor a profile to open.
@@ -357,6 +362,53 @@ export default function PropertyDetailScreen() {
   // Split into two content groups so tablet can lay them out as columns
   // (per-brief: gallery full-width, info + agent/contact side by side below)
   // while phone renders the exact same JSX in a single stacked column.
+  // On a phone it sits with the listing details, above the similar homes, so
+  // nobody has to scroll past them to see who published this.
+  const publisherCard = (publisher.loading || publisher.name || publisher.phone) ? (
+        <View style={styles.sectionCard}>
+          <View style={styles.sectionHeader}>
+            <MaterialIcons name="person" size={22} color={colors.accent} />
+            <Text style={styles.sectionTitle} accessibilityRole="header">{t('detail.publishedBy')}</Text>
+          </View>
+          {publisher.loading && !publisher.name ? (
+            <View style={styles.publisherSkeleton} />
+          ) : (
+            <TouchableOpacity
+              {...CARD_CONTAINER_A11Y}
+              style={styles.agentRow}
+              activeOpacity={0.8}
+              disabled={!openAgent}
+              onPress={openAgent}>
+              <View style={styles.agentAvatar}>
+                <Text style={styles.agentAvatarText}>{publisherInitial}</Text>
+              </View>
+              <View style={styles.agentInfo}>
+                <Text style={styles.agentName} accessibilityRole={openAgent ? 'link' : undefined} onPress={openAgent}>
+                  {publisherName}
+                </Text>
+                {publisher.office ? (
+                  <View style={styles.publisherOffice}>
+                    <MaterialIcons name="business" size={14} color={colors.accentText} />
+                    <Text style={styles.agentRole}>{publisher.office}</Text>
+                  </View>
+                ) : null}
+              </View>
+            </TouchableOpacity>
+          )}
+          {publisher.phone ? (
+            <TouchableOpacity
+              accessibilityRole="button"
+              accessibilityLabel={`${t('property.call')}, ${publisher.phone}`}
+              style={styles.publisherPhone}
+              onPress={handleCall}
+              activeOpacity={0.7}>
+              <MaterialIcons name="phone" size={20} color={colors.accent} />
+              <Text style={styles.publisherPhoneText}>{publisher.phone}</Text>
+            </TouchableOpacity>
+          ) : null}
+        </View>
+  ) : null;
+
   const infoContent = (
     <>
       <View style={styles.kickerRow}>
@@ -447,6 +499,8 @@ export default function PropertyDetailScreen() {
         </View>
       )}
 
+      {!split && publisherCard}
+
       {similar.length > 0 && (
         <View style={styles.sectionCard}>
           <View style={styles.sectionHeader}>
@@ -478,42 +532,7 @@ export default function PropertyDetailScreen() {
 
   const agentAndContactContent = (
     <>
-      {agent && (
-        <View style={styles.sectionCard}>
-          <View style={styles.sectionHeader}>
-            <MaterialIcons name="person" size={22} color={colors.accent} />
-            <Text style={styles.sectionTitle}>{t('auth.agent')}</Text>
-          </View>
-          <TouchableOpacity
-            {...CARD_CONTAINER_A11Y}
-            style={styles.agentRow}
-            activeOpacity={0.8}
-            onPress={() => router.push(`/agent/${agent.id}` as Href)}>
-            <View style={styles.agentAvatar}>
-              <Text style={styles.agentAvatarText}>{agentInitial}</Text>
-            </View>
-            <View style={styles.agentInfo}>
-              <Text
-                style={styles.agentName}
-                accessibilityRole="link"
-                onPress={() => router.push(`/agent/${agent.id}` as Href)}>
-                {agent.full_name || t('auth.agent')}
-              </Text>
-              {agent.agency_name ? <Text style={styles.agentRole}>{agent.agency_name}</Text> : null}
-            </View>
-            {contactPhone ? (
-              <TouchableOpacity
-                accessibilityRole="button"
-                accessibilityLabel={t('property.call')}
-                style={styles.callButton}
-                onPress={handleCall}
-                activeOpacity={0.7}>
-                <MaterialIcons name="phone" size={20} color="#fff" />
-              </TouchableOpacity>
-            ) : null}
-          </TouchableOpacity>
-        </View>
-      )}
+      {split && publisherCard}
 
       {!isOwnListing && (
         <View style={styles.sectionCard}>
@@ -1178,13 +1197,31 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     color: colors.accentText,
     fontFamily: Fonts.sansMedium,
   },
-  callButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: colors.accent,
-    justifyContent: 'center',
+  publisherOffice: {
+    flexDirection: 'row',
     alignItems: 'center',
+    gap: 4,
+  },
+  publisherPhone: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    minHeight: 48,
+    marginTop: 10,
+    paddingTop: 10,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: colors.border,
+  },
+  publisherPhoneText: {
+    flexShrink: 1,
+    fontSize: 16,
+    fontFamily: Fonts.sansSemiBold,
+    color: colors.textPrimary,
+  },
+  publisherSkeleton: {
+    height: 52,
+    borderRadius: 12,
+    backgroundColor: colors.glass,
   },
 
   contactInput: {

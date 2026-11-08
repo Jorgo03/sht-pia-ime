@@ -326,6 +326,11 @@ button.agent-strip__who:hover .agent-name {
   color: var(--fho-text);
 }
 
+.agent-published-by {
+  display: block;
+  font-size: 12px;
+  color: var(--fho-text-muted, inherit);
+}
 .agent-agency {
   display: block;
   font-size: 12px;

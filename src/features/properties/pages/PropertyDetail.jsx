@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { formatRef } from '../lib/searchFilters'
 import { ChevronLeft, Heart, Share2, MapPin, ExternalLink, ChevronRight as ChevRight, Globe, ArrowRight, Phone, Flag } from 'lucide-react'
 import { useProperty, useProperties } from '../hooks/useProperties'
+import { fetchPublisher, publisherView } from '../lib/publisher'
 import { useTranslatedProperty } from '../hooks/useTranslatedProperty'
 import { formatPrice, imageFor, listingBadgeKey, priceSuffixKey, telUrl, whatsappUrl } from '../../../lib/format'
 import { useFavorites } from '../../favorites/FavoritesContext'
@@ -27,6 +28,18 @@ export default function PropertyDetail() {
   const navigate = useNavigate()
   const { t, i18n } = useTranslation()
   const { property, loading, error } = useProperty(id)
+  const [publisherAnswer, setPublisherAnswer] = useState({ id: null, row: null })
+  const publisherRow = publisherAnswer.id === id ? publisherAnswer.row : null
+  // Who published this listing (lib/publisher.js). A failed lookup leaves
+  // what the listing already carries.
+  useEffect(() => {
+    if (!id) return undefined
+    let active = true
+    fetchPublisher(supabase, id)
+      .then((row) => { if (active) setPublisherAnswer({ id, row }) })
+      .catch(() => {})
+    return () => { active = false }
+  }, [id])
   const { user } = useAuth()
   const { isFavorite, toggle } = useFavorites()
   const [imgIdx, setImgIdx] = useState(0)
@@ -79,7 +92,10 @@ export default function PropertyDetail() {
   const suffixKey = priceSuffixKey(property.listing_type)
   const suffix = suffixKey ? t(suffixKey) : ''
   const badge = t(listingBadgeKey(property.listing_type))
-  const phone = property.contact_phone?.replace(/\s/g, '') || property.agent?.phone?.replace(/\s/g, '') || null
+  const publisher = publisherView(publisherRow, property)
+  const publisherName = publisher.name ?? t(publisher.kind === 'agent' ? 'auth.agent' : 'detail.owner')
+  // The number shown in "Published by", so the card, Call and WhatsApp agree.
+  const phone = publisher.phone?.replace(/\s/g, '') || null
   const features = property.features || []
   // Sales only: a monthly or daily rent per m² is not a figure anyone compares.
   const pricePerSqm = !suffixKey && property.sqft > 0 ? Math.round(property.price / property.sqft) : null
@@ -230,20 +246,24 @@ export default function PropertyDetail() {
           Owner listings used to render nothing here, leaving no way to reach
           them. The strip itself isn't clickable: only the agent's name links
           to the profile, so no button sits inside another interactive element. */}
-      {(property.agent || phone) && (
+      {(property.agent || publisher.name || phone) && (
         <section className="agent-strip">
           {property.agent ? (
             <button type="button" className="agent-strip__who" onClick={() => navigate(`/agent/${property.agent.id}`)}>
-              <span className="agent-initial">{property.agent.full_name?.[0] || 'A'}</span>
+              <span className="agent-initial">{publisherName[0]}</span>
               <span style={{ flex: 1, minWidth: 0 }}>
-                <span className="agent-name">{property.agent.full_name}</span>
-                <span className="agent-agency">{property.agent.agency_name}</span>
+                <span className="agent-published-by">{t('detail.publishedBy')}</span>
+                <span className="agent-name">{publisherName}</span>
+                {publisher.office && <span className="agent-agency">{publisher.office}</span>}
               </span>
             </button>
           ) : (
             <div className="agent-strip__who">
-              <span className="agent-initial">{t('detail.owner')[0]}</span>
-              <span className="agent-name" style={{ flex: 1 }}>{t('detail.owner')}</span>
+              <span className="agent-initial">{publisherName[0]}</span>
+              <span style={{ flex: 1, minWidth: 0 }}>
+                <span className="agent-published-by">{t('detail.publishedBy')}</span>
+                <span className="agent-name">{publisherName}</span>
+              </span>
             </div>
           )}
           <div className="agent-strip__actions">
@@ -253,6 +273,7 @@ export default function PropertyDetail() {
             {phone && (
               <a className="pill-btn" href={telUrl(phone)} aria-label={t('property.call')} onClick={() => logActivity(property.id, 'call')}>
                 <Phone size={14} aria-hidden="true" />
+                <span style={{ marginLeft: 6 }}>{publisher.phone}</span>
               </a>
             )}
             {phone && (

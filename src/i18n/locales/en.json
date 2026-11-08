@@ -255,7 +255,8 @@
     "linkCopied": "Link copied",
     "unavailable": "This listing is no longer available",
     "unavailableHint": "It may have been sold, rented out or removed by the agent.",
-    "reference": "Ref."
+    "reference": "Ref.",
+    "publishedBy": "Published by"
   },
   "favourites": {
     "title": "Favorites",

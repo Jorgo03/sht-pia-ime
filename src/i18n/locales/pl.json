@@ -254,7 +254,8 @@
     "linkCopied": "Link skopiowany",
     "unavailable": "To ogłoszenie nie jest już dostępne",
     "unavailableHint": "Mogło zostać sprzedane, wynajęte lub usunięte przez agenta.",
-    "reference": "Nr ref."
+    "reference": "Nr ref.",
+    "publishedBy": "Opublikowane przez"
   },
   "messages": {
     "subtitle": "Rozmowy z agentami",
