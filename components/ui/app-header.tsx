@@ -402,7 +402,8 @@ const createStyles = (
       flexDirection: 'row',
       alignItems: 'center',
       gap: 6,
-      paddingVertical: 7,
+      // The height of the buttons beside it, so its contents centre in it.
+      height: 34,
       paddingHorizontal: 11,
       borderRadius: Radii.pill,
       borderWidth: 1,
@@ -418,7 +419,8 @@ const createStyles = (
     langCode: {
       fontFamily: Fonts.sans,
       fontSize: 16,
-      lineHeight: 18,
+      // No lineHeight: squeezing the line pushed the flag emoji up on iPhone.
+      includeFontPadding: false,
       color: fg,
     },
     // `.theme-btn` / `.account-signin-btn`: 34px square, r-sm.

@@ -51,6 +51,14 @@ test('no phone-app style sets fontWeight: pick the weight file instead', () => {
   assert.deepEqual(weights, [], 'use Fonts.sansMedium / sansSemiBold / sansBold, not fontWeight')
 })
 
+test('no phone-app style sets fontStyle: Android fakes a slant, iOS ignores it', () => {
+  const italics = []
+  for (const { where, block } of styleBlocks()) {
+    if (/\bfontStyle\s*:/.test(block)) italics.push(where)
+  }
+  assert.deepEqual(italics, [], 'use Fonts.serifItalic, the real italic file')
+})
+
 test('every font file the styles name is loaded before or right after first paint', () => {
   const theme = fs.readFileSync(path.join(root, 'constants/theme.ts'), 'utf8')
   const layout = fs.readFileSync(path.join(root, 'app/_layout.tsx'), 'utf8')

@@ -233,9 +233,8 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     color: colors.textSecondary,
   },
   price: {
-    fontFamily: Fonts?.serif,
+    fontFamily: Fonts?.serifItalic,
     fontSize: 22,
-    fontStyle: 'italic',
     color: colors.accentText,
   },
 });

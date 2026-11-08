@@ -38,7 +38,7 @@ const createStyles = (colors: AtticoPalette) =>
       flexDirection: 'row',
       alignItems: 'center',
       gap: 10,
-      marginBottom: 6,
+      marginBottom: 12,
     },
     kickerDash: {
       width: 14,
@@ -58,8 +58,10 @@ const createStyles = (colors: AtticoPalette) =>
       fontSize: 28,
       color: colors.textPrimary,
     },
+    // The italic font file: fontStyle on the upright one is slanted on Android
+    // and ignored on iOS, so the two phones drew different headlines.
     headlineEm: {
-      fontStyle: 'italic',
+      fontFamily: Fonts?.serifItalic,
       color: colors.accentText,
     },
   });

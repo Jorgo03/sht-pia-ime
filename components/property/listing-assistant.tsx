@@ -481,7 +481,6 @@ const createStyles = (
     },
     thinkingText: {
       color: colors.textSecondary,
-      fontStyle: 'italic',
     },
     inputRow: {
       flexDirection: 'row',
