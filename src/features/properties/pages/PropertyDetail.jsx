@@ -81,7 +81,8 @@ export default function PropertyDetail() {
   const badge = t(listingBadgeKey(property.listing_type))
   const phone = property.contact_phone?.replace(/\s/g, '') || property.agent?.phone?.replace(/\s/g, '') || null
   const features = property.features || []
-  const pricePerSqm = property.sqft > 0 ? Math.round(property.price / property.sqft) : null
+  // Sales only: a monthly or daily rent per m² is not a figure anyone compares.
+  const pricePerSqm = !suffixKey && property.sqft > 0 ? Math.round(property.price / property.sqft) : null
   const propertyTypeLabel = property.property_type ? t(`search.${property.property_type}`) : ''
 
   const startChat = async () => {

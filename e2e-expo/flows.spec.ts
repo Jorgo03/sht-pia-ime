@@ -238,6 +238,18 @@ test('X76 the bottom menu says what each button is, and sign-up is in view witho
   expect(join!.y).toBeLessThan(others!.y);
 });
 
+test('X77 price per m² shows on a home for sale and not on a rental', async ({ page }) => {
+  const perSqm = page.getByText(/≈.*\/m²/);
+  await page.goto(`/property/${LISTINGS.find((l) => l.listing_type === 'sale')!.id}`);
+  await ready(page);
+  await expect(perSqm).toBeVisible();
+
+  await page.goto(`/property/${LISTINGS.find((l) => l.listing_type === 'rent')!.id}`);
+  await ready(page);
+  await expect(page.getByRole('heading', { name: 'Garsoniere me qera' }).first()).toBeVisible();
+  await expect(perSqm).toHaveCount(0);
+});
+
 test('X08 legal pages: reachable from Profile, each links to the other', async ({ page }) => {
   await page.goto('/profile');
   await ready(page);

@@ -338,7 +338,8 @@ export default function PropertyDetailScreen() {
           onProfile: agent?.id ? () => router.push(`/agent/${agent.id}` as Href) : undefined,
         };
   const features = property.features ?? [];
-  const pricePerSqm = property.sqft && property.sqft > 0 ? Math.round(property.price / property.sqft) : null;
+  // Sales only: a monthly or daily rent per m² is not a figure anyone compares.
+  const pricePerSqm = !suffixKey && property.sqft && property.sqft > 0 ? Math.round(property.price / property.sqft) : null;
 
   const amenities = [
     // *Count keys: property.beds/baths are the form-field labels and have no

@@ -6,6 +6,15 @@ import { axeViolations, expect, test } from './support/test';
 
 const strip = (page: import('@playwright/test').Page) => page.locator('.agent-strip');
 
+test('F02-H5 price per m² shows on a home for sale and not on a rental', async ({ page }) => {
+  const perSqm = page.locator('.detail-price__per');
+  await page.goto(`/property/${LISTINGS.find((l) => l.listing_type === 'sale')!.id}`);
+  await expect(perSqm).toBeVisible();
+  await page.goto(`/property/${LISTINGS.find((l) => l.listing_type === 'rent')!.id}`);
+  await expect(page.getByRole('heading', { name: 'Garsoniere me qera' }).first()).toBeVisible();
+  await expect(perSqm).toHaveCount(0);
+});
+
 test('F02-H1 agent listing: profile, chat, call and WhatsApp', async ({ page }) => {
   await page.goto(`/property/${AGENT_LISTING.id}`);
   await expect(page.getByRole('heading', { name: AGENT_LISTING.title, level: 1 })).toBeVisible();

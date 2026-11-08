@@ -10,6 +10,12 @@ import ReportSheet from '../../safety/components/ReportSheet'
 import { loadThreadMessages } from '../lib/thread'
 import LoadError from '../../../shared/LoadError'
 
+// Every subscription gets its own name. supabase.channel() hands back a channel
+// of the same name if it is still there, and removeChannel is asynchronous, so
+// re-subscribing under one name (the signed-in user object changes on every
+// token refresh) threw "cannot add postgres_changes callbacks after subscribe()".
+let pageChannelSeq = 0
+
 export default function Messages() {
   const { t, i18n } = useTranslation()
   const navigate = useNavigate()
@@ -61,7 +67,7 @@ export default function Messages() {
   useEffect(() => {
     if (!user) return
     const channel = supabase
-      .channel('messages-page')
+      .channel(`messages-page-${++pageChannelSeq}`)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'conversations' }, loadConversations)
       .subscribe()
     return () => { supabase.removeChannel(channel) }
