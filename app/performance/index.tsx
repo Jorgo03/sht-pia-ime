@@ -126,7 +126,7 @@ export default function PerformanceScreen() {
                   </TouchableOpacity>
                 </View>
               ) : (
-                <View style={[styles.content, isFetching && styles.refreshing]}>
+                <View style={[styles.stack, isFetching && styles.refreshing]}>
                   <Section title={t('performance.sections.properties')} note={t('performance.notes.snapshot')} styles={styles}>
                     <Stat label={t('performance.metrics.published')} value={report.listings.published} styles={styles} />
                     <Stat label={t('performance.metrics.activeNow')} value={report.listings.active_now} styles={styles} />
@@ -212,7 +212,7 @@ const Stat = memo(function Stat({ label, value, styles, strong = false }: { labe
 
 function ReportSkeleton({ styles }: { styles: Styles }) {
   return (
-    <View style={styles.content} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+    <View style={styles.stack} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
       {[0, 1, 2].map((s) => (
         <View key={s} style={styles.section}>
           <View style={[styles.skeleton, styles.skeletonTitle]} />
@@ -409,6 +409,8 @@ const createStyles = (colors: AtticoPalette) =>
     container: { flex: 1 },
     scroll: { paddingBottom: 48 },
     content: { paddingHorizontal: 20, gap: 28 },
+    // Sections inside `content`: same rhythm, no second gutter.
+    stack: { gap: 28 },
     refreshing: { opacity: 0.6 },
     privacy: { flexDirection: 'row', gap: 8, alignItems: 'flex-start', marginTop: -8 },
     privacyText: { flex: 1, fontFamily: Fonts.sans, fontSize: 13, lineHeight: 19, color: colors.textSecondary },
