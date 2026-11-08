@@ -55,5 +55,7 @@ test('over a dark header the status bar icons are light, only while that screen 
   const header = read('components/ui/app-header.tsx')
   assert.ok(header.includes('(onDark || floating) && <LightStatusBarWhileFocused />'))
   assert.ok(header.includes('focused ? <StatusBar style="light" /> : null'))
-  assert.match(header, /paddingTop: 16/)
+  assert.match(header, /HEADER_TOP_PADDING = 16/)
+  // The bar's colour runs up behind the clock and battery.
+  assert.match(header, /marginTop: -insets.top, paddingTop: insets.top + HEADER_TOP_PADDING/)
 })

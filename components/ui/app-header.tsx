@@ -28,6 +28,8 @@ import { supabase } from '@/lib/supabase';
 /** Same list, same native-language labels as web's Header.jsx LANGUAGES. */
 /** The bar's side padding: the app's page gutter. */
 const HEADER_GUTTER = 20;
+/** Space between the phone's status bar and the bar's controls. */
+const HEADER_TOP_PADDING = 16;
 /** Minimum space between the centred wordmark and the controls either side. */
 const BRAND_CLEARANCE = 8;
 
@@ -156,7 +158,11 @@ export function AppHeader({
   };
 
   return (
-    <View style={styles.header} onLayout={track('bar')}>
+    // Reaches up behind the clock and battery, so the bar's colour runs to the
+    // top of the screen instead of leaving the page's darker ground above it.
+    <View
+      style={[styles.header, !floating && { marginTop: -insets.top, paddingTop: insets.top + HEADER_TOP_PADDING }]}
+      onLayout={track('bar')}>
       {(onDark || floating) && <LightStatusBarWhileFocused />}
       {/* A floating header lets the hero image show through, so it gets no
           blur layer and no tint — only the controls sit on top. */}
@@ -209,7 +215,7 @@ export function AppHeader({
           untouched; that block still sits next to the chevron. */}
       {!title && onBack && (
         <View
-          style={[styles.brandCentered, !brandFits && styles.brandHidden]}
+          style={[styles.brandCentered, !floating && { top: insets.top }, !brandFits && styles.brandHidden]}
           pointerEvents="none"
           accessibilityElementsHidden={!brandFits}
           importantForAccessibility={brandFits ? 'auto' : 'no-hide-descendants'}>
@@ -327,7 +333,7 @@ const createStyles = (
       gap: 8,
       paddingHorizontal: HEADER_GUTTER,
       // More above than below: clear of the phone's clock and battery.
-      paddingTop: 16,
+      paddingTop: HEADER_TOP_PADDING,
       paddingBottom: 10,
       // The floating variant is chrome over a photo — a border would draw a
       // line across the image.
