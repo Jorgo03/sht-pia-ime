@@ -113,7 +113,33 @@
     "matched": "Passend zu Ihrem Geschmack",
     "seeAll": "Alle anzeigen →",
     "searchPlaceholder": "Stadt, Stadtteil, PLZ...",
-    "country": "Albanien"
+    "country": "Albanien",
+    "heroPhrases": [
+      {
+        "lead": "Die richtige Immobilie",
+        "accent": "beginnt hier."
+      },
+      {
+        "lead": "Finde die Immobilie,",
+        "accent": "die zu dir passt."
+      },
+      {
+        "lead": "Die richtige Investition",
+        "accent": "am richtigen Ort."
+      },
+      {
+        "lead": "Dein Unternehmen verdient",
+        "accent": "die richtige Adresse."
+      },
+      {
+        "lead": "Mach aus Chancen",
+        "accent": "Investitionen."
+      },
+      {
+        "lead": "Entdecke",
+        "accent": "deine nächste Chance."
+      }
+    ]
   },
   "search": {
     "title": "Immobilien suchen",

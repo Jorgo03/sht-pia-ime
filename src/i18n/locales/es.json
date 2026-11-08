@@ -114,7 +114,33 @@
     "matched": "A tu medida",
     "seeAll": "Ver todo →",
     "searchPlaceholder": "Ciudad, barrio, código postal...",
-    "country": "Albania"
+    "country": "Albania",
+    "heroPhrases": [
+      {
+        "lead": "La propiedad adecuada",
+        "accent": "empieza aquí."
+      },
+      {
+        "lead": "Encuentra la propiedad",
+        "accent": "hecha para ti."
+      },
+      {
+        "lead": "La inversión adecuada,",
+        "accent": "en el lugar adecuado."
+      },
+      {
+        "lead": "Tu negocio merece",
+        "accent": "el lugar adecuado."
+      },
+      {
+        "lead": "Convierte la oportunidad",
+        "accent": "en inversión."
+      },
+      {
+        "lead": "Descubre",
+        "accent": "tu próxima oportunidad."
+      }
+    ]
   },
   "search": {
     "title": "Buscar propiedades",

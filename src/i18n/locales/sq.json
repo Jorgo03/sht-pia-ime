@@ -113,7 +113,33 @@
     "matched": "Sipas shijes suaj",
     "seeAll": "Shiko të gjitha →",
     "searchPlaceholder": "Qytet, lagje, kod postar...",
-    "country": "Shqipëri"
+    "country": "Shqipëri",
+    "heroPhrases": [
+      {
+        "lead": "Prona e duhur,",
+        "accent": "fillon këtu."
+      },
+      {
+        "lead": "Gjej pronën që",
+        "accent": "të përshtatet."
+      },
+      {
+        "lead": "Investimi i duhur,",
+        "accent": "në vendin e duhur."
+      },
+      {
+        "lead": "Biznesi yt meriton",
+        "accent": "vendin e duhur."
+      },
+      {
+        "lead": "Ktheje mundësinë",
+        "accent": "në investim."
+      },
+      {
+        "lead": "Zbulo mundësinë",
+        "accent": "e radhës."
+      }
+    ]
   },
   "search": {
     "title": "Kërko pronë",

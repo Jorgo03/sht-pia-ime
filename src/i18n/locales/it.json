@@ -114,7 +114,33 @@
     "matched": "Su misura per te",
     "seeAll": "Vedi tutto →",
     "searchPlaceholder": "Città, quartiere, CAP...",
-    "country": "Albania"
+    "country": "Albania",
+    "heroPhrases": [
+      {
+        "lead": "L'immobile giusto",
+        "accent": "inizia qui."
+      },
+      {
+        "lead": "Trova l'immobile",
+        "accent": "adatto a te."
+      },
+      {
+        "lead": "L'investimento giusto,",
+        "accent": "nel posto giusto."
+      },
+      {
+        "lead": "La tua attività merita",
+        "accent": "il posto giusto."
+      },
+      {
+        "lead": "Trasforma l'opportunità",
+        "accent": "in investimento."
+      },
+      {
+        "lead": "Scopri",
+        "accent": "la prossima opportunità."
+      }
+    ]
   },
   "search": {
     "title": "Cerca immobili",

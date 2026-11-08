@@ -165,7 +165,33 @@
     "matched": "Matched to your taste",
     "seeAll": "See all →",
     "searchPlaceholder": "City, neighborhood, postcode…",
-    "country": "Albania"
+    "country": "Albania",
+    "heroPhrases": [
+      {
+        "lead": "The right property",
+        "accent": "starts here."
+      },
+      {
+        "lead": "Find the property",
+        "accent": "that fits you."
+      },
+      {
+        "lead": "The right investment,",
+        "accent": "in the right place."
+      },
+      {
+        "lead": "Your business deserves",
+        "accent": "the right address."
+      },
+      {
+        "lead": "Turn opportunity",
+        "accent": "into investment."
+      },
+      {
+        "lead": "Discover",
+        "accent": "your next opportunity."
+      }
+    ]
   },
   "search": {
     "title": "Search properties",

@@ -115,7 +115,33 @@
     "matched": "Dopasowane do Ciebie",
     "seeAll": "Zobacz wszystkie →",
     "searchPlaceholder": "Miasto, dzielnica, kod pocztowy...",
-    "country": "Albania"
+    "country": "Albania",
+    "heroPhrases": [
+      {
+        "lead": "Właściwa nieruchomość",
+        "accent": "zaczyna się tutaj."
+      },
+      {
+        "lead": "Znajdź nieruchomość",
+        "accent": "dopasowaną do Ciebie."
+      },
+      {
+        "lead": "Właściwa inwestycja",
+        "accent": "we właściwym miejscu."
+      },
+      {
+        "lead": "Twój biznes zasługuje",
+        "accent": "na właściwe miejsce."
+      },
+      {
+        "lead": "Zamień okazję",
+        "accent": "w inwestycję."
+      },
+      {
+        "lead": "Odkryj",
+        "accent": "kolejną okazję."
+      }
+    ]
   },
   "search": {
     "title": "Szukaj nieruchomości",

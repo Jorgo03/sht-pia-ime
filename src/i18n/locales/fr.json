@@ -114,7 +114,33 @@
     "matched": "Sélectionné pour vous",
     "seeAll": "Voir tout →",
     "searchPlaceholder": "Ville, quartier, code postal...",
-    "country": "Albanie"
+    "country": "Albanie",
+    "heroPhrases": [
+      {
+        "lead": "Le bon bien",
+        "accent": "commence ici."
+      },
+      {
+        "lead": "Trouvez le bien",
+        "accent": "qui vous ressemble."
+      },
+      {
+        "lead": "Le bon investissement,",
+        "accent": "au bon endroit."
+      },
+      {
+        "lead": "Votre entreprise mérite",
+        "accent": "la bonne adresse."
+      },
+      {
+        "lead": "Transformez l'opportunité",
+        "accent": "en investissement."
+      },
+      {
+        "lead": "Découvrez",
+        "accent": "votre prochaine opportunité."
+      }
+    ]
   },
   "search": {
     "title": "Rechercher des biens",
