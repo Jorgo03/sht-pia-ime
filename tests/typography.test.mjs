@@ -3,6 +3,7 @@ import assert from 'node:assert/strict'
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { HEADLINE_FONT_FILES } from '../src/lib/headlineFonts.js'
 
 // Samsung and iPhone drew the same screens in different fonts: a text style
 // that names no font falls back to each phone's system font (Roboto on
@@ -55,6 +56,9 @@ test('every font file the styles name is loaded before or right after first pain
   const layout = fs.readFileSync(path.join(root, 'app/_layout.tsx'), 'utf8')
   const fontsBlock = /export const Fonts = \{([\s\S]*?)\n\};/.exec(theme)[1]
   const families = [...fontsBlock.matchAll(/:\s*'([A-Za-z]+_\d{3}[A-Za-z_]*)'/g)].map((m) => m[1])
-  assert.ok(families.length >= 10, 'Fonts tokens found')
+  assert.ok(families.length >= 7, 'Fonts tokens found')
+  // The headline getters answer from src/lib/headlineFonts.js.
+  assert.match(fontsBlock, /get serif\(\)[\s\S]*headlineFont\('serif'/)
+  families.push(...HEADLINE_FONT_FILES)
   for (const family of families) assert.match(layout, new RegExp(`\\b${family}\\b`), `${family} is loaded in app/_layout.tsx`)
 })

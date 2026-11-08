@@ -39,7 +39,7 @@ export function AppErrorBoundary({ error, retry }: ErrorBoundaryProps) {
         <MaterialIcons name="error-outline" size={30} color={AtticoColorsDark.accent} />
       </View>
 
-      <Text style={styles.title}>{i18n.t('errors.generic')}</Text>
+      <Text style={[styles.title, { fontFamily: Fonts.serif }]}>{i18n.t('errors.generic')}</Text>
 
       {/* error.message is deliberately not rendered — it can carry internal
           detail (ids, query text) and is not translated. */}
@@ -71,8 +71,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: AtticoColorsDark.accentGlow,
   },
+  // fontFamily is set where it is drawn (Fonts.serif depends on the
+  // language, and these styles are built once at start-up).
   title: {
-    fontFamily: Fonts?.serif,
+    fontFamily: Fonts.sans,
     fontSize: 20,
     textAlign: 'center',
     color: AtticoColorsDark.textPrimary,

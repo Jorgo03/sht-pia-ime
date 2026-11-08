@@ -138,6 +138,41 @@ test('X07 language: switching to English sticks after a reload', async ({ page }
   await expect(page.locator('html')).toHaveAttribute('lang', 'en');
 });
 
+test('X64 Russian headlines switch to Manrope at once, and back to Newsreader in Albanian', async ({ page }) => {
+  // Newsreader has no Cyrillic: Russian headlines fell back to each phone's
+  // system font. Counts the elements drawn in each family, without a reload.
+  const families = () =>
+    page.evaluate(() => {
+      const count = { newsreader: 0, manrope: 0, cyrillicInNewsreader: 0 };
+      for (const el of Array.from(document.querySelectorAll('div, span'))) {
+        if (!el.childNodes.length || ![...el.childNodes].some((n) => n.nodeType === 3 && n.textContent!.trim())) continue;
+        const f = getComputedStyle(el).fontFamily;
+        if (/Newsreader/.test(f)) {
+          count.newsreader++;
+          if (/[Ѐ-ӿ]/.test(el.textContent!)) count.cyrillicInNewsreader++;
+        } else if (/Manrope/.test(f)) count.manrope++;
+      }
+      return count;
+    });
+  // The menu button's own label is in the current language.
+  const pickLanguage = async (menuLabel: string, name: RegExp) => {
+    await page.getByRole('button', { name: menuLabel, exact: true }).click();
+    await page.getByRole('button', { name }).click();
+  };
+  await page.goto('/');
+  await ready(page);
+  expect((await families()).newsreader).toBeGreaterThan(0);
+
+  await pickLanguage(t('common.language'), /Русский/);
+  await expect(page.locator('html')).toHaveAttribute('lang', 'ru');
+  await expect.poll(async () => (await families()).newsreader).toBe(0);
+  expect((await families()).cyrillicInNewsreader).toBe(0);
+
+  await pickLanguage('Язык', /Shqip/);
+  await expect(page.locator('html')).toHaveAttribute('lang', 'sq');
+  await expect.poll(async () => (await families()).newsreader).toBeGreaterThan(0);
+});
+
 test('X08 legal pages: reachable from Profile, each links to the other', async ({ page }) => {
   await page.goto('/profile');
   await ready(page);

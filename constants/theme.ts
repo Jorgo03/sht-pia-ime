@@ -3,7 +3,10 @@
  * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
  */
 
+import i18n from 'i18next';
 import { Platform } from 'react-native';
+
+import { headlineFont } from '@/src/lib/headlineFonts';
 
 const tintColorLight = '#0a7ea4';
 const tintColorDark = '#fff';
@@ -248,12 +251,22 @@ export const Fonts = {
   sansSemiBold: 'Manrope_600SemiBold',
   sansBold: 'Manrope_700Bold',
   sansExtraBold: 'Manrope_800ExtraBold',
-  serif: 'Newsreader_500Medium',
+  // Headline serif. Getters, because Newsreader has no Cyrillic: in Russian
+  // they answer with Manrope instead (src/lib/headlineFonts.js), so both
+  // phones draw the same font rather than each one's system fallback.
+  // Styles are rebuilt on a language change (contexts/theme-context.tsx).
+  get serif() {
+    return headlineFont('serif', i18n.language);
+  },
   /** True italic glyphs — pair with this instead of `fontStyle: 'italic'`
    *  on `serif`, which only synthesizes a slant on the upright font. */
-  serifItalic: 'Newsreader_500Medium_Italic',
+  get serifItalic() {
+    return headlineFont('serifItalic', i18n.language);
+  },
   /** Brand wordmark weight (CLAUDE_CODE_BRIEF.md §3.7: serif/600). */
-  serifSemiBold: 'Newsreader_600SemiBold',
+  get serifSemiBold() {
+    return headlineFont('serifSemiBold', i18n.language);
+  },
   mono: 'JetBrainsMono_400Regular',
   monoMedium: 'JetBrainsMono_500Medium',
   rounded: Platform.select({

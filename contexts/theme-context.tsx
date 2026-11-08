@@ -7,7 +7,10 @@ import {
   useMemo,
   useState,
 } from 'react';
+import i18n from 'i18next';
 import { Appearance } from 'react-native';
+
+import { needsHeadlineFallback } from '@/src/lib/headlineFonts';
 
 import { AtticoColorsDark, AtticoColorsLight, type AtticoPalette } from '@/constants/theme';
 
@@ -64,13 +67,27 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     });
   };
 
+  // Headline fonts depend on the language (Fonts.serif is Manrope in
+  // Russian, src/lib/headlineFonts.js), and every screen rebuilds its styles
+  // when `colors` changes. So a switch into or out of such a language hands
+  // out a fresh copy of the same palette, and headlines redraw at once,
+  // without restarting the app.
+  const [headlineFallback, setHeadlineFallback] = useState(() => needsHeadlineFallback(i18n.language));
+  useEffect(() => {
+    const onChange = (lng: string) => setHeadlineFallback(needsHeadlineFallback(lng));
+    i18n.on('languageChanged', onChange);
+    return () => i18n.off('languageChanged', onChange);
+  }, []);
+
   const value = useMemo<ThemeContextValue>(
     () => ({
       theme,
-      colors: theme === 'dark' ? AtticoColorsDark : AtticoColorsLight,
+      colors: { ...(theme === 'dark' ? AtticoColorsDark : AtticoColorsLight) },
       toggle,
     }),
-    [theme],
+    // headlineFallback is only a trigger: it changes the copy, not the values.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [theme, headlineFallback],
   );
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;

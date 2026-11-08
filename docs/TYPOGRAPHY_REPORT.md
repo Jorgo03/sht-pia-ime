@@ -54,9 +54,31 @@ Read from each font file's character table: **ë Ë ç Ç** and the German,
 Italian, Spanish, French and Polish letters, €, £, curly quotes and dashes
 are present in all 10 files.
 
-**Gap, not fixed here:** Newsreader (headlines) has **no Cyrillic**. In
-Russian, headlines fall back to each phone's system font, so they differ
-between iPhone and Samsung. Manrope and JetBrains Mono do have Cyrillic.
+Newsreader (headlines) has **no Cyrillic**, so Russian headlines used to
+fall back to each phone's system font and differed between iPhone and
+Samsung. Manrope and JetBrains Mono do have Cyrillic.
+
+**Fixed (2026-11-08, owner: "Yes, fix it"), no new font:** in Russian,
+headlines use the brand's Manrope (SemiBold for Newsreader Medium, Bold for
+Newsreader SemiBold; the italic accent becomes upright, as Manrope has no
+italic). Every other language keeps Newsreader.
+
+- `src/lib/headlineFonts.js`: the rule (`headlineFont(role, language)`).
+- `constants/theme.ts`: `Fonts.serif`, `serifSemiBold` and `serifItalic`
+  are getters that ask it for the current language.
+- `contexts/theme-context.tsx`: on a switch into or out of Russian, hands
+  out a fresh copy of the same colour palette, so every screen (they
+  rebuild their styles when `colors` changes) redraws its headlines at
+  once, without a restart.
+- `components/ui/error-boundary.tsx`: the crash screen builds its styles
+  once at start-up, so its title takes the headline font when drawn.
+
+Tests: unit `tests/headlineFonts.test.mjs` (3: Russian → Manrope, the other
+seven → Newsreader, every file loaded, `ru` is the only locale needing it);
+e2e-expo **X64**: on Home, switching to Русский through the app's menu
+leaves no element drawn in Newsreader and none of Newsreader's text is
+Cyrillic; switching back to Shqip brings Newsreader back; no reload
+(browser rendering, phone and desktop widths).
 
 ## Tests
 
