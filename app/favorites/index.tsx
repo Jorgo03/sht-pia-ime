@@ -174,6 +174,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     alignItems: 'center',
   },
   emptyText: {
+    fontFamily: Fonts.sans,
     fontSize: 14,
     color: colors.textSecondary,
     textAlign: 'center',
@@ -231,7 +232,6 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   rowTitle: {
     fontFamily: Fonts?.serif,
     fontSize: 15,
-    fontWeight: '500',
     color: colors.textPrimary,
   },
   rowLocRow: {
@@ -241,6 +241,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     marginBottom: 4,
   },
   rowLoc: {
+    fontFamily: Fonts.sans,
     fontSize: 12,
     color: colors.textSecondary,
     flex: 1,
@@ -248,12 +249,11 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   rowPrice: {
     fontFamily: Fonts?.serif,
     fontSize: 16,
-    fontWeight: '500',
     color: colors.accentText,
   },
   rowPriceSuffix: {
     fontSize: 12,
-    fontWeight: '400',
+    fontFamily: Fonts.sans,
     color: colors.textSecondary,
   },
   rowHeart: {

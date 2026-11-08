@@ -527,7 +527,6 @@ const createStyles = (colors: AtticoPalette, sheetHeight: number = 0) => StyleSh
   title: {
     fontFamily: Fonts?.serif,
     fontSize: 22,
-    fontWeight: '500',
     color: colors.textPrimary,
   },
   // Matches web's reset link: 13px, regular weight, no bold override.

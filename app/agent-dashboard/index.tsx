@@ -424,6 +424,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     gap: 12,
   },
   description: {
+    fontFamily: Fonts.sans,
     fontSize: 14,
     color: colors.textSecondary,
   },
@@ -435,11 +436,12 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   retryButtonText: {
     fontSize: 14,
-    fontWeight: '600',
+    fontFamily: Fonts.sansSemiBold,
     color: '#fff',
   },
   errorBanner: {
     textAlign: 'center',
+    fontFamily: Fonts.sans,
     fontSize: 12,
     color: colors.error,
     paddingVertical: 4,
@@ -467,10 +469,11 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   statValue: {
     fontSize: 22,
-    fontWeight: '700',
+    fontFamily: Fonts.sansBold,
     color: colors.textPrimary,
   },
   statLabel: {
+    fontFamily: Fonts.sans,
     fontSize: 11,
     color: colors.textSecondary,
     textAlign: 'center',
@@ -491,17 +494,16 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   sectionTitle: {
     fontFamily: Fonts?.serif,
     fontSize: 18,
-    fontWeight: '500',
     color: colors.textPrimary,
   },
   sectionLink: {
     fontSize: 13,
-    fontWeight: '600',
+    fontFamily: Fonts.sansSemiBold,
     color: colors.accentText,
   },
   sectionSub: {
     fontSize: 11,
-    fontWeight: '600',
+    fontFamily: Fonts.sansSemiBold,
     color: colors.textSecondary,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
@@ -516,6 +518,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     gap: 6,
   },
   emptyCardText: {
+    fontFamily: Fonts.sans,
     fontSize: 13,
     color: colors.textSecondary,
     textAlign: 'center',
@@ -530,10 +533,11 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   listCardTitle: {
     fontSize: 14,
-    fontWeight: '600',
+    fontFamily: Fonts.sansSemiBold,
     color: colors.textPrimary,
   },
   listCardMeta: {
+    fontFamily: Fonts.sans,
     fontSize: 13,
     color: colors.textSecondary,
   },
@@ -560,7 +564,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   actionButtonText: {
     fontSize: 12,
-    fontWeight: '600',
+    fontFamily: Fonts.sansSemiBold,
     color: colors.textPrimary,
   },
   wantedHead: {
@@ -569,6 +573,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     justifyContent: 'space-between',
   },
   wantedDate: {
+    fontFamily: Fonts.sans,
     fontSize: 11,
     color: colors.textSecondary,
   },
@@ -606,11 +611,11 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   matchText: {
     flex: 1,
     fontSize: 13,
-    fontWeight: '600',
+    fontFamily: Fonts.sansSemiBold,
     color: colors.accentText,
   },
   matchTextNone: {
-    fontWeight: '400',
+    fontFamily: Fonts.sans,
     color: colors.textSecondary,
   },
   matchItem: {
@@ -625,12 +630,13 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   matchItemTitle: {
     flex: 1,
+    fontFamily: Fonts.sans,
     fontSize: 13,
     color: colors.textPrimary,
   },
   matchItemPrice: {
     fontSize: 13,
-    fontWeight: '600',
+    fontFamily: Fonts.sansSemiBold,
     color: colors.accentText,
   },
 });

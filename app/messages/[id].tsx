@@ -23,7 +23,7 @@ import { ReportSheet } from '@/components/safety/report-sheet';
 import { confirmAction } from '@/lib/confirm';
 import { AppHeader } from '@/components/ui/app-header';
 import { SignInPrompt } from '@/components/ui/sign-in-prompt';
-import { type AtticoPalette } from '@/constants/theme';
+import { type AtticoPalette, Fonts } from '@/constants/theme';
 import { useAuth } from '@/contexts/auth-context';
 import { KeyboardDoneBar } from '@/components/ui/keyboard-done-bar';
 import { useTheme } from '@/contexts/theme-context';
@@ -488,6 +488,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   menuTitle: {
     paddingHorizontal: 18,
     paddingVertical: 10,
+    fontFamily: Fonts.sans,
     fontSize: 13,
     color: colors.textSecondary,
   },
@@ -497,6 +498,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     paddingHorizontal: 18,
   },
   menuItemText: {
+    fontFamily: Fonts.sans,
     fontSize: 16,
     color: colors.textPrimary,
   },
@@ -504,6 +506,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     color: colors.signOut,
   },
   menuItemCancel: {
+    fontFamily: Fonts.sans,
     fontSize: 16,
     color: colors.textSecondary,
   },
@@ -526,8 +529,9 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
   },
-  retryText: { fontSize: 14, fontWeight: '600', color: colors.textPrimary },
+  retryText: { fontSize: 14, fontFamily: Fonts.sansSemiBold, color: colors.textPrimary },
   unavailableText: {
+    fontFamily: Fonts.sans,
     fontSize: 14,
     color: colors.textSecondary,
     textAlign: 'center',
@@ -543,10 +547,11 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   headerAvatarText: {
     fontSize: 14,
-    fontWeight: '700',
+    fontFamily: Fonts.sansBold,
     color: '#fff',
   },
   headerProperty: {
+    fontFamily: Fonts.sans,
     fontSize: 12,
     color: colors.accentText,
   },
@@ -558,6 +563,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   emptyText: {
     textAlign: 'center',
     color: colors.textSecondary,
+    fontFamily: Fonts.sans,
     fontSize: 13,
     marginTop: 40,
   },
@@ -588,6 +594,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     borderBottomRightRadius: 4,
   },
   bubbleText: {
+    fontFamily: Fonts.sans,
     fontSize: 14,
     color: colors.textPrimary,
   },
@@ -595,6 +602,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     color: '#fff',
   },
   bubbleTime: {
+    fontFamily: Fonts.sans,
     fontSize: 10,
     color: colors.textSecondary,
     marginTop: 4,
@@ -604,6 +612,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   sendError: {
     textAlign: 'center',
+    fontFamily: Fonts.sans,
     fontSize: 12,
     color: colors.error,
     paddingVertical: 4,
@@ -623,6 +632,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     borderRadius: 20,
     paddingHorizontal: 16,
     paddingVertical: 10,
+    fontFamily: Fonts.sans,
     fontSize: 14,
     color: colors.textPrimary,
     borderWidth: 1,
@@ -656,6 +666,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   blockedText: {
     flex: 1,
+    fontFamily: Fonts.sans,
     fontSize: 13,
     color: colors.textSecondary,
   },
@@ -669,7 +680,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   unblockText: {
     fontSize: 13,
-    fontWeight: '600',
+    fontFamily: Fonts.sansSemiBold,
     color: colors.textPrimary,
   },
 });

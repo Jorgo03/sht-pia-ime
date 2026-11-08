@@ -1458,7 +1458,6 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     marginBottom: 12,
     fontFamily: Fonts?.serif,
     fontSize: 20,
-    fontWeight: '500',
     color: colors.textPrimary,
   },
 
@@ -1483,15 +1482,13 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     marginBottom: 8,
   },
   avatarText: {
-    fontFamily: Fonts?.serif,
+    fontFamily: Fonts?.serifSemiBold,
     fontSize: 24,
-    fontWeight: '700',
     color: '#fff',
   },
   profileName: {
     fontFamily: Fonts?.serif,
     fontSize: 18,
-    fontWeight: '500',
     color: colors.textPrimary,
   },
   roleBadge: {
@@ -1501,14 +1498,14 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     backgroundColor: colors.accentTint,
   },
   roleBadgeText: {
-    fontFamily: Fonts?.mono,
+    fontFamily: Fonts?.monoMedium,
     fontSize: 11,
-    fontWeight: '600',
     letterSpacing: 1,
     textTransform: 'uppercase',
     color: colors.accentText,
   },
   profileEmail: {
+    fontFamily: Fonts.sans,
     fontSize: 13,
     color: colors.textSecondary,
     marginTop: 2,
@@ -1536,7 +1533,6 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   statValue: {
     fontFamily: Fonts?.serif,
     fontSize: 20,
-    fontWeight: '500',
     color: colors.textPrimary,
   },
   statLabel: {
@@ -1566,7 +1562,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   menuRowText: {
     flex: 1,
     fontSize: 15,
-    fontWeight: '500',
+    fontFamily: Fonts.sansMedium,
     color: colors.textPrimary,
   },
   menuBadge: {
@@ -1579,9 +1575,8 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     justifyContent: 'center',
   },
   menuBadgeText: {
-    fontFamily: Fonts?.mono,
+    fontFamily: Fonts?.monoMedium,
     fontSize: 11,
-    fontWeight: '700',
     color: '#fff',
   },
   menuDivider: {
@@ -1602,7 +1597,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   signOutText: {
     fontSize: 15,
-    fontWeight: '600',
+    fontFamily: Fonts.sansSemiBold,
     color: colors.signOut,
   },
   // Deliberately quieter than Sign out: a plain, unboxed text link at the very
@@ -1614,11 +1609,13 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     paddingHorizontal: 24,
   },
   deleteAccountText: {
+    fontFamily: Fonts.sans,
     fontSize: 13,
     color: colors.textSecondary,
     textDecorationLine: 'underline',
   },
   deleteErrorText: {
+    fontFamily: Fonts.sans,
     fontSize: 13,
     color: colors.signOut,
     textAlign: 'center',
@@ -1633,11 +1630,13 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   // 12px text; the vertical padding makes a ~34px tap row instead of 14px.
   legalLink: {
     paddingVertical: 10,
+    fontFamily: Fonts.sans,
     fontSize: 12,
     color: colors.textSecondary,
     textDecorationLine: 'underline',
   },
   legalDot: {
+    fontFamily: Fonts.sans,
     fontSize: 12,
     color: colors.textFaint,
   },
@@ -1669,7 +1668,6 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   otpTitle: {
     fontFamily: Fonts?.serif,
     fontSize: 20,
-    fontWeight: '500',
     color: '#fff',
     textAlign: 'center',
   },
@@ -1740,12 +1738,11 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     backgroundColor: colors.accentLight,
   },
   kickerOnDark: {
-    fontFamily: Fonts?.mono,
+    fontFamily: Fonts?.monoMedium,
     fontSize: 11,
     letterSpacing: 1.5,
     textTransform: 'uppercase',
     color: 'rgba(255,255,255,0.6)',
-    fontWeight: '600',
   },
   // Prototype's hero: serif 48px / line-height 0.98 / letter-spacing -0.03em.
   authHeadline: {
@@ -1791,7 +1788,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   roleBtnText: {
     fontSize: 14,
-    fontWeight: '600',
+    fontFamily: Fonts.sansSemiBold,
     color: 'rgba(255,255,255,0.5)',
   },
   roleBtnTextActive: {
@@ -1816,6 +1813,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     borderColor: 'rgba(255,255,255,0.10)',
     backgroundColor: 'rgba(255,255,255,0.06)',
     color: '#f5f0e8',
+    fontFamily: Fonts.sans,
     fontSize: 14,
   },
   fieldEye: {
@@ -1833,7 +1831,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   ctaPillText: {
     fontSize: 15,
-    fontWeight: '700',
+    fontFamily: Fonts.sansBold,
     color: '#fff',
   },
   divider: {
@@ -1847,6 +1845,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.10)',
   },
   dividerText: {
+    fontFamily: Fonts.sans,
     fontSize: 12,
     color: 'rgba(255,255,255,0.4)',
   },
@@ -1921,12 +1920,13 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     marginBottom: -12,
   },
   linkButtonText: {
+    fontFamily: Fonts.sans,
     fontSize: 13,
     color: 'rgba(255,255,255,0.5)',
   },
   linkButtonTextStrong: {
     color: colors.accentLight,
-    fontWeight: '600',
+    fontFamily: Fonts.sansSemiBold,
   },
   // Resend link while the 30s lock is counting down.
   linkButtonTextMuted: {

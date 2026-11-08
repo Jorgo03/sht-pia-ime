@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-import { type AtticoPalette } from '@/constants/theme';
+import { type AtticoPalette, Fonts } from '@/constants/theme';
 import { useTheme } from '@/contexts/theme-context';
 
 interface FilterTabsProps {
@@ -70,7 +70,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   tabText: {
     fontSize: 14,
-    fontWeight: '600',
+    fontFamily: Fonts.sansSemiBold,
     color: colors.textSecondary,
   },
   activeTabText: {

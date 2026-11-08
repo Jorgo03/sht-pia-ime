@@ -164,7 +164,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   badgeText: {
     fontSize: 11,
-    fontWeight: '500',
+    fontFamily: Fonts.sansMedium,
     color: '#fff',
     letterSpacing: 1,
     textTransform: 'uppercase',
@@ -199,7 +199,6 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   name: {
     fontFamily: Fonts?.serif,
     fontSize: 18,
-    fontWeight: '500',
     color: colors.textPrimary,
     marginBottom: 4,
   },
@@ -210,6 +209,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     marginBottom: 12,
   },
   location: {
+    fontFamily: Fonts.sans,
     fontSize: 13,
     color: colors.textSecondary,
   },
@@ -228,13 +228,13 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     backgroundColor: colors.glass,
   },
   statText: {
+    fontFamily: Fonts.sans,
     fontSize: 12,
     color: colors.textSecondary,
   },
   price: {
     fontFamily: Fonts?.serif,
     fontSize: 22,
-    fontWeight: '500',
     fontStyle: 'italic',
     color: colors.accentText,
   },

@@ -11,7 +11,7 @@ import { useTranslation } from 'react-i18next';
 
 import { AppHeader } from '@/components/ui/app-header';
 import { GradientBackground } from '@/components/ui/gradient-background';
-import { type AtticoPalette } from '@/constants/theme';
+import { type AtticoPalette, Fonts } from '@/constants/theme';
 import { useAuth } from '@/contexts/auth-context';
 import { useTheme } from '@/contexts/theme-context';
 import { supabase } from '@/lib/supabase';
@@ -284,7 +284,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   pageTitle: {
     flexShrink: 1,
     fontSize: 26,
-    fontWeight: '700',
+    fontFamily: Fonts.sansBold,
     color: colors.textPrimary,
   },
   // Never squeezed by a long title in another language: the title wraps.
@@ -299,7 +299,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   newListingPillText: {
     fontSize: 13,
-    fontWeight: '600',
+    fontFamily: Fonts.sansSemiBold,
     color: '#fff',
   },
   center: {
@@ -322,17 +322,19 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   subtitle: {
     fontSize: 17,
-    fontWeight: '600',
+    fontFamily: Fonts.sansSemiBold,
     color: colors.textPrimary,
     textAlign: 'center',
   },
   description: {
+    fontFamily: Fonts.sans,
     fontSize: 14,
     color: colors.textSecondary,
     textAlign: 'center',
   },
   errorBanner: {
     textAlign: 'center',
+    fontFamily: Fonts.sans,
     fontSize: 12,
     color: colors.error,
     paddingVertical: 4,
@@ -376,7 +378,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   rowTitle: {
     flex: 1,
     fontSize: 14,
-    fontWeight: '600',
+    fontFamily: Fonts.sansSemiBold,
     color: colors.textPrimary,
   },
   statusPill: {
@@ -386,11 +388,11 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   statusPillText: {
     fontSize: 10,
-    fontWeight: '700',
+    fontFamily: Fonts.sansBold,
   },
   rowPrice: {
     fontSize: 15,
-    fontWeight: '700',
+    fontFamily: Fonts.sansBold,
     color: colors.accentText,
   },
   // Six 30px actions need 220px; the column beside the photo is ~148px on a

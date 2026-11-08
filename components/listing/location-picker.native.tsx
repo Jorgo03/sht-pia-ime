@@ -174,6 +174,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   hint: {
     marginTop: 4,
+    fontFamily: Fonts.sans,
     fontSize: 12,
     color: colors.textSecondary,
   },

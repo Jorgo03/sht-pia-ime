@@ -54,7 +54,6 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   headline: {
     paddingHorizontal: 20,
     fontFamily: Fonts?.serif,
-    fontWeight: '500',
     fontSize: 30,
     lineHeight: 31.5,
     letterSpacing: -0.75,
@@ -63,7 +62,6 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   headlineEmphasis: {
     fontFamily: Fonts?.serif,
     fontStyle: 'italic',
-    fontWeight: '500',
     color: colors.accentText,
   },
   searchBar: {
@@ -81,6 +79,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   searchPlaceholder: {
     flex: 1,
+    fontFamily: Fonts.sans,
     fontSize: 14,
     color: colors.textSecondary,
   },
@@ -92,7 +91,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   filtersChipText: {
     fontSize: 12,
-    fontWeight: '600',
+    fontFamily: Fonts.sansSemiBold,
     color: colors.accentText,
   },
 });

@@ -315,6 +315,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     gap: 2,
   },
   location: {
+    fontFamily: Fonts.sans,
     fontSize: 11,
     color: colors.textSecondary,
     flex: 1,
@@ -323,7 +324,6 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   price: {
     fontFamily: Fonts?.serif,
     fontSize: 14,
-    fontWeight: '500',
     color: colors.textPrimary,
     marginBottom: 2,
   },
@@ -361,7 +361,6 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   compactTitle: {
     fontFamily: Fonts?.serif,
     fontSize: 15,
-    fontWeight: '500',
     color: colors.textPrimary,
     marginBottom: 3,
   },
@@ -372,6 +371,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     marginBottom: 8,
   },
   compactLocation: {
+    fontFamily: Fonts.sans,
     fontSize: 12,
     color: colors.textSecondary,
     flex: 1,
@@ -385,7 +385,6 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   compactPrice: {
     fontFamily: Fonts?.serif,
     fontSize: 16,
-    fontWeight: '500',
     color: colors.accentText,
   },
   compactBeds: {
@@ -396,6 +395,6 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   compactBedsText: {
     fontSize: 11,
     color: colors.textSecondary,
-    fontWeight: '500',
+    fontFamily: Fonts.sansMedium,
   },
 });

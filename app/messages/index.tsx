@@ -10,7 +10,7 @@ import { ActionButton } from '@/components/ui/action-button';
 import { AppHeader } from '@/components/ui/app-header';
 import { ScreenHero } from '@/components/ui/screen-hero';
 import { GradientBackground } from '@/components/ui/gradient-background';
-import { type AtticoPalette } from '@/constants/theme';
+import { type AtticoPalette, Fonts } from '@/constants/theme';
 import { useAuth } from '@/contexts/auth-context';
 import { useTheme } from '@/contexts/theme-context';
 import { supabase } from '@/lib/supabase';
@@ -339,11 +339,12 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   subtitle: {
     fontSize: 17,
-    fontWeight: '600',
+    fontFamily: Fonts.sansSemiBold,
     color: colors.textPrimary,
     textAlign: 'center',
   },
   description: {
+    fontFamily: Fonts.sans,
     fontSize: 14,
     color: colors.textSecondary,
     textAlign: 'center',
@@ -356,7 +357,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   // as the same control.
   retryText: {
     fontSize: 14,
-    fontWeight: '600',
+    fontFamily: Fonts.sansSemiBold,
     color: colors.accentText,
     marginTop: 12,
   },
@@ -419,7 +420,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   avatarText: {
     fontSize: 17,
-    fontWeight: '700',
+    fontFamily: Fonts.sansBold,
     color: '#fff',
   },
   rowBody: {
@@ -428,7 +429,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   rowName: {
     fontSize: 15,
-    fontWeight: '600',
+    fontFamily: Fonts.sansSemiBold,
     color: colors.textPrimary,
   },
   nameRow: {
@@ -441,7 +442,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   blockedBadge: {
     fontSize: 11,
-    fontWeight: '600',
+    fontFamily: Fonts.sansSemiBold,
     color: colors.textSecondary,
     backgroundColor: colors.surface2,
     borderRadius: 999,
@@ -450,6 +451,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     overflow: 'hidden',
   },
   rowPreview: {
+    fontFamily: Fonts.sans,
     fontSize: 13,
     color: colors.textSecondary,
   },
@@ -458,6 +460,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     gap: 6,
   },
   rowTime: {
+    fontFamily: Fonts.sans,
     fontSize: 11,
     color: colors.textSecondary,
   },

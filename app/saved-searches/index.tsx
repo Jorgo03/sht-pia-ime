@@ -23,7 +23,7 @@ import { ScreenHero } from '@/components/ui/screen-hero';
 import { PrimaryCTA } from '@/components/ui/buttons';
 import { GradientBackground } from '@/components/ui/gradient-background';
 import { KeyboardDoneBar } from '@/components/ui/keyboard-done-bar';
-import { type AtticoPalette } from '@/constants/theme';
+import { type AtticoPalette, Fonts } from '@/constants/theme';
 import { useAuth } from '@/contexts/auth-context';
 import { useFilters } from '@/contexts/filters-context';
 import { useTheme } from '@/contexts/theme-context';
@@ -599,7 +599,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   tabText: {
     fontSize: 13,
-    fontWeight: '600',
+    fontFamily: Fonts.sansSemiBold,
     color: colors.textSecondary,
   },
   tabTextActive: {
@@ -621,11 +621,12 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   addPillText: {
     fontSize: 13,
-    fontWeight: '600',
+    fontFamily: Fonts.sansSemiBold,
     color: colors.textPrimary,
   },
   errorBanner: {
     textAlign: 'center',
+    fontFamily: Fonts.sans,
     fontSize: 12,
     color: colors.error,
     paddingVertical: 4,
@@ -652,15 +653,17 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   emptyTitle: {
     fontSize: 15,
-    fontWeight: '600',
+    fontFamily: Fonts.sansSemiBold,
     color: colors.textPrimary,
   },
   emptyHint: {
+    fontFamily: Fonts.sans,
     fontSize: 13,
     color: colors.textSecondary,
     textAlign: 'center',
   },
   alertsHint: {
+    fontFamily: Fonts.sans,
     fontSize: 12,
     color: colors.textSecondary,
     marginBottom: 4,
@@ -668,7 +671,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   newBadge: {
     alignSelf: 'flex-start',
     fontSize: 12,
-    fontWeight: '600',
+    fontFamily: Fonts.sansSemiBold,
     color: '#fff',
     backgroundColor: colors.accent,
     borderRadius: 999,
@@ -693,10 +696,11 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   cardTitle: {
     flex: 1,
     fontSize: 14,
-    fontWeight: '600',
+    fontFamily: Fonts.sansSemiBold,
     color: colors.textPrimary,
   },
   cardDate: {
+    fontFamily: Fonts.sans,
     fontSize: 11,
     color: colors.textSecondary,
   },
@@ -707,7 +711,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   statusPillText: {
     fontSize: 10,
-    fontWeight: '700',
+    fontFamily: Fonts.sansBold,
   },
   cardMetaRow: {
     flexDirection: 'row',
@@ -715,6 +719,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     gap: 10,
   },
   cardMeta: {
+    fontFamily: Fonts.sans,
     fontSize: 13,
     color: colors.textSecondary,
   },
@@ -737,7 +742,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   actionButtonText: {
     fontSize: 12,
-    fontWeight: '600',
+    fontFamily: Fonts.sansSemiBold,
     color: colors.textPrimary,
   },
   iconButton: {
@@ -774,7 +779,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   modalTitle: {
     fontSize: 18,
-    fontWeight: '700',
+    fontFamily: Fonts.sansBold,
     color: colors.textPrimary,
   },
   input: {
@@ -782,6 +787,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     borderRadius: 14,
     paddingHorizontal: 16,
     paddingVertical: 14,
+    fontFamily: Fonts.sans,
     fontSize: 15,
     color: colors.textPrimary,
     borderWidth: 1,
@@ -817,7 +823,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   toggleText: {
     fontSize: 13,
-    fontWeight: '600',
+    fontFamily: Fonts.sansSemiBold,
     color: colors.textSecondary,
   },
   toggleTextActive: {

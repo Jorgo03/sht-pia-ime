@@ -47,17 +47,15 @@ const createStyles = (colors: AtticoPalette) =>
     },
     kicker: {
       flexShrink: 1,
-      fontFamily: Fonts?.mono,
+      fontFamily: Fonts?.monoMedium,
       fontSize: 11,
       letterSpacing: 1.5,
       textTransform: 'uppercase',
       color: colors.textSecondary,
-      fontWeight: '600',
     },
     headline: {
       fontFamily: Fonts?.serif,
       fontSize: 28,
-      fontWeight: '500',
       color: colors.textPrimary,
     },
     headlineEm: {

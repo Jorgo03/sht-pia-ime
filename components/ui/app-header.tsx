@@ -397,6 +397,7 @@ const createStyles = (
     // `styles.langCode.color`, so this stays even though it's no longer
     // rendering a text code.
     langCode: {
+      fontFamily: Fonts.sans,
       fontSize: 16,
       lineHeight: 18,
       color: fg,
@@ -447,6 +448,7 @@ const createStyles = (
       borderRadius: 10,
     },
     langRowCode: {
+      fontFamily: Fonts.sans,
       fontSize: 18,
       lineHeight: 20,
       width: 24,

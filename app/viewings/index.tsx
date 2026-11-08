@@ -263,17 +263,19 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   subtitle: {
     fontSize: 17,
-    fontWeight: '600',
+    fontFamily: Fonts.sansSemiBold,
     color: colors.textPrimary,
     textAlign: 'center',
   },
   description: {
+    fontFamily: Fonts.sans,
     fontSize: 14,
     color: colors.textSecondary,
     textAlign: 'center',
   },
   errorBanner: {
     textAlign: 'center',
+    fontFamily: Fonts.sans,
     fontSize: 12,
     color: colors.error,
     paddingVertical: 4,
@@ -290,7 +292,6 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   sectionTitle: {
     fontFamily: Fonts?.serif,
     fontSize: 18,
-    fontWeight: '500',
     color: colors.textPrimary,
   },
   card: {
@@ -312,7 +313,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   cardTitle: {
     fontSize: 14,
-    fontWeight: '600',
+    fontFamily: Fonts.sansSemiBold,
     color: colors.textPrimary,
   },
   statusPill: {
@@ -322,7 +323,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   statusPillText: {
     fontSize: 10,
-    fontWeight: '700',
+    fontFamily: Fonts.sansBold,
   },
   cardMetaRow: {
     flexDirection: 'row',
@@ -330,14 +331,17 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     gap: 4,
   },
   cardMetaText: {
+    fontFamily: Fonts.sans,
     fontSize: 13,
     color: colors.textSecondary,
   },
   cardFrom: {
+    fontFamily: Fonts.sans,
     fontSize: 13,
     color: colors.textPrimary,
   },
   cardNotes: {
+    fontFamily: Fonts.sans,
     fontSize: 13,
     color: colors.textSecondary,
   },
@@ -359,7 +363,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   actionButtonText: {
     fontSize: 12,
-    fontWeight: '600',
+    fontFamily: Fonts.sansSemiBold,
     color: colors.textPrimary,
   },
 });

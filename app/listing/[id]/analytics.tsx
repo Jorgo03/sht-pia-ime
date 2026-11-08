@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 
 import { AppHeader } from '@/components/ui/app-header';
 import { GradientBackground } from '@/components/ui/gradient-background';
-import { type AtticoPalette } from '@/constants/theme';
+import { type AtticoPalette, Fonts } from '@/constants/theme';
 import { useTheme } from '@/contexts/theme-context';
 import { supabase } from '@/lib/supabase';
 import { formatDate } from '@/lib/format';
@@ -236,6 +236,7 @@ const createStyles = (colors: AtticoPalette) =>
       gap: 8,
     },
     description: {
+      fontFamily: Fonts.sans,
       fontSize: 14,
       color: colors.textSecondary,
     },
@@ -264,10 +265,11 @@ const createStyles = (colors: AtticoPalette) =>
     },
     statValue: {
       fontSize: 20,
-      fontWeight: '700',
+      fontFamily: Fonts.sansBold,
       color: colors.textPrimary,
     },
     statLabel: {
+      fontFamily: Fonts.sans,
       fontSize: 10,
       color: colors.textSecondary,
       textAlign: 'center',
@@ -293,7 +295,7 @@ const createStyles = (colors: AtticoPalette) =>
     },
     metricPillText: {
       fontSize: 11,
-      fontWeight: '600',
+      fontFamily: Fonts.sansSemiBold,
     },
     chartScroll: {
       marginTop: 4,
@@ -315,6 +317,7 @@ const createStyles = (colors: AtticoPalette) =>
       borderRadius: 3,
     },
     chartHint: {
+      fontFamily: Fonts.sans,
       fontSize: 11,
       color: colors.textSecondary,
       textAlign: 'right',
@@ -328,7 +331,7 @@ const createStyles = (colors: AtticoPalette) =>
     },
     listCardHeader: {
       fontSize: 14,
-      fontWeight: '700',
+      fontFamily: Fonts.sansBold,
       color: colors.textPrimary,
       padding: 14,
       borderBottomWidth: 1,
@@ -339,6 +342,7 @@ const createStyles = (colors: AtticoPalette) =>
       alignItems: 'center',
     },
     emptyText: {
+      fontFamily: Fonts.sans,
       fontSize: 13,
       color: colors.textSecondary,
     },
@@ -353,10 +357,12 @@ const createStyles = (colors: AtticoPalette) =>
     },
     activityType: {
       flex: 1,
+      fontFamily: Fonts.sans,
       fontSize: 13,
       color: colors.textPrimary,
     },
     activityDate: {
+      fontFamily: Fonts.sans,
       fontSize: 11,
       color: colors.textSecondary,
     },

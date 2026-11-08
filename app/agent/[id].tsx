@@ -17,7 +17,7 @@ import { useTranslation } from 'react-i18next';
 import { AppHeader } from '@/components/ui/app-header';
 import { PropertyCard } from '@/components/property/property-card';
 import { GradientBackground } from '@/components/ui/gradient-background';
-import { type AtticoPalette } from '@/constants/theme';
+import { type AtticoPalette, Fonts } from '@/constants/theme';
 import { useTheme } from '@/contexts/theme-context';
 import { supabase } from '@/lib/supabase';
 import { Property } from '@/data/types';
@@ -190,6 +190,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     alignItems: 'center',
   },
   description: {
+    fontFamily: Fonts.sans,
     fontSize: 14,
     color: colors.textSecondary,
   },
@@ -217,7 +218,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   avatarText: {
     fontSize: 22,
-    fontWeight: '700',
+    fontFamily: Fonts.sansBold,
     color: '#fff',
   },
   agentInfo: {
@@ -226,7 +227,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   agentName: {
     fontSize: 20,
-    fontWeight: '700',
+    fontFamily: Fonts.sansBold,
     color: colors.textPrimary,
     marginBottom: 2,
   },
@@ -236,6 +237,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     gap: 4,
   },
   metaText: {
+    fontFamily: Fonts.sans,
     fontSize: 13,
     color: colors.textSecondary,
   },
@@ -248,6 +250,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     alignItems: 'center',
   },
   emptyText: {
+    fontFamily: Fonts.sans,
     fontSize: 14,
     color: colors.textSecondary,
   },

@@ -9,7 +9,7 @@ import type { FeatureCollection } from 'geojson';
 import { useTabBarClearance } from '@/components/liquid-tab-bar';
 import { MapCanvas } from '@/components/map/map-canvas';
 import type { CountyGroup, MapCanvasHandle, MapRegionLike } from '@/components/map/map-canvas.types';
-import { type AtticoPalette } from '@/constants/theme';
+import { type AtticoPalette, Fonts } from '@/constants/theme';
 import { useFilters } from '@/contexts/filters-context';
 import { useTheme } from '@/contexts/theme-context';
 import { MAP_MARKER_LIMIT } from '@/data/properties';
@@ -325,7 +325,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   count: {
     color: colors.textPrimary,
     fontSize: 14,
-    fontWeight: '700',
+    fontFamily: Fonts.sansBold,
   },
   badge: {
     backgroundColor: colors.accent,
@@ -338,7 +338,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   badgeText: {
     color: colors.textPrimary,
     fontSize: 11,
-    fontWeight: '700',
+    fontFamily: Fonts.sansBold,
   },
   empty: {
     alignSelf: 'center',
@@ -355,10 +355,11 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   emptyTitle: {
     color: colors.textPrimary,
     fontSize: 15,
-    fontWeight: '600',
+    fontFamily: Fonts.sansSemiBold,
   },
   emptyHint: {
     color: colors.textSecondary,
+    fontFamily: Fonts.sans,
     fontSize: 13,
   },
   retry: {
@@ -370,7 +371,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   retryText: {
     color: colors.accentText,
     fontSize: 14,
-    fontWeight: '600',
+    fontFamily: Fonts.sansSemiBold,
   },
   legend: {
     flexDirection: 'row',
@@ -397,7 +398,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   legendLabel: {
     fontSize: 11,
-    fontWeight: '600',
+    fontFamily: Fonts.sansSemiBold,
     color: colors.textSecondary,
     textTransform: 'capitalize',
   },
@@ -444,15 +445,16 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   previewTitle: {
     fontSize: 14,
-    fontWeight: '700',
+    fontFamily: Fonts.sansBold,
     color: colors.textPrimary,
   },
   previewPrice: {
     fontSize: 15,
-    fontWeight: '700',
+    fontFamily: Fonts.sansBold,
     color: colors.accentText,
   },
   previewMeta: {
+    fontFamily: Fonts.sans,
     fontSize: 12,
     color: colors.textSecondary,
     textTransform: 'capitalize',
@@ -468,7 +470,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   previewCtaText: {
     fontSize: 12,
-    fontWeight: '700',
+    fontFamily: Fonts.sansBold,
     color: '#fff',
   },
   previewClose: {

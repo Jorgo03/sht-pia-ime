@@ -46,8 +46,8 @@ export default function NotFoundScreen() {
 const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   container: { flex: 1 },
   content: { flex: 1, alignItems: 'center', paddingHorizontal: 24, paddingTop: 64 },
-  code: { fontFamily: Fonts?.serif, fontSize: 60, lineHeight: 64, fontWeight: '500', color: colors.accentText },
-  title: { marginTop: 12, fontFamily: Fonts?.serif, fontSize: 22, fontWeight: '500', color: colors.textPrimary, textAlign: 'center' },
+  code: { fontFamily: Fonts?.serif, fontSize: 60, lineHeight: 64, color: colors.accentText },
+  title: { marginTop: 12, fontFamily: Fonts?.serif, fontSize: 22, color: colors.textPrimary, textAlign: 'center' },
   subtitle: { marginTop: 8, fontFamily: Fonts?.sans, fontSize: 14, lineHeight: 20, color: colors.textSecondary, textAlign: 'center' },
   actions: { marginTop: 24, width: '100%', maxWidth: 320, gap: 10 },
   action: { width: '100%' },

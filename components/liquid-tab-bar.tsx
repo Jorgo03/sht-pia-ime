@@ -23,7 +23,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { Shadows } from '@/constants/theme';
+import { Shadows, Fonts } from '@/constants/theme';
 import { useTheme } from '@/contexts/theme-context';
 import { useUnreadMessages } from '@/hooks/use-unread-messages';
 import { buildInboxHref, tokenForTab } from '@/src/features/messaging/lib/return-route';
@@ -471,7 +471,7 @@ const styles = StyleSheet.create({
   },
   navBadgeText: {
     fontSize: 10,
-    fontWeight: '700',
+    fontFamily: Fonts.sansBold,
     color: '#fff',
   },
 });

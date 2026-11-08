@@ -373,12 +373,13 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     gap: 8,
   },
   errorText: {
+    fontFamily: Fonts.sans,
     fontSize: 14,
     color: colors.textPrimary,
   },
   retryText: {
     fontSize: 14,
-    fontWeight: '600',
+    fontFamily: Fonts.sansSemiBold,
     color: colors.accentText,
   },
   section: {
@@ -401,7 +402,6 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   sectionTitle: {
     fontFamily: Fonts?.serif,
     fontSize: 18,
-    fontWeight: '500',
     color: colors.textPrimary,
   },
   // Matches web's .section-title a — muted by default, orange only on
@@ -409,7 +409,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   // always-on state here rather than always-orange.
   seeAll: {
     fontSize: 14,
-    fontWeight: '600',
+    fontFamily: Fonts.sansSemiBold,
     color: colors.textSecondary,
   },
   hScroll: {

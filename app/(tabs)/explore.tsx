@@ -429,7 +429,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   brand: {
     fontSize: 14,
-    fontWeight: '600',
+    fontFamily: Fonts.sansSemiBold,
     color: colors.accentText,
     letterSpacing: 1,
     marginBottom: 12,
@@ -504,7 +504,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   badgeText: {
     fontSize: 11,
-    fontWeight: '700',
+    fontFamily: Fonts.sansBold,
     color: colors.textPrimary,
   },
   searchField: {
@@ -538,6 +538,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     // assistant button off a 280px screen.
     minWidth: 0,
     alignSelf: 'stretch',
+    fontFamily: Fonts.sans,
     fontSize: 14,
     color: colors.textPrimary,
     padding: 0,
@@ -597,10 +598,11 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   emptyTitle: {
     fontSize: 16,
-    fontWeight: '600',
+    fontFamily: Fonts.sansSemiBold,
     color: colors.textPrimary,
   },
   emptyHint: {
+    fontFamily: Fonts.sans,
     fontSize: 13,
     color: colors.textSecondary,
   },
@@ -617,7 +619,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   emptyResetText: {
     fontSize: 13,
-    fontWeight: '600',
+    fontFamily: Fonts.sansSemiBold,
     color: colors.accentText,
   },
 });

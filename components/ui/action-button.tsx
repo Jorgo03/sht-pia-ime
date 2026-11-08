@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { StyleSheet, Text, TouchableOpacity } from 'react-native';
 
-import { type AtticoPalette } from '@/constants/theme';
+import { type AtticoPalette, Fonts } from '@/constants/theme';
 import { useTheme } from '@/contexts/theme-context';
 
 interface ActionButtonProps {
@@ -57,7 +57,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   text: {
     fontSize: 16,
-    fontWeight: '700',
+    fontFamily: Fonts.sansBold,
     color: '#fff',
   },
   secondaryText: {

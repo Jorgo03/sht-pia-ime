@@ -185,9 +185,8 @@ const createStyles = (colors: AtticoPalette) =>
       borderColor: colors.accentLight,
     },
     tabText: {
-      fontFamily: Fonts?.mono,
+      fontFamily: Fonts?.monoMedium,
       fontSize: 11,
-      fontWeight: '600',
       color: colors.textSecondary,
     },
     tabTextActive: {
@@ -200,6 +199,7 @@ const createStyles = (colors: AtticoPalette) =>
       flexWrap: 'wrap',
     },
     statusText: {
+      fontFamily: Fonts.sans,
       fontSize: 12,
       color: colors.textSecondary,
       flexShrink: 1,
@@ -209,7 +209,7 @@ const createStyles = (colors: AtticoPalette) =>
     },
     action: {
       fontSize: 12,
-      fontWeight: '700',
+      fontFamily: Fonts.sansBold,
       color: colors.accentText,
     },
   });

@@ -886,7 +886,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.5)',
     color: '#fff',
     fontSize: 11,
-    fontWeight: '600',
+    fontFamily: Fonts.sansSemiBold,
     paddingHorizontal: 10,
     paddingVertical: 3,
     borderRadius: 999,
@@ -924,7 +924,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.6)',
     color: '#fff',
     fontSize: 13,
-    fontWeight: '600',
+    fontFamily: Fonts.sansSemiBold,
     paddingHorizontal: 16,
     paddingVertical: 6,
     borderRadius: 12,
@@ -974,11 +974,11 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     fontSize: 11,
     letterSpacing: 1.5,
     color: colors.textSecondary,
-    fontWeight: '600',
+    fontFamily: Fonts.sansSemiBold,
   },
   name: {
     fontSize: 26,
-    fontWeight: '700',
+    fontFamily: Fonts.sansBold,
     color: colors.textPrimary,
     marginBottom: 8,
   },
@@ -989,6 +989,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     marginBottom: 16,
   },
   location: {
+    fontFamily: Fonts.sans,
     fontSize: 14,
     color: colors.textSecondary,
   },
@@ -1000,6 +1001,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     marginTop: 4,
   },
   description: {
+    fontFamily: Fonts.sans,
     fontSize: 14,
     lineHeight: 22,
     color: colors.textSecondary,
@@ -1023,7 +1025,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   translatedBadgeText: {
     fontSize: 11,
-    fontWeight: '500',
+    fontFamily: Fonts.sansMedium,
     color: colors.textSecondary,
   },
   featuresGrid: {
@@ -1050,7 +1052,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   featurePillText: {
     fontSize: 12,
-    fontWeight: '500',
+    fontFamily: Fonts.sansMedium,
     color: colors.textPrimary,
   },
   mapPreview: {
@@ -1067,7 +1069,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   openMapsLinkText: {
     fontSize: 13,
-    fontWeight: '600',
+    fontFamily: Fonts.sansSemiBold,
     color: colors.accentText,
   },
   // Wraps: four or five labels overran the right edge at 280-320 (and at
@@ -1097,7 +1099,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   amenityLabel: {
     fontSize: 12,
     color: colors.textSecondary,
-    fontWeight: '500',
+    fontFamily: Fonts.sansMedium,
   },
 
   sectionCard: {
@@ -1116,7 +1118,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 17,
-    fontWeight: '700',
+    fontFamily: Fonts.sansBold,
     color: colors.textPrimary,
   },
   reportLink: {
@@ -1128,6 +1130,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     paddingHorizontal: 4,
   },
   reportLinkText: {
+    fontFamily: Fonts.sans,
     fontSize: 13,
     color: colors.textSecondary,
     textDecorationLine: 'underline',
@@ -1157,7 +1160,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   agentAvatarText: {
     fontSize: 18,
-    fontWeight: '700',
+    fontFamily: Fonts.sansBold,
     color: colors.accentText,
   },
   agentInfo: {
@@ -1166,13 +1169,13 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   agentName: {
     fontSize: 16,
-    fontWeight: '600',
+    fontFamily: Fonts.sansSemiBold,
     color: colors.textPrimary,
   },
   agentRole: {
     fontSize: 12,
     color: colors.accentText,
-    fontWeight: '500',
+    fontFamily: Fonts.sansMedium,
   },
   callButton: {
     width: 44,
@@ -1188,6 +1191,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 14,
+    fontFamily: Fonts.sans,
     fontSize: 14,
     color: colors.textPrimary,
     borderWidth: 1,
@@ -1200,11 +1204,12 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   sentConfirm: {
     textAlign: 'center',
     color: colors.accentText,
-    fontWeight: '600',
+    fontFamily: Fonts.sansSemiBold,
     paddingVertical: 14,
   },
   sendError: {
     textAlign: 'center',
+    fontFamily: Fonts.sans,
     fontSize: 12,
     color: colors.error,
     paddingVertical: 4,
@@ -1221,7 +1226,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   whatsappButtonText: {
     fontSize: 14,
-    fontWeight: '600',
+    fontFamily: Fonts.sansSemiBold,
     color: colors.accentText,
   },
 
@@ -1232,21 +1237,23 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     marginBottom: 24,
   },
   priceLabel: {
+    fontFamily: Fonts.sans,
     fontSize: 13,
     color: colors.textSecondary,
     marginBottom: 4,
   },
   price: {
     fontSize: 28,
-    fontWeight: '700',
+    fontFamily: Fonts.sansBold,
     color: colors.accentText,
   },
   priceSuffix: {
     fontSize: 14,
-    fontWeight: '400',
+    fontFamily: Fonts.sans,
     color: colors.textSecondary,
   },
   pricePerSqm: {
+    fontFamily: Fonts.sans,
     fontSize: 12,
     color: colors.textSecondary,
     marginTop: 2,
@@ -1276,12 +1283,12 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   modalTitle: {
     fontSize: 18,
-    fontWeight: '700',
+    fontFamily: Fonts.sansBold,
     color: colors.textPrimary,
   },
   modalLabel: {
     fontSize: 13,
-    fontWeight: '600',
+    fontFamily: Fonts.sansSemiBold,
     color: colors.textSecondary,
   },
 });

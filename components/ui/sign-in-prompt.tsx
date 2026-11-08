@@ -7,7 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { ActionButton } from '@/components/ui/action-button';
 import { AppHeader } from '@/components/ui/app-header';
 import { GradientBackground } from '@/components/ui/gradient-background';
-import { type AtticoPalette } from '@/constants/theme';
+import { type AtticoPalette, Fonts } from '@/constants/theme';
 import { useTheme } from '@/contexts/theme-context';
 
 /**
@@ -49,6 +49,7 @@ const createStyles = (colors: AtticoPalette) =>
       paddingHorizontal: 32,
     },
     description: {
+      fontFamily: Fonts.sans,
       fontSize: 14,
       color: colors.textSecondary,
       textAlign: 'center',

@@ -99,7 +99,7 @@ type Styles = ReturnType<typeof createStyles>;
 const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   container: { flex: 1 },
   content: { paddingHorizontal: 20, paddingTop: 8, paddingBottom: 48, gap: 14 },
-  title: { fontFamily: Fonts?.serif, fontSize: 28, fontWeight: '500', color: colors.textPrimary },
+  title: { fontFamily: Fonts?.serif, fontSize: 28, color: colors.textPrimary },
   updated: { fontFamily: Fonts?.sans, fontSize: 13, color: colors.textFaint },
   note: {
     fontFamily: Fonts?.sans,
@@ -114,7 +114,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   intro: { fontFamily: Fonts?.sans, fontSize: 15, lineHeight: 23, color: colors.textPrimary },
   section: { gap: 8, marginTop: 10 },
-  sectionTitle: { fontFamily: Fonts?.serif, fontSize: 18, fontWeight: '500', color: colors.textPrimary },
+  sectionTitle: { fontFamily: Fonts?.serif, fontSize: 18, color: colors.textPrimary },
   paragraph: { fontFamily: Fonts?.sans, fontSize: 15, lineHeight: 23, color: colors.textSecondary },
   bulletRow: { flexDirection: 'row', gap: 8, paddingLeft: 4 },
   bulletText: { flex: 1 },
