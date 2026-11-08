@@ -271,6 +271,103 @@ test.describe('Published by', () => {
   });
 });
 
+test.describe('notification centre', () => {
+  test.use({ signedIn: true, allowConsoleErrors: [/status of 403/] });
+  const now = () => new Date().toISOString();
+  const CONV = CONVERSATIONS[0].id;
+  const rows = () => [
+    { id: 'a0000000-0000-4000-8000-000000000001', kind: 'message', data: { conversation_id: CONV, sender_name: 'Arta' }, read_at: null, created_at: now() },
+    { id: 'a0000000-0000-4000-8000-000000000002', kind: 'welcome', data: {}, read_at: now(), created_at: now() },
+  ];
+  const seed = (page: Page, writes: { table: string; method: string; query: string }[] | null = null, unread = 1) =>
+    page.route('**/rest/v1/notifications*', (route) => {
+      const req = route.request();
+      if (req.method() === 'HEAD') return route.fulfill({ status: 200, headers: { ...CORS, 'content-range': `0-0/${unread}`, 'access-control-expose-headers': 'content-range' } });
+      if (req.method() === 'PATCH') {
+        writes?.push({ table: 'notifications', method: 'PATCH', query: new URL(req.url()).search });
+        return route.fulfill({ status: 204, headers: CORS, body: '' });
+      }
+      return json(route, rows());
+    });
+
+  test('X81 the bell shows the unread count and opens the centre', async ({ page }) => {
+    await seed(page);
+    await page.goto('/');
+    await ready(page);
+    await page.getByRole('button', { name: `${t('notifications.title')}, 1` }).click();
+    await expect(page).toHaveURL(/\/notifications$/);
+    await expect(page.getByText(t('notifications.kinds.message.title'), { exact: true })).toBeVisible();
+    await expect(page.getByText(t('notifications.unreadTag'), { exact: true })).toBeVisible();
+  });
+
+  test('X82 mark one, mark all, and a tap opens the conversation', async ({ page }) => {
+    const writes: { table: string; method: string; query: string }[] = [];
+    await seed(page, writes, 2);
+    await page.goto('/notifications');
+    await ready(page);
+    await page.getByRole('button', { name: new RegExp(`^${t('notifications.markRead')}`) }).click();
+    await expect.poll(() => writes.filter((w) => /id=eq\.a0000000/.test(w.query)).length).toBe(1);
+    await page.getByRole('button', { name: t('notifications.markAll') }).click();
+    await expect.poll(() => writes.filter((w) => !/[?&]id=eq/.test(w.query)).length).toBe(1);
+    await page.getByRole('button', { name: new RegExp(t('notifications.kinds.message.title')) }).first().click();
+    await expect(page).toHaveURL(new RegExp(`/messages/${CONV}`));
+  });
+
+  test('X83 an empty centre says so and a failed load offers a retry', async ({ page }) => {
+    let fail = true;
+    await page.route('**/rest/v1/notifications*', (route) => {
+      if (route.request().method() === 'HEAD') return route.fulfill({ status: 200, headers: { ...CORS, 'content-range': '*/0', 'access-control-expose-headers': 'content-range' } });
+      if (fail) return route.fulfill({ status: 403, contentType: 'application/json', headers: CORS, body: JSON.stringify({ code: '42501', message: 'no' }) });
+      return json(route, []);
+    });
+    await page.goto('/notifications');
+    await ready(page);
+    await expect(page.getByText(t('notifications.loadFailed'))).toBeVisible();
+    fail = false;
+    await page.getByRole('button', { name: t('common.retry') }).click();
+    await expect(page.getByText(t('notifications.empty'), { exact: true })).toBeVisible();
+  });
+
+  test('X84 something arriving live drops a banner, and tapping it opens the conversation', async ({ page }) => {
+    await seed(page, null, 0);
+    let socket: { send: (m: string) => void } | null = null;
+    let topic = '';
+    let arrayFormat = false;
+    await page.routeWebSocket(/supabase\.co/, (ws) => {
+      ws.onMessage((raw) => {
+        const text = String(raw);
+        const isArray = text.startsWith('[');
+        arrayFormat = isArray;
+        const m = isArray ? (() => { const [join_ref, ref, t2, event, payload] = JSON.parse(text); return { join_ref, ref, topic: t2, event, payload }; })() : JSON.parse(text);
+        const reply = (response: object) => {
+          const payload = { status: 'ok', response };
+          ws.send(isArray ? JSON.stringify([m.join_ref, m.ref, m.topic, 'phx_reply', payload]) : JSON.stringify({ topic: m.topic, event: 'phx_reply', ref: m.ref, payload }));
+        };
+        if (m.event === 'phx_join') {
+          const pc = m.payload?.config?.postgres_changes ?? [];
+          reply({ postgres_changes: pc.map((c: object, i: number) => ({ ...c, id: i + 1 })) });
+          if (String(m.topic).includes('notifications-')) {
+            topic = m.topic;
+            socket = { send: (out: string) => ws.send(out) };
+          }
+        } else if (m.event === 'heartbeat') reply({});
+      });
+    });
+    await page.goto('/');
+    await ready(page);
+    await expect.poll(() => topic).not.toBe('');
+    const payload = { ids: [1], data: { schema: 'public', table: 'notifications', commit_timestamp: now(), type: 'INSERT', columns: [
+      { name: 'id', type: 'uuid' }, { name: 'kind', type: 'text' }, { name: 'data', type: 'jsonb' }, { name: 'read_at', type: 'timestamptz' }, { name: 'created_at', type: 'timestamptz' },
+    ], record: { id: 'a0000000-0000-4000-8000-000000000009', kind: 'message', data: { conversation_id: CONV, sender_name: 'Arta' }, read_at: null, created_at: now() }, errors: null } };
+    socket!.send(arrayFormat ? JSON.stringify([null, null, topic, 'postgres_changes', payload]) : JSON.stringify({ topic, event: 'postgres_changes', ref: null, payload }));
+    const title = t('notifications.kinds.message.title');
+    const banner = page.getByRole('button', { name: new RegExp(title) }).first();
+    await expect(banner).toBeVisible();
+    await banner.click();
+    await expect(page).toHaveURL(new RegExp(`/messages/${CONV}`));
+  });
+});
+
 test('X77 price per m² shows on a home for sale and not on a rental', async ({ page }) => {
   const perSqm = page.getByText(/≈.*\/m²/);
   await page.goto(`/property/${LISTINGS.find((l) => l.listing_type === 'sale')!.id}`);

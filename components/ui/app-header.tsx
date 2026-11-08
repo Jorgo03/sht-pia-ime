@@ -17,6 +17,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { NotificationBell } from '@/components/notifications/notification-bell';
 import { ThemeToggleButton } from '@/components/ui/theme-toggle-button';
 import { Fonts, Radii, Shadows, type AtticoPalette } from '@/constants/theme';
 import { IS_WEB, WEB_MAX_WIDTH } from '@/constants/web-frame';
@@ -233,6 +234,7 @@ export function AppHeader({
               <MaterialIcons name="expand-more" size={14} color={styles.langCode.color} />
             </Pressable>
 
+            <NotificationBell style={styles.iconBtn} iconColor={styles.langCode.color} />
             <ThemeToggleButton style={styles.iconBtn} iconColor={styles.langCode.color} />
           </>
         )}

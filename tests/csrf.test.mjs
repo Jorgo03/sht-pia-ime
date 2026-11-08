@@ -47,7 +47,7 @@ test('every server function that changes data checks who is calling', () => {
   const RULES = {
     'checkout-start': /Authorization/,
     'delete-account': /Authorization/,
-    'push-dispatch': /CRON_SECRET/,
+    'push-dispatch': /push_dispatch_secret_ok/,
     'saved-search-alerts': /CRON_SECRET/,
     'paysera-callback': /verifyCallback/,
     'saved-search-unsubscribe': /UUID\.test\(token\)/,

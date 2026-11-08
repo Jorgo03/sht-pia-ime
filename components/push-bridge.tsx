@@ -5,7 +5,8 @@ import { Platform } from 'react-native';
 
 import { useAuth } from '@/contexts/auth-context';
 import { Notifications } from '@/lib/notifications-module';
-import { refreshPushRegistration, routeFromNotification } from '@/lib/push';
+import { useNotifications } from '@/contexts/notifications-context';
+import { notificationIdFromResponse, refreshPushRegistration, routeFromNotification } from '@/lib/push';
 
 /**
  * Wires push notifications into navigation (docs/LAUNCH_TASKS.md F14):
@@ -16,6 +17,7 @@ import { refreshPushRegistration, routeFromNotification } from '@/lib/push';
 export function PushBridge() {
   const router = useRouter();
   const { user } = useAuth();
+  const { markRead } = useNotifications();
   const handledColdStart = useRef(false);
 
   useEffect(() => {
@@ -27,6 +29,8 @@ export function PushBridge() {
     // Not in Expo Go on Android, where the package is not available.
     if (Platform.OS === 'web' || !Notifications) return;
     const open = (response: NotificationResponse | null) => {
+      const id = notificationIdFromResponse(response);
+      if (id) void markRead(id);
       const route = routeFromNotification(response);
       if (route) router.push(route as Href);
     };
@@ -37,7 +41,7 @@ export function PushBridge() {
     }
     const sub = Notifications.addNotificationResponseReceivedListener(open);
     return () => sub.remove();
-  }, [router]);
+  }, [router, markRead]);
 
   return null;
 }

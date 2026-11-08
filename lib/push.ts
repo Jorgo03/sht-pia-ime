@@ -27,13 +27,17 @@ function projectId(): string | null {
   return extra?.eas?.projectId ?? Constants.easConfig?.projectId ?? null;
 }
 
-/** Show pushes that arrive while the app is open, quietly. */
+/**
+ * A push that arrives while the app is open draws nothing itself: the in-app
+ * banner (components/notifications/notification-banner.tsx) shows that event,
+ * so one event is not announced twice.
+ */
 export function configureForegroundNotifications() {
   if (Platform.OS === 'web' || !Notifications) return;
   Notifications.setNotificationHandler({
     handleNotification: async () => ({
-      shouldShowBanner: true,
-      shouldShowList: true,
+      shouldShowBanner: false,
+      shouldShowList: false,
       shouldPlaySound: false,
       shouldSetBadge: false,
     }),
@@ -139,5 +143,11 @@ export async function forgetDevice(): Promise<void> {
  */
 export function routeFromNotification(response: NotificationResponse | null): string | null {
   const url = response?.notification.request.content.data?.url;
-  return typeof url === 'string' && /^\/(messages\/[0-9a-f-]{36}|viewings)$/.test(url) ? url : null;
+  return typeof url === 'string' && /^\/(messages\/[0-9a-f-]{36}|property\/[0-9a-f-]{36}|viewings|notifications)$/.test(url) ? url : null;
+}
+
+/** The history row a tapped notification belongs to, to mark it read. */
+export function notificationIdFromResponse(response: NotificationResponse | null): string | null {
+  const id = response?.notification.request.content.data?.notification_id;
+  return typeof id === 'string' && /^[0-9a-f-]{36}$/.test(id) ? id : null;
 }

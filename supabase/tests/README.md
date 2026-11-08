@@ -16,6 +16,7 @@ runs a `DELETE`.
 | `rls_push_notifications.sql` | Push tokens, notification preferences, outbox (migration `20261021051557`) | `passed=11/11` |
 | `rls_moderation.sql` | Moderators, the review queue, listing holds (migration `20261021052850`) | `passed=12/12` |
 | `rls_moderation_read.sql` | Moderators read reported listings and accounts, read-only (migration `20261021053224`) | `passed=6/6` |
+| `rls_notifications.sql` | Notification centre: own rows only, no forging, tokens and the send queue private, one row per event, chats collapse, inquiries, no message text (migration `20261108210219`) | `passed=16/16` |
 | `rls_listing_publisher.sql` | "Published by": agent and client details, no client office, drafts hidden, profiles stay private, publisher cannot change (migration `20261108203236`) | `passed=13/13` |
 | `rls_insert_guards.sql` | New viewings and conversations: listing's agent or owner only, viewings start requested and in the future, server-set counters (migration `20261107225617`) | `passed=9/9` |
 | `rls_performance_report.sql` | Raporti im: each agent sees only their own report and baseline, clients and signed-out visitors get none, the status history cannot be written directly, viewings complete only by their agent after their time, and the counting rules (corrections, duplicates, periods) (migration `20261108005947`) | `passed=22/22` |

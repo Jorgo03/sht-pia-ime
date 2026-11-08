@@ -714,8 +714,60 @@
     "registerFailed": "Leja është dhënë, por ky telefon nuk u lidh për njoftime. Provo përsëri.",
     "settingsHint": "Hap Cilësimet e telefonit, zgjidh Shtëpia.ime dhe ndiz Njoftimet.",
     "prefsNote": "Këto zgjedhje ruhen në llogarinë tënde. Në këtë telefon nuk do të vijnë njoftime derisa t'i ndezësh.",
-    "loadFailed": "Zgjedhjet e tua nuk u ngarkuan.",
-    "saving": "Po ruhet…"
+    "loadFailed": "Njoftimet nuk u ngarkuan.",
+    "saving": "Po ruhet…",
+    "all": "Të gjitha",
+    "unread": "Të palexuara",
+    "read": "Të lexuara",
+    "unreadTag": "E palexuar",
+    "markRead": "Shëno si të lexuar",
+    "markAll": "Shëno të gjitha si të lexuara",
+    "loadMore": "Ngarko më shumë",
+    "headlinePre": "Njoftimet",
+    "headlineEm": "e tua",
+    "empty": "Nuk ke ende njoftime",
+    "emptyHint": "Këtu do të shfaqen mesazhet e reja, vizitat dhe ndryshimet për pronat e tua.",
+    "emptyUnread": "Nuk ke njoftime të palexuara",
+    "emptyRead": "Nuk ke njoftime të lexuara",
+    "inviteTitle": "Mos humb asnjë përgjigje",
+    "inviteBody": "Ndiz njoftimet që të dish menjëherë kur të shkruan dikush ose kur ndryshon një vizitë. Mund ta ndryshosh kur të duash te Profili.",
+    "inviteLater": "Jo tani",
+    "kinds": {
+      "message": {
+        "title": "Mesazh i ri",
+        "body": "{{name}} të dërgoi një mesazh",
+        "bodyMany": "{{name}} të dërgoi {{total}} mesazhe",
+        "bodyNoName": "Ke një mesazh të ri"
+      },
+      "inquiry": {
+        "title": "Pyetje e re për pronën",
+        "body": "{{name}} pyeti për pronën tënde",
+        "bodyNoName": "Dikush pyeti për pronën tënde"
+      },
+      "viewing_requested": {
+        "title": "Kërkesë për vizitë",
+        "body": "Dikush dëshiron të vizitojë pronën tënde"
+      },
+      "viewing_updated": {
+        "title": "Ndryshim te vizita",
+        "confirmed": "Vizita u konfirmua",
+        "declined": "Vizita u refuzua",
+        "cancelled": "Një vizitë u anulua",
+        "updated": "Një vizitë u përditësua"
+      },
+      "listing_hidden": {
+        "title": "Listimi u fsheh",
+        "body": "Një listim yt është fshehur ndërsa e rishikojmë"
+      },
+      "listing_restored": {
+        "title": "Listimi u rikthye",
+        "body": "Listimi yt është sërish publik"
+      },
+      "welcome": {
+        "title": "Mirë se erdhe",
+        "body": "Llogaria jote është gati. Kërko pronat ose shto listimin tënd."
+      }
+    }
   },
   "pricing": {
     "title": "Planet dhe çmimet",

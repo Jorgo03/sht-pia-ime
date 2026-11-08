@@ -5,19 +5,20 @@
 // (migration 20261021051557), only for people who have a device registered
 // and have not turned that kind off.
 //
-// OFF until the owner sets PUSH_DISPATCH_ENABLED=true. Real delivery also
-// needs production builds with push credentials (APNs for iOS, FCM for
-// Android, configured in EAS); Expo Go on Android cannot receive remote
+// Runs when something is queued (trigger on push_outbox) and every 2 minutes
+// for retries (pg_cron). The off switch is push_settings.enabled in the
+// database. Delivery to a phone also needs a build with push credentials (APNs
+// for iOS, FCM for Android, in EAS); Expo Go on Android cannot receive remote
 // pushes. EXPO_ACCESS_TOKEN is optional (Expo's "enhanced security").
 //
-// Auth: scheduler only (service-role key or PUSH_CRON_SECRET header).
+// Auth: the database's vault secret in x-cron-secret, or the service-role key.
+// Deployed with verify_jwt off because of that: this function checks its caller.
 // Logs carry outbox ids only: no names, tokens or message content.
 
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { buildPush, chunk, dispatchEnabled, readTickets, stillWanted } from './logic.js';
 
 const SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-const CRON_SECRET = Deno.env.get('PUSH_CRON_SECRET');
 const EXPO_ACCESS_TOKEN = Deno.env.get('EXPO_ACCESS_TOKEN');
 const MAX_PER_RUN = 200;
 
@@ -33,22 +34,21 @@ function sameSecret(a: string, b: string): boolean {
   return diff === 0;
 }
 
-function isScheduler(req: Request): boolean {
+async function isScheduler(req: Request): Promise<boolean> {
   const bearer = req.headers.get('Authorization')?.replace(/^Bearer\s+/i, '') ?? '';
   if (sameSecret(bearer, SERVICE_ROLE_KEY)) return true;
-  return Boolean(CRON_SECRET) && sameSecret(req.headers.get('x-cron-secret') ?? '', CRON_SECRET!);
+  const secret = req.headers.get('x-cron-secret') ?? '';
+  if (!secret) return false;
+  const { data, error } = await admin.rpc('push_dispatch_secret_ok', { p_secret: secret });
+  return !error && data === true;
 }
 
 type Outbox = { id: number; user_id: string; kind: string; data: Record<string, string>; attempts: number };
 
 async function dispatch() {
-  const { data: rows, error } = await admin
-    .from('push_outbox')
-    .select('id, user_id, kind, data, attempts')
-    .eq('status', 'pending')
-    .lt('attempts', 5)
-    .order('created_at', { ascending: true })
-    .limit(MAX_PER_RUN);
+  // Claimed atomically: a second run at the same moment gets other rows, so
+  // one event is never sent twice.
+  const { data: rows, error } = await admin.rpc('claim_push_outbox', { p_limit: MAX_PER_RUN });
   if (error) throw new Error(error.message);
   const queued = (rows ?? []) as Outbox[];
   if (!queued.length) return { sent: 0, failed: 0, removedTokens: 0, optedOut: 0 };
@@ -75,15 +75,44 @@ async function dispatch() {
   ]);
   const profileById = new Map((profiles ?? []).map((p) => [p.id, p]));
 
+  // The number on the app icon, where the phone supports one.
+  const unreadByUser = new Map<string, number>();
+  await Promise.all(userIds.map(async (id) => {
+    const { count } = await admin
+      .from('notifications')
+      .select('id', { count: 'exact', head: true })
+      .eq('user_id', id)
+      .is('read_at', null);
+    unreadByUser.set(id, count ?? 0);
+  }));
+
   // One Expo message per (queued push, device).
-  const messages: { to: string; title: string; body: string; data: { url: string }; sound: 'default' }[] = [];
+  const messages: {
+    to: string;
+    title: string;
+    body: string;
+    data: { url: string; notification_id?: string };
+    sound: 'default';
+    badge: number;
+    channelId: 'default';
+    priority: 'high';
+  }[] = [];
   const owners: number[] = [];
   for (const item of items) {
     const lang = profileById.get(item.user_id)?.preferred_language ?? 'sq';
     const senderName = item.data?.sender_id ? profileById.get(item.data.sender_id)?.full_name : null;
     const push = buildPush({ kind: item.kind, data: item.data, lang, senderName });
     for (const t of (tokens ?? []).filter((t) => t.user_id === item.user_id)) {
-      messages.push({ to: t.token, title: push.title, body: push.body, data: { url: push.url }, sound: 'default' });
+      messages.push({
+        to: t.token,
+        title: push.title,
+        body: push.body,
+        data: { url: push.url, notification_id: item.data?.notification_id },
+        sound: 'default',
+        badge: unreadByUser.get(item.user_id) ?? 0,
+        channelId: 'default',
+        priority: 'high',
+      });
       owners.push(item.id);
     }
   }
@@ -135,8 +164,9 @@ async function dispatch() {
 
 Deno.serve(async (req) => {
   if (req.method !== 'POST') return json({ error: 'method_not_allowed' }, 405);
-  if (!isScheduler(req)) return json({ error: 'unauthorized' }, 401);
-  if (!dispatchEnabled(Deno.env.toObject())) {
+  if (!(await isScheduler(req))) return json({ error: 'unauthorized' }, 401);
+  const { data: setting } = await admin.from('push_settings').select('enabled').maybeSingle();
+  if (!dispatchEnabled(Deno.env.toObject(), setting?.enabled === true)) {
     const { count } = await admin.from('push_outbox').select('id', { count: 'exact', head: true }).eq('status', 'pending');
     return json({ dispatch: 'off', pending: count ?? 0 });
   }

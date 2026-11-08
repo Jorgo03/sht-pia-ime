@@ -732,8 +732,60 @@
     "registerFailed": "Zgoda jest włączona, ale tego telefonu nie udało się połączyć z powiadomieniami. Spróbuj ponownie.",
     "settingsHint": "Otwórz Ustawienia telefonu, wybierz Shtëpia.ime i włącz Powiadomienia.",
     "prefsNote": "Te wybory są zapisane na Twoim koncie. Ten telefon nie dostanie powiadomień, dopóki ich nie włączysz.",
-    "loadFailed": "Nie udało się wczytać Twoich wyborów.",
-    "saving": "Zapisywanie…"
+    "loadFailed": "Nie udało się wczytać powiadomień.",
+    "saving": "Zapisywanie…",
+    "all": "Wszystkie",
+    "unread": "Nieprzeczytane",
+    "read": "Przeczytane",
+    "unreadTag": "Nieprzeczytane",
+    "markRead": "Oznacz jako przeczytane",
+    "markAll": "Oznacz wszystkie jako przeczytane",
+    "loadMore": "Wczytaj więcej",
+    "headlinePre": "Twoje",
+    "headlineEm": "powiadomienia",
+    "empty": "Brak powiadomień",
+    "emptyHint": "Tu pojawią się nowe wiadomości, oglądania i zmiany dotyczące Twoich nieruchomości.",
+    "emptyUnread": "Nic nieprzeczytanego",
+    "emptyRead": "Brak przeczytanych powiadomień",
+    "inviteTitle": "Nie przegap odpowiedzi",
+    "inviteBody": "Włącz powiadomienia, aby od razu wiedzieć, gdy ktoś napisze lub zmieni się oglądanie. Możesz to zmienić w Profilu.",
+    "inviteLater": "Nie teraz",
+    "kinds": {
+      "message": {
+        "title": "Nowa wiadomość",
+        "body": "{{name}} wysłał(a) wiadomość",
+        "bodyMany": "{{name}} wysłał(a) wiadomości: {{total}}",
+        "bodyNoName": "Masz nową wiadomość"
+      },
+      "inquiry": {
+        "title": "Nowe zapytanie",
+        "body": "{{name}} pyta o Twoją nieruchomość",
+        "bodyNoName": "Ktoś pyta o Twoją nieruchomość"
+      },
+      "viewing_requested": {
+        "title": "Prośba o oglądanie",
+        "body": "Ktoś chce obejrzeć Twoją nieruchomość"
+      },
+      "viewing_updated": {
+        "title": "Zmiana oglądania",
+        "confirmed": "Twoje oglądanie potwierdzono",
+        "declined": "Twoje oglądanie odrzucono",
+        "cancelled": "Oglądanie odwołano",
+        "updated": "Oglądanie zmieniono"
+      },
+      "listing_hidden": {
+        "title": "Ogłoszenie ukryte",
+        "body": "Twoje ogłoszenie jest ukryte na czas weryfikacji"
+      },
+      "listing_restored": {
+        "title": "Ogłoszenie przywrócone",
+        "body": "Twoje ogłoszenie jest znów publiczne"
+      },
+      "welcome": {
+        "title": "Witamy",
+        "body": "Twoje konto jest gotowe. Szukaj domów lub dodaj ogłoszenie."
+      }
+    }
   },
   "pricing": {
     "title": "Plany i ceny",

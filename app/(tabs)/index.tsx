@@ -11,6 +11,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 
 import { useTabBarClearance } from '@/components/liquid-tab-bar';
+import { NotificationInvite } from '@/components/notifications/notification-invite';
 import { FeaturedPropertyCard } from '@/components/property/featured-property-card';
 import { PropertyCard, getCompactCardSnapInterval } from '@/components/property/property-card';
 import { PropertyRow } from '@/components/property/property-row';
@@ -129,6 +130,9 @@ export default function HomeScreen() {
         {/* Web's `.app-header` sits above the headline on Home too. */}
         <AppHeader />
         {!shortScreen && <View style={readable}>{searchHeader}</View>}
+        <View style={readable}>
+          <NotificationInvite />
+        </View>
         <ScrollView
           contentContainerStyle={[
             styles.scroll,

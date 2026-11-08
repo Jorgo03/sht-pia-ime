@@ -714,8 +714,60 @@
     "registerFailed": "Die Erlaubnis ist erteilt, aber dieses Handy konnte nicht verbunden werden. Versuche es erneut.",
     "settingsHint": "Öffne die Einstellungen deines Handys, wähle Shtëpia.ime und schalte Mitteilungen ein.",
     "prefsNote": "Diese Auswahl wird in deinem Konto gespeichert. Auf diesem Handy kommen keine Benachrichtigungen an, bis du sie einschaltest.",
-    "loadFailed": "Deine Auswahl konnte nicht geladen werden.",
-    "saving": "Wird gespeichert…"
+    "loadFailed": "Benachrichtigungen konnten nicht geladen werden.",
+    "saving": "Wird gespeichert…",
+    "all": "Alle",
+    "unread": "Ungelesen",
+    "read": "Gelesen",
+    "unreadTag": "Ungelesen",
+    "markRead": "Als gelesen markieren",
+    "markAll": "Alle als gelesen markieren",
+    "loadMore": "Mehr laden",
+    "headlinePre": "Deine",
+    "headlineEm": "Benachrichtigungen",
+    "empty": "Noch keine Benachrichtigungen",
+    "emptyHint": "Neue Nachrichten, Besichtigungen und Änderungen an deinen Immobilien erscheinen hier.",
+    "emptyUnread": "Nichts Ungelesenes",
+    "emptyRead": "Keine gelesenen Benachrichtigungen",
+    "inviteTitle": "Keine Antwort verpassen",
+    "inviteBody": "Schalte Benachrichtigungen ein, um sofort zu erfahren, wenn dir jemand schreibt oder sich eine Besichtigung ändert. Du kannst das jederzeit im Profil ändern.",
+    "inviteLater": "Nicht jetzt",
+    "kinds": {
+      "message": {
+        "title": "Neue Nachricht",
+        "body": "{{name}} hat dir geschrieben",
+        "bodyMany": "{{name}} hat dir {{total}} Nachrichten geschickt",
+        "bodyNoName": "Du hast eine neue Nachricht"
+      },
+      "inquiry": {
+        "title": "Neue Immobilienanfrage",
+        "body": "{{name}} hat nach deiner Immobilie gefragt",
+        "bodyNoName": "Jemand hat nach deiner Immobilie gefragt"
+      },
+      "viewing_requested": {
+        "title": "Besichtigungsanfrage",
+        "body": "Jemand möchte deine Immobilie besichtigen"
+      },
+      "viewing_updated": {
+        "title": "Besichtigung geändert",
+        "confirmed": "Deine Besichtigung wurde bestätigt",
+        "declined": "Deine Besichtigung wurde abgelehnt",
+        "cancelled": "Eine Besichtigung wurde abgesagt",
+        "updated": "Eine Besichtigung wurde geändert"
+      },
+      "listing_hidden": {
+        "title": "Inserat ausgeblendet",
+        "body": "Ein Inserat ist während der Prüfung ausgeblendet"
+      },
+      "listing_restored": {
+        "title": "Inserat wieder online",
+        "body": "Dein Inserat ist wieder öffentlich"
+      },
+      "welcome": {
+        "title": "Willkommen",
+        "body": "Dein Konto ist bereit. Suche Immobilien oder inseriere deine eigene."
+      }
+    }
   },
   "pricing": {
     "title": "Pläne und Preise",

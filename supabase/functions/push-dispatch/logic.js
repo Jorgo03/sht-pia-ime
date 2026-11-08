@@ -5,9 +5,21 @@
 /** Expo's push service accepts up to 100 messages per request. */
 export const EXPO_BATCH = 100
 
-/** Off unless the owner has switched it on. */
-export function dispatchEnabled(env) {
-  return env.PUSH_DISPATCH_ENABLED === 'true'
+/** Off unless switched on: push_settings.enabled, or the old env variable. */
+export function dispatchEnabled(env, settingEnabled = false) {
+  return settingEnabled === true || env.PUSH_DISPATCH_ENABLED === 'true'
+}
+
+// The kinds added with the notification centre.
+const MORE = {
+  sq: { inquiry: (n) => (n ? `Pyetje e re për pronën tënde nga ${n}` : 'Pyetje e re për pronën tënde'), hidden: 'Një listim yt u fsheh për rishikim', restored: 'Listimi yt është sërish publik', welcome: 'Mirë se erdhe në Shtëpia.ime' },
+  en: { inquiry: (n) => (n ? `New inquiry about your property from ${n}` : 'New inquiry about your property'), hidden: 'One of your listings was hidden for review', restored: 'Your listing is public again', welcome: 'Welcome to Shtëpia.ime' },
+  de: { inquiry: (n) => (n ? `Neue Anfrage zu deiner Immobilie von ${n}` : 'Neue Anfrage zu deiner Immobilie'), hidden: 'Ein Inserat wurde zur Prüfung ausgeblendet', restored: 'Dein Inserat ist wieder öffentlich', welcome: 'Willkommen bei Shtëpia.ime' },
+  it: { inquiry: (n) => (n ? `Nuova richiesta per il tuo immobile da ${n}` : 'Nuova richiesta per il tuo immobile'), hidden: 'Un tuo annuncio è stato nascosto per revisione', restored: 'Il tuo annuncio è di nuovo pubblico', welcome: 'Benvenuto su Shtëpia.ime' },
+  es: { inquiry: (n) => (n ? `Nueva consulta sobre tu propiedad de ${n}` : 'Nueva consulta sobre tu propiedad'), hidden: 'Uno de tus anuncios se ocultó para revisión', restored: 'Tu anuncio vuelve a ser público', welcome: 'Bienvenido a Shtëpia.ime' },
+  fr: { inquiry: (n) => (n ? `Nouvelle demande pour votre bien de ${n}` : 'Nouvelle demande pour votre bien'), hidden: 'Une annonce a été masquée pour vérification', restored: 'Votre annonce est de nouveau publique', welcome: 'Bienvenue sur Shtëpia.ime' },
+  pl: { inquiry: (n) => (n ? `Nowe zapytanie o Twoją nieruchomość od ${n}` : 'Nowe zapytanie o Twoją nieruchomość'), hidden: 'Twoje ogłoszenie ukryto do weryfikacji', restored: 'Twoje ogłoszenie jest znów publiczne', welcome: 'Witamy w Shtëpia.ime' },
+  ru: { inquiry: (n) => (n ? `Новый запрос о вашем объекте от ${n}` : 'Новый запрос о вашем объекте'), hidden: 'Ваше объявление скрыто для проверки', restored: 'Ваше объявление снова опубликовано', welcome: 'Добро пожаловать в Shtëpia.ime' },
 }
 
 const STRINGS = {
@@ -32,6 +44,18 @@ export function firstName(fullName) {
  */
 export function buildPush({ kind, data, lang, senderName }) {
   const s = STRINGS[lang] ?? STRINGS.en
+  const m = MORE[lang] ?? MORE.en
+  if (kind === 'inquiry') {
+    return { title: 'Shtëpia.ime', body: m.inquiry(firstName(senderName)), url: `/messages/${data.conversation_id}` }
+  }
+  if (kind === 'listing_hidden' || kind === 'listing_restored') {
+    return { title: 'Shtëpia.ime', body: kind === 'listing_hidden' ? m.hidden : m.restored, url: `/property/${data.property_id}` }
+  }
+  if (kind === 'welcome') return { title: 'Shtëpia.ime', body: m.welcome, url: '/notifications' }
+  // The people sending announcements wrote these words for everyone to read.
+  if (kind === 'announcement') {
+    return { title: String(data?.title ?? 'Shtëpia.ime').slice(0, 80), body: String(data?.body ?? '').slice(0, 178), url: '/notifications' }
+  }
   if (kind === 'message') {
     return { title: 'Shtëpia.ime', body: s.message(firstName(senderName)), url: `/messages/${data.conversation_id}` }
   }
@@ -50,7 +74,9 @@ export function buildPush({ kind, data, lang, senderName }) {
  */
 export function stillWanted(kind, prefs) {
   if (!prefs) return true
-  return kind === 'message' ? prefs.messages !== false : prefs.viewings !== false
+  if (kind === 'message' || kind === 'inquiry') return prefs.messages !== false
+  if (kind === 'viewing_requested' || kind === 'viewing_updated') return prefs.viewings !== false
+  return true
 }
 
 /** Split into Expo-sized batches. */
@@ -77,5 +103,5 @@ export function readTickets(tickets, sentTokens) {
 
 /** Only routes the app knows; anything else opens the home screen. */
 export function safeRoute(url) {
-  return typeof url === 'string' && /^\/(messages\/[0-9a-f-]{36}|viewings)$/.test(url) ? url : '/'
+  return typeof url === 'string' && /^\/(messages\/[0-9a-f-]{36}|property\/[0-9a-f-]{36}|viewings|notifications)$/.test(url) ? url : '/'
 }

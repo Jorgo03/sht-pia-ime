@@ -34,6 +34,7 @@ const ROUTE_TITLES: Record<string, string> = {
   '(tabs)/explore': 'search.title',
   '(tabs)/profile': 'common.profile',
   favorites: 'common.favorites',
+  notifications: 'notifications.title',
   '(tabs)/messages': 'common.messages',
   'messages/[id]': 'common.messages',
   'my-listings': 'listing.myListings',

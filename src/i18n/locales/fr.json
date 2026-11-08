@@ -723,8 +723,60 @@
     "registerFailed": "L'autorisation est accordée, mais ce téléphone n'a pas pu être connecté aux notifications. Réessayez.",
     "settingsHint": "Ouvrez les Réglages du téléphone, choisissez Shtëpia.ime et activez les Notifications.",
     "prefsNote": "Ces choix sont enregistrés dans votre compte. Ce téléphone ne recevra pas de notifications tant que vous ne les activez pas.",
-    "loadFailed": "Vos choix n'ont pas pu être chargés.",
-    "saving": "Enregistrement…"
+    "loadFailed": "Impossible de charger les notifications.",
+    "saving": "Enregistrement…",
+    "all": "Toutes",
+    "unread": "Non lues",
+    "read": "Lues",
+    "unreadTag": "Non lue",
+    "markRead": "Marquer comme lue",
+    "markAll": "Tout marquer comme lu",
+    "loadMore": "Charger plus",
+    "headlinePre": "Vos",
+    "headlineEm": "notifications",
+    "empty": "Aucune notification pour le moment",
+    "emptyHint": "Les nouveaux messages, visites et changements sur vos biens apparaîtront ici.",
+    "emptyUnread": "Rien de non lu",
+    "emptyRead": "Aucune notification lue",
+    "inviteTitle": "Ne manquez aucune réponse",
+    "inviteBody": "Activez les notifications pour savoir tout de suite quand quelqu'un vous écrit ou qu'une visite change. Modifiable à tout moment dans Profil.",
+    "inviteLater": "Pas maintenant",
+    "kinds": {
+      "message": {
+        "title": "Nouveau message",
+        "body": "{{name}} vous a écrit",
+        "bodyMany": "{{name}} vous a envoyé {{total}} messages",
+        "bodyNoName": "Vous avez un nouveau message"
+      },
+      "inquiry": {
+        "title": "Nouvelle demande",
+        "body": "{{name}} a posé une question sur votre bien",
+        "bodyNoName": "Quelqu'un a posé une question sur votre bien"
+      },
+      "viewing_requested": {
+        "title": "Demande de visite",
+        "body": "Quelqu'un souhaite visiter votre bien"
+      },
+      "viewing_updated": {
+        "title": "Visite modifiée",
+        "confirmed": "Votre visite est confirmée",
+        "declined": "Votre visite a été refusée",
+        "cancelled": "Une visite a été annulée",
+        "updated": "Une visite a été modifiée"
+      },
+      "listing_hidden": {
+        "title": "Annonce masquée",
+        "body": "Une annonce est masquée pendant la vérification"
+      },
+      "listing_restored": {
+        "title": "Annonce rétablie",
+        "body": "Votre annonce est de nouveau publique"
+      },
+      "welcome": {
+        "title": "Bienvenue",
+        "body": "Votre compte est prêt. Cherchez un bien ou publiez le vôtre."
+      }
+    }
   },
   "pricing": {
     "title": "Formules et prix",

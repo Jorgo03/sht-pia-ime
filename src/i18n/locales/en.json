@@ -714,8 +714,60 @@
     "registerFailed": "Permission is on, but this phone couldn't be connected for notifications. Try again.",
     "settingsHint": "Open your phone's Settings, choose Shtëpia.ime and turn on Notifications.",
     "prefsNote": "These choices are saved to your account. This phone won't get notifications until you turn them on.",
-    "loadFailed": "Your choices couldn't be loaded.",
-    "saving": "Saving…"
+    "loadFailed": "Couldn't load your notifications.",
+    "saving": "Saving…",
+    "all": "All",
+    "unread": "Unread",
+    "read": "Read",
+    "unreadTag": "Unread",
+    "markRead": "Mark as read",
+    "markAll": "Mark all as read",
+    "loadMore": "Load more",
+    "headlinePre": "Your",
+    "headlineEm": "notifications",
+    "empty": "No notifications yet",
+    "emptyHint": "New messages, viewings and changes to your properties will appear here.",
+    "emptyUnread": "Nothing unread",
+    "emptyRead": "No read notifications",
+    "inviteTitle": "Don't miss a reply",
+    "inviteBody": "Turn on notifications to know right away when someone writes to you or a viewing changes. You can change this any time in Profile.",
+    "inviteLater": "Not now",
+    "kinds": {
+      "message": {
+        "title": "New message",
+        "body": "{{name}} sent you a message",
+        "bodyMany": "{{name}} sent you {{total}} messages",
+        "bodyNoName": "You have a new message"
+      },
+      "inquiry": {
+        "title": "New property inquiry",
+        "body": "{{name}} asked about your property",
+        "bodyNoName": "Someone asked about your property"
+      },
+      "viewing_requested": {
+        "title": "Viewing request",
+        "body": "Someone wants to view your property"
+      },
+      "viewing_updated": {
+        "title": "Viewing update",
+        "confirmed": "Your viewing was confirmed",
+        "declined": "Your viewing was declined",
+        "cancelled": "A viewing was cancelled",
+        "updated": "A viewing was updated"
+      },
+      "listing_hidden": {
+        "title": "Listing hidden",
+        "body": "One of your listings is hidden while we review it"
+      },
+      "listing_restored": {
+        "title": "Listing restored",
+        "body": "Your listing is public again"
+      },
+      "welcome": {
+        "title": "Welcome",
+        "body": "Your account is ready. Search homes or add your own listing."
+      }
+    }
   },
   "pricing": {
     "title": "Plans and prices",

@@ -38,7 +38,9 @@ import { queryClient } from '@/lib/query-client';
 import { installGlobalErrorReporting } from '@/lib/report-error';
 import { configureForegroundNotifications } from '@/lib/push';
 import { LaunchDoorSplash } from '@/components/brand/door-splash';
+import { NotificationBanner } from '@/components/notifications/notification-banner';
 import { PushBridge } from '@/components/push-bridge';
+import { NotificationsProvider } from '@/contexts/notifications-context';
 import { IS_WEB, WEB_MAX_WIDTH } from '@/constants/web-frame';
 import { RouteHead } from '@/components/web/page-head';
 import { debugWarn } from '@/lib/debug';
@@ -148,6 +150,10 @@ function ThemedNavigation() {
             options={{ headerShown: false, presentation: 'card' }}
           />
           <Stack.Screen
+            name="notifications"
+            options={{ headerShown: false, presentation: 'card' }}
+          />
+          <Stack.Screen
             name="viewings/index"
             options={{ headerShown: false, presentation: 'card' }}
           />
@@ -240,8 +246,11 @@ function AppGate({ fontsReady }: { fontsReady: boolean }) {
         {/* Above the navigator so the list and map tabs share one filter state. */}
         <FiltersProvider>
           <ThemeProvider>
-            <ThemedNavigation />
-            <PushBridge />
+            <NotificationsProvider>
+              <ThemedNavigation />
+              <NotificationBanner />
+              <PushBridge />
+            </NotificationsProvider>
           </ThemeProvider>
         </FiltersProvider>
       </FavoritesProvider>

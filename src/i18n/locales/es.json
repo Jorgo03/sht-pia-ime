@@ -723,8 +723,60 @@
     "registerFailed": "El permiso está activado, pero este teléfono no se pudo conectar a las notificaciones. Inténtalo de nuevo.",
     "settingsHint": "Abre los Ajustes del teléfono, elige Shtëpia.ime y activa las Notificaciones.",
     "prefsNote": "Estas opciones se guardan en tu cuenta. Este teléfono no recibirá notificaciones hasta que las actives.",
-    "loadFailed": "No se pudieron cargar tus opciones.",
-    "saving": "Guardando…"
+    "loadFailed": "No se pudieron cargar las notificaciones.",
+    "saving": "Guardando…",
+    "all": "Todas",
+    "unread": "Sin leer",
+    "read": "Leídas",
+    "unreadTag": "Sin leer",
+    "markRead": "Marcar como leída",
+    "markAll": "Marcar todas como leídas",
+    "loadMore": "Cargar más",
+    "headlinePre": "Tus",
+    "headlineEm": "notificaciones",
+    "empty": "Aún no hay notificaciones",
+    "emptyHint": "Aquí aparecerán nuevos mensajes, visitas y cambios en tus propiedades.",
+    "emptyUnread": "Nada sin leer",
+    "emptyRead": "No hay notificaciones leídas",
+    "inviteTitle": "No te pierdas una respuesta",
+    "inviteBody": "Activa las notificaciones para saber al momento cuándo alguien te escribe o cambia una visita. Puedes cambiarlo cuando quieras en Perfil.",
+    "inviteLater": "Ahora no",
+    "kinds": {
+      "message": {
+        "title": "Mensaje nuevo",
+        "body": "{{name}} te envió un mensaje",
+        "bodyMany": "{{name}} te envió {{total}} mensajes",
+        "bodyNoName": "Tienes un mensaje nuevo"
+      },
+      "inquiry": {
+        "title": "Nueva consulta",
+        "body": "{{name}} preguntó por tu propiedad",
+        "bodyNoName": "Alguien preguntó por tu propiedad"
+      },
+      "viewing_requested": {
+        "title": "Solicitud de visita",
+        "body": "Alguien quiere visitar tu propiedad"
+      },
+      "viewing_updated": {
+        "title": "Cambio en la visita",
+        "confirmed": "Tu visita fue confirmada",
+        "declined": "Tu visita fue rechazada",
+        "cancelled": "Se canceló una visita",
+        "updated": "Se actualizó una visita"
+      },
+      "listing_hidden": {
+        "title": "Anuncio oculto",
+        "body": "Uno de tus anuncios está oculto mientras lo revisamos"
+      },
+      "listing_restored": {
+        "title": "Anuncio restaurado",
+        "body": "Tu anuncio vuelve a ser público"
+      },
+      "welcome": {
+        "title": "Bienvenido",
+        "body": "Tu cuenta está lista. Busca viviendas o publica la tuya."
+      }
+    }
   },
   "pricing": {
     "title": "Planes y precios",
