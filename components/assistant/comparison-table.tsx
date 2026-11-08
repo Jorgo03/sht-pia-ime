@@ -125,6 +125,6 @@ const createStyles = (colors: AtticoPalette) =>
     cellText: { fontFamily: Fonts.sans, fontSize: 13, lineHeight: 18, color: colors.textPrimary },
     bestCell: { backgroundColor: colors.accentTint },
     bestText: { fontFamily: Fonts.sansBold },
-    bestBadge: { marginTop: 2, fontFamily: Fonts.sansSemiBold, fontSize: 10, color: colors.accentText },
-    note: { paddingHorizontal: 10, paddingVertical: 8, fontFamily: Fonts.sans, fontSize: 11, lineHeight: 15, color: colors.textSecondary },
+    bestBadge: { marginTop: 2, fontFamily: Fonts.sansSemiBold, fontSize: 12, color: colors.accentText },
+    note: { paddingHorizontal: 10, paddingVertical: 8, fontFamily: Fonts.sans, fontSize: 12, lineHeight: 15, color: colors.textSecondary },
   });

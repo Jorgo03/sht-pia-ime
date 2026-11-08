@@ -1498,7 +1498,7 @@ const createStyles = (colors: AtticoPalette) =>
     },
     stepCounter: {
       fontFamily: Fonts?.mono,
-      fontSize: 11,
+      fontSize: 12,
       letterSpacing: 1.1,
       color: colors.textSecondary,
     },
@@ -1660,7 +1660,7 @@ const createStyles = (colors: AtticoPalette) =>
     },
     coverBadgeText: {
       fontFamily: Fonts?.mono,
-      fontSize: 10,
+      fontSize: 12,
       color: '#fff',
       letterSpacing: 0.4,
     },
@@ -1723,7 +1723,7 @@ const createStyles = (colors: AtticoPalette) =>
     summaryRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
     summaryLabel: {
       fontFamily: Fonts?.mono,
-      fontSize: 10,
+      fontSize: 12,
       letterSpacing: 1,
       color: colors.textSecondary,
       width: 92,

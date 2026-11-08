@@ -337,7 +337,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   badgeText: {
     color: colors.textPrimary,
-    fontSize: 11,
+    fontSize: 12,
     fontFamily: Fonts.sansBold,
   },
   empty: {
@@ -397,7 +397,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     borderRadius: 4,
   },
   legendLabel: {
-    fontSize: 11,
+    fontSize: 12,
     fontFamily: Fonts.sansSemiBold,
     color: colors.textSecondary,
     textTransform: 'capitalize',

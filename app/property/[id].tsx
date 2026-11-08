@@ -885,7 +885,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   heroCounterText: {
     backgroundColor: 'rgba(0,0,0,0.5)',
     color: '#fff',
-    fontSize: 11,
+    fontSize: 12,
     fontFamily: Fonts.sansSemiBold,
     paddingHorizontal: 10,
     paddingVertical: 3,
@@ -971,7 +971,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     backgroundColor: colors.accent,
   },
   kicker: {
-    fontSize: 11,
+    fontSize: 12,
     letterSpacing: 1.5,
     color: colors.textSecondary,
     fontFamily: Fonts.sansSemiBold,
@@ -1024,7 +1024,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     marginBottom: 8,
   },
   translatedBadgeText: {
-    fontSize: 11,
+    fontSize: 12,
     fontFamily: Fonts.sansMedium,
     color: colors.textSecondary,
   },

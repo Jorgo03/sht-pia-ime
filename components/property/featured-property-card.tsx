@@ -163,7 +163,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     borderRadius: 10,
   },
   badgeText: {
-    fontSize: 11,
+    fontSize: 12,
     fontFamily: Fonts.sansMedium,
     color: '#fff',
     letterSpacing: 1,

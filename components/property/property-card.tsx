@@ -268,7 +268,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   typeBadgeText: {
     fontFamily: Fonts?.sansSemiBold,
-    fontSize: 10,
+    fontSize: 12,
     letterSpacing: 0.3,
     color: '#fff',
   },
@@ -286,7 +286,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   specText: {
     fontFamily: Fonts?.sansMedium,
-    fontSize: 11,
+    fontSize: 12,
     color: colors.textSecondary,
   },
   image: {
@@ -316,7 +316,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   location: {
     fontFamily: Fonts.sans,
-    fontSize: 11,
+    fontSize: 12,
     color: colors.textSecondary,
     flex: 1,
   },
@@ -393,7 +393,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     gap: 3,
   },
   compactBedsText: {
-    fontSize: 11,
+    fontSize: 12,
     color: colors.textSecondary,
     fontFamily: Fonts.sansMedium,
   },

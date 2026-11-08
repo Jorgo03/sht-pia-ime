@@ -186,7 +186,7 @@ const createStyles = (colors: AtticoPalette) =>
     },
     tabText: {
       fontFamily: Fonts?.monoMedium,
-      fontSize: 11,
+      fontSize: 12,
       color: colors.textSecondary,
     },
     tabTextActive: {

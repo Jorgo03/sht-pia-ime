@@ -28,7 +28,8 @@
     "retry": "Retry",
     "done": "Done",
     "language": "Language",
-    "closeKeyboard": "Closes the keyboard"
+    "closeKeyboard": "Closes the keyboard",
+    "addShort": "Add"
   },
   "auth": {
     "roleClient": "Client",
@@ -46,7 +47,7 @@
     "forgotPassword": "Forgot your password?",
     "accessClient": "Buyer & renter access",
     "accessAgent": "Agent portal access",
-    "forgotShort": "Forgot?",
+    "forgotShort": "Forgot password?",
     "resetSent": "If an account exists for this email, we've sent it a code to reset the password.",
     "recoveryTitle": "Set a new password",
     "recoverySubtitle": "Choose a new password for your account.",
@@ -523,7 +524,11 @@
     "removeVideo": "Remove video",
     "confirmSoldTitle": "Mark as sold?",
     "confirmRentedTitle": "Mark as rented?",
-    "confirmClosedHint": "Only do this once the deal is complete. It counts in your report; undone within 7 days, it does not."
+    "confirmClosedHint": "Only do this once the deal is complete. It counts in your report; undone within 7 days, it does not.",
+    "actionView": "View",
+    "actionStats": "Stats",
+    "actionSold": "Sold",
+    "actionRented": "Rented"
   },
   "dashboard": {
     "title": "Property Dashboard",
@@ -645,7 +650,9 @@
     "alertsHint": "New matches show up here when you open this page. Email alerts are not available yet.",
     "emailOn": "Email me new matches",
     "emailOff": "Stop emailing me",
-    "emailHint": "New matches show up here when you open this page. Turn on email to get them by email too; every email has a link to stop."
+    "emailHint": "New matches show up here when you open this page. Turn on email to get them by email too; every email has a link to stop.",
+    "confirmDeleteSearch": "Delete this saved search?",
+    "confirmDeleteWanted": "Delete this request?"
   },
   "bell": {
     "label": "Notifications",

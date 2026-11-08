@@ -28,7 +28,8 @@
     "retry": "Spróbuj ponownie",
     "done": "Gotowe",
     "language": "Język",
-    "closeKeyboard": "Zamyka klawiaturę"
+    "closeKeyboard": "Zamyka klawiaturę",
+    "addShort": "Dodaj"
   },
   "auth": {
     "roleClient": "Klient",
@@ -46,7 +47,7 @@
     "forgotPassword": "Zapomniałeś hasła?",
     "accessClient": "Dostęp dla kupujących i najemców",
     "accessAgent": "Dostęp do portalu agenta",
-    "forgotShort": "Zapomniałeś?",
+    "forgotShort": "Nie pamiętasz hasła?",
     "resetSent": "Jeśli istnieje konto z tym adresem, wysłaliśmy kod do zresetowania hasła.",
     "recoveryTitle": "Ustaw nowe hasło",
     "recoverySubtitle": "Wybierz nowe hasło do swojego konta.",
@@ -489,7 +490,11 @@
     "removeVideo": "Usuń wideo",
     "confirmSoldTitle": "Oznaczyć jako sprzedane?",
     "confirmRentedTitle": "Oznaczyć jako wynajęte?",
-    "confirmClosedHint": "Zrób to dopiero po zakończeniu transakcji. Liczy się w Twoim raporcie; cofnięte w ciągu 7 dni nie liczy się."
+    "confirmClosedHint": "Zrób to dopiero po zakończeniu transakcji. Liczy się w Twoim raporcie; cofnięte w ciągu 7 dni nie liczy się.",
+    "actionView": "Zobacz",
+    "actionStats": "Statystyki",
+    "actionSold": "Sprzedane",
+    "actionRented": "Wynajęte"
   },
   "dashboard": {
     "title": "Dashboard nieruchomości",
@@ -663,7 +668,9 @@
     "alertsHint": "Nowe wyniki pojawiają się tutaj, gdy otworzysz tę stronę. Powiadomienia e-mail nie są jeszcze dostępne.",
     "emailOn": "Wysyłaj mi nowe dopasowania e-mailem",
     "emailOff": "Nie wysyłaj mi więcej e-maili",
-    "emailHint": "Nowe dopasowania pojawiają się tutaj po otwarciu tej strony. Włącz e-mail, aby otrzymywać je także pocztą; każdy e-mail ma link do wypisania się."
+    "emailHint": "Nowe dopasowania pojawiają się tutaj po otwarciu tej strony. Włącz e-mail, aby otrzymywać je także pocztą; każdy e-mail ma link do wypisania się.",
+    "confirmDeleteSearch": "Usunąć to zapisane wyszukiwanie?",
+    "confirmDeleteWanted": "Usunąć to zgłoszenie?"
   },
   "bell": {
     "label": "Powiadomienia",

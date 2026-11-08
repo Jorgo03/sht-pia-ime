@@ -211,6 +211,7 @@ export function AppHeader({
                 screen reader reads as "flag" rather than "Language". */}
             <Pressable
               style={styles.langBtn}
+              hitSlop={6}
               onPress={() => setLangOpen(true)}
               accessibilityRole="button"
               accessibilityLabel={t('common.language')}>

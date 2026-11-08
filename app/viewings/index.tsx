@@ -342,7 +342,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     paddingVertical: 3,
   },
   statusPillText: {
-    fontSize: 10,
+    fontSize: 12,
     fontFamily: Fonts.sansBold,
   },
   cardMetaRow: {

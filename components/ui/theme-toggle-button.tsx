@@ -88,6 +88,7 @@ export function ThemeToggleButton({ style, iconColor }: { style: StyleProp<ViewS
       // react-native-web drops accessibilityState.checked for role "switch";
       // the explicit ARIA prop reaches both the web export and native.
       aria-checked={theme === 'dark'}
+      hitSlop={6}
       accessibilityLabel={t('common.toggleTheme')}>
       <Animated.View
         pointerEvents="none"

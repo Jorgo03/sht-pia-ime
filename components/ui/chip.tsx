@@ -128,7 +128,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   sectionLabelText: {
     fontFamily: Fonts?.mono,
-    fontSize: 11,
+    fontSize: 12,
     letterSpacing: 1.5,
     color: colors.textSecondary,
   },

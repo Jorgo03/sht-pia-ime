@@ -224,6 +224,20 @@ test('X64 Russian headlines switch to Manrope at once, and back to Newsreader in
   await expect.poll(async () => (await families()).newsreader).toBeGreaterThan(0);
 });
 
+test('X76 the bottom menu says what each button is, and sign-up is in view without scrolling', async ({ page }) => {
+  await page.goto('/profile');
+  await ready(page);
+  const menu = page.getByRole('tablist');
+  for (const word of [t('common.home'), t('common.search'), t('common.messages'), t('common.profile')]) {
+    await expect(menu.getByText(word, { exact: true })).toBeVisible();
+  }
+  await expect(page.getByText(t('common.addShort'), { exact: true })).toBeVisible();
+  // Above the other sign-in options, so a new person does not have to scroll.
+  const join = await page.getByText(t('common.signUp'), { exact: true }).first().boundingBox();
+  const others = await page.getByText(t('auth.signInWith'), { exact: true }).boundingBox();
+  expect(join!.y).toBeLessThan(others!.y);
+});
+
 test('X08 legal pages: reachable from Profile, each links to the other', async ({ page }) => {
   await page.goto('/profile');
   await ready(page);
@@ -1463,6 +1477,30 @@ test.describe('AI chat switched off', () => {
 test.describe('web confirmations actually ask and act', () => {
   test.describe('signed in', () => {
     test.use({ signedIn: true });
+
+    test('X74 deleting a saved search asks first: cancel keeps it, confirm deletes it', async ({ page, writes }) => {
+      await page.goto('/saved-searches');
+      await ready(page);
+      const del = page.getByRole('button', { name: t('saved.delete') }).first();
+      await expect(del).toBeVisible();
+
+      page.once('dialog', (d) => d.dismiss());
+      await del.click();
+      await page.waitForTimeout(300);
+      expect(writes.filter((w) => w.method === 'DELETE')).toHaveLength(0);
+
+      page.once('dialog', (d) => d.accept());
+      await del.click();
+      await expect.poll(() => writes.filter((w) => w.table === 'saved_searches' && w.method === 'DELETE').length).toBe(1);
+    });
+
+    test('X75 each listing action shows its word, not only a picture', async ({ page }) => {
+      await page.goto('/my-listings');
+      await ready(page);
+      for (const word of [t('listing.actionView'), t('listing.edit'), t('listing.actionStats'), t('listing.delete')]) {
+        await expect(page.getByText(word, { exact: true }).first()).toBeVisible();
+      }
+    });
 
     test('X53 deleting a listing asks first: cancel keeps it, confirm deletes it', async ({ page, writes }) => {
       await page.goto('/my-listings');

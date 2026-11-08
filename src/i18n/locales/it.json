@@ -28,7 +28,8 @@
     "retry": "Riprova",
     "done": "Fine",
     "language": "Lingua",
-    "closeKeyboard": "Chiude la tastiera"
+    "closeKeyboard": "Chiude la tastiera",
+    "addShort": "Aggiungi"
   },
   "auth": {
     "roleClient": "Cliente",
@@ -46,7 +47,7 @@
     "forgotPassword": "Password dimenticata?",
     "accessClient": "Accesso acquirenti e affittuari",
     "accessAgent": "Accesso al portale agenti",
-    "forgotShort": "Dimenticata?",
+    "forgotShort": "Password dimenticata?",
     "resetSent": "Se esiste un account con questa email, abbiamo inviato un codice per reimpostare la password.",
     "recoveryTitle": "Imposta una nuova password",
     "recoverySubtitle": "Scegli una nuova password per il tuo account.",
@@ -480,7 +481,11 @@
     "removeVideo": "Rimuovi video",
     "confirmSoldTitle": "Segnare come venduto?",
     "confirmRentedTitle": "Segnare come affittato?",
-    "confirmClosedHint": "Fallo solo a trattativa conclusa. Conta nel tuo report; se annullato entro 7 giorni, non conta."
+    "confirmClosedHint": "Fallo solo a trattativa conclusa. Conta nel tuo report; se annullato entro 7 giorni, non conta.",
+    "actionView": "Vedi",
+    "actionStats": "Statistiche",
+    "actionSold": "Venduto",
+    "actionRented": "Affittato"
   },
   "dashboard": {
     "title": "Dashboard immobile",
@@ -654,7 +659,9 @@
     "alertsHint": "I nuovi risultati compaiono qui quando apri questa pagina. Gli avvisi via email non sono ancora disponibili.",
     "emailOn": "Inviami via email i nuovi risultati",
     "emailOff": "Non inviarmi più email",
-    "emailHint": "I nuovi risultati compaiono qui quando apri questa pagina. Attiva l'email per riceverli anche via email; ogni email ha un link per disattivarla."
+    "emailHint": "I nuovi risultati compaiono qui quando apri questa pagina. Attiva l'email per riceverli anche via email; ogni email ha un link per disattivarla.",
+    "confirmDeleteSearch": "Eliminare questa ricerca salvata?",
+    "confirmDeleteWanted": "Eliminare questa richiesta?"
   },
   "bell": {
     "label": "Notifiche",

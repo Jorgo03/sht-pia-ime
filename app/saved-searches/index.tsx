@@ -24,6 +24,7 @@ import { PrimaryCTA } from '@/components/ui/buttons';
 import { GradientBackground } from '@/components/ui/gradient-background';
 import { KeyboardDoneBar } from '@/components/ui/keyboard-done-bar';
 import { type AtticoPalette, Fonts } from '@/constants/theme';
+import { confirmAction } from '@/lib/confirm';
 import { useAuth } from '@/contexts/auth-context';
 import { useFilters } from '@/contexts/filters-context';
 import { useTheme } from '@/contexts/theme-context';
@@ -167,6 +168,24 @@ export default function SavedSearchesScreen() {
     if (error) return flashError();
     setSearches((prev) => prev.filter((s) => s.id !== id));
   };
+
+  const askDeleteSearch = (id: string) =>
+    confirmAction({
+      title: t('saved.confirmDeleteSearch'),
+      confirmText: t('saved.delete'),
+      cancelText: t('common.cancel'),
+      destructive: true,
+      onConfirm: () => deleteSearch(id),
+    });
+
+  const askDeleteWanted = (id: string) =>
+    confirmAction({
+      title: t('saved.confirmDeleteWanted'),
+      confirmText: t('saved.delete'),
+      cancelText: t('common.cancel'),
+      destructive: true,
+      onConfirm: () => deleteWanted(id),
+    });
 
   const runSearch = (row: SavedSearch) => {
     // Opening a saved search counts as seeing its current matches.
@@ -355,7 +374,7 @@ export default function SavedSearchesScreen() {
                         accessibilityLabel={s.alerts_enabled ? t('saved.alertsOff') : t('saved.alertsOn')}>
                         <MaterialIcons
                           name={s.alerts_enabled ? 'notifications' : 'notifications-off'}
-                          size={16}
+                          size={20}
                           color={colors.textPrimary}
                         />
                       </TouchableOpacity>
@@ -369,7 +388,7 @@ export default function SavedSearchesScreen() {
                           accessibilityLabel={s.email_alerts ? t('saved.emailOff') : t('saved.emailOn')}>
                           <MaterialIcons
                             name={s.email_alerts ? 'mark-email-read' : 'unsubscribe'}
-                            size={16}
+                            size={20}
                             color={colors.textPrimary}
                           />
                         </TouchableOpacity>
@@ -377,10 +396,10 @@ export default function SavedSearchesScreen() {
                       <TouchableOpacity
                         accessibilityRole="button"
                         style={styles.iconButton}
-                        onPress={() => deleteSearch(s.id)}
+                        onPress={() => askDeleteSearch(s.id)}
                         activeOpacity={0.7}
                         accessibilityLabel={t('saved.delete')}>
-                        <MaterialIcons name="delete-outline" size={16} color="#e74c3c" />
+                        <MaterialIcons name="delete-outline" size={20} color="#e74c3c" />
                       </TouchableOpacity>
                     </View>
                   </View>
@@ -430,10 +449,10 @@ export default function SavedSearchesScreen() {
                       <TouchableOpacity
                         accessibilityRole="button"
                         style={styles.iconButton}
-                        onPress={() => deleteWanted(w.id)}
+                        onPress={() => askDeleteWanted(w.id)}
                         activeOpacity={0.7}
                         accessibilityLabel={t('saved.delete')}>
-                        <MaterialIcons name="delete-outline" size={16} color="#e74c3c" />
+                        <MaterialIcons name="delete-outline" size={20} color="#e74c3c" />
                       </TouchableOpacity>
                     </View>
                   </View>
@@ -701,7 +720,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   cardDate: {
     fontFamily: Fonts.sans,
-    fontSize: 11,
+    fontSize: 12,
     color: colors.textSecondary,
   },
   statusPill: {
@@ -710,7 +729,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     paddingVertical: 3,
   },
   statusPillText: {
-    fontSize: 10,
+    fontSize: 12,
     fontFamily: Fonts.sansBold,
   },
   cardMetaRow: {
@@ -746,8 +765,8 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     color: colors.textPrimary,
   },
   iconButton: {
-    width: 30,
-    height: 30,
+    width: 44,
+    height: 44,
     borderRadius: 8,
     backgroundColor: colors.glass,
     borderWidth: 1,

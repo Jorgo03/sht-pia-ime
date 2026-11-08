@@ -28,7 +28,8 @@
     "retry": "Reintentar",
     "done": "Listo",
     "language": "Idioma",
-    "closeKeyboard": "Cierra el teclado"
+    "closeKeyboard": "Cierra el teclado",
+    "addShort": "Añadir"
   },
   "auth": {
     "roleClient": "Cliente",
@@ -46,7 +47,7 @@
     "forgotPassword": "¿Olvidaste tu contraseña?",
     "accessClient": "Acceso compradores e inquilinos",
     "accessAgent": "Acceso al portal de agentes",
-    "forgotShort": "¿Olvidaste?",
+    "forgotShort": "¿Olvidaste la contraseña?",
     "resetSent": "Si existe una cuenta con este correo, le hemos enviado un código para restablecer la contraseña.",
     "recoveryTitle": "Establece una nueva contraseña",
     "recoverySubtitle": "Elige una nueva contraseña para tu cuenta.",
@@ -480,7 +481,11 @@
     "removeVideo": "Quitar vídeo",
     "confirmSoldTitle": "¿Marcar como vendida?",
     "confirmRentedTitle": "¿Marcar como alquilada?",
-    "confirmClosedHint": "Hazlo solo cuando la operación esté cerrada. Cuenta en tu informe; si lo deshaces en 7 días, no cuenta."
+    "confirmClosedHint": "Hazlo solo cuando la operación esté cerrada. Cuenta en tu informe; si lo deshaces en 7 días, no cuenta.",
+    "actionView": "Ver",
+    "actionStats": "Estadísticas",
+    "actionSold": "Vendido",
+    "actionRented": "Alquilado"
   },
   "dashboard": {
     "title": "Dashboard de propiedad",
@@ -654,7 +659,9 @@
     "alertsHint": "Los nuevos resultados aparecen aquí cuando abres esta página. Los avisos por correo aún no están disponibles.",
     "emailOn": "Enviarme por correo las coincidencias nuevas",
     "emailOff": "Dejar de enviarme correos",
-    "emailHint": "Las coincidencias nuevas aparecen aquí al abrir esta página. Activa el correo para recibirlas también por email; cada correo tiene un enlace para darte de baja."
+    "emailHint": "Las coincidencias nuevas aparecen aquí al abrir esta página. Activa el correo para recibirlas también por email; cada correo tiene un enlace para darte de baja.",
+    "confirmDeleteSearch": "¿Eliminar esta búsqueda guardada?",
+    "confirmDeleteWanted": "¿Eliminar esta solicitud?"
   },
   "bell": {
     "label": "Notificaciones",

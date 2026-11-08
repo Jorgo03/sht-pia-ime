@@ -200,43 +200,45 @@ export default function MyListingsScreen() {
                     <View style={styles.rowActions}>
                       <TouchableOpacity
                         style={styles.iconButton}
-                        hitSlop={4}
                         onPress={() => router.push(`/property/${item.id}` as Href)}
                         accessibilityRole="button"
                         accessibilityLabel={t('listing.viewPublic')}
                         activeOpacity={0.7}>
-                        <MaterialIcons name="visibility" size={16} color={colors.textPrimary} />
+                        <MaterialIcons name="visibility" size={20} color={colors.textPrimary} />
+                        <Text style={styles.actionLabel} numberOfLines={1}>{t('listing.actionView')}</Text>
                       </TouchableOpacity>
                       <TouchableOpacity
                         style={styles.iconButton}
-                        hitSlop={4}
                         onPress={() => router.push(`/listing/${item.id}/edit` as Href)}
                         accessibilityRole="button"
                         accessibilityLabel={t('listing.edit')}
                         activeOpacity={0.7}>
-                        <MaterialIcons name="edit" size={16} color={colors.textPrimary} />
+                        <MaterialIcons name="edit" size={20} color={colors.textPrimary} />
+                        <Text style={styles.actionLabel} numberOfLines={1}>{t('listing.edit')}</Text>
                       </TouchableOpacity>
                       <TouchableOpacity
                         style={styles.iconButton}
-                        hitSlop={4}
                         onPress={() => router.push(`/listing/${item.id}/analytics` as Href)}
                         accessibilityRole="button"
                         accessibilityLabel={t('listing.viewDashboard')}
                         activeOpacity={0.7}>
-                        <MaterialIcons name="bar-chart" size={16} color={colors.textPrimary} />
+                        <MaterialIcons name="bar-chart" size={20} color={colors.textPrimary} />
+                        <Text style={styles.actionLabel} numberOfLines={1}>{t('listing.actionStats')}</Text>
                       </TouchableOpacity>
                       <TouchableOpacity
                         style={styles.iconButton}
-                        hitSlop={4}
                         onPress={() => toggleStatus(item.id, item.status)}
                         accessibilityRole="button"
                         accessibilityLabel={item.status === 'active' ? t('listing.pause') : t('listing.activate')}
                         activeOpacity={0.7}>
                         <MaterialIcons
                           name={item.status === 'active' ? 'pause' : 'play-arrow'}
-                          size={16}
+                          size={20}
                           color={colors.textPrimary}
                         />
+                        <Text style={styles.actionLabel} numberOfLines={1}>
+                          {item.status === 'active' ? t('listing.pause') : t('listing.activate')}
+                        </Text>
                       </TouchableOpacity>
                       {/* Sale -> Sold, rental -> Rented. Closed listings leave
                           search (only active ones are public) and come back
@@ -244,7 +246,6 @@ export default function MyListingsScreen() {
                       {(item.status === 'active' || item.status === 'paused') && (
                         <TouchableOpacity
                           style={styles.iconButton}
-                        hitSlop={4}
                           onPress={() => confirmClosed(item.id, closedStatusFor(item.listing_type))}
                           accessibilityRole="button"
                           accessibilityLabel={
@@ -253,17 +254,20 @@ export default function MyListingsScreen() {
                               : t('listing.markRented')
                           }
                           activeOpacity={0.7}>
-                          <MaterialIcons name="check-circle-outline" size={16} color={colors.textPrimary} />
+                          <MaterialIcons name="check-circle-outline" size={20} color={colors.textPrimary} />
+                          <Text style={styles.actionLabel} numberOfLines={1}>
+                            {closedStatusFor(item.listing_type) === 'sold' ? t('listing.actionSold') : t('listing.actionRented')}
+                          </Text>
                         </TouchableOpacity>
                       )}
                       <TouchableOpacity
                         style={styles.iconButton}
-                        hitSlop={4}
                         onPress={() => confirmDelete(item.id)}
                         accessibilityRole="button"
                         accessibilityLabel={t('listing.delete')}
                         activeOpacity={0.7}>
-                        <MaterialIcons name="delete-outline" size={16} color="#e74c3c" />
+                        <MaterialIcons name="delete-outline" size={20} color="#e74c3c" />
+                        <Text style={[styles.actionLabel, styles.actionLabelDanger]} numberOfLines={1}>{t('listing.delete')}</Text>
                       </TouchableOpacity>
                     </View>
                   </View>
@@ -398,7 +402,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     paddingVertical: 3,
   },
   statusPillText: {
-    fontSize: 10,
+    fontSize: 12,
     fontFamily: Fonts.sansBold,
   },
   rowPrice: {
@@ -413,14 +417,26 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     flexWrap: 'wrap',
     gap: 8,
   },
+  // A picture and a word, big enough for any finger.
   iconButton: {
-    width: 30,
-    height: 30,
-    borderRadius: 8,
+    minWidth: 64,
+    minHeight: 52,
+    paddingHorizontal: 6,
+    paddingVertical: 6,
+    gap: 2,
+    borderRadius: 10,
     backgroundColor: colors.glass,
     borderWidth: 1,
     borderColor: colors.border,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  actionLabel: {
+    fontSize: 12,
+    fontFamily: Fonts.sansSemiBold,
+    color: colors.textPrimary,
+  },
+  actionLabelDanger: {
+    color: colors.error,
   },
 });

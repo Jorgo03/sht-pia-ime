@@ -270,7 +270,7 @@ const createStyles = (colors: AtticoPalette) =>
     },
     statLabel: {
       fontFamily: Fonts.sans,
-      fontSize: 10,
+      fontSize: 12,
       color: colors.textSecondary,
       textAlign: 'center',
     },
@@ -294,7 +294,7 @@ const createStyles = (colors: AtticoPalette) =>
       borderWidth: 1,
     },
     metricPillText: {
-      fontSize: 11,
+      fontSize: 12,
       fontFamily: Fonts.sansSemiBold,
     },
     chartScroll: {
@@ -318,7 +318,7 @@ const createStyles = (colors: AtticoPalette) =>
     },
     chartHint: {
       fontFamily: Fonts.sans,
-      fontSize: 11,
+      fontSize: 12,
       color: colors.textSecondary,
       textAlign: 'right',
     },
@@ -363,7 +363,7 @@ const createStyles = (colors: AtticoPalette) =>
     },
     activityDate: {
       fontFamily: Fonts.sans,
-      fontSize: 11,
+      fontSize: 12,
       color: colors.textSecondary,
     },
   });

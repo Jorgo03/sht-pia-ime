@@ -488,7 +488,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   statLabel: {
     fontFamily: Fonts.sans,
-    fontSize: 11,
+    fontSize: 12,
     color: colors.textSecondary,
     textAlign: 'center',
   },
@@ -538,7 +538,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     color: colors.accentText,
   },
   sectionSub: {
-    fontSize: 11,
+    fontSize: 12,
     fontFamily: Fonts.sansSemiBold,
     color: colors.textSecondary,
     textTransform: 'uppercase',
@@ -610,7 +610,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   wantedDate: {
     fontFamily: Fonts.sans,
-    fontSize: 11,
+    fontSize: 12,
     color: colors.textSecondary,
   },
   wantedMetaRow: {

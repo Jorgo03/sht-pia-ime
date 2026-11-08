@@ -31,7 +31,7 @@ import { useUnreadMessages } from '@/hooks/use-unread-messages';
  *  scrollable tab screens can reserve the right amount of space instead of
  *  hardcoding a guess that's wrong on any device whose home-indicator inset
  *  differs from the one it was eyeballed on. */
-export const TAB_BAR_HEIGHT = 62;
+export const TAB_BAR_HEIGHT = 68;
 export const TAB_BAR_BOTTOM_OFFSET = 18;
 
 /** The centre "+" button, and how far it rides above the pill's top edge.
@@ -39,11 +39,13 @@ export const TAB_BAR_BOTTOM_OFFSET = 18;
  *  center`, a `margin-top: -22px` on a 58px circle inside a 62px row puts the
  *  circle's top 9px proud of the row. */
 const NAV_ADD_SIZE = 58;
-const NAV_ADD_OVERHANG = Math.ceil((NAV_ADD_SIZE - 22 - TAB_BAR_HEIGHT) / 2 + 22);
+/** Extra lift, so the word under the circle is clear of it and its glow. */
+const NAV_ADD_LIFT = 8;
+const NAV_ADD_OVERHANG = Math.ceil((NAV_ADD_SIZE - 22 - TAB_BAR_HEIGHT) / 2 + 22) + NAV_ADD_LIFT;
 
 /** The glass lens that sits behind the active tab and glides between tabs. */
-const LENS_WIDTH = 54;
-const LENS_HEIGHT = 46;
+const LENS_WIDTH = 62;
+const LENS_HEIGHT = 56;
 /** A soft spring: arrives quickly, overshoots a touch, settles without wobble. */
 const LENS_SPRING = { damping: 20, stiffness: 200, mass: 0.9 };
 
@@ -109,6 +111,16 @@ function NavItem({
       <Animated.View style={iconStyle}>
         <Feather name={icon} size={22} strokeWidth={1.8} color={color} />
       </Animated.View>
+      {/* The word, not only the picture: an icon alone does not tell a
+          first-time user what is behind it. */}
+      <Text
+        style={[styles.navLabel, { color }, active && styles.navLabelActive]}
+        numberOfLines={1}
+        adjustsFontSizeToFit
+        minimumFontScale={0.8}
+        maxFontSizeMultiplier={1.2}>
+        {label}
+      </Text>
       {children}
     </Pressable>
   );
@@ -282,7 +294,11 @@ export function LiquidTabBar({ state, descriptors, emitter, navigateToTab }: Bot
             is rendered after the pill (below), so the tablist holds only
             tabs: a button inside a tablist is invalid for screen readers
             (axe aria-required-children / aria-required-parent, L31). */}
-        <View style={styles.navAddSlot} />
+        <View style={styles.navAddSlot}>
+          <Text style={[styles.navLabel, { color: colors.textSecondary }]} numberOfLines={1} maxFontSizeMultiplier={1.2}>
+            {t('common.addShort')}
+          </Text>
+        </View>
 
         <NavItem
           icon="message-circle"
@@ -391,10 +407,10 @@ const styles = StyleSheet.create({
   // 242px, and on a 280 Fold cover the pill has 232, so the outer icons
   // touched its rounded ends. From 300 wide up nothing shrinks.
   navItem: {
-    width: 46,
+    width: 62,
     flexShrink: 1,
     minWidth: 40,
-    height: 46,
+    height: 56,
     borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
@@ -416,7 +432,21 @@ const styles = StyleSheet.create({
     width: NAV_ADD_SIZE,
     flexShrink: 1,
     minWidth: 52,
-    height: NAV_ADD_SIZE,
+    height: TAB_BAR_HEIGHT - 2,
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+    paddingBottom: 6,
+  },
+  navLabel: {
+    marginTop: 2,
+    fontSize: 12,
+    lineHeight: 15,
+    fontFamily: Fonts.sansSemiBold,
+    textAlign: 'center',
+  },
+  // Not colour alone: the current tab is also heavier and sits in the lens.
+  navLabelActive: {
+    fontFamily: Fonts.sansBold,
   },
   // Same spot the button had as the pill's middle child: horizontally
   // centred (the four tabs are symmetric around it) and, from the margin-box
@@ -426,7 +456,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     left: '50%',
     marginLeft: -NAV_ADD_SIZE / 2,
-    top: NAV_ADD_OVERHANG + (TAB_BAR_HEIGHT - NAV_ADD_SIZE - 22) / 2,
+    top: NAV_ADD_OVERHANG + (TAB_BAR_HEIGHT - NAV_ADD_SIZE - 22) / 2 - NAV_ADD_LIFT,
     marginTop: 0,
   },
   navAddGradient: {
@@ -437,8 +467,8 @@ const styles = StyleSheet.create({
   },
   navBadge: {
     position: 'absolute',
-    top: 4,
-    right: 4,
+    top: 2,
+    right: 8,
     // minHeight + a pill radius: at 200% system text a fixed 16 clipped "9+".
     minWidth: 16,
     minHeight: 16,

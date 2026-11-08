@@ -503,7 +503,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     alignItems: 'center',
   },
   badgeText: {
-    fontSize: 11,
+    fontSize: 12,
     fontFamily: Fonts.sansBold,
     color: colors.textPrimary,
   },
@@ -576,7 +576,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   // Web's .mono-eyebrow: mono, 11px, 0.1em, uppercase, muted.
   countEyebrow: {
     fontFamily: Fonts?.mono,
-    fontSize: 11,
+    fontSize: 12,
     letterSpacing: 1.1,
     color: colors.textSecondary,
   },

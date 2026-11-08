@@ -448,7 +448,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     flexShrink: 1,
   },
   blockedBadge: {
-    fontSize: 11,
+    fontSize: 12,
     fontFamily: Fonts.sansSemiBold,
     color: colors.textSecondary,
     backgroundColor: colors.surface2,
@@ -468,7 +468,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   rowTime: {
     fontFamily: Fonts.sans,
-    fontSize: 11,
+    fontSize: 12,
     color: colors.textSecondary,
   },
   unreadDot: {

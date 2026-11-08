@@ -468,7 +468,7 @@ const createStyles = (colors: AtticoPalette) =>
     cardTitle: { fontFamily: Fonts.sansSemiBold, fontSize: 15, color: colors.textPrimary },
     cardMeta: { fontFamily: Fonts.sans, fontSize: 13, color: colors.textSecondary },
     statusPill: { borderRadius: 8, paddingHorizontal: 8, paddingVertical: 3 },
-    statusPillText: { fontSize: 11, fontFamily: Fonts.sansBold},
+    statusPillText: { fontSize: 12, fontFamily: Fonts.sansBold},
     cardNotes: { fontFamily: Fonts.sans, fontSize: 13, color: colors.textSecondary },
     actions: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
     action: {

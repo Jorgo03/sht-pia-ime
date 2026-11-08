@@ -691,7 +691,7 @@ export default function ProfileScreen() {
                 style={styles.menuRow}
                 onPress={() => router.navigate('/messages' as Href)}
                 activeOpacity={0.7}>
-                <MaterialIcons name="search" size={20} color={colors.textPrimary} />
+                <MaterialIcons name="chat-bubble-outline" size={20} color={colors.textPrimary} />
                 <Text style={styles.menuRowText}>{t('common.messages')}</Text>
                 {unreadMessages > 0 && (
                   <View style={styles.menuBadge}>
@@ -930,7 +930,7 @@ export default function ProfileScreen() {
                   <MaterialIcons
                     name="person"
                     size={16}
-                    color={role === 'buyer' ? '#fff' : 'rgba(255,255,255,0.5)'}
+                    color={role === 'buyer' ? '#fff' : 'rgba(255,255,255,0.85)'}
                   />
                   <Text style={[styles.roleBtnText, role === 'buyer' && styles.roleBtnTextActive]}>
                     {t('auth.roleClient')}
@@ -944,7 +944,7 @@ export default function ProfileScreen() {
                   <MaterialIcons
                     name="business-center"
                     size={16}
-                    color={role === 'agent' ? '#fff' : 'rgba(255,255,255,0.5)'}
+                    color={role === 'agent' ? '#fff' : 'rgba(255,255,255,0.85)'}
                   />
                   <Text style={[styles.roleBtnText, role === 'agent' && styles.roleBtnTextActive]}>
                     {t('auth.roleAgent')}
@@ -958,11 +958,11 @@ export default function ProfileScreen() {
                   <Text style={styles.otpTitle} accessibilityRole="header">{t('auth.forgotTitle')}</Text>
                   <Text style={styles.otpSubtitle}>{t('auth.forgotSubtitle')}</Text>
                   <View style={styles.fieldRow}>
-                    <MaterialIcons name="mail-outline" size={18} color="rgba(255,255,255,0.35)" style={styles.fieldIcon} />
+                    <MaterialIcons name="mail-outline" size={18} color="rgba(255,255,255,0.8)" style={styles.fieldIcon} />
                     <TextInput
                       style={styles.fieldInput}
                       placeholder={t('auth.email')}
-                      placeholderTextColor="rgba(255,255,255,0.35)"
+                      placeholderTextColor="rgba(255,255,255,0.8)"
                       value={email}
                       onChangeText={setEmail}
                       autoCapitalize="none"
@@ -1024,11 +1024,11 @@ export default function ProfileScreen() {
                   <Text style={styles.otpSubtitle}>{t('auth.recoverySubtitle')}</Text>
 
                   <View style={styles.fieldRow}>
-                    <MaterialIcons name="lock-outline" size={18} color="rgba(255,255,255,0.35)" style={styles.fieldIcon} />
+                    <MaterialIcons name="lock-outline" size={18} color="rgba(255,255,255,0.8)" style={styles.fieldIcon} />
                     <TextInput
                       style={styles.fieldInput}
                       placeholder={t('auth.newPassword')}
-                      placeholderTextColor="rgba(255,255,255,0.35)"
+                      placeholderTextColor="rgba(255,255,255,0.8)"
                       value={newPassword}
                       onChangeText={setNewPassword}
                       secureTextEntry={!showPassword}
@@ -1046,17 +1046,17 @@ export default function ProfileScreen() {
                       <MaterialIcons
                         name={showPassword ? 'visibility-off' : 'visibility'}
                         size={18}
-                        color="rgba(255,255,255,0.35)"
+                        color="rgba(255,255,255,0.8)"
                       />
                     </TouchableOpacity>
                   </View>
 
                   <View style={styles.fieldRow}>
-                    <MaterialIcons name="lock-outline" size={18} color="rgba(255,255,255,0.35)" style={styles.fieldIcon} />
+                    <MaterialIcons name="lock-outline" size={18} color="rgba(255,255,255,0.8)" style={styles.fieldIcon} />
                     <TextInput
                       style={styles.fieldInput}
                       placeholder={t('auth.confirmPassword')}
-                      placeholderTextColor="rgba(255,255,255,0.35)"
+                      placeholderTextColor="rgba(255,255,255,0.8)"
                       value={confirmNewPassword}
                       onChangeText={setConfirmNewPassword}
                       secureTextEntry={!showPassword}
@@ -1171,11 +1171,11 @@ export default function ProfileScreen() {
                 <>
               {isSignUp && (
                 <View style={styles.fieldRow}>
-                  <MaterialIcons name="person-outline" size={18} color="rgba(255,255,255,0.35)" style={styles.fieldIcon} />
+                  <MaterialIcons name="person-outline" size={18} color="rgba(255,255,255,0.8)" style={styles.fieldIcon} />
                   <TextInput
                     style={styles.fieldInput}
                     placeholder={t('auth.fullName')}
-                    placeholderTextColor="rgba(255,255,255,0.35)"
+                    placeholderTextColor="rgba(255,255,255,0.8)"
                     value={fullName}
                     onChangeText={setFullName}
                     autoCapitalize="words"
@@ -1187,11 +1187,11 @@ export default function ProfileScreen() {
               )}
 
               <View style={styles.fieldRow}>
-                <MaterialIcons name="mail-outline" size={18} color="rgba(255,255,255,0.35)" style={styles.fieldIcon} />
+                <MaterialIcons name="mail-outline" size={18} color="rgba(255,255,255,0.8)" style={styles.fieldIcon} />
                 <TextInput
                   style={styles.fieldInput}
                   placeholder={t('auth.email')}
-                  placeholderTextColor="rgba(255,255,255,0.35)"
+                  placeholderTextColor="rgba(255,255,255,0.8)"
                   value={email}
                   onChangeText={setEmail}
                   autoCapitalize="none"
@@ -1204,11 +1204,11 @@ export default function ProfileScreen() {
               </View>
 
               <View style={styles.fieldRow}>
-                <MaterialIcons name="lock-outline" size={18} color="rgba(255,255,255,0.35)" style={styles.fieldIcon} />
+                <MaterialIcons name="lock-outline" size={18} color="rgba(255,255,255,0.8)" style={styles.fieldIcon} />
                 <TextInput
                   style={styles.fieldInput}
                   placeholder={t('auth.password')}
-                  placeholderTextColor="rgba(255,255,255,0.35)"
+                  placeholderTextColor="rgba(255,255,255,0.8)"
                   value={password}
                   onChangeText={setPassword}
                   secureTextEntry={!showPassword}
@@ -1226,18 +1226,18 @@ export default function ProfileScreen() {
                   <MaterialIcons
                     name={showPassword ? 'visibility-off' : 'visibility'}
                     size={18}
-                    color="rgba(255,255,255,0.35)"
+                    color="rgba(255,255,255,0.8)"
                   />
                 </TouchableOpacity>
               </View>
 
               {isSignUp && (
                 <View style={styles.fieldRow}>
-                  <MaterialIcons name="lock-outline" size={18} color="rgba(255,255,255,0.35)" style={styles.fieldIcon} />
+                  <MaterialIcons name="lock-outline" size={18} color="rgba(255,255,255,0.8)" style={styles.fieldIcon} />
                   <TextInput
                     style={styles.fieldInput}
                     placeholder={t('auth.confirmPassword')}
-                    placeholderTextColor="rgba(255,255,255,0.35)"
+                    placeholderTextColor="rgba(255,255,255,0.8)"
                     value={confirmPassword}
                     onChangeText={setConfirmPassword}
                     secureTextEntry={!showPassword}
@@ -1251,11 +1251,11 @@ export default function ProfileScreen() {
 
               {isSignUp && role === 'agent' && (
                 <View style={styles.fieldRow}>
-                  <MaterialIcons name="business" size={18} color="rgba(255,255,255,0.35)" style={styles.fieldIcon} />
+                  <MaterialIcons name="business" size={18} color="rgba(255,255,255,0.8)" style={styles.fieldIcon} />
                   <TextInput
                     style={styles.fieldInput}
                     placeholder={t('auth.officeName')}
-                    placeholderTextColor="rgba(255,255,255,0.35)"
+                    placeholderTextColor="rgba(255,255,255,0.8)"
                     value={agencyName}
                     onChangeText={setAgencyName}
                     autoCapitalize="words"
@@ -1307,6 +1307,23 @@ export default function ProfileScreen() {
                   </Text>
                   <MaterialIcons name="arrow-forward" size={18} color="#fff" />
                 </LinearGradient>
+              </TouchableOpacity>
+
+              {/* Right under the main button: a new person must not have to
+                  scroll past the other sign-in options to find how to join. */}
+              <TouchableOpacity
+                accessibilityRole="button"
+                onPress={() => {
+                  setIsSignUp(!isSignUp);
+                  setFormError(null);
+                }}
+                style={styles.linkButton}>
+                <Text style={styles.linkButtonText}>
+                  {isSignUp ? t('auth.hasAccount') : t('auth.noAccount')}{' '}
+                  <Text style={styles.linkButtonTextStrong}>
+                    {isSignUp ? t('common.signIn') : t('common.signUp')}
+                  </Text>
+                </Text>
               </TouchableOpacity>
 
               <View style={styles.divider}>
@@ -1401,21 +1418,6 @@ export default function ProfileScreen() {
                 </TouchableOpacity>
               </View>
 
-              <TouchableOpacity
-                accessibilityRole="button"
-                onPress={() => {
-                  setIsSignUp(!isSignUp);
-                  setFormError(null);
-                }}
-                style={styles.linkButton}>
-                <Text style={styles.linkButtonText}>
-                  {isSignUp ? t('auth.hasAccount') : t('auth.noAccount')}{' '}
-                  <Text style={styles.linkButtonTextStrong}>
-                    {isSignUp ? t('common.signIn') : t('common.signUp')}
-                  </Text>
-                </Text>
-              </TouchableOpacity>
-
               {/* Reachable before signing up too: this is where people
                   decide whether to hand over their details. */}
               <View style={[styles.legalRow, styles.legalRowAuth]}>
@@ -1498,7 +1500,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   roleBadgeText: {
     fontFamily: Fonts?.monoMedium,
-    fontSize: 11,
+    fontSize: 12,
     letterSpacing: 1,
     textTransform: 'uppercase',
     color: colors.accentText,
@@ -1536,7 +1538,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   statLabel: {
     fontFamily: Fonts?.mono,
-    fontSize: 11,
+    fontSize: 12,
     letterSpacing: 1,
     textTransform: 'uppercase',
     color: colors.textSecondary,
@@ -1575,7 +1577,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   menuBadgeText: {
     fontFamily: Fonts?.monoMedium,
-    fontSize: 11,
+    fontSize: 12,
     color: '#fff',
   },
   menuDivider: {
@@ -1645,7 +1647,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     paddingBottom: 0,
   },
   legalLinkAuth: {
-    color: 'rgba(255,255,255,0.5)',
+    color: 'rgba(255,255,255,0.9)',
   },
 
   // ─── Auth (signed-out) screen — matches web's .auth-screen family ───
@@ -1673,7 +1675,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   otpSubtitle: {
     fontFamily: Fonts?.sans,
     fontSize: 13,
-    color: 'rgba(255,255,255,0.55)',
+    color: 'rgba(255,255,255,0.9)',
     textAlign: 'center',
   },
   otpEmail: {
@@ -1738,10 +1740,10 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   kickerOnDark: {
     fontFamily: Fonts?.monoMedium,
-    fontSize: 11,
+    fontSize: 12,
     letterSpacing: 1.5,
     textTransform: 'uppercase',
-    color: 'rgba(255,255,255,0.6)',
+    color: 'rgba(255,255,255,0.9)',
   },
   // Prototype's hero: serif 48px / line-height 0.98 / letter-spacing -0.03em.
   authHeadline: {
@@ -1788,7 +1790,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   roleBtnText: {
     fontSize: 14,
     fontFamily: Fonts.sansSemiBold,
-    color: 'rgba(255,255,255,0.5)',
+    color: 'rgba(255,255,255,0.9)',
   },
   roleBtnTextActive: {
     color: '#fff',
@@ -1846,7 +1848,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   dividerText: {
     fontFamily: Fonts.sans,
     fontSize: 12,
-    color: 'rgba(255,255,255,0.4)',
+    color: 'rgba(255,255,255,0.9)',
   },
   // Prototype's role-context / "Forgot?" row: 12.5px, space-between, 4px
   // inset so it lines up with the fields rather than the card edge.
@@ -1862,13 +1864,14 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     // "Forgot?" off the card.
     flexShrink: 1,
     fontFamily: Fonts?.sans,
-    fontSize: 12.5,
-    color: 'rgba(255,235,210,0.7)',
+    fontSize: 13,
+    color: 'rgba(255,235,210,0.95)',
   },
   accessForgot: {
     fontFamily: Fonts?.sansBold,
-    fontSize: 12.5,
-    color: colors.accentLight,
+    fontSize: 13,
+    color: '#fff',
+    textDecorationLine: 'underline',
   },
 
   // Web's .social-buttons: `grid-template-columns: 1fr 1fr; gap: 8px`.
@@ -1921,15 +1924,18 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   linkButtonText: {
     fontFamily: Fonts.sans,
     fontSize: 13,
-    color: 'rgba(255,255,255,0.5)',
+    color: 'rgba(255,255,255,0.9)',
   },
+  // "Sign up" is how a new person gets in: white and underlined, because
+  // orange on this gradient's orange end could hardly be read.
   linkButtonTextStrong: {
-    color: colors.accentLight,
-    fontFamily: Fonts.sansSemiBold,
+    color: '#fff',
+    fontFamily: Fonts.sansBold,
+    textDecorationLine: 'underline',
   },
   // Resend link while the 30s lock is counting down.
   linkButtonTextMuted: {
-    color: 'rgba(255,255,255,0.3)',
+    color: 'rgba(255,255,255,0.7)',
   },
 
 });

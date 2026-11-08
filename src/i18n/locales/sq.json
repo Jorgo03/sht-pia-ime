@@ -28,7 +28,8 @@
     "retry": "Provo përsëri",
     "done": "U krye",
     "language": "Gjuha",
-    "closeKeyboard": "Mbyll tastierën"
+    "closeKeyboard": "Mbyll tastierën",
+    "addShort": "Shto"
   },
   "auth": {
     "roleClient": "Klient",
@@ -46,7 +47,7 @@
     "forgotPassword": "Ke harruar fjalëkalimin?",
     "accessClient": "Akses për blerës dhe qiramarrës",
     "accessAgent": "Akses në portalin e agjentit",
-    "forgotShort": "Harruat?",
+    "forgotShort": "Harrove fjalëkalimin?",
     "resetSent": "Nëse ka një llogari me këtë email, i dërguam një kod për të rivendosur fjalëkalimin.",
     "recoveryTitle": "Vendos një fjalëkalim të ri",
     "recoverySubtitle": "Zgjidh një fjalëkalim të ri për llogarinë tënde.",
@@ -251,7 +252,7 @@
       "headlinePre": "Mesazhet"
     },
     "agent": {
-      "kicker": "{{leads}} lead aktive · {{newToday}} të reja sot",
+      "kicker": "{{leads}} klientë potencialë aktivë · {{newToday}} të rinj sot",
       "headlineEm": "kërkesat",
       "headlinePre": "Klientë &"
     },
@@ -372,7 +373,7 @@
     "signInFirst": "Hyni për të vazhduar",
     "searchSaved": "Kërkimi u ruajt",
     "wantedSaved": "Kërkesa u postua",
-    "leadSaved": "Lead u shtua",
+    "leadSaved": "Klienti potencial u shtua",
     "searchName": "Emri i kërkimit",
     "maxPrice": "Çmimi maks (€)",
     "minBedrooms": "Min dhoma gjumi",
@@ -403,7 +404,7 @@
         "sub": "Shto pronë në portofolin tënd"
       },
       "lead": {
-        "title": "Lead i ri",
+        "title": "Klient potencial i ri",
         "sub": "Gjurmo një klient potencial"
       },
       "viewing": {
@@ -523,7 +524,11 @@
     "removeVideo": "Hiq videon",
     "confirmSoldTitle": "Ta shënoni si të shitur?",
     "confirmRentedTitle": "Ta shënoni si të dhënë me qira?",
-    "confirmClosedHint": "Shënojeni vetëm kur marrëveshja është përfunduar. Do të llogaritet në raportin tuaj; nëse e zhbëni brenda 7 ditëve, nuk llogaritet."
+    "confirmClosedHint": "Shënojeni vetëm kur marrëveshja është përfunduar. Do të llogaritet në raportin tuaj; nëse e zhbëni brenda 7 ditëve, nuk llogaritet.",
+    "actionView": "Shiko",
+    "actionStats": "Statistika",
+    "actionSold": "Shitur",
+    "actionRented": "Me qira"
   },
   "dashboard": {
     "title": "Paneli i pronës",
@@ -645,7 +650,9 @@
     "alertsHint": "Përputhjet e reja shfaqen këtu kur hapni këtë faqe. Njoftimet me email nuk janë ende në dispozicion.",
     "emailOn": "Më dërgo email për përputhjet e reja",
     "emailOff": "Mos më dërgo më email",
-    "emailHint": "Përputhjet e reja shfaqen këtu kur hap këtë faqe. Ndiz email-in për t'i marrë edhe me email; çdo email ka një lidhje për ta ndalur."
+    "emailHint": "Përputhjet e reja shfaqen këtu kur hap këtë faqe. Ndiz email-in për t'i marrë edhe me email; çdo email ka një lidhje për ta ndalur.",
+    "confirmDeleteSearch": "Je i sigurt që dëshiron ta fshish këtë kërkim?",
+    "confirmDeleteWanted": "Je i sigurt që dëshiron ta fshish këtë kërkesë?"
   },
   "bell": {
     "label": "Njoftimet",

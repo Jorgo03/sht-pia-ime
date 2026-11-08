@@ -28,7 +28,8 @@
     "retry": "Erneut versuchen",
     "done": "Fertig",
     "language": "Sprache",
-    "closeKeyboard": "Schließt die Tastatur"
+    "closeKeyboard": "Schließt die Tastatur",
+    "addShort": "Neu"
   },
   "auth": {
     "roleClient": "Kunde",
@@ -46,7 +47,7 @@
     "forgotPassword": "Passwort vergessen?",
     "accessClient": "Zugang für Käufer & Mieter",
     "accessAgent": "Zugang zum Makler-Portal",
-    "forgotShort": "Vergessen?",
+    "forgotShort": "Passwort vergessen?",
     "resetSent": "Falls ein Konto mit dieser E-Mail existiert, haben wir einen Code zum Zurücksetzen gesendet.",
     "recoveryTitle": "Neues Passwort festlegen",
     "recoverySubtitle": "Wähle ein neues Passwort für dein Konto.",
@@ -471,7 +472,11 @@
     "removeVideo": "Video entfernen",
     "confirmSoldTitle": "Als verkauft markieren?",
     "confirmRentedTitle": "Als vermietet markieren?",
-    "confirmClosedHint": "Erst tun, wenn das Geschäft abgeschlossen ist. Es zählt in Ihrem Bericht; innerhalb von 7 Tagen rückgängig gemacht, zählt es nicht."
+    "confirmClosedHint": "Erst tun, wenn das Geschäft abgeschlossen ist. Es zählt in Ihrem Bericht; innerhalb von 7 Tagen rückgängig gemacht, zählt es nicht.",
+    "actionView": "Ansehen",
+    "actionStats": "Statistik",
+    "actionSold": "Verkauft",
+    "actionRented": "Vermietet"
   },
   "dashboard": {
     "title": "Immobilien-Dashboard",
@@ -645,7 +650,9 @@
     "alertsHint": "Neue Treffer erscheinen hier, wenn Sie diese Seite öffnen. E-Mail-Benachrichtigungen gibt es noch nicht.",
     "emailOn": "Neue Treffer per E-Mail",
     "emailOff": "Keine E-Mails mehr",
-    "emailHint": "Neue Treffer erscheinen hier, wenn du diese Seite öffnest. Schalte E-Mail ein, um sie auch per E-Mail zu bekommen; jede E-Mail hat einen Abmeldelink."
+    "emailHint": "Neue Treffer erscheinen hier, wenn du diese Seite öffnest. Schalte E-Mail ein, um sie auch per E-Mail zu bekommen; jede E-Mail hat einen Abmeldelink.",
+    "confirmDeleteSearch": "Diese gespeicherte Suche löschen?",
+    "confirmDeleteWanted": "Diese Anfrage löschen?"
   },
   "bell": {
     "label": "Benachrichtigungen",

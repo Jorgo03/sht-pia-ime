@@ -380,7 +380,7 @@ const createStyles = (
     },
     subtitle: {
       fontFamily: Fonts?.sans,
-      fontSize: 11,
+      fontSize: 12,
       color: colors.textSecondary,
     },
     scroll: {
@@ -418,7 +418,7 @@ const createStyles = (
     },
     contactTitle: {
       fontFamily: Fonts?.mono,
-      fontSize: 11,
+      fontSize: 12,
       letterSpacing: 0.5,
       color: colors.textSecondary,
     },
@@ -521,7 +521,7 @@ const createStyles = (
       paddingBottom: 10,
       paddingTop: 2,
       fontFamily: Fonts?.sans,
-      fontSize: 10,
+      fontSize: 12,
       color: colors.textFaint,
       textAlign: 'center',
     },

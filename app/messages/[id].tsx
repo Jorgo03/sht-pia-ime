@@ -599,7 +599,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   bubbleTime: {
     fontFamily: Fonts.sans,
-    fontSize: 10,
+    fontSize: 12,
     color: colors.textSecondary,
     marginTop: 4,
   },

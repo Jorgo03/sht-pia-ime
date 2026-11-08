@@ -28,7 +28,8 @@
     "retry": "Réessayer",
     "done": "OK",
     "language": "Langue",
-    "closeKeyboard": "Ferme le clavier"
+    "closeKeyboard": "Ferme le clavier",
+    "addShort": "Ajouter"
   },
   "auth": {
     "roleClient": "Client",
@@ -46,7 +47,7 @@
     "forgotPassword": "Mot de passe oublié ?",
     "accessClient": "Accès acheteurs et locataires",
     "accessAgent": "Accès au portail agent",
-    "forgotShort": "Oublié ?",
+    "forgotShort": "Mot de passe oublié ?",
     "resetSent": "Si un compte existe pour cet e-mail, nous lui avons envoyé un code pour réinitialiser le mot de passe.",
     "recoveryTitle": "Définir un nouveau mot de passe",
     "recoverySubtitle": "Choisissez un nouveau mot de passe pour votre compte.",
@@ -480,7 +481,11 @@
     "removeVideo": "Retirer la vidéo",
     "confirmSoldTitle": "Marquer comme vendu ?",
     "confirmRentedTitle": "Marquer comme loué ?",
-    "confirmClosedHint": "À faire seulement une fois la transaction conclue. Cela compte dans votre rapport ; annulé sous 7 jours, cela ne compte pas."
+    "confirmClosedHint": "À faire seulement une fois la transaction conclue. Cela compte dans votre rapport ; annulé sous 7 jours, cela ne compte pas.",
+    "actionView": "Voir",
+    "actionStats": "Statistiques",
+    "actionSold": "Vendu",
+    "actionRented": "Loué"
   },
   "dashboard": {
     "title": "Tableau de bord du bien",
@@ -654,7 +659,9 @@
     "alertsHint": "Les nouveaux résultats s'affichent ici quand vous ouvrez cette page. Les alertes par e-mail ne sont pas encore disponibles.",
     "emailOn": "M'envoyer les nouveaux résultats par e-mail",
     "emailOff": "Ne plus m'envoyer d'e-mails",
-    "emailHint": "Les nouveaux résultats s'affichent ici quand vous ouvrez cette page. Activez l'e-mail pour les recevoir aussi par e-mail ; chaque e-mail contient un lien de désinscription."
+    "emailHint": "Les nouveaux résultats s'affichent ici quand vous ouvrez cette page. Activez l'e-mail pour les recevoir aussi par e-mail ; chaque e-mail contient un lien de désinscription.",
+    "confirmDeleteSearch": "Supprimer cette recherche enregistrée ?",
+    "confirmDeleteWanted": "Supprimer cette demande ?"
   },
   "bell": {
     "label": "Notifications",

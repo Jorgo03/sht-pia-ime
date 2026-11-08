@@ -162,7 +162,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   dragBadgeText: {
     fontFamily: Fonts.sansSemiBold,
-    fontSize: 11,
+    fontSize: 12,
     color: colors.textPrimary,
   },
   instruction: {

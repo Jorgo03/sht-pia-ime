@@ -400,7 +400,7 @@ const createStyles = (colors: AtticoPalette) =>
     retry: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 8, minHeight: 36, alignSelf: 'flex-start' },
     retryText: { fontFamily: Fonts.sansSemiBold, fontSize: 14, color: colors.accentText },
     starters: { gap: Spacing.sm, marginTop: Spacing.xs },
-    startersTitle: { fontFamily: Fonts.monoMedium, fontSize: 11, letterSpacing: 1.5, textTransform: 'uppercase', color: colors.textSecondary },
+    startersTitle: { fontFamily: Fonts.monoMedium, fontSize: 12, letterSpacing: 1.5, textTransform: 'uppercase', color: colors.textSecondary },
     starter: {
       flexDirection: 'row',
       alignItems: 'center',
@@ -415,7 +415,7 @@ const createStyles = (colors: AtticoPalette) =>
     starterText: { flex: 1, fontFamily: Fonts.sansSemiBold, fontSize: 14, color: colors.textPrimary },
     answer: { gap: Spacing.sm },
     cards: { gap: Spacing.sm },
-    cardsLabel: { fontFamily: Fonts.monoMedium, fontSize: 11, letterSpacing: 1.5, textTransform: 'uppercase', color: colors.textSecondary },
+    cardsLabel: { fontFamily: Fonts.monoMedium, fontSize: 12, letterSpacing: 1.5, textTransform: 'uppercase', color: colors.textSecondary },
     screens: { flexDirection: 'row', flexWrap: 'wrap', gap: Spacing.sm },
     screenButton: {
       flexDirection: 'row',
@@ -460,7 +460,7 @@ const createStyles = (colors: AtticoPalette) =>
       paddingTop: 6,
       paddingBottom: 8,
       fontFamily: Fonts.sans,
-      fontSize: 11,
+      fontSize: 12,
       lineHeight: 15,
       color: colors.textFaint,
       textAlign: 'center',

@@ -48,7 +48,7 @@ const createStyles = (colors: AtticoPalette) =>
     kicker: {
       flexShrink: 1,
       fontFamily: Fonts?.monoMedium,
-      fontSize: 11,
+      fontSize: 12,
       letterSpacing: 1.5,
       textTransform: 'uppercase',
       color: colors.textSecondary,

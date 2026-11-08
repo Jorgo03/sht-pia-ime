@@ -550,7 +550,7 @@ const createStyles = (colors: AtticoPalette, sheetHeight: number = 0) => StyleSh
   // Mono's own regular weight), not a bolded override.
   sectionLabel: {
     fontFamily: Fonts?.mono,
-    fontSize: 11,
+    fontSize: 12,
     letterSpacing: 1,
     color: colors.textSecondary,
     marginBottom: 10,

@@ -207,7 +207,7 @@ const createStyles = (colors: AtticoPalette) =>
     },
     badgeText: {
       fontFamily: Fonts?.sansBold,
-      fontSize: 10,
+      fontSize: 12,
       letterSpacing: 0.3,
     },
     badgeTextSale: {
@@ -229,7 +229,7 @@ const createStyles = (colors: AtticoPalette) =>
     eyebrow: {
       flex: 1,
       fontFamily: Fonts?.mono,
-      fontSize: 10,
+      fontSize: 12,
       letterSpacing: 0.8,
       textTransform: 'uppercase',
       color: colors.textSecondary,
@@ -290,7 +290,7 @@ const createStyles = (colors: AtticoPalette) =>
     },
     perSqm: {
       fontFamily: Fonts?.mono,
-      fontSize: 10,
+      fontSize: 12,
       color: colors.textSecondary,
     },
   });
