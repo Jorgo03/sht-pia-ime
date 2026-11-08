@@ -101,8 +101,6 @@
     "officeName": "Nazwa biura"
   },
   "home": {
-    "brandHeadline": "Właściwy dom",
-    "brandHeadlineAccent": "zaczyna się tutaj.",
     "greetingMorning": "Dzień dobry",
     "greetingAfternoon": "Dobre popołudnie",
     "greetingEvening": "Dobry wieczór",
@@ -811,7 +809,8 @@
         "title": "Witamy",
         "body": "Twoje konto jest gotowe. Szukaj domów lub dodaj ogłoszenie."
       }
-    }
+    },
+    "settings": "Ustawienia powiadomień"
   },
   "pricing": {
     "title": "Plany i ceny",

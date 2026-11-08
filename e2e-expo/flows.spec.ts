@@ -76,7 +76,7 @@ test.describe('signed in', () => {
     await page.goto('/profile');
     await ready(page);
     await expect(page.getByRole('heading', { name: t('common.profile'), level: 1 })).toBeVisible();
-    for (const label of [t('profile.edit.title'), t('notifications.title'), t('listing.myListings')]) {
+    for (const label of [t('profile.edit.title'), t('notifications.settings'), t('listing.myListings')]) {
       await expect(page.getByRole('button', { name: label })).toBeVisible();
     }
     await page.getByRole('button', { name: t('common.signOut') }).first().click();
@@ -271,6 +271,49 @@ test.describe('Published by', () => {
   });
 });
 
+test.describe('headline typewriter', () => {
+  const first = `${t('home.heroPhrases.0.lead')} ${t('home.heroPhrases.0.accent')}`;
+  const second = t('home.heroPhrases.1.lead');
+
+  test.describe('with motion', () => {
+    test.use({ contextOptions: { reducedMotion: 'no-preference' } });
+
+    test('X85 types the next phrase, never moves the search bar, and follows the language', async ({ page }) => {
+      await page.goto('/');
+      await ready(page);
+      const heading = page.getByRole('heading', { level: 1 });
+      await expect(heading).toContainText(first.slice(0, 12));
+      const search = page.getByText(t('home.searchPlaceholder')).first();
+      const startY = (await search.boundingBox())!.y;
+      const ys = new Set<number>([Math.round(startY)]);
+      await expect
+        .poll(async () => {
+          ys.add(Math.round((await search.boundingBox())!.y));
+          return (await heading.textContent()) ?? '';
+        }, { timeout: 15_000, intervals: [120] })
+        .toContain(second);
+      expect([...ys]).toEqual([Math.round(startY)]);
+      // A cursor while animating, in the same run of text.
+      await expect(heading).toContainText('|');
+
+      await page.getByRole('button', { name: t('common.language') }).click();
+      await page.getByRole('button', { name: /Русский/ }).click();
+      await expect
+        .poll(async () => /[\u0400-\u04FF]/.test((await heading.textContent()) ?? ''), { timeout: 15_000, intervals: [150] })
+        .toBe(true);
+    });
+  });
+
+  test('X86 with reduced motion it is one still phrase and no cursor', async ({ page }) => {
+    await page.goto('/');
+    await ready(page);
+    const heading = page.getByRole('heading', { level: 1 });
+    await expect(heading).toHaveText(first);
+    await page.waitForTimeout(3500);
+    await expect(heading).toHaveText(first);
+  });
+});
+
 test.describe('notification centre', () => {
   test.use({ signedIn: true, allowConsoleErrors: [/status of 403/] });
   const now = () => new Date().toISOString();
@@ -440,7 +483,7 @@ test.describe('time of day', () => {
       await page.goto('/');
       await ready(page);
       const heading = page.getByRole('heading', { level: 1 });
-      await expect(heading).toHaveText(`${t('home.brandHeadline')} ${t('home.brandHeadlineAccent')}`);
+      await expect(heading).toHaveText(`${t('home.heroPhrases.0.lead')} ${t('home.heroPhrases.0.accent')}`);
       for (const key of ['home.greetingMorning', 'home.greetingAfternoon', 'home.greetingEvening']) {
         await expect(page.getByText(t(key))).toHaveCount(0);
       }
@@ -478,7 +521,7 @@ async function preferencesBackend(page: Page, initial: { messages: boolean; view
 }
 
 async function openNotifications(page: Page) {
-  await page.getByRole('button', { name: t('notifications.title') }).click();
+  await page.getByRole('button', { name: t('notifications.settings') }).click();
   await expect(page.getByRole('heading', { name: t('notifications.title') })).toBeVisible();
 }
 
@@ -1155,7 +1198,7 @@ test.describe('brand headline', () => {
         await page.goto('/');
         await ready(page);
         const heading = page.getByRole('heading', { level: 1 });
-        await expect(heading).toHaveText(`${t('home.brandHeadline')} ${t('home.brandHeadlineAccent')}`);
+        await expect(heading).toHaveText(`${t('home.heroPhrases.0.lead')} ${t('home.heroPhrases.0.accent')}`);
         await expect(heading).not.toContainText(SIGNED_IN_USER.user_metadata.full_name.split(' ')[0]);
         const m = await heading.evaluate((el, accent) => {
           const span = Array.from(el.querySelectorAll('span')).find((s) => s.textContent?.trim() === accent) as HTMLElement;
@@ -1171,7 +1214,7 @@ test.describe('brand headline', () => {
             accentColor: span ? rgb(getComputedStyle(span).color) : null,
             accentFont: span ? getComputedStyle(span).fontFamily : null,
           };
-        }, t('home.brandHeadlineAccent'));
+        }, t('home.heroPhrases.0.accent'));
         await info.attach('headline.json', { body: JSON.stringify(m, null, 2), contentType: 'application/json' });
         expect(m.pageScrolls).toBe(false);
         expect(m.overflows).toBe(false);

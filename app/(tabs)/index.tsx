@@ -110,14 +110,11 @@ export default function HomeScreen() {
     router.push('/(tabs)/explore' as Href);
   };
 
-  // A fixed brand line, not a greeting: the same for every visitor at every
-  // hour, so the pre-rendered web page and the browser always agree. Two keys
-  // so each language decides where its accent ending starts.
+  // Brand lines, not a greeting: the same for every visitor at every hour, so
+  // the pre-rendered web page and the browser always agree.
   const searchHeader = (
     <>
       <SearchHeader
-        headline={t('home.brandHeadline')}
-        emphasis={t('home.brandHeadlineAccent')}
         onSearchPress={() => router.push('/(tabs)/explore' as Href)}
       />
       {AI_CHAT_ENABLED && <AssistantEntry />}

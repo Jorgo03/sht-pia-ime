@@ -101,8 +101,6 @@
     "officeName": "Name des Büros"
   },
   "home": {
-    "brandHeadline": "Das richtige Zuhause",
-    "brandHeadlineAccent": "beginnt hier.",
     "greetingMorning": "Guten Morgen",
     "greetingAfternoon": "Guten Tag",
     "greetingEvening": "Guten Abend",
@@ -793,7 +791,8 @@
         "title": "Willkommen",
         "body": "Dein Konto ist bereit. Suche Immobilien oder inseriere deine eigene."
       }
-    }
+    },
+    "settings": "Benachrichtigungseinstellungen"
   },
   "pricing": {
     "title": "Pläne und Preise",

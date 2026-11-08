@@ -27,6 +27,8 @@ export default defineConfig({
   use: {
     baseURL: `http://localhost:${PORT}`,
     trace: 'retain-on-failure',
+    // The headline animates otherwise, and tests read it. X85 turns it back on.
+    contextOptions: { reducedMotion: 'reduce' },
     screenshot: 'only-on-failure',
     launchOptions: process.env.PW_CHROMIUM_PATH ? { executablePath: process.env.PW_CHROMIUM_PATH } : {},
   },

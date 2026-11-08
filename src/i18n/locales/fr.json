@@ -101,8 +101,6 @@
     "officeName": "Nom du bureau"
   },
   "home": {
-    "brandHeadline": "La bonne maison",
-    "brandHeadlineAccent": "commence ici.",
     "greetingMorning": "Bonjour",
     "greetingAfternoon": "Bon après-midi",
     "greetingEvening": "Bonsoir",
@@ -802,7 +800,8 @@
         "title": "Bienvenue",
         "body": "Votre compte est prêt. Cherchez un bien ou publiez le vôtre."
       }
-    }
+    },
+    "settings": "Réglages des notifications"
   },
   "pricing": {
     "title": "Formules et prix",

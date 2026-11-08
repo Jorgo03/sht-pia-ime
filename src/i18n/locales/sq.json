@@ -101,8 +101,6 @@
     "officeName": "Emri i zyrës"
   },
   "home": {
-    "brandHeadline": "Shtëpia e duhur,",
-    "brandHeadlineAccent": "fillon këtu.",
     "greetingMorning": "Mirëmëngjes",
     "greetingAfternoon": "Mirëdita",
     "greetingEvening": "Mirëmbrëma",
@@ -793,7 +791,8 @@
         "title": "Mirë se erdhe",
         "body": "Llogaria jote është gati. Kërko pronat ose shto listimin tënd."
       }
-    }
+    },
+    "settings": "Cilësimet e njoftimeve"
   },
   "pricing": {
     "title": "Planet dhe çmimet",

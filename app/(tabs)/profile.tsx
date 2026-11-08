@@ -665,7 +665,7 @@ export default function ProfileScreen() {
                 onPress={() => setNotificationsOpen(true)}
                 activeOpacity={0.7}>
                 <MaterialIcons name="notifications-none" size={20} color={colors.textPrimary} />
-                <Text style={styles.menuRowText}>{t('notifications.title')}</Text>
+                <Text style={styles.menuRowText}>{t('notifications.settings')}</Text>
                 <MaterialIcons name="chevron-right" size={18} color={colors.textSecondary} />
               </TouchableOpacity>
               <View style={styles.menuDivider} />

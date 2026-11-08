@@ -101,8 +101,6 @@
     "officeName": "Nombre de la oficina"
   },
   "home": {
-    "brandHeadline": "La casa ideal",
-    "brandHeadlineAccent": "empieza aquí.",
     "greetingMorning": "Buenos días",
     "greetingAfternoon": "Buenas tardes",
     "greetingEvening": "Buenas noches",
@@ -802,7 +800,8 @@
         "title": "Bienvenido",
         "body": "Tu cuenta está lista. Busca viviendas o publica la tuya."
       }
-    }
+    },
+    "settings": "Ajustes de notificaciones"
   },
   "pricing": {
     "title": "Planes y precios",

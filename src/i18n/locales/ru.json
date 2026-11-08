@@ -101,8 +101,6 @@
     "officeName": "Название офиса"
   },
   "home": {
-    "brandHeadline": "Подходящий дом",
-    "brandHeadlineAccent": "начинается здесь.",
     "greetingMorning": "Доброе утро",
     "greetingAfternoon": "Добрый день",
     "greetingEvening": "Добрый вечер",
@@ -811,7 +809,8 @@
         "title": "Добро пожаловать",
         "body": "Ваш аккаунт готов. Ищите жильё или добавьте объявление."
       }
-    }
+    },
+    "settings": "Настройки уведомлений"
   },
   "pricing": {
     "title": "Тарифы и цены",

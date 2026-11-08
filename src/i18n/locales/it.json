@@ -101,8 +101,6 @@
     "officeName": "Nome dell'ufficio"
   },
   "home": {
-    "brandHeadline": "La casa giusta",
-    "brandHeadlineAccent": "inizia qui.",
     "greetingMorning": "Buongiorno",
     "greetingAfternoon": "Buon pomeriggio",
     "greetingEvening": "Buonasera",
@@ -802,7 +800,8 @@
         "title": "Benvenuto",
         "body": "Il tuo account è pronto. Cerca case o pubblica il tuo annuncio."
       }
-    }
+    },
+    "settings": "Impostazioni notifiche"
   },
   "pricing": {
     "title": "Piani e prezzi",

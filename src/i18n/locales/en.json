@@ -153,8 +153,6 @@
     "saveError": "Couldn't save. Please try again."
   },
   "home": {
-    "brandHeadline": "The right home",
-    "brandHeadlineAccent": "starts here.",
     "greetingMorning": "Good morning",
     "greetingAfternoon": "Good afternoon",
     "greetingEvening": "Good evening",
@@ -793,7 +791,8 @@
         "title": "Welcome",
         "body": "Your account is ready. Search homes or add your own listing."
       }
-    }
+    },
+    "settings": "Notification settings"
   },
   "pricing": {
     "title": "Plans and prices",

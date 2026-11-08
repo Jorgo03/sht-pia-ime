@@ -1,5 +1,5 @@
 import { useIsFocused } from 'expo-router';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useSyncExternalStore } from 'react';
 import { AppState, Platform, StyleSheet, Text, View, type LayoutChangeEvent, type TextStyle } from 'react-native';
 import { useReducedMotion } from 'react-native-reanimated';
 
@@ -13,6 +13,7 @@ import {
 } from '@/src/features/home/lib/typewriter';
 
 const BLINK_MS = 530;
+const noSubscribe = () => () => {};
 
 /**
  * The Home headline, typed and deleted phrase by phrase. Knows nothing about
@@ -41,7 +42,10 @@ export function HeroTypewriter({
 }) {
   const phrases = useMemo(() => preparePhrases(raw), [raw]);
   const reduceMotion = useReducedMotion();
-  const animated = !reduceMotion && phrases.length > 0;
+  // The pre-rendered page cannot know the visitor's motion setting, so its
+  // first draw is the still phrase on every device; the animation starts after.
+  const motionAllowed = useSyncExternalStore(noSubscribe, () => !reduceMotion, () => false);
+  const animated = motionAllowed && phrases.length > 0;
 
   const [state, setState] = useState<TypewriterState>(() =>
     Platform.OS === 'web'

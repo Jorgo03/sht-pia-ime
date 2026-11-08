@@ -3,34 +3,42 @@ import { useMemo } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
+import { HeroTypewriter } from '@/components/home/hero-typewriter';
 import { Fonts, type AtticoPalette } from '@/constants/theme';
 import { useTheme } from '@/contexts/theme-context';
 
 interface SearchHeaderProps {
-  headline: string;
-  /** Rendered in accent-orange italic, appended after `headline` (with a
-   *  space) — the brand headline's ending, e.g. "fillon këtu.". */
-  emphasis?: string;
   onSearchPress?: () => void;
 }
 
 /**
- * Home's header: the brand headline (web's screen-headline in
- * src/styles/globals.css; no kicker above it, the headline already says it),
+ * Home's header: the brand headline, typed phrase by phrase (HeroTypewriter;
+ * the words are in the translation files under home.heroPhrases), in web's
+ * screen-headline style (src/styles/globals.css; no kicker above it),
  * plus web's full-width tappable home-search-bar — not just a small icon
  * button, so the search entry point actually reads as a search field.
  */
-export function SearchHeader({ headline, emphasis, onSearchPress }: SearchHeaderProps) {
-  const { t } = useTranslation();
+export function SearchHeader({ onSearchPress }: SearchHeaderProps) {
+  const { t, i18n } = useTranslation();
+  const language = i18n.language;
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- the phrases change with the language
+  const phrases = useMemo(() => t('home.heroPhrases', { returnObjects: true }), [language]);
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
 
   return (
     <View style={styles.container}>
-      <Text style={styles.headline} accessibilityRole="header">
-        {headline}
-        {emphasis ? <Text style={styles.headlineEmphasis}> {emphasis}</Text> : null}
-      </Text>
+      <View style={styles.headlineWrap}>
+        {/* A new language starts cleanly rather than mid-phrase. */}
+        <HeroTypewriter
+          key={language}
+          phrases={phrases}
+          language={language}
+          textStyle={styles.headline}
+          accentStyle={styles.headlineEmphasis}
+          cursorColor={colors.accentText}
+        />
+      </View>
 
       <TouchableOpacity accessibilityRole="button" style={styles.searchBar} onPress={onSearchPress} activeOpacity={0.8}>
         <MaterialIcons name="search" size={18} color={colors.textSecondary} />
@@ -51,8 +59,10 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     paddingBottom: 4,
   },
   // Matches web's .screen-headline exactly (src/styles/globals.css).
+  headlineWrap: {
+    marginHorizontal: 20,
+  },
   headline: {
-    paddingHorizontal: 20,
     fontFamily: Fonts?.serif,
     fontSize: 30,
     lineHeight: 31.5,
