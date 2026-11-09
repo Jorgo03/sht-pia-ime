@@ -158,7 +158,7 @@ Catia.al's native app could not be used, so its scores are less certain. Your ph
 | Security | 5 | 7 | Catia reports outdated software. Yours has row-level security on all tables; leaked-password checks and Confirm email are off |
 | Accessibility | 3 | 7 | Yours has automated checks. One contrast issue is open, awaiting your decision |
 | Overall functionality | 7 | 7 | Catia is live and full. Yours is deeper but not yet launched |
-| **Total** | **76 / 130** | **95 / 130** | Yours is ahead on quality. Catia is ahead on what a buyer can find today |
+| **Total** | **72 / 130** | **95 / 130** | Yours is ahead on quality. Catia is ahead on what a buyer can find today |
 
 **You are stronger:** design, languages and translation, real-time chat, agent tools, wanted homes, accessibility, security foundations.
 
