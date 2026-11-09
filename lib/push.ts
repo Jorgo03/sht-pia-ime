@@ -143,7 +143,7 @@ export async function forgetDevice(): Promise<void> {
  */
 export function routeFromNotification(response: NotificationResponse | null): string | null {
   const url = response?.notification.request.content.data?.url;
-  return typeof url === 'string' && /^\/(messages\/[0-9a-f-]{36}|property\/[0-9a-f-]{36}|viewings|notifications)$/.test(url) ? url : null;
+  return typeof url === 'string' && /^\/(messages\/[0-9a-f-]{36}|property\/[0-9a-f-]{36}|viewings|notifications|saved-searches)$/.test(url) ? url : null;
 }
 
 /** The history row a tapped notification belongs to, to mark it read. */

@@ -22,6 +22,18 @@ const MORE = {
   ru: { inquiry: (n) => (n ? `Новый запрос о вашем объекте от ${n}` : 'Новый запрос о вашем объекте'), hidden: 'Ваше объявление скрыто для проверки', restored: 'Ваше объявление снова опубликовано', welcome: 'Добро пожаловать в Shtëpia.ime' },
 }
 
+// A saved search with new matches. Never the search's name: lock screens are public.
+const SEARCH = {
+  sq: { one: "Një pronë e re përputhet me kërkimin tënd", many: (n) => `${n} prona të reja përputhen me kërkimin tënd` },
+  en: { one: "A new home matches your saved search", many: (n) => `${n} new homes match your saved search` },
+  de: { one: "Ein neues Angebot passt zu deiner Suche", many: (n) => `${n} neue Angebote passen zu deiner Suche` },
+  it: { one: "Un nuovo immobile corrisponde alla tua ricerca", many: (n) => `${n} nuovi immobili corrispondono alla tua ricerca` },
+  es: { one: "Una vivienda nueva coincide con tu búsqueda", many: (n) => `${n} viviendas nuevas coinciden con tu búsqueda` },
+  fr: { one: "Un nouveau bien correspond à votre recherche", many: (n) => `${n} nouveaux biens correspondent à votre recherche` },
+  pl: { one: "Nowa oferta pasuje do Twojego wyszukiwania", many: (n) => `Nowe oferty pasujące do wyszukiwania: ${n}` },
+  ru: { one: "Новый объект подходит под ваш поиск", many: (n) => `Новых объектов по вашему поиску: ${n}` },
+}
+
 const STRINGS = {
   sq: { message: (n) => (n ? `Mesazh i ri nga ${n}` : 'Mesazh i ri'), requested: 'Kërkesë e re për vizitë', confirmed: 'Vizita juaj u konfirmua', declined: 'Vizita juaj u refuzua', cancelled: 'Një vizitë u anulua', updated: 'Një vizitë u përditësua' },
   en: { message: (n) => (n ? `New message from ${n}` : 'New message'), requested: 'New viewing request', confirmed: 'Your viewing was confirmed', declined: 'Your viewing was declined', cancelled: 'A viewing was cancelled', updated: 'A viewing was updated' },
@@ -50,6 +62,15 @@ export function buildPush({ kind, data, lang, senderName }) {
   }
   if (kind === 'listing_hidden' || kind === 'listing_restored') {
     return { title: 'Shtëpia.ime', body: kind === 'listing_hidden' ? m.hidden : m.restored, url: `/property/${data.property_id}` }
+  }
+  if (kind === 'saved_search') {
+    const copy = SEARCH[lang] ?? SEARCH.en
+    const count = Number(data?.count) || 1
+    return {
+      title: 'Shtëpia.ime',
+      body: count > 1 ? copy.many(count) : copy.one,
+      url: count === 1 && data?.property_id ? `/property/${data.property_id}` : '/saved-searches',
+    }
   }
   if (kind === 'welcome') return { title: 'Shtëpia.ime', body: m.welcome, url: '/notifications' }
   // The people sending announcements wrote these words for everyone to read.
@@ -103,5 +124,5 @@ export function readTickets(tickets, sentTokens) {
 
 /** Only routes the app knows; anything else opens the home screen. */
 export function safeRoute(url) {
-  return typeof url === 'string' && /^\/(messages\/[0-9a-f-]{36}|property\/[0-9a-f-]{36}|viewings|notifications)$/.test(url) ? url : '/'
+  return typeof url === 'string' && /^\/(messages\/[0-9a-f-]{36}|property\/[0-9a-f-]{36}|viewings|notifications|saved-searches)$/.test(url) ? url : '/'
 }

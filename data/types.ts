@@ -31,6 +31,8 @@ export interface Property {
     | null;
   listing_type: 'sale' | 'rent' | 'daily_rent';
   image_urls: string[];
+  /** The tour an agent uploaded; only the listing page reads it. */
+  video_url?: string | null;
   features?: string[] | null;
   status:
     | 'active'
@@ -86,6 +88,8 @@ export interface PropertyFilters {
   baths?: number | null;
   minArea?: number | null;
   maxArea?: number | null;
+  /** Amenities a home must have, all of them. */
+  features?: string[] | null;
   sort?: PropertySort;
   /** Map-only: restricts results to the visible region. */
   bounds?: MapBounds | null;

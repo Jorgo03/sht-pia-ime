@@ -278,7 +278,9 @@
     "unavailable": "Questo annuncio non è più disponibile",
     "unavailableHint": "Potrebbe essere stato venduto, affittato o rimosso dall'agente.",
     "reference": "Rif.",
-    "publishedBy": "Pubblicato da"
+    "publishedBy": "Pubblicato da",
+    "video": "Video",
+    "videoFailed": "Impossibile riprodurre il video."
   },
   "messages": {
     "subtitle": "Conversazioni con agenti",
@@ -805,6 +807,11 @@
       "welcome": {
         "title": "Benvenuto",
         "body": "Il tuo account è pronto. Cerca case o pubblica il tuo annuncio."
+      },
+      "saved_search": {
+        "title": "Nuovi immobili per te",
+        "body": "Un nuovo immobile corrisponde alla tua ricerca",
+        "bodyMany": "{{total}} nuovi immobili corrispondono alla tua ricerca"
       }
     },
     "settings": "Impostazioni notifiche"

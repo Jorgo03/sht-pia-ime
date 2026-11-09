@@ -271,7 +271,9 @@
     "unavailable": "Kjo pronë nuk është më e disponueshme",
     "unavailableHint": "Mund të jetë shitur, dhënë me qira ose hequr nga agjenti.",
     "reference": "Ref.",
-    "publishedBy": "Publikuar nga"
+    "publishedBy": "Publikuar nga",
+    "video": "Video",
+    "videoFailed": "Videoja nuk u luajt dot."
   },
   "messages": {
     "subtitle": "Bisedat me agjentët",
@@ -796,6 +798,11 @@
       "welcome": {
         "title": "Mirë se erdhe",
         "body": "Llogaria jote është gati. Kërko pronat ose shto listimin tënd."
+      },
+      "saved_search": {
+        "title": "Prona të reja për ty",
+        "body": "Një pronë e re përputhet me kërkimin tënd",
+        "bodyMany": "{{total}} prona të reja përputhen me kërkimin tënd"
       }
     },
     "settings": "Cilësimet e njoftimeve"

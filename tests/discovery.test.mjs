@@ -10,6 +10,10 @@ import {
   rankCityTiles,
   tallyAgents,
 } from '../src/features/properties/lib/discovery.js'
+import { AMENITIES, toggleAmenity } from '../src/features/properties/lib/amenities.js'
+import { alertNotificationData, notTheirOwn } from '../supabase/functions/saved-search-alerts/logic.js'
+import { buildPush, safeRoute } from '../supabase/functions/push-dispatch/logic.js'
+import { notificationCopy, notificationRoute } from '../src/features/notifications/lib/feed.js'
 import {
   allFeatures,
   bestOf,
@@ -100,4 +104,40 @@ test('a rent is never "cheaper" than a sale, nor lek than euro', () => {
 
 test('features are listed once each', () => {
   assert.deepEqual(allFeatures([home('a', { features: ['pool', 'balcony'] }), home('b', { features: ['balcony'] }), home('c', { features: null })]), ['balcony', 'pool'])
+})
+
+test('amenities stay in one order, so one search has one cache key', () => {
+  assert.deepEqual(toggleAmenity(['pool'], 'balcony'), ['balcony', 'pool'])
+  assert.deepEqual(toggleAmenity(['balcony', 'pool'], 'pool'), ['balcony'])
+  assert.deepEqual(toggleAmenity(null, 'pool'), ['pool'])
+  assert.ok(!AMENITIES.includes('heating'), 'no longer offered')
+})
+
+const SEARCH = '11111111-1111-4111-8111-111111111111'
+const HOME = '22222222-2222-4222-8222-222222222222'
+
+test('alerts skip your own listings and record ids and a count only', () => {
+  const rows = [{ id: 'a', owner_id: 'me', agent_id: 'x' }, { id: 'b', owner_id: 'x', agent_id: 'me' }, { id: 'c', owner_id: 'x', agent_id: 'y' }]
+  assert.deepEqual(notTheirOwn(rows, 'me').map((r) => r.id), ['c'])
+  assert.deepEqual(alertNotificationData(SEARCH, [{ id: HOME, title: 'secret' }]), { search_id: SEARCH, count: 1, property_id: HOME })
+  assert.deepEqual(alertNotificationData(SEARCH, [{ id: 'a' }, { id: 'b' }]), { search_id: SEARCH, count: 2 })
+})
+
+test('an alert opens the home when there is one, the searches when there are many', () => {
+  assert.equal(buildPush({ kind: 'saved_search', data: { count: 1, property_id: HOME }, lang: 'sq' }).url, `/property/${HOME}`)
+  const many = buildPush({ kind: 'saved_search', data: { count: 3 }, lang: 'en' })
+  assert.equal(many.url, '/saved-searches')
+  assert.equal(safeRoute(many.url), '/saved-searches')
+  assert.match(many.body, /^3 new homes/)
+  assert.equal(notificationRoute({ kind: 'saved_search', data: { count: 3 } }), '/saved-searches')
+  assert.equal(notificationRoute({ kind: 'saved_search', data: { count: 1, property_id: HOME } }), `/property/${HOME}`)
+})
+
+test('every language has alert wording that shows no search name, address or price', () => {
+  for (const lang of ['sq', 'en', 'de', 'it', 'es', 'pl', 'ru', 'fr']) {
+    const push = buildPush({ kind: 'saved_search', data: { count: 2, name: 'SECRET', address: 'SECRET', price: 99 }, lang })
+    assert.doesNotMatch(push.body, /SECRET|99/, lang)
+  }
+  const t = (key, opts) => (opts?.total ? `${key}:${opts.total}` : key)
+  assert.equal(notificationCopy({ kind: 'saved_search', data: { count: 4 } }, t).body, 'notifications.kinds.saved_search.bodyMany:4')
 })

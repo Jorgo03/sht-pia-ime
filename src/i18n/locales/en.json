@@ -286,7 +286,9 @@
     "unavailable": "This listing is no longer available",
     "unavailableHint": "It may have been sold, rented out or removed by the agent.",
     "reference": "Ref.",
-    "publishedBy": "Published by"
+    "publishedBy": "Published by",
+    "video": "Video",
+    "videoFailed": "The video couldn't be played."
   },
   "favourites": {
     "title": "Favorites",
@@ -796,6 +798,11 @@
       "welcome": {
         "title": "Welcome",
         "body": "Your account is ready. Search homes or add your own listing."
+      },
+      "saved_search": {
+        "title": "New homes for you",
+        "body": "A new home matches your saved search",
+        "bodyMany": "{{total}} new homes match your saved search"
       }
     },
     "settings": "Notification settings"

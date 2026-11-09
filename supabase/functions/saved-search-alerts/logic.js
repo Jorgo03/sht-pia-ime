@@ -78,6 +78,23 @@ export function windowStart(search) {
   return search.last_alerted_at ?? search.created_at
 }
 
+/** Nobody is alerted about a listing they published themselves. */
+export function notTheirOwn(listings, userId) {
+  return listings.filter((l) => l.owner_id !== userId && l.agent_id !== userId)
+}
+
+/**
+ * What the notification records: how many, and the listing when there is just
+ * one. Ids and a count only; the words are chosen when it is shown.
+ */
+export function alertNotificationData(searchId, listings) {
+  return {
+    search_id: searchId,
+    count: listings.length,
+    ...(listings.length === 1 ? { property_id: listings[0].id } : {}),
+  }
+}
+
 /**
  * Sending is OFF unless the owner has set all three: an email provider key, a
  * verified sender address, and the explicit switch. Until then alerts are

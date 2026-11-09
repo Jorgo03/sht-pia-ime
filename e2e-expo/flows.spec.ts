@@ -711,6 +711,29 @@ test.describe('discovery', () => {
     await expect(page.getByText(t('aiAssistant.compare.best.price'), { exact: true })).toHaveCount(0);
   });
 
+  test('X98 amenity filters narrow the search, count on the badge and clear with reset', async ({ page }) => {
+    await page.goto('/explore');
+    await ready(page);
+    await page.getByRole('button', { name: t('search.filtersTitle') }).click();
+    await page.getByRole('button', { name: t('listing.feature.pool'), exact: true }).click();
+    await expect(page.getByText(/në shikim/)).toContainText('1');
+    await page.getByRole('button', { name: t('search.reset') }).click();
+    await expect(page.getByText(/në shikim/)).toContainText(String(LISTINGS.length));
+  });
+
+  test('X99 a listing with a video offers it, opens the player and says so if it cannot play', async ({ page }) => {
+    await page.goto(`/property/${LISTINGS[0].id}`);
+    await ready(page);
+    await expect(page.getByRole('button', { name: t('detail.video'), exact: true })).toHaveCount(0);
+    await page.goto(`/property/${LISTINGS[1].id}`);
+    await ready(page);
+    await page.getByRole('button', { name: t('detail.video'), exact: true }).click();
+    // The fake backend answers with an image, which no player can decode.
+    await expect(page.getByText(t('detail.videoFailed'))).toBeVisible();
+    await page.getByRole('button', { name: t('common.close') }).click();
+    await expect(page.getByText(t('detail.videoFailed'))).toHaveCount(0);
+  });
+
   test('X97 compare: nothing picked says how to start; a pick shows the pill on Home', async ({ page }) => {
     await page.goto('/compare');
     await ready(page);

@@ -18,6 +18,8 @@ export function notificationRoute(n) {
     case 'listing_hidden':
     case 'listing_restored':
       return UUID.test(data.property_id ?? '') ? `/property/${data.property_id}` : null
+    case 'saved_search':
+      return UUID.test(data.property_id ?? '') ? `/property/${data.property_id}` : '/saved-searches'
     default:
       return null
   }
@@ -37,6 +39,10 @@ export function notificationCopy(n, t) {
         ? count > 1 ? t(key('bodyMany'), { name, total: count }) : t(key('body'), { name })
         : t(key('bodyNoName'))
       return { title: t(key('title')), body }
+    }
+    case 'saved_search': {
+      const total = Number(data.count) || 1
+      return { title: t(key('title')), body: total > 1 ? t(key('bodyMany'), { total }) : t(key('body')) }
     }
     case 'inquiry':
       return { title: t(key('title')), body: name ? t(key('body'), { name }) : t(key('bodyNoName')) }

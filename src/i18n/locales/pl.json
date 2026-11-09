@@ -285,7 +285,9 @@
     "unavailable": "To ogłoszenie nie jest już dostępne",
     "unavailableHint": "Mogło zostać sprzedane, wynajęte lub usunięte przez agenta.",
     "reference": "Nr ref.",
-    "publishedBy": "Opublikowane przez"
+    "publishedBy": "Opublikowane przez",
+    "video": "Wideo",
+    "videoFailed": "Nie udało się odtworzyć wideo."
   },
   "messages": {
     "subtitle": "Rozmowy z agentami",
@@ -814,6 +816,11 @@
       "welcome": {
         "title": "Witamy",
         "body": "Twoje konto jest gotowe. Szukaj domów lub dodaj ogłoszenie."
+      },
+      "saved_search": {
+        "title": "Nowe oferty dla Ciebie",
+        "body": "Nowa oferta pasuje do Twojego wyszukiwania",
+        "bodyMany": "Nowe oferty pasujące do wyszukiwania: {{total}}"
       }
     },
     "settings": "Ustawienia powiadomień"

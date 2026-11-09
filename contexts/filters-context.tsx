@@ -113,6 +113,7 @@ export function FiltersProvider({ children }: { children: ReactNode }) {
         filters.baths,
         filters.minArea,
         filters.maxArea,
+        ...(filters.features ?? []),
       ].filter((v) => v != null && v !== '').length,
     [filters],
   );

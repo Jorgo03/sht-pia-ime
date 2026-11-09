@@ -77,6 +77,11 @@ function filter(rows: Listing[], params: URLSearchParams): Listing[] {
       out = out.filter((r) => ids.includes(String(field(r))));
     }
     if (op === 'ilike') out = out.filter((r) => String(field(r) ?? '').toLowerCase().includes(like(value)));
+    // contains, as .contains() sends it: features=cs.{balcony,pool}
+    if (op === 'cs') {
+      const wanted = value.replace(/[{}"]/g, '').split(',');
+      out = out.filter((r) => wanted.every((w) => ((field(r) as string[] | null) ?? []).includes(w)));
+    }
     if (op === 'gte') out = out.filter((r) => Number(field(r)) >= Number(value));
     if (op === 'lte') out = out.filter((r) => Number(field(r)) <= Number(value));
   }

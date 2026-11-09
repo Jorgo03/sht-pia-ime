@@ -60,6 +60,7 @@ import {
   type PickedVideo,
 } from '@/lib/upload';
 import LOCATIONS from '@/src/features/properties/data/locations';
+import { AMENITIES } from '@/src/features/properties/lib/amenities';
 import { zonesFor } from '@/src/features/properties/lib/searchFilters';
 import { useReadableColumn, useResponsive } from '@/hooks/use-responsive';
 
@@ -116,19 +117,7 @@ const CURRENCIES: Currency[] = ['EUR', 'ALL', 'USD'];
 
 const CITIES: string[] = (LOCATIONS as { city: string }[]).map((l) => l.city);
 
-const FEATURES_LIST = [
-  'balcony',
-  'parking',
-  'elevator',
-  'garden',
-  'pool',
-  'furnished',
-  'airConditioning',
-  // 'heating' is no longer offered (owner's call, 2026-10-15). Listings that
-  // already have it still show it: listing.feature.heating stays in the locales.
-  'security',
-  'storage',
-] as const;
+const FEATURES_LIST = AMENITIES;
 
 // Same client-side caps as web — properties.sqft/beds/floor/total_floors/
 // year_built are Postgres `integer`, so a fat-fingered value is caught on the

@@ -271,7 +271,9 @@
     "unavailable": "Dieses Inserat ist nicht mehr verfügbar",
     "unavailableHint": "Es wurde möglicherweise verkauft, vermietet oder vom Makler entfernt.",
     "reference": "Ref.",
-    "publishedBy": "Veröffentlicht von"
+    "publishedBy": "Veröffentlicht von",
+    "video": "Video",
+    "videoFailed": "Das Video konnte nicht abgespielt werden."
   },
   "messages": {
     "subtitle": "Gespräche mit Maklern",
@@ -796,6 +798,11 @@
       "welcome": {
         "title": "Willkommen",
         "body": "Dein Konto ist bereit. Suche Immobilien oder inseriere deine eigene."
+      },
+      "saved_search": {
+        "title": "Neue Angebote für dich",
+        "body": "Ein neues Angebot passt zu deiner Suche",
+        "bodyMany": "{{total}} neue Angebote passen zu deiner Suche"
       }
     },
     "settings": "Benachrichtigungseinstellungen"

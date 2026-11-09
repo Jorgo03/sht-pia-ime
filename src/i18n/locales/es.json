@@ -278,7 +278,9 @@
     "unavailable": "Este anuncio ya no está disponible",
     "unavailableHint": "Puede que se haya vendido, alquilado o que el agente lo haya retirado.",
     "reference": "Ref.",
-    "publishedBy": "Publicado por"
+    "publishedBy": "Publicado por",
+    "video": "Vídeo",
+    "videoFailed": "No se pudo reproducir el vídeo."
   },
   "messages": {
     "subtitle": "Conversaciones con agentes",
@@ -805,6 +807,11 @@
       "welcome": {
         "title": "Bienvenido",
         "body": "Tu cuenta está lista. Busca viviendas o publica la tuya."
+      },
+      "saved_search": {
+        "title": "Viviendas nuevas para ti",
+        "body": "Una vivienda nueva coincide con tu búsqueda",
+        "bodyMany": "{{total}} viviendas nuevas coinciden con tu búsqueda"
       }
     },
     "settings": "Ajustes de notificaciones"

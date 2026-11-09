@@ -278,7 +278,9 @@
     "unavailable": "Cette annonce n'est plus disponible",
     "unavailableHint": "Il a peut-être été vendu, loué ou retiré par l'agent.",
     "reference": "Réf.",
-    "publishedBy": "Publié par"
+    "publishedBy": "Publié par",
+    "video": "Vidéo",
+    "videoFailed": "Impossible de lire la vidéo."
   },
   "messages": {
     "subtitle": "Conversations avec les agents",
@@ -805,6 +807,11 @@
       "welcome": {
         "title": "Bienvenue",
         "body": "Votre compte est prêt. Cherchez un bien ou publiez le vôtre."
+      },
+      "saved_search": {
+        "title": "Nouveaux biens pour vous",
+        "body": "Un nouveau bien correspond à votre recherche",
+        "bodyMany": "{{total}} nouveaux biens correspondent à votre recherche"
       }
     },
     "settings": "Réglages des notifications"

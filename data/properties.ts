@@ -57,6 +57,7 @@ function applyFilters(query: any, f: PropertyFilters): any {
   // `sqft` holds m², matching the surface labels in the UI.
   if (f.minArea != null) q = q.gte('sqft', f.minArea);
   if (f.maxArea != null) q = q.lte('sqft', f.maxArea);
+  if (f.features?.length) q = q.contains('features', f.features);
   // Zone only with its own city; a reference is exact (shared with web).
   q = applyZoneAndRef(q, { city: f.city, zone: f.zone, ref: f.refCode });
 

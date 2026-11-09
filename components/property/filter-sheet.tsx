@@ -33,6 +33,7 @@ import { usePropertiesCountQuery } from '@/hooks/use-property-queries';
 // Shared with the web app rather than duplicated — the same convention i18n
 // already uses to pull locales out of src/.
 import LOCATIONS from '@/src/features/properties/data/locations';
+import { AMENITIES, toggleAmenity } from '@/src/features/properties/lib/amenities';
 import { normalizeRef, zonesFor } from '@/src/features/properties/lib/searchFilters';
 import { sheetColumn } from '@/constants/web-frame';
 
@@ -448,6 +449,19 @@ export function FilterSheet({
                   label={t(`search.${pt}`)}
                   active={filters.propertyType === pt}
                   onPress={() => setFilter('propertyType', pt)}
+                />
+              ))}
+            </View>
+          </Section>
+
+          <Section label={t('listing.features')}>
+            <View style={styles.row}>
+              {AMENITIES.map((amenity) => (
+                <Chip
+                  key={amenity}
+                  label={t(`listing.feature.${amenity}`, amenity)}
+                  active={filters.features?.includes(amenity) ?? false}
+                  onPress={() => setFilter('features', toggleAmenity(filters.features, amenity), { immediate: true })}
                 />
               ))}
             </View>

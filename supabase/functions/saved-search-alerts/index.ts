@@ -1,30 +1,28 @@
 // supabase/functions/saved-search-alerts/index.ts
 //
-// Saved-search email alerts (docs/LAUNCH_TASKS.md F13). Run on a schedule; it
-// does two things:
+// Saved-search alerts (docs/LAUNCH_TASKS.md F13). Run on a schedule; it does
+// two things:
 //
-//   1. QUEUE. For every saved search with email_alerts on, find active
+//   1. QUEUE. For every saved search with alerts on, find active
 //      listings created since the last run that match its filters (the same
 //      rules as the apps, logic.js). Each (search, listing) pair is recorded in
 //      saved_search_alert_deliveries first; its primary key means a listing is
-//      never emailed twice for the same search, however often this runs. One
-//      email per search goes into email_outbox (unique dedupe_key).
+//      never alerted twice for the same search, however often this runs. One
+//      notification per search goes to the notification centre and push
+//      (alerts_enabled), one email to email_outbox (email_alerts).
 //   2. SEND, only when the owner has switched it on: ALERTS_DISPATCH_ENABLED=
 //      'true' plus RESEND_API_KEY and ALERT_EMAIL_FROM secrets. Until then the
 //      queue just fills and nothing leaves the server.
 //
-// Auth: scheduler only. The caller must present the service-role key (the
-// Supabase scheduler does) or the ALERTS_CRON_SECRET header. App users get 401.
-//
-// Scheduling is an owner action (pg_cron + pg_net, or a GitHub Actions cron);
-// see docs/ACCOUNT_AND_RELEASE_HANDOFF.md.
+// Auth: scheduler only. The caller must present the service-role key or the
+// database's vault secret in x-cron-secret. App users get 401, so this is
+// deployed without JWT verification, as push-dispatch is.
 
 import { createClient } from 'npm:@supabase/supabase-js@2';
-import { applySavedFilters, buildAlertEmail, dedupeKey, dispatchEnabled, unsubscribeHeaders, windowStart } from './logic.js';
+import { alertNotificationData, applySavedFilters, buildAlertEmail, dedupeKey, dispatchEnabled, notTheirOwn, unsubscribeHeaders, windowStart } from './logic.js';
 
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
 const SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-const CRON_SECRET = Deno.env.get('ALERTS_CRON_SECRET');
 const SITE_URL = (Deno.env.get('SITE_URL') ?? 'https://real-estate-app-hazel-seven.vercel.app').replace(/\/+$/, '');
 const MAX_SEARCHES_PER_RUN = 500;
 const MAX_NEW_PER_SEARCH = 50;
@@ -43,11 +41,13 @@ function sameSecret(a: string, b: string): boolean {
   return diff === 0;
 }
 
-function isScheduler(req: Request): boolean {
+async function isScheduler(req: Request): Promise<boolean> {
   const bearer = req.headers.get('Authorization')?.replace(/^Bearer\s+/i, '') ?? '';
   if (sameSecret(bearer, SERVICE_ROLE_KEY)) return true;
-  const cron = req.headers.get('x-cron-secret') ?? '';
-  return Boolean(CRON_SECRET) && sameSecret(cron, CRON_SECRET!);
+  const secret = req.headers.get('x-cron-secret') ?? '';
+  if (!secret) return false;
+  const { data, error } = await admin.rpc('push_dispatch_secret_ok', { p_secret: secret });
+  return !error && data === true;
 }
 
 type Search = {
@@ -58,13 +58,15 @@ type Search = {
   created_at: string;
   last_alerted_at: string | null;
   unsubscribe_token: string;
+  alerts_enabled: boolean | null;
+  email_alerts: boolean;
 };
 
 async function queue(now: string): Promise<{ searches: number; queued: number; failed: number }> {
   const { data: searches, error } = await admin
     .from('saved_searches')
-    .select('id, user_id, name, filters, created_at, last_alerted_at, unsubscribe_token')
-    .eq('email_alerts', true)
+    .select('id, user_id, name, filters, created_at, last_alerted_at, unsubscribe_token, alerts_enabled, email_alerts')
+    .or('alerts_enabled.eq.true,email_alerts.eq.true')
     .order('last_alerted_at', { ascending: true, nullsFirst: true })
     .limit(MAX_SEARCHES_PER_RUN);
   if (error) throw new Error(`saved_searches: ${error.message}`);
@@ -76,8 +78,10 @@ async function queue(now: string): Promise<{ searches: number; queued: number; f
       const { data: rows, error: qErr } = await applySavedFilters(
         admin
           .from('properties')
-          .select('id, title, title_i18n, city, price, currency, created_at')
+          .select('id, title, title_i18n, city, price, currency, created_at, owner_id, agent_id')
           .eq('status', 'active')
+          // A listing a moderator has hidden must not be announced.
+          .not('moderation_hold', 'is', true)
           .gt('created_at', windowStart(s))
           .lte('created_at', now)
           .order('created_at', { ascending: false })
@@ -86,20 +90,32 @@ async function queue(now: string): Promise<{ searches: number; queued: number; f
       );
       if (qErr) throw new Error(qErr.message);
 
-      if (rows && rows.length) {
+      const matches = notTheirOwn(rows ?? [], s.user_id);
+      if (matches.length) {
         // Only pairs inserted now are new; existing pairs come back empty.
         const { data: fresh, error: dErr } = await admin
           .from('saved_search_alert_deliveries')
-          .upsert(rows.map((r) => ({ saved_search_id: s.id, property_id: r.id })), {
+          .upsert(matches.map((r) => ({ saved_search_id: s.id, property_id: r.id })), {
             onConflict: 'saved_search_id,property_id',
             ignoreDuplicates: true,
           })
           .select('property_id');
         if (dErr) throw new Error(dErr.message);
         const freshIds = new Set((fresh ?? []).map((f) => f.property_id));
-        const listings = rows.filter((r) => freshIds.has(r.id));
+        const listings = matches.filter((r) => freshIds.has(r.id));
 
-        if (listings.length) {
+        if (listings.length && s.alerts_enabled) {
+          const { error: pushErr } = await admin.rpc('queue_push', {
+            p_user: s.user_id,
+            p_kind: 'saved_search',
+            p_data: alertNotificationData(s.id, listings),
+            p_key: dedupeKey(s.id, listings.map((l) => l.id)),
+          });
+          if (pushErr) throw new Error(pushErr.message);
+          queued++;
+        }
+
+        if (listings.length && s.email_alerts) {
           const { data: profile } = await admin
             .from('profiles')
             .select('preferred_language')
@@ -122,7 +138,6 @@ async function queue(now: string): Promise<{ searches: number; queued: number; f
           });
           // 23505 = this exact email is already queued (a retried run).
           if (oErr && oErr.code !== '23505') throw new Error(oErr.message);
-          if (!oErr) queued++;
         }
       }
 
@@ -187,7 +202,7 @@ async function send(): Promise<{ sent: number; failed: number }> {
 
 Deno.serve(async (req) => {
   if (req.method !== 'POST') return json({ error: 'method_not_allowed' }, 405);
-  if (!isScheduler(req)) return json({ error: 'unauthorized' }, 401);
+  if (!(await isScheduler(req))) return json({ error: 'unauthorized' }, 401);
   try {
     const result = await queue(new Date().toISOString());
     const env = Deno.env.toObject();

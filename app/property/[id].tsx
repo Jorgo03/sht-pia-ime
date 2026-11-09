@@ -48,6 +48,7 @@ import { useTranslatedProperty } from '@/hooks/use-translated-property';
 import { logActivity } from '@/lib/activity';
 import { propertyUrl } from '@/lib/site';
 import { supabase } from '@/lib/supabase';
+import { isPlayableVideo, ListingVideo } from '@/components/property/listing-video';
 import { useCompare } from '@/contexts/compare-context';
 import { formatPrice, listingBadgeKey, priceSuffixKey, telUrl, whatsappUrl } from '@/lib/format';
 import { sheetColumn } from '@/constants/web-frame';
@@ -682,6 +683,8 @@ export default function PropertyDetailScreen() {
             }
           />
         </SafeAreaView>
+
+        {isPlayableVideo(property.video_url) && <ListingVideo uri={property.video_url} />}
 
         {images.length > 1 && (
           images.length <= 8 ? (
