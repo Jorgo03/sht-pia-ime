@@ -184,6 +184,7 @@ function ThemedNavigation() {
           />
           <Stack.Screen name="agents/index" options={{ headerShown: false, presentation: 'card' }} />
           <Stack.Screen name="compare" options={{ headerShown: false, presentation: 'card' }} />
+          <Stack.Screen name="listing/import" options={{ headerShown: false, presentation: 'card' }} />
           <Stack.Screen name="assistant" options={{ headerShown: false, presentation: 'card' }} />
           {/* Website pages; pricing, moderation and auth/callback are web
               only (their native files redirect home). */}

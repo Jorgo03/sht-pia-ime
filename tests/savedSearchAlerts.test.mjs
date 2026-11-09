@@ -20,6 +20,8 @@ test('the server matches with the same rules as the apps', () => {
     { city: 'Tiranë', zone: 'Blloku', listing_type: 'sale', type: 'apartment', minPrice: '50000', maxPrice: 200000, beds: 2 },
     { city: '', type: 'all', minPrice: 'abc' },
     { listing_type: 'rent' },
+    { beds: 2, baths: 1, minArea: 50, maxArea: 90, features: ['pool', 'balcony'] },
+    { features: [] },
     null,
   ]
   for (const f of cases) {

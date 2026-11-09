@@ -217,7 +217,9 @@
     "referenceInvalid": "Une référence compte 8 lettres ou chiffres, par ex. SH-1A2B3C4D.",
     "rangeMin": "Min",
     "rangeMax": "Max",
-    "showHomesAny": "Voir les biens"
+    "showHomesAny": "Voir les biens",
+    "saveSearch": "Enregistrer cette recherche",
+    "searchSaved": "Enregistrée · Alertes activées"
   },
   "favourites": {
     "title": "Favoris",
@@ -1126,5 +1128,45 @@
     "loadFailed": "Impossible de charger la comparaison.",
     "yes": "Oui",
     "no": "Non"
+  },
+  "nearMe": {
+    "button": "Près de moi",
+    "denied": "Autorisez la localisation dans les réglages du téléphone pour voir les biens à proximité.",
+    "failed": "Impossible de trouver votre position. Réessayez."
+  },
+  "import": {
+    "headlinePre": "Importer",
+    "headlineEm": "les annonces",
+    "entry": "Importer des annonces",
+    "intro": "Envoyez un fichier CSV avec les annonces de votre agence. Vous verrez le résultat avant toute publication.",
+    "pick": "Choisir un fichier CSV",
+    "required": "Colonnes obligatoires",
+    "optional": "Colonnes facultatives",
+    "valuesHint": "lloji : shitje, qira ou ditore. tipi : apartament, shtepi, vile, toke, biznes, zyre ou garazh.",
+    "photosHint": "Photos : liens https séparés par |. Les caractéristiques sont aussi séparées par |.",
+    "rightsHint": "N’importez que des annonces et photos que vous avez le droit de publier.",
+    "ready": "prêtes à publier",
+    "withErrors": "avec erreurs",
+    "publish": "Publier {{total}}",
+    "chooseAnother": "Choisir un autre fichier",
+    "publishing": "Publication {{done}} sur {{total}}",
+    "doneBody": "{{ok}} publiées.",
+    "doneFailed": "{{total}} non publiées. Renvoyez le fichier : celles déjà publiées sont ignorées.",
+    "another": "Importer un autre fichier",
+    "agentsOnly": "L’import est réservé aux agents.",
+    "fileTooBig": "Le fichier est trop volumineux (2 Mo maximum).",
+    "fileExcel": "Ceci est un fichier Excel. Enregistrez-le en CSV et réessayez.",
+    "fileEmpty": "Le fichier est vide.",
+    "missingColumns": "Colonnes manquantes : {{list}}",
+    "tooMany": "Maximum {{max}} annonces par fichier.",
+    "readFailed": "Impossible de lire le fichier. Réessayez.",
+    "line": "Ligne {{n}}",
+    "more": "et {{total}} de plus",
+    "err": {
+      "required": "Manquant : {{field}}",
+      "invalid": "Non valide : {{field}}",
+      "duplicate": "Existe déjà",
+      "encoding": "Caractères endommagés. Enregistrez en CSV UTF-8."
+    }
   }
 }

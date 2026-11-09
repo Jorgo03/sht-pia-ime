@@ -213,7 +213,9 @@
     "referenceInvalid": "Referenca ka 8 shkronja ose shifra, p.sh. SH-1A2B3C4D.",
     "rangeMin": "Min",
     "rangeMax": "Maks",
-    "showHomesAny": "Shfaq shtëpitë"
+    "showHomesAny": "Shfaq shtëpitë",
+    "saveSearch": "Ruaj këtë kërkim",
+    "searchSaved": "U ruajt · Njoftimet aktive"
   },
   "favourites": {
     "title": "Të preferuarat",
@@ -1116,5 +1118,45 @@
     "loadFailed": "Krahasimi nuk u ngarkua.",
     "yes": "Po",
     "no": "Jo"
+  },
+  "nearMe": {
+    "button": "Pranë meje",
+    "denied": "Lejo vendndodhjen te cilësimet e telefonit për të parë pronat pranë teje.",
+    "failed": "Nuk e gjetëm dot vendndodhjen tënde. Provo sërish."
+  },
+  "import": {
+    "headlinePre": "Importo",
+    "headlineEm": "pronat",
+    "entry": "Importo prona",
+    "intro": "Ngarko një skedar CSV me pronat e zyrës. Do të shohësh rezultatin para se të publikohet.",
+    "pick": "Zgjidh skedarin CSV",
+    "required": "Kolona të detyrueshme",
+    "optional": "Kolona opsionale",
+    "valuesHint": "Lloji: shitje, qira ose ditore. Tipi: apartament, shtepi, vile, toke, biznes, zyre ose garazh.",
+    "photosHint": "Fotot: lidhje https, të ndara me |. Karakteristikat ndahen po ashtu me |.",
+    "rightsHint": "Importo vetëm prona dhe foto që ke të drejtë t'i publikosh.",
+    "ready": "gati për publikim",
+    "withErrors": "me gabime",
+    "publish": "Publiko {{total}}",
+    "chooseAnother": "Zgjidh një skedar tjetër",
+    "publishing": "Po publikohen {{done}} nga {{total}}",
+    "doneBody": "U publikuan {{ok}}.",
+    "doneFailed": "{{total}} nuk u publikuan. Ngarkoje sërish skedarin: të publikuarat anashkalohen.",
+    "another": "Importo një skedar tjetër",
+    "agentsOnly": "Importi është vetëm për agjentë.",
+    "fileTooBig": "Skedari është shumë i madh (maks. 2 MB).",
+    "fileExcel": "Ky është skedar Excel. Ruaje si CSV dhe provo sërish.",
+    "fileEmpty": "Skedari është bosh.",
+    "missingColumns": "Mungojnë kolonat: {{list}}",
+    "tooMany": "Maksimumi {{max}} prona për skedar.",
+    "readFailed": "Skedari nuk u lexua dot. Provo sërish.",
+    "line": "Rreshti {{n}}",
+    "more": "dhe {{total}} të tjera",
+    "err": {
+      "required": "Mungon: {{field}}",
+      "invalid": "E pavlefshme: {{field}}",
+      "duplicate": "Ekziston tashmë",
+      "encoding": "Shkronja të dëmtuara. Ruaje si CSV UTF-8."
+    }
   }
 }

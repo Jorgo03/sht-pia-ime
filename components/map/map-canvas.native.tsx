@@ -26,6 +26,7 @@ function MapCanvasNative(
     clusters,
     onMarkerPress,
     accentColor,
+    showUserLocation = false,
     bottomInset = 0,
   }: MapCanvasProps & {
     /** Height of whatever floats over the map's bottom edge (the tab bar). */
@@ -52,7 +53,7 @@ function MapCanvasNative(
       initialRegion={initialRegion as Region}
       onRegionChangeComplete={(region) => onRegionChangeComplete(region)}
       onPress={onMapPress}
-      showsUserLocation={false}
+      showsUserLocation={showUserLocation}
       toolbarEnabled={false}
       userInterfaceStyle="dark">
       {isRegionOverview ? (

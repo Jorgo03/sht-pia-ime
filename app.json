@@ -69,7 +69,13 @@
         }
       ],
       "expo-image",
-      "expo-web-browser"
+      "expo-web-browser",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Shtëpia.ime uses your location to show homes near you on the map. It is not stored."
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

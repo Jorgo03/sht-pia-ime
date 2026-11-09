@@ -7,6 +7,10 @@ export interface SavedFilters {
   minPrice?: number | string | null;
   maxPrice?: number | string | null;
   beds?: number | string | null;
+  baths?: number | string | null;
+  minArea?: number | string | null;
+  maxArea?: number | string | null;
+  features?: string[] | null;
 }
 
 type Client = { from: (table: string) => any };

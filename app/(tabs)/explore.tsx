@@ -24,6 +24,7 @@ import { FilterTabs } from '@/components/ui/filter-tabs';
 import { GradientBackground } from '@/components/ui/gradient-background';
 import { RiseIn } from '@/components/ui/motion';
 import { type AtticoPalette, Fonts } from '@/constants/theme';
+import { SaveSearchButton } from '@/components/property/save-search-button';
 import { useFilters } from '@/contexts/filters-context';
 import { KeyboardDoneBar } from '@/components/ui/keyboard-done-bar';
 import { useTheme } from '@/contexts/theme-context';
@@ -366,6 +367,7 @@ export default function ExploreScreen() {
                     </Text>
                   </View>
                 )}
+                {!loading && !failedEmpty && <SaveSearchButton filters={queryFilters} />}
               </>
             }
             ListEmptyComponent={

@@ -38,7 +38,7 @@ function statusColor(colors: AtticoPalette, status: string): string {
 export default function MyListingsScreen() {
   const router = useRouter();
   const { t, i18n } = useTranslation();
-  const { user } = useAuth();
+  const { user, isAgent } = useAuth();
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
   // A centred column on an unfolded Fold or a spanned Duo (hooks/use-responsive).
@@ -135,17 +135,29 @@ export default function MyListingsScreen() {
             a gradient "+ New Listing" pill, not a bare icon button. */}
         <View style={styles.titleRow}>
           <Text style={styles.pageTitle} accessibilityRole="header">{t('listing.myListings')}</Text>
-          <TouchableOpacity
-            accessibilityRole="button"
-            onPress={() => router.push('/listing/new' as Href)}
-            activeOpacity={0.85}
-            style={styles.newListingTouch}
-            hitSlop={6}>
-            <LinearGradient colors={[colors.accent, colors.accentEnd]} style={styles.newListingPill}>
-              <MaterialIcons name="add" size={16} color="#fff" />
-              <Text style={styles.newListingPillText}>{t('listing.newListing')}</Text>
-            </LinearGradient>
-          </TouchableOpacity>
+          <View style={styles.titleActions}>
+            {isAgent && (
+              <TouchableOpacity
+                accessibilityRole="button"
+                accessibilityLabel={t('import.entry')}
+                onPress={() => router.push('/listing/import' as Href)}
+                activeOpacity={0.75}
+                style={styles.importButton}>
+                <MaterialIcons name="upload-file" size={20} color={colors.accentText} />
+              </TouchableOpacity>
+            )}
+            <TouchableOpacity
+              accessibilityRole="button"
+              onPress={() => router.push('/listing/new' as Href)}
+              activeOpacity={0.85}
+              style={styles.newListingTouch}
+              hitSlop={6}>
+              <LinearGradient colors={[colors.accent, colors.accentEnd]} style={styles.newListingPill}>
+                <MaterialIcons name="add" size={16} color="#fff" />
+                <Text style={styles.newListingPillText}>{t('listing.newListing')}</Text>
+              </LinearGradient>
+            </TouchableOpacity>
+          </View>
         </View>
 
         {actionError && <Text style={styles.errorBanner}>{t('errors.updateFailed')}</Text>}
@@ -303,6 +315,17 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     color: colors.textPrimary,
   },
   // Never squeezed by a long title in another language: the title wraps.
+  titleActions: { flexDirection: 'row', alignItems: 'center', gap: 8, flexShrink: 0 },
+  importButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: colors.glass,
+  },
   newListingTouch: { flexShrink: 0 },
   newListingPill: {
     flexDirection: 'row',

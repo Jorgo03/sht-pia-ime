@@ -1,3 +1,6 @@
+import * as Location from 'expo-location';
+import { DEFAULT_RADIUS, NEAR_ME_RADII, regionAround } from '@/src/features/properties/lib/nearMe';
+
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { Image } from 'expo-image';
 import { useRouter, type Href } from 'expo-router';
@@ -19,6 +22,9 @@ import { Cluster, clusterProperties, MARKER_COLORS } from '@/lib/cluster';
 import { boundsToRegion, geometryBounds, pointInGeometry, type GeoJSONGeometry } from '@/lib/geo';
 import { formatPrice, getLocalizedText, priceSuffixKey } from '@/lib/format';
 import albaniaCountiesRaw from '@/data/albania-counties.json';
+
+/** How long to wait for a fresh position before using the last known one. */
+const LOCATE_TIMEOUT_MS = 12_000;
 
 // Only the colours a bubble can have: markers are coloured by listing type,
 // so the green "commercial" and yellow "land" entries promised markers that
@@ -86,6 +92,50 @@ export function MapScreenContent() {
   const [region, setRegion] = useState<MapRegionLike>(ALBANIA);
   const [queryRegion, setQueryRegion] = useState<MapRegionLike>(ALBANIA);
   const [previewProperty, setPreviewProperty] = useState<Property | null>(null);
+  // Near me: the position stays in this component and is not stored anywhere.
+  const [position, setPosition] = useState<{ latitude: number; longitude: number } | null>(null);
+  const [radius, setRadius] = useState(DEFAULT_RADIUS);
+  const [locating, setLocating] = useState(false);
+  const [locationNotice, setLocationNotice] = useState<string | null>(null);
+
+  const showAround = (center: { latitude: number; longitude: number }, km: number) => {
+    setPreviewProperty(null);
+    mapRef.current?.animateToRegion(regionAround(center, km), 500);
+  };
+
+  const findMe = async () => {
+    if (locating) return;
+    setLocating(true);
+    setLocationNotice(null);
+    try {
+      const permission = await Location.requestForegroundPermissionsAsync();
+      if (permission.status !== 'granted') {
+        setLocationNotice(t('nearMe.denied'));
+        return;
+      }
+      const fix = await Promise.race([
+        Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced }),
+        new Promise<null>((resolve) => setTimeout(() => resolve(null), LOCATE_TIMEOUT_MS)),
+      ]);
+      const known = fix ?? (await Location.getLastKnownPositionAsync());
+      if (!known) {
+        setLocationNotice(t('nearMe.failed'));
+        return;
+      }
+      const center = { latitude: known.coords.latitude, longitude: known.coords.longitude };
+      setPosition(center);
+      showAround(center, radius);
+    } catch {
+      setLocationNotice(t('nearMe.failed'));
+    } finally {
+      setLocating(false);
+    }
+  };
+
+  const chooseRadius = (km: number) => {
+    setRadius(km);
+    if (position) showAround(position, km);
+  };
 
   // onRegionChangeComplete already fires only at gesture end; the extra debounce
   // covers momentum scrolling, which can settle several times in quick succession.
@@ -187,6 +237,7 @@ export function MapScreenContent() {
         accentColor={colors.accent}
         properties={properties}
         bottomInset={tabBarTop}
+        showUserLocation={position !== null}
       />
 
       <View style={styles.overlay} pointerEvents="box-none">
@@ -211,6 +262,40 @@ export function MapScreenContent() {
             </View>
           )}
         </View>
+
+        <TouchableOpacity
+          accessibilityRole="button"
+          accessibilityLabel={t('nearMe.button')}
+          style={styles.nearMeButton}
+          onPress={findMe}
+          disabled={locating}
+          activeOpacity={0.8}>
+          {locating ? (
+            <ActivityIndicator size="small" color={colors.accentText} />
+          ) : (
+            <MaterialIcons name={position ? 'my-location' : 'location-searching'} size={22} color={colors.accentText} />
+          )}
+        </TouchableOpacity>
+
+        {position && (
+          <View style={styles.radiusRow}>
+            {NEAR_ME_RADII.map((km) => (
+              <TouchableOpacity
+                key={km}
+                accessibilityRole="button"
+                accessibilityState={{ selected: radius === km }}
+                style={[styles.radiusChip, radius === km && styles.radiusChipOn]}
+                onPress={() => chooseRadius(km)}
+                activeOpacity={0.8}>
+                <Text style={[styles.radiusText, radius === km && styles.radiusTextOn]}>{km} km</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
+
+        {locationNotice && (
+          <Text style={styles.locationNotice} accessibilityLiveRegion="polite">{locationNotice}</Text>
+        )}
 
         {!isRegionOverview && (
           <View style={styles.legend}>
@@ -303,6 +388,46 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     flex: 1,
     paddingHorizontal: 20,
     paddingTop: 8,
+  },
+  nearMeButton: {
+    position: 'absolute',
+    top: 8,
+    right: 20,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.primary,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  radiusRow: { flexDirection: 'row', gap: 8, marginTop: 8 },
+  radiusChip: {
+    minHeight: 36,
+    justifyContent: 'center',
+    paddingHorizontal: 14,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: colors.primary,
+  },
+  radiusChipOn: { borderColor: colors.accent },
+  radiusText: { fontFamily: Fonts.sansSemiBold, fontSize: 13, color: colors.textSecondary },
+  radiusTextOn: { color: colors.accentText },
+  locationNotice: {
+    alignSelf: 'flex-start',
+    maxWidth: '86%',
+    marginTop: 8,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 14,
+    overflow: 'hidden',
+    fontFamily: Fonts.sans,
+    fontSize: 13,
+    lineHeight: 18,
+    color: colors.textPrimary,
+    backgroundColor: colors.primary,
   },
   card: {
     flexDirection: 'row',

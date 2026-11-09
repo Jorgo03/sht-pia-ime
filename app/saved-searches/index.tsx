@@ -51,6 +51,11 @@ interface SavedSearch {
   // read defensively so a saved search stays fully replayable if the web
   // create form grows those fields later.
   filters: {
+    zone?: string | null;
+    baths?: number | null;
+    minArea?: number | null;
+    maxArea?: number | null;
+    features?: string[] | null;
     city?: string | null;
     listing_type?: ListingType | null;
     type?: string | null;
@@ -198,6 +203,11 @@ export default function SavedSearchesScreen() {
     if (f?.minPrice) setFilter('minPrice', f.minPrice);
     if (f?.maxPrice) setFilter('maxPrice', f.maxPrice);
     if (f?.beds) setFilter('beds', f.beds);
+    if (f?.zone) setFilter('zone', f.zone);
+    if (f?.baths) setFilter('baths', f.baths);
+    if (f?.minArea) setFilter('minArea', f.minArea);
+    if (f?.maxArea) setFilter('maxArea', f.maxArea);
+    if (f?.features?.length) setFilter('features', f.features);
     router.push('/(tabs)/explore' as Href);
   };
 

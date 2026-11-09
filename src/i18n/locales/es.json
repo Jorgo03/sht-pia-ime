@@ -217,7 +217,9 @@
     "referenceInvalid": "Una referencia tiene 8 letras o cifras, p. ej. SH-1A2B3C4D.",
     "rangeMin": "Mín",
     "rangeMax": "Máx",
-    "showHomesAny": "Ver viviendas"
+    "showHomesAny": "Ver viviendas",
+    "saveSearch": "Guardar esta búsqueda",
+    "searchSaved": "Guardada · Alertas activas"
   },
   "favourites": {
     "title": "Favoritos",
@@ -1126,5 +1128,45 @@
     "loadFailed": "No se pudo cargar la comparación.",
     "yes": "Sí",
     "no": "No"
+  },
+  "nearMe": {
+    "button": "Cerca de mí",
+    "denied": "Permite la ubicación en los ajustes del teléfono para ver viviendas cercanas.",
+    "failed": "No hemos podido encontrar tu ubicación. Inténtalo de nuevo."
+  },
+  "import": {
+    "headlinePre": "Importar",
+    "headlineEm": "anuncios",
+    "entry": "Importar anuncios",
+    "intro": "Sube un archivo CSV con los anuncios de tu oficina. Verás el resultado antes de publicar nada.",
+    "pick": "Elegir archivo CSV",
+    "required": "Columnas obligatorias",
+    "optional": "Columnas opcionales",
+    "valuesHint": "lloji: shitje, qira o ditore. tipi: apartament, shtepi, vile, toke, biznes, zyre o garazh.",
+    "photosHint": "Fotos: enlaces https separados por |. Las características también se separan con |.",
+    "rightsHint": "Importa solo anuncios y fotos que tengas derecho a publicar.",
+    "ready": "listos para publicar",
+    "withErrors": "con errores",
+    "publish": "Publicar {{total}}",
+    "chooseAnother": "Elegir otro archivo",
+    "publishing": "Publicando {{done}} de {{total}}",
+    "doneBody": "{{ok}} publicados.",
+    "doneFailed": "{{total}} no se publicaron. Sube el archivo de nuevo: los ya publicados se omiten.",
+    "another": "Importar otro archivo",
+    "agentsOnly": "La importación es solo para agentes.",
+    "fileTooBig": "El archivo es demasiado grande (máximo 2 MB).",
+    "fileExcel": "Este es un archivo Excel. Guárdalo como CSV e inténtalo de nuevo.",
+    "fileEmpty": "El archivo está vacío.",
+    "missingColumns": "Faltan columnas: {{list}}",
+    "tooMany": "Máximo {{max}} anuncios por archivo.",
+    "readFailed": "No se pudo leer el archivo. Inténtalo de nuevo.",
+    "line": "Fila {{n}}",
+    "more": "y {{total}} más",
+    "err": {
+      "required": "Falta: {{field}}",
+      "invalid": "No válido: {{field}}",
+      "duplicate": "Ya existe",
+      "encoding": "Caracteres dañados. Guarda como CSV UTF-8."
+    }
   }
 }

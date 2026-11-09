@@ -221,7 +221,9 @@
     "referenceInvalid": "Numer referencyjny ma 8 liter lub cyfr, np. SH-1A2B3C4D.",
     "rangeMin": "Min",
     "rangeMax": "Maks",
-    "showHomesAny": "Pokaż nieruchomości"
+    "showHomesAny": "Pokaż nieruchomości",
+    "saveSearch": "Zapisz to wyszukiwanie",
+    "searchSaved": "Zapisano · Powiadomienia włączone"
   },
   "favourites": {
     "title": "Ulubione",
@@ -1136,5 +1138,45 @@
     "loadFailed": "Nie udało się załadować porównania.",
     "yes": "Tak",
     "no": "Nie"
+  },
+  "nearMe": {
+    "button": "W pobliżu",
+    "denied": "Zezwól na lokalizację w ustawieniach telefonu, aby zobaczyć oferty w pobliżu.",
+    "failed": "Nie udało się ustalić Twojej lokalizacji. Spróbuj ponownie."
+  },
+  "import": {
+    "headlinePre": "Importuj",
+    "headlineEm": "ogłoszenia",
+    "entry": "Importuj ogłoszenia",
+    "intro": "Prześlij plik CSV z ogłoszeniami biura. Przed publikacją zobaczysz wynik.",
+    "pick": "Wybierz plik CSV",
+    "required": "Wymagane kolumny",
+    "optional": "Opcjonalne kolumny",
+    "valuesHint": "lloji: shitje, qira lub ditore. tipi: apartament, shtepi, vile, toke, biznes, zyre lub garazh.",
+    "photosHint": "Zdjęcia: linki https rozdzielone |. Cechy również rozdzielaj |.",
+    "rightsHint": "Importuj tylko ogłoszenia i zdjęcia, które masz prawo publikować.",
+    "ready": "gotowe do publikacji",
+    "withErrors": "z błędami",
+    "publish": "Opublikuj: {{total}}",
+    "chooseAnother": "Wybierz inny plik",
+    "publishing": "Publikowanie {{done}} z {{total}}",
+    "doneBody": "Opublikowano: {{ok}}.",
+    "doneFailed": "Nie opublikowano: {{total}}. Prześlij plik ponownie: opublikowane zostaną pominięte.",
+    "another": "Importuj kolejny plik",
+    "agentsOnly": "Import jest tylko dla agentów.",
+    "fileTooBig": "Plik jest za duży (maksymalnie 2 MB).",
+    "fileExcel": "To plik Excel. Zapisz go jako CSV i spróbuj ponownie.",
+    "fileEmpty": "Plik jest pusty.",
+    "missingColumns": "Brakujące kolumny: {{list}}",
+    "tooMany": "Maksymalnie {{max}} ogłoszeń w pliku.",
+    "readFailed": "Nie udało się odczytać pliku. Spróbuj ponownie.",
+    "line": "Wiersz {{n}}",
+    "more": "i jeszcze: {{total}}",
+    "err": {
+      "required": "Brak: {{field}}",
+      "invalid": "Nieprawidłowe: {{field}}",
+      "duplicate": "Już istnieje",
+      "encoding": "Uszkodzone znaki. Zapisz jako CSV UTF-8."
+    }
   }
 }

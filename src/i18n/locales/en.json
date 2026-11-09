@@ -265,7 +265,9 @@
     "referenceInvalid": "A reference has 8 letters or digits, e.g. SH-1A2B3C4D.",
     "rangeMin": "Min",
     "rangeMax": "Max",
-    "showHomesAny": "Show homes"
+    "showHomesAny": "Show homes",
+    "saveSearch": "Save this search",
+    "searchSaved": "Saved · Alerts on"
   },
   "detail": {
     "forSale": "For Sale",
@@ -1116,5 +1118,45 @@
     "loadFailed": "The comparison couldn't be loaded.",
     "yes": "Yes",
     "no": "No"
+  },
+  "nearMe": {
+    "button": "Near me",
+    "denied": "Allow location in your phone settings to see homes near you.",
+    "failed": "We couldn't find your location. Please try again."
+  },
+  "import": {
+    "headlinePre": "Import",
+    "headlineEm": "listings",
+    "entry": "Import listings",
+    "intro": "Upload a CSV file with your office's listings. You will see the result before anything is published.",
+    "pick": "Choose CSV file",
+    "required": "Required columns",
+    "optional": "Optional columns",
+    "valuesHint": "lloji: shitje, qira or ditore. tipi: apartament, shtepi, vile, toke, biznes, zyre or garazh.",
+    "photosHint": "Photos: https links separated by |. Features are separated by | too.",
+    "rightsHint": "Only import listings and photos you have the right to publish.",
+    "ready": "ready to publish",
+    "withErrors": "with errors",
+    "publish": "Publish {{total}}",
+    "chooseAnother": "Choose another file",
+    "publishing": "Publishing {{done}} of {{total}}",
+    "doneBody": "{{ok}} published.",
+    "doneFailed": "{{total}} could not be published. Upload the file again: those already published are skipped.",
+    "another": "Import another file",
+    "agentsOnly": "Importing is for agents only.",
+    "fileTooBig": "The file is too large (2 MB maximum).",
+    "fileExcel": "This is an Excel file. Save it as CSV and try again.",
+    "fileEmpty": "The file is empty.",
+    "missingColumns": "Missing columns: {{list}}",
+    "tooMany": "Maximum {{max}} listings per file.",
+    "readFailed": "The file couldn't be read. Please try again.",
+    "line": "Row {{n}}",
+    "more": "and {{total}} more",
+    "err": {
+      "required": "Missing: {{field}}",
+      "invalid": "Invalid: {{field}}",
+      "duplicate": "Already exists",
+      "encoding": "Damaged characters. Save as CSV UTF-8."
+    }
   }
 }

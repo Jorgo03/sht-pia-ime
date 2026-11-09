@@ -217,7 +217,9 @@
     "referenceInvalid": "Un riferimento ha 8 lettere o cifre, es. SH-1A2B3C4D.",
     "rangeMin": "Min",
     "rangeMax": "Max",
-    "showHomesAny": "Mostra le case"
+    "showHomesAny": "Mostra le case",
+    "saveSearch": "Salva questa ricerca",
+    "searchSaved": "Salvata · Avvisi attivi"
   },
   "favourites": {
     "title": "Preferiti",
@@ -1126,5 +1128,45 @@
     "loadFailed": "Impossibile caricare il confronto.",
     "yes": "Sì",
     "no": "No"
+  },
+  "nearMe": {
+    "button": "Vicino a me",
+    "denied": "Consenti la posizione nelle impostazioni del telefono per vedere gli immobili vicini.",
+    "failed": "Non siamo riusciti a trovare la tua posizione. Riprova."
+  },
+  "import": {
+    "headlinePre": "Importa",
+    "headlineEm": "annunci",
+    "entry": "Importa annunci",
+    "intro": "Carica un file CSV con gli annunci del tuo ufficio. Vedrai il risultato prima della pubblicazione.",
+    "pick": "Scegli file CSV",
+    "required": "Colonne obbligatorie",
+    "optional": "Colonne facoltative",
+    "valuesHint": "lloji: shitje, qira o ditore. tipi: apartament, shtepi, vile, toke, biznes, zyre o garazh.",
+    "photosHint": "Foto: link https separati da |. Anche le caratteristiche vanno separate da |.",
+    "rightsHint": "Importa solo annunci e foto che hai il diritto di pubblicare.",
+    "ready": "pronti da pubblicare",
+    "withErrors": "con errori",
+    "publish": "Pubblica {{total}}",
+    "chooseAnother": "Scegli un altro file",
+    "publishing": "Pubblicazione {{done}} di {{total}}",
+    "doneBody": "{{ok}} pubblicati.",
+    "doneFailed": "{{total}} non pubblicati. Carica di nuovo il file: quelli già pubblicati vengono saltati.",
+    "another": "Importa un altro file",
+    "agentsOnly": "L'importazione è solo per gli agenti.",
+    "fileTooBig": "Il file è troppo grande (massimo 2 MB).",
+    "fileExcel": "Questo è un file Excel. Salvalo come CSV e riprova.",
+    "fileEmpty": "Il file è vuoto.",
+    "missingColumns": "Colonne mancanti: {{list}}",
+    "tooMany": "Massimo {{max}} annunci per file.",
+    "readFailed": "Impossibile leggere il file. Riprova.",
+    "line": "Riga {{n}}",
+    "more": "e altri {{total}}",
+    "err": {
+      "required": "Manca: {{field}}",
+      "invalid": "Non valido: {{field}}",
+      "duplicate": "Esiste già",
+      "encoding": "Caratteri danneggiati. Salva come CSV UTF-8."
+    }
   }
 }

@@ -1,5 +1,7 @@
 import type { Page, Route } from '@playwright/test';
 
+declare const Buffer: { from(text: string): never };
+
 import { AGENT, CHAT_CLIENT_ID, CONVERSATIONS, LISTINGS, PERFORMANCE_REPORT } from '../e2e/support/fixtures';
 import { fakeSession, SESSION_STORAGE_KEY, SIGNED_IN_USER } from '../e2e/support/backend';
 import { AI_CHAT_ENABLED } from '../constants/features';
@@ -63,6 +65,57 @@ test('X03 sign in with email and password', async ({ page }) => {
 
 test.describe('signed in', () => {
   test.use({ signedIn: true });
+
+  test('X101 a filtered search is saved in one tap, with its amenities', async ({ page }) => {
+    const sent: Array<Record<string, unknown>> = [];
+    const rows: unknown[] = [];
+    await page.route('**/rest/v1/saved_searches*', (route) => {
+      if (route.request().method() === 'POST') {
+        const body = route.request().postDataJSON();
+        sent.push(body);
+        rows.push(body);
+        return route.fulfill({ status: 201, headers: { 'access-control-allow-origin': '*' }, body: '' });
+      }
+      return json(route, rows);
+    });
+    await page.goto('/explore');
+    await ready(page);
+    await expect(page.getByRole('button', { name: t('search.saveSearch') })).toHaveCount(0);
+    await page.getByRole('button', { name: t('search.filtersTitle') }).click();
+    await page.getByRole('button', { name: t('listing.feature.pool'), exact: true }).click();
+    await page.getByRole('button', { name: /^Shfaq d/ }).click();
+    await page.getByRole('button', { name: t('search.saveSearch') }).click();
+    await expect(page.getByRole('button', { name: t('search.searchSaved') })).toBeVisible();
+    expect(sent[0]).toMatchObject({ alerts_enabled: true, filters: { features: ['pool'] } });
+  });
+
+  test('X102 an agent imports a spreadsheet: errors are shown, good rows are published', async ({ page, writes }) => {
+    const inserted: Array<Record<string, unknown>> = [];
+    await page.route('**/rest/v1/properties*', (route) => {
+      if (route.request().method() === 'POST') {
+        inserted.push(...route.request().postDataJSON());
+        return route.fulfill({ status: 201, headers: { 'access-control-allow-origin': '*' }, body: '' });
+      }
+      return route.fallback();
+    });
+    void writes;
+    await page.goto('/listing/import');
+    await ready(page);
+    const csv = [
+      'titulli,cmimi,qyteti,lloji,tipi,siperfaqja,foto',
+      'Vilë e re,250000,Durrës,shitje,vile,200,https://x.al/a.jpg',
+      ',0,Durrës,shitje,kala,200,https://x.al/a.jpg',
+    ].join('\n');
+    const chooser = page.waitForEvent('filechooser');
+    await page.getByRole('button', { name: t('import.pick') }).click();
+    await (await chooser).setFiles({ name: 'prona.csv', mimeType: 'text/csv', buffer: Buffer.from(csv) });
+    await expect(page.getByText(t('import.withErrors'))).toBeVisible();
+    await expect(page.getByText(t('import.line').replace('{{n}}', '3'))).toBeVisible();
+    await page.getByRole('button', { name: t('import.publish').replace('{{total}}', '1') }).click();
+    await expect(page.getByText(t('import.doneBody').replace('{{ok}}', '1'))).toBeVisible();
+    expect(inserted).toHaveLength(1);
+    expect(inserted[0]).toMatchObject({ title: 'Vilë e re', price: 250000, listing_type: 'sale', property_type: 'villa', status: 'active', owner_type: 'agent' });
+  });
 
   test('X04 favourites: the heart saves a listing for this account', async ({ page, writes }) => {
     await page.goto('/');
@@ -732,6 +785,19 @@ test.describe('discovery', () => {
     await expect(page.getByText(t('detail.videoFailed'))).toBeVisible();
     await page.getByRole('button', { name: t('common.close') }).click();
     await expect(page.getByText(t('detail.videoFailed'))).toHaveCount(0);
+  });
+
+  test('X100 near me shows distance choices and moves the map', async ({ page, context }) => {
+    await context.grantPermissions(['geolocation']);
+    await context.setGeolocation({ latitude: 41.33, longitude: 19.82 });
+    await page.goto('/explore');
+    await ready(page);
+    await page.getByRole('button', { name: t('search.mapView') }).click();
+    await page.getByRole('button', { name: t('nearMe.button') }).click();
+    const five = page.getByRole('button', { name: '5 km', exact: true });
+    await expect(five).toBeVisible();
+    await page.getByRole('button', { name: '1 km', exact: true }).click();
+    await expect(page.getByRole('button', { name: '1 km', exact: true })).toBeVisible();
   });
 
   test('X97 compare: nothing picked says how to start; a pick shows the pill on Home', async ({ page }) => {

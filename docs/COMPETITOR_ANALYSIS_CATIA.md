@@ -216,12 +216,12 @@ Features are decided a few at a time. Nothing is built without a YES here.
 | Show listing video | **YES** | 2026-11-09 | Built |
 | Amenity filters | **YES** | 2026-11-09 | Built |
 | Search alerts actually sent | **YES** | 2026-11-09 | Push first, email later. Live since 2026-11-09, checked every 15 minutes |
-| Bulk listing import | Pending | | |
-| Near me and radius search | Pending | | |
+| Bulk listing import | **YES** | 2026-11-09 | Built: CSV upload for agents |
+| Near me and radius search | **YES** | 2026-11-09 | Built on the map, no database change |
 | Real agency accounts | Pending | | |
 | Honest recommendations | Pending | | |
 | More property types and status tags | Pending | | |
-| Save a search from Search | Pending | | |
+| Save a search from Search | **YES** | 2026-11-09 | Built; alert function update needs approval |
 | Price guide per area | Pending | | |
 | Agent reviews | Pending | | |
 | Floor plans | Pending | | |

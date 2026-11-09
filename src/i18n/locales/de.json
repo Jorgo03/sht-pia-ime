@@ -213,7 +213,9 @@
     "referenceInvalid": "Eine Referenz hat 8 Buchstaben oder Ziffern, z. B. SH-1A2B3C4D.",
     "rangeMin": "Min.",
     "rangeMax": "Max.",
-    "showHomesAny": "Immobilien anzeigen"
+    "showHomesAny": "Immobilien anzeigen",
+    "saveSearch": "Diese Suche speichern",
+    "searchSaved": "Gespeichert · Benachrichtigungen an"
   },
   "favourites": {
     "title": "Favoriten",
@@ -1116,5 +1118,45 @@
     "loadFailed": "Der Vergleich konnte nicht geladen werden.",
     "yes": "Ja",
     "no": "Nein"
+  },
+  "nearMe": {
+    "button": "In meiner Nähe",
+    "denied": "Erlaube den Standort in den Telefoneinstellungen, um Angebote in deiner Nähe zu sehen.",
+    "failed": "Dein Standort konnte nicht ermittelt werden. Bitte versuche es erneut."
+  },
+  "import": {
+    "headlinePre": "Inserate",
+    "headlineEm": "importieren",
+    "entry": "Inserate importieren",
+    "intro": "Lade eine CSV-Datei mit den Inseraten deines Büros hoch. Du siehst das Ergebnis, bevor etwas veröffentlicht wird.",
+    "pick": "CSV-Datei wählen",
+    "required": "Pflichtspalten",
+    "optional": "Optionale Spalten",
+    "valuesHint": "lloji: shitje, qira oder ditore. tipi: apartament, shtepi, vile, toke, biznes, zyre oder garazh.",
+    "photosHint": "Fotos: https-Links, getrennt durch |. Merkmale ebenfalls durch | trennen.",
+    "rightsHint": "Importiere nur Inserate und Fotos, die du veröffentlichen darfst.",
+    "ready": "bereit zur Veröffentlichung",
+    "withErrors": "mit Fehlern",
+    "publish": "{{total}} veröffentlichen",
+    "chooseAnother": "Andere Datei wählen",
+    "publishing": "{{done}} von {{total}} werden veröffentlicht",
+    "doneBody": "{{ok}} veröffentlicht.",
+    "doneFailed": "{{total}} konnten nicht veröffentlicht werden. Lade die Datei erneut hoch: Bereits veröffentlichte werden übersprungen.",
+    "another": "Weitere Datei importieren",
+    "agentsOnly": "Der Import ist nur für Makler.",
+    "fileTooBig": "Die Datei ist zu groß (maximal 2 MB).",
+    "fileExcel": "Das ist eine Excel-Datei. Speichere sie als CSV und versuche es erneut.",
+    "fileEmpty": "Die Datei ist leer.",
+    "missingColumns": "Fehlende Spalten: {{list}}",
+    "tooMany": "Maximal {{max}} Inserate pro Datei.",
+    "readFailed": "Die Datei konnte nicht gelesen werden. Bitte versuche es erneut.",
+    "line": "Zeile {{n}}",
+    "more": "und {{total}} weitere",
+    "err": {
+      "required": "Fehlt: {{field}}",
+      "invalid": "Ungültig: {{field}}",
+      "duplicate": "Existiert bereits",
+      "encoding": "Beschädigte Zeichen. Als CSV UTF-8 speichern."
+    }
   }
 }

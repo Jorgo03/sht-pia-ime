@@ -14,6 +14,9 @@ import { AMENITIES, toggleAmenity } from '../src/features/properties/lib/ameniti
 import { alertNotificationData, notTheirOwn } from '../supabase/functions/saved-search-alerts/logic.js'
 import { buildPush, safeRoute } from '../supabase/functions/push-dispatch/logic.js'
 import { notificationCopy, notificationRoute } from '../src/features/notifications/lib/feed.js'
+import { batches, buildImport, COLUMN_NAMES, parseCsv, parseNumber, REQUIRED_COLUMNS } from '../src/features/listings/lib/bulkImport.js'
+import { regionAround } from '../src/features/properties/lib/nearMe.js'
+import { hasFacets, savedFromFilters, savedKey, savedLabel } from '../src/features/saved-searches/lib/fromFilters.js'
 import {
   allFeatures,
   bestOf,
@@ -140,4 +143,72 @@ test('every language has alert wording that shows no search name, address or pri
   }
   const t = (key, opts) => (opts?.total ? `${key}:${opts.total}` : key)
   assert.equal(notificationCopy({ kind: 'saved_search', data: { count: 4 } }, t).body, 'notifications.kinds.saved_search.bodyMany:4')
+})
+
+test('saving a search keeps what was chosen, in one comparable form', () => {
+  const saved = savedFromFilters({ city: ' Tiranë ', listingType: 'rent', beds: 2, features: ['pool'], minPrice: null, sort: 'newest' })
+  assert.deepEqual(saved, { city: 'Tiranë', listing_type: 'rent', beds: 2, features: ['pool'] })
+  assert.equal(hasFacets(savedFromFilters({ sort: 'newest', city: '  ', features: [] })), false)
+  assert.equal(savedKey({ city: 'A', listing_type: 'rent', zone: null }), savedKey({ listing_type: 'rent', city: 'A' }))
+  assert.match(savedLabel(saved, (k) => k), /^Tiranë · search\.rent · 2\+/)
+})
+
+test('near me shows the same distance north and east', () => {
+  const r = regionAround({ latitude: 41.33, longitude: 19.82 }, 5)
+  assert.ok(Math.abs(r.latitudeDelta * 110.574 - 10) < 0.001)
+  assert.ok(r.longitudeDelta > r.latitudeDelta, 'a degree of longitude is shorter at this latitude')
+})
+
+test('the spreadsheet reader copes with what Excel really writes', () => {
+  assert.deepEqual(parseCsv('\uFEFFa;b\r\n1;"x;y"\r\n;\r\n"li""ne\ntwo";2').map((r) => r.cells), [['a', 'b'], ['1', 'x;y'], ['li"ne\ntwo', '2']])
+  assert.equal(parseNumber('125.000 €'), 125000)
+  assert.equal(parseNumber('125,000'), 125000)
+  assert.equal(parseNumber('1.250.000,50'), 1250000.5)
+  assert.equal(parseNumber('85,5'), 85.5)
+  assert.equal(parseNumber('abc'), null)
+})
+
+const HEAD = 'titulli,cmimi,qyteti,lloji,tipi,siperfaqja,foto,karakteristikat,dhoma'
+const good = (t = 'Apartament 1') => `${t},"120.000 €",Tiranë,shitje,apartament,80,https://x.al/a.jpg|https://x.al/b.jpg,Ballkon|Ashensor,2`
+
+test('a good row becomes exactly what the database accepts', () => {
+  const { problem, rows } = buildImport(`${HEAD}\n${good()}`)
+  assert.equal(problem, null)
+  assert.deepEqual(rows[0].errors, [])
+  const c = rows[0].columns
+  assert.equal(c.price, 120000)
+  assert.equal(c.listing_type, 'sale')
+  assert.equal(c.property_type, 'apartment')
+  assert.deepEqual(c.features, ['balcony', 'elevator'])
+  assert.equal(c.image_urls.length, 2)
+  assert.equal(c.currency, 'EUR')
+})
+
+test('bad rows say exactly what is wrong, and good rows still go through', () => {
+  const { rows } = buildImport(`${HEAD}\n,0,Tiranë,shitje,kala,80,http://x.al/a.jpg,Fantazi,2\n${good()}`)
+  assert.deepEqual(rows[0].errors.map((e) => `${e.kind}:${e.field}`).sort(), ['invalid:features', 'invalid:photos', 'invalid:price', 'invalid:property_type', 'required:title'])
+  assert.equal(rows[0].columns, null)
+  assert.ok(rows[1].columns)
+})
+
+test('nothing is published twice, from the same file or an earlier import', () => {
+  const twice = buildImport(`${HEAD}\n${good()}\n${good()}`).rows
+  assert.deepEqual(twice[1].errors, [{ kind: 'duplicate' }])
+  const again = buildImport(`${HEAD}\n${good()}`, [{ title: 'APARTAMENT 1', address: '', price: 120000 }]).rows
+  assert.deepEqual(again[0].errors, [{ kind: 'duplicate' }])
+})
+
+test('files that cannot be imported say why', () => {
+  assert.equal(buildImport('PK\u0003\u0004binary').problem, 'excel')
+  assert.equal(buildImport('').problem, 'empty')
+  const columns = buildImport('titulli,cmimi\nA,1')
+  assert.equal(columns.problem, 'columns')
+  assert.ok(columns.missing.includes('photos'))
+  assert.equal(buildImport(`${HEAD}\n${Array(201).fill(good()).join('\n')}`).problem, 'tooMany')
+  assert.deepEqual(buildImport(`${HEAD}\nApartament \uFFFD,1,T,shitje,vile,8,https://a.al/a,,1`).rows[0].errors, [{ kind: 'encoding' }])
+})
+
+test('every required column has a name, and rows go in small groups', () => {
+  for (const c of REQUIRED_COLUMNS) assert.ok(COLUMN_NAMES[c], c)
+  assert.deepEqual(batches([1, 2, 3], 2), [[1, 2], [3]])
 })

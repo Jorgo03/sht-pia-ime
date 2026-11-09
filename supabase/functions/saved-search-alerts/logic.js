@@ -70,6 +70,10 @@ export function applySavedFilters(query, filters) {
   const price = priceRangeExpression(f.minPrice, f.maxPrice)
   if (price) query = query.or(price)
   if (num(f.beds) !== null) query = query.gte('beds', num(f.beds))
+  if (num(f.baths) !== null) query = query.gte('baths', num(f.baths))
+  if (num(f.minArea) !== null) query = query.gte('sqft', num(f.minArea))
+  if (num(f.maxArea) !== null) query = query.lte('sqft', num(f.maxArea))
+  if (Array.isArray(f.features) && f.features.length) query = query.contains('features', f.features)
   return query
 }
 
