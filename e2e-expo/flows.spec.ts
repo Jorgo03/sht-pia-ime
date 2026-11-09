@@ -83,7 +83,7 @@ test.describe('signed in', () => {
     await expect(page.getByRole('button', { name: t('search.saveSearch') })).toHaveCount(0);
     await page.getByRole('button', { name: t('search.filtersTitle') }).click();
     await page.getByRole('button', { name: t('listing.feature.pool'), exact: true }).click();
-    await page.getByRole('button', { name: /^Shfaq d/ }).click();
+    await page.getByRole('button', { name: /^Shfaq [0-9]/ }).click();
     await page.getByRole('button', { name: t('search.saveSearch') }).click();
     await expect(page.getByRole('button', { name: t('search.searchSaved') })).toBeVisible();
     expect(sent[0]).toMatchObject({ alerts_enabled: true, filters: { features: ['pool'] } });
