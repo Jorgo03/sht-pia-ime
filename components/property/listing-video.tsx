@@ -75,7 +75,8 @@ const styles = StyleSheet.create({
   chip: {
     position: 'absolute',
     left: 16,
-    bottom: 12,
+    // Clear of the content card, which overlaps the bottom of the photo.
+    bottom: 40,
     minHeight: 44,
     flexDirection: 'row',
     alignItems: 'center',
