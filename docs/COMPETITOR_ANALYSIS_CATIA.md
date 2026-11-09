@@ -215,7 +215,7 @@ Features are decided a few at a time. Nothing is built without a YES here.
 | Explore cities, agencies directory, comparison | Already built at your request | 2026-11-08 | Tell me if you want any changed or removed |
 | Show listing video | **YES** | 2026-11-09 | Built |
 | Amenity filters | **YES** | 2026-11-09 | Built |
-| Search alerts actually sent | **YES** | 2026-11-09 | Push first, email later. Built; live backend needs approval |
+| Search alerts actually sent | **YES** | 2026-11-09 | Push first, email later. Live since 2026-11-09, checked every 15 minutes |
 | Bulk listing import | Pending | | |
 | Near me and radius search | Pending | | |
 | Real agency accounts | Pending | | |

@@ -680,7 +680,7 @@
     "newSearch": "Neue Suche",
     "newWanted": "Neues Gesuch",
     "newMatches": "{{n}} mehr als beim letzten Mal",
-    "alertsHint": "Neue Treffer erscheinen hier, wenn Sie diese Seite öffnen. E-Mail-Benachrichtigungen gibt es noch nicht.",
+    "alertsHint": "Wir benachrichtigen dich, wenn neue passende Angebote erscheinen. E-Mail-Benachrichtigungen sind noch nicht verfügbar.",
     "emailOn": "Neue Treffer per E-Mail",
     "emailOff": "Keine E-Mails mehr",
     "emailHint": "Neue Treffer erscheinen hier, wenn du diese Seite öffnest. Schalte E-Mail ein, um sie auch per E-Mail zu bekommen; jede E-Mail hat einen Abmeldelink.",
