@@ -221,7 +221,7 @@ Features are decided a few at a time. Nothing is built without a YES here.
 | Real agency accounts | Pending | | |
 | Honest recommendations | Pending | | |
 | More property types and status tags | Pending | | |
-| Save a search from Search | **YES** | 2026-11-09 | Built; alert function update needs approval |
+| Save a search from Search | **YES** | 2026-11-09 | Live since 2026-11-09, including alert matching |
 | Price guide per area | Pending | | |
 | Agent reviews | Pending | | |
 | Floor plans | Pending | | |
