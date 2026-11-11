@@ -74,14 +74,15 @@ const FONT_GATE_TIMEOUT_MS = 4000;
 
 /**
  * Loaded after the first screen, not before it: Ionicons draws only the Apple
- * and LinkedIn logos on Profile (390 KB), and these weights are in
- * constants/theme.ts's Fonts but no screen uses them yet.
+ * and LinkedIn logos on Profile (390 KB), and the sansExtraBold weight is in
+ * constants/theme.ts but no screen uses it yet. Count uses as `Fonts?.x` too
+ * (tests/fontGate.test.mjs does):
+ * missing that form once moved sansMedium (listing cards) and serifItalic
+ * here, and text already drawn kept the system font.
  */
 const LATER_FONTS = {
   ...Ionicons.font,
-  Manrope_500Medium,
   Manrope_800ExtraBold,
-  Newsreader_500Medium_Italic,
 };
 
 // Redacted crash reports to client_errors (docs/LAUNCH_TASKS.md F11); a no-op
@@ -285,13 +286,15 @@ export default function RootLayout() {
   // "do not show the UI before required fonts have loaded" is enforced by
   // construction rather than left to chance.
   //
-  // Only what the first screens draw blocks the splash (8 files); the rest
-  // follows in LATER_FONTS, and FONT_GATE_TIMEOUT_MS caps the wait.
+  // Every font a screen uses blocks the splash (10 files); the rest follows
+  // in LATER_FONTS, and FONT_GATE_TIMEOUT_MS caps the wait.
   const [fontsLoaded, fontError] = useFonts({
     ...MaterialIcons.font,
     Newsreader_500Medium,
+    Newsreader_500Medium_Italic,
     Newsreader_600SemiBold,
     Manrope_400Regular,
+    Manrope_500Medium,
     Manrope_600SemiBold,
     Manrope_700Bold,
     JetBrainsMono_400Regular,
