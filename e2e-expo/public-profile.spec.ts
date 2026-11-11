@@ -7,7 +7,7 @@ import { axeViolations, expect, test } from '../e2e/support/test';
 // Public profile (app/user/[id].tsx): chat header → the other person's profile
 // → their listings → a listing → back to the profile → back to the chat.
 // public_profile() decides what may be shown (the fake backend applies the
-// same rules as migration 20261111120000); listings are active ones only.
+// same rules as migration 20261111230117); listings are active ones only.
 // Same fake backend as e2e/: offline, never touches production.
 
 const CORS = { 'access-control-allow-origin': '*', 'access-control-expose-headers': 'content-range' };

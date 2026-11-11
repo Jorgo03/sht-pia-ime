@@ -1,4 +1,4 @@
--- Public profile (migration 20261111120000; app/user/[id].tsx).
+-- Public profile (migration 20261111230117; app/user/[id].tsx).
 -- One DO block that always ends in `raise exception 'RESULTS …'`, so every
 -- write is rolled back. Expected: passed=16/16. Uses the oldest agent and three
 -- clients: c1 writes to c2 about c2's listing; `stranger` has no conversation

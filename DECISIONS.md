@@ -1017,19 +1017,18 @@ Tapping the photo or name in a chat opens that person's profile
 (`app/user/[id].tsx`, also what `/agent/<id>` now shows): agent or client,
 phone, an agent's office, and every active listing they publish. Client
 profiles are private in the database, so the page reads them through
-`public_profile()` (migration `20261111120000_public_profile.sql`), the same
+`public_profile()` (migration `20261111230117_public_profile.sql`), the same
 kind of narrow function as `listing_publisher()`. It answers only for an agent,
 yourself, someone you share a conversation with, or a client with an active
 listing, and returns only name, photo (not for the listing-only case), phone,
 office (agents only) and the active-listing count. No table policy changes.
 
-**Waiting for the owner's OK to apply it.** It was run on the live database
-inside a transaction that is always rolled back
-(`supabase/tests/rls_public_profile.sql`, 16/16) and nothing was left behind.
-Until it is applied, the app falls back to reading `profiles` directly, as the
-agent page did: agents' profiles work, a client's appears only where the old
-rules already allowed, and a client writing to a client who published still
-sees "?" as the name in the chat.
+**Applied live 2026-11-12 on the owner's OK** (migration version
+20261111230117). `supabase/tests/rls_public_profile.sql` passed 16/16 against
+the live function, inside a transaction that is always rolled back; nothing
+was left behind. The app's fallback to reading `profiles` directly (for a
+database without the function, code PGRST202) stays harmless and can be
+removed later.
 
 Listings on a profile are matched by `owner_id` or `agent_id` (all three live
 listings today are client-published, with no `agent_id`, which the old agent

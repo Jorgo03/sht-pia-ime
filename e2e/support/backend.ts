@@ -236,7 +236,7 @@ export async function mockBackend(page: Page, { signedIn = false, writes = [] as
         }]);
       }
       if (url.pathname === '/rest/v1/rpc/public_profile') {
-        // As migration 20261111120000: an agent to anyone, a client to the
+        // As migration 20261111230117: an agent to anyone, a client to the
         // agent they talk to (signed in here) or to anyone when they publish an
         // active listing; never an office for a client.
         let body: { p_user?: string } = {};

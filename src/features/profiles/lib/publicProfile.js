@@ -4,7 +4,7 @@
 //
 // The person is always the id in the address, never the one looking. Their
 // card comes from public_profile() on the server, which decides what may be
-// shown (migration 20261111120000). Their listings are read from `properties`
+// shown (migration 20261111230117). Their listings are read from `properties`
 // by publisher id, owner_id or agent_id, and only active ones: the table
 // would also give the viewer their own drafts when they open their own
 // profile, and a public profile must look the same to everyone.
@@ -24,7 +24,7 @@ const clean = (value) => {
 }
 
 // PostgREST's "no such function": the database does not have public_profile()
-// yet (migration 20261111120000 not applied).
+// yet (migration 20261111230117 not applied).
 const MISSING_FUNCTION = 'PGRST202'
 
 /** The server's card for a person, or null when it may not be shown. */
