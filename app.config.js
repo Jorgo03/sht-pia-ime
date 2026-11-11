@@ -17,7 +17,39 @@
 // manifest entry. Without the variable nothing is added: Expo Go and iOS
 // (Apple Maps) do not need it. The key ships inside the app, so it must be
 // restricted in Google Cloud to this package and the signing certificates.
+//
+// Free Apple ID sideloading (SIDELOAD_FREE=1, .github/workflows/ios-sideload.yml):
+// a free account cannot sign the push-notification or Sign in with Apple
+// capabilities, so Sideloadly refuses an app that asks for them. That build
+// leaves out the two plugins that add them. The app already copes: push
+// registration reports 'failed', and Apple sign-in shows the usual error.
 const COMMANDS_THAT_SERVE_A_MANIFEST = ['start', 'export'];
+const PLUGINS_A_FREE_ACCOUNT_CANNOT_SIGN = ['expo-apple-authentication', 'expo-notifications'];
+
+// Expo also applies these packages' plugins on its own because they are
+// installed, so leaving them out of the list is not enough: the entitlements
+// are deleted again as the very last step.
+const ENTITLEMENTS_A_FREE_ACCOUNT_CANNOT_SIGN = ['aps-environment', 'com.apple.developer.applesignin'];
+
+function withoutPaidEntitlements(config) {
+  const { withEntitlementsPlist } = require('expo/config-plugins');
+  return withEntitlementsPlist(config, (mod) => {
+    for (const key of ENTITLEMENTS_A_FREE_ACCOUNT_CANNOT_SIGN) delete mod.modResults[key];
+    return mod;
+  });
+}
+
+function withoutPaidCapabilities(config) {
+  const name = (plugin) => (Array.isArray(plugin) ? plugin[0] : plugin);
+  return {
+    ...config,
+    ios: { ...config.ios, usesAppleSignIn: false },
+    plugins: [
+      ...(config.plugins ?? []).filter((p) => !PLUGINS_A_FREE_ACCOUNT_CANNOT_SIGN.includes(name(p))),
+      withoutPaidEntitlements,
+    ],
+  };
+}
 
 function withAndroidMapsKey(config, key) {
   if (!key) return config;
@@ -29,7 +61,8 @@ function withAndroidMapsKey(config, key) {
 }
 
 module.exports = ({ config }) => {
-  const withKey = withAndroidMapsKey(config, (process.env.GOOGLE_MAPS_ANDROID_API_KEY ?? '').trim());
+  const mapped = withAndroidMapsKey(config, (process.env.GOOGLE_MAPS_ANDROID_API_KEY ?? '').trim());
+  const withKey = process.env.SIDELOAD_FREE === '1' ? withoutPaidCapabilities(mapped) : mapped;
   const command = process.argv.slice(2).find((arg) => !arg.startsWith('-'));
   const icon = withKey.ios?.icon;
   if (!COMMANDS_THAT_SERVE_A_MANIFEST.includes(command) || !icon || typeof icon !== 'object') {

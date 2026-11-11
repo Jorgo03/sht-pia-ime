@@ -1,0 +1,104 @@
+# Builds the iPhone app as an unsigned .ipa on GitHub's free macOS machines,
+# for installing with a free Apple ID through Sideloadly (Windows/Mac). The app
+# then opens like any other app, with no laptop or Expo Go, for 7 days; after
+# that, install it again. docs/IPHONE_SIDELOAD.md has the steps.
+#
+# Started by hand: Actions → "iPhone app (free sideload)" → Run workflow.
+# The result is the artifact "Shtepia-ime-ipa" on the run's page.
+#
+# Needs two repository secrets (Settings → Secrets and variables → Actions):
+# EXPO_PUBLIC_SUPABASE_URL and EXPO_PUBLIC_SUPABASE_ANON_KEY, the same values
+# as .env.local. Both end up inside the app, exactly as in every other build:
+# the anon key is public by design and protected by row-level security.
+#
+# SIDELOAD_FREE=1 leaves out push notifications and Sign in with Apple, which
+# a free Apple ID cannot sign (app.config.js).
+
+name: iPhone app (free sideload)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ios-sideload-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ipa:
+    name: Build unsigned .ipa
+    runs-on: macos-latest
+    timeout-minutes: 75
+    env:
+      EXPO_PUBLIC_SUPABASE_URL: ${{ secrets.EXPO_PUBLIC_SUPABASE_URL }}
+      EXPO_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.EXPO_PUBLIC_SUPABASE_ANON_KEY }}
+      EXPO_NO_TELEMETRY: 1
+      CI: 1
+    steps:
+      - name: Check the two secrets are set
+        run: |
+          missing=0
+          for name in EXPO_PUBLIC_SUPABASE_URL EXPO_PUBLIC_SUPABASE_ANON_KEY; do
+            if [ -z "${!name}" ]; then
+              echo "::error::Repository secret $name is not set (Settings → Secrets and variables → Actions)."
+              missing=1
+            fi
+          done
+          exit $missing
+
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+
+      # The newest Xcode on the image: each Expo SDK needs a recent one, and
+      # pinning a number here would break on the next image update.
+      - name: Select the newest Xcode
+        run: |
+          xcode=$(ls -d /Applications/Xcode_*.app | grep -vi beta | sort -V | tail -1)
+          echo "Using $xcode"
+          sudo xcode-select -s "$xcode/Contents/Developer"
+          xcodebuild -version
+
+      - run: npm ci
+
+      - name: Generate the iOS project (free-account capabilities only)
+        run: SIDELOAD_FREE=1 npx expo prebuild --platform ios --clean
+
+      - name: Check no paid capability is left
+        run: |
+          ent=$(ls ios/*/*.entitlements 2>/dev/null | head -1)
+          if [ -n "$ent" ] && grep -qE "aps-environment|applesignin" "$ent"; then
+            echo "::error::$ent still asks for a capability a free Apple ID cannot sign:"
+            cat "$ent"
+            exit 1
+          fi
+
+      - name: Build the app (Release, unsigned)
+        run: |
+          workspace=$(ls -d ios/*.xcworkspace | head -1)
+          scheme=$(basename "$workspace" .xcworkspace)
+          set -o pipefail
+          xcodebuild -workspace "$workspace" -scheme "$scheme" \
+            -configuration Release -sdk iphoneos -destination 'generic/platform=iOS' \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
+            build | tail -n 200
+
+      - name: Package the .ipa
+        run: |
+          app=$(ls -d build/Build/Products/Release-iphoneos/*.app | head -1)
+          mkdir -p Payload
+          cp -R "$app" Payload/
+          zip -qry Shtepia-ime.ipa Payload
+          ls -lh Shtepia-ime.ipa
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: Shtepia-ime-ipa
+          path: Shtepia-ime.ipa
+          retention-days: 14
