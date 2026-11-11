@@ -259,7 +259,8 @@
     "similar": "Biens similaires",
     "video": "Visite vidéo",
     "perDay": "/jour",
-    "forDailyRent": "Location journalière"
+    "forDailyRent": "Location journalière",
+    "publishedOn": "Publié le {{date}}"
   },
   "detail": {
     "forSale": "À vendre",
@@ -1168,5 +1169,16 @@
       "duplicate": "Existe déjà",
       "encoding": "Caractères endommagés. Enregistrez en CSV UTF-8."
     }
+  },
+  "publicProfile": {
+    "agent": "Agent immobilier",
+    "unnamed": "Utilisateur",
+    "published": "Biens publiés : {{n}}",
+    "listingsTitle": "Biens publiés par cet utilisateur",
+    "empty": "Aucun bien publié pour le moment.",
+    "unavailable": "Ce profil n'est pas disponible.",
+    "listingsFailed": "Impossible de charger les biens.",
+    "open": "Ouvrir le profil de {{name}}",
+    "call": "Appeler le {{phone}}"
   }
 }

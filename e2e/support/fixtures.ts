@@ -111,6 +111,16 @@ export const MISSING_ID = 'e2e00000-0000-4000-b000-00000000dead';
 // One conversation the signed-in agent (AGENT) has with a client about the
 // first listing, for the chat tests (report and block).
 export const CHAT_CLIENT_ID = 'e2e00000-0000-4000-c000-0000000000c1';
+// That client as public_profile() returns them to the agent they talk to. A
+// client publishes nothing here, and their profile holds an office that must
+// never be shown for a client.
+export const CHAT_CLIENT = {
+  id: CHAT_CLIENT_ID,
+  full_name: 'Ana Klientja',
+  phone: '+355 69 000 0002',
+  agency_name: 'Should not show',
+  avatar_url: null,
+};
 export const CONVERSATIONS = [
   {
     id: 'e2e00000-0000-4000-d000-000000000001',

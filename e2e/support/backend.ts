@@ -1,6 +1,6 @@
 import type { Page, Route } from '@playwright/test';
 
-import { AGENT, CONVERSATIONS, LISTINGS, PERFORMANCE_REPORT, SAVED_SEARCHES, type Listing } from './fixtures';
+import { AGENT, CHAT_CLIENT, CONVERSATIONS, LISTINGS, PERFORMANCE_REPORT, SAVED_SEARCHES, type Listing } from './fixtures';
 
 // A stand-in for Supabase, served from inside the browser. The app under test
 // is built against https://e2e.supabase.co, which does not exist, and every
@@ -234,6 +234,26 @@ export async function mockBackend(page: Page, { signedIn = false, writes = [] as
           phone: listing.contact_phone ?? agent?.phone ?? null,
           agency_name: agent?.agency_name ?? null,
         }]);
+      }
+      if (url.pathname === '/rest/v1/rpc/public_profile') {
+        // As migration 20261111120000: an agent to anyone, a client to the
+        // agent they talk to (signed in here) or to anyone when they publish an
+        // active listing; never an office for a client.
+        let body: { p_user?: string } = {};
+        try { body = route.request().postDataJSON() ?? {}; } catch { /* no body */ }
+        const who = body.p_user;
+        const live = store.filter((l) => (l.owner_id === who || l.agent_id === who) && l.status === 'active');
+        const agent = LISTINGS.map((l) => l.agent).find((a) => a?.id === who);
+        if (agent) {
+          return json(route, 200, [{ id: who, kind: 'agent', full_name: agent.full_name, avatar_url: agent.avatar_url, phone: agent.phone, agency_name: agent.agency_name, listing_count: live.length }]);
+        }
+        if (who === CHAT_CLIENT.id && signedIn) {
+          return json(route, 200, [{ id: who, kind: 'client', full_name: CHAT_CLIENT.full_name, avatar_url: null, phone: CHAT_CLIENT.phone, agency_name: null, listing_count: live.length }]);
+        }
+        if (live.length > 0) {
+          return json(route, 200, [{ id: who, kind: 'client', full_name: null, avatar_url: null, phone: (live[0].contact_phone as string | null) ?? null, agency_name: null, listing_count: live.length }]);
+        }
+        return json(route, 200, []);
       }
       if (url.pathname === '/rest/v1/rpc/my_performance_report') {
         // Like the database: agents only, and the arguments are recorded so a

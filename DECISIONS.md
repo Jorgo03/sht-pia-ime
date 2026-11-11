@@ -1010,3 +1010,28 @@ password as the default. Per-code wrong-guess limits exist only in the app, beca
 Supabase has no per-code limit and clients can call its verify endpoint
 directly; the server-side limit is per IP (Token verifications). Delivery
 events, bounce webhooks and SPF/DKIM/DMARC on our own name wait for a domain.
+
+## 20. Public profile from the chat: one database function to approve — 2026-11-11
+
+Tapping the photo or name in a chat opens that person's profile
+(`app/user/[id].tsx`, also what `/agent/<id>` now shows): agent or client,
+phone, an agent's office, and every active listing they publish. Client
+profiles are private in the database, so the page reads them through
+`public_profile()` (migration `20261111120000_public_profile.sql`), the same
+kind of narrow function as `listing_publisher()`. It answers only for an agent,
+yourself, someone you share a conversation with, or a client with an active
+listing, and returns only name, photo (not for the listing-only case), phone,
+office (agents only) and the active-listing count. No table policy changes.
+
+**Waiting for the owner's OK to apply it.** It was run on the live database
+inside a transaction that is always rolled back
+(`supabase/tests/rls_public_profile.sql`, 16/16) and nothing was left behind.
+Until it is applied, the app falls back to reading `profiles` directly, as the
+agent page did: agents' profiles work, a client's appears only where the old
+rules already allowed, and a client writing to a client who published still
+sees "?" as the name in the chat.
+
+Listings on a profile are matched by `owner_id` or `agent_id` (all three live
+listings today are client-published, with no `agent_id`, which the old agent
+page missed) and only `status = 'active'`: drafts, paused, sold and rented stay
+off, as on every other public list.

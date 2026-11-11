@@ -13,7 +13,7 @@ import { useFavorites } from '@/contexts/favorites-context';
 import { useTheme } from '@/contexts/theme-context';
 import { useResponsive } from '@/hooks/use-responsive';
 import { Property } from '@/data/types';
-import { formatPrice, getLocalizedText, listingBadgeKey, priceSuffixKey } from '@/lib/format';
+import { formatDate, formatPrice, getLocalizedText, listingBadgeKey, priceSuffixKey } from '@/lib/format';
 import { cardImageUrl } from '@/lib/image';
 import { CARD_CONTAINER_A11Y } from '@/components/property/card-a11y';
 
@@ -47,9 +47,13 @@ interface PropertyCardProps {
   /** 'compact' mirrors web's PropertyCard variant="compact" — the smaller
    *  card used in horizontal-scroll rails (Matched, Recently Viewed). */
   variant?: 'grid' | 'compact';
+  /** Grid only: also the listing's title and when it was published, for a
+   *  list of one person's listings (their public profile), where each card
+   *  has to say which home it is. Off everywhere else. */
+  detailed?: boolean;
 }
 
-function PropertyCardBase({ property, onPress, variant = 'grid' }: PropertyCardProps) {
+function PropertyCardBase({ property, onPress, variant = 'grid', detailed = false }: PropertyCardProps) {
   const { t, i18n } = useTranslation();
   const { isFavorite, toggle } = useFavorites();
   const router = useRouter();
@@ -194,6 +198,11 @@ function PropertyCardBase({ property, onPress, variant = 'grid' }: PropertyCardP
         </View>
       </View>
       <View style={styles.info}>
+        {detailed && title ? (
+          <Text style={styles.detailTitle} numberOfLines={2} accessibilityElementsHidden importantForAccessibility="no">
+            {title}
+          </Text>
+        ) : null}
         {/* Matches web's .mini-price — price and suffix share one plain text
             node with no distinct sub-styling for the suffix. */}
         <Text
@@ -219,6 +228,11 @@ function PropertyCardBase({ property, onPress, variant = 'grid' }: PropertyCardP
             ))}
           </View>
         )}
+        {detailed && property.created_at ? (
+          <Text style={styles.detailDate} numberOfLines={1}>
+            {t('property.publishedOn', { date: formatDate(property.created_at) })}
+          </Text>
+        ) : null}
       </View>
     </Pressable>
     </Animated.View>
@@ -319,6 +333,19 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     fontSize: 12,
     color: colors.textSecondary,
     flex: 1,
+  },
+  // `detailed` cards (a person's public profile) only.
+  detailTitle: {
+    fontFamily: Fonts.sansSemiBold,
+    fontSize: 13,
+    lineHeight: 17,
+    color: colors.textPrimary,
+  },
+  detailDate: {
+    fontFamily: Fonts.sans,
+    fontSize: 12,
+    color: colors.textSecondary,
+    marginTop: 3,
   },
   // Matches web's .mini-price — serif, not the plain sans used elsewhere.
   price: {

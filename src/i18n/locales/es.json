@@ -259,7 +259,8 @@
     "similar": "Propiedades similares",
     "video": "Video tour",
     "perDay": "/día",
-    "forDailyRent": "Alquiler diario"
+    "forDailyRent": "Alquiler diario",
+    "publishedOn": "Publicado el {{date}}"
   },
   "detail": {
     "forSale": "En venta",
@@ -1168,5 +1169,16 @@
       "duplicate": "Ya existe",
       "encoding": "Caracteres dañados. Guarda como CSV UTF-8."
     }
+  },
+  "publicProfile": {
+    "agent": "Agente inmobiliario",
+    "unnamed": "Usuario",
+    "published": "Propiedades publicadas: {{n}}",
+    "listingsTitle": "Propiedades publicadas por este usuario",
+    "empty": "Aún no hay propiedades publicadas.",
+    "unavailable": "Este perfil no está disponible.",
+    "listingsFailed": "No se pudieron cargar las propiedades.",
+    "open": "Abrir el perfil de {{name}}",
+    "call": "Llamar al {{phone}}"
   }
 }

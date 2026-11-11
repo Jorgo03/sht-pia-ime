@@ -252,7 +252,8 @@
     "similar": "Prona të ngjashme",
     "video": "Video tur",
     "perDay": "/ditë",
-    "forDailyRent": "Qira ditore"
+    "forDailyRent": "Qira ditore",
+    "publishedOn": "Publikuar më {{date}}"
   },
   "detail": {
     "forSale": "Shitje",
@@ -1158,5 +1159,16 @@
       "duplicate": "Ekziston tashmë",
       "encoding": "Shkronja të dëmtuara. Ruaje si CSV UTF-8."
     }
+  },
+  "publicProfile": {
+    "agent": "Agjent imobiliar",
+    "unnamed": "Përdorues",
+    "published": "Prona të publikuara: {{n}}",
+    "listingsTitle": "Pronat e publikuara nga ky përdorues",
+    "empty": "Ende nuk ka prona të publikuara.",
+    "unavailable": "Ky profil nuk është i disponueshëm.",
+    "listingsFailed": "Pronat nuk u ngarkuan.",
+    "open": "Hap profilin e {{name}}",
+    "call": "Telefono {{phone}}"
   }
 }

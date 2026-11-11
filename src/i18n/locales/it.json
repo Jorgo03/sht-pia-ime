@@ -259,7 +259,8 @@
     "similar": "Immobili simili",
     "video": "Video tour",
     "perDay": "/giorno",
-    "forDailyRent": "Affitto giornaliero"
+    "forDailyRent": "Affitto giornaliero",
+    "publishedOn": "Pubblicato il {{date}}"
   },
   "detail": {
     "forSale": "In vendita",
@@ -1168,5 +1169,16 @@
       "duplicate": "Esiste già",
       "encoding": "Caratteri danneggiati. Salva come CSV UTF-8."
     }
+  },
+  "publicProfile": {
+    "agent": "Agente immobiliare",
+    "unnamed": "Utente",
+    "published": "Immobili pubblicati: {{n}}",
+    "listingsTitle": "Immobili pubblicati da questo utente",
+    "empty": "Nessun immobile pubblicato finora.",
+    "unavailable": "Questo profilo non è disponibile.",
+    "listingsFailed": "Impossibile caricare gli immobili.",
+    "open": "Apri il profilo di {{name}}",
+    "call": "Chiama {{phone}}"
   }
 }

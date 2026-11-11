@@ -98,6 +98,8 @@ export function AppHeader({
   showControls = true,
   onDark = false,
   titleIsHeading = false,
+  onIdentityPress,
+  identityLabel,
 }: {
   trailing?: ReactNode;
   onBack?: () => void;
@@ -110,6 +112,12 @@ export function AppHeader({
   /** The title is the screen's only heading (an <h1> on the web, a heading
    *  for VoiceOver/TalkBack). Off where the screen has its own headline. */
   titleIsHeading?: boolean;
+  /** Makes the avatar and the title (not the subtitle) open something: the
+   *  message thread opens the other person's profile. The avatar is the
+   *  button screen readers get, labelled `identityLabel`; the title stays a
+   *  heading and is also tappable. */
+  onIdentityPress?: () => void;
+  identityLabel?: string;
 }) {
   const { t, i18n } = useTranslation();
   const { user } = useAuth();
@@ -188,10 +196,26 @@ export function AppHeader({
             <MaterialIcons name="chevron-left" size={26} color={styles.langCode.color} />
           </Pressable>
         )}
-        {avatar}
+        {avatar && onIdentityPress ? (
+          <Pressable
+            onPress={onIdentityPress}
+            hitSlop={6}
+            accessibilityRole="button"
+            accessibilityLabel={identityLabel}
+            style={({ pressed }) => pressed && styles.identityPressed}>
+            {avatar}
+          </Pressable>
+        ) : (
+          avatar
+        )}
         {title ? (
           <View style={styles.titleBlock}>
-            <Text style={styles.title} numberOfLines={1} accessibilityRole={titleIsHeading ? 'header' : undefined}>
+            <Text
+              style={styles.title}
+              numberOfLines={1}
+              accessibilityRole={titleIsHeading ? 'header' : undefined}
+              onPress={onIdentityPress}
+              suppressHighlighting>
               {title}
             </Text>
             {subtitle}
@@ -384,6 +408,9 @@ const createStyles = (
       fontSize: 22,
       letterSpacing: -0.44,
       color: colors.accent,
+    },
+    identityPressed: {
+      opacity: 0.6,
     },
     titleBlock: {
       flexShrink: 1,

@@ -350,7 +350,8 @@
     "similar": "Similar properties",
     "video": "Video tour",
     "perDay": "/day",
-    "forDailyRent": "Daily Rent"
+    "forDailyRent": "Daily Rent",
+    "publishedOn": "Published {{date}}"
   },
   "notFound": {
     "title": "Page not found",
@@ -1158,5 +1159,16 @@
       "duplicate": "Already exists",
       "encoding": "Damaged characters. Save as CSV UTF-8."
     }
+  },
+  "publicProfile": {
+    "agent": "Real estate agent",
+    "unnamed": "User",
+    "published": "Published properties: {{n}}",
+    "listingsTitle": "Properties published by this user",
+    "empty": "No properties published yet.",
+    "unavailable": "This profile is not available.",
+    "listingsFailed": "Couldn't load the properties.",
+    "open": "Open {{name}}'s profile",
+    "call": "Call {{phone}}"
   }
 }

@@ -266,7 +266,8 @@
     "similar": "Podobne nieruchomości",
     "video": "Wideo",
     "perDay": "/dzień",
-    "forDailyRent": "Najem dobowy"
+    "forDailyRent": "Najem dobowy",
+    "publishedOn": "Opublikowano {{date}}"
   },
   "detail": {
     "forSale": "Na sprzedaż",
@@ -1178,5 +1179,16 @@
       "duplicate": "Już istnieje",
       "encoding": "Uszkodzone znaki. Zapisz jako CSV UTF-8."
     }
+  },
+  "publicProfile": {
+    "agent": "Agent nieruchomości",
+    "unnamed": "Użytkownik",
+    "published": "Opublikowane nieruchomości: {{n}}",
+    "listingsTitle": "Nieruchomości opublikowane przez tego użytkownika",
+    "empty": "Brak opublikowanych nieruchomości.",
+    "unavailable": "Ten profil jest niedostępny.",
+    "listingsFailed": "Nie udało się wczytać nieruchomości.",
+    "open": "Otwórz profil: {{name}}",
+    "call": "Zadzwoń: {{phone}}"
   }
 }

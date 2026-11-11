@@ -36,6 +36,7 @@ import {
   unblockUser,
 } from '@/src/features/safety/lib/safety';
 import { isNotFound, loadThreadMessages } from '@/src/features/messaging/lib/thread';
+import { fetchPublicProfile, otherParticipant } from '@/src/features/profiles/lib/publicProfile';
 import { FORM_LIMITS } from '@/src/lib/formLimits';
 import { useReadableColumn } from '@/hooks/use-responsive';
 
@@ -144,8 +145,11 @@ export default function ThreadScreen() {
 
       const otherId = convo.client_id === user.id ? convo.agent_id : convo.client_id;
       setOtherId(otherId);
-      const [profRes, propRes, blockedIds] = await Promise.all([
-        supabase.from('profiles').select('full_name, agency_name').eq('id', otherId).single(),
+      // public_profile() rather than the profiles table: the table hides a
+      // client from another client, so writing to a client who published a
+      // listing showed "?" as the name. A failure only costs the name.
+      const [profile, propRes, blockedIds] = await Promise.all([
+        fetchPublicProfile(supabase, otherId).catch(() => null),
         convo.property_id
           ? supabase.from('properties').select('id, title, title_i18n').eq('id', convo.property_id).single()
           : Promise.resolve({ data: null }),
@@ -153,7 +157,7 @@ export default function ThreadScreen() {
       ]);
       if (cancelled) return;
       setBlocked(blockedIds.has(otherId));
-      setOtherName(profRes.data?.full_name || profRes.data?.agency_name || '?');
+      setOtherName(profile?.full_name?.trim() || profile?.agency_name?.trim() || '?');
       if (propRes.data) {
         setPropertyId(propRes.data.id);
         setPropertyTitle(getLocalizedText(propRes.data.title_i18n, i18n.language) || propRes.data.title);
@@ -259,6 +263,11 @@ export default function ThreadScreen() {
     ]);
   };
 
+  const profileTarget = otherParticipant(conversation, user?.id);
+  const openProfile = () => {
+    if (profileTarget) router.push(`/user/${profileTarget}` as Href);
+  };
+
   // Signed out (a notification left in the tray, a link) the load never
   // starts, so this used to be a spinner forever.
   if (!user) return authLoading ? null : <SignInPrompt message={t('messages.loginPrompt')} />;
@@ -328,6 +337,10 @@ export default function ThreadScreen() {
           showControls={false}
           title={otherName}
           titleIsHeading
+          // The other participant's own profile, never the viewer's: the id
+          // comes from the conversation row, not from anything shown.
+          onIdentityPress={profileTarget ? openProfile : undefined}
+          identityLabel={t('publicProfile.open', { name: otherName })}
           trailing={
             <TouchableOpacity
               onPress={openMenu}

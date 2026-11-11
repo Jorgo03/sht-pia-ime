@@ -54,7 +54,10 @@ test('map marker HTML escapes what it inserts', () => {
 })
 
 test('text filters only hold the account id, or go through a builder that strips filter syntax', () => {
-  const VETTED = new Set(['supabase/functions/ai-assistant/logic.js']) // keywords pass cleanText(), which strips , ( ) * % _ \ : . " ' and more
+  const VETTED = new Set([
+    'supabase/functions/ai-assistant/logic.js', // keywords pass cleanText(), which strips , ( ) * % _ \ : . " ' and more
+    'src/features/profiles/lib/publicProfile.js', // the id must pass isUserId(), a strict UUID, first (tests/publicProfile.test.mjs)
+  ])
   const bad = []
   for (const { f, s } of all) {
     for (const m of s.matchAll(/\.or\(\s*`([^`]*)`/g)) {

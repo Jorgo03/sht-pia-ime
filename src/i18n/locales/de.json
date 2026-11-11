@@ -252,7 +252,8 @@
     "similar": "Ähnliche Immobilien",
     "video": "Videotour",
     "perDay": "/Tag",
-    "forDailyRent": "Tagesmiete"
+    "forDailyRent": "Tagesmiete",
+    "publishedOn": "Veröffentlicht am {{date}}"
   },
   "detail": {
     "forSale": "Zu verkaufen",
@@ -1158,5 +1159,16 @@
       "duplicate": "Existiert bereits",
       "encoding": "Beschädigte Zeichen. Als CSV UTF-8 speichern."
     }
+  },
+  "publicProfile": {
+    "agent": "Immobilienmakler",
+    "unnamed": "Nutzer",
+    "published": "Veröffentlichte Immobilien: {{n}}",
+    "listingsTitle": "Von diesem Nutzer veröffentlichte Immobilien",
+    "empty": "Noch keine Immobilien veröffentlicht.",
+    "unavailable": "Dieses Profil ist nicht verfügbar.",
+    "listingsFailed": "Die Immobilien konnten nicht geladen werden.",
+    "open": "Profil von {{name}} öffnen",
+    "call": "{{phone}} anrufen"
   }
 }
