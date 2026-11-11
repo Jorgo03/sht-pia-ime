@@ -247,7 +247,7 @@ test('X64 Russian headlines switch to Manrope at once, and back to Newsreader in
   // system font. Counts the elements drawn in each family, without a reload.
   const families = () =>
     page.evaluate(() => {
-      const count = { newsreader: 0, manrope: 0, cyrillicInNewsreader: 0 };
+      const count = { newsreader: 0, manrope: 0, cyrillicInNewsreader: 0, bold: 0 };
       for (const el of Array.from(document.querySelectorAll('div, span'))) {
         if (!el.childNodes.length || ![...el.childNodes].some((n) => n.nodeType === 3 && n.textContent!.trim())) continue;
         const f = getComputedStyle(el).fontFamily;
@@ -255,6 +255,8 @@ test('X64 Russian headlines switch to Manrope at once, and back to Newsreader in
           count.newsreader++;
           if (/[Ѐ-ӿ]/.test(el.textContent!)) count.cyrillicInNewsreader++;
         } else if (/Manrope/.test(f)) count.manrope++;
+        // Manrope Bold or heavier, which Albanian draws only where it asks for it.
+        if (/Manrope_(700|800)/.test(f)) count.bold++;
       }
       return count;
     });
@@ -271,10 +273,16 @@ test('X64 Russian headlines switch to Manrope at once, and back to Newsreader in
   await expect(page.locator('html')).toHaveAttribute('lang', 'ru');
   await expect.poll(async () => (await families()).newsreader).toBe(0);
   expect((await families()).cyrillicInNewsreader).toBe(0);
+  const russianBold = (await families()).bold;
 
   await pickLanguage('Язык', /Shqip/);
   await expect(page.locator('html')).toHaveAttribute('lang', 'sq');
   await expect.poll(async () => (await families()).newsreader).toBeGreaterThan(0);
+  // Same weight as the serif it replaces: Russian draws no more bold text than
+  // Albanian (the Sale chip and the active tab in both). One step heavier made
+  // everything look bold on the phone (2026-11-12).
+  await expect.poll(async () => (await families()).bold).toBe(russianBold);
+  expect(russianBold).toBeLessThanOrEqual(2);
 });
 
 test('X76 the bottom menu says what each button is, and sign-up is in view without scrolling', async ({ page }) => {

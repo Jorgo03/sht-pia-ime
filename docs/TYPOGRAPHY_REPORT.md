@@ -59,9 +59,17 @@ fall back to each phone's system font and differed between iPhone and
 Samsung. Manrope and JetBrains Mono do have Cyrillic.
 
 **Fixed (2026-11-08, owner: "Yes, fix it"), no new font:** in Russian,
-headlines use the brand's Manrope (SemiBold for Newsreader Medium, Bold for
-Newsreader SemiBold; the italic accent becomes upright, as Manrope has no
-italic). Every other language keeps Newsreader.
+headlines use the brand's Manrope (the italic accent becomes upright, as
+Manrope has no italic). Every other language keeps Newsreader.
+
+**Weights corrected 2026-11-12** (owner: in Russian "everything bolder"). At
+first Manrope was one step heavier than the serif it replaced (SemiBold for
+Newsreader Medium, Bold for Newsreader SemiBold). But the serif styles also
+set prices, names and card titles, so Russian looked bold throughout. It now
+uses the same weight: Medium for Newsreader Medium and its italic, SemiBold
+for Newsreader SemiBold. X64 also checks that Russian draws no more Manrope
+Bold than Albanian (2 on Home in both: the Sale chip and the active tab); with
+the old weights it counted 4.
 
 - `src/lib/headlineFonts.js`: the rule (`headlineFont(role, language)`).
 - `constants/theme.ts`: `Fonts.serif`, `serifSemiBold` and `serifItalic`

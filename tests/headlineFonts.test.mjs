@@ -9,9 +9,11 @@ import { HEADLINE_FONT_FILES, headlineFont, needsHeadlineFallback } from '../src
 test('Russian headlines use Manrope; every other language keeps Newsreader', () => {
   for (const lang of ['ru', 'ru-RU', 'RU', 'ru_RU']) {
     assert.equal(needsHeadlineFallback(lang), true, lang)
-    assert.equal(headlineFont('serif', lang), 'Manrope_600SemiBold')
-    assert.equal(headlineFont('serifSemiBold', lang), 'Manrope_700Bold')
-    assert.equal(headlineFont('serifItalic', lang), 'Manrope_600SemiBold')
+    // The same weight as the Newsreader file it replaces, never heavier:
+    // one step heavier made all Russian text look bold (2026-11-12).
+    assert.equal(headlineFont('serif', lang), 'Manrope_500Medium')
+    assert.equal(headlineFont('serifSemiBold', lang), 'Manrope_600SemiBold')
+    assert.equal(headlineFont('serifItalic', lang), 'Manrope_500Medium')
   }
   for (const lang of ['sq', 'en', 'de', 'it', 'es', 'pl', 'fr', 'en-GB', '', null, undefined]) {
     assert.equal(needsHeadlineFallback(lang), false, String(lang))

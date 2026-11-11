@@ -14,13 +14,15 @@ const NEWSREADER = {
   serifItalic: 'Newsreader_500Medium_Italic',
 }
 
-// One step heavier than the serif it replaces: a sans at the same weight
-// reads lighter at headline sizes. Manrope has no italic, so the italic
-// accent becomes upright.
+// The same weight as the serif it replaces. It was one step heavier at first
+// (600 for 500, 700 for 600), on the idea that a sans reads lighter at
+// headline sizes, but "serif" also sets prices, names and card titles, so in
+// Russian everything looked bolder (owner, 2026-11-12). Manrope has no
+// italic, so the italic accent becomes upright.
 const MANROPE = {
-  serif: 'Manrope_600SemiBold',
-  serifSemiBold: 'Manrope_700Bold',
-  serifItalic: 'Manrope_600SemiBold',
+  serif: 'Manrope_500Medium',
+  serifSemiBold: 'Manrope_600SemiBold',
+  serifItalic: 'Manrope_500Medium',
 }
 
 /** True for a language written in a script Newsreader lacks. */
