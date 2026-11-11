@@ -46,6 +46,9 @@ test.describe('signed in as the agent', () => {
 
     await page.getByRole('button', { name: tv('publicProfile.open', { name: CHAT_CLIENT.full_name }) }).click();
     await expect(page).toHaveURL(new RegExp(`/user/${CHAT_CLIENT_ID}$`));
+    // No system header showing file paths ("messages/[id]", "user/[id]"), as
+    // the iPhone did before the screen was declared in app/_layout.tsx.
+    await expect(page.getByText('[id]')).toHaveCount(0);
     await expect(page.getByRole('heading', { name: CHAT_CLIENT.full_name })).toBeVisible();
     await expect(page.getByText(t('auth.roleClient'), { exact: true })).toBeVisible();
     await expect(page.getByText(CHAT_CLIENT.phone)).toBeVisible();

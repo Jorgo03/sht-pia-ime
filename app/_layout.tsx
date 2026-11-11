@@ -121,7 +121,11 @@ function ThemedNavigation() {
     <NavigationThemeProvider value={theme === 'dark' ? DarkTheme : DefaultTheme}>
       <RouteHead />
       <WebColumn>
-        <Stack>
+        {/* Every screen draws its own header (AppHeader), so the system one is
+            off by default: a route missing from this list showed its file
+            path ("messages/[id]", "user/[id]") as a bar on iPhone
+            (2026-11-12). tests/routes.test.mjs keeps the list complete. */}
+        <Stack screenOptions={{ headerShown: false }}>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen
             name="property/[id]"
@@ -181,6 +185,10 @@ function ThemedNavigation() {
           />
           <Stack.Screen
             name="agent/[id]"
+            options={{ headerShown: false, presentation: 'card' }}
+          />
+          <Stack.Screen
+            name="user/[id]"
             options={{ headerShown: false, presentation: 'card' }}
           />
           <Stack.Screen name="agents/index" options={{ headerShown: false, presentation: 'card' }} />
