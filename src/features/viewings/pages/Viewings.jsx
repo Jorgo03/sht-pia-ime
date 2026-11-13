@@ -5,7 +5,8 @@ import { CalendarDays, Check, X, MapPin } from 'lucide-react'
 import { useAuth } from '../../auth/AuthContext'
 import BackButton from '../../../shared/BackButton'
 import { supabase } from '../../../lib/supabase'
-import { getLocalizedText, formatDate } from '../../../lib/format'
+import { getLocalizedText } from '../../../lib/format'
+import { deviceUsesTiranaTime, formatViewingWhen } from '../../../lib/tiranaTime'
 import LoadError from '../../../shared/LoadError'
 
 const STATUS_COLORS = {
@@ -15,10 +16,10 @@ const STATUS_COLORS = {
   cancelled: 'var(--fho-status-draft, #7f8c8d)',
 }
 
-function formatWhen(iso, lang) {
-  const d = new Date(iso)
-  const time = new Intl.DateTimeFormat(lang, { hour: '2-digit', minute: '2-digit' }).format(d)
-  return `${formatDate(iso, lang)} · ${time}`
+// Tirana time, labelled when this browser is in another zone (AUDIT-005).
+function formatWhen(iso, tiranaLabel) {
+  const when = formatViewingWhen(iso)
+  return deviceUsesTiranaTime(new Date(iso)) ? when : `${when} (${tiranaLabel})`
 }
 
 export default function Viewings() {
@@ -88,7 +89,7 @@ export default function Viewings() {
           </span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: 'var(--fho-text-muted)' }}>
-          <CalendarDays size={13} /> {formatWhen(v.scheduled_at, i18n.language)}
+          <CalendarDays size={13} /> {formatWhen(v.scheduled_at, t('viewings.tiranaTime'))}
           {v.property?.city && <><MapPin size={13} style={{ marginLeft: 8 }} /> {v.property.city}</>}
         </div>
         {isIncoming && client && (

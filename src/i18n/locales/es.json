@@ -657,6 +657,8 @@
     "requestTitle": "Solicita una",
     "requestTitleEm": "visita",
     "when": "¿Cuándo?",
+    "tiranaTime": "hora de Tirana",
+    "pickInTiranaTime": "Las horas son en hora de Tirana, donde está la propiedad.",
     "request": "Enviar solicitud",
     "requestSuccess": "Solicitud enviada — recibirás un aviso cuando se confirme",
     "requestFailed": "La solicitud falló — inténtalo de nuevo",

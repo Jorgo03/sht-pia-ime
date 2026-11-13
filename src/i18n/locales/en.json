@@ -648,6 +648,8 @@
     "requestTitle": "Request a",
     "requestTitleEm": "viewing",
     "when": "When?",
+    "tiranaTime": "Tirana time",
+    "pickInTiranaTime": "Times are in Tirana time, where the property is.",
     "request": "Send request",
     "requestSuccess": "Request sent — you'll be notified once it's confirmed",
     "requestFailed": "Request failed — try again",

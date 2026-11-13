@@ -13,7 +13,8 @@ import { type AtticoPalette, Fonts } from '@/constants/theme';
 import { useAuth } from '@/contexts/auth-context';
 import { useTheme } from '@/contexts/theme-context';
 import { supabase } from '@/lib/supabase';
-import { formatDate, getLocalizedText } from '@/lib/format';
+import { getLocalizedText } from '@/lib/format';
+import { deviceUsesTiranaTime, formatViewingWhen } from '@/src/lib/tiranaTime';
 import { useReadableColumn } from '@/hooks/use-responsive';
 
 type ViewingStatus = 'requested' | 'confirmed' | 'declined' | 'cancelled' | 'completed' | 'no_show';
@@ -58,9 +59,10 @@ function statusColor(colors: AtticoPalette, status: ViewingStatus): string {
   return map[status] ?? colors.statusDraft;
 }
 
-function formatWhen(iso: string, lang: string) {
-  const time = new Intl.DateTimeFormat(lang, { hour: '2-digit', minute: '2-digit' }).format(new Date(iso));
-  return `${formatDate(iso, lang)} · ${time}`;
+/** Tirana time, labelled when this device is in another zone (AUDIT-005). */
+function formatWhen(iso: string, tiranaLabel: string) {
+  const when = formatViewingWhen(iso);
+  return deviceUsesTiranaTime(new Date(iso)) ? when : `${when} (${tiranaLabel})`;
 }
 
 export default function ViewingsScreen() {
@@ -149,7 +151,7 @@ export default function ViewingsScreen() {
 
         <View style={styles.cardMetaRow}>
           <MaterialIcons name="calendar-today" size={13} color={colors.textSecondary} />
-          <Text style={styles.cardMetaText}>{formatWhen(v.scheduled_at, i18n.language)}</Text>
+          <Text style={styles.cardMetaText}>{formatWhen(v.scheduled_at, t('viewings.tiranaTime'))}</Text>
           {v.property?.city ? (
             <>
               <MaterialIcons name="location-on" size={13} color={colors.textSecondary} style={{ marginLeft: 8 }} />

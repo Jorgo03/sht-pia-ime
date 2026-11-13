@@ -5,6 +5,7 @@ import { Building2, Eye, MessageCircle, CalendarDays, Users, Check, X, MapPin, H
 import { useAuth } from '../../auth/AuthContext'
 import { supabase } from '../../../lib/supabase'
 import { formatPrice, formatDate, getLocalizedText } from '../../../lib/format'
+import { formatViewingWhen } from '../../../lib/tiranaTime'
 
 export default function AgentDashboard() {
   const { t, i18n } = useTranslation()
@@ -138,12 +139,11 @@ export default function AgentDashboard() {
                 {pendingViewings.map(v => {
                   const title = v.property ? (getLocalizedText(v.property.title_i18n, i18n.language) || v.property.title) : ''
                   const client = clientProfiles[v.client_id]
-                  const time = new Intl.DateTimeFormat(i18n.language, { hour: '2-digit', minute: '2-digit' }).format(new Date(v.scheduled_at))
                   return (
                     <div key={v.id} className="placeholder-card" style={{ textAlign: 'left', alignItems: 'stretch', gap: 6 }}>
                       <div style={{ fontWeight: 600, fontSize: 14 }}>{title}</div>
                       <div style={{ fontSize: 13, color: 'var(--fho-text-muted)', display: 'flex', gap: 8, alignItems: 'center' }}>
-                        <CalendarDays size={13} /> {formatDate(v.scheduled_at, i18n.language)} · {time}
+                        <CalendarDays size={13} /> {formatViewingWhen(v.scheduled_at)}
                         {client && <span>· {client.full_name || '?'}</span>}
                       </div>
                       <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>

@@ -648,6 +648,8 @@
     "requestTitle": "Eine Besichtigung",
     "requestTitleEm": "anfragen",
     "when": "Wann?",
+    "tiranaTime": "Ortszeit Tirana",
+    "pickInTiranaTime": "Die Uhrzeiten gelten in Ortszeit Tirana, wo sich die Immobilie befindet.",
     "request": "Anfrage senden",
     "requestSuccess": "Anfrage gesendet — du wirst bei Bestätigung benachrichtigt",
     "requestFailed": "Anfrage fehlgeschlagen — bitte erneut versuchen",

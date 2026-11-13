@@ -666,6 +666,8 @@
     "requestTitle": "Poproś o",
     "requestTitleEm": "wizytę",
     "when": "Kiedy?",
+    "tiranaTime": "czas w Tiranie",
+    "pickInTiranaTime": "Godziny podano według czasu w Tiranie, gdzie znajduje się nieruchomość.",
     "request": "Wyślij prośbę",
     "requestSuccess": "Prośba wysłana — otrzymasz powiadomienie po potwierdzeniu",
     "requestFailed": "Prośba nie powiodła się — spróbuj ponownie",

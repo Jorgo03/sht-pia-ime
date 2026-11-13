@@ -648,6 +648,8 @@
     "requestTitle": "Kërko një",
     "requestTitleEm": "vizitë",
     "when": "Kur?",
+    "tiranaTime": "ora e Tiranës",
+    "pickInTiranaTime": "Orari është sipas orës së Tiranës, ku ndodhet prona.",
     "request": "Dërgo kërkesën",
     "requestSuccess": "Kërkesa u dërgua — do të njoftohesh kur të konfirmohet",
     "requestFailed": "Kërkesa dështoi — provo përsëri",

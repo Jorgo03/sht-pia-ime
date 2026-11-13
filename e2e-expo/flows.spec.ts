@@ -5,6 +5,7 @@ declare const Buffer: { from(text: string): never };
 import { AGENT, CHAT_CLIENT_ID, CONVERSATIONS, LISTINGS, PERFORMANCE_REPORT } from '../e2e/support/fixtures';
 import { fakeSession, SESSION_STORAGE_KEY, SIGNED_IN_USER } from '../e2e/support/backend';
 import { AI_CHAT_ENABLED } from '../constants/features';
+import { fromTiranaWallTime } from '../src/lib/tiranaTime';
 import { t } from '../e2e/support/i18n';
 import { axeViolations, expect, test } from '../e2e/support/test';
 
@@ -222,9 +223,31 @@ test.describe('signed in', () => {
     await when.fill(`${day.getFullYear()}-${p(day.getMonth() + 1)}-${p(day.getDate())}T15:30`);
     await page.getByRole('button', { name: t('viewings.request') }).click();
     await expect.poll(() => writes.find((w) => w.table === 'viewings')?.method).toBe('POST');
+    // The field means Tirana time, whatever the browser's zone (AUDIT-005).
     expect(writes.find((w) => w.table === 'viewings')?.body).toMatchObject({
       property_id: home.id,
-      scheduled_at: day.toISOString(),
+      scheduled_at: fromTiranaWallTime(day.getFullYear(), day.getMonth() + 1, day.getDate(), 15, 30).toISOString(),
+    });
+  });
+
+  test.describe('in London', () => {
+    test.use({ timezoneId: 'Europe/London' });
+
+    test('X104 a visitor in London picks 15:30 Tirana time, is told so, and Tirana 15:30 is sent', async ({ page, writes }) => {
+      const home = LISTINGS.find((l) => l.owner_type === 'client')!;
+      await page.goto(`/property/${home.id}`);
+      await ready(page);
+      await page.getByRole('button', { name: t('detail.scheduleViewing') }).click();
+      await expect(page.getByText(t('viewings.pickInTiranaTime'))).toBeVisible();
+      const day = new Date(Date.now() + 3 * 86_400_000);
+      const p = (n: number) => String(n).padStart(2, '0');
+      await page.getByLabel(t('viewings.when')).fill(`${day.getFullYear()}-${p(day.getMonth() + 1)}-${p(day.getDate())}T15:30`);
+      await page.getByRole('button', { name: t('viewings.request') }).click();
+      await expect.poll(() => writes.find((w) => w.table === 'viewings')?.method).toBe('POST');
+      const sent = new Date(String(writes.find((w) => w.table === 'viewings')?.body.scheduled_at));
+      // 15:30 in Tirana is 14:30 UTC in winter, 13:30 in summer; never 15:30 London.
+      expect(sent.toISOString()).toBe(fromTiranaWallTime(day.getFullYear(), day.getMonth() + 1, day.getDate(), 15, 30).toISOString());
+      expect([13, 14]).toContain(sent.getUTCHours());
     });
   });
 });

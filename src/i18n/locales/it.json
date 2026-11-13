@@ -657,6 +657,8 @@
     "requestTitle": "Richiedi una",
     "requestTitleEm": "visita",
     "when": "Quando?",
+    "tiranaTime": "ora di Tirana",
+    "pickInTiranaTime": "Gli orari sono nell'ora di Tirana, dove si trova l'immobile.",
     "request": "Invia richiesta",
     "requestSuccess": "Richiesta inviata — riceverai una notifica alla conferma",
     "requestFailed": "Richiesta non riuscita — riprova",

@@ -60,6 +60,7 @@ import { FORM_LIMITS } from '@/src/lib/formLimits';
 import { confirmAction } from '@/lib/confirm';
 import { viewingRequestErrorKey } from '@/src/features/viewings/lib/viewingErrors';
 import { LoadError } from '@/components/ui/load-error';
+import { deviceUsesTiranaTime } from '@/src/lib/tiranaTime';
 
 // Rounds "now + 1h" to the next half hour — same default the web app's
 // ViewingRequestSheet uses.
@@ -758,6 +759,9 @@ export default function PropertyDetailScreen() {
             <ScrollView contentContainerStyle={styles.modalBody} keyboardShouldPersistTaps="handled">
               <Text style={styles.modalLabel}>{t('viewings.when')}</Text>
               <ViewingTimePicker value={viewingDate} minimumDate={nextSlot()} onChange={setViewingDate} />
+              {!deviceUsesTiranaTime(viewingDate) && (
+                <Text style={[styles.modalLabel, { marginTop: 8 }]}>{t('viewings.pickInTiranaTime')}</Text>
+              )}
               <TextInput
                 style={[styles.contactInput, styles.contactMessage, { marginTop: 12 }]}
                 placeholder={t('addSheet.notes')}

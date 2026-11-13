@@ -4,11 +4,13 @@ import { StyleSheet } from 'react-native';
 
 import { Fonts, Radii, type AtticoPalette } from '@/constants/theme';
 import { useTheme } from '@/contexts/theme-context';
+import { localWallAsTirana, tiranaWallAsLocal } from '@/src/lib/tiranaTime';
 
 import type { ViewingTimePickerProps } from './viewing-time-picker.types';
 
-/** "2026-10-27T17:30" in the visitor's own time zone, as datetime-local wants. */
-function localValue(d: Date): string {
+/** "2026-10-27T17:30" as Tirana's clock reads it (AUDIT-005), as datetime-local wants. */
+function localValue(instant: Date): string {
+  const d = tiranaWallAsLocal(instant);
   const p = (n: number) => String(n).padStart(2, '0');
   return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`;
 }
@@ -32,9 +34,12 @@ export function ViewingTimePicker({ value, minimumDate, onChange }: ViewingTimeP
     step: 900,
     'aria-label': t('viewings.when'),
     onChange: (e: { target: { value: string } }) => {
-      const next = new Date(e.target.value);
+      const typed = new Date(e.target.value);
       // Cleared or typed past the minimum: keep the last valid time.
-      if (!Number.isNaN(next.getTime()) && next >= minimumDate) onChange(next);
+      if (Number.isNaN(typed.getTime())) return;
+      // What was typed is Tirana time, wherever the browser is (AUDIT-005).
+      const next = localWallAsTirana(typed);
+      if (next >= minimumDate) onChange(next);
     },
     style: StyleSheet.flatten([styles.input, { colorScheme: theme === 'dark' ? 'dark' : 'light' }]),
   });

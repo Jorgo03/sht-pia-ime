@@ -13,6 +13,7 @@ import { type AtticoPalette, Fonts, InlineTarget } from '@/constants/theme';
 import { useAuth } from '@/contexts/auth-context';
 import { useTheme } from '@/contexts/theme-context';
 import { supabase } from '@/lib/supabase';
+import { formatViewingClock, tiranaDayStart } from '@/src/lib/tiranaTime';
 import { formatDate, formatPrice, getLocalizedText } from '@/lib/format';
 import { useReadableColumn } from '@/hooks/use-responsive';
 import { wantedMatches } from '@/src/features/leads/lib/leads';
@@ -97,11 +98,10 @@ export default function AgentDashboardScreen() {
         .or(`owner_id.eq.${user.id},agent_id.eq.${user.id}`);
       const propIds = (myProps ?? []).map((p) => p.id);
 
-      // Today, in the agent's own time zone.
-      const dayStart = new Date();
-      dayStart.setHours(0, 0, 0, 0);
-      const dayEnd = new Date(dayStart);
-      dayEnd.setDate(dayEnd.getDate() + 1);
+      // Today in Tirana, where the viewings happen (AUDIT-005). The next
+      // day's midnight, not +24h, so the DST change days stay whole.
+      const dayStart = tiranaDayStart();
+      const dayEnd = tiranaDayStart(new Date(dayStart.getTime() + 36 * 60 * 60 * 1000));
 
       const [viewsRes, convRes, leadsRes, viewingsRes, wantedRes, todayRes] = await Promise.all([
         propIds.length
@@ -257,9 +257,7 @@ export default function AgentDashboardScreen() {
                   const client = clientProfiles[v.client_id];
                   // 24-hour, as in Albania; also where the browser has no data
                   // for the language and would fall back to "05:00 PM".
-                  const time = new Intl.DateTimeFormat(i18n.language, { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).format(
-                    new Date(v.scheduled_at),
-                  );
+                  const time = formatViewingClock(v.scheduled_at);
                   return (
                     <TouchableOpacity
                       key={v.id}
@@ -295,9 +293,7 @@ export default function AgentDashboardScreen() {
                 pendingViewings.map((v) => {
                   const title = v.property ? getLocalizedText(v.property.title_i18n, i18n.language) || v.property.title : '';
                   const client = clientProfiles[v.client_id];
-                  const time = new Intl.DateTimeFormat(i18n.language, { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).format(
-                    new Date(v.scheduled_at),
-                  );
+                  const time = formatViewingClock(v.scheduled_at);
                   return (
                     <View key={v.id} style={styles.listCard}>
                       <Text style={styles.listCardTitle}>{title}</Text>

@@ -5,10 +5,12 @@ import { useAuth } from '../../auth/AuthContext'
 import { supabase } from '../../../lib/supabase'
 import { logActivity } from '../../../lib/activity'
 import { viewingRequestErrorKey } from '../lib/viewingErrors'
+import { deviceUsesTiranaTime, localWallAsTirana, tiranaWallAsLocal } from '../../../lib/tiranaTime'
 
-// Rounds "now + 1h" to the next half hour for the datetime-local default/min.
+// Rounds "now + 1h" to the next half hour for the datetime-local default/min,
+// as Tirana's clock reads it: the field means Tirana time (AUDIT-005).
 function nextSlot() {
-  const d = new Date(Date.now() + 60 * 60 * 1000)
+  const d = tiranaWallAsLocal(new Date(Date.now() + 60 * 60 * 1000))
   d.setMinutes(d.getMinutes() < 30 ? 30 : 60, 0, 0)
   const pad = (n) => String(n).padStart(2, '0')
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`
@@ -30,7 +32,9 @@ export default function ViewingRequestSheet({ property, onClose, onDone }) {
 
   const submit = async () => {
     if (!user || loading) return
-    const scheduled = when ? new Date(when) : null
+    // What was typed is Tirana time, wherever the browser is.
+    const typed = when ? new Date(when) : null
+    const scheduled = typed && !Number.isNaN(typed.getTime()) ? localWallAsTirana(typed) : null
     if (!scheduled || Number.isNaN(scheduled.getTime()) || scheduled.getTime() < Date.now()) {
       setError(t('viewings.pastDate'))
       return
@@ -78,6 +82,9 @@ export default function ViewingRequestSheet({ property, onClose, onDone }) {
             min={nextSlot()}
             onChange={(e) => { setWhen(e.target.value); setError('') }}
           />
+          {!deviceUsesTiranaTime() && (
+            <p style={{ fontSize: 12, color: 'var(--fho-text-muted)', margin: '4px 0 0' }}>{t('viewings.pickInTiranaTime')}</p>
+          )}
           <textarea
             className="addsheet-input addsheet-textarea"
             placeholder={t('addSheet.notes')}
