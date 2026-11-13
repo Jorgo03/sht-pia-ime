@@ -1,6 +1,7 @@
 export interface Property {
   id: string;
-  agent_id: string;
+  /** Null when the owner published it themselves (owner_type client). */
+  agent_id: string | null;
   owner_id?: string | null;
   /** Present when fetched via getPropertyById's embedded profiles select. */
   agent?: Pick<Profile, 'id' | 'full_name' | 'phone' | 'agency_name' | 'avatar_url'> | null;
