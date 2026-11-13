@@ -103,7 +103,8 @@
     "continue": "Continue",
     "checkInbox": "Check your email",
     "usePassword": "Password",
-    "spamHint": "If you haven't received the email, check your Spam/Junk folder or request a new code."
+    "spamHint": "If you haven't received the email, check your Spam/Junk folder or request a new code.",
+    "browseWithoutAccount": "Browse without an account"
   },
   "addSheet": {
     "openLabel": "Create new",

@@ -103,7 +103,8 @@
     "continue": "Dalej",
     "checkInbox": "Sprawdź e-mail",
     "usePassword": "Hasło",
-    "spamHint": "Jeśli e-mail nie dotarł, sprawdź folder Spam lub poproś o nowy kod."
+    "spamHint": "Jeśli e-mail nie dotarł, sprawdź folder Spam lub poproś o nowy kod.",
+    "browseWithoutAccount": "Przeglądaj bez konta"
   },
   "home": {
     "greetingMorning": "Dzień dobry",

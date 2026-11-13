@@ -103,7 +103,8 @@
     "continue": "Continuar",
     "checkInbox": "Revisa tu correo",
     "usePassword": "Contraseña",
-    "spamHint": "Si no has recibido el correo, revisa la carpeta de spam o solicita un código nuevo."
+    "spamHint": "Si no has recibido el correo, revisa la carpeta de spam o solicita un código nuevo.",
+    "browseWithoutAccount": "Explorar sin cuenta"
   },
   "home": {
     "greetingMorning": "Buenos días",

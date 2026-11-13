@@ -10,7 +10,11 @@ import { FORM_LIMITS, inIntRange, isValidEmail } from '../src/lib/formLimits.js'
 import { PROFILE_LIMITS } from '../src/features/auth/lib/profileForm.js'
 import { LEAD_LIMITS } from '../src/features/leads/lib/leads.js'
 
-const sql = fs.readFileSync(new URL('../supabase/migrations/20261104215248_server_form_checks.sql', import.meta.url), 'utf8')
+// Line endings normalised: a Windows checkout has CRLF, and the patterns below
+// end constraints at "\n".
+const sql = fs
+  .readFileSync(new URL('../supabase/migrations/20261104215248_server_form_checks.sql', import.meta.url), 'utf8')
+  .replace(/\r\n/g, '\n')
 
 /** The CHECK expression of one constraint in the migration. */
 function constraint(name) {
