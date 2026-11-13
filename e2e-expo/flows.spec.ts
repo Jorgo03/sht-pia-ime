@@ -2345,3 +2345,27 @@ test.describe('performance report', () => {
     await expect(page.getByText(t('viewings.status.completed'))).toBeVisible();
   });
 });
+
+// AUDIT-006: a listing whose request fails offers a retry; it is not called
+// "no longer available". The retry then shows it. (A request that fails, not
+// "offline": offline, React Query waits and loads it on reconnect.)
+test.describe('listing that fails to load', () => {
+  test.use({ allowConsoleErrors: [/Failed to load resource|ERR_FAILED|Failed to fetch|Network request failed/] });
+
+  test('X103 a failed request shows a retry, and the retry opens the listing', async ({ page }) => {
+    let fail = true;
+    await page.route(
+      (url) => url.pathname.endsWith('/rest/v1/properties') && decodeURIComponent(url.search).includes(`id=eq.${FEATURED.id}`) && decodeURIComponent(url.search).includes('agent:profiles'),
+      (route) => (fail ? route.abort('failed') : route.fallback()),
+    );
+    // supabase-js retries a failed GET 3 times with backoff, then React Query
+    // once more, so the error shows after about 15 seconds.
+    test.setTimeout(90_000);
+    await page.goto(`/property/${FEATURED.id}`);
+    await expect(page.getByText(t('errors.loadFailed'))).toBeVisible({ timeout: 45_000 });
+    await expect(page.getByText(t('detail.unavailable'))).toHaveCount(0);
+    fail = false;
+    await page.getByRole('button', { name: t('common.retry') }).click();
+    await expect(page.getByRole('heading', { name: FEATURED.title as string, level: 1 })).toBeVisible();
+  });
+});

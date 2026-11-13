@@ -59,6 +59,7 @@ import { ViewingTimePicker } from '@/components/viewings/viewing-time-picker';
 import { FORM_LIMITS } from '@/src/lib/formLimits';
 import { confirmAction } from '@/lib/confirm';
 import { viewingRequestErrorKey } from '@/src/features/viewings/lib/viewingErrors';
+import { LoadError } from '@/components/ui/load-error';
 
 // Rounds "now + 1h" to the next half hour — same default the web app's
 // ViewingRequestSheet uses.
@@ -83,7 +84,7 @@ export default function PropertyDetailScreen() {
   const split = isTablet && layoutWidth >= 820;
   const readable = useReadableColumn();
   const favorited = isFavorite(id ?? '');
-  const { data: property = null, isLoading: loading } = usePropertyQuery(id);
+  const { data: property = null, isLoading: loading, isError: loadFailed, refetch } = usePropertyQuery(id);
   const publisher = useListingPublisher(property);
   const [contactMessage, setContactMessage] = useState('');
   const [sendingMessage, setSendingMessage] = useState(false);
@@ -285,6 +286,16 @@ export default function PropertyDetailScreen() {
       <View style={styles.errorContainer}>
         <ActivityIndicator size="large" color={colors.accent} />
       </View>
+    );
+  }
+
+  if (!property && loadFailed) {
+    // Offline, a timeout or a server error: the listing may well exist, so
+    // offer a retry rather than calling it unavailable (AUDIT-006).
+    return (
+      <SafeAreaView style={styles.errorContainer}>
+        <LoadError onRetry={() => refetch()} />
+      </SafeAreaView>
     );
   }
 

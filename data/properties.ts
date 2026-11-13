@@ -9,6 +9,7 @@ import {
 } from '@/src/features/properties/lib/discovery';
 import { applyPriceRange } from '@/src/features/properties/lib/priceRange';
 import { applyFreeText, applyZoneAndRef } from '@/src/features/properties/lib/searchFilters';
+import { propertyOrNotFound } from '@/src/features/properties/lib/propertyResult';
 
 import { Property, PropertyFilters, PropertySort } from './types';
 
@@ -216,8 +217,9 @@ export async function getPropertyById(id: string): Promise<Property | null> {
     .eq('id', id)
     .single();
 
-  if (error) return null;
-  return data;
+  // Gone (or not visible) → null; offline or a server error → thrown, so the
+  // screen can offer a retry (AUDIT-006).
+  return propertyOrNotFound<Property>({ data, error });
 }
 
 /**
