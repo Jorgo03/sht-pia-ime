@@ -1,0 +1,7 @@
+{
+  "ios": {
+    "CFBundleDisplayName": "Shtëpia.ime",
+    "NSPhotoLibraryUsageDescription": "Shtëpia.ime ka nevojë për qasje te fotot e tua që t'i shtosh në një listim.",
+    "NSLocationWhenInUseUsageDescription": "Shtëpia.ime përdor vendndodhjen tënde për të treguar shtëpitë pranë teje në hartë. Nuk ruhet."
+  }
+}
