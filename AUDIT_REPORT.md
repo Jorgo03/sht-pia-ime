@@ -168,5 +168,48 @@ AUDIT-010, AUDIT-011, AUDIT-017.
 
 ---
 
-**Waiting for the owner's approval before any fix.** Nothing above has been
-changed in code, the database or settings.
+## Fix pass (approved 2026-11-13)
+
+The owner approved the recommended order. Each fix has its own commit, and
+each had a test that failed first. The SQL fixes were checked inside blocks
+that roll themselves back.
+
+**Fixed in code and pushed:**
+- AUDIT-001: Apple sign-in button hidden.
+- AUDIT-005: viewing times are Tirana time.
+- AUDIT-006: a failed load shows a retry.
+- AUDIT-010: npm audit fix (no major upgrades).
+- AUDIT-011: Expo patch versions.
+- AUDIT-012: the migration file carries its live version.
+- AUDIT-014: `.env.example` documents every variable.
+- AUDIT-015: My listings and Messages load 24 at a time.
+
+**Written, verified, and waiting for the owner's OK to go live:**
+- Migrations `20261113180000` (AUDIT-004) and `20261113180100` (AUDIT-003): `rls_viewing_schedule.sql` went from 5/12 to 12/12.
+- Migration `20261113180200` (AUDIT-017): `rls_anon_grants.sql` went from 4/8 to 8/8.
+- The `delete-account` Edge Function redeploy (AUDIT-007).
+
+Until those are applied, the live database behaves as before.
+
+**Not done:**
+- AUDIT-009 needs a new dependency (NetInfo), which needs an OK.
+- AUDIT-016 needs a live upload test first.
+- The owner-only items (002, 008, 013, 019, 022, 023) and the deferred Low items (018, 020, 021) stay open.
+
+**Checks after the last fix:**
+
+| Check | Result |
+|---|---|
+| Lint | 0 errors, 34 warnings (the same 34 as before) |
+| `tsc` | clean |
+| Unit tests | 557/557 passed (was 531) |
+| Web build | passes |
+| `expo-doctor` | 20/20 |
+| `npm run test:e2e` | 269 passed, 9 skipped |
+| `npm run test:e2e:expo` | 318 passed, 46 skipped (new: X103, X104) |
+| iOS export | builds |
+
+**What "done" in the task still needs:**
+- Zero open High: AUDIT-002 (Confirm email) is the owner's step.
+- RLS checked on the live database, not only in rolled-back blocks: it holds for every table today (`rls_full_matrix.sql` 48/51). It reaches 51/51 once the viewing migrations are applied.
+- No native device was used. The Expo web build in phone and desktop sizes is the platform these fixes were tested on.
