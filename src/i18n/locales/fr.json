@@ -660,6 +660,7 @@
     "request": "Envoyer la demande",
     "requestSuccess": "Demande envoyée — vous serez averti après confirmation",
     "requestFailed": "Échec de la demande — réessayez",
+    "slotTaken": "Ce créneau est déjà pris. Choisissez une autre heure.",
     "pastDate": "Choisissez une date future",
     "empty": "Pas encore de visites",
     "emptyHint": "Demandez-en une depuis la page d'un bien",

@@ -58,6 +58,7 @@ import { CARD_CONTAINER_A11Y } from '@/components/property/card-a11y';
 import { ViewingTimePicker } from '@/components/viewings/viewing-time-picker';
 import { FORM_LIMITS } from '@/src/lib/formLimits';
 import { confirmAction } from '@/lib/confirm';
+import { viewingRequestErrorKey } from '@/src/features/viewings/lib/viewingErrors';
 
 // Rounds "now + 1h" to the next half hour — same default the web app's
 // ViewingRequestSheet uses.
@@ -271,7 +272,7 @@ export default function PropertyDetailScreen() {
     });
     setRequestingViewing(false);
     if (error) {
-      Alert.alert(t('common.error'), t('viewings.requestFailed'));
+      Alert.alert(t('common.error'), t(viewingRequestErrorKey(error)));
       return;
     }
     logActivity(property.id, 'meeting');

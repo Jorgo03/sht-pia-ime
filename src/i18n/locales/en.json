@@ -651,6 +651,7 @@
     "request": "Send request",
     "requestSuccess": "Request sent — you'll be notified once it's confirmed",
     "requestFailed": "Request failed — try again",
+    "slotTaken": "That time is already taken. Please pick another time.",
     "pastDate": "Pick a date in the future",
     "empty": "No viewings yet",
     "emptyHint": "Request one from any property page",

@@ -651,6 +651,7 @@
     "request": "Anfrage senden",
     "requestSuccess": "Anfrage gesendet — du wirst bei Bestätigung benachrichtigt",
     "requestFailed": "Anfrage fehlgeschlagen — bitte erneut versuchen",
+    "slotTaken": "Dieser Termin ist bereits vergeben. Bitte wählen Sie eine andere Uhrzeit.",
     "pastDate": "Wähle ein Datum in der Zukunft",
     "empty": "Noch keine Besichtigungen",
     "emptyHint": "Frage eine auf einer Objektseite an",

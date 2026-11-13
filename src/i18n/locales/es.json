@@ -660,6 +660,7 @@
     "request": "Enviar solicitud",
     "requestSuccess": "Solicitud enviada — recibirás un aviso cuando se confirme",
     "requestFailed": "La solicitud falló — inténtalo de nuevo",
+    "slotTaken": "Esa hora ya está ocupada. Elige otra hora.",
     "pastDate": "Elige una fecha futura",
     "empty": "Aún no hay visitas",
     "emptyHint": "Solicita una desde la página de una propiedad",

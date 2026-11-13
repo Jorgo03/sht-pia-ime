@@ -651,6 +651,7 @@
     "request": "Dërgo kërkesën",
     "requestSuccess": "Kërkesa u dërgua — do të njoftohesh kur të konfirmohet",
     "requestFailed": "Kërkesa dështoi — provo përsëri",
+    "slotTaken": "Ky orar është zënë. Zgjidhni një orë tjetër.",
     "pastDate": "Zgjidh një datë në të ardhmen",
     "empty": "Ende pa vizita",
     "emptyHint": "Kërko një vizitë nga faqja e një prone",

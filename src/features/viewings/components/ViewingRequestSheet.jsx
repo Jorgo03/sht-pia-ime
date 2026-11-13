@@ -4,6 +4,7 @@ import { X, CalendarDays } from 'lucide-react'
 import { useAuth } from '../../auth/AuthContext'
 import { supabase } from '../../../lib/supabase'
 import { logActivity } from '../../../lib/activity'
+import { viewingRequestErrorKey } from '../lib/viewingErrors'
 
 // Rounds "now + 1h" to the next half hour for the datetime-local default/min.
 function nextSlot() {
@@ -46,7 +47,7 @@ export default function ViewingRequestSheet({ property, onClose, onDone }) {
     })
     setLoading(false)
     if (err) {
-      setError(t('viewings.requestFailed'))
+      setError(t(viewingRequestErrorKey(err)))
       return
     }
     logActivity(property.id, 'meeting')

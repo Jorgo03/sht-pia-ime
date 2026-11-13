@@ -669,6 +669,7 @@
     "request": "Wyślij prośbę",
     "requestSuccess": "Prośba wysłana — otrzymasz powiadomienie po potwierdzeniu",
     "requestFailed": "Prośba nie powiodła się — spróbuj ponownie",
+    "slotTaken": "Ten termin jest już zajęty. Wybierz inną godzinę.",
     "pastDate": "Wybierz przyszłą datę",
     "empty": "Brak wizyt",
     "emptyHint": "Poproś o wizytę na stronie nieruchomości",

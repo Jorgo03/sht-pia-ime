@@ -660,6 +660,7 @@
     "request": "Invia richiesta",
     "requestSuccess": "Richiesta inviata — riceverai una notifica alla conferma",
     "requestFailed": "Richiesta non riuscita — riprova",
+    "slotTaken": "Questo orario è già occupato. Scegli un altro orario.",
     "pastDate": "Scegli una data futura",
     "empty": "Nessuna visita ancora",
     "emptyHint": "Richiedine una dalla pagina di un immobile",
