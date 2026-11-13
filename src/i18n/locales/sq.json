@@ -103,7 +103,8 @@
     "continue": "Vazhdo",
     "checkInbox": "Kontrollo email-in",
     "usePassword": "Fjalëkalim",
-    "spamHint": "Nëse nuk e ke marrë email-in, kontrollo dosjen Spam ose Junk, ose kërko një kod të ri."
+    "spamHint": "Nëse nuk e ke marrë email-in, kontrollo dosjen Spam ose Junk, ose kërko një kod të ri.",
+    "browseWithoutAccount": "Shfleto pa llogari"
   },
   "home": {
     "greetingMorning": "Mirëmëngjes",

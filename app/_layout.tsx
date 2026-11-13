@@ -41,6 +41,7 @@ import { configureForegroundNotifications } from '@/lib/push';
 import { LaunchDoorSplash } from '@/components/brand/door-splash';
 import { NotificationBanner } from '@/components/notifications/notification-banner';
 import { PushBridge } from '@/components/push-bridge';
+import { SignedOutStart } from '@/components/auth/signed-out-start';
 import { NotificationsProvider } from '@/contexts/notifications-context';
 import { IS_WEB, WEB_MAX_WIDTH } from '@/constants/web-frame';
 import { RouteHead } from '@/components/web/page-head';
@@ -264,6 +265,8 @@ function AppGate({ fontsReady }: { fontsReady: boolean }) {
               <ThemedNavigation />
               <NotificationBanner />
               <PushBridge />
+              {/* Phones: signed out, the app opens on sign-in, not Home. */}
+              <SignedOutStart />
             </NotificationsProvider>
           </ThemeProvider>
         </FiltersProvider>

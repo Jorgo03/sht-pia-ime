@@ -103,7 +103,8 @@
     "continue": "Weiter",
     "checkInbox": "Prüfe deine E-Mails",
     "usePassword": "Passwort",
-    "spamHint": "Falls du die E-Mail nicht erhalten hast, prüfe deinen Spam-Ordner oder fordere einen neuen Code an."
+    "spamHint": "Falls du die E-Mail nicht erhalten hast, prüfe deinen Spam-Ordner oder fordere einen neuen Code an.",
+    "browseWithoutAccount": "Ohne Konto stöbern"
   },
   "home": {
     "greetingMorning": "Guten Morgen",

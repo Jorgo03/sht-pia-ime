@@ -9,7 +9,7 @@ import { IS_WEB } from '@/constants/web-frame';
 import { isModerator } from '@/src/features/moderation/lib/moderation';
 import { supabase } from '@/lib/supabase';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useRouter, type Href } from 'expo-router';
+import { useLocalSearchParams, useRouter, type Href } from 'expo-router';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Alert,
@@ -55,6 +55,7 @@ import {
 } from '@/src/features/auth/lib/signupCode';
 import { newPasswordError, passwordStrengthError } from '@/src/features/auth/lib/password';
 import { providerEnabled } from '@/src/features/auth/lib/authLinks';
+import { openedAtLaunch, START_PARAM } from '@/src/features/auth/lib/startScreen';
 import { ChangePasswordSheet } from '@/components/profile/change-password-sheet';
 import { useProfileStats } from '@/hooks/use-profile-stats';
 import type { ProfileFields } from '@/src/features/auth/lib/profileForm';
@@ -114,6 +115,22 @@ export default function ProfileScreen() {
       active = false;
     };
   }, [user]);
+
+  // Opened as the app's first screen (components/auth/signed-out-start.tsx):
+  // offer browsing without an account, and go Home once signed in.
+  const params = useLocalSearchParams<{ [START_PARAM]?: string }>();
+  const atLaunch = openedAtLaunch(params[START_PARAM]);
+  const leaveStart = () => {
+    router.setParams({ [START_PARAM]: undefined });
+    router.navigate('/' as Href);
+  };
+  const sentHome = useRef(false);
+  useEffect(() => {
+    if (!atLaunch || !user || sentHome.current) return;
+    sentHome.current = true;
+    router.setParams({ [START_PARAM]: undefined });
+    router.navigate('/' as Href);
+  }, [atLaunch, user, router]);
 
   // On the website the documents are this app's own pages; the phone apps
   // open them on the website (lib/legal.ts).
@@ -1508,6 +1525,17 @@ export default function ProfileScreen() {
                   {t('legal.termsOfService')}
                 </Text>
               </View>
+              {/* Apple 5.1.1(v): browsing homes needs no account, so the
+                  sign-in screen the app opens on lets people skip it. */}
+              {atLaunch ? (
+                <TouchableOpacity
+                  accessibilityRole="button"
+                  onPress={leaveStart}
+                  style={styles.browseButton}
+                  hitSlop={8}>
+                  <Text style={styles.browseText}>{t('auth.browseWithoutAccount')}</Text>
+                </TouchableOpacity>
+              ) : null}
                 </>
               )}
             </View>
@@ -1727,6 +1755,21 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   legalLinkAuth: {
     color: 'rgba(255,255,255,0.9)',
+  },
+  // "Browse without an account" under the sign-in card, when it is the
+  // app's first screen.
+  browseButton: {
+    alignSelf: 'center',
+    minHeight: 44,
+    justifyContent: 'center',
+    paddingHorizontal: 16,
+    marginTop: 8,
+  },
+  browseText: {
+    fontFamily: Fonts.sansSemiBold,
+    fontSize: 15,
+    color: '#fff',
+    textDecorationLine: 'underline',
   },
 
   // ─── Auth (signed-out) screen — matches web's .auth-screen family ───
