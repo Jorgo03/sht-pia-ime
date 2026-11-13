@@ -85,10 +85,16 @@ test.describe('signed in: favourites', () => {
     await page.goto('/');
     const heart = page.getByRole('button', { name: t('common.save') }).first();
     await expect(heart).toBeVisible();
-    await heart.click();
-    await heart.click();
+    // The same button both times: saving can add a "saved" row above the
+    // list, which would move `.first()` to another listing's heart.
+    const button = await heart.elementHandle();
+    await button!.click();
+    await button!.click();
     await expect.poll(() => writes.filter((w) => w.table === 'favorites').length).toBe(2);
-    expect(writes.filter((w) => w.table === 'favorites').map((w) => w.method)).toEqual(['POST', 'DELETE']);
+    const favs = writes.filter((w) => w.table === 'favorites');
+    expect(favs.map((w) => w.method)).toEqual(['POST', 'DELETE']);
+    expect(favs[0].body?.property_id).toBeTruthy();
+    expect(favs[1].query).toContain(`property_id=eq.${favs[0].body.property_id}`);
     expect(delayed).toBeGreaterThan(0);
   });
 });

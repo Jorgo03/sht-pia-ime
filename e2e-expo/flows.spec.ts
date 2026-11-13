@@ -120,15 +120,31 @@ test.describe('signed in', () => {
 
   // AUDIT-028: two quick taps mean save, then unsave. The requests must reach
   // the server in that order, or the server keeps a favourite the heart says
-  // is not saved.
+  // is not saved. The save reads the listing first, so on a slow connection
+  // the unsave used to overtake it.
   test('X105 favourites: a quick second tap unsaves, and the server sees save then unsave', async ({ page, writes }) => {
+    // A real network: the save first reads the listing; give that read half a
+    // second, as on a phone connection, so the unsave could overtake it.
+    await page.route(
+      (url) => url.pathname.endsWith('/rest/v1/properties') && /id=eq./.test(url.search) && !url.search.includes('status'),
+      async (route) => {
+        await new Promise((r) => setTimeout(r, 500));
+        await route.fallback();
+      },
+    );
     await page.goto('/');
     await ready(page);
     const heart = page.getByRole('button', { name: t('common.save') }).first();
-    await heart.click();
-    await heart.click();
+    // The same button both times: saving can add a "saved" row above the
+    // list, which would move `.first()` to another listing's heart.
+    const button = await heart.elementHandle();
+    await button!.click();
+    await button!.click();
     await expect.poll(() => writes.filter((w) => w.table === 'favorites').length).toBe(2);
-    expect(writes.filter((w) => w.table === 'favorites').map((w) => w.method)).toEqual(['POST', 'DELETE']);
+    const favs = writes.filter((w) => w.table === 'favorites');
+    expect(favs.map((w) => w.method)).toEqual(['POST', 'DELETE']);
+    expect(favs[0].body?.property_id).toBeTruthy();
+    expect(favs[1].query).toContain(`property_id=eq.${favs[0].body.property_id}`);
   });
 
   test('X04 favourites: the heart saves a listing for this account', async ({ page, writes }) => {
