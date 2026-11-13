@@ -17,7 +17,8 @@
       },
       "usesAppleSignIn": true,
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "CFBundleAllowMixedLocalizations": true
       }
     },
     "android": {
@@ -86,6 +87,10 @@
       "eas": {
         "projectId": "ed500f91-752b-49d7-a3f7-51fadaedce3b"
       }
+    },
+    "locales": {
+      "sq": "./store-locales/sq.json",
+      "en": "./store-locales/en.json"
     }
   }
 }
