@@ -1,6 +1,6 @@
 // Form limits are enforced twice: by the forms (src/lib/formLimits.js and the
 // limits already in profileForm.js / leads.js) and by the database
-// (supabase/migrations/20261104210000_server_form_checks.sql). This keeps the
+// (supabase/migrations/20261104215248_server_form_checks.sql). This keeps the
 // two the same, so the server never refuses what a form allowed.
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
@@ -10,7 +10,7 @@ import { FORM_LIMITS, inIntRange, isValidEmail } from '../src/lib/formLimits.js'
 import { PROFILE_LIMITS } from '../src/features/auth/lib/profileForm.js'
 import { LEAD_LIMITS } from '../src/features/leads/lib/leads.js'
 
-const sql = fs.readFileSync(new URL('../supabase/migrations/20261104210000_server_form_checks.sql', import.meta.url), 'utf8')
+const sql = fs.readFileSync(new URL('../supabase/migrations/20261104215248_server_form_checks.sql', import.meta.url), 'utf8')
 
 /** The CHECK expression of one constraint in the migration. */
 function constraint(name) {

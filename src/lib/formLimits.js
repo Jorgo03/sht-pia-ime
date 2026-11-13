@@ -1,6 +1,6 @@
 // Limits for what people type into forms, shared by the apps and the database.
 // The forms stop at these values (maxLength, step checks); the database
-// refuses anything past them too (supabase/migrations/20261104210000_server_form_checks.sql),
+// refuses anything past them too (supabase/migrations/20261104215248_server_form_checks.sql),
 // so a request sent around the app is checked the same way.
 // tests/formLimits.test.mjs fails if the two drift apart.
 
