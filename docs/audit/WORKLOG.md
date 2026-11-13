@@ -92,3 +92,41 @@ step).
    - Set `MSYS_NO_PATHCONV=1` for Playwright.
    - Never run two Playwright runs at once.
    - Write scripts to files rather than `node -e`.
+
+## 2026-11-13: second pass, fixes after checkpoint 1 (stopped at the usage limit)
+
+### Done and pushed
+
+| Commit | Change |
+|---|---|
+| `5752d09` | AUDIT-024: chat catch-up |
+| `c5b8936` | merge of master (login-first) |
+| `c2ab8c7` | AUDIT-027: favicon and manifest |
+| `dd93746`, `3c35e58`, `9457099` | AUDIT-028: favourites save and unsave reach the server in tap order, app and website |
+| `8b2aa06` | AUDIT-026: `agent_id` type |
+| `b10b500` | `docs/LAUNCH_PLAN.md` |
+| `7475703` | AUDIT-031: iOS permission prompts in Albanian and English |
+
+`9457099` corrects the record for AUDIT-028. The real bug is ordering: the unsave overtook the save on a slow connection. The double POST reported in `dd93746` was a test artefact. Proof on the old code: X105 failed 6/6 and F-N28 failed 10/10. On the fixed code: 12/12 and 10/10.
+
+### Checks at the stop
+
+| Check | Result |
+|---|---|
+| Unit tests | 570 passed |
+| `expo-doctor` | 20/20 |
+| `tsc` | clean |
+| Lint | 0 errors |
+| Last full Playwright run | before the favourites test fix: website 269 passed, 2 failed (F-N28); Expo app 326 passed, 2 failed (X105). Both are since fixed and passed repeated runs. |
+
+### Left to do
+
+1. Rerun both full Playwright suites once (they never run in parallel).
+2. Write `docs/audit/AUDIT_REPORT.md`:
+   - consolidate the root `AUDIT_REPORT.md` and `docs/audit/FINDINGS.md`;
+   - add a Commit column;
+   - update AUDIT-028 to the corrected cause;
+   - add AUDIT-031;
+   - give health 7 → 8.5.
+3. Open the PR from `audit/full-sweep`, with the report summary as its description.
+4. Give the owner the summary in chat.
