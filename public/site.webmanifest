@@ -1,0 +1,16 @@
+{
+  "name": "Shtëpia.ime",
+  "short_name": "Shtëpia.ime",
+  "description": "Shtëpi në shitje dhe me qira në Shqipëri",
+  "lang": "sq",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f7f3ec",
+  "theme_color": "#ff7d1a",
+  "icons": [
+    { "src": "/apple-touch-icon.png", "sizes": "180x180", "type": "image/png" },
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml" },
+    { "src": "/favicon.ico", "sizes": "48x48", "type": "image/x-icon" }
+  ]
+}

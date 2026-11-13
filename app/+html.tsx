@@ -85,6 +85,7 @@ export default function Root({ children }: PropsWithChildren) {
         <meta name="theme-color" content="#ff7d1a" />
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        <link rel="manifest" href="/site.webmanifest" />
         <meta property="og:type" content="website" />
         <meta property="og:site_name" content="Shtëpia.ime" />
         <meta property="og:locale" content="sq_AL" />
