@@ -4,6 +4,7 @@ import { useLocalSearchParams, useRouter, type Href } from 'expo-router';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
+  AppState,
   Alert,
   FlatList,
   KeyboardAvoidingView,
@@ -36,6 +37,7 @@ import {
   unblockUser,
 } from '@/src/features/safety/lib/safety';
 import { isNotFound, loadThreadMessages } from '@/src/features/messaging/lib/thread';
+import { createCatchUp, mergeMessages } from '@/src/features/messaging/lib/catchUp';
 import { fetchPublicProfile, otherParticipant } from '@/src/features/profiles/lib/publicProfile';
 import { MessageAttachment } from '@/components/messaging/message-attachment';
 import {
@@ -200,6 +202,17 @@ export default function ThreadScreen() {
       markRead(convo, convo.client_id === user.id);
     })();
 
+    // Realtime does not replay what was missed while the channel was down or
+    // the app was in the background: re-read then, and merge (AUDIT-024).
+    const catchUp = createCatchUp(async () => {
+      const { messages: fresh } = await loadThreadMessages<Message>(supabase, id);
+      if (cancelled || !fresh) return;
+      setMessages((prev) => mergeMessages(prev, fresh));
+      const convo = conversationRef.current;
+      if (convo) markRead(convo, convo.client_id === user.id);
+    });
+    const appStateSub = AppState.addEventListener('change', catchUp.onAppState);
+
     const channel = supabase
       .channel(`thread-${id}`)
       .on(
@@ -211,10 +224,11 @@ export default function ThreadScreen() {
           if (msg.sender_id !== user.id && convo) markRead(convo, convo.client_id === user.id);
         },
       )
-      .subscribe();
+      .subscribe((status) => catchUp.onStatus(status));
 
     return () => {
       cancelled = true;
+      appStateSub.remove();
       supabase.removeChannel(channel);
     };
     // conversation is intentionally excluded — the realtime handler reads

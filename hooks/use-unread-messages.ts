@@ -1,7 +1,9 @@
 import { useEffect, useId, useState } from 'react';
+import { AppState } from 'react-native';
 
 import { useAuth } from '@/contexts/auth-context';
 import { supabase } from '@/lib/supabase';
+import { createCatchUp } from '@/src/features/messaging/lib/catchUp';
 
 /**
  * Total unread message count across all of the current user's conversations
@@ -51,13 +53,19 @@ export function useUnreadMessages(): number {
 
     refresh();
 
+    // Re-sum after a reconnect or a return to the foreground: realtime does
+    // not replay the changes missed meanwhile (AUDIT-024).
+    const catchUp = createCatchUp(refresh);
+    const appStateSub = AppState.addEventListener('change', catchUp.onAppState);
+
     const channel = supabase
       .channel(`unread-messages-${instanceId}`)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'conversations' }, refresh)
-      .subscribe();
+      .subscribe((status) => catchUp.onStatus(status));
 
     return () => {
       active = false;
+      appStateSub.remove();
       supabase.removeChannel(channel);
     };
     // Depends on user.id (a stable primitive), not the user object — matches
