@@ -20,6 +20,8 @@ import { Property } from '@/data/types';
 import { closedStatusFor } from '@/src/features/listings/lib/listingForm';
 import { useReadableColumn } from '@/hooks/use-responsive';
 import { confirmAction } from '@/lib/confirm';
+import { LIST_PAGE_SIZE, pageWindow } from '@/src/lib/pageWindow';
+import { ActionButton } from '@/components/ui/action-button';
 
 // Reads the theme's status tokens rather than hardcoding the light-theme
 // hexes — web pulls these from --fho-status-*, which swap in dark mode, so a
@@ -49,6 +51,9 @@ export default function MyListingsScreen() {
   // A failed read: shown with a retry rather than as an empty list.
   const [loadError, setLoadError] = useState(false);
   const [actionError, setActionError] = useState(false);
+  // 24 at a time; "Load more" raises the window (AUDIT-015).
+  const [limit, setLimit] = useState(LIST_PAGE_SIZE);
+  const [hasMore, setHasMore] = useState(false);
 
   const flashError = () => {
     setActionError(true);
@@ -65,15 +70,18 @@ export default function MyListingsScreen() {
       .from('properties')
       .select('*')
       .or(`owner_id.eq.${user.id},agent_id.eq.${user.id}`)
-      .order('created_at', { ascending: false });
+      .order('created_at', { ascending: false })
+      .limit(limit + 1);
     if (error) {
       setLoadError(true);
       setLoading(false);
       return;
     }
-    setListings(data ?? []);
+    const page = pageWindow(data, limit);
+    setListings(page.items);
+    setHasMore(page.hasMore);
     setLoading(false);
-  }, [user]);
+  }, [user, limit]);
 
   useEffect(() => {
     load();
@@ -187,6 +195,11 @@ export default function MyListingsScreen() {
             keyExtractor={(item) => item.id}
             contentContainerStyle={styles.list}
             showsVerticalScrollIndicator={false}
+            ListFooterComponent={
+              hasMore ? (
+                <ActionButton variant="secondary" title={t('common.loadMore')} onPress={() => setLimit((n) => n + LIST_PAGE_SIZE)} />
+              ) : undefined
+            }
             renderItem={({ item }) => {
               const title = getLocalizedText(item.title_i18n, i18n.language) || item.title;
               const color = statusColor(colors, item.status);

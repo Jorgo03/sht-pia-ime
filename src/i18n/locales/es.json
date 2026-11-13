@@ -2,6 +2,7 @@
   "common": {
     "appName": "Shtëpia.ime",
     "loading": "Cargando...",
+    "loadMore": "Cargar más",
     "error": "Error",
     "save": "Guardar",
     "cancel": "Cancelar",

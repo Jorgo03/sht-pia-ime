@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next';
 
 import { useTabBarClearance } from '@/components/liquid-tab-bar';
 import { ActionButton } from '@/components/ui/action-button';
+import { LIST_PAGE_SIZE, pageWindow } from '@/src/lib/pageWindow';
 import { AppHeader } from '@/components/ui/app-header';
 import { ScreenHero } from '@/components/ui/screen-hero';
 import { GradientBackground } from '@/components/ui/gradient-background';
@@ -94,6 +95,10 @@ export default function MessagesInboxScreen() {
   // header and hero render at once and only the list area loads.
   const [loading, setLoading] = useState(() => !initial);
   const [error, setError] = useState(false);
+  // 24 conversations at a time, newest first; "Load more" raises the window
+  // and realtime reloads keep it (AUDIT-015).
+  const [limit, setLimit] = useState(LIST_PAGE_SIZE);
+  const [hasMore, setHasMore] = useState(false);
   // True once names and titles have arrived (or came from cache). Until
   // then the list shows skeleton rows, not rows named '?' — the history
   // (conversations) is already there, only its labels are still loading.
@@ -137,7 +142,8 @@ export default function MessagesInboxScreen() {
       .from('conversations')
       .select('*')
       .or(`client_id.eq.${user.id},agent_id.eq.${user.id}`)
-      .order('last_message_at', { ascending: false });
+      .order('last_message_at', { ascending: false })
+      .limit(limit + 1);
     if (run !== loadSeq.current) return;
     // The error was previously discarded, so a failed fetch fell through to the
     // empty state — an agent whose leads failed to load was told they had no
@@ -148,7 +154,9 @@ export default function MessagesInboxScreen() {
       setLoading(false);
       return;
     }
-    const convos = data ?? [];
+    const page = pageWindow(data, limit);
+    const convos = page.items;
+    setHasMore(page.hasMore);
     // Stage one: the list (and the hero counts) is correct now; names and
     // titles fill in from stage two as background data.
     setConversations(convos);
@@ -180,7 +188,7 @@ export default function MessagesInboxScreen() {
       properties: nextProperties,
       blocked: blockedIds,
     };
-  }, [user]);
+  }, [user, limit]);
 
   // On every visit, not only the first: a tab stays mounted between visits.
   // One fetch per focus; while it is open the realtime channel below keeps
@@ -278,6 +286,11 @@ export default function MessagesInboxScreen() {
             keyExtractor={(item) => item.id}
             contentContainerStyle={[styles.list, { paddingBottom: tabBarClearance }]}
             showsVerticalScrollIndicator={false}
+            ListFooterComponent={
+              hasMore ? (
+                <ActionButton variant="secondary" title={t('common.loadMore')} onPress={() => setLimit((n) => n + LIST_PAGE_SIZE)} />
+              ) : undefined
+            }
             renderItem={({ item }) => {
               const otherId = item.client_id === user.id ? item.agent_id : item.client_id;
               const other = profiles[otherId];
