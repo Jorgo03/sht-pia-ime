@@ -60,6 +60,7 @@ import { useProfileStats } from '@/hooks/use-profile-stats';
 import type { ProfileFields } from '@/src/features/auth/lib/profileForm';
 import { useUnreadMessages } from '@/hooks/use-unread-messages';
 import { useReadableColumn } from '@/hooks/use-responsive';
+import { APPLE_SIGN_IN_ENABLED } from '@/src/features/auth/lib/oauthOptions';
 
 type Role = 'buyer' | 'agent';
 
@@ -1441,18 +1442,23 @@ export default function ProfileScreen() {
                       a fetchable request, so a disabled provider's raw JSON
                       400 replaces the page before any app code runs. Not
                       fixable from in-app error handling; goes away once the
-                      Dashboard config lands. */}
-                <TouchableOpacity
-                  accessibilityRole="button"
-                  style={[styles.socialButton, socialOneColumn && styles.socialButtonFull]}
-                  onPress={() => handleProvider('apple' as Provider)}
-                  activeOpacity={0.8}
-                  disabled={!!providerLoading}>
-                  <Ionicons name="logo-apple" size={19} color="#f5f0e8" />
-                  <Text style={styles.socialLabel} numberOfLines={1}>
-                    {providerLoading === 'apple' ? t('common.loading') : t('auth.continueWithApple')}
-                  </Text>
-                </TouchableOpacity>
+                      Dashboard config lands.
+                    2026-11-13 (AUDIT-001): Apple is hidden behind
+                    APPLE_SIGN_IN_ENABLED until the provider is on, since the
+                    button could only fail. LinkedIn is on live. */}
+                {APPLE_SIGN_IN_ENABLED && (
+                  <TouchableOpacity
+                    accessibilityRole="button"
+                    style={[styles.socialButton, socialOneColumn && styles.socialButtonFull]}
+                    onPress={() => handleProvider('apple' as Provider)}
+                    activeOpacity={0.8}
+                    disabled={!!providerLoading}>
+                    <Ionicons name="logo-apple" size={19} color="#f5f0e8" />
+                    <Text style={styles.socialLabel} numberOfLines={1}>
+                      {providerLoading === 'apple' ? t('common.loading') : t('auth.continueWithApple')}
+                    </Text>
+                  </TouchableOpacity>
+                )}
 
                 <TouchableOpacity
                   accessibilityRole="button"

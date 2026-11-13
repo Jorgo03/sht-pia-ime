@@ -15,6 +15,7 @@ import { EMAIL_RE, friendlyError, retryAfterSeconds } from '../../../lib/authErr
 import { supabase } from '../../../lib/supabase'
 import LegalLinks from '../../../shared/LegalLinks'
 import { isModerator } from '../../moderation/lib/moderation'
+import { APPLE_SIGN_IN_ENABLED } from '../lib/oauthOptions'
 import '../../../styles/profile.css'
 
 export default function Profile() {
@@ -832,11 +833,15 @@ export default function Profile() {
                 OTP/password paths, which stay on this page. This is the
                 exact rough edge the 2026-07-12 removal was avoiding — it's
                 back now because that's what was asked for, but it isn't
-                solved, only re-exposed until the Dashboard config lands. */}
-            <button className="social-btn" onClick={() => handleProvider('apple')} disabled={!!providerLoading}>
-              {providerLoading === 'apple' ? <Loader2 size={18} className="animate-spin" /> : <Apple size={18} />}
-              {t('auth.continueWithApple')}
-            </button>
+                solved, only re-exposed until the Dashboard config lands.
+                2026-11-13 (AUDIT-001): Apple is hidden behind
+                APPLE_SIGN_IN_ENABLED until the provider is on. */}
+            {APPLE_SIGN_IN_ENABLED && (
+              <button className="social-btn" onClick={() => handleProvider('apple')} disabled={!!providerLoading}>
+                {providerLoading === 'apple' ? <Loader2 size={18} className="animate-spin" /> : <Apple size={18} />}
+                {t('auth.continueWithApple')}
+              </button>
+            )}
             <button className="social-btn" onClick={() => handleProvider('linkedin_oidc')} disabled={!!providerLoading}>
               {providerLoading === 'linkedin_oidc' ? <Loader2 size={18} className="animate-spin" /> : <Linkedin size={18} />}
               {t('auth.continueWithLinkedIn')}

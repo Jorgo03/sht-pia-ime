@@ -14,3 +14,11 @@ export function oauthQueryParams(provider) {
   if (provider === 'google') return { prompt: 'select_account' }
   return undefined
 }
+
+// "Continue with Apple" is shown only when this is true (AUDIT-001). The Apple
+// provider is off in Supabase (GET /auth/v1/settings, 2026-11-13), so the
+// button could only fail: an error on the phone, Supabase's raw JSON 400 on
+// the web. Turn the provider on (Dashboard > Authentication > Providers >
+// Apple), test it, then set this to true. Required before App Store review:
+// Guideline 4.8 asks for Sign in with Apple when Google sign-in is offered.
+export const APPLE_SIGN_IN_ENABLED = false

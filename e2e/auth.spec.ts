@@ -441,7 +441,10 @@ test('F4-N12 a provider switched off in Supabase gets a plain message, not its r
   const authorize: string[] = [];
   page.on('request', (r) => { if (r.url().includes('/authorize')) authorize.push(r.url()); });
   await page.goto('/profile');
-  await page.getByRole('button', { name: t('auth.continueWithApple') }).click();
+  // Apple is hidden while its provider is off (AUDIT-001); LinkedIn takes the
+  // same path when Supabase reports it off.
+  await expect(page.getByRole('button', { name: t('auth.continueWithApple') })).toHaveCount(0);
+  await page.getByRole('button', { name: t('auth.continueWithLinkedIn') }).click();
   await expect(page.getByText(t('errors.providerUnavailable'))).toBeVisible();
   expect(authorize).toEqual([]);
   await expect(page).toHaveURL(/\/profile$/);
