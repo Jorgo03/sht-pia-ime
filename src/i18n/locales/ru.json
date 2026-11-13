@@ -315,7 +315,18 @@
     "loginPrompt": "Войдите, чтобы увидеть сообщения",
     "sendFailed": "Сообщение не отправлено — попробуйте ещё раз",
     "unavailable": "Этот разговор недоступен",
-    "loadFailed": "Не удалось загрузить переписку."
+    "loadFailed": "Не удалось загрузить переписку.",
+    "attach": "Прикрепить",
+    "attachPhoto": "Фото",
+    "attachDocument": "Документ",
+    "attachTooBig": "Размер файла — до {{max}} МБ.",
+    "attachType": "Можно отправить фото, PDF, файл Word, Excel или текстовый файл.",
+    "attachPermission": "Разрешите доступ к фото, чтобы отправить его.",
+    "attachFailed": "Файл не отправлен. Попробуйте ещё раз.",
+    "removeAttachment": "Убрать файл",
+    "openAttachment": "Открыть {{name}}",
+    "sendingFile": "Отправка файла…",
+    "photoSent": "Фото"
   },
   "notFound": {
     "title": "Страница не найдена",

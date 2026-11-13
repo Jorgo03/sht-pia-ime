@@ -299,7 +299,18 @@
     "loginPrompt": "Kyçu për të parë mesazhet",
     "sendFailed": "Mesazhi nuk u dërgua — provo përsëri",
     "unavailable": "Kjo bisedë nuk është e disponueshme",
-    "loadFailed": "Biseda nuk u ngarkua dot."
+    "loadFailed": "Biseda nuk u ngarkua dot.",
+    "attach": "Bashkëngjit",
+    "attachPhoto": "Foto",
+    "attachDocument": "Dokument",
+    "attachTooBig": "Skedari mund të jetë deri në {{max}} MB.",
+    "attachType": "Mund të dërgosh një foto, PDF, Word, Excel ose skedar teksti.",
+    "attachPermission": "Lejo qasjen te fotot për të dërguar një.",
+    "attachFailed": "Skedari nuk u dërgua. Provo përsëri.",
+    "removeAttachment": "Hiq skedarin",
+    "openAttachment": "Hap {{name}}",
+    "sendingFile": "Po dërgohet skedari…",
+    "photoSent": "Foto"
   },
   "notFound": {
     "title": "Faqja nuk u gjet",

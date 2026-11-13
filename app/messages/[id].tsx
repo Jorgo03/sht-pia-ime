@@ -37,6 +37,22 @@ import {
 } from '@/src/features/safety/lib/safety';
 import { isNotFound, loadThreadMessages } from '@/src/features/messaging/lib/thread';
 import { fetchPublicProfile, otherParticipant } from '@/src/features/profiles/lib/publicProfile';
+import { MessageAttachment } from '@/components/messaging/message-attachment';
+import {
+  AttachmentTooLarge,
+  pickChatDocument,
+  pickChatPhoto,
+  removeChatFile,
+  uploadChatFile,
+  type PickedFile,
+  type PickResult,
+} from '@/lib/message-attachments';
+import {
+  MAX_ATTACHMENT_MB,
+  formatBytes,
+  readAttachment,
+  type Attachment,
+} from '@/src/features/messaging/lib/attachments';
 import { FORM_LIMITS } from '@/src/lib/formLimits';
 import { useReadableColumn } from '@/hooks/use-responsive';
 
@@ -46,6 +62,8 @@ interface Message {
   sender_id: string;
   body: string;
   created_at: string;
+  /** A photo or document (src/features/messaging/lib/attachments.js). */
+  attachment?: unknown;
 }
 
 interface ConversationInfo {
@@ -92,6 +110,12 @@ export default function ThreadScreen() {
   // The web's Report / Block menu (phones use the native Alert sheet).
   const [menuOpen, setMenuOpen] = useState(false);
   const [safetyError, setSafetyError] = useState(false);
+  // A photo or document chosen to go with the next message, and why one could
+  // not be chosen or sent.
+  const [pendingFile, setPendingFile] = useState<PickedFile | null>(null);
+  const [attachError, setAttachError] = useState<null | 'type' | 'size' | 'permission' | 'failed'>(null);
+  // The web's Photo / Document menu (phones use the native Alert sheet).
+  const [attachMenuOpen, setAttachMenuOpen] = useState(false);
   const listRef = useRef<FlatList<Message>>(null);
   // The postgres_changes handler below is created once when the effect
   // mounts (conversation is still null at that point) and never recreated,
@@ -205,22 +229,71 @@ export default function ThreadScreen() {
 
   const send = async () => {
     const body = text.trim();
-    if (!body || sending || !user || !id) return;
+    const file = pendingFile;
+    if ((!body && !file) || sending || !user || !id) return;
     setSending(true);
     setSendError(null);
+    setAttachError(null);
+    // The file goes up first, into this conversation's private folder; the
+    // message then points at it. A refused message removes the file again.
+    let attachment: Attachment | null = null;
+    if (file) {
+      try {
+        attachment = await uploadChatFile(id, file);
+      } catch (err) {
+        setSending(false);
+        setAttachError(err instanceof AttachmentTooLarge ? 'size' : 'failed');
+        return;
+      }
+    }
     const { data, error } = await supabase
       .from('messages')
-      .insert({ conversation_id: id, sender_id: user.id, body })
+      .insert({ conversation_id: id, sender_id: user.id, body, ...(attachment ? { attachment } : {}) })
       .select('*')
       .single();
     setSending(false);
     if (!error && data) {
       setText('');
+      setPendingFile(null);
       setMessages((prev) => (prev.some((m) => m.id === data.id) ? prev : [...prev, data]));
     } else {
+      if (attachment) void removeChatFile(attachment.path);
       // Refused by the database because the other person blocked you.
       setSendError(isBlockedSendError(error) ? 'blockedByThem' : 'failed');
     }
+  };
+
+  const takePick = (result: PickResult) => {
+    if (!result) return; // cancelled
+    if ('problem' in result) {
+      setAttachError(result.problem);
+      return;
+    }
+    setAttachError(null);
+    setPendingFile(result.file);
+  };
+
+  const choose = async (kind: 'photo' | 'document') => {
+    setAttachMenuOpen(false);
+    try {
+      takePick(kind === 'photo' ? await pickChatPhoto() : await pickChatDocument());
+    } catch {
+      setAttachError('failed');
+    }
+  };
+
+  // Same pattern as the Report / Block menu: a native sheet on phones, a small
+  // menu on the web, where Alert.alert does nothing.
+  const openAttachMenu = () => {
+    if (Platform.OS === 'web') {
+      setAttachMenuOpen(true);
+      return;
+    }
+    Alert.alert(t('messages.attach'), undefined, [
+      { text: t('messages.attachPhoto'), onPress: () => void choose('photo') },
+      { text: t('messages.attachDocument'), onPress: () => void choose('document') },
+      { text: t('common.cancel'), style: 'cancel' },
+    ]);
   };
 
   const toggleBlock = async () => {
@@ -379,9 +452,13 @@ export default function ThreadScreen() {
           }
           renderItem={({ item }) => {
             const mine = item.sender_id === user?.id;
+            const attachment = readAttachment(item.attachment);
             const body = (
               <>
-                <Text style={[styles.bubbleText, mine && styles.bubbleTextMine]}>{item.body}</Text>
+                {attachment ? <MessageAttachment attachment={attachment} mine={mine} /> : null}
+                {item.body?.trim() ? (
+                  <Text style={[styles.bubbleText, mine && styles.bubbleTextMine]}>{item.body}</Text>
+                ) : null}
                 <Text style={[styles.bubbleTime, mine && styles.bubbleTimeMine]}>
                   {formatRelativeTime(item.created_at, i18n.language)}
                 </Text>
@@ -397,14 +474,49 @@ export default function ThreadScreen() {
           }}
         />
 
-        {sendError || safetyError ? (
+        {sendError || safetyError || attachError ? (
           <Text style={styles.sendError} accessibilityLiveRegion="polite">
             {safetyError
               ? t('errors.generic')
               : sendError === 'blockedByThem'
                 ? t('safety.cannotMessage')
-                : t('messages.sendFailed')}
+                : sendError
+                  ? t('messages.sendFailed')
+                  : attachError === 'size'
+                    ? t('messages.attachTooBig', { max: MAX_ATTACHMENT_MB })
+                    : attachError === 'type'
+                      ? t('messages.attachType')
+                      : attachError === 'permission'
+                        ? t('messages.attachPermission')
+                        : t('messages.attachFailed')}
           </Text>
+        ) : null}
+
+        {pendingFile && !blocked ? (
+          <View style={styles.pending}>
+            <MaterialIcons
+              name={pendingFile.kind === 'image' ? 'image' : 'description'}
+              size={20}
+              color={colors.accent}
+            />
+            <Text style={styles.pendingName} numberOfLines={1}>
+              {sending ? t('messages.sendingFile') : pendingFile.name}
+            </Text>
+            {pendingFile.size && !sending ? (
+              <Text style={styles.pendingSize}>{formatBytes(pendingFile.size, i18n.language)}</Text>
+            ) : null}
+            {sending ? (
+              <ActivityIndicator size="small" color={colors.accent} />
+            ) : (
+              <TouchableOpacity
+                accessibilityRole="button"
+                accessibilityLabel={t('messages.removeAttachment')}
+                onPress={() => setPendingFile(null)}
+                hitSlop={10}>
+                <MaterialIcons name="close" size={20} color={colors.textSecondary} />
+              </TouchableOpacity>
+            )}
+          </View>
         ) : null}
 
         {blocked ? (
@@ -416,6 +528,15 @@ export default function ThreadScreen() {
           </View>
         ) : (
         <View style={styles.inputRow}>
+          <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel={t('messages.attach')}
+            onPress={openAttachMenu}
+            disabled={sending}
+            hitSlop={6}
+            style={[styles.attachButton, sending && styles.sendButtonDisabled]}>
+            <MaterialIcons name="attach-file" size={22} color={colors.textPrimary} />
+          </TouchableOpacity>
           <TextInput
             style={styles.input}
             placeholder={t('messages.inputPlaceholder')}
@@ -429,9 +550,9 @@ export default function ThreadScreen() {
           <TouchableOpacity
             accessibilityRole="button" accessibilityLabel={t('common.send')}
             onPress={send}
-            disabled={sending || !text.trim()}
+            disabled={sending || (!text.trim() && !pendingFile)}
             activeOpacity={0.8}
-            style={(!text.trim() || sending) && styles.sendButtonDisabled}>
+            style={((!text.trim() && !pendingFile) || sending) && styles.sendButtonDisabled}>
             <LinearGradient colors={[colors.accent, colors.accentEnd]} style={styles.sendButton}>
               <MaterialIcons name="send" size={18} color="#fff" />
             </LinearGradient>
@@ -439,6 +560,24 @@ export default function ThreadScreen() {
         </View>
         )}
         <ReportSheet visible={reportOpen} userId={otherId} onClose={() => setReportOpen(false)} />
+        {Platform.OS === 'web' && (
+          <Modal visible={attachMenuOpen} transparent animationType="fade" onRequestClose={() => setAttachMenuOpen(false)}>
+            <Pressable style={styles.menuBackdrop} onPress={() => setAttachMenuOpen(false)} accessibilityLabel={t('common.cancel')}>
+              <View style={styles.menuCard} accessibilityRole="menu">
+                <Text style={styles.menuTitle}>{t('messages.attach')}</Text>
+                <TouchableOpacity accessibilityRole="menuitem" style={styles.menuItem} onPress={() => void choose('photo')}>
+                  <Text style={styles.menuItemText}>{t('messages.attachPhoto')}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity accessibilityRole="menuitem" style={styles.menuItem} onPress={() => void choose('document')}>
+                  <Text style={styles.menuItemText}>{t('messages.attachDocument')}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity accessibilityRole="menuitem" style={styles.menuItem} onPress={() => setAttachMenuOpen(false)}>
+                  <Text style={styles.menuItemCancel}>{t('common.cancel')}</Text>
+                </TouchableOpacity>
+              </View>
+            </Pressable>
+          </Modal>
+        )}
         {Platform.OS === 'web' && (
           <Modal visible={menuOpen} transparent animationType="fade" onRequestClose={() => setMenuOpen(false)}>
             <Pressable style={styles.menuBackdrop} onPress={() => setMenuOpen(false)} accessibilityLabel={t('common.cancel')}>
@@ -657,6 +796,38 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   sendButtonDisabled: {
     opacity: 0.5,
+  },
+  attachButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  // The photo or document waiting to go with the next message.
+  pending: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginHorizontal: 16,
+    marginTop: 8,
+    paddingHorizontal: 12,
+    minHeight: 44,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: colors.primaryLight,
+  },
+  pendingName: {
+    flex: 1,
+    fontFamily: Fonts.sansMedium,
+    fontSize: 14,
+    color: colors.textPrimary,
+  },
+  pendingSize: {
+    fontFamily: Fonts.sans,
+    fontSize: 12,
+    color: colors.textSecondary,
   },
   menuButton: {
     width: 44,

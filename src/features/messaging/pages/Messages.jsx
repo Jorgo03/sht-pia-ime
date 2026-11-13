@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
-import { MessageCircle, ArrowLeft, Send, MoreVertical } from 'lucide-react'
+import { MessageCircle, ArrowLeft, Send, MoreVertical, Paperclip } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../auth/AuthContext'
 import { supabase } from '../../../lib/supabase'
@@ -8,6 +8,7 @@ import { formatRelativeTime, getLocalizedText } from '../../../lib/format'
 import { blockUser, isBlockedSendError, loadBlockedIds, unblockUser } from '../../safety/lib/safety'
 import ReportSheet from '../../safety/components/ReportSheet'
 import { loadThreadMessages } from '../lib/thread'
+import { formatBytes, readAttachment } from '../lib/attachments'
 import LoadError from '../../../shared/LoadError'
 
 // Every subscription gets its own name. supabase.channel() hands back a channel
@@ -172,6 +173,40 @@ export default function Messages() {
   )
 }
 
+// A photo or document sent from the phone app. The bucket is private, so the
+// link is made when it is opened (an hour long), never stored in the page.
+// Sending files is in the phone app only; the website shows and opens them.
+function AttachmentLink({ attachment }) {
+  const { t, i18n } = useTranslation()
+  const [failed, setFailed] = useState(false)
+  const open = async () => {
+    setFailed(false)
+    const tab = window.open('', '_blank', 'noopener')
+    const { data, error } = await supabase.storage.from('message-attachments').createSignedUrl(attachment.path, 3600)
+    if (error || !data?.signedUrl) {
+      tab?.close()
+      setFailed(true)
+      return
+    }
+    if (tab) tab.location.href = data.signedUrl
+    else window.location.assign(data.signedUrl)
+  }
+  const size = formatBytes(attachment.size, i18n.language)
+  return (
+    <button
+      type="button"
+      onClick={open}
+      aria-label={t('messages.openAttachment', { name: attachment.name })}
+      className="mb-1 flex w-full items-center gap-2 rounded-lg border border-current/20 px-2 py-1.5 text-left text-[13px]"
+    >
+      <Paperclip size={16} aria-hidden="true" />
+      <span className="min-w-0 flex-1 truncate font-semibold">{attachment.name}</span>
+      {size && <span className="opacity-75">{size}</span>}
+      {failed && <span role="alert">{t('messages.attachFailed')}</span>}
+    </button>
+  )
+}
+
 function Thread({ conversation, other, property, meIsClient, userId, otherId, blocked, onBlockedChange, onBack, onOpenProperty }) {
   const { t, i18n } = useTranslation()
   const [messages, setMessages] = useState([])
@@ -321,7 +356,8 @@ function Thread({ conversation, other, property, meIsClient, userId, otherId, bl
         )}
         {messages.map(m => (
           <div key={m.id} className={`msg-bubble ${m.sender_id === userId ? 'mine' : ''}`}>
-            <div className="msg-bubble__body">{m.body}</div>
+            {readAttachment(m.attachment) && <AttachmentLink attachment={readAttachment(m.attachment)} />}
+            {m.body?.trim() ? <div className="msg-bubble__body">{m.body}</div> : null}
             <div className="msg-bubble__time">{formatRelativeTime(m.created_at, i18n.language)}</div>
           </div>
         ))}

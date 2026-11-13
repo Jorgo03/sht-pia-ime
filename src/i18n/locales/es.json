@@ -307,7 +307,18 @@
     "loginPrompt": "Inicia sesión para ver tus mensajes",
     "sendFailed": "Mensaje no enviado — inténtalo de nuevo",
     "unavailable": "Esta conversación no está disponible",
-    "loadFailed": "No se pudo cargar esta conversación."
+    "loadFailed": "No se pudo cargar esta conversación.",
+    "attach": "Adjuntar",
+    "attachPhoto": "Foto",
+    "attachDocument": "Documento",
+    "attachTooBig": "Los archivos pueden ocupar hasta {{max}} MB.",
+    "attachType": "Puedes enviar una foto, un PDF o un archivo de Word, Excel o texto.",
+    "attachPermission": "Permite el acceso a tus fotos para enviar una.",
+    "attachFailed": "El archivo no se envió. Inténtalo de nuevo.",
+    "removeAttachment": "Quitar archivo",
+    "openAttachment": "Abrir {{name}}",
+    "sendingFile": "Enviando archivo…",
+    "photoSent": "Foto"
   },
   "notFound": {
     "title": "Página no encontrada",

@@ -216,6 +216,11 @@ export async function mockBackend(page: Page, { signedIn = false, writes = [] as
     if (url.hostname === SUPABASE_HOST) {
       if (url.pathname.startsWith('/storage/')) {
         if (method === 'GET' || method === 'HEAD') return route.fulfill(IMAGE);
+        // A private file's temporary link (createSignedUrl), as Storage answers.
+        if (method === 'POST' && url.pathname.startsWith('/storage/v1/object/sign/')) {
+          const rest = url.pathname.slice('/storage/v1/object/sign/'.length);
+          return json(route, 200, { signedURL: `/object/sign/${rest}?token=e2e` });
+        }
         // Uploads and deletes are recorded as writes to "storage".
         let body: Record<string, unknown> = {};
         try { body = route.request().postDataJSON() ?? {}; } catch { /* binary upload */ }

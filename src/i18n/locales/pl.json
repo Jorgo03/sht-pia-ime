@@ -315,7 +315,18 @@
     "loginPrompt": "Zaloguj się, aby zobaczyć wiadomości",
     "sendFailed": "Wiadomość nie została wysłana — spróbuj ponownie",
     "unavailable": "Ta rozmowa jest niedostępna",
-    "loadFailed": "Nie udało się wczytać tej rozmowy."
+    "loadFailed": "Nie udało się wczytać tej rozmowy.",
+    "attach": "Załącz",
+    "attachPhoto": "Zdjęcie",
+    "attachDocument": "Dokument",
+    "attachTooBig": "Plik może mieć maksymalnie {{max}} MB.",
+    "attachType": "Możesz wysłać zdjęcie, PDF, plik Word, Excel lub tekstowy.",
+    "attachPermission": "Zezwól na dostęp do zdjęć, aby je wysłać.",
+    "attachFailed": "Plik nie został wysłany. Spróbuj ponownie.",
+    "removeAttachment": "Usuń plik",
+    "openAttachment": "Otwórz {{name}}",
+    "sendingFile": "Wysyłanie pliku…",
+    "photoSent": "Zdjęcie"
   },
   "notFound": {
     "title": "Nie znaleziono strony",

@@ -307,7 +307,18 @@
     "loginPrompt": "Connectez-vous pour voir vos messages",
     "sendFailed": "Message non envoyé — réessayez",
     "unavailable": "Cette conversation n'est pas disponible",
-    "loadFailed": "Impossible de charger cette conversation."
+    "loadFailed": "Impossible de charger cette conversation.",
+    "attach": "Joindre",
+    "attachPhoto": "Photo",
+    "attachDocument": "Document",
+    "attachTooBig": "Les fichiers peuvent faire jusqu'à {{max}} Mo.",
+    "attachType": "Vous pouvez envoyer une photo, un PDF, un fichier Word, Excel ou texte.",
+    "attachPermission": "Autorisez l'accès à vos photos pour en envoyer une.",
+    "attachFailed": "Le fichier n'a pas été envoyé. Réessayez.",
+    "removeAttachment": "Retirer le fichier",
+    "openAttachment": "Ouvrir {{name}}",
+    "sendingFile": "Envoi du fichier…",
+    "photoSent": "Photo"
   },
   "notFound": {
     "title": "Page introuvable",

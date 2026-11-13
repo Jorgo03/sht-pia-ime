@@ -329,7 +329,18 @@
     "loginPrompt": "Sign in to see your messages",
     "sendFailed": "Message not sent — try again",
     "unavailable": "This conversation is not available",
-    "loadFailed": "Couldn't load this conversation."
+    "loadFailed": "Couldn't load this conversation.",
+    "attach": "Attach",
+    "attachPhoto": "Photo",
+    "attachDocument": "Document",
+    "attachTooBig": "Files can be up to {{max}} MB.",
+    "attachType": "You can send a photo, PDF, Word, Excel or text file.",
+    "attachPermission": "Allow access to your photos to send one.",
+    "attachFailed": "The file wasn't sent. Try again.",
+    "removeAttachment": "Remove file",
+    "openAttachment": "Open {{name}}",
+    "sendingFile": "Sending file…",
+    "photoSent": "Photo"
   },
   "property": {
     "beds": "Bedrooms",

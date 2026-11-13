@@ -299,7 +299,18 @@
     "loginPrompt": "Melde dich an, um deine Nachrichten zu sehen",
     "sendFailed": "Nachricht nicht gesendet — bitte erneut versuchen",
     "unavailable": "Dieses Gespräch ist nicht verfügbar",
-    "loadFailed": "Diese Unterhaltung konnte nicht geladen werden."
+    "loadFailed": "Diese Unterhaltung konnte nicht geladen werden.",
+    "attach": "Anhängen",
+    "attachPhoto": "Foto",
+    "attachDocument": "Dokument",
+    "attachTooBig": "Dateien dürfen höchstens {{max}} MB groß sein.",
+    "attachType": "Du kannst ein Foto, PDF, Word-, Excel- oder Textdatei senden.",
+    "attachPermission": "Erlaube den Zugriff auf deine Fotos, um eines zu senden.",
+    "attachFailed": "Die Datei wurde nicht gesendet. Versuche es erneut.",
+    "removeAttachment": "Datei entfernen",
+    "openAttachment": "{{name}} öffnen",
+    "sendingFile": "Datei wird gesendet…",
+    "photoSent": "Foto"
   },
   "notFound": {
     "title": "Seite nicht gefunden",

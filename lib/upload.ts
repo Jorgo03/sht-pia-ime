@@ -120,8 +120,9 @@ async function renderJpeg(uri: string, size: { width: number; height?: number } 
   }
 }
 
-/** Same max width/quality as the website; never enlarges a smaller photo. */
-async function prepareListingImage(img: PickedImage): Promise<UploadSource> {
+/** Same max width/quality as the website; never enlarges a smaller photo.
+ *  Also used for photos sent in chats (lib/message-attachments.ts). */
+export async function prepareListingImage(img: PickedImage): Promise<UploadSource> {
   let processed: string | null = null;
   let failure: unknown = null;
   try {
