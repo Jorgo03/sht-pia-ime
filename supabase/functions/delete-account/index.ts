@@ -34,6 +34,10 @@
 //     avatars/<uid>/... and property-images/<uid>/... would outlive the
 //     account and stay reachable, since both buckets are public-read. Removed
 //     explicitly.
+//     message-attachments/<conversation_id>/... (private): the account's
+//     conversations cascade away, but their chat photos and documents stayed
+//     in storage (AUDIT-007). The folders are per conversation, not per user,
+//     so they are found and emptied before the auth user is deleted.
 
 import { createClient } from 'npm:@supabase/supabase-js@2';
 
@@ -56,7 +60,7 @@ const admin = createClient(
 
 const BUCKETS = ['avatars', 'property-images'];
 
-/** Remove everything under `<uid>/` in a public bucket. Best-effort: a storage
+/** Remove everything under `<folder>/` in a bucket. Best-effort: a storage
  *  failure must not abort the account deletion itself, or the user is left in
  *  the "permanently inaccessible account" state the stores also reject.
  *  Page by page until the folder is empty: one list() returns at most 1000
@@ -64,12 +68,12 @@ const BUCKETS = ['avatars', 'property-images'];
  *  gone (an agent with 100 listings of 10 photos). Removed names drop out of
  *  the listing, so each round lists from the start again; the cap only stops
  *  a folder that refuses to shrink. */
-async function purgeBucket(bucket: string, uid: string): Promise<number> {
+async function purgeFolder(bucket: string, folder: string): Promise<number> {
   let removed = 0;
   for (let round = 0; round < 50; round++) {
-    const { data, error } = await admin.storage.from(bucket).list(uid, { limit: 1000 });
+    const { data, error } = await admin.storage.from(bucket).list(folder, { limit: 1000 });
     if (error || !data?.length) break;
-    const paths = data.map((f) => `${uid}/${f.name}`);
+    const paths = data.map((f) => `${folder}/${f.name}`);
     const { error: rmErr } = await admin.storage.from(bucket).remove(paths);
     if (rmErr) break;
     removed += paths.length;
@@ -96,7 +100,15 @@ Deno.serve(async (req) => {
     // 1. Storage first. If this fails we still proceed — an orphaned image is
     //    a smaller problem than an account the user cannot delete.
     let filesRemoved = 0;
-    for (const b of BUCKETS) filesRemoved += await purgeBucket(b, uid);
+    for (const b of BUCKETS) filesRemoved += await purgeFolder(b, uid);
+
+    //    Chat files, per conversation: the conversations themselves go with the
+    //    auth user (step 3), and nobody could open these files after that.
+    //    Two plain lookups rather than an interpolated .or() filter.
+    for (const side of ['client_id', 'agent_id']) {
+      const { data: convos } = await admin.from('conversations').select('id').eq(side, uid);
+      for (const c of convos ?? []) filesRemoved += await purgeFolder('message-attachments', c.id);
+    }
 
     // 2. Properties they OWN. Not covered by cascade (SET NULL), and the
     //    reason this function exists rather than a bare admin.deleteUser call.
