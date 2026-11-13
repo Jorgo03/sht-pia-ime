@@ -4,7 +4,7 @@ import fs from 'node:fs'
 import { viewingRequestErrorKey } from '../src/features/viewings/lib/viewingErrors.js'
 
 // AUDIT-003: the database now refuses a viewing that overlaps another open one
-// (migration 20261113180100, error 23P01). Both apps must say the time is
+// (migration 20261113194212, error 23P01). Both apps must say the time is
 // taken instead of a generic "request failed".
 
 test('an overlapping time says the slot is taken', () => {

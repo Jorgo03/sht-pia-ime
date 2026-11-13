@@ -10,6 +10,8 @@
 -- everything passes.
 -- Result live 2026-11-13 (before fixes): passed=48/51, failing D1, D2, D3
 -- (AUDIT_REPORT.md AUDIT-003 and AUDIT-004). All 27 anon inserts: 42501.
+-- Result live 2026-11-13 after migrations 20261113194202/194212/194218 were
+-- applied: passed=51/51.
 do $$
 declare
   a uuid; b uuid; agent uuid; prop uuid; prop_status text;
@@ -52,12 +54,16 @@ begin
     end;
   end loop;
   -- A28: anon cannot update or delete listings.
+  -- Since migration 20261113194218 the attempt is refused outright (42501);
+  -- before it, RLS made it touch 0 rows. Both pass.
   total := total + 1;
-  update public.properties set title = 'x' where id = prop;
-  get diagnostics n = row_count;
-  delete from public.properties where id = prop;
-  if n = 0 and exists (select 1 from public.properties where id = prop) then passed := passed + 1;
-  else log := log || 'anon-update-listing:FAIL '; end if;
+  begin
+    update public.properties set title = 'x' where id = prop;
+    get diagnostics n = row_count;
+    delete from public.properties where id = prop;
+    if n = 0 and exists (select 1 from public.properties where id = prop) then passed := passed + 1;
+    else log := log || 'anon-update-listing:FAIL '; end if;
+  exception when insufficient_privilege then passed := passed + 1; end;
   reset role;
 
   ------------------------------------------------------------------ owner A creates own rows
@@ -165,7 +171,9 @@ begin
   begin
     update public.viewings set scheduled_at = scheduled_at + interval '5 hours' where id = vid and status = 'confirmed';
     get diagnostics n = row_count;
-    if n = 0 then passed := passed + 1; else log := log || 'D2:FAIL(confirmed viewing re-timed by client, stays confirmed) '; end if;
+    -- Fixed behaviour: the move is accepted but the viewing is back to requested.
+    if n = 0 or not exists (select 1 from public.viewings where id = vid and status = 'confirmed') then passed := passed + 1;
+    else log := log || 'D2:FAIL(confirmed viewing re-timed by client, stays confirmed) '; end if;
   exception when others then passed := passed + 1; end;
   -- D3 [BUG?]: A moves the viewing into the past.
   total := total + 1;

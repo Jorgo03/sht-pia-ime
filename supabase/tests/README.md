@@ -19,9 +19,9 @@ runs a `DELETE`.
 | `rls_notifications.sql` | Notification centre: own rows only, no forging, tokens and the send queue private, one row per event, chats collapse, inquiries, no message text (migration `20261108210219`) | `passed=16/16` |
 | `rls_listing_publisher.sql` | "Published by": agent and client details, no client office, drafts hidden, profiles stay private, publisher cannot change (migration `20261108203236`) | `passed=13/13` |
 | `rls_insert_guards.sql` | New viewings and conversations: listing's agent or owner only, viewings start requested and in the future, server-set counters (migration `20261107225617`) | `passed=9/9` |
-| `rls_full_matrix.sql` | Writes on every table as a signed-out visitor, the owner and another account; viewing D1–D3 (AUDIT_REPORT.md) | `passed=51/51` after migrations `20261113180000`/`180100` (48/51 before) |
+| `rls_full_matrix.sql` | Writes on every table as a signed-out visitor, the owner and another account; viewing D1–D3 (AUDIT_REPORT.md) | `passed=51/51` live after migrations `20261113194202`/`194212`/`194218` (48/51 before) |
 | `rls_viewing_schedule.sql` | No double booking per listing or agent, no moving a viewing into the past, a client's move sends a confirmed viewing back to requested (AUDIT-003/004) | `passed=12/12` with the migrations (5/12 before) |
-| `rls_anon_grants.sql` | Signed-out visitors hold no grants on private tables; listings and plans read-only; view counts insert-only (AUDIT-017) | `passed=8/8` with migration `20261113180200` (4/8 before) |
+| `rls_anon_grants.sql` | Signed-out visitors hold no grants on private tables; listings and plans read-only; view counts insert-only (AUDIT-017) | `passed=8/8` with migration `20261113194218` (4/8 before) |
 | `rls_performance_report.sql` | Raporti im: each agent sees only their own report and baseline, clients and signed-out visitors get none, the status history cannot be written directly, viewings complete only by their agent after their time, and the counting rules (corrections, duplicates, periods) (migration `20261108005947`) | `passed=22/22` |
 
 Run one in the Supabase SQL editor, with the Supabase MCP `execute_sql` tool,

@@ -1,4 +1,4 @@
--- Signed-out grants (AUDIT-017, migration 20261113180200).
+-- Signed-out grants (AUDIT-017, migration 20261113194218).
 -- Read-only catalog checks plus one rolled-back signed-out insert; the block
 -- always ends in `raise exception 'RESULTS …'`. Expected: passed=8/8.
 -- Before the migration (live 2026-11-13): A1 fails (anon holds table grants
