@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { useAuth } from '../auth/AuthContext'
 import { supabase } from '../../lib/supabase'
 import { debugWarn } from '../../lib/debug'
@@ -10,10 +10,20 @@ export function FavoritesProvider({ children }) {
   const [favoriteIds, setFavoriteIds] = useState(new Set())
   const [favoriteProperties, setFavoriteProperties] = useState([])
   const [loading, setLoading] = useState(true)
+  // The hearts as they are right now, for toggle(), and one write at a time
+  // per listing in tap order. A quick second tap used to send its unsave
+  // while the first tap's save was still reading the listing, so the server
+  // kept a favourite the visitor had removed (AUDIT-028).
+  const idsRef = useRef(new Set())
+  const writes = useRef(new Map())
+  const applyIds = useCallback((next) => {
+    idsRef.current = next
+    setFavoriteIds(next)
+  }, [])
 
   const fetchFavorites = useCallback(async () => {
     if (!user) {
-      setFavoriteIds(new Set())
+      applyIds(new Set())
       setFavoriteProperties([])
       setLoading(false)
       return
@@ -34,12 +44,12 @@ export function FavoritesProvider({ children }) {
       if (hasJoinedData) {
         const props = (data ?? []).map((f) => f.property).filter(Boolean)
         const ids = new Set(props.map((p) => p.id))
-        setFavoriteIds(ids)
+        applyIds(ids)
         setFavoriteProperties(props)
       } else {
         // Fallback: join failed silently, fetch properties separately
         const ids = new Set((data ?? []).map((f) => f.property_id).filter(Boolean))
-        setFavoriteIds(ids)
+        applyIds(ids)
         if (ids.size > 0) {
           const { data: props } = await supabase
             .from('properties')
@@ -52,12 +62,12 @@ export function FavoritesProvider({ children }) {
       }
     } catch {
       // Table might not exist yet — start empty
-      setFavoriteIds(new Set())
+      applyIds(new Set())
       setFavoriteProperties([])
     } finally {
       setLoading(false)
     }
-  }, [user])
+  }, [user, applyIds])
 
   useEffect(() => {
     fetchFavorites()
@@ -72,14 +82,23 @@ export function FavoritesProvider({ children }) {
     async (propertyId) => {
       if (!user) return
 
-      const wasFav = favoriteIds.has(propertyId)
+      const wasFav = idsRef.current.has(propertyId)
 
-      setFavoriteIds((prev) => {
-        const next = new Set(prev)
-        if (wasFav) next.delete(propertyId)
-        else next.add(propertyId)
-        return next
-      })
+      const next = new Set(idsRef.current)
+      if (wasFav) next.delete(propertyId)
+      else next.add(propertyId)
+      applyIds(next)
+
+      // Queue the write behind any earlier one for this listing, before
+      // reading the listing below, so the server sees taps in order.
+      const write = async () => {
+        const { error } = wasFav
+          ? await supabase.from('favorites').delete().eq('user_id', user.id).eq('property_id', propertyId)
+          : await supabase.from('favorites').insert({ user_id: user.id, property_id: propertyId })
+        return error
+      }
+      const run = (writes.current.get(propertyId) ?? Promise.resolve(null)).then(write, write)
+      writes.current.set(propertyId, run)
 
       if (wasFav) {
         setFavoriteProperties((prev) => prev.filter((p) => p.id !== propertyId))
@@ -89,28 +108,25 @@ export function FavoritesProvider({ children }) {
           .select('*')
           .eq('id', propertyId)
           .single()
-        if (data) setFavoriteProperties((prev) => [...prev, data])
+        if (data && idsRef.current.has(propertyId)) {
+          setFavoriteProperties((prev) => (prev.some((p) => p.id === data.id) ? prev : [...prev, data]))
+        }
       }
 
       let error
-      if (wasFav) {
-        ({ error } = await supabase
-          .from('favorites')
-          .delete()
-          .eq('user_id', user.id)
-          .eq('property_id', propertyId))
-      } else {
-        ({ error } = await supabase
-          .from('favorites')
-          .insert({ user_id: user.id, property_id: propertyId }))
+      try {
+        error = await run
+      } catch (err) {
+        error = err
       }
+      if (writes.current.get(propertyId) === run) writes.current.delete(propertyId)
 
       if (error) {
         debugWarn('Favorites toggle', error)
         fetchFavorites()
       }
     },
-    [user, favoriteIds, fetchFavorites],
+    [user, applyIds, fetchFavorites],
   )
 
   return (
