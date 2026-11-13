@@ -63,3 +63,32 @@ test('F03-N1 saving a favourite from a card while signed out goes to sign-in', a
   await page.getByRole('button', { name: t('common.save') }).first().click();
   await expect(page).toHaveURL('/profile');
 });
+
+// AUDIT-028: two quick taps on a heart mean save, then unsave. The second tap
+// used to read the state from before the first and save again, so the server
+// kept a favourite the visitor had just removed.
+test.describe('signed in: favourites', () => {
+  test.use({ signedIn: true });
+
+  test('F-N28 a quick second tap unsaves, and the server sees save then unsave', async ({ page, writes }) => {
+    let delayed = 0;
+    // A real network: the save first reads the listing (to show it in the
+    // list), so give that read half a second, as on a phone connection.
+    await page.route(
+      (url) => url.pathname.endsWith('/rest/v1/properties') && /id=eq\./.test(url.search) && !url.search.includes('status'),
+      async (route) => {
+        delayed++;
+        await new Promise((r) => setTimeout(r, 500));
+        await route.fallback();
+      },
+    );
+    await page.goto('/');
+    const heart = page.getByRole('button', { name: t('common.save') }).first();
+    await expect(heart).toBeVisible();
+    await heart.click();
+    await heart.click();
+    await expect.poll(() => writes.filter((w) => w.table === 'favorites').length).toBe(2);
+    expect(writes.filter((w) => w.table === 'favorites').map((w) => w.method)).toEqual(['POST', 'DELETE']);
+    expect(delayed).toBeGreaterThan(0);
+  });
+});

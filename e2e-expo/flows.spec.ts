@@ -118,6 +118,19 @@ test.describe('signed in', () => {
     expect(inserted[0]).toMatchObject({ title: 'Vilë e re', price: 250000, listing_type: 'sale', property_type: 'villa', status: 'active', owner_type: 'agent' });
   });
 
+  // AUDIT-028: two quick taps mean save, then unsave. The requests must reach
+  // the server in that order, or the server keeps a favourite the heart says
+  // is not saved.
+  test('X105 favourites: a quick second tap unsaves, and the server sees save then unsave', async ({ page, writes }) => {
+    await page.goto('/');
+    await ready(page);
+    const heart = page.getByRole('button', { name: t('common.save') }).first();
+    await heart.click();
+    await heart.click();
+    await expect.poll(() => writes.filter((w) => w.table === 'favorites').length).toBe(2);
+    expect(writes.filter((w) => w.table === 'favorites').map((w) => w.method)).toEqual(['POST', 'DELETE']);
+  });
+
   test('X04 favourites: the heart saves a listing for this account', async ({ page, writes }) => {
     await page.goto('/');
     await ready(page);

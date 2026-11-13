@@ -40,13 +40,24 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
   // The account the latest fetch is for. A slow fetch for an account that
   // has signed out since must not put its hearts back on this phone.
   const fetchingFor = useRef<string | null>(null);
+  // The hearts as they are right now, for toggle(). Reading `favoriteIds` from
+  // the render closure let a quick second tap see the state before the first
+  // tap and save again instead of unsaving (AUDIT-028).
+  const idsRef = useRef<Set<string>>(new Set());
+  const applyIds = useCallback((next: Set<string>) => {
+    idsRef.current = next;
+    setFavoriteIds(next);
+  }, []);
+  // One write at a time per listing, in tap order: an unsave must not reach
+  // the server before the save it undoes.
+  const writes = useRef(new Map<string, Promise<boolean>>());
 
   const fetchFavorites = useCallback(async () => {
     const uid = user?.id ?? null;
     fetchingFor.current = uid;
     if (!uid) {
       loadedFor.current = null;
-      setFavoriteIds(new Set());
+      applyIds(new Set());
       setFavoriteProperties([]);
       setError(false);
       return;
@@ -68,20 +79,20 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
       const ids = new Set(props.map((p) => p.id));
 
       loadedFor.current = uid;
-      setFavoriteIds(ids);
+      applyIds(ids);
       setFavoriteProperties(props);
     } catch {
       if (fetchingFor.current !== uid) return;
       setError(true);
       // A failed reload keeps this account's hearts; another account's never stay.
       if (loadedFor.current !== uid) {
-        setFavoriteIds(new Set());
+        applyIds(new Set());
         setFavoriteProperties([]);
       }
     } finally {
       if (fetchingFor.current === uid) setLoading(false);
     }
-  }, [user]);
+  }, [user, applyIds]);
 
   useEffect(() => {
     fetchFavorites();
@@ -110,54 +121,49 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
         return;
       }
 
-      const wasFav = favoriteIds.has(propertyId);
+      const wasFav = idsRef.current.has(propertyId);
 
       // Optimistic update
-      setFavoriteIds((prev) => {
-        const next = new Set(prev);
-        if (wasFav) {
-          next.delete(propertyId);
-        } else {
-          next.add(propertyId);
+      const next = new Set(idsRef.current);
+      if (wasFav) next.delete(propertyId);
+      else next.add(propertyId);
+      applyIds(next);
+
+      // Persist, queued behind any earlier write for this listing. supabase-js
+      // reports a refusal or a lost connection in `error` rather than
+      // throwing, so both count as a failure.
+      const write = async (): Promise<boolean> => {
+        try {
+          const { error } = wasFav
+            ? await supabase.from('favorites').delete().eq('user_id', user.id).eq('property_id', propertyId)
+            : await supabase.from('favorites').insert({ user_id: user.id, property_id: propertyId });
+          return Boolean(error);
+        } catch {
+          return true;
         }
-        return next;
-      });
+      };
+      const run = (writes.current.get(propertyId) ?? Promise.resolve(false)).then(write);
+      writes.current.set(propertyId, run);
 
       if (wasFav) {
-        setFavoriteProperties((prev) =>
-          prev.filter((p) => p.id !== propertyId),
-        );
+        setFavoriteProperties((prev) => prev.filter((p) => p.id !== propertyId));
       } else {
         // Fetch the property to add it to the list immediately
-        const { data } = await supabase
-          .from('properties')
-          .select('*')
-          .eq('id', propertyId)
-          .single();
-        if (data) {
-          setFavoriteProperties((prev) => [...prev, data]);
+        const { data } = await supabase.from('properties').select('*').eq('id', propertyId).single();
+        if (data && idsRef.current.has(propertyId)) {
+          setFavoriteProperties((prev) => (prev.some((p) => p.id === data.id) ? prev : [...prev, data]));
         }
       }
 
-      // Persist. supabase-js reports a refusal or a lost connection in
-      // `error` rather than throwing, so the old catch-only revert never ran
-      // and a failed save left the heart filled with nothing stored.
-      let failed = false;
-      try {
-        const { error } = wasFav
-          ? await supabase.from('favorites').delete().eq('user_id', user.id).eq('property_id', propertyId)
-          : await supabase.from('favorites').insert({ user_id: user.id, property_id: propertyId });
-        failed = Boolean(error);
-      } catch {
-        failed = true;
-      }
+      const failed = await run;
+      if (writes.current.get(propertyId) === run) writes.current.delete(propertyId);
       if (failed) {
         // Back to what the server holds, and say so.
         void fetchFavorites();
         if (Platform.OS !== 'web') Alert.alert(t('common.error'), t('errors.updateFailed'));
       }
     },
-    [user, favoriteIds, fetchFavorites, t],
+    [user, applyIds, fetchFavorites, t],
   );
 
   return (
