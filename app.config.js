@@ -29,7 +29,11 @@ const PLUGINS_A_FREE_ACCOUNT_CANNOT_SIGN = ['expo-apple-authentication', 'expo-n
 // Expo also applies these packages' plugins on its own because they are
 // installed, so leaving them out of the list is not enough: the entitlements
 // are deleted again as the very last step.
-const ENTITLEMENTS_A_FREE_ACCOUNT_CANNOT_SIGN = ['aps-environment', 'com.apple.developer.applesignin'];
+const ENTITLEMENTS_A_FREE_ACCOUNT_CANNOT_SIGN = [
+  'aps-environment',
+  'com.apple.developer.applesignin',
+  'com.apple.developer.associated-domains',
+];
 
 function withoutPaidEntitlements(config) {
   const { withEntitlementsPlist } = require('expo/config-plugins');
@@ -43,7 +47,7 @@ function withoutPaidCapabilities(config) {
   const name = (plugin) => (Array.isArray(plugin) ? plugin[0] : plugin);
   return {
     ...config,
-    ios: { ...config.ios, usesAppleSignIn: false },
+    ios: { ...config.ios, usesAppleSignIn: false, associatedDomains: undefined },
     plugins: [
       ...(config.plugins ?? []).filter((p) => !PLUGINS_A_FREE_ACCOUNT_CANNOT_SIGN.includes(name(p))),
       withoutPaidEntitlements,
@@ -60,8 +64,39 @@ function withAndroidMapsKey(config, key) {
   };
 }
 
+// Shared website links open the app (AUDIT-008): iOS universal links and
+// Android verified app links for the screens the app answers itself. Off until
+// APP_LINK_DOMAIN (e.g. shtepia.al, no scheme) is set for the build; the
+// website must then serve the files from scripts/write-app-links.cjs, which
+// also holds the same path list.
+const APP_LINK_PATHS = ['/property', '/user', '/agent'];
+
+function withAppLinks(config, domain) {
+  if (!domain) return config;
+  if (!/^[a-z0-9-]+(.[a-z0-9-]+)+$/.test(domain)) {
+    throw new Error(`APP_LINK_DOMAIN must be a bare host name such as shtepia.al, not "${domain}"`);
+  }
+  const hosts = domain.startsWith('www.') ? [domain] : [domain, `www.${domain}`];
+  return {
+    ...config,
+    ios: { ...config.ios, associatedDomains: hosts.map((h) => `applinks:${h}`) },
+    android: {
+      ...config.android,
+      intentFilters: [
+        {
+          action: 'VIEW',
+          autoVerify: true,
+          data: hosts.flatMap((host) => APP_LINK_PATHS.map((pathPrefix) => ({ scheme: 'https', host, pathPrefix }))),
+          category: ['BROWSABLE', 'DEFAULT'],
+        },
+      ],
+    },
+  };
+}
+
 module.exports = ({ config }) => {
-  const mapped = withAndroidMapsKey(config, (process.env.GOOGLE_MAPS_ANDROID_API_KEY ?? '').trim());
+  const linked = withAppLinks(config, (process.env.APP_LINK_DOMAIN ?? '').trim().toLowerCase());
+  const mapped = withAndroidMapsKey(linked, (process.env.GOOGLE_MAPS_ANDROID_API_KEY ?? '').trim());
   const withKey = process.env.SIDELOAD_FREE === '1' ? withoutPaidCapabilities(mapped) : mapped;
   const command = process.argv.slice(2).find((arg) => !arg.startsWith('-'));
   const icon = withKey.ios?.icon;
