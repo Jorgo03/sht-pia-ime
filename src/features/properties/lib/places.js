@@ -2,7 +2,7 @@
 // any way (Tirana, tirane, Durazzo, Peshkopia, "blloku") resolve to the
 // canonical city and zone from data/locations.js, and a pin is checked
 // against Albania and its own municipality before a listing is saved. The
-// database repeats the same checks (supabase/pending/locations.sql), so a
+// database repeats the same checks (supabase/migrations/20261114215248_locations.sql), so a
 // client that skips them still cannot save a fake place.
 import { CITIES } from '../data/locations.js'
 

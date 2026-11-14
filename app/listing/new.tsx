@@ -471,7 +471,7 @@ function ListingWizard({ editId }: { editId?: string }) {
     if (s === 1) {
       if (!form.city) errs.city = t('listing.required');
       // The database refuses the same pins (public.locations, migration
-      // supabase/pending/locations.sql); saying so here is kinder.
+      // supabase/migrations/20261114215248_locations.sql); saying so here is kinder.
       else if (form.latitude != null && form.longitude != null) {
         const pin = checkPin(form.city, form.latitude, form.longitude);
         if (pin === 'outside-albania') errs.pin = t('listing.pinOutsideAlbania');

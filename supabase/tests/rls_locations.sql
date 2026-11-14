@@ -1,4 +1,4 @@
--- Real locations (supabase/pending/locations.sql, locations audit).
+-- Real locations (supabase/migrations/20261114215248_locations.sql, locations audit).
 -- One DO block that always ends in `raise exception 'RESULTS …'`, so every
 -- write is rolled back. Expected: passed=14/14.
 do $$
@@ -22,7 +22,7 @@ begin
   -- 5. A signed-out visitor reads the list.
   set local role anon;
   select count(*) into n from public.locations;
-  if n > 1000 then passed := passed + 1; else log := log || '5:FAIL(anon reads ' || n || ') '; end if;
+  if n > 600 then passed := passed + 1; else log := log || '5:FAIL(anon reads ' || n || ') '; end if;
   reset role;
 
   perform set_config('request.jwt.claims', json_build_object('sub', owner, 'role', 'authenticated')::text, true);

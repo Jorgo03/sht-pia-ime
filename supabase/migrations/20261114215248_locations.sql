@@ -3,7 +3,7 @@
 -- public.locations   the one list of real places: 12 qarqe, 61 bashki,
 --                    373 njësi administrative (Law 115/2014), lagje,
 --                    villages and the zones the apps offer. Filled by
---                    supabase/pending/locations_seed.sql, generated from
+--                    supabase/locations_seed.sql, generated from
 --                    data/albania-locations.json. Everyone may read it; only
 --                    moderators (public.is_moderator()) may change it.
 -- location_id        on properties and wanted_homes: the place a row is in
@@ -18,7 +18,7 @@
 --
 -- Additive: two nullable columns, a new table, a trigger. Existing rows are
 -- not touched here; locations_map_listings.sql fills their location_id.
--- Undo: supabase/pending/locations_rollback.sql.
+-- Undo: supabase/rollback_locations.sql.
 
 create table public.locations (
   id            text primary key,

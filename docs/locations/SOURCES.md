@@ -46,7 +46,8 @@ One gap in OpenStreetMap: it maps Kamëz's two units (Kamëz and Paskuqan) one l
 
 - `sq.wikipedia`: the Albanian Wikipedia article title, which names a town in its definite form (Kamza, Gjirokastra);
 - `wikidata`: the Albanian Wikidata label, when it is plainly the definite form;
-- `rule`: the standard Albanian rule, used only when no source gives the form: -ë → -a, -ër → -ra, -i → -ia, -k/-g/-h → -u, otherwise +i, and for a phrase, the first word (Malësi e Madhe → Malësia e Madhe).
+- `rule`: the standard Albanian rule, for a single word only, when no source gives the form: -ë → -a, -ër → -ra, -i → -ia, -k/-g/-h → -u, otherwise +i.
+- `none`: no definite form. This applies to a name of several words, with a number or brackets, or ending in -o ("Ali Demi", "10 Korriku", "Kinostudio"): the rule cannot tell which word changes, or how.
 
 A county takes its seat's form.
 
@@ -122,4 +123,4 @@ npm test -- tests/locations.test.mjs
 ```
 
 The database copy is updated by running the regenerated
-`supabase/pending/locations_seed.sql` (it updates rows in place).
+`supabase/locations_seed.sql` (it updates rows in place).

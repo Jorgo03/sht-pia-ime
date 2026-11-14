@@ -391,7 +391,7 @@ export default function NewListing() {
     }
     if (s === 1) {
       if (!form.city) errs.city = t('listing.required')
-      // The database refuses the same pins (supabase/pending/locations.sql).
+      // The database refuses the same pins (supabase/migrations/20261114215248_locations.sql).
       else if (form.latitude != null && form.longitude != null) {
         const pin = checkPin(form.city, form.latitude, form.longitude)
         if (pin === 'outside-albania') errs.pin = t('listing.pinOutsideAlbania')

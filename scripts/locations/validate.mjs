@@ -243,7 +243,6 @@ for (const x of LIVE) {
 
 // ---------- output ----------
 const rows = [...cityRows, ...zoneRows, ...coordRows]
-const cache = path.join(root, 'docs/locations/cache')
 fs.writeFileSync(path.join(root, process.argv[2] ?? 'docs/locations/validation-current.json'), JSON.stringify(rows, null, 1))
 const counts = {}
 for (const r of rows) counts[r.status] = (counts[r.status] ?? 0) + 1

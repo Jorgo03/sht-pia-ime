@@ -2,7 +2,7 @@
 
 The mission was to replace every fake or misplaced location in the app with real Albanian places, verified against sources, and to make sure no fake location can get in again. Branch `fix/real-albania-locations`.
 
-**Status: 🛑 waiting at Checkpoint 2.** The code is done and tested. The database part is written and tested locally, but it is **not applied** to the live database. See the last section.
+**Status: done.** Checkpoint 2 approved and applied on 2026-11-14: the live database has the locations table, the guard and the linked listings, and both AI functions are deployed. Details in the last section.
 
 ## What was there (step 1, `INVENTORY.md`)
 
@@ -56,7 +56,7 @@ The cities and zones on live listings (Tiranë, Durrës) are unchanged, so no us
 
 **Pin check:** the map pin must be inside Albania and inside the chosen city's municipality. Both apps check it before saving, with a message in all 8 languages.
 
-**Database guard** (`supabase/pending/locations.sql`). This is not live yet:
+**Database guard** (`supabase/migrations/20261114215248_locations.sql`, live):
 - a `locations` table: everyone reads it, only moderators write it;
 - `location_id` on listings and wanted homes, set by the database and not by clients;
 - a trigger that refuses an unknown city, a zone that is not that city's, and a pin outside Albania or outside the municipality.
@@ -67,21 +67,27 @@ The cities and zones on live listings (Tiranë, Durrës) are unchanged, so no us
 - `supabase/tests/rls_locations.sql`: 14 checks, passing 14/14 in a local Postgres. The migration was applied there to copies of the three live listings and rolled back cleanly.
 - Totals: 587 unit tests pass; 271 website and 332 Expo-web browser tests pass; type-check clean; lint has no errors.
 
-## 🛑 Checkpoint 2: what needs your approval
+## Checkpoint 2: applied (approved: "Yes, apply and deploy")
 
-Nothing below has run on the live database:
+1. **Migration `20261114215248_locations`:** the table, the two columns and the guard.
+2. **Seed** (`supabase/locations_seed.sql`), 659 rows: the 12 counties, the 61 municipalities, the 373 units, and the zones the apps offer that are not units. The 717 villages and lagje that are not offered stay only in `data/albania-locations.json`.
+   - Live counts: 61 cities, 525 offered zones (the same as the apps), and no broken parent links.
+3. **Migration `20261114220533_locations_map_listings`:** every listing and wanted home is backed up in `locations_backup_20261114`, a private table with no policies. The 3 listings now point to Bashkia Tiranë (2) and Bashkia Durrës (1).
+   - City, zone, address, pin and the "last updated" time are unchanged.
+4. **Live check** `supabase/tests/rls_locations.sql`: **passed=14/14**, rolled back.
+5. **Advisors:** the only new note is the backup table having no policies. That is intended.
+6. **Deployed:** `ai-parse-search` (version 6) and `ai-assistant` (version 2).
+   - Both answer an empty request with their own 400, so both start.
+   - `ai-parse-search` also carries the currency change from 2026-10-26, which that commit had marked as needing a deploy.
+   - No paid AI call was made to test them.
 
-1. **Apply `supabase/pending/locations.sql`, then `locations_seed.sql`.** This adds the table, the two columns and the guard, then fills the 1,334 places. It is additive.
-2. **Apply `locations_map_listings.sql`.** It backs up every listing and wanted home into `locations_backup_20261114`, then sets `location_id` on the 3 live listings. Their city, zone, address and pin are not changed. Expected result: two listings point to Bashkia Tiranë and one to Bashkia Durrës.
-3. **Deploy `ai-assistant` and `ai-parse-search`.** This applies the city aliases and the clearer prompt examples (no "Plazh"). It does not switch either one on or off.
+Undo: `supabase/rollback_locations.sql`.
 
-Undo: `supabase/pending/locations_rollback.sql`.
-
-After approval, the live check `supabase/tests/rls_locations.sql` should read `passed=14/14`.
+**Cleanup after applying.** 89 definite forms that the grammar rule had guessed for names of several words, with numbers or ending in -o ("Alia Demi", "10i Korriku") were set to empty, in the dataset and in the database. Definite forms now come from a source, or from the rule for single words only; otherwise there is none.
 
 ## Not done, or for later
 
 - **Postal codes:** present for 317 of 373 units, and missing for some municipalities and villages, because OpenStreetMap lacks them. No code is guessed.
-- **Definite forms:** 1,023 follow the grammar rule (marked `rule`), not a source. Worth a native speaker's pass.
+- **Definite forms:** 980 follow the grammar rule for single words (marked `rule`), 233 have none, 119 come from a source. Worth a native speaker's pass.
 - **Lagje outside the main markets:** only official units and approved zones are listed. More lagje can be added from the dataset when needed.
 - **Real-device testing:** not done for these changes. The checks above ran in Node, Chromium and a local Postgres.

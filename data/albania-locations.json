@@ -17,7 +17,7 @@
   "bashki": 61,
   "njesi": 373,
   "lagje": 150,
-  "fshat": 717,
+  "fshat": 715,
   "zone": 21
  },
  "locations": [
@@ -2370,8 +2370,8 @@
    "parent_id": "qark/shkoder",
    "name": {
     "indefinite": "Malësi e Madhe",
-    "definite": "Malësia e Madhe",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Malësi e Madhe",
@@ -2385,9 +2385,7 @@
    "aliases": [
     "Koplik",
     "Kopliku",
-    "Malësia e Madhe",
     "malesi e madhe",
-    "malesia e madhe",
     "Коплику"
    ],
    "centroid": {
@@ -3526,8 +3524,8 @@
    "parent_id": "qark/shkoder",
    "name": {
     "indefinite": "Vau i Dejës",
-    "definite": "Vau i Dejës",
-    "definite_source": "sq.wikipedia"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Vau i Dejës",
@@ -3680,8 +3678,8 @@
    "parent_id": "bashki/vlore/finiq",
    "name": {
     "indefinite": "Aliko",
-    "definite": "Alikoi",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Aliko",
@@ -3691,9 +3689,7 @@
     "pl": "Aliko"
    },
    "aliases": [
-    "Alikoi",
-    "aliko",
-    "alikoi"
+    "aliko"
    ],
    "centroid": {
     "lat": 39.860917,
@@ -3760,8 +3756,8 @@
    "parent_id": "bashki/shkoder/shkoder",
    "name": {
     "indefinite": "Ana e Malit",
-    "definite": "Ana e Malit",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Ana e Malit",
@@ -4004,8 +4000,8 @@
    "parent_id": "bashki/kukes/tropoje",
    "name": {
     "indefinite": "Bajram Curri",
-    "definite": "Bajrami Curri",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Bajram Curri",
@@ -4014,9 +4010,7 @@
     "ru": "Байрам-Цурри"
    },
    "aliases": [
-    "Bajrami Curri",
     "bajram curri",
-    "bajrami curri",
     "Байрам-Цурри"
    ],
    "centroid": {
@@ -5285,8 +5279,8 @@
    "parent_id": "bashki/gjirokaster/gjirokaster",
    "name": {
     "indefinite": "Cepo",
-    "definite": "Cepoi",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Cepo",
@@ -5298,10 +5292,8 @@
     "pl": "Cepo"
    },
    "aliases": [
-    "Cepoi",
     "Paleocastro",
-    "cepo",
-    "cepoi"
+    "cepo"
    ],
    "centroid": {
     "lat": 40.114701,
@@ -6122,8 +6114,8 @@
    "parent_id": "bashki/gjirokaster/dropull",
    "name": {
     "indefinite": "Dropull i Poshtëm",
-    "definite": "Dropulli i Poshtëm",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Dropull i Poshtëm",
@@ -6135,9 +6127,7 @@
    },
    "aliases": [
     "Dropull i Poshtem",
-    "Dropulli i Poshtëm",
-    "dropull i poshtem",
-    "dropulli i poshtem"
+    "dropull i poshtem"
    ],
    "centroid": {
     "lat": 39.973637,
@@ -6163,8 +6153,8 @@
    "parent_id": "bashki/gjirokaster/dropull",
    "name": {
     "indefinite": "Dropull i Sipërm",
-    "definite": "Dropulli i Sipërm",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Dropull i Sipërm",
@@ -6176,9 +6166,7 @@
    },
    "aliases": [
     "Dropull i Siperm",
-    "Dropulli i Sipërm",
-    "dropull i siperm",
-    "dropulli i siperm"
+    "dropull i siperm"
    ],
    "centroid": {
     "lat": 39.903243,
@@ -6990,8 +6978,8 @@
    "parent_id": "bashki/lezhe/kurbin",
    "name": {
     "indefinite": "Fushë Kuqe",
-    "definite": "Fusha Kuqe",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Fushë Kuqe",
@@ -7004,12 +6992,10 @@
     "ru": "Фуше-Куке"
    },
    "aliases": [
-    "Fusha Kuqe",
     "Fushe-Kuqe",
     "Fushë-Kuqe",
     "Fushë-Kuqja",
     "Fushë-Kuqë",
-    "fusha kuqe",
     "fushe kuqe",
     "Фуше-Куке"
    ],
@@ -7787,8 +7773,8 @@
    "parent_id": "bashki/shkoder/shkoder",
    "name": {
     "indefinite": "Guri i Zi",
-    "definite": "Guria i Zi",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Guri i Zi",
@@ -7800,9 +7786,7 @@
    },
    "aliases": [
     "Gur i Zi",
-    "Guria i Zi",
-    "guri i zi",
-    "guria i zi"
+    "guri i zi"
    ],
    "centroid": {
     "lat": 42.04674,
@@ -8735,8 +8719,8 @@
    "parent_id": "bashki/diber/diber",
    "name": {
     "indefinite": "Kala e Dodës",
-    "definite": "Kala e Dodës",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Kala e Dodës",
@@ -9089,8 +9073,8 @@
    "parent_id": "bashki/durres/durres",
    "name": {
     "indefinite": "Katund i Ri",
-    "definite": "Katundi i Ri",
-    "definite_source": "wikidata"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Katund i Ri",
@@ -9101,9 +9085,8 @@
     "pl": "Katund i Ri"
    },
    "aliases": [
-    "Katundi i Ri",
     "katund i ri",
-    "katundi i ri"
+    "Katundi i Ri"
    ],
    "centroid": {
     "lat": 41.402551,
@@ -11597,8 +11580,8 @@
    "parent_id": "bashki/tirane/kavaje",
    "name": {
     "indefinite": "Luz i Vogël",
-    "definite": "Luzi i Vogël",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Luz i Vogël",
@@ -11608,9 +11591,7 @@
    },
    "aliases": [
     "Luz i Vogel",
-    "Luzi i Vogël",
-    "luz i vogel",
-    "luzi i vogel"
+    "luz i vogel"
    ],
    "centroid": {
     "lat": 41.127388,
@@ -12139,8 +12120,8 @@
    "parent_id": "bashki/fier/fier",
    "name": {
     "indefinite": "Mbrostar Ura",
-    "definite": "Mbrostari Ura",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Mbrostar Ura",
@@ -12152,9 +12133,7 @@
    },
    "aliases": [
     "Mbrostar",
-    "Mbrostari Ura",
-    "mbrostar ura",
-    "mbrostari ura"
+    "mbrostar ura"
    ],
    "centroid": {
     "lat": 40.785502,
@@ -12264,8 +12243,8 @@
    "parent_id": "bashki/gjirokaster/memaliaj",
    "name": {
     "indefinite": "Memaliaj Fshat",
-    "definite": "Memaliaji Fshat",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Memaliaj Fshat",
@@ -12276,9 +12255,7 @@
     "pl": "Memaliaj Fshat"
    },
    "aliases": [
-    "Memaliaji Fshat",
-    "memaliaj fshat",
-    "memaliaji fshat"
+    "memaliaj fshat"
    ],
    "centroid": {
     "lat": 40.345203,
@@ -14583,8 +14560,8 @@
    "parent_id": "bashki/korce/devoll",
    "name": {
     "indefinite": "Qendër Bilisht",
-    "definite": "Qendra Bilisht",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Qendër Bilisht",
@@ -14597,9 +14574,7 @@
    },
    "aliases": [
     "Qender Bilisht",
-    "Qendra Bilisht",
     "qender bilisht",
-    "qendra bilisht",
     "Билишт"
    ],
    "centroid": {
@@ -14626,8 +14601,8 @@
    "parent_id": "bashki/korce/korce",
    "name": {
     "indefinite": "Qendër Bulgarec",
-    "definite": "Qendra Bulgarec",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Qendër Bulgarec",
@@ -14639,9 +14614,7 @@
    },
    "aliases": [
     "Qender Bulgarec",
-    "Qendra Bulgarec",
-    "qender bulgarec",
-    "qendra bulgarec"
+    "qender bulgarec"
    ],
    "centroid": {
     "lat": 40.657009,
@@ -14667,8 +14640,8 @@
    "parent_id": "bashki/fier/mallakaster",
    "name": {
     "indefinite": "Qendër Dukas",
-    "definite": "Qendra Dukas",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Qendër Dukas",
@@ -14680,11 +14653,9 @@
     "ru": "Кендёр"
    },
    "aliases": [
-    "Qendra Dukas",
     "Qendër",
     "Qendër (Okręg Mallakastra)",
     "qender dukas",
-    "qendra dukas",
     "Кендёр"
    ],
    "centroid": {
@@ -14711,8 +14682,8 @@
    "parent_id": "bashki/korce/kolonje",
    "name": {
     "indefinite": "Qendër Ersekë",
-    "definite": "Qendra Ersekë",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Qendër Ersekë",
@@ -14724,10 +14695,8 @@
    },
    "aliases": [
     "Qender Erseke",
-    "Qendra Ersekë",
     "Qendër",
-    "qender erseke",
-    "qendra erseke"
+    "qender erseke"
    ],
    "centroid": {
     "lat": 40.338437,
@@ -14753,8 +14722,8 @@
    "parent_id": "bashki/korce/kolonje",
    "name": {
     "indefinite": "Qendër Leskovik",
-    "definite": "Qendra Leskovik",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Qendër Leskovik",
@@ -14767,9 +14736,7 @@
    "aliases": [
     "Leskovik",
     "Qender Leskovik",
-    "Qendra Leskovik",
-    "qender leskovik",
-    "qendra leskovik"
+    "qender leskovik"
    ],
    "centroid": {
     "lat": 40.152422,
@@ -14795,8 +14762,8 @@
    "parent_id": "bashki/gjirokaster/libohove",
    "name": {
     "indefinite": "Qendër Libohovë",
-    "definite": "Qendra Libohovë",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Qendër Libohovë",
@@ -14806,10 +14773,8 @@
     "es": "Qendër Libohovë"
    },
    "aliases": [
-    "Qendra Libohovë",
     "Qendër",
-    "qender libohove",
-    "qendra libohove"
+    "qender libohove"
    ],
    "centroid": {
     "lat": 40.04746,
@@ -14835,8 +14800,8 @@
    "parent_id": "bashki/elbasan/librazhd",
    "name": {
     "indefinite": "Qendër Librazhd",
-    "definite": "Qendra Librazhd",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Qendër Librazhd",
@@ -14847,10 +14812,8 @@
     "pl": "Qendër"
    },
    "aliases": [
-    "Qendra Librazhd",
     "Qendër",
     "qender librazhd",
-    "qendra librazhd",
     "Librazhd Qendër"
    ],
    "centroid": {
@@ -14877,8 +14840,8 @@
    "parent_id": "bashki/gjirokaster/permet",
    "name": {
     "indefinite": "Qendër Piskovë",
-    "definite": "Qendra Piskovë",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Qendër Piskovë",
@@ -14890,10 +14853,8 @@
    },
    "aliases": [
     "Qender Piskove",
-    "Qendra Piskovë",
     "Qendër",
-    "qender piskove",
-    "qendra piskove"
+    "qender piskove"
    ],
    "centroid": {
     "lat": 40.286304,
@@ -14919,8 +14880,8 @@
    "parent_id": "bashki/berat/skrapar",
    "name": {
     "indefinite": "Qendër Skrapar",
-    "definite": "Qendra Skrapar",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Qendër Skrapar",
@@ -14931,10 +14892,8 @@
     "pl": "Qendër Skrapar"
    },
    "aliases": [
-    "Qendra Skrapar",
     "Qendër",
-    "qender skrapar",
-    "qendra skrapar"
+    "qender skrapar"
    ],
    "centroid": {
     "lat": 40.503623,
@@ -14960,8 +14919,8 @@
    "parent_id": "bashki/gjirokaster/tepelene",
    "name": {
     "indefinite": "Qendër Tepelenë",
-    "definite": "Qendra Tepelenë",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Qendër Tepelenë",
@@ -14971,11 +14930,9 @@
    },
    "aliases": [
     "Qender Tepelene",
-    "Qendra Tepelenë",
     "Qendër",
     "Qendër (Tepelenë)",
-    "qender tepelene",
-    "qendra tepelene"
+    "qender tepelene"
    ],
    "centroid": {
     "lat": 40.298226,
@@ -15001,8 +14958,8 @@
    "parent_id": "bashki/vlore/vlore",
    "name": {
     "indefinite": "Qendër Vlorë",
-    "definite": "Qendra Vlorë",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Qendër Vlorë",
@@ -15012,10 +14969,8 @@
     "pl": "Qendër"
    },
    "aliases": [
-    "Qendra Vlorë",
     "Qendër",
-    "qender vlore",
-    "qendra vlore"
+    "qender vlore"
    ],
    "centroid": {
     "lat": 40.512783,
@@ -17996,8 +17951,8 @@
    "parent_id": "bashki/shkoder/vau-i-dejes",
    "name": {
     "indefinite": "Vau i Dejës",
-    "definite": "Vau i Dejës",
-    "definite_source": "sq.wikipedia"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Vau i Dejës",
@@ -18211,8 +18166,8 @@
    "parent_id": "bashki/vlore/delvine",
    "name": {
     "indefinite": "Vergo",
-    "definite": "Vergoi",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Vergo",
@@ -18223,10 +18178,8 @@
     "pl": "Vergo"
    },
    "aliases": [
-    "Vergoi",
     "Vergojes",
-    "vergo",
-    "vergoi"
+    "vergo"
    ],
    "centroid": {
     "lat": 40.006449,
@@ -19215,16 +19168,14 @@
    "parent_id": "njesi/fier/fier/fier",
    "name": {
     "indefinite": "1 Maji",
-    "definite": "1i Maji",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "1 Maji"
    },
    "aliases": [
-    "1 maji",
-    "1i Maji",
-    "1i maji"
+    "1 maji"
    ],
    "centroid": {
     "lat": 40.722368,
@@ -19245,16 +19196,14 @@
    "parent_id": "njesi/shkoder/shkoder/shkoder",
    "name": {
     "indefinite": "10 Korriku",
-    "definite": "10i Korriku",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "10 Korriku"
    },
    "aliases": [
-    "10 korriku",
-    "10i Korriku",
-    "10i korriku"
+    "10 korriku"
    ],
    "centroid": {
     "lat": 42.055322,
@@ -19275,16 +19224,14 @@
    "parent_id": "njesi/fier/fier/fier",
    "name": {
     "indefinite": "11 Janari",
-    "definite": "11i Janari",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "11 Janari"
    },
    "aliases": [
-    "11 janari",
-    "11i Janari",
-    "11i janari"
+    "11 janari"
    ],
    "centroid": {
     "lat": 40.724039,
@@ -19305,16 +19252,14 @@
    "parent_id": "njesi/fier/fier/fier",
    "name": {
     "indefinite": "15 Tetori",
-    "definite": "15i Tetori",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "15 Tetori"
    },
    "aliases": [
-    "15 tetori",
-    "15i Tetori",
-    "15i tetori"
+    "15 tetori"
    ],
    "centroid": {
     "lat": 40.730836,
@@ -19335,16 +19280,14 @@
    "parent_id": "njesi/fier/fier/fier",
    "name": {
     "indefinite": "16 Prilli",
-    "definite": "16i Prilli",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "16 Prilli"
    },
    "aliases": [
-    "16 prilli",
-    "16i Prilli",
-    "16i prilli"
+    "16 prilli"
    ],
    "centroid": {
     "lat": 40.719063,
@@ -19365,16 +19308,14 @@
    "parent_id": "njesi/tirane/tirane/tirane",
    "name": {
     "indefinite": "21 Dhjetori",
-    "definite": "21i Dhjetori",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "21 Dhjetori"
    },
    "aliases": [
-    "21 dhjetori",
-    "21i Dhjetori",
-    "21i dhjetori"
+    "21 dhjetori"
    ],
    "centroid": {
     "lat": 41.325822,
@@ -19395,16 +19336,14 @@
    "parent_id": "njesi/fier/fier/fier",
    "name": {
     "indefinite": "29 Nëntori",
-    "definite": "29i Nëntori",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "29 Nëntori"
    },
    "aliases": [
-    "29 nentori",
-    "29i Nëntori",
-    "29i nentori"
+    "29 nentori"
    ],
    "centroid": {
     "lat": 40.730657,
@@ -19425,16 +19364,14 @@
    "parent_id": "njesi/shkoder/shkoder/shkoder",
    "name": {
     "indefinite": "3 Heronjtë",
-    "definite": "3i Heronjtë",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "3 Heronjtë"
    },
    "aliases": [
-    "3 heronjte",
-    "3i Heronjtë",
-    "3i heronjte"
+    "3 heronjte"
    ],
    "centroid": {
     "lat": 42.065125,
@@ -19455,16 +19392,14 @@
    "parent_id": "njesi/fier/fier/fier",
    "name": {
     "indefinite": "8 Shkurti",
-    "definite": "8i Shkurti",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "8 Shkurti"
    },
    "aliases": [
-    "8 shkurti",
-    "8i Shkurti",
-    "8i shkurti"
+    "8 shkurti"
    ],
    "centroid": {
     "lat": 40.736462,
@@ -19633,16 +19568,14 @@
    "parent_id": "njesi/fier/fier/fier",
    "name": {
     "indefinite": "Afrim i Ri",
-    "definite": "Afrimi i Ri",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Afrim i Ri"
    },
    "aliases": [
-    "Afrimi i Ri",
-    "afrim i ri",
-    "afrimi i ri"
+    "afrim i ri"
    ],
    "centroid": {
     "lat": 40.732462,
@@ -19693,16 +19626,14 @@
    "parent_id": "njesi/shkoder/shkoder/shkoder",
    "name": {
     "indefinite": "Ahmet Haxhia",
-    "definite": "Ahmeti Haxhia",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Ahmet Haxhia"
    },
    "aliases": [
-    "Ahmeti Haxhia",
-    "ahmet haxhia",
-    "ahmeti haxhia"
+    "ahmet haxhia"
    ],
    "centroid": {
     "lat": 42.069191,
@@ -19783,16 +19714,14 @@
    "parent_id": "njesi/tirane/tirane/tirane",
    "name": {
     "indefinite": "Ali Demi",
-    "definite": "Alia Demi",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Ali Demi"
    },
    "aliases": [
-    "Alia Demi",
-    "ali demi",
-    "alia demi"
+    "ali demi"
    ],
    "centroid": {
     "lat": 41.327689,
@@ -20051,8 +19980,8 @@
    "parent_id": "njesi/shkoder/shkoder/shkoder",
    "name": {
     "indefinite": "Arra e Madhe",
-    "definite": "Arra e Madhe",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Arra e Madhe"
@@ -20109,15 +20038,13 @@
    "parent_id": "njesi/vlore/vlore/qender-vlore",
    "name": {
     "indefinite": "Babicë e Madhe",
-    "definite": "Babica e Madhe",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Babicë e Madhe"
    },
    "aliases": [
-    "Babica e Madhe",
-    "babica e madhe",
     "babice e madhe"
    ],
    "centroid": {
@@ -20139,15 +20066,13 @@
    "parent_id": "njesi/vlore/vlore/qender-vlore",
    "name": {
     "indefinite": "Babicë e Vogël",
-    "definite": "Babica e Vogël",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Babicë e Vogël"
    },
    "aliases": [
-    "Babica e Vogël",
-    "babica e vogel",
     "babice e vogel"
    ],
    "centroid": {
@@ -20229,8 +20154,8 @@
    "parent_id": "njesi/shkoder/shkoder/shkoder",
    "name": {
     "indefinite": "Bahçe Çakajve",
-    "definite": "Bahçe Çakajve",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Bahçe Çakajve"
@@ -20257,16 +20182,14 @@
    "parent_id": "njesi/shkoder/shkoder/velipoje",
    "name": {
     "indefinite": "Baks i Ri",
-    "definite": "Baksi i Ri",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Baks i Ri"
    },
    "aliases": [
-    "Baksi i Ri",
-    "baks i ri",
-    "baksi i ri"
+    "baks i ri"
    ],
    "centroid": {
     "lat": 41.918621,
@@ -20555,16 +20478,14 @@
    "parent_id": "njesi/tirane/tirane/zall-bastar",
    "name": {
     "indefinite": "Bastar i Mesëm",
-    "definite": "Bastari i Mesëm",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Bastar i Mesëm"
    },
    "aliases": [
-    "Bastari i Mesëm",
-    "bastar i mesem",
-    "bastari i mesem"
+    "bastar i mesem"
    ],
    "centroid": {
     "lat": 41.437663,
@@ -20585,16 +20506,14 @@
    "parent_id": "njesi/tirane/tirane/zall-bastar",
    "name": {
     "indefinite": "Bastar Murriz",
-    "definite": "Bastari Murriz",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Bastar Murriz"
    },
    "aliases": [
-    "Bastari Murriz",
-    "bastar murriz",
-    "bastari murriz"
+    "bastar murriz"
    ],
    "centroid": {
     "lat": 41.426785,
@@ -20915,15 +20834,13 @@
    "parent_id": "njesi/shkoder/shkoder/berdice",
    "name": {
     "indefinite": "Bërdicë e Madhe",
-    "definite": "Bërdica e Madhe",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Bërdicë e Madhe"
    },
    "aliases": [
-    "Bërdica e Madhe",
-    "berdica e madhe",
     "berdice e madhe"
    ],
    "centroid": {
@@ -20945,15 +20862,13 @@
    "parent_id": "njesi/shkoder/shkoder/berdice",
    "name": {
     "indefinite": "Bërdicë e Mesme",
-    "definite": "Bërdica e Mesme",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Bërdicë e Mesme"
    },
    "aliases": [
-    "Bërdica e Mesme",
-    "berdica e mesme",
     "berdice e mesme"
    ],
    "centroid": {
@@ -20975,15 +20890,13 @@
    "parent_id": "njesi/shkoder/shkoder/berdice",
    "name": {
     "indefinite": "Bërdicë e Sipërme",
-    "definite": "Bërdica e Sipërme",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Bërdicë e Sipërme"
    },
    "aliases": [
-    "Bërdica e Sipërme",
-    "berdica e siperme",
     "berdice e siperme"
    ],
    "centroid": {
@@ -21155,16 +21068,14 @@
    "parent_id": "njesi/durres/durres/katund-i-ri",
    "name": {
     "indefinite": "Bisht Kamëz",
-    "definite": "Bishti Kamëz",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Bisht Kamëz"
    },
    "aliases": [
-    "Bishti Kamëz",
-    "bisht kamez",
-    "bishti kamez"
+    "bisht kamez"
    ],
    "centroid": {
     "lat": 41.391143,
@@ -21365,16 +21276,14 @@
    "parent_id": "njesi/diber/diber/maqellare",
    "name": {
     "indefinite": "Bllatë e Sipërme",
-    "definite": "Bllata e Sipërme",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Bllatë e Sipërme"
    },
    "aliases": [
-    "Bllata e Sipërme",
     "Luzni",
-    "bllata e siperme",
     "bllate e siperme"
    ],
    "centroid": {
@@ -21424,8 +21333,8 @@
    "parent_id": "njesi/tirane/tirane/tirane",
    "name": {
     "indefinite": "Blloku Gintash",
-    "definite": "Blloku Gintash",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Blloku Gintash"
@@ -22352,16 +22261,14 @@
    "parent_id": "njesi/fier/fier/cakran",
    "name": {
     "indefinite": "Cakran i Ri",
-    "definite": "Cakrani i Ri",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Cakran i Ri"
    },
    "aliases": [
-    "Cakrani i Ri",
-    "cakran i ri",
-    "cakrani i ri"
+    "cakran i ri"
    ],
    "centroid": {
     "lat": 40.603157,
@@ -22834,16 +22741,14 @@
    "parent_id": "njesi/shkoder/shkoder/shkoder",
    "name": {
     "indefinite": "Daniel Matlia",
-    "definite": "Danieli Matlia",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Daniel Matlia"
    },
    "aliases": [
-    "Danieli Matlia",
-    "daniel matlia",
-    "danieli matlia"
+    "daniel matlia"
    ],
    "centroid": {
     "lat": 42.058304,
@@ -22894,15 +22799,13 @@
    "parent_id": "njesi/fier/fier/dermenas",
    "name": {
     "indefinite": "Darëzezë e Re",
-    "definite": "Darëzeza e Re",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Darëzezë e Re"
    },
    "aliases": [
-    "Darëzeza e Re",
-    "darezeza e re",
     "darezeze e re"
    ],
    "centroid": {
@@ -23372,8 +23275,8 @@
    "parent_id": "njesi/tirane/tirane/shengjergj",
    "name": {
     "indefinite": "Domje e Malit",
-    "definite": "Domje e Malit",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Domje e Malit"
@@ -23400,16 +23303,14 @@
    "parent_id": "njesi/tirane/tirane/tirane",
    "name": {
     "indefinite": "Don Bosko",
-    "definite": "Doni Bosko",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Don Bosko"
    },
    "aliases": [
-    "Doni Bosko",
-    "don bosko",
-    "doni bosko"
+    "don bosko"
    ],
    "centroid": {
     "lat": 41.340849,
@@ -23878,8 +23779,8 @@
    "parent_id": "njesi/vlore/vlore/orikum",
    "name": {
     "indefinite": "Dukat i Ri",
-    "definite": "Dukati i Ri",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "de": "Neuer Dukat",
@@ -23887,10 +23788,8 @@
    },
    "aliases": [
     "Dukat Fushë",
-    "Dukati i Ri",
     "Neuer Dukat",
-    "dukat i ri",
-    "dukati i ri"
+    "dukat i ri"
    ],
    "centroid": {
     "lat": 40.27233,
@@ -23971,16 +23870,14 @@
    "parent_id": "njesi/durres/durres/katund-i-ri",
    "name": {
     "indefinite": "Erzen Sukth",
-    "definite": "Erzeni Sukth",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Erzen Sukth"
    },
    "aliases": [
-    "Erzeni Sukth",
-    "erzen sukth",
-    "erzeni sukth"
+    "erzen sukth"
    ],
    "centroid": {
     "lat": 41.389899,
@@ -24061,16 +23958,14 @@
    "parent_id": "njesi/shkoder/shkoder/shkoder",
    "name": {
     "indefinite": "Fahri Ramadani",
-    "definite": "Fahria Ramadani",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Fahri Ramadani"
    },
    "aliases": [
-    "Fahria Ramadani",
-    "fahri ramadani",
-    "fahria ramadani"
+    "fahri ramadani"
    ],
    "centroid": {
     "lat": 42.072512,
@@ -24091,15 +23986,13 @@
    "parent_id": "njesi/tirane/tirane/farke",
    "name": {
     "indefinite": "Farkë e Madhe",
-    "definite": "Farka e Madhe",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Farkë e Madhe"
    },
    "aliases": [
-    "Farka e Madhe",
-    "farka e madhe",
     "farke e madhe"
    ],
    "centroid": {
@@ -24121,15 +24014,13 @@
    "parent_id": "njesi/tirane/tirane/farke",
    "name": {
     "indefinite": "Farkë e Vogël",
-    "definite": "Farka e Vogël",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Farkë e Vogël"
    },
    "aliases": [
-    "Farka e Vogël",
-    "farka e vogel",
     "farke e vogel"
    ],
    "centroid": {
@@ -24151,8 +24042,8 @@
    "parent_id": "njesi/tirane/tirane/tirane",
    "name": {
     "indefinite": "Farmacia 10",
-    "definite": "Farmacia 10",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Farmacia 10"
@@ -24417,16 +24308,14 @@
    "parent_id": "njesi/fier/fier/frakull",
    "name": {
     "indefinite": "Frakull e Madhe",
-    "definite": "Frakulli e Madhe",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Frakull e Madhe"
    },
    "aliases": [
-    "Frakulli e Madhe",
-    "frakull e madhe",
-    "frakulli e madhe"
+    "frakull e madhe"
    ],
    "centroid": {
     "lat": 40.656953,
@@ -24447,16 +24336,14 @@
    "parent_id": "njesi/fier/fier/frakull",
    "name": {
     "indefinite": "Frakull e Vogël",
-    "definite": "Frakulli e Vogël",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Frakull e Vogël"
    },
    "aliases": [
-    "Frakulli e Vogël",
-    "frakull e vogel",
-    "frakulli e vogel"
+    "frakull e vogel"
    ],
    "centroid": {
     "lat": 40.623244,
@@ -24625,15 +24512,13 @@
    "parent_id": "njesi/elbasan/elbasan/shushice",
    "name": {
     "indefinite": "Fushë Buall",
-    "definite": "Fusha Buall",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Fushë Buall"
    },
    "aliases": [
-    "Fusha Buall",
-    "fusha buall",
     "fushe buall"
    ],
    "centroid": {
@@ -24655,15 +24540,13 @@
    "parent_id": "njesi/durres/durres/ishem",
    "name": {
     "indefinite": "Fushë Draç",
-    "definite": "Fusha Draç",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Fushë Draç"
    },
    "aliases": [
-    "Fusha Draç",
-    "fusha drac",
     "fushe drac"
    ],
    "centroid": {
@@ -24985,16 +24868,14 @@
    "parent_id": "njesi/korce/korce/voskop",
    "name": {
     "indefinite": "Goskovë Lart",
-    "definite": "Goskova Lart",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Goskovë Lart"
    },
    "aliases": [
-    "Goskova Lart",
     "Goskovë e Sipërme",
-    "goskova lart",
     "goskove lart"
    ],
    "centroid": {
@@ -25016,16 +24897,14 @@
    "parent_id": "njesi/korce/korce/voskop",
    "name": {
     "indefinite": "Goskovë Poshtë",
-    "definite": "Goskova Poshtë",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Goskovë Poshtë"
    },
    "aliases": [
-    "Goskova Poshtë",
     "Goskovë e Poshtme",
-    "goskova poshte",
     "goskove poshte"
    ],
    "centroid": {
@@ -25197,16 +25076,14 @@
    "parent_id": "njesi/elbasan/elbasan/labinot-fushe",
    "name": {
     "indefinite": "Griqan i Poshtëm",
-    "definite": "Griqani i Poshtëm",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Griqan i Poshtëm"
    },
    "aliases": [
-    "Griqani i Poshtëm",
-    "griqan i poshtem",
-    "griqani i poshtem"
+    "griqan i poshtem"
    ],
    "centroid": {
     "lat": 41.150842,
@@ -25227,16 +25104,14 @@
    "parent_id": "njesi/elbasan/elbasan/labinot-fushe",
    "name": {
     "indefinite": "Griqan i Sipërm",
-    "definite": "Griqani i Sipërm",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Griqan i Sipërm"
    },
    "aliases": [
-    "Griqani i Sipërm",
-    "griqan i siperm",
-    "griqani i siperm"
+    "griqan i siperm"
    ],
    "centroid": {
     "lat": 41.162541,
@@ -25317,15 +25192,13 @@
    "parent_id": "njesi/shkoder/shkoder/rrethinat",
    "name": {
     "indefinite": "Grudë e Re",
-    "definite": "Gruda e Re",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Grudë e Re"
    },
    "aliases": [
-    "Gruda e Re",
-    "gruda e re",
     "grude e re"
    ],
    "centroid": {
@@ -25377,16 +25250,14 @@
    "parent_id": "njesi/shkoder/shkoder/rrethinat",
    "name": {
     "indefinite": "Guci e Re",
-    "definite": "Gucia e Re",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Guci e Re"
    },
    "aliases": [
-    "Gucia e Re",
-    "guci e re",
-    "gucia e re"
+    "guci e re"
    ],
    "centroid": {
     "lat": 42.124066,
@@ -25435,16 +25306,14 @@
    "parent_id": "njesi/elbasan/elbasan/labinot-mal",
    "name": {
     "indefinite": "Gur i Zi",
-    "definite": "Guri i Zi",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Gur i Zi"
    },
    "aliases": [
-    "Guri i Zi",
-    "gur i zi",
-    "guri i zi"
+    "gur i zi"
    ],
    "centroid": {
     "lat": 41.205518,
@@ -25555,15 +25424,13 @@
    "parent_id": "njesi/tirane/tirane/petrele",
    "name": {
     "indefinite": "Gurrë e Vogël",
-    "definite": "Gurra e Vogël",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Gurrë e Vogël"
    },
    "aliases": [
-    "Gurra e Vogël",
-    "gurra e vogel",
     "gurre e vogel"
    ],
    "centroid": {
@@ -25856,15 +25723,13 @@
    "parent_id": "njesi/elbasan/elbasan/gjergjan",
    "name": {
     "indefinite": "Gjonmë jug",
-    "definite": "Gjonma jug",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Gjonmë jug"
    },
    "aliases": [
-    "Gjonma jug",
-    "gjonma jug",
     "gjonme jug"
    ],
    "centroid": {
@@ -26515,16 +26380,14 @@
    "parent_id": "njesi/shkoder/shkoder/rrethinat",
    "name": {
     "indefinite": "Hot i Ri",
-    "definite": "Hoti i Ri",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Hot i Ri"
    },
    "aliases": [
-    "Hoti i Ri",
-    "hot i ri",
-    "hoti i ri"
+    "hot i ri"
    ],
    "centroid": {
     "lat": 42.100265,
@@ -26575,15 +26438,13 @@
    "parent_id": "njesi/tirane/tirane/berzhite",
    "name": {
     "indefinite": "Ibë e Poshtme",
-    "definite": "Iba e Poshtme",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Ibë e Poshtme"
    },
    "aliases": [
-    "Iba e Poshtme",
-    "iba e poshtme",
     "ibe e poshtme"
    ],
    "centroid": {
@@ -26605,15 +26466,13 @@
    "parent_id": "njesi/tirane/tirane/berzhite",
    "name": {
     "indefinite": "Ibë e Sipërme",
-    "definite": "Iba e Sipërme",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Ibë e Sipërme"
    },
    "aliases": [
-    "Iba e Sipërme",
-    "iba e siperme",
     "ibe e siperme"
    ],
    "centroid": {
@@ -26665,16 +26524,14 @@
    "parent_id": "njesi/tirane/tirane/baldushk",
    "name": {
     "indefinite": "Isuf Muçaj",
-    "definite": "Isufi Muçaj",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Isuf Muçaj"
    },
    "aliases": [
-    "Isufi Muçaj",
-    "isuf mucaj",
-    "isufi mucaj"
+    "isuf mucaj"
    ],
    "centroid": {
     "lat": 41.211389,
@@ -26695,16 +26552,14 @@
    "parent_id": "njesi/tirane/tirane/tirane",
    "name": {
     "indefinite": "Ish Fusha e Aviacionit",
-    "definite": "Ishi Fusha e Aviacionit",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Ish Fusha e Aviacionit"
    },
    "aliases": [
-    "Ishi Fusha e Aviacionit",
-    "ish fusha e aviacionit",
-    "ishi fusha e aviacionit"
+    "ish fusha e aviacionit"
    ],
    "centroid": {
     "lat": 41.332513,
@@ -26725,16 +26580,14 @@
    "parent_id": "njesi/tirane/tirane/tirane",
    "name": {
     "indefinite": "Ish Fusha e Druve",
-    "definite": "Ishi Fusha e Druve",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Ish Fusha e Druve"
    },
    "aliases": [
-    "Ishi Fusha e Druve",
-    "ish fusha e druve",
-    "ishi fusha e druve"
+    "ish fusha e druve"
    ],
    "centroid": {
     "lat": 41.319796,
@@ -26755,16 +26608,14 @@
    "parent_id": "njesi/tirane/tirane/tirane",
    "name": {
     "indefinite": "Ish Merkata",
-    "definite": "Ishi Merkata",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Ish Merkata"
    },
    "aliases": [
-    "Ishi Merkata",
-    "ish merkata",
-    "ishi merkata"
+    "ish merkata"
    ],
    "centroid": {
     "lat": 41.317865,
@@ -26785,16 +26636,14 @@
    "parent_id": "njesi/tirane/tirane/tirane",
    "name": {
     "indefinite": "Ish Stacioni i Trenit",
-    "definite": "Ishi Stacioni i Trenit",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Ish Stacioni i Trenit"
    },
    "aliases": [
-    "Ishi Stacioni i Trenit",
-    "ish stacioni i trenit",
-    "ishi stacioni i trenit"
+    "ish stacioni i trenit"
    ],
    "centroid": {
     "lat": 41.336616,
@@ -26815,16 +26664,14 @@
    "parent_id": "njesi/tirane/tirane/tirane",
    "name": {
     "indefinite": "Ish Zdruktharia",
-    "definite": "Ishi Zdruktharia",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Ish Zdruktharia"
    },
    "aliases": [
-    "Ishi Zdruktharia",
-    "ish zdruktharia",
-    "ishi zdruktharia"
+    "ish zdruktharia"
    ],
    "centroid": {
     "lat": 41.31723,
@@ -26845,8 +26692,8 @@
    "parent_id": "njesi/tirane/tirane/tirane",
    "name": {
     "indefinite": "Ish-Uzina Dinamo",
-    "definite": "Ish-Uzina Dinamo",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Ish-Uzina Dinamo"
@@ -26873,16 +26720,14 @@
    "parent_id": "njesi/lezhe/lezhe/shengjin",
    "name": {
     "indefinite": "Ishull Lezhë",
-    "definite": "Ishulli Lezhë",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Ishull Lezhë"
    },
    "aliases": [
-    "Ishulli Lezhë",
-    "ishull lezhe",
-    "ishulli lezhe"
+    "ishull lezhe"
    ],
    "centroid": {
     "lat": 41.764868,
@@ -27173,8 +27018,8 @@
    "parent_id": "njesi/tirane/kamez/paskuqan",
    "name": {
     "indefinite": "Kafja e Rremës",
-    "definite": "Kafja e Rremës",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Kafja e Rremës"
@@ -27294,16 +27139,14 @@
    "parent_id": "njesi/fier/fier/mbrostar-ura",
    "name": {
     "indefinite": "Kallm i Madh",
-    "definite": "Kallmi i Madh",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Kallm i Madh"
    },
    "aliases": [
-    "Kallmi i Madh",
-    "kallm i madh",
-    "kallmi i madh"
+    "kallm i madh"
    ],
    "centroid": {
     "lat": 40.761561,
@@ -27324,16 +27167,14 @@
    "parent_id": "njesi/fier/fier/mbrostar-ura",
    "name": {
     "indefinite": "Kallm i Vogël",
-    "definite": "Kallmi i Vogël",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Kallm i Vogël"
    },
    "aliases": [
-    "Kallmi i Vogël",
-    "kallm i vogel",
-    "kallmi i vogel"
+    "kallm i vogel"
    ],
    "centroid": {
     "lat": 40.774957,
@@ -27684,16 +27525,14 @@
    "parent_id": "njesi/tirane/tirane/kashar",
    "name": {
     "indefinite": "Katund i Ri",
-    "definite": "Katundi i Ri",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Katund i Ri"
    },
    "aliases": [
-    "Katundi i Ri",
-    "katund i ri",
-    "katundi i ri"
+    "katund i ri"
    ],
    "centroid": {
     "lat": 41.354146,
@@ -27714,16 +27553,14 @@
    "parent_id": "njesi/elbasan/elbasan/bradashesh",
    "name": {
     "indefinite": "Katund i Ri",
-    "definite": "Katundi i Ri",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Katund i Ri"
    },
    "aliases": [
-    "Katundi i Ri",
-    "katund i ri",
-    "katundi i ri"
+    "katund i ri"
    ],
    "centroid": {
     "lat": 41.097497,
@@ -27744,16 +27581,14 @@
    "parent_id": "njesi/durres/durres/katund-i-ri",
    "name": {
     "indefinite": "Katund i Ri",
-    "definite": "Katundi i Ri",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Katund i Ri"
    },
    "aliases": [
-    "Katundi i Ri",
-    "katund i ri",
-    "katundi i ri"
+    "katund i ri"
    ],
    "centroid": {
     "lat": 41.402551,
@@ -27922,16 +27757,14 @@
    "parent_id": "njesi/tirane/tirane/tirane",
    "name": {
     "indefinite": "Kinostudio",
-    "definite": "Kinostudioi",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Kinostudio"
    },
    "aliases": [
-    "Kinostudioi",
-    "kinostudio",
-    "kinostudioi"
+    "kinostudio"
    ],
    "centroid": {
     "lat": 41.345952,
@@ -28042,16 +27875,14 @@
    "parent_id": "njesi/tirane/tirane/baldushk",
    "name": {
     "indefinite": "Koçaj - Tavareni",
-    "definite": "Koçaji - Tavareni",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Koçaj - Tavareni"
    },
    "aliases": [
-    "Koçaji - Tavareni",
-    "kocaj tavareni",
-    "kocaji tavareni"
+    "kocaj tavareni"
    ],
    "centroid": {
     "lat": 41.188707,
@@ -28072,16 +27903,14 @@
    "parent_id": "njesi/elbasan/elbasan/gjergjan",
    "name": {
     "indefinite": "Kodër Bujaras",
-    "definite": "Kodra Bujaras",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Kodër Bujaras"
    },
    "aliases": [
-    "Kodra Bujaras",
-    "koder bujaras",
-    "kodra bujaras"
+    "koder bujaras"
    ],
    "centroid": {
     "lat": 41.011601,
@@ -28163,16 +27992,14 @@
    "parent_id": "njesi/tirane/tirane/tirane",
    "name": {
     "indefinite": "Kompleksi Delijorgji",
-    "definite": "Kompleksia Delijorgji",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Kompleksi Delijorgji"
    },
    "aliases": [
-    "Kompleksia Delijorgji",
-    "kompleksi delijorgji",
-    "kompleksia delijorgji"
+    "kompleksi delijorgji"
    ],
    "centroid": {
     "lat": 41.322275,
@@ -28193,16 +28020,14 @@
    "parent_id": "njesi/tirane/tirane/tirane",
    "name": {
     "indefinite": "Kompleksi Vizion",
-    "definite": "Kompleksia Vizion",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Kompleksi Vizion"
    },
    "aliases": [
-    "Kompleksia Vizion",
-    "kompleksi vizion",
-    "kompleksia vizion"
+    "kompleksi vizion"
    ],
    "centroid": {
     "lat": 41.337019,
@@ -28223,8 +28048,8 @@
    "parent_id": "njesi/tirane/tirane/tirane",
    "name": {
     "indefinite": "Komuna e Parisit",
-    "definite": "Komuna e Parisit",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Komuna e Parisit"
@@ -28251,8 +28076,8 @@
    "parent_id": "njesi/fier/fier/fier",
    "name": {
     "indefinite": "Konferenca e Pezës",
-    "definite": "Konferenca e Pezës",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Konferenca e Pezës"
@@ -28279,16 +28104,14 @@
    "parent_id": "njesi/fier/fier/fier",
    "name": {
     "indefinite": "Kongresi i Përmetit",
-    "definite": "Kongresia i Përmetit",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Kongresi i Përmetit"
    },
    "aliases": [
-    "Kongresia i Përmetit",
-    "kongresi i permetit",
-    "kongresia i permetit"
+    "kongresi i permetit"
    ],
    "centroid": {
     "lat": 40.728405,
@@ -28309,16 +28132,14 @@
    "parent_id": "njesi/shkoder/shkoder/shkoder",
    "name": {
     "indefinite": "Kongresi Përmetit",
-    "definite": "Kongresia Përmetit",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Kongresi Përmetit"
    },
    "aliases": [
-    "Kongresia Përmetit",
-    "kongresi permetit",
-    "kongresia permetit"
+    "kongresi permetit"
    ],
    "centroid": {
     "lat": 42.067634,
@@ -28519,8 +28340,8 @@
    "parent_id": "njesi/fier/fier/fier",
    "name": {
     "indefinite": "Kryengritja e Fierit",
-    "definite": "Kryengritja e Fierit",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Kryengritja e Fierit"
@@ -28607,15 +28428,13 @@
    "parent_id": "njesi/elbasan/elbasan/funare",
    "name": {
     "indefinite": "Krrabë e Vogël",
-    "definite": "Krraba e Vogël",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Krrabë e Vogël"
    },
    "aliases": [
-    "Krraba e Vogël",
-    "krraba e vogel",
     "krrabe e vogel"
    ],
    "centroid": {
@@ -28697,16 +28516,14 @@
    "parent_id": "njesi/korce/korce/qender-bulgarec",
    "name": {
     "indefinite": "Kuç i Zi",
-    "definite": "Kuçi i Zi",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Kuç i Zi"
    },
    "aliases": [
-    "Kuçi i Zi",
-    "kuc i zi",
-    "kuci i zi"
+    "kuc i zi"
    ],
    "centroid": {
     "lat": 40.67244,
@@ -28997,15 +28814,13 @@
    "parent_id": "njesi/gjirokaster/gjirokaster/odrie",
    "name": {
     "indefinite": "Labovë e Madhe",
-    "definite": "Labova e Madhe",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Labovë e Madhe"
    },
    "aliases": [
-    "Labova e Madhe",
-    "labova e madhe",
     "labove e madhe"
    ],
    "centroid": {
@@ -29027,15 +28842,13 @@
    "parent_id": "njesi/gjirokaster/gjirokaster/odrie",
    "name": {
     "indefinite": "Labovë e Vogël",
-    "definite": "Labova e Vogël",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Labovë e Vogël"
    },
    "aliases": [
-    "Labova e Vogël",
-    "labova e vogel",
     "labove e vogel"
    ],
    "centroid": {
@@ -29057,8 +28870,8 @@
    "parent_id": "njesi/tirane/tirane/ndroq",
    "name": {
     "indefinite": "Lagja e Re",
-    "definite": "Lagja e Re",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Lagja e Re"
@@ -29085,8 +28898,8 @@
    "parent_id": "njesi/fier/fier/qender",
    "name": {
     "indefinite": "Lagjia e Romëve",
-    "definite": "Lagjia e Romëve",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Lagjia e Romëve"
@@ -29113,8 +28926,8 @@
    "parent_id": "njesi/shkoder/shkoder/shkoder",
    "name": {
     "indefinite": "Lagjja 1",
-    "definite": "Lagjja 1",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Lagjja 1"
@@ -29141,8 +28954,8 @@
    "parent_id": "njesi/shkoder/shkoder/shkoder",
    "name": {
     "indefinite": "Lagjja 2",
-    "definite": "Lagjja 2",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Lagjja 2"
@@ -29169,8 +28982,8 @@
    "parent_id": "njesi/shkoder/shkoder/shkoder",
    "name": {
     "indefinite": "Lagjja 3",
-    "definite": "Lagjja 3",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Lagjja 3"
@@ -29197,8 +29010,8 @@
    "parent_id": "njesi/shkoder/shkoder/shkoder",
    "name": {
     "indefinite": "Lagjja 4",
-    "definite": "Lagjja 4",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Lagjja 4"
@@ -29225,8 +29038,8 @@
    "parent_id": "njesi/shkoder/shkoder/shkoder",
    "name": {
     "indefinite": "Lagjja 5",
-    "definite": "Lagjja 5",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Lagjja 5"
@@ -29277,7 +29090,7 @@
    }
   },
   {
-   "id": "fshat/fier/fier/portez/lalar-728429205",
+   "id": "fshat/fier/fier/portez/lalar-2",
    "slug": "lalar",
    "type": "fshat",
    "parent_id": "njesi/fier/fier/portez",
@@ -29520,16 +29333,14 @@
    "parent_id": "njesi/korce/korce/voskopoje",
    "name": {
     "indefinite": "Lavdar i Korçës",
-    "definite": "Lavdari i Korçës",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Lavdar i Korçës"
    },
    "aliases": [
-    "Lavdari i Korçës",
-    "lavdar i korces",
-    "lavdari i korces"
+    "lavdar i korces"
    ],
    "centroid": {
     "lat": 40.602781,
@@ -29638,16 +29449,14 @@
    "parent_id": "njesi/tirane/tirane/tirane",
    "name": {
     "indefinite": "Libri Universitar",
-    "definite": "Libria Universitar",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Libri Universitar"
    },
    "aliases": [
-    "Libria Universitar",
-    "libri universitar",
-    "libria universitar"
+    "libri universitar"
    ],
    "centroid": {
     "lat": 41.319302,
@@ -29789,16 +29598,14 @@
    "parent_id": "njesi/fier/fier/fier",
    "name": {
     "indefinite": "Liri Gero",
-    "definite": "Liria Gero",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Liri Gero"
    },
    "aliases": [
-    "Liria Gero",
-    "liri gero",
-    "liria gero"
+    "liri gero"
    ],
    "centroid": {
     "lat": 40.732787,
@@ -30265,16 +30072,14 @@
    "parent_id": "njesi/shkoder/shkoder/berdice",
    "name": {
     "indefinite": "Mali Hebej",
-    "definite": "Malia Hebej",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Mali Hebej"
    },
    "aliases": [
-    "Malia Hebej",
-    "mali hebej",
-    "malia hebej"
+    "mali hebej"
    ],
    "centroid": {
     "lat": 42.010021,
@@ -30295,17 +30100,15 @@
    "parent_id": "njesi/shkoder/shkoder/dajc",
    "name": {
     "indefinite": "Mali i Gjymtit",
-    "definite": "Malia i Gjymtit",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "ru": "Мали и Джымтит",
     "sq": "Mali i Gjymtit"
    },
    "aliases": [
-    "Malia i Gjymtit",
     "mali i gjymtit",
-    "malia i gjymtit",
     "Мали и Джымтит"
    ],
    "centroid": {
@@ -30327,16 +30130,14 @@
    "parent_id": "njesi/tirane/kavaje/golem",
    "name": {
     "indefinite": "Mali i Robit",
-    "definite": "Malia i Robit",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Mali i Robit"
    },
    "aliases": [
-    "Malia i Robit",
-    "mali i robit",
-    "malia i robit"
+    "mali i robit"
    ],
    "centroid": {
     "lat": 41.236268,
@@ -30357,16 +30158,14 @@
    "parent_id": "njesi/shkoder/shkoder/velipoje",
    "name": {
     "indefinite": "Mali Kolaj",
-    "definite": "Malia Kolaj",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Mali Kolaj"
    },
    "aliases": [
-    "Malia Kolaj",
-    "mali kolaj",
-    "malia kolaj"
+    "mali kolaj"
    ],
    "centroid": {
     "lat": 41.906609,
@@ -30387,16 +30186,14 @@
    "parent_id": "njesi/durres/durres/rrashbull",
    "name": {
     "indefinite": "Maliq Muço (Xhafzotaj)",
-    "definite": "Maliqi Muço (Xhafzotaj)",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Maliq Muço (Xhafzotaj)"
    },
    "aliases": [
-    "Maliqi Muço (Xhafzotaj)",
-    "maliq muco (xhafzotaj)",
-    "maliqi muco (xhafzotaj)"
+    "maliq muco (xhafzotaj)"
    ],
    "centroid": {
     "lat": 41.331633,
@@ -30477,16 +30274,14 @@
    "parent_id": "njesi/durres/durres/manez",
    "name": {
     "indefinite": "Manëz e Re",
-    "definite": "Manëzi e Re",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Manëz e Re"
    },
    "aliases": [
-    "Manëzi e Re",
-    "manez e re",
-    "manezi e re"
+    "manez e re"
    ],
    "centroid": {
     "lat": 41.439664,
@@ -30597,16 +30392,14 @@
    "parent_id": "njesi/shkoder/shkoder/shkoder",
    "name": {
     "indefinite": "Manush Alimani",
-    "definite": "Manushi Alimani",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Manush Alimani"
    },
    "aliases": [
-    "Manushi Alimani",
-    "manush alimani",
-    "manushi alimani"
+    "manush alimani"
    ],
    "centroid": {
     "lat": 42.05907,
@@ -30657,16 +30450,14 @@
    "parent_id": "njesi/shkoder/shkoder/shkoder",
    "name": {
     "indefinite": "Mark Lula",
-    "definite": "Marku Lula",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Mark Lula"
    },
    "aliases": [
-    "Marku Lula",
-    "mark lula",
-    "marku lula"
+    "mark lula"
    ],
    "centroid": {
     "lat": 42.057108,
@@ -30956,16 +30747,14 @@
    "parent_id": "njesi/fier/fier/qender",
    "name": {
     "indefinite": "Mbrostar-Ferko",
-    "definite": "Mbrostar-Ferkoi",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Mbrostar-Ferko"
    },
    "aliases": [
-    "Mbrostar-Ferkoi",
-    "mbrostar ferko",
-    "mbrostar ferkoi"
+    "mbrostar ferko"
    ],
    "centroid": {
     "lat": 40.737778,
@@ -31044,8 +30833,8 @@
    "parent_id": "njesi/shkoder/shkoder/shkoder",
    "name": {
     "indefinite": "Mehalla Çakajve",
-    "definite": "Mehalla Çakajve",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Mehalla Çakajve"
@@ -31522,16 +31311,14 @@
    "parent_id": "njesi/tirane/tirane/zall-bastar",
    "name": {
     "indefinite": "Mner i Sipërm",
-    "definite": "Mneri i Sipërm",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Mner i Sipërm"
    },
    "aliases": [
-    "Mneri i Sipërm",
-    "mner i siperm",
-    "mneri i siperm"
+    "mner i siperm"
    ],
    "centroid": {
     "lat": 41.471353,
@@ -31852,8 +31639,8 @@
    "parent_id": "njesi/tirane/tirane/baldushk",
    "name": {
     "indefinite": "Mustafa Koçaj",
-    "definite": "Mustafa Koçaj",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Mustafa Koçaj"
@@ -31968,16 +31755,14 @@
    "parent_id": "njesi/shkoder/shkoder/shkoder",
    "name": {
     "indefinite": "Naim Gjylbegu",
-    "definite": "Naimi Gjylbegu",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Naim Gjylbegu"
    },
    "aliases": [
-    "Naimi Gjylbegu",
-    "naim gjylbegu",
-    "naimi gjylbegu"
+    "naim gjylbegu"
    ],
    "centroid": {
     "lat": 42.07474,
@@ -32028,16 +31813,14 @@
    "parent_id": "njesi/fier/fier/libofshe",
    "name": {
     "indefinite": "Nb. Hadaj",
-    "definite": "Nb.i Hadaj",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Nb. Hadaj"
    },
    "aliases": [
-    "Nb.i Hadaj",
-    "nb. hadaj",
-    "nb.i hadaj"
+    "nb. hadaj"
    ],
    "centroid": {
     "lat": 40.881122,
@@ -32058,16 +31841,14 @@
    "parent_id": "njesi/elbasan/elbasan/paper",
    "name": {
     "indefinite": "Nb. papër",
-    "definite": "Nb.i papër",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Nb. papër"
    },
    "aliases": [
-    "Nb.i papër",
-    "nb. paper",
-    "nb.i paper"
+    "nb. paper"
    ],
    "centroid": {
     "lat": 41.126697,
@@ -32152,16 +31933,14 @@
    "parent_id": "njesi/shkoder/shkoder/shkoder",
    "name": {
     "indefinite": "Ndoc Mazi",
-    "definite": "Ndoci Mazi",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Ndoc Mazi"
    },
    "aliases": [
-    "Ndoci Mazi",
-    "ndoc mazi",
-    "ndoci mazi"
+    "ndoc mazi"
    ],
    "centroid": {
     "lat": 42.060619,
@@ -32392,8 +32171,8 @@
    "parent_id": "njesi/tirane/tirane/tirane",
    "name": {
     "indefinite": "Njësia Bashkiake Nr. 1",
-    "definite": "Njësia Bashkiake Nr. 1",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Njësia Bashkiake Nr. 1"
@@ -32421,8 +32200,8 @@
    "parent_id": "njesi/tirane/tirane/tirane",
    "name": {
     "indefinite": "Njësia Bashkiake Nr. 10",
-    "definite": "Njësia Bashkiake Nr. 10",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Njësia Bashkiake Nr. 10"
@@ -32450,8 +32229,8 @@
    "parent_id": "njesi/tirane/tirane/tirane",
    "name": {
     "indefinite": "Njësia Bashkiake Nr. 11",
-    "definite": "Njësia Bashkiake Nr. 11",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Njësia Bashkiake Nr. 11"
@@ -32479,8 +32258,8 @@
    "parent_id": "njesi/tirane/tirane/tirane",
    "name": {
     "indefinite": "Njësia Bashkiake Nr. 2",
-    "definite": "Njësia Bashkiake Nr. 2",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Njësia Bashkiake Nr. 2"
@@ -32508,8 +32287,8 @@
    "parent_id": "njesi/tirane/tirane/tirane",
    "name": {
     "indefinite": "Njësia Bashkiake Nr. 3",
-    "definite": "Njësia Bashkiake Nr. 3",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Njësia Bashkiake Nr. 3"
@@ -32537,8 +32316,8 @@
    "parent_id": "njesi/tirane/tirane/tirane",
    "name": {
     "indefinite": "Njësia Bashkiake Nr. 4",
-    "definite": "Njësia Bashkiake Nr. 4",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Njësia Bashkiake Nr. 4"
@@ -32566,8 +32345,8 @@
    "parent_id": "njesi/tirane/tirane/tirane",
    "name": {
     "indefinite": "Njësia Bashkiake Nr. 5",
-    "definite": "Njësia Bashkiake Nr. 5",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Njësia Bashkiake Nr. 5"
@@ -32595,8 +32374,8 @@
    "parent_id": "njesi/tirane/tirane/tirane",
    "name": {
     "indefinite": "Njësia Bashkiake Nr. 6",
-    "definite": "Njësia Bashkiake Nr. 6",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Njësia Bashkiake Nr. 6"
@@ -32624,8 +32403,8 @@
    "parent_id": "njesi/tirane/tirane/tirane",
    "name": {
     "indefinite": "Njësia Bashkiake Nr. 7",
-    "definite": "Njësia Bashkiake Nr. 7",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Njësia Bashkiake Nr. 7"
@@ -32653,8 +32432,8 @@
    "parent_id": "njesi/tirane/tirane/tirane",
    "name": {
     "indefinite": "Njësia Bashkiake Nr. 8",
-    "definite": "Njësia Bashkiake Nr. 8",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Njësia Bashkiake Nr. 8"
@@ -32682,8 +32461,8 @@
    "parent_id": "njesi/tirane/tirane/tirane",
    "name": {
     "indefinite": "Njësia Bashkiake Nr. 9",
-    "definite": "Njësia Bashkiake Nr. 9",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Njësia Bashkiake Nr. 9"
@@ -32742,15 +32521,13 @@
    "parent_id": "njesi/shkoder/shkoder/ana-e-malit",
    "name": {
     "indefinite": "Oblikë e Sipërme",
-    "definite": "Oblika e Sipërme",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Oblikë e Sipërme"
    },
    "aliases": [
-    "Oblika e Sipërme",
-    "oblika e siperme",
     "oblike e siperme"
    ],
    "centroid": {
@@ -33403,16 +33180,14 @@
    "parent_id": "njesi/shkoder/shkoder/shkoder",
    "name": {
     "indefinite": "Perlat Rexhepi",
-    "definite": "Perlati Rexhepi",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Perlat Rexhepi"
    },
    "aliases": [
-    "Perlati Rexhepi",
-    "perlat rexhepi",
-    "perlati rexhepi"
+    "perlat rexhepi"
    ],
    "centroid": {
     "lat": 42.067882,
@@ -33463,16 +33238,14 @@
    "parent_id": "njesi/fier/fier/levan",
    "name": {
     "indefinite": "Peshtan i Vogël",
-    "definite": "Peshtani i Vogël",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Peshtan i Vogël"
    },
    "aliases": [
-    "Peshtani i Vogël",
-    "peshtan i vogel",
-    "peshtani i vogel"
+    "peshtan i vogel"
    ],
    "centroid": {
     "lat": 40.698993,
@@ -33553,16 +33326,14 @@
    "parent_id": "njesi/tirane/tirane/peze",
    "name": {
     "indefinite": "Pezë e Madhe",
-    "definite": "Peza e Madhe",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Pezë e Madhe"
    },
    "aliases": [
-    "Peza e Madhe",
     "Pezë",
-    "peza e madhe",
     "peze e madhe"
    ],
    "centroid": {
@@ -33584,15 +33355,13 @@
    "parent_id": "njesi/tirane/tirane/peze",
    "name": {
     "indefinite": "Pezë e Vogël",
-    "definite": "Peza e Vogël",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Pezë e Vogël"
    },
    "aliases": [
-    "Peza e Vogël",
-    "peza e vogel",
     "peze e vogel"
    ],
    "centroid": {
@@ -34152,16 +33921,14 @@
    "parent_id": "njesi/elbasan/elbasan/shushice",
    "name": {
     "indefinite": "Polis i Vogël",
-    "definite": "Polisi i Vogël",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Polis i Vogël"
    },
    "aliases": [
-    "Polisi i Vogël",
-    "polis i vogel",
-    "polisi i vogel"
+    "polis i vogel"
    ],
    "centroid": {
     "lat": 41.136733,
@@ -34362,15 +34129,13 @@
    "parent_id": "njesi/elbasan/elbasan/funare",
    "name": {
     "indefinite": "Preçë e Poshtme",
-    "definite": "Preça e Poshtme",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Preçë e Poshtme"
    },
    "aliases": [
-    "Preça e Poshtme",
-    "preca e poshtme",
     "prece e poshtme"
    ],
    "centroid": {
@@ -34392,15 +34157,13 @@
    "parent_id": "njesi/elbasan/elbasan/funare",
    "name": {
     "indefinite": "Preçë e Sipërme",
-    "definite": "Preça e Sipërme",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Preçë e Sipërme"
    },
    "aliases": [
-    "Preça e Sipërme",
-    "preca e siperme",
     "prece e siperme"
    ],
    "centroid": {
@@ -34452,15 +34215,13 @@
    "parent_id": "njesi/tirane/tirane/dajt",
    "name": {
     "indefinite": "Priskë e Madhe",
-    "definite": "Priska e Madhe",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Priskë e Madhe"
    },
    "aliases": [
-    "Priska e Madhe",
-    "priska e madhe",
     "priske e madhe"
    ],
    "centroid": {
@@ -34482,15 +34243,13 @@
    "parent_id": "njesi/tirane/tirane/zall-herr",
    "name": {
     "indefinite": "Priskë e Vogël",
-    "definite": "Priska e Vogël",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Priskë e Vogël"
    },
    "aliases": [
-    "Priska e Vogël",
-    "priska e vogel",
     "priske e vogel"
    ],
    "centroid": {
@@ -34662,15 +34421,13 @@
    "parent_id": "njesi/shkoder/shkoder/shkoder",
    "name": {
     "indefinite": "Qafë Hardhi",
-    "definite": "Qafa Hardhi",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Qafë Hardhi"
    },
    "aliases": [
-    "Qafa Hardhi",
-    "qafa hardhi",
     "qafe hardhi"
    ],
    "centroid": {
@@ -34782,16 +34539,14 @@
    "parent_id": "njesi/vlore/himare/lukove",
    "name": {
     "indefinite": "Qazim Pali",
-    "definite": "Qazimi Pali",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Qazim Pali"
    },
    "aliases": [
-    "Qazimi Pali",
-    "qazim pali",
-    "qazimi pali"
+    "qazim pali"
    ],
    "centroid": {
     "lat": 40.04783,
@@ -34840,16 +34595,14 @@
    "parent_id": "njesi/shkoder/shkoder/shkoder",
    "name": {
     "indefinite": "Qemal Stafa",
-    "definite": "Qemali Stafa",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Qemal Stafa"
    },
    "aliases": [
-    "Qemali Stafa",
-    "qemal stafa",
-    "qemali stafa"
+    "qemal stafa"
    ],
    "centroid": {
     "lat": 42.064832,
@@ -34870,16 +34623,14 @@
    "parent_id": "njesi/vlore/himare/himare",
    "name": {
     "indefinite": "Qeparo",
-    "definite": "Qeparoi",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Qeparo"
    },
    "aliases": [
-    "Qeparoi",
-    "qeparo",
-    "qeparoi"
+    "qeparo"
    ],
    "centroid": {
     "lat": 40.054973,
@@ -34900,16 +34651,14 @@
    "parent_id": "njesi/vlore/himare/himare",
    "name": {
     "indefinite": "Qeparo i Sipërm",
-    "definite": "Qeparoi i Sipërm",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Qeparo i Sipërm"
    },
    "aliases": [
-    "Qeparoi i Sipërm",
-    "qeparo i siperm",
-    "qeparoi i siperm"
+    "qeparo i siperm"
    ],
    "centroid": {
     "lat": 40.067822,
@@ -35050,16 +34799,14 @@
    "parent_id": "njesi/tirane/tirane/tirane",
    "name": {
     "indefinite": "Qyteti Studenti",
-    "definite": "Qytetia Studenti",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Qyteti Studenti"
    },
    "aliases": [
-    "Qytetia Studenti",
-    "qyteti studenti",
-    "qytetia studenti"
+    "qyteti studenti"
    ],
    "centroid": {
     "lat": 41.319458,
@@ -35230,16 +34977,14 @@
    "parent_id": "njesi/shkoder/malesi-e-madhe/shkrel",
    "name": {
     "indefinite": "Razëm (Vrith)",
-    "definite": "Razëmi (Vrith)",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Razëm (Vrith)"
    },
    "aliases": [
-    "Razëmi (Vrith)",
-    "razem (vrith)",
-    "razemi (vrith)"
+    "razem (vrith)"
    ],
    "centroid": {
     "lat": 42.345169,
@@ -35290,16 +35035,14 @@
    "parent_id": "njesi/shkoder/shkoder/velipoje",
    "name": {
     "indefinite": "Reç i Ri",
-    "definite": "Reçi i Ri",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Reç i Ri"
    },
    "aliases": [
-    "Reçi i Ri",
-    "rec i ri",
-    "reci i ri"
+    "rec i ri"
    ],
    "centroid": {
     "lat": 41.908908,
@@ -35498,16 +35241,14 @@
    "parent_id": "njesi/tirane/tirane/petrele",
    "name": {
     "indefinite": "Rolling Hills",
-    "definite": "Rollingu Hills",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Rolling Hills"
    },
    "aliases": [
-    "Rollingu Hills",
-    "rolling hills",
-    "rollingu hills"
+    "rolling hills"
    ],
    "centroid": {
     "lat": 41.277551,
@@ -35678,16 +35419,14 @@
    "parent_id": "njesi/fier/fier/libofshe",
    "name": {
     "indefinite": "Rreth Libofshë",
-    "definite": "Rrethi Libofshë",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Rreth Libofshë"
    },
    "aliases": [
-    "Rrethi Libofshë",
-    "rreth libofshe",
-    "rrethi libofshe"
+    "rreth libofshe"
    ],
    "centroid": {
     "lat": 40.807054,
@@ -35768,8 +35507,8 @@
    "parent_id": "njesi/durres/durres/durres",
    "name": {
     "indefinite": "Rrota E Kuqe",
-    "definite": "Rrota E Kuqe",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Rrota E Kuqe"
@@ -35826,16 +35565,14 @@
    "parent_id": "njesi/shkoder/shkoder/shkoder",
    "name": {
     "indefinite": "Salo Halili",
-    "definite": "Saloi Halili",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Salo Halili"
    },
    "aliases": [
-    "Saloi Halili",
-    "salo halili",
-    "saloi halili"
+    "salo halili"
    ],
    "centroid": {
     "lat": 42.062195,
@@ -35856,17 +35593,15 @@
    "parent_id": "njesi/shkoder/shkoder/dajc",
    "name": {
     "indefinite": "Samrisht i Ri",
-    "definite": "Samrishti i Ri",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "ru": "Самришт и Ри",
     "sq": "Samrisht i Ri"
    },
    "aliases": [
-    "Samrishti i Ri",
     "samrisht i ri",
-    "samrishti i ri",
     "Самришт и Ри"
    ],
    "centroid": {
@@ -35888,17 +35623,15 @@
    "parent_id": "njesi/shkoder/shkoder/dajc",
    "name": {
     "indefinite": "Samrisht i Sipërm",
-    "definite": "Samrishti i Sipërm",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Samrisht i Sipërm"
    },
    "aliases": [
     "Samrisht",
-    "Samrishti i Sipërm",
-    "samrisht i siperm",
-    "samrishti i siperm"
+    "samrisht i siperm"
    ],
    "centroid": {
     "lat": 42.002158,
@@ -36189,15 +35922,13 @@
    "parent_id": "njesi/tirane/tirane/zall-bastar",
    "name": {
     "indefinite": "Selitë e Malit",
-    "definite": "Selita e Malit",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Selitë e Malit"
    },
    "aliases": [
-    "Selita e Malit",
-    "selita e malit",
     "selite e malit"
    ],
    "centroid": {
@@ -36277,16 +36008,14 @@
    "parent_id": "njesi/fier/fier/topoje",
    "name": {
     "indefinite": "Seman i Ri",
-    "definite": "Semani i Ri",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Seman i Ri"
    },
    "aliases": [
-    "Semani i Ri",
-    "seman i ri",
-    "semani i ri"
+    "seman i ri"
    ],
    "centroid": {
     "lat": 40.788809,
@@ -36693,16 +36422,14 @@
    "parent_id": "njesi/durres/durres/sukth",
    "name": {
     "indefinite": "Sukth i Ri",
-    "definite": "Sukthi i Ri",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Sukth i Ri"
    },
    "aliases": [
-    "Sukthi i Ri",
-    "sukth i ri",
-    "sukthi i ri"
+    "sukth i ri"
    ],
    "centroid": {
     "lat": 41.366756,
@@ -37023,16 +36750,14 @@
    "parent_id": "njesi/fier/fier/qender",
    "name": {
     "indefinite": "Sheq i Madh",
-    "definite": "Sheqi i Madh",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Sheq i Madh"
    },
    "aliases": [
-    "Sheqi i Madh",
-    "sheq i madh",
-    "sheqi i madh"
+    "sheq i madh"
    ],
    "centroid": {
     "lat": 40.734649,
@@ -37053,16 +36778,14 @@
    "parent_id": "njesi/fier/fier/fier",
    "name": {
     "indefinite": "Sheq i Vogël",
-    "definite": "Sheqi i Vogël",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Sheq i Vogël"
    },
    "aliases": [
-    "Sheqi i Vogël",
-    "sheq i vogel",
-    "sheqi i vogel"
+    "sheq i vogel"
    ],
    "centroid": {
     "lat": 40.724734,
@@ -37203,15 +36926,13 @@
    "parent_id": "njesi/elbasan/peqin/gjocaj",
    "name": {
     "indefinite": "Shezë e Vogël",
-    "definite": "Sheza e Vogël",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Shezë e Vogël"
    },
    "aliases": [
-    "Sheza e Vogël",
-    "sheza e vogel",
     "sheze e vogel"
    ],
    "centroid": {
@@ -37263,16 +36984,14 @@
    "parent_id": "njesi/tirane/tirane/shengjergj",
    "name": {
     "indefinite": "Shën Mëri",
-    "definite": "Shëni Mëri",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Shën Mëri"
    },
    "aliases": [
-    "Shëni Mëri",
-    "shen meri",
-    "sheni meri"
+    "shen meri"
    ],
    "centroid": {
     "lat": 41.340977,
@@ -37293,17 +37012,15 @@
    "parent_id": "njesi/vlore/himare/lukove",
    "name": {
     "indefinite": "Shën Vasil",
-    "definite": "Shëni Vasil",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Shën Vasil"
    },
    "aliases": [
     "Përparim",
-    "Shëni Vasil",
-    "shen vasil",
-    "sheni vasil"
+    "shen vasil"
    ],
    "centroid": {
     "lat": 39.959886,
@@ -37384,16 +37101,14 @@
    "parent_id": "njesi/tirane/tirane/shengjergj",
    "name": {
     "indefinite": "Shëngjin i Madh",
-    "definite": "Shëngjini i Madh",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Shëngjin i Madh"
    },
    "aliases": [
-    "Shëngjini i Madh",
-    "shengjin i madh",
-    "shengjini i madh"
+    "shengjin i madh"
    ],
    "centroid": {
     "lat": 41.316856,
@@ -37414,16 +37129,14 @@
    "parent_id": "njesi/tirane/tirane/zall-bastar",
    "name": {
     "indefinite": "Shëngjin i Vogël",
-    "definite": "Shëngjini i Vogël",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Shëngjin i Vogël"
    },
    "aliases": [
-    "Shëngjini i Vogël",
-    "shengjin i vogel",
-    "shengjini i vogel"
+    "shengjin i vogel"
    ],
    "centroid": {
     "lat": 41.371476,
@@ -37744,8 +37457,8 @@
    "parent_id": "njesi/tirane/tirane/tirane",
    "name": {
     "indefinite": "Shkolla e Bashkuar",
-    "definite": "Shkolla e Bashkuar",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Shkolla e Bashkuar"
@@ -37892,16 +37605,14 @@
    "parent_id": "njesi/tirane/tirane/baldushk",
    "name": {
     "indefinite": "Shpat i Sipërm",
-    "definite": "Shpati i Sipërm",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Shpat i Sipërm"
    },
    "aliases": [
-    "Shpati i Sipërm",
-    "shpat i siperm",
-    "shpati i siperm"
+    "shpat i siperm"
    ],
    "centroid": {
     "lat": 41.162679,
@@ -38012,16 +37723,14 @@
    "parent_id": "njesi/shkoder/shkoder/rrethinat",
    "name": {
     "indefinite": "Shtoj i Ri",
-    "definite": "Shtoji i Ri",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Shtoj i Ri"
    },
    "aliases": [
-    "Shtoji i Ri",
-    "shtoj i ri",
-    "shtoji i ri"
+    "shtoj i ri"
    ],
    "centroid": {
     "lat": 42.104565,
@@ -38042,16 +37751,14 @@
    "parent_id": "njesi/shkoder/shkoder/rrethinat",
    "name": {
     "indefinite": "Shtoj i Vjetër",
-    "definite": "Shtoji i Vjetër",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Shtoj i Vjetër"
    },
    "aliases": [
-    "Shtoji i Vjetër",
-    "shtoj i vjeter",
-    "shtoji i vjeter"
+    "shtoj i vjeter"
    ],
    "centroid": {
     "lat": 42.108851,
@@ -38340,8 +38047,8 @@
    "parent_id": "njesi/tirane/tirane/tirane",
    "name": {
     "indefinite": "Tirana e Re",
-    "definite": "Tirana e Re",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Tirana e Re"
@@ -38368,16 +38075,14 @@
    "parent_id": "njesi/shkoder/shkoder/shkoder",
    "name": {
     "indefinite": "Tom Kola",
-    "definite": "Tomi Kola",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Tom Kola"
    },
    "aliases": [
-    "Tomi Kola",
-    "tom kola",
-    "tomi kola"
+    "tom kola"
    ],
    "centroid": {
     "lat": 42.070621,
@@ -38398,16 +38103,14 @@
    "parent_id": "njesi/berat/polican/vertop",
    "name": {
     "indefinite": "Tomorr i Vogël (Tomorr)",
-    "definite": "Tomorri i Vogël (Tomorr)",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Tomorr i Vogël (Tomorr)"
    },
    "aliases": [
-    "Tomorri i Vogël (Tomorr)",
-    "tomorr i vogel (tomorr)",
-    "tomorri i vogel (tomorr)"
+    "tomorr i vogel (tomorr)"
    ],
    "centroid": {
     "lat": 40.683032,
@@ -38488,8 +38191,8 @@
    "parent_id": "njesi/tirane/tirane/tirane",
    "name": {
     "indefinite": "Tregu Çam",
-    "definite": "Tregu Çam",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "en": "Çam Market",
@@ -38910,16 +38613,14 @@
    "parent_id": "njesi/korce/korce/mollaj",
    "name": {
     "indefinite": "Ujë Bardhë",
-    "definite": "Uja Bardhë",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Ujë Bardhë"
    },
    "aliases": [
     "Bellovodë",
-    "Uja Bardhë",
-    "uja bardhe",
     "uje bardhe"
    ],
    "centroid": {
@@ -38941,16 +38642,14 @@
    "parent_id": "njesi/vlore/vlore/vlore",
    "name": {
     "indefinite": "Uji i Ftohtë (Vlorë)",
-    "definite": "Ujia i Ftohtë (Vlorë)",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Uji i Ftohtë (Vlorë)"
    },
    "aliases": [
-    "Ujia i Ftohtë (Vlorë)",
-    "uji i ftohte (vlore)",
-    "ujia i ftohte (vlore)"
+    "uji i ftohte (vlore)"
    ],
    "centroid": {
     "lat": 40.420727,
@@ -39031,8 +38730,8 @@
    "parent_id": "njesi/shkoder/shkoder/postribe",
    "name": {
     "indefinite": "Ura e Shtrenjtë",
-    "definite": "Ura e Shtrenjtë",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Ura e Shtrenjtë"
@@ -39420,17 +39119,15 @@
    "parent_id": "njesi/tirane/tirane/tirane",
    "name": {
     "indefinite": "Varri i Bamit",
-    "definite": "Varria i Bamit",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Varri i Bamit"
    },
    "aliases": [
-    "Varria i Bamit",
     "Vorri Bomit",
-    "varri i bamit",
-    "varria i bamit"
+    "varri i bamit"
    ],
    "centroid": {
     "lat": 41.338268,
@@ -39451,16 +39148,14 @@
    "parent_id": "njesi/shkoder/shkoder/shkoder",
    "name": {
     "indefinite": "Vasil Shanto",
-    "definite": "Vasili Shanto",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Vasil Shanto"
    },
    "aliases": [
-    "Vasili Shanto",
-    "vasil shanto",
-    "vasili shanto"
+    "vasil shanto"
    ],
    "centroid": {
     "lat": 42.066062,
@@ -39481,16 +39176,14 @@
    "parent_id": "njesi/tirane/tirane/tirane",
    "name": {
     "indefinite": "Vasil Shanto",
-    "definite": "Vasili Shanto",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Vasil Shanto"
    },
    "aliases": [
-    "Vasili Shanto",
-    "vasil shanto",
-    "vasili shanto"
+    "vasil shanto"
    ],
    "centroid": {
     "lat": 41.321156,
@@ -39963,16 +39656,14 @@
    "parent_id": "njesi/shkoder/shkoder/shkoder",
    "name": {
     "indefinite": "Vojo Kushi",
-    "definite": "Vojoi Kushi",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Vojo Kushi"
    },
    "aliases": [
-    "Vojoi Kushi",
-    "vojo kushi",
-    "vojoi kushi"
+    "vojo kushi"
    ],
    "centroid": {
     "lat": 42.071018,
@@ -40322,16 +40013,14 @@
    "parent_id": "njesi/tirane/tirane/vaqarr",
    "name": {
     "indefinite": "Xhameta(Sharrë)",
-    "definite": "Xhameta(Sharrë)i",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Xhameta(Sharrë)"
    },
    "aliases": [
-    "Xhameta(Sharrë)i",
-    "xhameta(sharre)",
-    "xhameta(sharre)i"
+    "xhameta(sharre)"
    ],
    "centroid": {
     "lat": 41.300728,
@@ -40560,16 +40249,14 @@
    "parent_id": "njesi/shkoder/shkoder/shkoder",
    "name": {
     "indefinite": "Zalli i Kirit",
-    "definite": "Zallia i Kirit",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Zalli i Kirit"
    },
    "aliases": [
-    "Zallia i Kirit",
-    "zalli i kirit",
-    "zallia i kirit"
+    "zalli i kirit"
    ],
    "centroid": {
     "lat": 42.06666,
@@ -40678,8 +40365,8 @@
    "parent_id": "njesi/tirane/tirane/tirane",
    "name": {
     "indefinite": "Zogu i Zi",
-    "definite": "Zogu i Zi",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Zogu i Zi"
@@ -40848,23 +40535,21 @@
    }
   },
   {
-   "id": "lagje/shkoder/shkoder/shkoder/vasil-shanto-8766645",
+   "id": "lagje/shkoder/shkoder/shkoder/vasil-shanto-2",
    "slug": "vasil-shanto",
    "type": "lagje",
    "parent_id": "njesi/shkoder/shkoder/shkoder",
    "name": {
     "indefinite": "Vasil Shanto",
-    "definite": "Vasili Shanto",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Vasil Shanto"
    },
    "aliases": [
     "Lagjja Vasil Shanto",
-    "Vasili Shanto",
-    "vasil shanto",
-    "vasili shanto"
+    "vasil shanto"
    ],
    "centroid": {
     "lat": 42.066771,
@@ -40879,22 +40564,20 @@
    }
   },
   {
-   "id": "lagje/shkoder/shkoder/shkoder/tom-kola-8766646",
+   "id": "lagje/shkoder/shkoder/shkoder/tom-kola-2",
    "slug": "tom-kola",
    "type": "lagje",
    "parent_id": "njesi/shkoder/shkoder/shkoder",
    "name": {
     "indefinite": "Tom Kola",
-    "definite": "Tomi Kola",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Tom Kola"
    },
    "aliases": [
-    "Tomi Kola",
-    "tom kola",
-    "tomi kola"
+    "tom kola"
    ],
    "centroid": {
     "lat": 42.070961,
@@ -40909,22 +40592,20 @@
    }
   },
   {
-   "id": "lagje/shkoder/shkoder/shkoder/3-heronjte-8766647",
+   "id": "lagje/shkoder/shkoder/shkoder/3-heronjte-2",
    "slug": "3-heronjte",
    "type": "lagje",
    "parent_id": "njesi/shkoder/shkoder/shkoder",
    "name": {
     "indefinite": "3 Heronjtë",
-    "definite": "3i Heronjtë",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "3 Heronjtë"
    },
    "aliases": [
-    "3 heronjte",
-    "3i Heronjtë",
-    "3i heronjte"
+    "3 heronjte"
    ],
    "centroid": {
     "lat": 42.065371,
@@ -40939,23 +40620,21 @@
    }
   },
   {
-   "id": "lagje/shkoder/shkoder/shkoder/qemal-stafa-8766648",
+   "id": "lagje/shkoder/shkoder/shkoder/qemal-stafa-2",
    "slug": "qemal-stafa",
    "type": "lagje",
    "parent_id": "njesi/shkoder/shkoder/shkoder",
    "name": {
     "indefinite": "Qemal Stafa",
-    "definite": "Qemali Stafa",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Qemal Stafa"
    },
    "aliases": [
     "Lagjja Qemal Stafa",
-    "Qemali Stafa",
-    "qemal stafa",
-    "qemali stafa"
+    "qemal stafa"
    ],
    "centroid": {
     "lat": 42.065109,
@@ -40970,22 +40649,20 @@
    }
   },
   {
-   "id": "lagje/shkoder/shkoder/shkoder/perlat-rexhepi-8766774",
+   "id": "lagje/shkoder/shkoder/shkoder/perlat-rexhepi-2",
    "slug": "perlat-rexhepi",
    "type": "lagje",
    "parent_id": "njesi/shkoder/shkoder/shkoder",
    "name": {
     "indefinite": "Perlat Rexhepi",
-    "definite": "Perlati Rexhepi",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Perlat Rexhepi"
    },
    "aliases": [
-    "Perlati Rexhepi",
-    "perlat rexhepi",
-    "perlati rexhepi"
+    "perlat rexhepi"
    ],
    "centroid": {
     "lat": 42.067542,
@@ -41000,22 +40677,20 @@
    }
   },
   {
-   "id": "lagje/shkoder/shkoder/shkoder/fahri-ramadani-8766775",
+   "id": "lagje/shkoder/shkoder/shkoder/fahri-ramadani-2",
    "slug": "fahri-ramadani",
    "type": "lagje",
    "parent_id": "njesi/shkoder/shkoder/shkoder",
    "name": {
     "indefinite": "Fahri Ramadani",
-    "definite": "Fahria Ramadani",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Fahri Ramadani"
    },
    "aliases": [
-    "Fahria Ramadani",
-    "fahri ramadani",
-    "fahria ramadani"
+    "fahri ramadani"
    ],
    "centroid": {
     "lat": 42.072729,
@@ -41060,7 +40735,7 @@
    }
   },
   {
-   "id": "lagje/shkoder/shkoder/shkoder/skenderbeg-8766777",
+   "id": "lagje/shkoder/shkoder/shkoder/skenderbeg-2",
    "slug": "skenderbeg",
    "type": "lagje",
    "parent_id": "njesi/shkoder/shkoder/shkoder",
@@ -41090,22 +40765,20 @@
    }
   },
   {
-   "id": "lagje/shkoder/shkoder/shkoder/daniel-matlia-8766778",
+   "id": "lagje/shkoder/shkoder/shkoder/daniel-matlia-2",
    "slug": "daniel-matlia",
    "type": "lagje",
    "parent_id": "njesi/shkoder/shkoder/shkoder",
    "name": {
     "indefinite": "Daniel Matlia",
-    "definite": "Danieli Matlia",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Daniel Matlia"
    },
    "aliases": [
-    "Danieli Matlia",
-    "daniel matlia",
-    "danieli matlia"
+    "daniel matlia"
    ],
    "centroid": {
     "lat": 42.058394,
@@ -41120,22 +40793,20 @@
    }
   },
   {
-   "id": "lagje/shkoder/shkoder/shkoder/ndoc-mazi-8766779",
+   "id": "lagje/shkoder/shkoder/shkoder/ndoc-mazi-2",
    "slug": "ndoc-mazi",
    "type": "lagje",
    "parent_id": "njesi/shkoder/shkoder/shkoder",
    "name": {
     "indefinite": "Ndoc Mazi",
-    "definite": "Ndoci Mazi",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Ndoc Mazi"
    },
    "aliases": [
-    "Ndoci Mazi",
-    "ndoc mazi",
-    "ndoci mazi"
+    "ndoc mazi"
    ],
    "centroid": {
     "lat": 42.061039,
@@ -41150,22 +40821,20 @@
    }
   },
   {
-   "id": "lagje/shkoder/shkoder/shkoder/mark-lula-8766780",
+   "id": "lagje/shkoder/shkoder/shkoder/mark-lula-2",
    "slug": "mark-lula",
    "type": "lagje",
    "parent_id": "njesi/shkoder/shkoder/shkoder",
    "name": {
     "indefinite": "Mark Lula",
-    "definite": "Marku Lula",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Mark Lula"
    },
    "aliases": [
-    "Marku Lula",
-    "mark lula",
-    "marku lula"
+    "mark lula"
    ],
    "centroid": {
     "lat": 42.055166,
@@ -41180,22 +40849,20 @@
    }
   },
   {
-   "id": "lagje/shkoder/shkoder/shkoder/10-korriku-8766781",
+   "id": "lagje/shkoder/shkoder/shkoder/10-korriku-2",
    "slug": "10-korriku",
    "type": "lagje",
    "parent_id": "njesi/shkoder/shkoder/shkoder",
    "name": {
     "indefinite": "10 Korriku",
-    "definite": "10i Korriku",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "10 Korriku"
    },
    "aliases": [
-    "10 korriku",
-    "10i Korriku",
-    "10i korriku"
+    "10 korriku"
    ],
    "centroid": {
     "lat": 42.049733,
@@ -41210,7 +40877,7 @@
    }
   },
   {
-   "id": "lagje/shkoder/shkoder/shkoder/perash-8766782",
+   "id": "lagje/shkoder/shkoder/shkoder/perash-2",
    "slug": "perash",
    "type": "lagje",
    "parent_id": "njesi/shkoder/shkoder/shkoder",
@@ -41240,23 +40907,21 @@
    }
   },
   {
-   "id": "lagje/shkoder/shkoder/shkoder/manush-alimani-8766783",
+   "id": "lagje/shkoder/shkoder/shkoder/manush-alimani-2",
    "slug": "manush-alimani",
    "type": "lagje",
    "parent_id": "njesi/shkoder/shkoder/shkoder",
    "name": {
     "indefinite": "Manush Alimani",
-    "definite": "Manushi Alimani",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Manush Alimani"
    },
    "aliases": [
     "Lagjja Manush Alimani",
-    "Manushi Alimani",
-    "manush alimani",
-    "manushi alimani"
+    "manush alimani"
    ],
    "centroid": {
     "lat": 42.059547,
@@ -41271,23 +40936,21 @@
    }
   },
   {
-   "id": "lagje/shkoder/shkoder/shkoder/salo-halili-8766784",
+   "id": "lagje/shkoder/shkoder/shkoder/salo-halili-2",
    "slug": "salo-halili",
    "type": "lagje",
    "parent_id": "njesi/shkoder/shkoder/shkoder",
    "name": {
     "indefinite": "Salo Halili",
-    "definite": "Saloi Halili",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Salo Halili"
    },
    "aliases": [
     "Lagjja Salo Halili",
-    "Saloi Halili",
-    "salo halili",
-    "saloi halili"
+    "salo halili"
    ],
    "centroid": {
     "lat": 42.060159,
@@ -41302,23 +40965,21 @@
    }
   },
   {
-   "id": "lagje/shkoder/shkoder/shkoder/kongresi-permetit-8766785",
+   "id": "lagje/shkoder/shkoder/shkoder/kongresi-permetit-2",
    "slug": "kongresi-permetit",
    "type": "lagje",
    "parent_id": "njesi/shkoder/shkoder/shkoder",
    "name": {
     "indefinite": "Kongresi Përmetit",
-    "definite": "Kongresia Përmetit",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Kongresi Përmetit"
    },
    "aliases": [
-    "Kongresia Përmetit",
     "Lagjja Kongresi Përmetit",
-    "kongresi permetit",
-    "kongresia permetit"
+    "kongresi permetit"
    ],
    "centroid": {
     "lat": 42.067864,
@@ -41333,22 +40994,20 @@
    }
   },
   {
-   "id": "lagje/shkoder/shkoder/shkoder/ahmet-haxhia-8766786",
+   "id": "lagje/shkoder/shkoder/shkoder/ahmet-haxhia-2",
    "slug": "ahmet-haxhia",
    "type": "lagje",
    "parent_id": "njesi/shkoder/shkoder/shkoder",
    "name": {
     "indefinite": "Ahmet Haxhia",
-    "definite": "Ahmeti Haxhia",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Ahmet Haxhia"
    },
    "aliases": [
-    "Ahmeti Haxhia",
-    "ahmet haxhia",
-    "ahmeti haxhia"
+    "ahmet haxhia"
    ],
    "centroid": {
     "lat": 42.069013,
@@ -41363,7 +41022,7 @@
    }
   },
   {
-   "id": "lagje/shkoder/shkoder/shkoder/kiras-8766787",
+   "id": "lagje/shkoder/shkoder/shkoder/kiras-2",
    "slug": "kiras",
    "type": "lagje",
    "parent_id": "njesi/shkoder/shkoder/shkoder",
@@ -41393,7 +41052,7 @@
    }
   },
   {
-   "id": "lagje/shkoder/shkoder/shkoder/guerrile-8766788",
+   "id": "lagje/shkoder/shkoder/shkoder/guerrile-2",
    "slug": "guerrile",
    "type": "lagje",
    "parent_id": "njesi/shkoder/shkoder/shkoder",
@@ -41421,22 +41080,20 @@
    }
   },
   {
-   "id": "lagje/shkoder/shkoder/shkoder/naim-gjylbegu-8766789",
+   "id": "lagje/shkoder/shkoder/shkoder/naim-gjylbegu-2",
    "slug": "naim-gjylbegu",
    "type": "lagje",
    "parent_id": "njesi/shkoder/shkoder/shkoder",
    "name": {
     "indefinite": "Naim Gjylbegu",
-    "definite": "Naimi Gjylbegu",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Naim Gjylbegu"
    },
    "aliases": [
-    "Naimi Gjylbegu",
-    "naim gjylbegu",
-    "naimi gjylbegu"
+    "naim gjylbegu"
    ],
    "centroid": {
     "lat": 42.073937,
@@ -41451,23 +41108,21 @@
    }
   },
   {
-   "id": "lagje/shkoder/shkoder/shkoder/vojo-kushi-8766790",
+   "id": "lagje/shkoder/shkoder/shkoder/vojo-kushi-2",
    "slug": "vojo-kushi",
    "type": "lagje",
    "parent_id": "njesi/shkoder/shkoder/shkoder",
    "name": {
     "indefinite": "Vojo Kushi",
-    "definite": "Vojoi Kushi",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Vojo Kushi"
    },
    "aliases": [
     "Lagjja Vojo Kushi",
-    "Vojoi Kushi",
-    "vojo kushi",
-    "vojoi kushi"
+    "vojo kushi"
    ],
    "centroid": {
     "lat": 42.071559,
@@ -41518,16 +41173,14 @@
    "parent_id": "njesi/tirane/tirane/farke",
    "name": {
     "indefinite": "Liqeni i Thatë",
-    "definite": "Liqenia i Thatë",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Liqeni i Thatë"
    },
    "aliases": [
-    "Liqenia i Thatë",
-    "liqeni i thate",
-    "liqenia i thate"
+    "liqeni i thate"
    ],
    "centroid": {
     "lat": 41.303166,
@@ -41549,16 +41202,14 @@
    "parent_id": "njesi/tirane/tirane/tirane",
    "name": {
     "indefinite": "Myslym Shyri",
-    "definite": "Myslymi Shyri",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Myslym Shyri"
    },
    "aliases": [
-    "Myslymi Shyri",
-    "myslym shyri",
-    "myslymi shyri"
+    "myslym shyri"
    ],
    "centroid": {
     "lat": 41.324464,
@@ -41580,8 +41231,8 @@
    "parent_id": "njesi/tirane/tirane/tirane",
    "name": {
     "indefinite": "Rruga e Kavajës",
-    "definite": "Rruga e Kavajës",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Rruga e Kavajës"
@@ -41609,16 +41260,14 @@
    "parent_id": "njesi/tirane/tirane/tirane",
    "name": {
     "indefinite": "Pazari i Ri",
-    "definite": "Pazaria i Ri",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Pazari i Ri"
    },
    "aliases": [
-    "Pazaria i Ri",
-    "pazari i ri",
-    "pazaria i ri"
+    "pazari i ri"
    ],
    "centroid": {
     "lat": 41.330246,
@@ -41967,16 +41616,14 @@
    "parent_id": "njesi/durres/durres/rrashbull",
    "name": {
     "indefinite": "Shkëmbi i Kavajës",
-    "definite": "Shkëmbia i Kavajës",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Shkëmbi i Kavajës"
    },
    "aliases": [
-    "Shkëmbia i Kavajës",
-    "shkembi i kavajes",
-    "shkembia i kavajes"
+    "shkembi i kavajes"
    ],
    "centroid": {
     "lat": 41.28058,
@@ -42057,16 +41704,14 @@
    "parent_id": "njesi/durres/durres/katund-i-ri",
    "name": {
     "indefinite": "Porto Romano",
-    "definite": "Portoi Romano",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Porto Romano"
    },
    "aliases": [
-    "Portoi Romano",
-    "porto romano",
-    "portoi romano"
+    "porto romano"
    ],
    "centroid": {
     "lat": 41.382834,
@@ -42167,36 +41812,6 @@
    "osm_place": "town",
    "source": {
     "osm": "node/713605590",
-    "wikidata": null
-   }
-  },
-  {
-   "id": "fshat/vlore/vlore/qender-vlore/kanine-undefined",
-   "slug": "kanine",
-   "type": "fshat",
-   "parent_id": "njesi/vlore/vlore/qender-vlore",
-   "name": {
-    "indefinite": "Kaninë",
-    "definite": "Kanina",
-    "definite_source": "rule"
-   },
-   "names": {
-    "sq": "Kaninë"
-   },
-   "aliases": [
-    "Kanina",
-    "kanina",
-    "kanine"
-   ],
-   "centroid": {
-    "lat": 40.437985,
-    "lng": 19.521082,
-    "source": "OSM object (Nominatim)"
-   },
-   "postal_code": null,
-   "osm_place": "village",
-   "source": {
-    "osm": "nominatim:Kaninë, Qendër Vlorë, Bashkia Vlorë, Qarku i Vlorës, 9400, Shqipëria",
     "wikidata": null
    }
   },
@@ -42328,16 +41943,14 @@
    "parent_id": "njesi/elbasan/elbasan/elbasan",
    "name": {
     "indefinite": "11 Nëntori",
-    "definite": "11i Nëntori",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "11 Nëntori"
    },
    "aliases": [
-    "11 nentori",
-    "11i Nëntori",
-    "11i nentori"
+    "11 nentori"
    ],
    "centroid": {
     "lat": 41.106999,
@@ -42450,16 +42063,14 @@
    "parent_id": "njesi/elbasan/elbasan/labinot-fushe",
    "name": {
     "indefinite": "Labinot Fushë",
-    "definite": "Labinoti Fushë",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Labinot Fushë"
    },
    "aliases": [
-    "Labinoti Fushë",
-    "labinot fushe",
-    "labinoti fushe"
+    "labinot fushe"
    ],
    "centroid": {
     "lat": 41.147973,
@@ -42480,16 +42091,14 @@
    "parent_id": "njesi/elbasan/elbasan/labinot-mal",
    "name": {
     "indefinite": "Labinot Mal",
-    "definite": "Labinoti Mal",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Labinot Mal"
    },
    "aliases": [
-    "Labinoti Mal",
-    "labinot mal",
-    "labinoti mal"
+    "labinot mal"
    ],
    "centroid": {
     "lat": 41.199803,
@@ -42840,16 +42449,14 @@
    "parent_id": "njesi/korce/korce/korce",
    "name": {
     "indefinite": "Pazari i Vjetër",
-    "definite": "Pazaria i Vjetër",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Pazari i Vjetër"
    },
    "aliases": [
-    "Pazaria i Vjetër",
-    "pazari i vjeter",
-    "pazaria i vjeter"
+    "pazari i vjeter"
    ],
    "centroid": {
     "lat": 40.617747,
@@ -42871,16 +42478,14 @@
    "parent_id": "njesi/korce/korce/korce",
    "name": {
     "indefinite": "Bulevardi Fan Noli",
-    "definite": "Bulevardia Fan Noli",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Bulevardi Fan Noli"
    },
    "aliases": [
-    "Bulevardia Fan Noli",
-    "bulevardi fan noli",
-    "bulevardia fan noli"
+    "bulevardi fan noli"
    ],
    "centroid": {
     "lat": 40.613935,
@@ -42902,16 +42507,14 @@
    "parent_id": "njesi/korce/korce/korce",
    "name": {
     "indefinite": "Bulevardi Republika",
-    "definite": "Bulevardia Republika",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Bulevardi Republika"
    },
    "aliases": [
-    "Bulevardia Republika",
-    "bulevardi republika",
-    "bulevardia republika"
+    "bulevardi republika"
    ],
    "centroid": {
     "lat": 40.616434,
@@ -42933,16 +42536,14 @@
    "parent_id": "njesi/korce/korce/korce",
    "name": {
     "indefinite": "10 Korriku",
-    "definite": "10i Korriku",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "10 Korriku"
    },
    "aliases": [
-    "10 korriku",
-    "10i Korriku",
-    "10i korriku"
+    "10 korriku"
    ],
    "centroid": {
     "lat": 40.610583,
@@ -43144,8 +42745,8 @@
    "parent_id": "njesi/berat/dimal/dimal",
    "name": {
     "indefinite": "Ura Vajgurore",
-    "definite": "Ura Vajgurore",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Ura Vajgurore"
@@ -43232,16 +42833,14 @@
    "parent_id": "njesi/fier/lushnje/fier-shegan",
    "name": {
     "indefinite": "Fier Shegan",
-    "definite": "Fieri Shegan",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Fier Shegan"
    },
    "aliases": [
-    "Fieri Shegan",
-    "fier shegan",
-    "fieri shegan"
+    "fier shegan"
    ],
    "centroid": {
     "lat": 40.869009,
@@ -43376,36 +42975,6 @@
    }
   },
   {
-   "id": "fshat/fier/lushnje/hysgjokaj/hysgjokaj-728428202",
-   "slug": "hysgjokaj",
-   "type": "fshat",
-   "parent_id": "njesi/fier/lushnje/hysgjokaj",
-   "name": {
-    "indefinite": "Hysgjokaj",
-    "definite": "Hysgjokaji",
-    "definite_source": "rule"
-   },
-   "names": {
-    "sq": "Hysgjokaj"
-   },
-   "aliases": [
-    "Hysgjokaji",
-    "hysgjokaj",
-    "hysgjokaji"
-   ],
-   "centroid": {
-    "lat": 40.974652,
-    "lng": 19.790414,
-    "source": "OSM object"
-   },
-   "postal_code": null,
-   "osm_place": "village",
-   "source": {
-    "osm": "node/728428202",
-    "wikidata": null
-   }
-  },
-  {
    "id": "zone/korce/pogradec/bucimas/drilon",
    "slug": "drilon",
    "type": "zone",
@@ -43533,16 +43102,14 @@
    "parent_id": "njesi/tirane/kavaje/luz-i-vogel",
    "name": {
     "indefinite": "Luz i Vogël",
-    "definite": "Luzi i Vogël",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Luz i Vogël"
    },
    "aliases": [
-    "Luzi i Vogël",
-    "luz i vogel",
-    "luzi i vogel"
+    "luz i vogel"
    ],
    "centroid": {
     "lat": 41.127388,
@@ -43743,16 +43310,14 @@
    "parent_id": "njesi/gjirokaster/gjirokaster/gjirokaster",
    "name": {
     "indefinite": "Pazari i Vjetër",
-    "definite": "Pazaria i Vjetër",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Pazari i Vjetër"
    },
    "aliases": [
-    "Pazaria i Vjetër",
-    "pazari i vjeter",
-    "pazaria i vjeter"
+    "pazari i vjeter"
    ],
    "centroid": {
     "lat": 40.075389,
@@ -43804,16 +43369,14 @@
    "parent_id": "njesi/vlore/sarande/sarande",
    "name": {
     "indefinite": "Mango",
-    "definite": "Mangoi",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Mango"
    },
    "aliases": [
-    "Mangoi",
-    "mango",
-    "mangoi"
+    "mango"
    ],
    "centroid": {
     "lat": 39.8527,
@@ -44436,15 +43999,13 @@
    "parent_id": "njesi/lezhe/kurbin/fushe-kuqe",
    "name": {
     "indefinite": "Fushë Kuqe",
-    "definite": "Fusha Kuqe",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Fushë Kuqe"
    },
    "aliases": [
-    "Fusha Kuqe",
-    "fusha kuqe",
     "fushe kuqe"
    ],
    "centroid": {
@@ -44676,15 +44237,13 @@
    "parent_id": "njesi/diber/bulqize/fushe-bulqize",
    "name": {
     "indefinite": "Fushë Bulqizë",
-    "definite": "Fusha Bulqizë",
-    "definite_source": "rule"
+    "definite": null,
+    "definite_source": "none"
    },
    "names": {
     "sq": "Fushë Bulqizë"
    },
    "aliases": [
-    "Fusha Bulqizë",
-    "fusha bulqize",
     "fushe bulqize"
    ],
    "centroid": {

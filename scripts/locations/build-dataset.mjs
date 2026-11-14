@@ -85,13 +85,14 @@ export const fold = (s) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').to
   .replace(/^(lagjja|lagja|lagje|fshati|bashkia|njësia administrative|njesia administrative)\s+/, '')
   .replace(/[-‐–]/g, ' ').replace(/\s+/g, ' ').trim()
 const slugify = (s) => fold(s).replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
-/** Albanian definite form by the standard rule; only used when no source
- *  gives it, and marked as such. A phrase takes it on its first word
- *  ("Malësi e Madhe" -> "Malësia e Madhe"). */
+/** Albanian definite form by the standard rule, for a single word only; only
+ *  used when no source gives it, and marked as such. A name of several words,
+ *  with a number or a note in brackets ("Ali Demi", "10 Korriku", "Malësi e
+ *  Madhe") gets none: the rule cannot know which word changes, or whether. */
 function definiteByRule(n) {
-  const [first, ...rest] = n.split(' ')
-  if (rest.length) return [definiteByRule(first), ...rest].join(' ')
+  if (/[\s\d()]/.test(n)) return null
   if (/u$|[ae]$/.test(n)) return n
+  if (/o$/.test(n)) return null // -o nouns vary (Kinostudio); no guess
   if (/ër$/.test(n)) return n.replace(/ër$/, 'ra')
   if (/ë$/.test(n)) return n.replace(/ë$/, 'a')
   if (/i$/.test(n)) return `${n}a`
@@ -198,7 +199,8 @@ for (const b of bashki) {
 const out = []
 const ids = new Set()
 function add(entry) {
-  if (ids.has(entry.id)) entry.id = `${entry.id}-${entry.source.osm.split('/')[1]}`
+  // Two places of one name in one unit: number the second.
+  for (let n = 2; ids.has(entry.id); n++) entry.id = `${entry.id.replace(/-\d+$/, '')}-${n}`
   ids.add(entry.id)
   out.push(entry)
   return entry
@@ -215,10 +217,10 @@ function entry({ type, name, parent, tags, osm, centroid, centroidSource, shape:
   const isDefinite = (v) => v && v !== name && !/^Bashkia /.test(v) && fold(v).startsWith(stem) && /[aiu]$/.test(v) && v.length - name.length <= 2
   const wikiTitle = item?.sqwiki?.replace(/\s*\(.*\)$/, '').replace(/,.*$/, '')
   const definite = [wikiTitle, sqLabel].find(isDefinite) ?? definiteByRule(name)
-  const definiteSource = definite === wikiTitle ? 'sq.wikipedia' : definite === sqLabel && definite !== name ? 'wikidata' : 'rule'
+  const definiteSource = definite === null ? 'none' : definite === wikiTitle ? 'sq.wikipedia' : definite === sqLabel && definite !== name ? 'wikidata' : 'rule'
   names.sq = name
   const folded = fold(name)
-  for (const v of [definite, folded, fold(definite), ...Object.values(names)]) aliases.add(v)
+  for (const v of [definite, folded, definite && fold(definite), ...Object.values(names)]) if (v) aliases.add(v)
   aliases.delete(name)
   return {
     id: `${type}/${parent ? `${parent.id.split('/').slice(1).join('/')}/` : ''}${slugify(name)}`,
@@ -316,6 +318,10 @@ for (const e of lagjeAreas) {
 for (const t of approved) {
   const name = t.as ?? t.name
   if (out.some((e) => e.source.osm === t.osm && fold(e.name.indefinite) === fold(name))) continue
+  // Already listed under the same name in the same unit (Kaninë as a village
+  // node and as a Nominatim area): one entry, not two.
+  const sameUnit = units.find((u) => u.inside(t.lat, t.lon))
+  if (sameUnit && out.some((e) => e.parent_id === unitEntries.get(sameUnit)?.id && fold(e.name.indefinite) === fold(name))) continue
   // A beach's centre can sit just off the mapped coastline: then the nearest
   // unit of the municipality validation placed it in.
   const unit = units.find((u) => u.inside(t.lat, t.lon)) ??
