@@ -42,3 +42,6 @@ playwright-report-expo/
 
 # JetBrains IDE settings (per machine)
 .idea/
+
+# Locations audit: raw OpenStreetMap / Wikidata downloads (scripts/locations/fetch-sources.mjs)
+docs/locations/cache/

@@ -2357,5 +2357,6417 @@
     "elsewhere": []
    }
   ]
+ },
+ {
+  "city": "Fier",
+  "osm": {
+   "name": "Fier",
+   "type": "city",
+   "category": "boundary",
+   "lat": 40.7251118,
+   "lon": 19.5582079,
+   "municipality": "Bashkia Fier",
+   "county": "Qarku i Fierit",
+   "display": "Fier, Bashkia Fier, Qarku i Fierit, Shqipëria"
+  },
+  "municipality": "Bashkia Fier",
+  "county": "Qarku i Fierit",
+  "zones": [
+   {
+    "zone": "Qendër",
+    "inCity": [
+     {
+      "name": "Qendër",
+      "type": "city",
+      "category": "boundary",
+      "lat": 40.7430422,
+      "lon": 19.5557986,
+      "municipality": "Bashkia Fier",
+      "county": "Qarku i Fierit",
+      "display": "Qendër, Bashkia Fier, Qarku i Fierit, 9302, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Apolloni",
+    "inCity": [],
+    "elsewhere": []
+   },
+   {
+    "zone": "Liri",
+    "inCity": [
+     {
+      "name": "Liri",
+      "type": "neighbourhood",
+      "category": "place",
+      "lat": 40.7309988,
+      "lon": 19.5692253,
+      "municipality": "Bashkia Fier",
+      "county": "Qarku i Fierit",
+      "display": "Liri, Sheq i Vogël, Fier, Bashkia Fier, Qarku i Fierit, 9300, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Sheq i Madh",
+    "inCity": [
+     {
+      "name": "Sheq i Madh",
+      "type": "village",
+      "category": "place",
+      "lat": 40.7346488,
+      "lon": 19.5788803,
+      "municipality": "Bashkia Fier",
+      "county": "Qarku i Fierit",
+      "display": "Sheq i Madh, Qendër, Bashkia Fier, Qarku i Fierit, 9300, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Sheq i Vogël",
+    "inCity": [
+     {
+      "name": "Fier",
+      "type": "railway",
+      "category": "railway",
+      "lat": 40.7300053,
+      "lon": 19.5530284,
+      "municipality": "Bashkia Fier",
+      "county": "Qarku i Fierit",
+      "display": "Fier, Rruga Rauf Nallbani, 15 Tetori, Sheq i Vogël, Fier, Bashkia Fier, Qarku i Fierit, 9301, Shqipëria"
+     },
+     {
+      "name": "Sheq i Vogël",
+      "type": "village",
+      "category": "place",
+      "lat": 40.7247342,
+      "lon": 19.5697752,
+      "municipality": "Bashkia Fier",
+      "county": "Qarku i Fierit",
+      "display": "Sheq i Vogël, Fier, Bashkia Fier, Qarku i Fierit, 9300, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Levan",
+    "inCity": [
+     {
+      "name": "Levan",
+      "type": "city",
+      "category": "boundary",
+      "lat": 40.6770854,
+      "lon": 19.4805949,
+      "municipality": "Bashkia Fier",
+      "county": "Qarku i Fierit",
+      "display": "Levan, Bashkia Fier, Qarku i Fierit, 9314, Shqipëria"
+     },
+     {
+      "name": "Levan",
+      "type": "village",
+      "category": "place",
+      "lat": 40.6758517,
+      "lon": 19.489382,
+      "municipality": "Bashkia Fier",
+      "county": "Qarku i Fierit",
+      "display": "Levan, Bashkia Fier, Qarku i Fierit, 9314, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Cakran",
+    "inCity": [
+     {
+      "name": "Cakran",
+      "type": "city",
+      "category": "boundary",
+      "lat": 40.6021275,
+      "lon": 19.6119561,
+      "municipality": "Bashkia Fier",
+      "county": "Qarku i Fierit",
+      "display": "Cakran, Bashkia Fier, Qarku i Fierit, 9311, Shqipëria"
+     },
+     {
+      "name": "Cakran",
+      "type": "village",
+      "category": "place",
+      "lat": 40.6000415,
+      "lon": 19.619923,
+      "municipality": "Bashkia Fier",
+      "county": "Qarku i Fierit",
+      "display": "Cakran, Bashkia Fier, Qarku i Fierit, 9311, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Dërmenas",
+    "inCity": [
+     {
+      "name": "Dërmenas",
+      "type": "city",
+      "category": "boundary",
+      "lat": 40.7167256,
+      "lon": 19.4305755,
+      "municipality": "Bashkia Fier",
+      "county": "Qarku i Fierit",
+      "display": "Dërmenas, Bashkia Fier, Qarku i Fierit, Shqipëria"
+     },
+     {
+      "name": "Dërmenas",
+      "type": "village",
+      "category": "place",
+      "lat": 40.7454366,
+      "lon": 19.4942104,
+      "municipality": "Bashkia Fier",
+      "county": "Qarku i Fierit",
+      "display": "Dërmenas, Bashkia Fier, Qarku i Fierit, 9302, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Topojë",
+    "inCity": [
+     {
+      "name": "Topojë",
+      "type": "city",
+      "category": "boundary",
+      "lat": 40.8036844,
+      "lon": 19.4271652,
+      "municipality": "Bashkia Fier",
+      "county": "Qarku i Fierit",
+      "display": "Topojë, Bashkia Fier, Qarku i Fierit, Shqipëria"
+     },
+     {
+      "name": "Topojë",
+      "type": "village",
+      "category": "place",
+      "lat": 40.7641702,
+      "lon": 19.4346292,
+      "municipality": "Bashkia Fier",
+      "county": "Qarku i Fierit",
+      "display": "Topojë, Bashkia Fier, Qarku i Fierit, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Mbrostar",
+    "inCity": [
+     {
+      "name": "Mbrostar",
+      "type": "village",
+      "category": "place",
+      "lat": 40.7529385,
+      "lon": 19.5842305,
+      "municipality": "Bashkia Fier",
+      "county": "Qarku i Fierit",
+      "display": "Mbrostar, Mbrostar Ura, Bashkia Fier, Qarku i Fierit, 9304, Shqipëria"
+     },
+     {
+      "name": "Mbrostar",
+      "type": "neighbourhood",
+      "category": "place",
+      "lat": 40.7378927,
+      "lon": 19.5560932,
+      "municipality": "Bashkia Fier",
+      "county": "Qarku i Fierit",
+      "display": "Mbrostar, Sheq i Vogël, Fier, Bashkia Fier, Qarku i Fierit, 9304, Shqipëria"
+     },
+     {
+      "name": "Mbrostar Ura",
+      "type": "city",
+      "category": "boundary",
+      "lat": 40.7788403,
+      "lon": 19.6180256,
+      "municipality": "Bashkia Fier",
+      "county": "Qarku i Fierit",
+      "display": "Mbrostar Ura, Bashkia Fier, Qarku i Fierit, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Portëz",
+    "inCity": [
+     {
+      "name": "Portëz",
+      "type": "city",
+      "category": "boundary",
+      "lat": 40.6737798,
+      "lon": 19.5840247,
+      "municipality": "Bashkia Fier",
+      "county": "Qarku i Fierit",
+      "display": "Portëz, Bashkia Fier, Qarku i Fierit, 9318, Shqipëria"
+     },
+     {
+      "name": "Portëz",
+      "type": "village",
+      "category": "place",
+      "lat": 40.6996714,
+      "lon": 19.5780721,
+      "municipality": "Bashkia Fier",
+      "county": "Qarku i Fierit",
+      "display": "Portëz, Bashkia Fier, Qarku i Fierit, 9318, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Frakull",
+    "inCity": [
+     {
+      "name": "Frakull",
+      "type": "city",
+      "category": "boundary",
+      "lat": 40.6222298,
+      "lon": 19.5216144,
+      "municipality": "Bashkia Fier",
+      "county": "Qarku i Fierit",
+      "display": "Frakull, Bashkia Fier, Qarku i Fierit, 9313, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Libofshë",
+    "inCity": [
+     {
+      "name": "Libofshë",
+      "type": "city",
+      "category": "boundary",
+      "lat": 40.8458832,
+      "lon": 19.5075503,
+      "municipality": "Bashkia Fier",
+      "county": "Qarku i Fierit",
+      "display": "Libofshë, Bashkia Fier, Qarku i Fierit, 9310, Shqipëria"
+     },
+     {
+      "name": "Libofshë",
+      "type": "village",
+      "category": "place",
+      "lat": 40.8333293,
+      "lon": 19.554253,
+      "municipality": "Bashkia Fier",
+      "county": "Qarku i Fierit",
+      "display": "Libofshë, Bashkia Fier, Qarku i Fierit, 9310, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Hysgjokaj",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Hysgjokaj",
+      "type": "city",
+      "category": "boundary",
+      "lat": 40.9763606,
+      "lon": 19.7859778,
+      "municipality": "Bashkia Lushnjë",
+      "county": "Qarku i Fierit",
+      "display": "Hysgjokaj, Bashkia Lushnjë, Qarku i Fierit, 9006, Shqipëria"
+     },
+     {
+      "name": "Hysgjokaj",
+      "type": "village",
+      "category": "place",
+      "lat": 40.9746524,
+      "lon": 19.790414,
+      "municipality": "Bashkia Lushnjë",
+      "county": "Qarku i Fierit",
+      "display": "Hysgjokaj, Bashkia Lushnjë, Qarku i Fierit, 9006, Shqipëria"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "city": "Korçë",
+  "osm": {
+   "name": "Korçë",
+   "type": "city",
+   "category": "boundary",
+   "lat": 40.6158967,
+   "lon": 20.7772187,
+   "municipality": "Bashkia Korçë",
+   "county": "Qarku i Korçës",
+   "display": "Korçë, Bashkia Korçë, Qarku i Korçës, 7001, Shqipëria"
+  },
+  "municipality": "Bashkia Korçë",
+  "county": "Qarku i Korçës",
+  "zones": [
+   {
+    "zone": "Qendër",
+    "inCity": [
+     {
+      "name": "Qendër Bulgarec",
+      "type": "city",
+      "category": "boundary",
+      "lat": 40.6467087,
+      "lon": 20.7747533,
+      "municipality": "Bashkia Korçë",
+      "county": "Qarku i Korçës",
+      "display": "Qendër Bulgarec, Bashkia Korçë, Qarku i Korçës, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Pazari i Ri",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Pazari i Ri",
+      "type": "amenity",
+      "category": "amenity",
+      "lat": 41.3302464,
+      "lon": 19.8243503,
+      "municipality": "Bashkia Tiranë",
+      "county": "Qarku i Tiranës",
+      "display": "Pazari i Ri, Rruga Luigj Gurakuqi, Njësia Bashkiake Nr. 2, Tiranë, Bashkia Tiranë, Qarku i Tiranës, 1017, Shqipëria"
+     },
+     {
+      "name": "Pazari i Ri",
+      "type": "amenity",
+      "category": "amenity",
+      "lat": 41.329841,
+      "lon": 19.8243837,
+      "municipality": "Bashkia Tiranë",
+      "county": "Qarku i Tiranës",
+      "display": "Pazari i Ri, 4, Rruga Shenasi Dishnica, Njësia Bashkiake Nr. 2, Tiranë, Bashkia Tiranë, Qarku i Tiranës, 1017, Shqipëria"
+     },
+     {
+      "name": "Pazari I Ri",
+      "type": "amenity",
+      "category": "amenity",
+      "lat": 41.3298321,
+      "lon": 19.8243905,
+      "municipality": "Bashkia Tiranë",
+      "county": "Qarku i Tiranës",
+      "display": "Pazari I Ri, 4, Rruga Shenasi Dishnica, Njësia Bashkiake Nr. 2, Tiranë, Bashkia Tiranë, Qarku i Tiranës, 1017, Shqipëria"
+     },
+     {
+      "name": "Pazari i Ri",
+      "type": "highway",
+      "category": "highway",
+      "lat": 41.3290526,
+      "lon": 19.8243148,
+      "municipality": "Bashkia Tiranë",
+      "county": "Qarku i Tiranës",
+      "display": "Pazari i Ri, Rruga Luigj Gurakuqi, Njësia Bashkiake Nr. 2, Tiranë, Bashkia Tiranë, Qarku i Tiranës, 1017, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Pazari i Vjetër",
+    "inCity": [
+     {
+      "name": "Pazari i Vjetër",
+      "type": "amenity",
+      "category": "amenity",
+      "lat": 40.6177468,
+      "lon": 20.774764,
+      "municipality": "Bashkia Korçë",
+      "county": "Qarku i Korçës",
+      "display": "Pazari i Vjetër, Rrugica Koli Karapanxha, Pazari i Korçës, Korçë, Bashkia Korçë, Qarku i Korçës, 7001, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Bulevardi Fan Noli",
+    "inCity": [
+     {
+      "name": "Bulevardi Fan Noli",
+      "type": "secondary",
+      "category": "highway",
+      "lat": 40.6139347,
+      "lon": 20.7808253,
+      "municipality": "Bashkia Korçë",
+      "county": "Qarku i Korçës",
+      "display": "Bulevardi Fan Noli, Korçë, Bashkia Korçë, Qarku i Korçës, 7001, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Bulevardi Republika",
+    "inCity": [
+     {
+      "name": "Bulevardi Republika",
+      "type": "tertiary",
+      "category": "highway",
+      "lat": 40.6164344,
+      "lon": 20.7806629,
+      "municipality": "Bashkia Korçë",
+      "county": "Qarku i Korçës",
+      "display": "Bulevardi Republika, Korçë, Bashkia Korçë, Qarku i Korçës, 7001, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "10 Korriku",
+    "inCity": [
+     {
+      "name": "Rruga 10 Korriku",
+      "type": "residential",
+      "category": "highway",
+      "lat": 40.6105834,
+      "lon": 20.7806241,
+      "municipality": "Bashkia Korçë",
+      "county": "Qarku i Korçës",
+      "display": "Rruga 10 Korriku, Korçë, Bashkia Korçë, Qarku i Korçës, 7001, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Liqeni i Korçës",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Liqeni i Moglicës",
+      "type": "reservoir",
+      "category": "water",
+      "lat": 40.6697086,
+      "lon": 20.4654946,
+      "municipality": "Bashkia Maliq",
+      "county": "Qarku i Korçës",
+      "display": "Liqeni i Moglicës, Lumaj, Moglicë, Bashkia Maliq, Qarku i Korçës, 7018, Shqipëria"
+     },
+     {
+      "name": "Liqeni Lenijes",
+      "type": "lake",
+      "category": "water",
+      "lat": 40.7879495,
+      "lon": 20.4711604,
+      "municipality": "Bashkia Maliq",
+      "county": "Qarku i Korçës",
+      "display": "Liqeni Lenijes, Gorë, Bashkia Maliq, Qarku i Korçës, Shqipëria"
+     },
+     {
+      "name": "Liqeni i Shelegurit",
+      "type": "lake",
+      "category": "water",
+      "lat": 40.1827591,
+      "lon": 20.64593,
+      "municipality": "Bashkia Kolonjë",
+      "county": "Qarku i Korçës",
+      "display": "Liqeni i Shelegurit, Qendër Leskovik, Bashkia Kolonjë, Qarku i Korçës, Shqipëria"
+     },
+     {
+      "name": "Liqeni i Lerës së Zezë",
+      "type": "lake",
+      "category": "water",
+      "lat": 40.8240305,
+      "lon": 20.8690704,
+      "municipality": "Bashkia Pustec",
+      "county": "Qarku i Korçës",
+      "display": "Liqeni i Lerës së Zezë, Bashkia Pustec, Qarku i Korçës, Shqipëria"
+     },
+     {
+      "name": "Liqeni Lukovës",
+      "type": "lake",
+      "category": "water",
+      "lat": 40.9059457,
+      "lon": 20.3953392,
+      "municipality": "Bashkia Pogradec",
+      "county": "Qarku i Korçës",
+      "display": "Liqeni Lukovës, Velçan, Bashkia Pogradec, Qarku i Korçës, 7310, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Voskopojë",
+    "inCity": [
+     {
+      "name": "Voskopojë",
+      "type": "village",
+      "category": "boundary",
+      "lat": 40.6332013,
+      "lon": 20.5906137,
+      "municipality": "Bashkia Korçë",
+      "county": "Qarku i Korçës",
+      "display": "Voskopojë, Bashkia Korçë, Qarku i Korçës, 7029, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Dardha",
+    "inCity": [
+     {
+      "name": "Hotel Dardha",
+      "type": "amenity",
+      "category": "amenity",
+      "lat": 40.5192511,
+      "lon": 20.8258581,
+      "municipality": "Bashkia Korçë",
+      "county": "Qarku i Korçës",
+      "display": "Hotel Dardha, SH90, Dardhë, Drenovë, Bashkia Korçë, Qarku i Korçës, 7023, Shqipëria"
+     },
+     {
+      "name": "Hotel Dardha",
+      "type": "tourism",
+      "category": "tourism",
+      "lat": 40.5193315,
+      "lon": 20.8258506,
+      "municipality": "Bashkia Korçë",
+      "county": "Qarku i Korçës",
+      "display": "Hotel Dardha, SH90, Dardhë, Drenovë, Bashkia Korçë, Qarku i Korçës, 7023, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Boboshticë",
+    "inCity": [
+     {
+      "name": "Boboshticë",
+      "type": "village",
+      "category": "place",
+      "lat": 40.553401,
+      "lon": 20.7648106,
+      "municipality": "Bashkia Korçë",
+      "county": "Qarku i Korçës",
+      "display": "Boboshticë, Drenovë, Bashkia Korçë, Qarku i Korçës, 7023, Shqipëria"
+     },
+     {
+      "name": "Boboshticë",
+      "type": "residential",
+      "category": "landuse",
+      "lat": 40.5542817,
+      "lon": 20.765507,
+      "municipality": "Bashkia Korçë",
+      "county": "Qarku i Korçës",
+      "display": "Boboshticë, Drenovë, Bashkia Korçë, Qarku i Korçës, 7023, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Drenovë",
+    "inCity": [
+     {
+      "name": "Drenovë",
+      "type": "city",
+      "category": "boundary",
+      "lat": 40.5726872,
+      "lon": 20.8004427,
+      "municipality": "Bashkia Korçë",
+      "county": "Qarku i Korçës",
+      "display": "Drenovë, Bashkia Korçë, Qarku i Korçës, 7023, Shqipëria"
+     },
+     {
+      "name": "Drenovë",
+      "type": "village",
+      "category": "place",
+      "lat": 40.5834892,
+      "lon": 20.7909202,
+      "municipality": "Bashkia Korçë",
+      "county": "Qarku i Korçës",
+      "display": "Drenovë, Bashkia Korçë, Qarku i Korçës, 7023, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Mborje",
+    "inCity": [
+     {
+      "name": "Mborje",
+      "type": "village",
+      "category": "place",
+      "lat": 40.6061265,
+      "lon": 20.8011201,
+      "municipality": "Bashkia Korçë",
+      "county": "Qarku i Korçës",
+      "display": "Mborje, Drenovë, Bashkia Korçë, Qarku i Korçës, 7023, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Pojan",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Pojan",
+      "type": "village",
+      "category": "boundary",
+      "lat": 40.7283218,
+      "lon": 20.8375065,
+      "municipality": "Bashkia Maliq",
+      "county": "Qarku i Korçës",
+      "display": "Pojan, Bashkia Maliq, Qarku i Korçës, 7014, Shqipëria"
+     },
+     {
+      "name": "Pojan",
+      "type": "village",
+      "category": "place",
+      "lat": 40.7305739,
+      "lon": 19.4677869,
+      "municipality": "Bashkia Fier",
+      "county": "Qarku i Fierit",
+      "display": "Pojan, Dërmenas, Bashkia Fier, Qarku i Fierit, 9302, Shqipëria"
+     },
+     {
+      "name": "Pojan (Baldushk)",
+      "type": "hamlet",
+      "category": "place",
+      "lat": 41.2072328,
+      "lon": 19.7721592,
+      "municipality": "Bashkia Tiranë",
+      "county": "Qarku i Tiranës",
+      "display": "Pojan (Baldushk), Baldushk, Bashkia Tiranë, Qarku i Tiranës, 1035, Shqipëria"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "city": "Berat",
+  "osm": {
+   "name": "Berat",
+   "type": "city",
+   "category": "boundary",
+   "lat": 40.7018636,
+   "lon": 19.9580758,
+   "municipality": "Bashkia Berat",
+   "county": "Qarku i Beratit",
+   "display": "Berat, Bashkia Berat, Qarku i Beratit, 5001, Shqipëria"
+  },
+  "municipality": "Bashkia Berat",
+  "county": "Qarku i Beratit",
+  "zones": [
+   {
+    "zone": "Mangalem",
+    "inCity": [
+     {
+      "name": "Mangalem",
+      "type": "neighbourhood",
+      "category": "place",
+      "lat": 40.705387,
+      "lon": 19.949939,
+      "municipality": "Bashkia Berat",
+      "county": "Qarku i Beratit",
+      "display": "Mangalem, Berat, Bashkia Berat, Qarku i Beratit, 5001, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Goricë",
+    "inCity": [
+     {
+      "name": "Goricë (Velabisht)",
+      "type": "hamlet",
+      "category": "place",
+      "lat": 40.6971282,
+      "lon": 19.9463221,
+      "municipality": "Bashkia Berat",
+      "county": "Qarku i Beratit",
+      "display": "Goricë (Velabisht), Velabisht, Bashkia Berat, Qarku i Beratit, 5012, Shqipëria"
+     },
+     {
+      "name": "Goricë",
+      "type": "neighbourhood",
+      "category": "landuse",
+      "lat": 40.7025662,
+      "lon": 19.9467161,
+      "municipality": "Bashkia Berat",
+      "county": "Qarku i Beratit",
+      "display": "Goricë, Berat, Bashkia Berat, Qarku i Beratit, 5001, Shqipëria"
+     },
+     {
+      "name": "Berat",
+      "type": "tourism",
+      "category": "tourism",
+      "lat": 40.7010986,
+      "lon": 19.9560744,
+      "municipality": "Bashkia Berat",
+      "county": "Qarku i Beratit",
+      "display": "Berat, Rruga Shëtitorja Osumi, Goricë (Velabisht), Velabisht, Bashkia Berat, Qarku i Beratit, 5012, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Kala",
+    "inCity": [
+     {
+      "name": "Rruga Lagje Kala",
+      "type": "road",
+      "category": "highway",
+      "lat": 40.7089023,
+      "lon": 19.9449234,
+      "municipality": "Bashkia Berat",
+      "county": "Qarku i Beratit",
+      "display": "Rruga Lagje Kala, Kalaja e Beratit, Berat, Bashkia Berat, Qarku i Beratit, 5001, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Qendër",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Qendër",
+      "type": "city",
+      "category": "boundary",
+      "lat": 42.2015792,
+      "lon": 19.3616511,
+      "municipality": "Bashkia Malësi e Madhe",
+      "county": "Qarku i Shkodrës",
+      "display": "Qendër, Bashkia Malësi e Madhe, Qarku i Shkodrës, 4301, Shqipëria"
+     },
+     {
+      "name": "Qendër",
+      "type": "city",
+      "category": "boundary",
+      "lat": 40.7430422,
+      "lon": 19.5557986,
+      "municipality": "Bashkia Fier",
+      "county": "Qarku i Fierit",
+      "display": "Qendër, Bashkia Fier, Qarku i Fierit, 9302, Shqipëria"
+     },
+     {
+      "name": "Qendër",
+      "type": "residential",
+      "category": "landuse",
+      "lat": 40.4453063,
+      "lon": 19.8007105,
+      "municipality": "Bashkia Mallakastër",
+      "county": "Qarku i Fierit",
+      "display": "Qendër, Çorrush, Kutë, Bashkia Mallakastër, Qarku i Fierit, 9329, Shqipëria"
+     },
+     {
+      "name": "Qendër Ersekë",
+      "type": "city",
+      "category": "boundary",
+      "lat": 40.3356012,
+      "lon": 20.72269,
+      "municipality": "Bashkia Kolonjë",
+      "county": "Qarku i Korçës",
+      "display": "Qendër Ersekë, Bashkia Kolonjë, Qarku i Korçës, 7401, Shqipëria"
+     },
+     {
+      "name": "Librazhd Qendër",
+      "type": "city",
+      "category": "boundary",
+      "lat": 41.2119415,
+      "lon": 20.3238168,
+      "municipality": "Bashkia Librazhd",
+      "county": "Qarku i Elbasanit",
+      "display": "Librazhd Qendër, Bashkia Librazhd, Qarku i Elbasanit, 3402, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Uznove",
+    "inCity": [
+     {
+      "name": "Uznovë",
+      "type": "village",
+      "category": "place",
+      "lat": 40.6957461,
+      "lon": 19.9788398,
+      "municipality": "Bashkia Berat",
+      "county": "Qarku i Beratit",
+      "display": "Uznovë, Berat, Bashkia Berat, Qarku i Beratit, 5001, Shqipëria"
+     },
+     {
+      "name": "Kullau (Uznovë)",
+      "type": "hamlet",
+      "category": "place",
+      "lat": 40.6929841,
+      "lon": 19.9896775,
+      "municipality": "Bashkia Berat",
+      "county": "Qarku i Beratit",
+      "display": "Kullau (Uznovë), Uznovë, Berat, Bashkia Berat, Qarku i Beratit, 5001, Shqipëria"
+     },
+     {
+      "name": "Velias (Uznovë)",
+      "type": "hamlet",
+      "category": "place",
+      "lat": 40.7047208,
+      "lon": 19.9873136,
+      "municipality": "Bashkia Berat",
+      "county": "Qarku i Beratit",
+      "display": "Velias (Uznovë), Velabisht, Bashkia Berat, Qarku i Beratit, 5012, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Dorez",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Dorëz",
+      "type": "village",
+      "category": "place",
+      "lat": 41.216436,
+      "lon": 20.3144537,
+      "municipality": "Bashkia Librazhd",
+      "county": "Qarku i Elbasanit",
+      "display": "Dorëz, Librazhd Qendër, Bashkia Librazhd, Qarku i Elbasanit, 3402, Shqipëria"
+     },
+     {
+      "name": "Dorëz",
+      "type": "village",
+      "category": "place",
+      "lat": 41.221986,
+      "lon": 19.751922,
+      "municipality": "Bashkia Tiranë",
+      "county": "Qarku i Tiranës",
+      "display": "Dorëz, Pezë, Bashkia Tiranë, Qarku i Tiranës, 1038, Shqipëria"
+     },
+     {
+      "name": "Dorëz",
+      "type": "village",
+      "category": "place",
+      "lat": 40.3823617,
+      "lon": 19.8287634,
+      "municipality": "Bashkia Tepelenë",
+      "county": "Qarku i Gjirokastrës",
+      "display": "Dorëz, Lopës, Bashkia Tepelenë, Qarku i Gjirokastrës, 6308, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Roshnik",
+    "inCity": [
+     {
+      "name": "Roshnik",
+      "type": "city",
+      "category": "boundary",
+      "lat": 40.7185543,
+      "lon": 20.0562299,
+      "municipality": "Bashkia Berat",
+      "county": "Qarku i Beratit",
+      "display": "Roshnik, Bashkia Berat, Qarku i Beratit, 5014, Shqipëria"
+     },
+     {
+      "name": "Roshnik",
+      "type": "village",
+      "category": "place",
+      "lat": 40.7311372,
+      "lon": 20.0413734,
+      "municipality": "Bashkia Berat",
+      "county": "Qarku i Beratit",
+      "display": "Roshnik, Bashkia Berat, Qarku i Beratit, 5014, Shqipëria"
+     },
+     {
+      "name": "Roshnik",
+      "type": "residential",
+      "category": "landuse",
+      "lat": 40.731199,
+      "lon": 20.0419302,
+      "municipality": "Bashkia Berat",
+      "county": "Qarku i Beratit",
+      "display": "Roshnik, Cacallarë (Roshnik), Roshnik, Bashkia Berat, Qarku i Beratit, 5014, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Sinjë",
+    "inCity": [
+     {
+      "name": "Sinjë",
+      "type": "city",
+      "category": "boundary",
+      "lat": 40.6276209,
+      "lon": 19.8769494,
+      "municipality": "Bashkia Berat",
+      "county": "Qarku i Beratit",
+      "display": "Sinjë, Bashkia Berat, Qarku i Beratit, 5011, Shqipëria"
+     },
+     {
+      "name": "Sinjë",
+      "type": "village",
+      "category": "place",
+      "lat": 40.648359,
+      "lon": 19.8682853,
+      "municipality": "Bashkia Berat",
+      "county": "Qarku i Beratit",
+      "display": "Sinjë, Bashkia Berat, Qarku i Beratit, 5011, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Otllak",
+    "inCity": [
+     {
+      "name": "Otllak",
+      "type": "city",
+      "category": "boundary",
+      "lat": 40.7500259,
+      "lon": 19.9664454,
+      "municipality": "Bashkia Berat",
+      "county": "Qarku i Beratit",
+      "display": "Otllak, Bashkia Berat, Qarku i Beratit, 5010, Shqipëria"
+     },
+     {
+      "name": "Otllak",
+      "type": "village",
+      "category": "place",
+      "lat": 40.7440491,
+      "lon": 19.9348885,
+      "municipality": "Bashkia Berat",
+      "county": "Qarku i Beratit",
+      "display": "Otllak, Bashkia Berat, Qarku i Beratit, 5010, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Velabisht",
+    "inCity": [
+     {
+      "name": "Velabisht",
+      "type": "city",
+      "category": "boundary",
+      "lat": 40.6793442,
+      "lon": 19.9579777,
+      "municipality": "Bashkia Berat",
+      "county": "Qarku i Beratit",
+      "display": "Velabisht, Bashkia Berat, Qarku i Beratit, 5012, Shqipëria"
+     },
+     {
+      "name": "Velabisht",
+      "type": "village",
+      "category": "place",
+      "lat": 40.7015325,
+      "lon": 19.9343516,
+      "municipality": "Bashkia Berat",
+      "county": "Qarku i Beratit",
+      "display": "Velabisht, Bashkia Berat, Qarku i Beratit, 5012, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Ura Vajgurore",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Ura Vajgurore",
+      "type": "city_district",
+      "category": "boundary",
+      "lat": 40.7391336,
+      "lon": 19.8422361,
+      "municipality": null,
+      "county": "Qarku i Beratit",
+      "display": "Ura Vajgurore, Bashkia Dimal, Qarku i Beratit, 5007, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Poshnjë",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Poshnjë",
+      "type": "city_district",
+      "category": "boundary",
+      "lat": 40.8161623,
+      "lon": 19.8240864,
+      "municipality": null,
+      "county": "Qarku i Beratit",
+      "display": "Poshnjë, Bashkia Dimal, Qarku i Beratit, 5008, Shqipëria"
+     },
+     {
+      "name": "Poshnjë",
+      "type": "village",
+      "category": "place",
+      "lat": 40.7829351,
+      "lon": 19.8443153,
+      "municipality": null,
+      "county": "Qarku i Beratit",
+      "display": "Poshnjë, Bashkia Dimal, Qarku i Beratit, 5007, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Kutalli",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Kutalli",
+      "type": "city_district",
+      "category": "boundary",
+      "lat": 40.7918714,
+      "lon": 19.780813,
+      "municipality": null,
+      "county": "Qarku i Beratit",
+      "display": "Kutalli, Bashkia Dimal, Qarku i Beratit, 5009, Shqipëria"
+     },
+     {
+      "name": "Kutalli",
+      "type": "village",
+      "category": "place",
+      "lat": 40.7851671,
+      "lon": 19.7922362,
+      "municipality": null,
+      "county": "Qarku i Beratit",
+      "display": "Kutalli, Bashkia Dimal, Qarku i Beratit, 5009, Shqipëria"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "city": "Lushnjë",
+  "osm": {
+   "name": "Lushnjë",
+   "type": "city",
+   "category": "boundary",
+   "lat": 40.9422038,
+   "lon": 19.7059724,
+   "municipality": "Bashkia Lushnjë",
+   "county": "Qarku i Fierit",
+   "display": "Lushnjë, Bashkia Lushnjë, Qarku i Fierit, 9001, Shqipëria"
+  },
+  "municipality": "Bashkia Lushnjë",
+  "county": "Qarku i Fierit",
+  "zones": [
+   {
+    "zone": "Qendër",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Qendër",
+      "type": "city",
+      "category": "boundary",
+      "lat": 42.2015792,
+      "lon": 19.3616511,
+      "municipality": "Bashkia Malësi e Madhe",
+      "county": "Qarku i Shkodrës",
+      "display": "Qendër, Bashkia Malësi e Madhe, Qarku i Shkodrës, 4301, Shqipëria"
+     },
+     {
+      "name": "Qendër",
+      "type": "city",
+      "category": "boundary",
+      "lat": 40.7430422,
+      "lon": 19.5557986,
+      "municipality": "Bashkia Fier",
+      "county": "Qarku i Fierit",
+      "display": "Qendër, Bashkia Fier, Qarku i Fierit, 9302, Shqipëria"
+     },
+     {
+      "name": "Qendër",
+      "type": "residential",
+      "category": "landuse",
+      "lat": 40.4453063,
+      "lon": 19.8007105,
+      "municipality": "Bashkia Mallakastër",
+      "county": "Qarku i Fierit",
+      "display": "Qendër, Çorrush, Kutë, Bashkia Mallakastër, Qarku i Fierit, 9329, Shqipëria"
+     },
+     {
+      "name": "Qendër Ersekë",
+      "type": "city",
+      "category": "boundary",
+      "lat": 40.3356012,
+      "lon": 20.72269,
+      "municipality": "Bashkia Kolonjë",
+      "county": "Qarku i Korçës",
+      "display": "Qendër Ersekë, Bashkia Kolonjë, Qarku i Korçës, 7401, Shqipëria"
+     },
+     {
+      "name": "Librazhd Qendër",
+      "type": "city",
+      "category": "boundary",
+      "lat": 41.2119415,
+      "lon": 20.3238168,
+      "municipality": "Bashkia Librazhd",
+      "county": "Qarku i Elbasanit",
+      "display": "Librazhd Qendër, Bashkia Librazhd, Qarku i Elbasanit, 3402, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Divjakë",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Divjakë",
+      "type": "town",
+      "category": "boundary",
+      "lat": 40.9956207,
+      "lon": 19.533122,
+      "municipality": "Bashkia Divjakë",
+      "county": "Qarku i Fierit",
+      "display": "Divjakë, Bashkia Divjakë, Qarku i Fierit, 9022, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Fier-Shegan",
+    "inCity": [
+     {
+      "name": "Fier Shegan",
+      "type": "village",
+      "category": "place",
+      "lat": 40.8690086,
+      "lon": 19.784368,
+      "municipality": "Bashkia Lushnjë",
+      "county": "Qarku i Fierit",
+      "display": "Fier Shegan, Bashkia Lushnjë, Qarku i Fierit, 9013, Shqipëria"
+     },
+     {
+      "name": "Fier Shegan",
+      "type": "city",
+      "category": "boundary",
+      "lat": 40.8808409,
+      "lon": 19.7896801,
+      "municipality": "Bashkia Lushnjë",
+      "county": "Qarku i Fierit",
+      "display": "Fier Shegan, Bashkia Lushnjë, Qarku i Fierit, 9013, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Karbunarë",
+    "inCity": [
+     {
+      "name": "Karbunarë",
+      "type": "city",
+      "category": "boundary",
+      "lat": 40.926017,
+      "lon": 19.7682662,
+      "municipality": "Bashkia Lushnjë",
+      "county": "Qarku i Fierit",
+      "display": "Karbunarë, Bashkia Lushnjë, Qarku i Fierit, 9002, Shqipëria"
+     },
+     {
+      "name": "Karbunarë e Poshtme",
+      "type": "village",
+      "category": "place",
+      "lat": 40.9192948,
+      "lon": 19.7189076,
+      "municipality": "Bashkia Lushnjë",
+      "county": "Qarku i Fierit",
+      "display": "Karbunarë e Poshtme, Lushnjë, Bashkia Lushnjë, Qarku i Fierit, 9001, Shqipëria"
+     },
+     {
+      "name": "Rruga Lushnje Skilaj",
+      "type": "unclassified",
+      "category": "highway",
+      "lat": 40.9284831,
+      "lon": 19.7824704,
+      "municipality": "Bashkia Lushnjë",
+      "county": "Qarku i Fierit",
+      "display": "Rruga Lushnje Skilaj, Zgjanë, Karbunarë, Bashkia Lushnjë, Qarku i Fierit, 9002, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Golem",
+    "inCity": [
+     {
+      "name": "Golem",
+      "type": "village",
+      "category": "place",
+      "lat": 40.9673917,
+      "lon": 19.6817049,
+      "municipality": "Bashkia Lushnjë",
+      "county": "Qarku i Fierit",
+      "display": "Golem, Bashkia Lushnjë, Qarku i Fierit, 9012, Shqipëria"
+     },
+     {
+      "name": "Golem",
+      "type": "city",
+      "category": "boundary",
+      "lat": 40.9743912,
+      "lon": 19.687044,
+      "municipality": "Bashkia Lushnjë",
+      "county": "Qarku i Fierit",
+      "display": "Golem, Bashkia Lushnjë, Qarku i Fierit, 9012, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Kolonjë",
+    "inCity": [
+     {
+      "name": "Kolonjë",
+      "type": "village",
+      "category": "place",
+      "lat": 40.8254518,
+      "lon": 19.6048673,
+      "municipality": "Bashkia Lushnjë",
+      "county": "Qarku i Fierit",
+      "display": "Kolonjë, Bashkia Lushnjë, Qarku i Fierit, 9007, Shqipëria"
+     },
+     {
+      "name": "Kolonjë",
+      "type": "city",
+      "category": "boundary",
+      "lat": 40.8431395,
+      "lon": 19.6132502,
+      "municipality": "Bashkia Lushnjë",
+      "county": "Qarku i Fierit",
+      "display": "Kolonjë, Bashkia Lushnjë, Qarku i Fierit, 9007, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Ballagat",
+    "inCity": [
+     {
+      "name": "Ballagat",
+      "type": "village",
+      "category": "place",
+      "lat": 40.9968041,
+      "lon": 19.7756136,
+      "municipality": "Bashkia Lushnjë",
+      "county": "Qarku i Fierit",
+      "display": "Ballagat, Bashkia Lushnjë, Qarku i Fierit, 9017, Shqipëria"
+     },
+     {
+      "name": "Ballagat",
+      "type": "city",
+      "category": "boundary",
+      "lat": 40.9936771,
+      "lon": 19.7583335,
+      "municipality": "Bashkia Lushnjë",
+      "county": "Qarku i Fierit",
+      "display": "Ballagat, Bashkia Lushnjë, Qarku i Fierit, 9017, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Bubullimë",
+    "inCity": [
+     {
+      "name": "Bubullimë",
+      "type": "village",
+      "category": "place",
+      "lat": 40.8135377,
+      "lon": 19.6484904,
+      "municipality": "Bashkia Lushnjë",
+      "county": "Qarku i Fierit",
+      "display": "Bubullimë, Bashkia Lushnjë, Qarku i Fierit, 9016, Shqipëria"
+     },
+     {
+      "name": "Bubullimë",
+      "type": "city",
+      "category": "boundary",
+      "lat": 40.8133881,
+      "lon": 19.6637601,
+      "municipality": "Bashkia Lushnjë",
+      "county": "Qarku i Fierit",
+      "display": "Bubullimë, Bashkia Lushnjë, Qarku i Fierit, 9016, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Greth",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Rreth-Greth",
+      "type": "village",
+      "category": "place",
+      "lat": 41.0690874,
+      "lon": 19.4892027,
+      "municipality": "Bashkia Rrogozhinë",
+      "county": "Qarku i Tiranës",
+      "display": "Rreth-Greth, Kryevidh, Bashkia Rrogozhinë, Qarku i Tiranës, 2510, Shqipëria"
+     },
+     {
+      "name": "Rreth-greth",
+      "type": "residential",
+      "category": "highway",
+      "lat": 41.0575416,
+      "lon": 19.4956116,
+      "municipality": "Bashkia Rrogozhinë",
+      "county": "Qarku i Tiranës",
+      "display": "Rreth-greth, Vilë-Ballaj, Gosë, Bashkia Rrogozhinë, Qarku i Tiranës, 2508, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Hysgjokaj",
+    "inCity": [
+     {
+      "name": "Hysgjokaj",
+      "type": "village",
+      "category": "place",
+      "lat": 40.9746524,
+      "lon": 19.790414,
+      "municipality": "Bashkia Lushnjë",
+      "county": "Qarku i Fierit",
+      "display": "Hysgjokaj, Bashkia Lushnjë, Qarku i Fierit, 9006, Shqipëria"
+     },
+     {
+      "name": "Hysgjokaj",
+      "type": "city",
+      "category": "boundary",
+      "lat": 40.9763606,
+      "lon": 19.7859778,
+      "municipality": "Bashkia Lushnjë",
+      "county": "Qarku i Fierit",
+      "display": "Hysgjokaj, Bashkia Lushnjë, Qarku i Fierit, 9006, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   }
+  ]
+ },
+ {
+  "city": "Pogradec",
+  "osm": {
+   "name": "Pogradec",
+   "type": "city",
+   "category": "boundary",
+   "lat": 40.8998739,
+   "lon": 20.6573881,
+   "municipality": "Bashkia Pogradec",
+   "county": "Qarku i Korçës",
+   "display": "Pogradec, Bashkia Pogradec, Qarku i Korçës, 7301, Shqipëria"
+  },
+  "municipality": "Bashkia Pogradec",
+  "county": "Qarku i Korçës",
+  "zones": [
+   {
+    "zone": "Qendër",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Qendër",
+      "type": "city",
+      "category": "boundary",
+      "lat": 42.2015792,
+      "lon": 19.3616511,
+      "municipality": "Bashkia Malësi e Madhe",
+      "county": "Qarku i Shkodrës",
+      "display": "Qendër, Bashkia Malësi e Madhe, Qarku i Shkodrës, 4301, Shqipëria"
+     },
+     {
+      "name": "Qendër",
+      "type": "city",
+      "category": "boundary",
+      "lat": 40.7430422,
+      "lon": 19.5557986,
+      "municipality": "Bashkia Fier",
+      "county": "Qarku i Fierit",
+      "display": "Qendër, Bashkia Fier, Qarku i Fierit, 9302, Shqipëria"
+     },
+     {
+      "name": "Qendër",
+      "type": "residential",
+      "category": "landuse",
+      "lat": 40.4453063,
+      "lon": 19.8007105,
+      "municipality": "Bashkia Mallakastër",
+      "county": "Qarku i Fierit",
+      "display": "Qendër, Çorrush, Kutë, Bashkia Mallakastër, Qarku i Fierit, 9329, Shqipëria"
+     },
+     {
+      "name": "Qendër Ersekë",
+      "type": "city",
+      "category": "boundary",
+      "lat": 40.3356012,
+      "lon": 20.72269,
+      "municipality": "Bashkia Kolonjë",
+      "county": "Qarku i Korçës",
+      "display": "Qendër Ersekë, Bashkia Kolonjë, Qarku i Korçës, 7401, Shqipëria"
+     },
+     {
+      "name": "Librazhd Qendër",
+      "type": "city",
+      "category": "boundary",
+      "lat": 41.2119415,
+      "lon": 20.3238168,
+      "municipality": "Bashkia Librazhd",
+      "county": "Qarku i Elbasanit",
+      "display": "Librazhd Qendër, Bashkia Librazhd, Qarku i Elbasanit, 3402, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Liqeni",
+    "inCity": [
+     {
+      "name": "Big Market Liqeni",
+      "type": "shop",
+      "category": "shop",
+      "lat": 40.9013687,
+      "lon": 20.666513,
+      "municipality": "Bashkia Pogradec",
+      "county": "Qarku i Korçës",
+      "display": "Big Market Liqeni, Dëshmorët e Pojskës, Pogradec, Bashkia Pogradec, Qarku i Korçës, 7301, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Tushemisht",
+    "inCity": [
+     {
+      "name": "Bus to Tushemisht",
+      "type": "highway",
+      "category": "highway",
+      "lat": 40.8996076,
+      "lon": 20.662089,
+      "municipality": "Bashkia Pogradec",
+      "county": "Qarku i Korçës",
+      "display": "Bus to Tushemisht, Gani Butka, Pogradec, Bashkia Pogradec, Qarku i Korçës, 7301, Shqipëria"
+     },
+     {
+      "name": "Pogradeci 2",
+      "type": "tourism",
+      "category": "tourism",
+      "lat": 40.9015613,
+      "lon": 20.7151536,
+      "municipality": "Bashkia Pogradec",
+      "county": "Qarku i Korçës",
+      "display": "Pogradeci 2, Deshmoret e Pojskes, Tushemisht, Buçimas, Bashkia Pogradec, Qarku i Korçës, 7304, Shqipëria"
+     },
+     {
+      "name": "Bio Kamping Pogradec",
+      "type": "tourism",
+      "category": "tourism",
+      "lat": 40.8979694,
+      "lon": 20.6977584,
+      "municipality": "Bashkia Pogradec",
+      "county": "Qarku i Korçës",
+      "display": "Bio Kamping Pogradec, Sul Starovari, Gurras, Buçimas, Bashkia Pogradec, Qarku i Korçës, 7304, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Drilon",
+    "inCity": [
+     {
+      "name": "Parku Kombëtar i Drilonit",
+      "type": "forest",
+      "category": "landuse",
+      "lat": 40.8998324,
+      "lon": 20.713082,
+      "municipality": "Bashkia Pogradec",
+      "county": "Qarku i Korçës",
+      "display": "Parku Kombëtar i Drilonit, Tushemisht, Buçimas, Bashkia Pogradec, Qarku i Korçës, 7304, Shqipëria"
+     },
+     {
+      "name": "Bar Restaurant Drilon",
+      "type": "amenity",
+      "category": "amenity",
+      "lat": 40.8984747,
+      "lon": 20.7120145,
+      "municipality": "Bashkia Pogradec",
+      "county": "Qarku i Korçës",
+      "display": "Bar Restaurant Drilon, Sul Starovari, Tushemisht, Buçimas, Bashkia Pogradec, Qarku i Korçës, 7304, Shqipëria"
+     },
+     {
+      "name": "Lake View Home - Drilon",
+      "type": "tourism",
+      "category": "tourism",
+      "lat": 40.9017565,
+      "lon": 20.7159547,
+      "municipality": "Bashkia Pogradec",
+      "county": "Qarku i Korçës",
+      "display": "Lake View Home - Drilon, Deshmoret e Pojskes, Tushemisht, Buçimas, Bashkia Pogradec, Qarku i Korçës, 7304, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Lin",
+    "inCity": [
+     {
+      "name": "Bus nach/von Lin",
+      "type": "highway",
+      "category": "highway",
+      "lat": 40.9014552,
+      "lon": 20.6547739,
+      "municipality": "Bashkia Pogradec",
+      "county": "Qarku i Korçës",
+      "display": "Bus nach/von Lin, Kajo Karafili, Pogradec, Bashkia Pogradec, Qarku i Korçës, 7301, Shqipëria"
+     },
+     {
+      "name": "Lin",
+      "type": "village",
+      "category": "place",
+      "lat": 41.0663515,
+      "lon": 20.6395205,
+      "municipality": "Bashkia Pogradec",
+      "county": "Qarku i Korçës",
+      "display": "Lin, Udenisht, Bashkia Pogradec, Qarku i Korçës, 7305, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Çërravë",
+    "inCity": [
+     {
+      "name": "Çërravë",
+      "type": "city",
+      "category": "boundary",
+      "lat": 40.860112,
+      "lon": 20.77658,
+      "municipality": "Bashkia Pogradec",
+      "county": "Qarku i Korçës",
+      "display": "Çërravë, Bashkia Pogradec, Qarku i Korçës, 7306, Shqipëria"
+     },
+     {
+      "name": "Çerravë",
+      "type": "village",
+      "category": "place",
+      "lat": 40.8521316,
+      "lon": 20.7264853,
+      "municipality": "Bashkia Pogradec",
+      "county": "Qarku i Korçës",
+      "display": "Çerravë, Çërravë, Bashkia Pogradec, Qarku i Korçës, 7306, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Buçimas",
+    "inCity": [
+     {
+      "name": "Bio Kamping Pogradec",
+      "type": "tourism",
+      "category": "tourism",
+      "lat": 40.8979694,
+      "lon": 20.6977584,
+      "municipality": "Bashkia Pogradec",
+      "county": "Qarku i Korçës",
+      "display": "Bio Kamping Pogradec, Sul Starovari, Gurras, Buçimas, Bashkia Pogradec, Qarku i Korçës, 7304, Shqipëria"
+     },
+     {
+      "name": "Pogradeci 2",
+      "type": "tourism",
+      "category": "tourism",
+      "lat": 40.9015613,
+      "lon": 20.7151536,
+      "municipality": "Bashkia Pogradec",
+      "county": "Qarku i Korçës",
+      "display": "Pogradeci 2, Deshmoret e Pojskes, Tushemisht, Buçimas, Bashkia Pogradec, Qarku i Korçës, 7304, Shqipëria"
+     },
+     {
+      "name": "Buçimas",
+      "type": "village",
+      "category": "boundary",
+      "lat": 40.8915517,
+      "lon": 20.6837574,
+      "municipality": "Bashkia Pogradec",
+      "county": "Qarku i Korçës",
+      "display": "Buçimas, Bashkia Pogradec, Qarku i Korçës, 7304, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Hudënisht",
+    "inCity": [],
+    "elsewhere": []
+   },
+   {
+    "zone": "Guri i Kuq",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Maja Guri i Kuq",
+      "type": "peak",
+      "category": "natural",
+      "lat": 40.224418,
+      "lon": 20.6470871,
+      "municipality": "Bashkia Kolonjë",
+      "county": "Qarku i Korçës",
+      "display": "Maja Guri i Kuq, Qendër Leskovik, Bashkia Kolonjë, Qarku i Korçës, 7404, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Verdovë",
+    "inCity": [
+     {
+      "name": "Vërdovë",
+      "type": "village",
+      "category": "place",
+      "lat": 40.8907606,
+      "lon": 20.6572833,
+      "municipality": "Bashkia Pogradec",
+      "county": "Qarku i Korçës",
+      "display": "Vërdovë, Buçimas, Bashkia Pogradec, Qarku i Korçës, 7304, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   }
+  ]
+ },
+ {
+  "city": "Kavajë",
+  "osm": {
+   "name": "Kavajë",
+   "type": "town",
+   "category": "boundary",
+   "lat": 41.1834239,
+   "lon": 19.5599485,
+   "municipality": "Bashkia Kavajë",
+   "county": "Qarku i Tiranës",
+   "display": "Kavajë, Bashkia Kavajë, Qarku i Tiranës, 2501, Shqipëria"
+  },
+  "municipality": "Bashkia Kavajë",
+  "county": "Qarku i Tiranës",
+  "zones": [
+   {
+    "zone": "Qendër",
+    "inCity": [
+     {
+      "name": "Qender Mefiboshet",
+      "type": "building",
+      "category": "building",
+      "lat": 41.1835763,
+      "lon": 19.5544231,
+      "municipality": "Bashkia Kavajë",
+      "county": "Qarku i Tiranës",
+      "display": "Qender Mefiboshet, Rruga Qazim Kariqi, Kavajë, Bashkia Kavajë, Qarku i Tiranës, 2501, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Golem",
+    "inCity": [
+     {
+      "name": "Golem",
+      "type": "village",
+      "category": "boundary",
+      "lat": 41.2434439,
+      "lon": 19.5223942,
+      "municipality": "Bashkia Kavajë",
+      "county": "Qarku i Tiranës",
+      "display": "Golem, Bashkia Kavajë, Qarku i Tiranës, 2504, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Qerret",
+    "inCity": [
+     {
+      "name": "Qerret",
+      "type": "village",
+      "category": "place",
+      "lat": 41.2166061,
+      "lon": 19.5276902,
+      "municipality": "Bashkia Kavajë",
+      "county": "Qarku i Tiranës",
+      "display": "Qerret, Golem, Bashkia Kavajë, Qarku i Tiranës, 2504, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Mali i Robit",
+    "inCity": [
+     {
+      "name": "Mali i Robit",
+      "type": "quarter",
+      "category": "place",
+      "lat": 41.2362684,
+      "lon": 19.5175605,
+      "municipality": "Bashkia Kavajë",
+      "county": "Qarku i Tiranës",
+      "display": "Mali i Robit, Golem, Bashkia Kavajë, Qarku i Tiranës, 2504, Shqipëria"
+     },
+     {
+      "name": "Mali i Robit",
+      "type": "residential",
+      "category": "highway",
+      "lat": 41.2339646,
+      "lon": 19.5155574,
+      "municipality": "Bashkia Kavajë",
+      "county": "Qarku i Tiranës",
+      "display": "Mali i Robit, Qerret, Golem, Bashkia Kavajë, Qarku i Tiranës, 2504, Shqipëria"
+     },
+     {
+      "name": "Royal G Max",
+      "type": "building",
+      "category": "building",
+      "lat": 41.2346421,
+      "lon": 19.5153413,
+      "municipality": "Bashkia Kavajë",
+      "county": "Qarku i Tiranës",
+      "display": "Royal G Max, Mali i Robit, Qerret, Golem, Bashkia Kavajë, Qarku i Tiranës, 2504, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Spille",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Spille",
+      "type": "village",
+      "category": "place",
+      "lat": 41.0953179,
+      "lon": 19.4680787,
+      "municipality": "Bashkia Rrogozhinë",
+      "county": "Qarku i Tiranës",
+      "display": "Spille, Kryevidh, Bashkia Rrogozhinë, Qarku i Tiranës, 2510, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Helmës",
+    "inCity": [
+     {
+      "name": "Helmes",
+      "type": "village",
+      "category": "place",
+      "lat": 41.2029849,
+      "lon": 19.6168098,
+      "municipality": "Bashkia Kavajë",
+      "county": "Qarku i Tiranës",
+      "display": "Helmes, Helmas, Bashkia Kavajë, Qarku i Tiranës, 2506, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Luz i Vogël",
+    "inCity": [
+     {
+      "name": "Luz i Vogël",
+      "type": "village",
+      "category": "boundary",
+      "lat": 41.1273876,
+      "lon": 19.5736017,
+      "municipality": "Bashkia Kavajë",
+      "county": "Qarku i Tiranës",
+      "display": "Luz i Vogël, Bashkia Kavajë, Qarku i Tiranës, 2509, Shqipëria"
+     },
+     {
+      "name": "Luz i Vogël",
+      "type": "residential",
+      "category": "landuse",
+      "lat": 41.1262546,
+      "lon": 19.576064,
+      "municipality": "Bashkia Kavajë",
+      "county": "Qarku i Tiranës",
+      "display": "Luz i Vogël, Vorrozen, Luz i Vogël, Bashkia Kavajë, Qarku i Tiranës, 2509, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Synej",
+    "inCity": [
+     {
+      "name": "Synej",
+      "type": "village",
+      "category": "boundary",
+      "lat": 41.1748033,
+      "lon": 19.5461306,
+      "municipality": "Bashkia Kavajë",
+      "county": "Qarku i Tiranës",
+      "display": "Synej, Bashkia Kavajë, Qarku i Tiranës, 2505, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Rrogozhinë",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Rrogozhinë",
+      "type": "town",
+      "category": "boundary",
+      "lat": 41.0758988,
+      "lon": 19.6649775,
+      "municipality": "Bashkia Rrogozhinë",
+      "county": "Qarku i Tiranës",
+      "display": "Rrogozhinë, Bashkia Rrogozhinë, Qarku i Tiranës, 2503, Shqipëria"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "city": "Lezhë",
+  "osm": {
+   "name": "Bashkia Lezhë",
+   "type": "town",
+   "category": "boundary",
+   "lat": 41.7816638,
+   "lon": 19.6433538,
+   "municipality": null,
+   "county": "Qarku i Lezhës",
+   "display": "Bashkia Lezhë, Qarku i Lezhës, Shqipëria"
+  },
+  "municipality": null,
+  "county": "Qarku i Lezhës",
+  "zones": [
+   {
+    "zone": "Qendër",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Qendër",
+      "type": "city",
+      "category": "boundary",
+      "lat": 42.2015792,
+      "lon": 19.3616511,
+      "municipality": "Bashkia Malësi e Madhe",
+      "county": "Qarku i Shkodrës",
+      "display": "Qendër, Bashkia Malësi e Madhe, Qarku i Shkodrës, 4301, Shqipëria"
+     },
+     {
+      "name": "Qendër",
+      "type": "city",
+      "category": "boundary",
+      "lat": 40.7430422,
+      "lon": 19.5557986,
+      "municipality": "Bashkia Fier",
+      "county": "Qarku i Fierit",
+      "display": "Qendër, Bashkia Fier, Qarku i Fierit, 9302, Shqipëria"
+     },
+     {
+      "name": "Qendër",
+      "type": "residential",
+      "category": "landuse",
+      "lat": 40.4453063,
+      "lon": 19.8007105,
+      "municipality": "Bashkia Mallakastër",
+      "county": "Qarku i Fierit",
+      "display": "Qendër, Çorrush, Kutë, Bashkia Mallakastër, Qarku i Fierit, 9329, Shqipëria"
+     },
+     {
+      "name": "Qendër Ersekë",
+      "type": "city",
+      "category": "boundary",
+      "lat": 40.3356012,
+      "lon": 20.72269,
+      "municipality": "Bashkia Kolonjë",
+      "county": "Qarku i Korçës",
+      "display": "Qendër Ersekë, Bashkia Kolonjë, Qarku i Korçës, 7401, Shqipëria"
+     },
+     {
+      "name": "Librazhd Qendër",
+      "type": "city",
+      "category": "boundary",
+      "lat": 41.2119415,
+      "lon": 20.3238168,
+      "municipality": "Bashkia Librazhd",
+      "county": "Qarku i Elbasanit",
+      "display": "Librazhd Qendër, Bashkia Librazhd, Qarku i Elbasanit, 3402, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Kala",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Kala",
+      "type": "building",
+      "category": "building",
+      "lat": 40.2534004,
+      "lon": 20.1595635,
+      "municipality": "Bashkia Këlcyrë",
+      "county": "Qarku i Gjirokastrës",
+      "display": "Kala, SH75, Gurë (Këlcyrë), Fshat Këlcyrë, Këlcyrë, Bashkia Këlcyrë, Qarku i Gjirokastrës, 6402, Shqipëria"
+     },
+     {
+      "name": "Kala e Dodës",
+      "type": "city",
+      "category": "boundary",
+      "lat": 41.8128498,
+      "lon": 20.5179748,
+      "municipality": "Bashkia Dibër",
+      "county": "Qarku i Dibrës",
+      "display": "Kala e Dodës, Bashkia Dibër, Qarku i Dibrës, 8308, Shqipëria"
+     },
+     {
+      "name": "Maja Kala",
+      "type": "peak",
+      "category": "natural",
+      "lat": 40.947767,
+      "lon": 20.0324745,
+      "municipality": "Bashkia Cërrik",
+      "county": "Qarku i Elbasanit",
+      "display": "Maja Kala, Klos, Bashkia Cërrik, Qarku i Elbasanit, 3020, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Shëngjin",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Shëngjin",
+      "type": "town",
+      "category": "boundary",
+      "lat": 41.8097827,
+      "lon": 19.5989755,
+      "municipality": null,
+      "county": "Qarku i Lezhës",
+      "display": "Shëngjin, Bashkia Lezhë, Qarku i Lezhës, 4503, Shqipëria"
+     },
+     {
+      "name": "Shëngjin",
+      "type": "village",
+      "category": "place",
+      "lat": 41.1665808,
+      "lon": 20.0061771,
+      "municipality": "Bashkia Elbasan",
+      "county": "Qarku i Elbasanit",
+      "display": "Shëngjin, Gracen, Bashkia Elbasan, Qarku i Elbasanit, 3012, Shqipëria"
+     },
+     {
+      "name": "Shëngjin",
+      "type": "village",
+      "category": "place",
+      "lat": 41.9225645,
+      "lon": 20.1798148,
+      "municipality": "Bashkia Mirditë",
+      "county": "Qarku i Lezhës",
+      "display": "Shëngjin, Fan, Bashkia Mirditë, Qarku i Lezhës, 4608, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Ishull-Lezhë",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Ishull Lezhë",
+      "type": "village",
+      "category": "place",
+      "lat": 41.7648685,
+      "lon": 19.6405816,
+      "municipality": null,
+      "county": "Qarku i Lezhës",
+      "display": "Ishull Lezhë, Bashkia Lezhë, Qarku i Lezhës, 4501, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Balldren",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Balldren",
+      "type": "city_district",
+      "category": "boundary",
+      "lat": 41.864379,
+      "lon": 19.5863019,
+      "municipality": null,
+      "county": "Qarku i Lezhës",
+      "display": "Balldren, Bashkia Lezhë, Qarku i Lezhës, 4504, Shqipëria"
+     },
+     {
+      "name": "Balldren",
+      "type": "village",
+      "category": "place",
+      "lat": 41.8211888,
+      "lon": 19.6377892,
+      "municipality": null,
+      "county": "Qarku i Lezhës",
+      "display": "Balldren, Bashkia Lezhë, Qarku i Lezhës, 4501, Shqipëria"
+     },
+     {
+      "name": "Balldren",
+      "type": "village",
+      "category": "place",
+      "lat": 41.0882003,
+      "lon": 20.0029983,
+      "municipality": "Bashkia Elbasan",
+      "county": "Qarku i Elbasanit",
+      "display": "Balldren, Papër, Bashkia Elbasan, Qarku i Elbasanit, 3016, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Blinisht",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Blinisht",
+      "type": "city_district",
+      "category": "boundary",
+      "lat": 41.8950569,
+      "lon": 19.6742926,
+      "municipality": null,
+      "county": "Qarku i Lezhës",
+      "display": "Blinisht, Bashkia Lezhë, Qarku i Lezhës, 4505, Shqipëria"
+     },
+     {
+      "name": "Blinisht",
+      "type": "village",
+      "category": "place",
+      "lat": 41.882065,
+      "lon": 19.6366548,
+      "municipality": null,
+      "county": "Qarku i Lezhës",
+      "display": "Blinisht, Bashkia Lezhë, Qarku i Lezhës, 4505, Shqipëria"
+     },
+     {
+      "name": "Blinisht",
+      "type": "village",
+      "category": "place",
+      "lat": 41.8605522,
+      "lon": 19.9917891,
+      "municipality": "Bashkia Mirditë",
+      "county": "Qarku i Lezhës",
+      "display": "Blinisht, Orosh, Bashkia Mirditë, Qarku i Lezhës, 4605, Shqipëria"
+     },
+     {
+      "name": "Blinisht",
+      "type": "village",
+      "category": "place",
+      "lat": 42.0695625,
+      "lon": 19.9599213,
+      "municipality": "Bashkia Pukë",
+      "county": "Qarku i Shkodrës",
+      "display": "Blinisht, Rrapë, Bashkia Pukë, Qarku i Shkodrës, 4407, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Kallmet",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Kallmet",
+      "type": "city_district",
+      "category": "boundary",
+      "lat": 41.8314604,
+      "lon": 19.6821928,
+      "municipality": null,
+      "county": "Qarku i Lezhës",
+      "display": "Kallmet, Bashkia Lezhë, Qarku i Lezhës, 4507, Shqipëria"
+     },
+     {
+      "name": "Kallmet",
+      "type": "village",
+      "category": "place",
+      "lat": 41.4179858,
+      "lon": 19.823245,
+      "municipality": "Bashkia Tiranë",
+      "county": "Qarku i Tiranës",
+      "display": "Kallmet, Zall-Herr, Bashkia Tiranë, Qarku i Tiranës, 1048, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Kolsh",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Kolsh",
+      "type": "city_district",
+      "category": "boundary",
+      "lat": 42.0714117,
+      "lon": 20.3645242,
+      "municipality": null,
+      "county": "Qarku i Kukësit",
+      "display": "Kolsh, Bashkia Kukës, Qarku i Kukësit, 8511, Shqipëria"
+     },
+     {
+      "name": "Kolsh",
+      "type": "city",
+      "category": "boundary",
+      "lat": 41.7788068,
+      "lon": 19.6910781,
+      "municipality": "Bashkia Lezhë",
+      "county": "Qarku i Lezhës",
+      "display": "Kolsh, Bashkia Lezhë, Qarku i Lezhës, Shqipëria"
+     },
+     {
+      "name": "Kolsh",
+      "type": "village",
+      "category": "place",
+      "lat": 42.0780138,
+      "lon": 20.3414408,
+      "municipality": null,
+      "county": "Qarku i Kukësit",
+      "display": "Kolsh, Bashkia Kukës, Qarku i Kukësit, 8511, Shqipëria"
+     },
+     {
+      "name": "Kolç",
+      "type": "village",
+      "category": "place",
+      "lat": 41.7903239,
+      "lon": 19.6814491,
+      "municipality": "Bashkia Lezhë",
+      "county": "Qarku i Lezhës",
+      "display": "Kolç, Bashkia Lezhë, Qarku i Lezhës, 4501, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Zejmen",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Zejmen",
+      "type": "city_district",
+      "category": "boundary",
+      "lat": 41.7233434,
+      "lon": 19.7070384,
+      "municipality": null,
+      "county": "Qarku i Lezhës",
+      "display": "Zejmen, Bashkia Lezhë, Qarku i Lezhës, 4510, Shqipëria"
+     },
+     {
+      "name": "Zejmen",
+      "type": "village",
+      "category": "place",
+      "lat": 41.7075387,
+      "lon": 19.6895601,
+      "municipality": null,
+      "county": "Qarku i Lezhës",
+      "display": "Zejmen, Bashkia Lezhë, Qarku i Lezhës, 4510, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Ungrej",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Ungrej",
+      "type": "city_district",
+      "category": "boundary",
+      "lat": 41.8909465,
+      "lon": 19.7827161,
+      "municipality": null,
+      "county": "Qarku i Lezhës",
+      "display": "Ungrej, Bashkia Lezhë, Qarku i Lezhës, 4508, Shqipëria"
+     },
+     {
+      "name": "Ungrej",
+      "type": "village",
+      "category": "place",
+      "lat": 41.8728191,
+      "lon": 19.7914912,
+      "municipality": null,
+      "county": "Qarku i Lezhës",
+      "display": "Ungrej, Bashkia Lezhë, Qarku i Lezhës, 4508, Shqipëria"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "city": "Gjirokastër",
+  "osm": {
+   "name": "Gjirokastër",
+   "type": "town",
+   "category": "boundary",
+   "lat": 40.0770871,
+   "lon": 20.1393359,
+   "municipality": "Bashkia Gjirokastër",
+   "county": "Qarku i Gjirokastrës",
+   "display": "Gjirokastër, Bashkia Gjirokastër, Qarku i Gjirokastrës, 6001, Shqipëria"
+  },
+  "municipality": "Bashkia Gjirokastër",
+  "county": "Qarku i Gjirokastrës",
+  "zones": [
+   {
+    "zone": "Kala",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Kala",
+      "type": "building",
+      "category": "building",
+      "lat": 40.2534004,
+      "lon": 20.1595635,
+      "municipality": "Bashkia Këlcyrë",
+      "county": "Qarku i Gjirokastrës",
+      "display": "Kala, SH75, Gurë (Këlcyrë), Fshat Këlcyrë, Këlcyrë, Bashkia Këlcyrë, Qarku i Gjirokastrës, 6402, Shqipëria"
+     },
+     {
+      "name": "Kala e Dodës",
+      "type": "city",
+      "category": "boundary",
+      "lat": 41.8128498,
+      "lon": 20.5179748,
+      "municipality": "Bashkia Dibër",
+      "county": "Qarku i Dibrës",
+      "display": "Kala e Dodës, Bashkia Dibër, Qarku i Dibrës, 8308, Shqipëria"
+     },
+     {
+      "name": "Maja Kala",
+      "type": "peak",
+      "category": "natural",
+      "lat": 40.947767,
+      "lon": 20.0324745,
+      "municipality": "Bashkia Cërrik",
+      "county": "Qarku i Elbasanit",
+      "display": "Maja Kala, Klos, Bashkia Cërrik, Qarku i Elbasanit, 3020, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Qendër",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Qendër",
+      "type": "city",
+      "category": "boundary",
+      "lat": 42.2015792,
+      "lon": 19.3616511,
+      "municipality": "Bashkia Malësi e Madhe",
+      "county": "Qarku i Shkodrës",
+      "display": "Qendër, Bashkia Malësi e Madhe, Qarku i Shkodrës, 4301, Shqipëria"
+     },
+     {
+      "name": "Qendër",
+      "type": "city",
+      "category": "boundary",
+      "lat": 40.7430422,
+      "lon": 19.5557986,
+      "municipality": "Bashkia Fier",
+      "county": "Qarku i Fierit",
+      "display": "Qendër, Bashkia Fier, Qarku i Fierit, 9302, Shqipëria"
+     },
+     {
+      "name": "Qendër",
+      "type": "residential",
+      "category": "landuse",
+      "lat": 40.4453063,
+      "lon": 19.8007105,
+      "municipality": "Bashkia Mallakastër",
+      "county": "Qarku i Fierit",
+      "display": "Qendër, Çorrush, Kutë, Bashkia Mallakastër, Qarku i Fierit, 9329, Shqipëria"
+     },
+     {
+      "name": "Qendër Ersekë",
+      "type": "city",
+      "category": "boundary",
+      "lat": 40.3356012,
+      "lon": 20.72269,
+      "municipality": "Bashkia Kolonjë",
+      "county": "Qarku i Korçës",
+      "display": "Qendër Ersekë, Bashkia Kolonjë, Qarku i Korçës, 7401, Shqipëria"
+     },
+     {
+      "name": "Librazhd Qendër",
+      "type": "city",
+      "category": "boundary",
+      "lat": 41.2119415,
+      "lon": 20.3238168,
+      "municipality": "Bashkia Librazhd",
+      "county": "Qarku i Elbasanit",
+      "display": "Librazhd Qendër, Bashkia Librazhd, Qarku i Elbasanit, 3402, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Pazari i Vjetër",
+    "inCity": [
+     {
+      "name": "Rruga Pazari i Vjetër",
+      "type": "residential",
+      "category": "highway",
+      "lat": 40.0753892,
+      "lon": 20.1430949,
+      "municipality": "Bashkia Gjirokastër",
+      "county": "Qarku i Gjirokastrës",
+      "display": "Rruga Pazari i Vjetër, Gjirokastër, Bashkia Gjirokastër, Qarku i Gjirokastrës, 6001, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Dunavat",
+    "inCity": [],
+    "elsewhere": []
+   },
+   {
+    "zone": "Antigonë",
+    "inCity": [
+     {
+      "name": "Antigonë",
+      "type": "city",
+      "category": "boundary",
+      "lat": 40.1006211,
+      "lon": 20.2187589,
+      "municipality": "Bashkia Gjirokastër",
+      "county": "Qarku i Gjirokastrës",
+      "display": "Antigonë, Bashkia Gjirokastër, Qarku i Gjirokastrës, 6017, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Lazarat",
+    "inCity": [
+     {
+      "name": "Lazarat",
+      "type": "village",
+      "category": "boundary",
+      "lat": 40.0486634,
+      "lon": 20.1506355,
+      "municipality": "Bashkia Gjirokastër",
+      "county": "Qarku i Gjirokastrës",
+      "display": "Lazarat, Bashkia Gjirokastër, Qarku i Gjirokastrës, 6004, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Lunxhëri",
+    "inCity": [
+     {
+      "name": "Lunxhëri",
+      "type": "city",
+      "category": "boundary",
+      "lat": 40.1327712,
+      "lon": 20.1732051,
+      "municipality": "Bashkia Gjirokastër",
+      "county": "Qarku i Gjirokastrës",
+      "display": "Lunxhëri, Bashkia Gjirokastër, Qarku i Gjirokastrës, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Dropull",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Dropull i Sipërm",
+      "type": "city",
+      "category": "boundary",
+      "lat": 39.8694303,
+      "lon": 20.326274,
+      "municipality": "Bashkia Dropull",
+      "county": "Qarku i Gjirokastrës",
+      "display": "Dropull i Sipërm, Bashkia Dropull, Qarku i Gjirokastrës, Shqipëria"
+     },
+     {
+      "name": "Dropull i Poshtëm",
+      "type": "city",
+      "category": "boundary",
+      "lat": 39.9849202,
+      "lon": 20.1887243,
+      "municipality": "Bashkia Dropull",
+      "county": "Qarku i Gjirokastrës",
+      "display": "Dropull i Poshtëm, Bashkia Dropull, Qarku i Gjirokastrës, Shqipëria"
+     },
+     {
+      "name": "Bashkia Dropull",
+      "type": "municipality",
+      "category": "boundary",
+      "lat": 39.9756198,
+      "lon": 20.2329665,
+      "municipality": "Bashkia Dropull",
+      "county": "Qarku i Gjirokastrës",
+      "display": "Bashkia Dropull, Qarku i Gjirokastrës, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Cepo",
+    "inCity": [
+     {
+      "name": "Cepo",
+      "type": "city",
+      "category": "boundary",
+      "lat": 40.1144883,
+      "lon": 20.0266457,
+      "municipality": "Bashkia Gjirokastër",
+      "county": "Qarku i Gjirokastrës",
+      "display": "Cepo, Bashkia Gjirokastër, Qarku i Gjirokastrës, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Labovë",
+    "inCity": [
+     {
+      "name": "Labovë e Madhe",
+      "type": "village",
+      "category": "place",
+      "lat": 40.2073931,
+      "lon": 20.1368326,
+      "municipality": "Bashkia Gjirokastër",
+      "county": "Qarku i Gjirokastrës",
+      "display": "Labovë e Madhe, Odrie, Bashkia Gjirokastër, Qarku i Gjirokastrës, Shqipëria"
+     },
+     {
+      "name": "Labovë e Vogël",
+      "type": "village",
+      "category": "place",
+      "lat": 40.1967212,
+      "lon": 20.1383312,
+      "municipality": "Bashkia Gjirokastër",
+      "county": "Qarku i Gjirokastrës",
+      "display": "Labovë e Vogël, Odrie, Bashkia Gjirokastër, Qarku i Gjirokastrës, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Hormovë",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Hormovë",
+      "type": "village",
+      "category": "place",
+      "lat": 40.2382185,
+      "lon": 20.1007506,
+      "municipality": "Bashkia Tepelenë",
+      "county": "Qarku i Gjirokastrës",
+      "display": "Hormovë, Qendër Tepelenë, Bashkia Tepelenë, Qarku i Gjirokastrës, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Kakavijë",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Kakavijë",
+      "type": "village",
+      "category": "place",
+      "lat": 39.9084407,
+      "lon": 20.358378,
+      "municipality": "Bashkia Dropull",
+      "county": "Qarku i Gjirokastrës",
+      "display": "Kakavijë, Dropull i Sipërm, Bashkia Dropull, Qarku i Gjirokastrës, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Mashkullorë",
+    "inCity": [
+     {
+      "name": "Mashkullorë",
+      "type": "village",
+      "category": "place",
+      "lat": 40.1179099,
+      "lon": 20.088061,
+      "municipality": "Bashkia Gjirokastër",
+      "county": "Qarku i Gjirokastrës",
+      "display": "Mashkullorë, Cepo, Bashkia Gjirokastër, Qarku i Gjirokastrës, 6019, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   }
+  ]
+ },
+ {
+  "city": "Sarandë",
+  "osm": {
+   "name": "Sarandë",
+   "type": "town",
+   "category": "boundary",
+   "lat": 39.8752198,
+   "lon": 20.0065258,
+   "municipality": "Bashkia Sarandë",
+   "county": "Qarku i Vlorës",
+   "display": "Sarandë, Bashkia Sarandë, Qarku i Vlorës, 9701, Shqipëria"
+  },
+  "municipality": "Bashkia Sarandë",
+  "county": "Qarku i Vlorës",
+  "zones": [
+   {
+    "zone": "Qendër",
+    "inCity": [
+     {
+      "name": "Posta Shqiptare Zyra Postale Qendër Sarandë",
+      "type": "amenity",
+      "category": "amenity",
+      "lat": 39.8743094,
+      "lon": 20.0085654,
+      "municipality": "Bashkia Sarandë",
+      "county": "Qarku i Vlorës",
+      "display": "Posta Shqiptare Zyra Postale Qendër Sarandë, Rruga E Flamurit, Gjashtë, Sarandë, Bashkia Sarandë, Qarku i Vlorës, 9701, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Lungomare",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Lungomare",
+      "type": "suburb",
+      "category": "place",
+      "lat": 40.442011,
+      "lon": 19.4959128,
+      "municipality": "Bashkia Vlorë",
+      "county": "Qarku i Vlorës",
+      "display": "Lungomare, Vlorë, Bashkia Vlorë, Qarku i Vlorës, 9400, Shqipëria"
+     },
+     {
+      "name": "Lungomare",
+      "type": "pedestrian",
+      "category": "highway",
+      "lat": 40.4491104,
+      "lon": 19.4905873,
+      "municipality": "Bashkia Vlorë",
+      "county": "Qarku i Vlorës",
+      "display": "Lungomare, Vlorë, Bashkia Vlorë, Qarku i Vlorës, 9401, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Mango",
+    "inCity": [
+     {
+      "name": "Plazhi Mango",
+      "type": "beach",
+      "category": "natural",
+      "lat": 39.8527238,
+      "lon": 20.0212166,
+      "municipality": "Bashkia Sarandë",
+      "county": "Qarku i Vlorës",
+      "display": "Plazhi Mango, Çukë, Sarandë, Bashkia Sarandë, Qarku i Vlorës, 9701, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Ksamil",
+    "inCity": [
+     {
+      "name": "Ksamil",
+      "type": "village",
+      "category": "boundary",
+      "lat": 39.7701379,
+      "lon": 20.0037922,
+      "municipality": "Bashkia Sarandë",
+      "county": "Qarku i Vlorës",
+      "display": "Ksamil, Bashkia Sarandë, Qarku i Vlorës, 9706, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Butrint",
+    "inCity": [
+     {
+      "name": "Parku Kombëtar i Butrintit",
+      "type": "national_park",
+      "category": "boundary",
+      "lat": 39.7572865,
+      "lon": 20.032287,
+      "municipality": "Bashkia Sarandë",
+      "county": "Qarku i Vlorës",
+      "display": "Parku Kombëtar i Butrintit, Ksamil, Bashkia Sarandë, Qarku i Vlorës, 9706, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Çukë",
+    "inCity": [
+     {
+      "name": "Çukë",
+      "type": "village",
+      "category": "place",
+      "lat": 39.8457914,
+      "lon": 20.035488,
+      "municipality": "Bashkia Sarandë",
+      "county": "Qarku i Vlorës",
+      "display": "Çukë, Sarandë, Bashkia Sarandë, Qarku i Vlorës, 9701, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Lukovë",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Lukovë",
+      "type": "village",
+      "category": "boundary",
+      "lat": 39.9927221,
+      "lon": 19.9135183,
+      "municipality": "Bashkia Himarë",
+      "county": "Qarku i Vlorës",
+      "display": "Lukovë, Bashkia Himarë, Qarku i Vlorës, 9713, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Kakome",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Manastiri i Shën Mërisë (Kakome)",
+      "type": "tourism",
+      "category": "tourism",
+      "lat": 39.9312749,
+      "lon": 19.9498211,
+      "municipality": "Bashkia Himarë",
+      "county": "Qarku i Vlorës",
+      "display": "Manastiri i Shën Mërisë (Kakome), SH8, Qopek (Nivicë-Bubar), Shën Vasil, Lukovë, Bashkia Himarë, Qarku i Vlorës, 9713, Shqipëria"
+     },
+     {
+      "name": "Plazhi i Kakomesë",
+      "type": "beach",
+      "category": "natural",
+      "lat": 39.9267878,
+      "lon": 19.9388882,
+      "municipality": "Bashkia Himarë",
+      "county": "Qarku i Vlorës",
+      "display": "Plazhi i Kakomesë, Lukovë, Bashkia Himarë, Qarku i Vlorës, 9713, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Himara Jugor",
+    "inCity": [],
+    "elsewhere": []
+   },
+   {
+    "zone": "Konispol",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Konispol",
+      "type": "town",
+      "category": "boundary",
+      "lat": 39.6595303,
+      "lon": 20.1830111,
+      "municipality": "Bashkia Konispol",
+      "county": "Qarku i Vlorës",
+      "display": "Konispol, Bashkia Konispol, Qarku i Vlorës, 9705, Shqipëria"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "city": "Kukës",
+  "osm": {
+   "name": "Bashkia Kukës",
+   "type": "town",
+   "category": "boundary",
+   "lat": 42.0768978,
+   "lon": 20.4163203,
+   "municipality": null,
+   "county": "Qarku i Kukësit",
+   "display": "Bashkia Kukës, Qarku i Kukësit, Shqipëria"
+  },
+  "municipality": null,
+  "county": "Qarku i Kukësit",
+  "zones": [
+   {
+    "zone": "Qendër",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Qendër",
+      "type": "city",
+      "category": "boundary",
+      "lat": 42.2015792,
+      "lon": 19.3616511,
+      "municipality": "Bashkia Malësi e Madhe",
+      "county": "Qarku i Shkodrës",
+      "display": "Qendër, Bashkia Malësi e Madhe, Qarku i Shkodrës, 4301, Shqipëria"
+     },
+     {
+      "name": "Qendër",
+      "type": "city",
+      "category": "boundary",
+      "lat": 40.7430422,
+      "lon": 19.5557986,
+      "municipality": "Bashkia Fier",
+      "county": "Qarku i Fierit",
+      "display": "Qendër, Bashkia Fier, Qarku i Fierit, 9302, Shqipëria"
+     },
+     {
+      "name": "Qendër",
+      "type": "residential",
+      "category": "landuse",
+      "lat": 40.4453063,
+      "lon": 19.8007105,
+      "municipality": "Bashkia Mallakastër",
+      "county": "Qarku i Fierit",
+      "display": "Qendër, Çorrush, Kutë, Bashkia Mallakastër, Qarku i Fierit, 9329, Shqipëria"
+     },
+     {
+      "name": "Qendër Ersekë",
+      "type": "city",
+      "category": "boundary",
+      "lat": 40.3356012,
+      "lon": 20.72269,
+      "municipality": "Bashkia Kolonjë",
+      "county": "Qarku i Korçës",
+      "display": "Qendër Ersekë, Bashkia Kolonjë, Qarku i Korçës, 7401, Shqipëria"
+     },
+     {
+      "name": "Librazhd Qendër",
+      "type": "city",
+      "category": "boundary",
+      "lat": 41.2119415,
+      "lon": 20.3238168,
+      "municipality": "Bashkia Librazhd",
+      "county": "Qarku i Elbasanit",
+      "display": "Librazhd Qendër, Bashkia Librazhd, Qarku i Elbasanit, 3402, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Kukës i Ri",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Bardhoc i Ri",
+      "type": "village",
+      "category": "place",
+      "lat": 42.1154741,
+      "lon": 20.5025527,
+      "municipality": null,
+      "county": "Qarku i Kukësit",
+      "display": "Bardhoc i Ri, Bashkia Kukës, Qarku i Kukësit, Shqipëria"
+     },
+     {
+      "name": "Rruga Kukësi i Ri",
+      "type": "secondary",
+      "category": "highway",
+      "lat": 42.0791106,
+      "lon": 20.4237694,
+      "municipality": null,
+      "county": "Qarku i Kukësit",
+      "display": "Rruga Kukësi i Ri, Kukës, Bashkia Kukës, Qarku i Kukësit, 8501, Shqipëria"
+     },
+     {
+      "name": "Rruga Kukësi i Ri",
+      "type": "residential",
+      "category": "highway",
+      "lat": 42.0810789,
+      "lon": 20.4220096,
+      "municipality": null,
+      "county": "Qarku i Kukësit",
+      "display": "Rruga Kukësi i Ri, Kukës, Bashkia Kukës, Qarku i Kukësit, 8501, Shqipëria"
+     },
+     {
+      "name": "Rruga Parku I ri",
+      "type": "road",
+      "category": "highway",
+      "lat": 42.0733729,
+      "lon": 20.4300288,
+      "municipality": null,
+      "county": "Qarku i Kukësit",
+      "display": "Rruga Parku I ri, Kukës, Bashkia Kukës, Qarku i Kukësit, 8501, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Kukës i Vjetër",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Rruga Kukësi i Vjetër",
+      "type": "residential",
+      "category": "highway",
+      "lat": 42.0836041,
+      "lon": 20.4185399,
+      "municipality": null,
+      "county": "Qarku i Kukësit",
+      "display": "Rruga Kukësi i Vjetër, Kukës, Bashkia Kukës, Qarku i Kukësit, 8501, Shqipëria"
+     },
+     {
+      "name": "Rruga Parku i Vjetër",
+      "type": "unclassified",
+      "category": "highway",
+      "lat": 42.0846121,
+      "lon": 20.4198787,
+      "municipality": null,
+      "county": "Qarku i Kukësit",
+      "display": "Rruga Parku i Vjetër, Kukës, Bashkia Kukës, Qarku i Kukësit, 8501, Shqipëria"
+     },
+     {
+      "name": "Ura e Vjetër e Drinit",
+      "type": "secondary",
+      "category": "highway",
+      "lat": 42.075625,
+      "lon": 20.4067999,
+      "municipality": null,
+      "county": "Qarku i Kukësit",
+      "display": "Ura e Vjetër e Drinit, Kukës, Bashkia Kukës, Qarku i Kukësit, 8501, Shqipëria"
+     },
+     {
+      "name": "Rruga Kukësi i Vjetër",
+      "type": "road",
+      "category": "highway",
+      "lat": 42.0839504,
+      "lon": 20.4195095,
+      "municipality": null,
+      "county": "Qarku i Kukësit",
+      "display": "Rruga Kukësi i Vjetër, Kukës, Bashkia Kukës, Qarku i Kukësit, 8501, Shqipëria"
+     },
+     {
+      "name": "Rruga Parku i Vjetër",
+      "type": "road",
+      "category": "highway",
+      "lat": 42.0853328,
+      "lon": 20.4203806,
+      "municipality": null,
+      "county": "Qarku i Kukësit",
+      "display": "Rruga Parku i Vjetër, Kukës, Bashkia Kukës, Qarku i Kukësit, 8501, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Kolsh",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Kolsh",
+      "type": "city_district",
+      "category": "boundary",
+      "lat": 42.0714117,
+      "lon": 20.3645242,
+      "municipality": null,
+      "county": "Qarku i Kukësit",
+      "display": "Kolsh, Bashkia Kukës, Qarku i Kukësit, 8511, Shqipëria"
+     },
+     {
+      "name": "Kolsh",
+      "type": "city",
+      "category": "boundary",
+      "lat": 41.7788068,
+      "lon": 19.6910781,
+      "municipality": "Bashkia Lezhë",
+      "county": "Qarku i Lezhës",
+      "display": "Kolsh, Bashkia Lezhë, Qarku i Lezhës, Shqipëria"
+     },
+     {
+      "name": "Kolsh",
+      "type": "village",
+      "category": "place",
+      "lat": 42.0780138,
+      "lon": 20.3414408,
+      "municipality": null,
+      "county": "Qarku i Kukësit",
+      "display": "Kolsh, Bashkia Kukës, Qarku i Kukësit, 8511, Shqipëria"
+     },
+     {
+      "name": "Kolç",
+      "type": "village",
+      "category": "place",
+      "lat": 41.7903239,
+      "lon": 19.6814491,
+      "municipality": "Bashkia Lezhë",
+      "county": "Qarku i Lezhës",
+      "display": "Kolç, Bashkia Lezhë, Qarku i Lezhës, 4501, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Shtiqën",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Shtiqën",
+      "type": "city_district",
+      "category": "boundary",
+      "lat": 42.0426972,
+      "lon": 20.4397009,
+      "municipality": null,
+      "county": "Qarku i Kukësit",
+      "display": "Shtiqën, Bashkia Kukës, Qarku i Kukësit, 8513, Shqipëria"
+     },
+     {
+      "name": "Shtiqën",
+      "type": "village",
+      "category": "place",
+      "lat": 42.040905,
+      "lon": 20.430684,
+      "municipality": null,
+      "county": "Qarku i Kukësit",
+      "display": "Shtiqën, Bashkia Kukës, Qarku i Kukësit, 8513, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Bicaj",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Bicaj",
+      "type": "city_district",
+      "category": "boundary",
+      "lat": 41.9922897,
+      "lon": 20.4225968,
+      "municipality": null,
+      "county": "Qarku i Kukësit",
+      "display": "Bicaj, Bashkia Kukës, Qarku i Kukësit, 8504, Shqipëria"
+     },
+     {
+      "name": "Bicaj",
+      "type": "village",
+      "category": "place",
+      "lat": 41.9933984,
+      "lon": 20.4105507,
+      "municipality": null,
+      "county": "Qarku i Kukësit",
+      "display": "Bicaj, Bashkia Kukës, Qarku i Kukësit, 8504, Shqipëria"
+     },
+     {
+      "name": "Bicaj",
+      "type": "village",
+      "category": "place",
+      "lat": 41.0620705,
+      "lon": 19.8089631,
+      "municipality": "Bashkia Peqin",
+      "county": "Qarku i Elbasanit",
+      "display": "Bicaj, Përparim, Bashkia Peqin, Qarku i Elbasanit, 3502, Shqipëria"
+     },
+     {
+      "name": "Bicaj",
+      "type": "village",
+      "category": "place",
+      "lat": 40.7601642,
+      "lon": 20.3956283,
+      "municipality": "Bashkia Gramsh",
+      "county": "Qarku i Elbasanit",
+      "display": "Bicaj, Lënie, Bashkia Gramsh, Qarku i Elbasanit, 3309, Shqipëria"
+     },
+     {
+      "name": "Bicaj",
+      "type": "hamlet",
+      "category": "place",
+      "lat": 41.9297095,
+      "lon": 19.6483142,
+      "municipality": "Bashkia Vau-Dejës",
+      "county": "Qarku i Shkodrës",
+      "display": "Bicaj, Nënshatë, Hajmel, Bashkia Vau-Dejës, Qarku i Shkodrës, 4029, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Shishtavec",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Shishtavec",
+      "type": "village",
+      "category": "place",
+      "lat": 41.9796374,
+      "lon": 20.6059536,
+      "municipality": null,
+      "county": "Qarku i Kukësit",
+      "display": "Shishtavec, Bashkia Kukës, Qarku i Kukësit, 8517, Shqipëria"
+     },
+     {
+      "name": "Shishtavec",
+      "type": "city_district",
+      "category": "boundary",
+      "lat": 41.9763271,
+      "lon": 20.5819029,
+      "municipality": null,
+      "county": "Qarku i Kukësit",
+      "display": "Shishtavec, Bashkia Kukës, Qarku i Kukësit, 8517, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Surroj",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Surroj",
+      "type": "city_district",
+      "category": "boundary",
+      "lat": 41.9984429,
+      "lon": 20.3186247,
+      "municipality": null,
+      "county": "Qarku i Kukësit",
+      "display": "Surroj, Bashkia Kukës, Qarku i Kukësit, 8510, Shqipëria"
+     },
+     {
+      "name": "Surroj",
+      "type": "village",
+      "category": "place",
+      "lat": 41.9878683,
+      "lon": 20.3392426,
+      "municipality": null,
+      "county": "Qarku i Kukësit",
+      "display": "Surroj, Bashkia Kukës, Qarku i Kukësit, 8510, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Zapod",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Zapod",
+      "type": "city_district",
+      "category": "boundary",
+      "lat": 42.0547603,
+      "lon": 20.5319002,
+      "municipality": null,
+      "county": "Qarku i Kukësit",
+      "display": "Zapod, Bashkia Kukës, Qarku i Kukësit, 8515, Shqipëria"
+     },
+     {
+      "name": "Zapod",
+      "type": "village",
+      "category": "place",
+      "lat": 42.05087,
+      "lon": 20.5514901,
+      "municipality": null,
+      "county": "Qarku i Kukësit",
+      "display": "Zapod, Bashkia Kukës, Qarku i Kukësit, 8515, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Tërthorë",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Tërthorë",
+      "type": "city_district",
+      "category": "boundary",
+      "lat": 42.1133044,
+      "lon": 20.5165596,
+      "municipality": null,
+      "county": "Qarku i Kukësit",
+      "display": "Tërthorë, Bashkia Kukës, Qarku i Kukësit, Shqipëria"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "city": "Peshkopi",
+  "osm": {
+   "name": "Peshkopi",
+   "type": "town",
+   "category": "boundary",
+   "lat": 41.6848768,
+   "lon": 20.4287139,
+   "municipality": "Bashkia Dibër",
+   "county": "Qarku i Dibrës",
+   "display": "Peshkopi, Bashkia Dibër, Qarku i Dibrës, 8301, Shqipëria"
+  },
+  "municipality": "Bashkia Dibër",
+  "county": "Qarku i Dibrës",
+  "zones": [
+   {
+    "zone": "Qendër",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Qendër",
+      "type": "city",
+      "category": "boundary",
+      "lat": 42.2015792,
+      "lon": 19.3616511,
+      "municipality": "Bashkia Malësi e Madhe",
+      "county": "Qarku i Shkodrës",
+      "display": "Qendër, Bashkia Malësi e Madhe, Qarku i Shkodrës, 4301, Shqipëria"
+     },
+     {
+      "name": "Qendër",
+      "type": "city",
+      "category": "boundary",
+      "lat": 40.7430422,
+      "lon": 19.5557986,
+      "municipality": "Bashkia Fier",
+      "county": "Qarku i Fierit",
+      "display": "Qendër, Bashkia Fier, Qarku i Fierit, 9302, Shqipëria"
+     },
+     {
+      "name": "Qendër",
+      "type": "residential",
+      "category": "landuse",
+      "lat": 40.4453063,
+      "lon": 19.8007105,
+      "municipality": "Bashkia Mallakastër",
+      "county": "Qarku i Fierit",
+      "display": "Qendër, Çorrush, Kutë, Bashkia Mallakastër, Qarku i Fierit, 9329, Shqipëria"
+     },
+     {
+      "name": "Qendër Ersekë",
+      "type": "city",
+      "category": "boundary",
+      "lat": 40.3356012,
+      "lon": 20.72269,
+      "municipality": "Bashkia Kolonjë",
+      "county": "Qarku i Korçës",
+      "display": "Qendër Ersekë, Bashkia Kolonjë, Qarku i Korçës, 7401, Shqipëria"
+     },
+     {
+      "name": "Librazhd Qendër",
+      "type": "city",
+      "category": "boundary",
+      "lat": 41.2119415,
+      "lon": 20.3238168,
+      "municipality": "Bashkia Librazhd",
+      "county": "Qarku i Elbasanit",
+      "display": "Librazhd Qendër, Bashkia Librazhd, Qarku i Elbasanit, 3402, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Maqellarë",
+    "inCity": [
+     {
+      "name": "Peshkopi Tirane",
+      "type": "tertiary",
+      "category": "highway",
+      "lat": 41.5895975,
+      "lon": 20.4859737,
+      "municipality": "Bashkia Dibër",
+      "county": "Qarku i Dibrës",
+      "display": "Peshkopi Tirane, Pesjakë, Maqellarë, Bashkia Dibër, Qarku i Dibrës, 8302, Shqipëria"
+     },
+     {
+      "name": "Maqellare Peshkopi",
+      "type": "primary",
+      "category": "highway",
+      "lat": 41.593665,
+      "lon": 20.479176,
+      "municipality": "Bashkia Dibër",
+      "county": "Qarku i Dibrës",
+      "display": "Maqellare Peshkopi, Pesjakë, Maqellarë, Bashkia Dibër, Qarku i Dibrës, 8302, Shqipëria"
+     },
+     {
+      "name": "Maqellare Peshkopi",
+      "type": "primary",
+      "category": "highway",
+      "lat": 41.6140587,
+      "lon": 20.4681759,
+      "municipality": "Bashkia Dibër",
+      "county": "Qarku i Dibrës",
+      "display": "Maqellare Peshkopi, Grazhdan, Maqellarë, Bashkia Dibër, Qarku i Dibrës, 8302, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Melan",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Melan",
+      "type": "village",
+      "category": "boundary",
+      "lat": 41.6549196,
+      "lon": 20.4645851,
+      "municipality": "Bashkia Dibër",
+      "county": "Qarku i Dibrës",
+      "display": "Melan, Bashkia Dibër, Qarku i Dibrës, 8303, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Tomin",
+    "inCity": [
+     {
+      "name": "Peshkopi Kukes",
+      "type": "secondary",
+      "category": "highway",
+      "lat": 41.6929961,
+      "lon": 20.3756779,
+      "municipality": "Bashkia Dibër",
+      "county": "Qarku i Dibrës",
+      "display": "Peshkopi Kukes, Zdojan, Tomin, Bashkia Dibër, Qarku i Dibrës, 8304, Shqipëria"
+     },
+     {
+      "name": "Peshkopi Kukes",
+      "type": "secondary",
+      "category": "highway",
+      "lat": 41.6918461,
+      "lon": 20.4083426,
+      "municipality": "Bashkia Dibër",
+      "county": "Qarku i Dibrës",
+      "display": "Peshkopi Kukes, Kabe, Pilafë, Tomin, Bashkia Dibër, Qarku i Dibrës, 8304, Shqipëria"
+     },
+     {
+      "name": "Unaza e Peshkopisë",
+      "type": "secondary",
+      "category": "highway",
+      "lat": 41.6758527,
+      "lon": 20.4275371,
+      "municipality": "Bashkia Dibër",
+      "county": "Qarku i Dibrës",
+      "display": "Unaza e Peshkopisë, Dohoshisht, Tomin, Bashkia Dibër, Qarku i Dibrës, 8304, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Luzni",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Luzni",
+      "type": "city",
+      "category": "boundary",
+      "lat": 41.6420038,
+      "lon": 20.3490862,
+      "municipality": "Bashkia Dibër",
+      "county": "Qarku i Dibrës",
+      "display": "Luzni, Bashkia Dibër, Qarku i Dibrës, 8314, Shqipëria"
+     },
+     {
+      "name": "Bllatë e Sipërme",
+      "type": "village",
+      "category": "place",
+      "lat": 41.5636281,
+      "lon": 20.489507,
+      "municipality": "Bashkia Dibër",
+      "county": "Qarku i Dibrës",
+      "display": "Bllatë e Sipërme, Maqellarë, Bashkia Dibër, Qarku i Dibrës, 8302, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Selishtë",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Selishtë",
+      "type": "village",
+      "category": "boundary",
+      "lat": 41.6273457,
+      "lon": 20.2735541,
+      "municipality": "Bashkia Dibër",
+      "county": "Qarku i Dibrës",
+      "display": "Selishtë, Bashkia Dibër, Qarku i Dibrës, 8313, Shqipëria"
+     },
+     {
+      "name": "Selishtë",
+      "type": "village",
+      "category": "place",
+      "lat": 41.003899,
+      "lon": 20.4764492,
+      "municipality": "Bashkia Pogradec",
+      "county": "Qarku i Korçës",
+      "display": "Selishtë, Proptisht, Bashkia Pogradec, Qarku i Korçës, 7308, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Kastriot",
+    "inCity": [
+     {
+      "name": "Peshkopi Kukes",
+      "type": "secondary",
+      "category": "highway",
+      "lat": 41.6929961,
+      "lon": 20.3756779,
+      "municipality": "Bashkia Dibër",
+      "county": "Qarku i Dibrës",
+      "display": "Peshkopi Kukes, Zdojan, Tomin, Bashkia Dibër, Qarku i Dibrës, 8304, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Sllovë",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Sllovë",
+      "type": "village",
+      "category": "boundary",
+      "lat": 41.8029517,
+      "lon": 20.4106784,
+      "municipality": "Bashkia Dibër",
+      "county": "Qarku i Dibrës",
+      "display": "Sllovë, Bashkia Dibër, Qarku i Dibrës, 8307, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Radomirë",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Radomirë",
+      "type": "village",
+      "category": "place",
+      "lat": 41.8156832,
+      "lon": 20.4850426,
+      "municipality": "Bashkia Dibër",
+      "county": "Qarku i Dibrës",
+      "display": "Radomirë, Kala e Dodës, Bashkia Dibër, Qarku i Dibrës, 8308, Shqipëria"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "city": "Krujë",
+  "osm": {
+   "name": "Bashkia Krujë",
+   "type": "town",
+   "category": "boundary",
+   "lat": 41.511251,
+   "lon": 19.792852,
+   "municipality": null,
+   "county": "Qarku i Durrësit",
+   "display": "Bashkia Krujë, Qarku i Durrësit, Shqipëria"
+  },
+  "municipality": null,
+  "county": "Qarku i Durrësit",
+  "zones": [
+   {
+    "zone": "Qendër",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Qendër",
+      "type": "city",
+      "category": "boundary",
+      "lat": 42.2015792,
+      "lon": 19.3616511,
+      "municipality": "Bashkia Malësi e Madhe",
+      "county": "Qarku i Shkodrës",
+      "display": "Qendër, Bashkia Malësi e Madhe, Qarku i Shkodrës, 4301, Shqipëria"
+     },
+     {
+      "name": "Qendër",
+      "type": "city",
+      "category": "boundary",
+      "lat": 40.7430422,
+      "lon": 19.5557986,
+      "municipality": "Bashkia Fier",
+      "county": "Qarku i Fierit",
+      "display": "Qendër, Bashkia Fier, Qarku i Fierit, 9302, Shqipëria"
+     },
+     {
+      "name": "Qendër",
+      "type": "residential",
+      "category": "landuse",
+      "lat": 40.4453063,
+      "lon": 19.8007105,
+      "municipality": "Bashkia Mallakastër",
+      "county": "Qarku i Fierit",
+      "display": "Qendër, Çorrush, Kutë, Bashkia Mallakastër, Qarku i Fierit, 9329, Shqipëria"
+     },
+     {
+      "name": "Qendër Ersekë",
+      "type": "city",
+      "category": "boundary",
+      "lat": 40.3356012,
+      "lon": 20.72269,
+      "municipality": "Bashkia Kolonjë",
+      "county": "Qarku i Korçës",
+      "display": "Qendër Ersekë, Bashkia Kolonjë, Qarku i Korçës, 7401, Shqipëria"
+     },
+     {
+      "name": "Librazhd Qendër",
+      "type": "city",
+      "category": "boundary",
+      "lat": 41.2119415,
+      "lon": 20.3238168,
+      "municipality": "Bashkia Librazhd",
+      "county": "Qarku i Elbasanit",
+      "display": "Librazhd Qendër, Bashkia Librazhd, Qarku i Elbasanit, 3402, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Kala",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Kala",
+      "type": "building",
+      "category": "building",
+      "lat": 40.2534004,
+      "lon": 20.1595635,
+      "municipality": "Bashkia Këlcyrë",
+      "county": "Qarku i Gjirokastrës",
+      "display": "Kala, SH75, Gurë (Këlcyrë), Fshat Këlcyrë, Këlcyrë, Bashkia Këlcyrë, Qarku i Gjirokastrës, 6402, Shqipëria"
+     },
+     {
+      "name": "Kala e Dodës",
+      "type": "city",
+      "category": "boundary",
+      "lat": 41.8128498,
+      "lon": 20.5179748,
+      "municipality": "Bashkia Dibër",
+      "county": "Qarku i Dibrës",
+      "display": "Kala e Dodës, Bashkia Dibër, Qarku i Dibrës, 8308, Shqipëria"
+     },
+     {
+      "name": "Maja Kala",
+      "type": "peak",
+      "category": "natural",
+      "lat": 40.947767,
+      "lon": 20.0324745,
+      "municipality": "Bashkia Cërrik",
+      "county": "Qarku i Elbasanit",
+      "display": "Maja Kala, Klos, Bashkia Cërrik, Qarku i Elbasanit, 3020, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Pazari i Vjetër",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Pazari i Vjetër",
+      "type": "amenity",
+      "category": "amenity",
+      "lat": 40.6177468,
+      "lon": 20.774764,
+      "municipality": "Bashkia Korçë",
+      "county": "Qarku i Korçës",
+      "display": "Pazari i Vjetër, Rrugica Koli Karapanxha, Pazari i Korçës, Korçë, Bashkia Korçë, Qarku i Korçës, 7001, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Fushë-Krujë",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Fushë-Krujë",
+      "type": "town",
+      "category": "boundary",
+      "lat": 41.4791135,
+      "lon": 19.7205635,
+      "municipality": null,
+      "county": "Qarku i Durrësit",
+      "display": "Fushë-Krujë, Bashkia Krujë, Qarku i Durrësit, 1502, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Nikël",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Nikël",
+      "type": "village",
+      "category": "boundary",
+      "lat": 41.4372243,
+      "lon": 19.7413751,
+      "municipality": null,
+      "county": "Qarku i Durrësit",
+      "display": "Nikël, Bashkia Krujë, Qarku i Durrësit, 1504, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Bubq",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Bubq",
+      "type": "city_district",
+      "category": "boundary",
+      "lat": 41.4737961,
+      "lon": 19.641365,
+      "municipality": null,
+      "county": "Qarku i Durrësit",
+      "display": "Bubq, Bashkia Krujë, Qarku i Durrësit, 1505, Shqipëria"
+     },
+     {
+      "name": "Bubq",
+      "type": "village",
+      "category": "place",
+      "lat": 41.4713963,
+      "lon": 19.6545539,
+      "municipality": null,
+      "county": "Qarku i Durrësit",
+      "display": "Bubq, Bashkia Krujë, Qarku i Durrësit, 1505, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Cudhi",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Cudhi",
+      "type": "city_district",
+      "category": "boundary",
+      "lat": 41.5256477,
+      "lon": 19.8517929,
+      "municipality": null,
+      "county": "Qarku i Durrësit",
+      "display": "Cudhi, Bashkia Krujë, Qarku i Durrësit, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Sarisalltik",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Sarisalltik Baba",
+      "type": "tourism",
+      "category": "tourism",
+      "lat": 41.5173423,
+      "lon": 19.8020562,
+      "municipality": null,
+      "county": "Qarku i Durrësit",
+      "display": "Sarisalltik Baba, Rruga Malit, Krujë, Bashkia Krujë, Qarku i Durrësit, 1501, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Zgërdhesh",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Zgërdhesh",
+      "type": "village",
+      "category": "place",
+      "lat": 41.475806,
+      "lon": 19.7634937,
+      "municipality": null,
+      "county": "Qarku i Durrësit",
+      "display": "Zgërdhesh, Bashkia Krujë, Qarku i Durrësit, 1501, Shqipëria"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "city": "Laç",
+  "osm": {
+   "name": "Laç",
+   "type": "town",
+   "category": "boundary",
+   "lat": 41.635741,
+   "lon": 19.7123916,
+   "municipality": "Bashkia Kurbin",
+   "county": "Qarku i Lezhës",
+   "display": "Laç, Bashkia Kurbin, Qarku i Lezhës, 4701, Shqipëria"
+  },
+  "municipality": "Bashkia Kurbin",
+  "county": "Qarku i Lezhës",
+  "zones": [
+   {
+    "zone": "Qendër",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Qendër",
+      "type": "city",
+      "category": "boundary",
+      "lat": 42.2015792,
+      "lon": 19.3616511,
+      "municipality": "Bashkia Malësi e Madhe",
+      "county": "Qarku i Shkodrës",
+      "display": "Qendër, Bashkia Malësi e Madhe, Qarku i Shkodrës, 4301, Shqipëria"
+     },
+     {
+      "name": "Qendër",
+      "type": "city",
+      "category": "boundary",
+      "lat": 40.7430422,
+      "lon": 19.5557986,
+      "municipality": "Bashkia Fier",
+      "county": "Qarku i Fierit",
+      "display": "Qendër, Bashkia Fier, Qarku i Fierit, 9302, Shqipëria"
+     },
+     {
+      "name": "Qendër",
+      "type": "residential",
+      "category": "landuse",
+      "lat": 40.4453063,
+      "lon": 19.8007105,
+      "municipality": "Bashkia Mallakastër",
+      "county": "Qarku i Fierit",
+      "display": "Qendër, Çorrush, Kutë, Bashkia Mallakastër, Qarku i Fierit, 9329, Shqipëria"
+     },
+     {
+      "name": "Qendër Ersekë",
+      "type": "city",
+      "category": "boundary",
+      "lat": 40.3356012,
+      "lon": 20.72269,
+      "municipality": "Bashkia Kolonjë",
+      "county": "Qarku i Korçës",
+      "display": "Qendër Ersekë, Bashkia Kolonjë, Qarku i Korçës, 7401, Shqipëria"
+     },
+     {
+      "name": "Librazhd Qendër",
+      "type": "city",
+      "category": "boundary",
+      "lat": 41.2119415,
+      "lon": 20.3238168,
+      "municipality": "Bashkia Librazhd",
+      "county": "Qarku i Elbasanit",
+      "display": "Librazhd Qendër, Bashkia Librazhd, Qarku i Elbasanit, 3402, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Mamurras",
+    "inCity": [
+     {
+      "name": "Laç",
+      "type": "railway",
+      "category": "railway",
+      "lat": 41.6378644,
+      "lon": 19.7005902,
+      "municipality": "Bashkia Kurbin",
+      "county": "Qarku i Lezhës",
+      "display": "Laç, Koder Lac, Sanxhak, Laç, Bashkia Kurbin, Qarku i Lezhës, 4701, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Milot",
+    "inCity": [
+     {
+      "name": "Lac Milot",
+      "type": "residential",
+      "category": "highway",
+      "lat": 41.6310345,
+      "lon": 19.710471,
+      "municipality": "Bashkia Kurbin",
+      "county": "Qarku i Lezhës",
+      "display": "Lac Milot, Sanxhak, Laç, Bashkia Kurbin, Qarku i Lezhës, 4701, Shqipëria"
+     },
+     {
+      "name": "Lac Milot",
+      "type": "residential",
+      "category": "highway",
+      "lat": 41.6437737,
+      "lon": 19.7084451,
+      "municipality": "Bashkia Kurbin",
+      "county": "Qarku i Lezhës",
+      "display": "Lac Milot, Laç, Bashkia Kurbin, Qarku i Lezhës, 4701, Shqipëria"
+     },
+     {
+      "name": "Lac Milot",
+      "type": "residential",
+      "category": "highway",
+      "lat": 41.648692,
+      "lon": 19.7076047,
+      "municipality": "Bashkia Kurbin",
+      "county": "Qarku i Lezhës",
+      "display": "Lac Milot, Shullaz, Milot, Bashkia Kurbin, Qarku i Lezhës, 4705, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Fushë-Kuqe",
+    "inCity": [
+     {
+      "name": "Gore Lac",
+      "type": "residential",
+      "category": "highway",
+      "lat": 41.6423463,
+      "lon": 19.6461116,
+      "municipality": "Bashkia Kurbin",
+      "county": "Qarku i Lezhës",
+      "display": "Gore Lac, Gorre, Fushë-Kuqe, Bashkia Kurbin, Qarku i Lezhës, 4706, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Sanxhak",
+    "inCity": [
+     {
+      "name": "Sanxhak",
+      "type": "village",
+      "category": "place",
+      "lat": 41.6205329,
+      "lon": 19.7125823,
+      "municipality": "Bashkia Kurbin",
+      "county": "Qarku i Lezhës",
+      "display": "Sanxhak, Laç, Bashkia Kurbin, Qarku i Lezhës, 4701, Shqipëria"
+     },
+     {
+      "name": "Laç",
+      "type": "railway",
+      "category": "railway",
+      "lat": 41.6378644,
+      "lon": 19.7005902,
+      "municipality": "Bashkia Kurbin",
+      "county": "Qarku i Lezhës",
+      "display": "Laç, Koder Lac, Sanxhak, Laç, Bashkia Kurbin, Qarku i Lezhës, 4701, Shqipëria"
+     },
+     {
+      "name": "Sanxhak",
+      "type": "residential",
+      "category": "highway",
+      "lat": 41.6208931,
+      "lon": 19.7109175,
+      "municipality": "Bashkia Kurbin",
+      "county": "Qarku i Lezhës",
+      "display": "Sanxhak, Laç, Bashkia Kurbin, Qarku i Lezhës, 4701, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Kakarriq",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Balldren Kakarriq Gjader",
+      "type": "secondary",
+      "category": "highway",
+      "lat": 41.8510941,
+      "lon": 19.6162318,
+      "municipality": null,
+      "county": "Qarku i Lezhës",
+      "display": "Balldren Kakarriq Gjader, Sirmak, Balldren, Bashkia Lezhë, Qarku i Lezhës, 4504, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Troshan",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Troshan",
+      "type": "village",
+      "category": "place",
+      "lat": 41.876659,
+      "lon": 19.6764521,
+      "municipality": null,
+      "county": "Qarku i Lezhës",
+      "display": "Troshan, Bashkia Lezhë, Qarku i Lezhës, 4505, Shqipëria"
+     },
+     {
+      "name": "Troshan (Vrith)",
+      "type": "hamlet",
+      "category": "place",
+      "lat": 42.3462761,
+      "lon": 19.545646,
+      "municipality": "Bashkia Malësi e Madhe",
+      "county": "Qarku i Shkodrës",
+      "display": "Troshan (Vrith), Kastrat, Bashkia Malësi e Madhe, Qarku i Shkodrës, 4306, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Delbnisht",
+    "inCity": [
+     {
+      "name": "Shullaz Delbnisht",
+      "type": "unclassified",
+      "category": "highway",
+      "lat": 41.6499144,
+      "lon": 19.7164614,
+      "municipality": "Bashkia Kurbin",
+      "county": "Qarku i Lezhës",
+      "display": "Shullaz Delbnisht, Mal i Bardhë, Milot, Bashkia Kurbin, Qarku i Lezhës, 4705, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   }
+  ]
+ },
+ {
+  "city": "Burrel",
+  "osm": {
+   "name": "Burrel",
+   "type": "town",
+   "category": "boundary",
+   "lat": 41.610429,
+   "lon": 20.0130651,
+   "municipality": "Bashkia Mat",
+   "county": "Qarku i Dibrës",
+   "display": "Burrel, Bashkia Mat, Qarku i Dibrës, 8001, Shqipëria"
+  },
+  "municipality": "Bashkia Mat",
+  "county": "Qarku i Dibrës",
+  "zones": [
+   {
+    "zone": "Qendër",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Qendër",
+      "type": "city",
+      "category": "boundary",
+      "lat": 42.2015792,
+      "lon": 19.3616511,
+      "municipality": "Bashkia Malësi e Madhe",
+      "county": "Qarku i Shkodrës",
+      "display": "Qendër, Bashkia Malësi e Madhe, Qarku i Shkodrës, 4301, Shqipëria"
+     },
+     {
+      "name": "Qendër",
+      "type": "city",
+      "category": "boundary",
+      "lat": 40.7430422,
+      "lon": 19.5557986,
+      "municipality": "Bashkia Fier",
+      "county": "Qarku i Fierit",
+      "display": "Qendër, Bashkia Fier, Qarku i Fierit, 9302, Shqipëria"
+     },
+     {
+      "name": "Qendër",
+      "type": "residential",
+      "category": "landuse",
+      "lat": 40.4453063,
+      "lon": 19.8007105,
+      "municipality": "Bashkia Mallakastër",
+      "county": "Qarku i Fierit",
+      "display": "Qendër, Çorrush, Kutë, Bashkia Mallakastër, Qarku i Fierit, 9329, Shqipëria"
+     },
+     {
+      "name": "Qendër Ersekë",
+      "type": "city",
+      "category": "boundary",
+      "lat": 40.3356012,
+      "lon": 20.72269,
+      "municipality": "Bashkia Kolonjë",
+      "county": "Qarku i Korçës",
+      "display": "Qendër Ersekë, Bashkia Kolonjë, Qarku i Korçës, 7401, Shqipëria"
+     },
+     {
+      "name": "Librazhd Qendër",
+      "type": "city",
+      "category": "boundary",
+      "lat": 41.2119415,
+      "lon": 20.3238168,
+      "municipality": "Bashkia Librazhd",
+      "county": "Qarku i Elbasanit",
+      "display": "Librazhd Qendër, Bashkia Librazhd, Qarku i Elbasanit, 3402, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Suç",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Suç",
+      "type": "village",
+      "category": "boundary",
+      "lat": 41.5751431,
+      "lon": 20.0504498,
+      "municipality": "Bashkia Klos",
+      "county": "Qarku i Dibrës",
+      "display": "Suç, Bashkia Klos, Qarku i Dibrës, 8007, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Baz",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Baz",
+      "type": "village",
+      "category": "boundary",
+      "lat": 41.6317778,
+      "lon": 19.9307855,
+      "municipality": "Bashkia Mat",
+      "county": "Qarku i Dibrës",
+      "display": "Baz, Bashkia Mat, Qarku i Dibrës, 8004, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Macukull",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Macukull",
+      "type": "village",
+      "category": "boundary",
+      "lat": 41.6932494,
+      "lon": 20.1089763,
+      "municipality": "Bashkia Mat",
+      "county": "Qarku i Dibrës",
+      "display": "Macukull, Bashkia Mat, Qarku i Dibrës, 8011, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Ulëz",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Ulëz",
+      "type": "village",
+      "category": "boundary",
+      "lat": 41.6821908,
+      "lon": 19.8918946,
+      "municipality": "Bashkia Mat",
+      "county": "Qarku i Dibrës",
+      "display": "Ulëz, Bashkia Mat, Qarku i Dibrës, 8003, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Klos",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Klos",
+      "type": "town",
+      "category": "boundary",
+      "lat": 41.5072297,
+      "lon": 20.0850706,
+      "municipality": "Bashkia Klos",
+      "county": "Qarku i Dibrës",
+      "display": "Klos, Bashkia Klos, Qarku i Dibrës, 8002, Shqipëria"
+     },
+     {
+      "name": "Klos",
+      "type": "village",
+      "category": "boundary",
+      "lat": 40.9435506,
+      "lon": 20.0102412,
+      "municipality": "Bashkia Cërrik",
+      "county": "Qarku i Elbasanit",
+      "display": "Klos, Bashkia Cërrik, Qarku i Elbasanit, 3020, Shqipëria"
+     },
+     {
+      "name": "Klos",
+      "type": "village",
+      "category": "place",
+      "lat": 41.9273688,
+      "lon": 20.1548087,
+      "municipality": "Bashkia Mirditë",
+      "county": "Qarku i Lezhës",
+      "display": "Klos, Fan, Bashkia Mirditë, Qarku i Lezhës, 4608, Shqipëria"
+     },
+     {
+      "name": "Klos",
+      "type": "village",
+      "category": "place",
+      "lat": 40.5301285,
+      "lon": 19.7496094,
+      "municipality": "Bashkia Mallakastër",
+      "county": "Qarku i Fierit",
+      "display": "Klos, Hekal, Bashkia Mallakastër, Qarku i Fierit, 9332, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Martanesh",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Martanesh",
+      "type": "village",
+      "category": "boundary",
+      "lat": 41.4232172,
+      "lon": 20.2034934,
+      "municipality": null,
+      "county": "Qarku i Dibrës",
+      "display": "Martanesh, Bashkia Bulqizë, Qarku i Dibrës, 8403, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Zerqan",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Zerqan",
+      "type": "city_district",
+      "category": "boundary",
+      "lat": 41.4789357,
+      "lon": 20.3624492,
+      "municipality": null,
+      "county": "Qarku i Dibrës",
+      "display": "Zerqan, Bashkia Bulqizë, Qarku i Dibrës, 8406, Shqipëria"
+     },
+     {
+      "name": "Zerqan",
+      "type": "village",
+      "category": "place",
+      "lat": 41.5032582,
+      "lon": 20.3556273,
+      "municipality": null,
+      "county": "Qarku i Dibrës",
+      "display": "Zerqan, Bashkia Bulqizë, Qarku i Dibrës, 8406, Shqipëria"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "city": "Bulqizë",
+  "osm": {
+   "name": "Bashkia Bulqizë",
+   "type": "town",
+   "category": "boundary",
+   "lat": 41.4922026,
+   "lon": 20.2183758,
+   "municipality": null,
+   "county": "Qarku i Dibrës",
+   "display": "Bashkia Bulqizë, Qarku i Dibrës, Shqipëria"
+  },
+  "municipality": null,
+  "county": "Qarku i Dibrës",
+  "zones": [
+   {
+    "zone": "Qendër",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Qendër",
+      "type": "city",
+      "category": "boundary",
+      "lat": 42.2015792,
+      "lon": 19.3616511,
+      "municipality": "Bashkia Malësi e Madhe",
+      "county": "Qarku i Shkodrës",
+      "display": "Qendër, Bashkia Malësi e Madhe, Qarku i Shkodrës, 4301, Shqipëria"
+     },
+     {
+      "name": "Qendër",
+      "type": "city",
+      "category": "boundary",
+      "lat": 40.7430422,
+      "lon": 19.5557986,
+      "municipality": "Bashkia Fier",
+      "county": "Qarku i Fierit",
+      "display": "Qendër, Bashkia Fier, Qarku i Fierit, 9302, Shqipëria"
+     },
+     {
+      "name": "Qendër",
+      "type": "residential",
+      "category": "landuse",
+      "lat": 40.4453063,
+      "lon": 19.8007105,
+      "municipality": "Bashkia Mallakastër",
+      "county": "Qarku i Fierit",
+      "display": "Qendër, Çorrush, Kutë, Bashkia Mallakastër, Qarku i Fierit, 9329, Shqipëria"
+     },
+     {
+      "name": "Qendër Ersekë",
+      "type": "city",
+      "category": "boundary",
+      "lat": 40.3356012,
+      "lon": 20.72269,
+      "municipality": "Bashkia Kolonjë",
+      "county": "Qarku i Korçës",
+      "display": "Qendër Ersekë, Bashkia Kolonjë, Qarku i Korçës, 7401, Shqipëria"
+     },
+     {
+      "name": "Librazhd Qendër",
+      "type": "city",
+      "category": "boundary",
+      "lat": 41.2119415,
+      "lon": 20.3238168,
+      "municipality": "Bashkia Librazhd",
+      "county": "Qarku i Elbasanit",
+      "display": "Librazhd Qendër, Bashkia Librazhd, Qarku i Elbasanit, 3402, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Shupenzë",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Shupenzë",
+      "type": "city_district",
+      "category": "boundary",
+      "lat": 41.5751906,
+      "lon": 20.3714345,
+      "municipality": null,
+      "county": "Qarku i Dibrës",
+      "display": "Shupenzë, Bashkia Bulqizë, Qarku i Dibrës, 8404, Shqipëria"
+     },
+     {
+      "name": "Okshatinë",
+      "type": "village",
+      "category": "place",
+      "lat": 41.5637751,
+      "lon": 20.4285568,
+      "municipality": null,
+      "county": "Qarku i Dibrës",
+      "display": "Okshatinë, Bashkia Bulqizë, Qarku i Dibrës, 8404, Shqipëria"
+     },
+     {
+      "name": "Boçovë",
+      "type": "village",
+      "category": "place",
+      "lat": 41.5415987,
+      "lon": 20.4230557,
+      "municipality": null,
+      "county": "Qarku i Dibrës",
+      "display": "Boçovë, Bashkia Bulqizë, Qarku i Dibrës, 8407, Shqipëria"
+     },
+     {
+      "name": "Shupenzë",
+      "type": "village",
+      "category": "place",
+      "lat": 41.5308882,
+      "lon": 20.4232675,
+      "municipality": null,
+      "county": "Qarku i Dibrës",
+      "display": "Shupenzë, Bashkia Bulqizë, Qarku i Dibrës, 8407, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Homesh",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Homesh",
+      "type": "village",
+      "category": "place",
+      "lat": 41.5521859,
+      "lon": 20.4279527,
+      "municipality": null,
+      "county": "Qarku i Dibrës",
+      "display": "Homesh, Bashkia Bulqizë, Qarku i Dibrës, 8407, Shqipëria"
+     },
+     {
+      "name": "Homesh",
+      "type": "tertiary",
+      "category": "highway",
+      "lat": 41.5627357,
+      "lon": 20.4126979,
+      "municipality": null,
+      "county": "Qarku i Dibrës",
+      "display": "Homesh, Shupenzë, Bashkia Bulqizë, Qarku i Dibrës, 8404, Shqipëria"
+     },
+     {
+      "name": "Homesh",
+      "type": "secondary",
+      "category": "highway",
+      "lat": 41.5484238,
+      "lon": 20.4267536,
+      "municipality": null,
+      "county": "Qarku i Dibrës",
+      "display": "Homesh, Shupenzë, Bashkia Bulqizë, Qarku i Dibrës, 8404, Shqipëria"
+     },
+     {
+      "name": "Homesh",
+      "type": "residential",
+      "category": "highway",
+      "lat": 41.5606586,
+      "lon": 20.4173721,
+      "municipality": null,
+      "county": "Qarku i Dibrës",
+      "display": "Homesh, Shupenzë, Bashkia Bulqizë, Qarku i Dibrës, 8404, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Ostren",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Ostren",
+      "type": "city_district",
+      "category": "boundary",
+      "lat": 41.4317355,
+      "lon": 20.4566545,
+      "municipality": null,
+      "county": "Qarku i Dibrës",
+      "display": "Ostren, Bashkia Bulqizë, Qarku i Dibrës, 8405, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Martanesh",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Martanesh",
+      "type": "village",
+      "category": "boundary",
+      "lat": 41.4232172,
+      "lon": 20.2034934,
+      "municipality": null,
+      "county": "Qarku i Dibrës",
+      "display": "Martanesh, Bashkia Bulqizë, Qarku i Dibrës, 8403, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Zerqan",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Zerqan",
+      "type": "city_district",
+      "category": "boundary",
+      "lat": 41.4789357,
+      "lon": 20.3624492,
+      "municipality": null,
+      "county": "Qarku i Dibrës",
+      "display": "Zerqan, Bashkia Bulqizë, Qarku i Dibrës, 8406, Shqipëria"
+     },
+     {
+      "name": "Zerqan",
+      "type": "village",
+      "category": "place",
+      "lat": 41.5032582,
+      "lon": 20.3556273,
+      "municipality": null,
+      "county": "Qarku i Dibrës",
+      "display": "Zerqan, Bashkia Bulqizë, Qarku i Dibrës, 8406, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Fushë-Bulqizë",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Fushë-Bulqizë",
+      "type": "city_district",
+      "category": "boundary",
+      "lat": 41.5195235,
+      "lon": 20.2838112,
+      "municipality": null,
+      "county": "Qarku i Dibrës",
+      "display": "Fushë-Bulqizë, Bashkia Bulqizë, Qarku i Dibrës, Shqipëria"
+     },
+     {
+      "name": "Fushë Bulqizë",
+      "type": "village",
+      "category": "place",
+      "lat": 41.5220116,
+      "lon": 20.2819272,
+      "municipality": null,
+      "county": "Qarku i Dibrës",
+      "display": "Fushë Bulqizë, Bashkia Bulqizë, Qarku i Dibrës, 8401, Shqipëria"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "city": "Gramsh",
+  "osm": {
+   "name": "Gramsh",
+   "type": "town",
+   "category": "boundary",
+   "lat": 40.8654273,
+   "lon": 20.1864495,
+   "municipality": "Bashkia Gramsh",
+   "county": "Qarku i Elbasanit",
+   "display": "Gramsh, Bashkia Gramsh, Qarku i Elbasanit, 3301, Shqipëria"
+  },
+  "municipality": "Bashkia Gramsh",
+  "county": "Qarku i Elbasanit",
+  "zones": [
+   {
+    "zone": "Qendër",
+    "inCity": [
+     {
+      "name": "Qënder Ditore për Pensionistët",
+      "type": "amenity",
+      "category": "amenity",
+      "lat": 40.8690373,
+      "lon": 20.1841691,
+      "municipality": "Bashkia Gramsh",
+      "county": "Qarku i Elbasanit",
+      "display": "Qënder Ditore për Pensionistët, 10 Korriku, Gramsh, Bashkia Gramsh, Qarku i Elbasanit, 3301, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Kodovjat",
+    "inCity": [
+     {
+      "name": "Kodovjat",
+      "type": "village",
+      "category": "boundary",
+      "lat": 40.8056371,
+      "lon": 20.2509188,
+      "municipality": "Bashkia Gramsh",
+      "county": "Qarku i Elbasanit",
+      "display": "Kodovjat, Bashkia Gramsh, Qarku i Elbasanit, 3310, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Poroçan",
+    "inCity": [
+     {
+      "name": "Poroçan",
+      "type": "village",
+      "category": "place",
+      "lat": 40.9360561,
+      "lon": 20.2902543,
+      "municipality": "Bashkia Gramsh",
+      "county": "Qarku i Elbasanit",
+      "display": "Poroçan, Bashkia Gramsh, Qarku i Elbasanit, 3308, Shqipëria"
+     },
+     {
+      "name": "Poroçan",
+      "type": "city",
+      "category": "boundary",
+      "lat": 40.9203479,
+      "lon": 20.3114043,
+      "municipality": "Bashkia Gramsh",
+      "county": "Qarku i Elbasanit",
+      "display": "Poroçan, Bashkia Gramsh, Qarku i Elbasanit, 3308, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Skënderbegas",
+    "inCity": [
+     {
+      "name": "Skëndërbegas",
+      "type": "village",
+      "category": "place",
+      "lat": 40.7772493,
+      "lon": 20.2393121,
+      "municipality": "Bashkia Gramsh",
+      "county": "Qarku i Elbasanit",
+      "display": "Skëndërbegas, Skënderbegas, Bashkia Gramsh, Qarku i Elbasanit, 3303, Shqipëria"
+     },
+     {
+      "name": "Skënderbegas",
+      "type": "city",
+      "category": "boundary",
+      "lat": 40.7734037,
+      "lon": 20.2523389,
+      "municipality": "Bashkia Gramsh",
+      "county": "Qarku i Elbasanit",
+      "display": "Skënderbegas, Bashkia Gramsh, Qarku i Elbasanit, 3303, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Kushovë",
+    "inCity": [
+     {
+      "name": "Kushovë",
+      "type": "village",
+      "category": "place",
+      "lat": 40.7881926,
+      "lon": 20.1880618,
+      "municipality": "Bashkia Gramsh",
+      "county": "Qarku i Elbasanit",
+      "display": "Kushovë, Bashkia Gramsh, Qarku i Elbasanit, 3306, Shqipëria"
+     },
+     {
+      "name": "Kushovë",
+      "type": "city",
+      "category": "boundary",
+      "lat": 40.7811157,
+      "lon": 20.1645253,
+      "municipality": "Bashkia Gramsh",
+      "county": "Qarku i Elbasanit",
+      "display": "Kushovë, Bashkia Gramsh, Qarku i Elbasanit, 3306, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Lënie",
+    "inCity": [
+     {
+      "name": "Lenie",
+      "type": "village",
+      "category": "place",
+      "lat": 40.7652176,
+      "lon": 20.3896364,
+      "municipality": "Bashkia Gramsh",
+      "county": "Qarku i Elbasanit",
+      "display": "Lenie, Lënie, Bashkia Gramsh, Qarku i Elbasanit, 3309, Shqipëria"
+     },
+     {
+      "name": "Lënie",
+      "type": "city",
+      "category": "boundary",
+      "lat": 40.7963466,
+      "lon": 20.4027616,
+      "municipality": "Bashkia Gramsh",
+      "county": "Qarku i Elbasanit",
+      "display": "Lënie, Bashkia Gramsh, Qarku i Elbasanit, 3309, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Sult",
+    "inCity": [
+     {
+      "name": "Sult",
+      "type": "village",
+      "category": "place",
+      "lat": 40.883013,
+      "lon": 20.1023279,
+      "municipality": "Bashkia Gramsh",
+      "county": "Qarku i Elbasanit",
+      "display": "Sult, Bashkia Gramsh, Qarku i Elbasanit, 3304, Shqipëria"
+     },
+     {
+      "name": "Sult",
+      "type": "city",
+      "category": "boundary",
+      "lat": 40.9089384,
+      "lon": 20.1001153,
+      "municipality": "Bashkia Gramsh",
+      "county": "Qarku i Elbasanit",
+      "display": "Sult, Bashkia Gramsh, Qarku i Elbasanit, 3304, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   }
+  ]
+ },
+ {
+  "city": "Librazhd",
+  "osm": {
+   "name": "Librazhd",
+   "type": "town",
+   "category": "boundary",
+   "lat": 41.1802251,
+   "lon": 20.3167518,
+   "municipality": "Bashkia Librazhd",
+   "county": "Qarku i Elbasanit",
+   "display": "Librazhd, Bashkia Librazhd, Qarku i Elbasanit, 3401, Shqipëria"
+  },
+  "municipality": "Bashkia Librazhd",
+  "county": "Qarku i Elbasanit",
+  "zones": [
+   {
+    "zone": "Qendër",
+    "inCity": [
+     {
+      "name": "Librazhd Qendër",
+      "type": "city",
+      "category": "boundary",
+      "lat": 41.2119415,
+      "lon": 20.3238168,
+      "municipality": "Bashkia Librazhd",
+      "county": "Qarku i Elbasanit",
+      "display": "Librazhd Qendër, Bashkia Librazhd, Qarku i Elbasanit, 3402, Shqipëria"
+     },
+     {
+      "name": "Librazhd Katund",
+      "type": "village",
+      "category": "place",
+      "lat": 41.2115445,
+      "lon": 20.3622287,
+      "municipality": "Bashkia Librazhd",
+      "county": "Qarku i Elbasanit",
+      "display": "Librazhd Katund, Librazhd Qendër, Bashkia Librazhd, Qarku i Elbasanit, 3402, Shqipëria"
+     },
+     {
+      "name": "Librazhd Qendër",
+      "type": "village",
+      "category": "place",
+      "lat": 41.1981027,
+      "lon": 20.339632,
+      "municipality": "Bashkia Librazhd",
+      "county": "Qarku i Elbasanit",
+      "display": "Librazhd Qendër, Bashkia Librazhd, Qarku i Elbasanit, 3402, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Steblevë",
+    "inCity": [
+     {
+      "name": "Steblevë",
+      "type": "village",
+      "category": "place",
+      "lat": 41.336638,
+      "lon": 20.4716974,
+      "municipality": "Bashkia Librazhd",
+      "county": "Qarku i Elbasanit",
+      "display": "Steblevë, Stëblevë, Bashkia Librazhd, Qarku i Elbasanit, 3412, Shqipëria"
+     },
+     {
+      "name": "Stëblevë",
+      "type": "city",
+      "category": "boundary",
+      "lat": 41.3386527,
+      "lon": 20.430895,
+      "municipality": "Bashkia Librazhd",
+      "county": "Qarku i Elbasanit",
+      "display": "Stëblevë, Bashkia Librazhd, Qarku i Elbasanit, 3412, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Hotolisht",
+    "inCity": [
+     {
+      "name": "Hotolisht",
+      "type": "village",
+      "category": "boundary",
+      "lat": 41.1547579,
+      "lon": 20.3953929,
+      "municipality": "Bashkia Librazhd",
+      "county": "Qarku i Elbasanit",
+      "display": "Hotolisht, Bashkia Librazhd, Qarku i Elbasanit, 3408, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Lunik",
+    "inCity": [
+     {
+      "name": "Lunik",
+      "type": "village",
+      "category": "boundary",
+      "lat": 41.2852416,
+      "lon": 20.3232915,
+      "municipality": "Bashkia Librazhd",
+      "county": "Qarku i Elbasanit",
+      "display": "Lunik, Bashkia Librazhd, Qarku i Elbasanit, 3410, Shqipëria"
+     },
+     {
+      "name": "Zgosht",
+      "type": "village",
+      "category": "place",
+      "lat": 41.2479237,
+      "lon": 20.3193355,
+      "municipality": "Bashkia Librazhd",
+      "county": "Qarku i Elbasanit",
+      "display": "Zgosht, Lunik, Bashkia Librazhd, Qarku i Elbasanit, 3410, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Orenjë",
+    "inCity": [
+     {
+      "name": "Orenjë",
+      "type": "village",
+      "category": "place",
+      "lat": 41.2843288,
+      "lon": 20.2093087,
+      "municipality": "Bashkia Librazhd",
+      "county": "Qarku i Elbasanit",
+      "display": "Orenjë, Bashkia Librazhd, Qarku i Elbasanit, Shqipëria"
+     },
+     {
+      "name": "Orenjë",
+      "type": "city",
+      "category": "boundary",
+      "lat": 41.3035458,
+      "lon": 20.2097416,
+      "municipality": "Bashkia Librazhd",
+      "county": "Qarku i Elbasanit",
+      "display": "Orenjë, Bashkia Librazhd, Qarku i Elbasanit, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Qukës",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Qukës",
+      "type": "city",
+      "category": "boundary",
+      "lat": 41.0886087,
+      "lon": 20.4804823,
+      "municipality": "Bashkia Prrenjas",
+      "county": "Qarku i Elbasanit",
+      "display": "Qukës, Bashkia Prrenjas, Qarku i Elbasanit, 3407, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Prrenjas",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Përrenjas",
+      "type": "town",
+      "category": "boundary",
+      "lat": 41.0712276,
+      "lon": 20.5485577,
+      "municipality": "Bashkia Prrenjas",
+      "county": "Qarku i Elbasanit",
+      "display": "Përrenjas, Bashkia Prrenjas, Qarku i Elbasanit, 3413, Shqipëria"
+     },
+     {
+      "name": "Prrenjas",
+      "type": "village",
+      "category": "place",
+      "lat": 40.8606308,
+      "lon": 20.0529679,
+      "municipality": "Bashkia Gramsh",
+      "county": "Qarku i Elbasanit",
+      "display": "Prrenjas, Sult, Bashkia Gramsh, Qarku i Elbasanit, 3304, Shqipëria"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "city": "Tepelenë",
+  "osm": {
+   "name": "Tepelenë",
+   "type": "town",
+   "category": "boundary",
+   "lat": 40.2982258,
+   "lon": 20.0208733,
+   "municipality": "Bashkia Tepelenë",
+   "county": "Qarku i Gjirokastrës",
+   "display": "Tepelenë, Bashkia Tepelenë, Qarku i Gjirokastrës, 6301, Shqipëria"
+  },
+  "municipality": "Bashkia Tepelenë",
+  "county": "Qarku i Gjirokastrës",
+  "zones": [
+   {
+    "zone": "Qendër",
+    "inCity": [
+     {
+      "name": "Zyra Postare Qënder Tepelenë - 6301",
+      "type": "amenity",
+      "category": "amenity",
+      "lat": 40.2972879,
+      "lon": 20.02056,
+      "municipality": "Bashkia Tepelenë",
+      "county": "Qarku i Gjirokastrës",
+      "display": "Zyra Postare Qënder Tepelenë - 6301, Ali Pashë Tepelena, Tepelenë, Bashkia Tepelenë, Qarku i Gjirokastrës, 6301, Shqipëria"
+     },
+     {
+      "name": "Qendër Tepelenë",
+      "type": "city",
+      "category": "boundary",
+      "lat": 40.2873919,
+      "lon": 19.9979102,
+      "municipality": "Bashkia Tepelenë",
+      "county": "Qarku i Gjirokastrës",
+      "display": "Qendër Tepelenë, Bashkia Tepelenë, Qarku i Gjirokastrës, 6301, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Memaliaj",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Memaliaj",
+      "type": "town",
+      "category": "boundary",
+      "lat": 40.3516573,
+      "lon": 19.9833859,
+      "municipality": "Bashkia Memaliaj",
+      "county": "Qarku i Gjirokastrës",
+      "display": "Memaliaj, Bashkia Memaliaj, Qarku i Gjirokastrës, 6302, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Këlcyrë",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Këlcyrë",
+      "type": "town",
+      "category": "boundary",
+      "lat": 40.3135075,
+      "lon": 20.1922837,
+      "municipality": "Bashkia Këlcyrë",
+      "county": "Qarku i Gjirokastrës",
+      "display": "Këlcyrë, Bashkia Këlcyrë, Qarku i Gjirokastrës, 6402, Shqipëria"
+     },
+     {
+      "name": "Këlcyrë (Koçanaj)",
+      "type": "hamlet",
+      "category": "place",
+      "lat": 42.4068296,
+      "lon": 20.0327059,
+      "municipality": "Bashkia Tropojë",
+      "county": "Qarku i Kukësit",
+      "display": "Këlcyrë (Koçanaj), Margegaj, Bashkia Tropojë, Qarku i Kukësit, 8702, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Luftinjë",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Luftinjë",
+      "type": "village",
+      "category": "boundary",
+      "lat": 40.4393917,
+      "lon": 19.9542141,
+      "municipality": "Bashkia Memaliaj",
+      "county": "Qarku i Gjirokastrës",
+      "display": "Luftinjë, Bashkia Memaliaj, Qarku i Gjirokastrës, 6306, Shqipëria"
+     },
+     {
+      "name": "Luftinjë (Veleshnjë)",
+      "type": "hamlet",
+      "category": "place",
+      "lat": 40.6217464,
+      "lon": 19.9320467,
+      "municipality": "Bashkia Berat",
+      "county": "Qarku i Beratit",
+      "display": "Luftinjë (Veleshnjë), Veleshnjë, Velabisht, Bashkia Berat, Qarku i Beratit, 5012, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Lopës",
+    "inCity": [
+     {
+      "name": "Lopës",
+      "type": "city",
+      "category": "boundary",
+      "lat": 40.3422989,
+      "lon": 19.8466152,
+      "municipality": "Bashkia Tepelenë",
+      "county": "Qarku i Gjirokastrës",
+      "display": "Lopës, Bashkia Tepelenë, Qarku i Gjirokastrës, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Bënçë",
+    "inCity": [
+     {
+      "name": "Bënçë",
+      "type": "river",
+      "category": "waterway",
+      "lat": 40.2693667,
+      "lon": 20.0102589,
+      "municipality": "Bashkia Tepelenë",
+      "county": "Qarku i Gjirokastrës",
+      "display": "Bënçë, Qendër Tepelenë, Bashkia Tepelenë, Qarku i Gjirokastrës, Shqipëria"
+     },
+     {
+      "name": "Bënçë",
+      "type": "river",
+      "category": "waterway",
+      "lat": 40.3023017,
+      "lon": 20.0123518,
+      "municipality": "Bashkia Tepelenë",
+      "county": "Qarku i Gjirokastrës",
+      "display": "Bënçë, Mamaj (Turan), Veliqot, Qendër Tepelenë, Bashkia Tepelenë, Qarku i Gjirokastrës, 6301, Shqipëria"
+     },
+     {
+      "name": "Bënçë",
+      "type": "river",
+      "category": "waterway",
+      "lat": 40.3059035,
+      "lon": 20.0158474,
+      "municipality": "Bashkia Tepelenë",
+      "county": "Qarku i Gjirokastrës",
+      "display": "Bënçë, Tepelenë, Bashkia Tepelenë, Qarku i Gjirokastrës, 6301, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Krahës",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Krahës",
+      "type": "village",
+      "category": "boundary",
+      "lat": 40.43207,
+      "lon": 19.8505404,
+      "municipality": "Bashkia Memaliaj",
+      "county": "Qarku i Gjirokastrës",
+      "display": "Krahës, Bashkia Memaliaj, Qarku i Gjirokastrës, 6307, Shqipëria"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "city": "Përmet",
+  "osm": {
+   "name": "Përmet",
+   "type": "town",
+   "category": "boundary",
+   "lat": 40.233256,
+   "lon": 20.3533616,
+   "municipality": "Bashkia Përmet",
+   "county": "Qarku i Gjirokastrës",
+   "display": "Përmet, Bashkia Përmet, Qarku i Gjirokastrës, 6401, Shqipëria"
+  },
+  "municipality": "Bashkia Përmet",
+  "county": "Qarku i Gjirokastrës",
+  "zones": [
+   {
+    "zone": "Qendër",
+    "inCity": [
+     {
+      "name": "Qendër Piskovë",
+      "type": "city",
+      "category": "boundary",
+      "lat": 40.301146,
+      "lon": 20.3392964,
+      "municipality": "Bashkia Përmet",
+      "county": "Qarku i Gjirokastrës",
+      "display": "Qendër Piskovë, Bashkia Përmet, Qarku i Gjirokastrës, 6405, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Këlcyrë",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Këlcyrë",
+      "type": "town",
+      "category": "boundary",
+      "lat": 40.3135075,
+      "lon": 20.1922837,
+      "municipality": "Bashkia Këlcyrë",
+      "county": "Qarku i Gjirokastrës",
+      "display": "Këlcyrë, Bashkia Këlcyrë, Qarku i Gjirokastrës, 6402, Shqipëria"
+     },
+     {
+      "name": "Këlcyrë (Koçanaj)",
+      "type": "hamlet",
+      "category": "place",
+      "lat": 42.4068296,
+      "lon": 20.0327059,
+      "municipality": "Bashkia Tropojë",
+      "county": "Qarku i Kukësit",
+      "display": "Këlcyrë (Koçanaj), Margegaj, Bashkia Tropojë, Qarku i Kukësit, 8702, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Petran",
+    "inCity": [
+     {
+      "name": "Petran",
+      "type": "village",
+      "category": "boundary",
+      "lat": 40.2080905,
+      "lon": 20.418365,
+      "municipality": "Bashkia Përmet",
+      "county": "Qarku i Gjirokastrës",
+      "display": "Petran, Bashkia Përmet, Qarku i Gjirokastrës, 6404, Shqipëria"
+     },
+     {
+      "name": "Rruga Permet Tepelene",
+      "type": "primary",
+      "category": "highway",
+      "lat": 40.2305935,
+      "lon": 20.3646294,
+      "municipality": "Bashkia Përmet",
+      "county": "Qarku i Gjirokastrës",
+      "display": "Rruga Permet Tepelene, Leshnicë, Petran, Bashkia Përmet, Qarku i Gjirokastrës, 6404, Shqipëria"
+     },
+     {
+      "name": "Rruga Petran Permet",
+      "type": "residential",
+      "category": "highway",
+      "lat": 40.2223159,
+      "lon": 20.3664778,
+      "municipality": "Bashkia Përmet",
+      "county": "Qarku i Gjirokastrës",
+      "display": "Rruga Petran Permet, Leshnicë, Petran, Bashkia Përmet, Qarku i Gjirokastrës, 6404, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Çarçovë",
+    "inCity": [
+     {
+      "name": "Çarçovë",
+      "type": "village",
+      "category": "boundary",
+      "lat": 40.1183018,
+      "lon": 20.5435007,
+      "municipality": "Bashkia Përmet",
+      "county": "Qarku i Gjirokastrës",
+      "display": "Çarçovë, Bashkia Përmet, Qarku i Gjirokastrës, 6403, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Ballaban",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Ballaban",
+      "type": "village",
+      "category": "boundary",
+      "lat": 40.4150096,
+      "lon": 20.1268374,
+      "municipality": "Bashkia Këlcyrë",
+      "county": "Qarku i Gjirokastrës",
+      "display": "Ballaban, Bashkia Këlcyrë, Qarku i Gjirokastrës, 6406, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Piskovë",
+    "inCity": [
+     {
+      "name": "Piskovë",
+      "type": "village",
+      "category": "place",
+      "lat": 40.2795649,
+      "lon": 20.273695,
+      "municipality": "Bashkia Përmet",
+      "county": "Qarku i Gjirokastrës",
+      "display": "Piskovë, Qendër Piskovë, Bashkia Përmet, Qarku i Gjirokastrës, 6405, Shqipëria"
+     },
+     {
+      "name": "Qendër Piskovë",
+      "type": "city",
+      "category": "boundary",
+      "lat": 40.301146,
+      "lon": 20.3392964,
+      "municipality": "Bashkia Përmet",
+      "county": "Qarku i Gjirokastrës",
+      "display": "Qendër Piskovë, Bashkia Përmet, Qarku i Gjirokastrës, 6405, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Frashër",
+    "inCity": [
+     {
+      "name": "Frashër",
+      "type": "village",
+      "category": "boundary",
+      "lat": 40.3661283,
+      "lon": 20.4281963,
+      "municipality": "Bashkia Përmet",
+      "county": "Qarku i Gjirokastrës",
+      "display": "Frashër, Bashkia Përmet, Qarku i Gjirokastrës, 6408, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   }
+  ]
+ },
+ {
+  "city": "Ersekë",
+  "osm": {
+   "name": "Ersekë",
+   "type": "town",
+   "category": "boundary",
+   "lat": 40.3384368,
+   "lon": 20.6810024,
+   "municipality": "Bashkia Kolonjë",
+   "county": "Qarku i Korçës",
+   "display": "Ersekë, Bashkia Kolonjë, Qarku i Korçës, 7401, Shqipëria"
+  },
+  "municipality": "Bashkia Kolonjë",
+  "county": "Qarku i Korçës",
+  "zones": [
+   {
+    "zone": "Qendër",
+    "inCity": [
+     {
+      "name": "Zyra Postare Qendër Ersekë",
+      "type": "amenity",
+      "category": "amenity",
+      "lat": 40.3370798,
+      "lon": 20.6803688,
+      "municipality": "Bashkia Kolonjë",
+      "county": "Qarku i Korçës",
+      "display": "Zyra Postare Qendër Ersekë, SH75, Ersekë, Bashkia Kolonjë, Qarku i Korçës, 7401, Shqipëria"
+     },
+     {
+      "name": "Taç Qendër",
+      "type": "village",
+      "category": "place",
+      "lat": 40.3227148,
+      "lon": 20.6889573,
+      "municipality": "Bashkia Kolonjë",
+      "county": "Qarku i Korçës",
+      "display": "Taç Qendër, Qendër Ersekë, Bashkia Kolonjë, Qarku i Korçës, 7401, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Leskovik",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Leskovik",
+      "type": "town",
+      "category": "boundary",
+      "lat": 40.1524216,
+      "lon": 20.5990179,
+      "municipality": "Bashkia Kolonjë",
+      "county": "Qarku i Korçës",
+      "display": "Leskovik, Bashkia Kolonjë, Qarku i Korçës, 7402, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Barmash",
+    "inCity": [
+     {
+      "name": "Kisha e Shën Marisë (Barmash)",
+      "type": "amenity",
+      "category": "amenity",
+      "lat": 40.2827643,
+      "lon": 20.6315906,
+      "municipality": "Bashkia Kolonjë",
+      "county": "Qarku i Korçës",
+      "display": "Kisha e Shën Marisë (Barmash), SH75, Sanjollas, Barmash, Bashkia Kolonjë, Qarku i Korçës, 7404, Shqipëria"
+     },
+     {
+      "name": "Kalaja e Gradishtës Barmash",
+      "type": "historic",
+      "category": "historic",
+      "lat": 40.2815209,
+      "lon": 20.61989,
+      "municipality": "Bashkia Kolonjë",
+      "county": "Qarku i Korçës",
+      "display": "Kalaja e Gradishtës Barmash, SH75, Sanjollas, Barmash, Bashkia Kolonjë, Qarku i Korçës, 7404, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Mollas",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Mollas",
+      "type": "village",
+      "category": "boundary",
+      "lat": 40.425825,
+      "lon": 20.6762377,
+      "municipality": "Bashkia Kolonjë",
+      "county": "Qarku i Korçës",
+      "display": "Mollas, Bashkia Kolonjë, Qarku i Korçës, 7403, Shqipëria"
+     },
+     {
+      "name": "Mollas",
+      "type": "city",
+      "category": "boundary",
+      "lat": 40.904115,
+      "lon": 20.0201757,
+      "municipality": "Bashkia Cërrik",
+      "county": "Qarku i Elbasanit",
+      "display": "Mollas, Bashkia Cërrik, Qarku i Elbasanit, 3019, Shqipëria"
+     },
+     {
+      "name": "Mollas",
+      "type": "village",
+      "category": "place",
+      "lat": 40.538754,
+      "lon": 20.2305324,
+      "municipality": "Bashkia Skrapar",
+      "county": "Qarku i Beratit",
+      "display": "Mollas, Qendër Skrapar, Bashkia Skrapar, Qarku i Beratit, 5401, Shqipëria"
+     },
+     {
+      "name": "Mollas",
+      "type": "village",
+      "category": "place",
+      "lat": 40.9180062,
+      "lon": 19.7640648,
+      "municipality": "Bashkia Lushnjë",
+      "county": "Qarku i Fierit",
+      "display": "Mollas, Karbunarë, Bashkia Lushnjë, Qarku i Fierit, 9002, Shqipëria"
+     },
+     {
+      "name": "Mollas",
+      "type": "village",
+      "category": "place",
+      "lat": 40.9235576,
+      "lon": 20.0041545,
+      "municipality": "Bashkia Cërrik",
+      "county": "Qarku i Elbasanit",
+      "display": "Mollas, Bashkia Cërrik, Qarku i Elbasanit, 3019, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Novoselë",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Novoselë",
+      "type": "village",
+      "category": "boundary",
+      "lat": 40.3329921,
+      "lon": 20.5902153,
+      "municipality": "Bashkia Kolonjë",
+      "county": "Qarku i Korçës",
+      "display": "Novoselë, Bashkia Kolonjë, Qarku i Korçës, 7405, Shqipëria"
+     },
+     {
+      "name": "Novoselë",
+      "type": "village",
+      "category": "boundary",
+      "lat": 40.6241635,
+      "lon": 19.467975,
+      "municipality": "Bashkia Vlorë",
+      "county": "Qarku i Vlorës",
+      "display": "Novoselë, Bashkia Vlorë, Qarku i Vlorës, 9411, Shqipëria"
+     },
+     {
+      "name": "Novoselë",
+      "type": "village",
+      "category": "place",
+      "lat": 40.7625225,
+      "lon": 20.700757,
+      "municipality": "Bashkia Maliq",
+      "county": "Qarku i Korçës",
+      "display": "Novoselë, Pirg, Bashkia Maliq, Qarku i Korçës, 7016, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Çlirim",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Çlirim",
+      "type": "village",
+      "category": "boundary",
+      "lat": 40.4166681,
+      "lon": 20.5525025,
+      "municipality": "Bashkia Kolonjë",
+      "county": "Qarku i Korçës",
+      "display": "Çlirim, Bashkia Kolonjë, Qarku i Korçës, 7406, Shqipëria"
+     },
+     {
+      "name": "Çlirim",
+      "type": "village",
+      "category": "place",
+      "lat": 40.8108518,
+      "lon": 19.7949456,
+      "municipality": null,
+      "county": "Qarku i Beratit",
+      "display": "Çlirim, Bashkia Dimal, Qarku i Beratit, 5009, Shqipëria"
+     },
+     {
+      "name": "Çlirim",
+      "type": "village",
+      "category": "place",
+      "lat": 39.9007157,
+      "lon": 20.0738666,
+      "municipality": "Bashkia Finiq",
+      "county": "Qarku i Vlorës",
+      "display": "Çlirim, Finiq, Bashkia Finiq, Qarku i Vlorës, 9716, Shqipëria"
+     },
+     {
+      "name": "Çlirim",
+      "type": "village",
+      "category": "place",
+      "lat": 40.7377882,
+      "lon": 19.5205048,
+      "municipality": "Bashkia Fier",
+      "county": "Qarku i Fierit",
+      "display": "Çlirim, Qendër, Bashkia Fier, Qarku i Fierit, 9302, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Rehova",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Rruga Bajazit Rehova",
+      "type": "residential",
+      "category": "highway",
+      "lat": 40.6242915,
+      "lon": 20.7705738,
+      "municipality": "Bashkia Korçë",
+      "county": "Qarku i Korçës",
+      "display": "Rruga Bajazit Rehova, Korçë, Bashkia Korçë, Qarku i Korçës, 7001, Shqipëria"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "city": "Kuçovë",
+  "osm": {
+   "name": "Kuçovë",
+   "type": "town",
+   "category": "boundary",
+   "lat": 40.804415,
+   "lon": 19.9134448,
+   "municipality": "Bashkia Kuçovë",
+   "county": "Qarku i Beratit",
+   "display": "Kuçovë, Bashkia Kuçovë, Qarku i Beratit, 5301, Shqipëria"
+  },
+  "municipality": "Bashkia Kuçovë",
+  "county": "Qarku i Beratit",
+  "zones": [
+   {
+    "zone": "Qendër",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Qendër",
+      "type": "city",
+      "category": "boundary",
+      "lat": 42.2015792,
+      "lon": 19.3616511,
+      "municipality": "Bashkia Malësi e Madhe",
+      "county": "Qarku i Shkodrës",
+      "display": "Qendër, Bashkia Malësi e Madhe, Qarku i Shkodrës, 4301, Shqipëria"
+     },
+     {
+      "name": "Qendër",
+      "type": "city",
+      "category": "boundary",
+      "lat": 40.7430422,
+      "lon": 19.5557986,
+      "municipality": "Bashkia Fier",
+      "county": "Qarku i Fierit",
+      "display": "Qendër, Bashkia Fier, Qarku i Fierit, 9302, Shqipëria"
+     },
+     {
+      "name": "Qendër",
+      "type": "residential",
+      "category": "landuse",
+      "lat": 40.4453063,
+      "lon": 19.8007105,
+      "municipality": "Bashkia Mallakastër",
+      "county": "Qarku i Fierit",
+      "display": "Qendër, Çorrush, Kutë, Bashkia Mallakastër, Qarku i Fierit, 9329, Shqipëria"
+     },
+     {
+      "name": "Qendër Ersekë",
+      "type": "city",
+      "category": "boundary",
+      "lat": 40.3356012,
+      "lon": 20.72269,
+      "municipality": "Bashkia Kolonjë",
+      "county": "Qarku i Korçës",
+      "display": "Qendër Ersekë, Bashkia Kolonjë, Qarku i Korçës, 7401, Shqipëria"
+     },
+     {
+      "name": "Librazhd Qendër",
+      "type": "city",
+      "category": "boundary",
+      "lat": 41.2119415,
+      "lon": 20.3238168,
+      "municipality": "Bashkia Librazhd",
+      "county": "Qarku i Elbasanit",
+      "display": "Librazhd Qendër, Bashkia Librazhd, Qarku i Elbasanit, 3402, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Perondi",
+    "inCity": [
+     {
+      "name": "Baza Ajrore Kuçovë",
+      "type": "aeroway",
+      "category": "aeroway",
+      "lat": 40.7725141,
+      "lon": 19.9050098,
+      "municipality": "Bashkia Kuçovë",
+      "county": "Qarku i Beratit",
+      "display": "Baza Ajrore Kuçovë, SH91, Tapi, Perondi, Bashkia Kuçovë, Qarku i Beratit, 5306, Shqipëria"
+     },
+     {
+      "name": "Perondi",
+      "type": "city",
+      "category": "boundary",
+      "lat": 40.8074117,
+      "lon": 19.8909317,
+      "municipality": "Bashkia Kuçovë",
+      "county": "Qarku i Beratit",
+      "display": "Perondi, Bashkia Kuçovë, Qarku i Beratit, 5306, Shqipëria"
+     },
+     {
+      "name": "Perondi",
+      "type": "village",
+      "category": "place",
+      "lat": 40.7791212,
+      "lon": 19.9222363,
+      "municipality": "Bashkia Kuçovë",
+      "county": "Qarku i Beratit",
+      "display": "Perondi, Bashkia Kuçovë, Qarku i Beratit, 5306, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Kozarë",
+    "inCity": [
+     {
+      "name": "Kozarë",
+      "type": "village",
+      "category": "place",
+      "lat": 40.8336621,
+      "lon": 19.9024089,
+      "municipality": "Bashkia Kuçovë",
+      "county": "Qarku i Beratit",
+      "display": "Kozarë, Kozare, Bashkia Kuçovë, Qarku i Beratit, 5305, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Lumas",
+    "inCity": [
+     {
+      "name": "Lumas",
+      "type": "village",
+      "category": "boundary",
+      "lat": 40.8172241,
+      "lon": 19.9994237,
+      "municipality": "Bashkia Kuçovë",
+      "county": "Qarku i Beratit",
+      "display": "Lumas, Bashkia Kuçovë, Qarku i Beratit, 5013, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Visokë",
+    "inCity": [],
+    "elsewhere": []
+   },
+   {
+    "zone": "Hajdaraj",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Hajdaraj",
+      "type": "village",
+      "category": "place",
+      "lat": 40.9589859,
+      "lon": 19.7222141,
+      "municipality": "Bashkia Lushnjë",
+      "county": "Qarku i Fierit",
+      "display": "Hajdaraj, Golem, Bashkia Lushnjë, Qarku i Fierit, 9012, Shqipëria"
+     },
+     {
+      "name": "Hajdaraj",
+      "type": "village",
+      "category": "place",
+      "lat": 41.1422414,
+      "lon": 19.514443,
+      "municipality": "Bashkia Kavajë",
+      "county": "Qarku i Tiranës",
+      "display": "Hajdaraj, Synej, Bashkia Kavajë, Qarku i Tiranës, 2505, Shqipëria"
+     },
+     {
+      "name": "Hajdaraj (Dragobi)",
+      "type": "hamlet",
+      "category": "place",
+      "lat": 42.4336856,
+      "lon": 19.9744797,
+      "municipality": "Bashkia Tropojë",
+      "county": "Qarku i Kukësit",
+      "display": "Hajdaraj (Dragobi), Dragobi, Margegaj, Bashkia Tropojë, Qarku i Kukësit, 8703, Shqipëria"
+     },
+     {
+      "name": "Hajdaraj (Kashar)",
+      "type": "hamlet",
+      "category": "place",
+      "lat": 41.3535684,
+      "lon": 19.7152123,
+      "municipality": "Bashkia Tiranë",
+      "county": "Qarku i Tiranës",
+      "display": "Hajdaraj (Kashar), Katund i Ri, Kashar, Bashkia Tiranë, Qarku i Tiranës, 1051, Shqipëria"
+     },
+     {
+      "name": "Hajdaraj",
+      "type": "road",
+      "category": "highway",
+      "lat": 41.4422622,
+      "lon": 20.4124171,
+      "municipality": null,
+      "county": "Qarku i Dibrës",
+      "display": "Hajdaraj, Zerqan, Bashkia Bulqizë, Qarku i Dibrës, 8406, Shqipëria"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "city": "Çorovodë",
+  "osm": {
+   "name": "Çorovodë",
+   "type": "town",
+   "category": "boundary",
+   "lat": 40.5036229,
+   "lon": 20.2283496,
+   "municipality": "Bashkia Skrapar",
+   "county": "Qarku i Beratit",
+   "display": "Çorovodë, Bashkia Skrapar, Qarku i Beratit, 5401, Shqipëria"
+  },
+  "municipality": "Bashkia Skrapar",
+  "county": "Qarku i Beratit",
+  "zones": [
+   {
+    "zone": "Qendër",
+    "inCity": [
+     {
+      "name": "Qendra Shendetesore Qender - Leshnje - Potom - Skrapar",
+      "type": "building",
+      "category": "building",
+      "lat": 40.5132373,
+      "lon": 20.2290071,
+      "municipality": "Bashkia Skrapar",
+      "county": "Qarku i Beratit",
+      "display": "Qendra Shendetesore Qender - Leshnje - Potom - Skrapar, Rruga Arkitekt Kasemi, Çorovodë, Bashkia Skrapar, Qarku i Beratit, 5401, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Polican",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Poliçan",
+      "type": "town",
+      "category": "boundary",
+      "lat": 40.6122122,
+      "lon": 20.0989769,
+      "municipality": "Bashkia Poliçan",
+      "county": "Qarku i Beratit",
+      "display": "Poliçan, Bashkia Poliçan, Qarku i Beratit, 5403, Shqipëria"
+     },
+     {
+      "name": "Poliçan",
+      "type": "village",
+      "category": "place",
+      "lat": 40.1298038,
+      "lon": 20.3517736,
+      "municipality": "Bashkia Dropull",
+      "county": "Qarku i Gjirokastrës",
+      "display": "Poliçan, Pogon, Bashkia Dropull, Qarku i Gjirokastrës, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Bogovë",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Bogovë",
+      "type": "city",
+      "category": "boundary",
+      "lat": 40.5782517,
+      "lon": 20.1950418,
+      "municipality": "Bashkia Skrapar",
+      "county": "Qarku i Beratit",
+      "display": "Bogovë, Bashkia Skrapar, Qarku i Beratit, 5405, Shqipëria"
+     },
+     {
+      "name": "Bogovë",
+      "type": "village",
+      "category": "place",
+      "lat": 40.5707974,
+      "lon": 20.1465409,
+      "municipality": "Bashkia Skrapar",
+      "county": "Qarku i Beratit",
+      "display": "Bogovë, Bashkia Skrapar, Qarku i Beratit, 5405, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Leshnjë",
+    "inCity": [
+     {
+      "name": "Qendra Shendetesore Qender - Leshnje - Potom - Skrapar",
+      "type": "building",
+      "category": "building",
+      "lat": 40.5132373,
+      "lon": 20.2290071,
+      "municipality": "Bashkia Skrapar",
+      "county": "Qarku i Beratit",
+      "display": "Qendra Shendetesore Qender - Leshnje - Potom - Skrapar, Rruga Arkitekt Kasemi, Çorovodë, Bashkia Skrapar, Qarku i Beratit, 5401, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Çepan",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Çepan",
+      "type": "city",
+      "category": "boundary",
+      "lat": 40.4019346,
+      "lon": 20.3164664,
+      "municipality": "Bashkia Skrapar",
+      "county": "Qarku i Beratit",
+      "display": "Çepan, Bashkia Skrapar, Qarku i Beratit, 5406, Shqipëria"
+     },
+     {
+      "name": "Çepan",
+      "type": "village",
+      "category": "place",
+      "lat": 40.4220452,
+      "lon": 20.2625737,
+      "municipality": "Bashkia Skrapar",
+      "county": "Qarku i Beratit",
+      "display": "Çepan, Bashkia Skrapar, Qarku i Beratit, 5406, Shqipëria"
+     },
+     {
+      "name": "Çepan (Panarit)",
+      "type": "hamlet",
+      "category": "place",
+      "lat": 40.3414906,
+      "lon": 20.2053165,
+      "municipality": "Bashkia Këlcyrë",
+      "county": "Qarku i Gjirokastrës",
+      "display": "Çepan (Panarit), Tolar, Dishnicë, Bashkia Këlcyrë, Qarku i Gjirokastrës, 6407, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Zhepë",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Zhepë",
+      "type": "city",
+      "category": "boundary",
+      "lat": 40.6851051,
+      "lon": 20.237298,
+      "municipality": "Bashkia Skrapar",
+      "county": "Qarku i Beratit",
+      "display": "Zhepë, Bashkia Skrapar, Qarku i Beratit, Shqipëria"
+     },
+     {
+      "name": "Zhepë",
+      "type": "village",
+      "category": "place",
+      "lat": 40.1191155,
+      "lon": 20.5109327,
+      "municipality": "Bashkia Përmet",
+      "county": "Qarku i Gjirokastrës",
+      "display": "Zhepë, Çarçovë, Bashkia Përmet, Qarku i Gjirokastrës, 6403, Shqipëria"
+     },
+     {
+      "name": "Zhepë",
+      "type": "village",
+      "category": "place",
+      "lat": 40.6777302,
+      "lon": 20.2880788,
+      "municipality": "Bashkia Skrapar",
+      "county": "Qarku i Beratit",
+      "display": "Zhepë, Bashkia Skrapar, Qarku i Beratit, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Tomorr",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Tomorr",
+      "type": "village",
+      "category": "place",
+      "lat": 40.6958835,
+      "lon": 20.1042639,
+      "municipality": "Bashkia Poliçan",
+      "county": "Qarku i Beratit",
+      "display": "Tomorr, Vërtop, Bashkia Poliçan, Qarku i Beratit, 5017, Shqipëria"
+     },
+     {
+      "name": "Mount Tomorr",
+      "type": "peak",
+      "category": "natural",
+      "lat": 40.6362945,
+      "lon": 20.1626389,
+      "municipality": "Bashkia Skrapar",
+      "county": "Qarku i Beratit",
+      "display": "Mount Tomorr, Zhepë, Bashkia Skrapar, Qarku i Beratit, Shqipëria"
+     }
+    ]
+   }
+  ]
+ },
+ {
+  "city": "Peqin",
+  "osm": {
+   "name": "Peqin",
+   "type": "town",
+   "category": "boundary",
+   "lat": 41.0461304,
+   "lon": 19.7494517,
+   "municipality": "Bashkia Peqin",
+   "county": "Qarku i Elbasanit",
+   "display": "Peqin, Bashkia Peqin, Qarku i Elbasanit, 3501, Shqipëria"
+  },
+  "municipality": "Bashkia Peqin",
+  "county": "Qarku i Elbasanit",
+  "zones": [
+   {
+    "zone": "Qendër",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Qendër",
+      "type": "city",
+      "category": "boundary",
+      "lat": 42.2015792,
+      "lon": 19.3616511,
+      "municipality": "Bashkia Malësi e Madhe",
+      "county": "Qarku i Shkodrës",
+      "display": "Qendër, Bashkia Malësi e Madhe, Qarku i Shkodrës, 4301, Shqipëria"
+     },
+     {
+      "name": "Qendër",
+      "type": "city",
+      "category": "boundary",
+      "lat": 40.7430422,
+      "lon": 19.5557986,
+      "municipality": "Bashkia Fier",
+      "county": "Qarku i Fierit",
+      "display": "Qendër, Bashkia Fier, Qarku i Fierit, 9302, Shqipëria"
+     },
+     {
+      "name": "Qendër",
+      "type": "residential",
+      "category": "landuse",
+      "lat": 40.4453063,
+      "lon": 19.8007105,
+      "municipality": "Bashkia Mallakastër",
+      "county": "Qarku i Fierit",
+      "display": "Qendër, Çorrush, Kutë, Bashkia Mallakastër, Qarku i Fierit, 9329, Shqipëria"
+     },
+     {
+      "name": "Qendër Ersekë",
+      "type": "city",
+      "category": "boundary",
+      "lat": 40.3356012,
+      "lon": 20.72269,
+      "municipality": "Bashkia Kolonjë",
+      "county": "Qarku i Korçës",
+      "display": "Qendër Ersekë, Bashkia Kolonjë, Qarku i Korçës, 7401, Shqipëria"
+     },
+     {
+      "name": "Librazhd Qendër",
+      "type": "city",
+      "category": "boundary",
+      "lat": 41.2119415,
+      "lon": 20.3238168,
+      "municipality": "Bashkia Librazhd",
+      "county": "Qarku i Elbasanit",
+      "display": "Librazhd Qendër, Bashkia Librazhd, Qarku i Elbasanit, 3402, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Pajovë",
+    "inCity": [
+     {
+      "name": "Pajovë",
+      "type": "village",
+      "category": "boundary",
+      "lat": 41.0672975,
+      "lon": 19.8318855,
+      "municipality": "Bashkia Peqin",
+      "county": "Qarku i Elbasanit",
+      "display": "Pajovë, Bashkia Peqin, Qarku i Elbasanit, 3503, Shqipëria"
+     },
+     {
+      "name": "Pajove",
+      "type": "village",
+      "category": "place",
+      "lat": 41.0548543,
+      "lon": 19.8376574,
+      "municipality": "Bashkia Peqin",
+      "county": "Qarku i Elbasanit",
+      "display": "Pajove, Pajovë, Bashkia Peqin, Qarku i Elbasanit, 3503, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Gjocaj",
+    "inCity": [
+     {
+      "name": "Gjocaj",
+      "type": "village",
+      "category": "place",
+      "lat": 41.024523,
+      "lon": 19.7253789,
+      "municipality": "Bashkia Peqin",
+      "county": "Qarku i Elbasanit",
+      "display": "Gjocaj, Gjoçaj, Bashkia Peqin, Qarku i Elbasanit, 3505, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Karinë",
+    "inCity": [
+     {
+      "name": "Karinë",
+      "type": "village",
+      "category": "place",
+      "lat": 41.0630445,
+      "lon": 19.7164676,
+      "municipality": "Bashkia Peqin",
+      "county": "Qarku i Elbasanit",
+      "display": "Karinë, Bashkia Peqin, Qarku i Elbasanit, 3506, Shqipëria"
+     },
+     {
+      "name": "Karinë",
+      "type": "city",
+      "category": "boundary",
+      "lat": 41.0884654,
+      "lon": 19.7451148,
+      "municipality": "Bashkia Peqin",
+      "county": "Qarku i Elbasanit",
+      "display": "Karinë, Bashkia Peqin, Qarku i Elbasanit, 3506, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Shezë",
+    "inCity": [
+     {
+      "name": "Shezë",
+      "type": "village",
+      "category": "boundary",
+      "lat": 41.0256514,
+      "lon": 19.8173878,
+      "municipality": "Bashkia Peqin",
+      "county": "Qarku i Elbasanit",
+      "display": "Shezë, Bashkia Peqin, Qarku i Elbasanit, 3504, Shqipëria"
+     },
+     {
+      "name": "Shezë e Vogël",
+      "type": "village",
+      "category": "place",
+      "lat": 41.0235486,
+      "lon": 19.7985971,
+      "municipality": "Bashkia Peqin",
+      "county": "Qarku i Elbasanit",
+      "display": "Shezë e Vogël, Gjoçaj, Bashkia Peqin, Qarku i Elbasanit, 3505, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   }
+  ]
+ },
+ {
+  "city": "Himarë",
+  "osm": {
+   "name": "Himarë",
+   "type": "town",
+   "category": "boundary",
+   "lat": 40.102163,
+   "lon": 19.7472977,
+   "municipality": "Bashkia Himarë",
+   "county": "Qarku i Vlorës",
+   "display": "Himarë, Bashkia Himarë, Qarku i Vlorës, 9425, Shqipëria"
+  },
+  "municipality": "Bashkia Himarë",
+  "county": "Qarku i Vlorës",
+  "zones": [
+   {
+    "zone": "Qendër",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Qendër",
+      "type": "city",
+      "category": "boundary",
+      "lat": 42.2015792,
+      "lon": 19.3616511,
+      "municipality": "Bashkia Malësi e Madhe",
+      "county": "Qarku i Shkodrës",
+      "display": "Qendër, Bashkia Malësi e Madhe, Qarku i Shkodrës, 4301, Shqipëria"
+     },
+     {
+      "name": "Qendër",
+      "type": "city",
+      "category": "boundary",
+      "lat": 40.7430422,
+      "lon": 19.5557986,
+      "municipality": "Bashkia Fier",
+      "county": "Qarku i Fierit",
+      "display": "Qendër, Bashkia Fier, Qarku i Fierit, 9302, Shqipëria"
+     },
+     {
+      "name": "Qendër",
+      "type": "residential",
+      "category": "landuse",
+      "lat": 40.4453063,
+      "lon": 19.8007105,
+      "municipality": "Bashkia Mallakastër",
+      "county": "Qarku i Fierit",
+      "display": "Qendër, Çorrush, Kutë, Bashkia Mallakastër, Qarku i Fierit, 9329, Shqipëria"
+     },
+     {
+      "name": "Qendër Ersekë",
+      "type": "city",
+      "category": "boundary",
+      "lat": 40.3356012,
+      "lon": 20.72269,
+      "municipality": "Bashkia Kolonjë",
+      "county": "Qarku i Korçës",
+      "display": "Qendër Ersekë, Bashkia Kolonjë, Qarku i Korçës, 7401, Shqipëria"
+     },
+     {
+      "name": "Librazhd Qendër",
+      "type": "city",
+      "category": "boundary",
+      "lat": 41.2119415,
+      "lon": 20.3238168,
+      "municipality": "Bashkia Librazhd",
+      "county": "Qarku i Elbasanit",
+      "display": "Librazhd Qendër, Bashkia Librazhd, Qarku i Elbasanit, 3402, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Dhërmi",
+    "inCity": [
+     {
+      "name": "Dhërmi",
+      "type": "village",
+      "category": "place",
+      "lat": 40.151199,
+      "lon": 19.6414118,
+      "municipality": "Bashkia Himarë",
+      "county": "Qarku i Vlorës",
+      "display": "Dhërmi, Himarë, Bashkia Himarë, Qarku i Vlorës, 9425, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Jalë",
+    "inCity": [
+     {
+      "name": "Jalë",
+      "type": "village",
+      "category": "place",
+      "lat": 40.1195096,
+      "lon": 19.7026135,
+      "municipality": "Bashkia Himarë",
+      "county": "Qarku i Vlorës",
+      "display": "Jalë, Himarë, Bashkia Himarë, Qarku i Vlorës, 9425, Shqipëria"
+     },
+     {
+      "name": "Jalë",
+      "type": "tourism",
+      "category": "tourism",
+      "lat": 40.1190002,
+      "lon": 19.7030153,
+      "municipality": "Bashkia Himarë",
+      "county": "Qarku i Vlorës",
+      "display": "Jalë, Rruga Jali, Jalë, Himarë, Bashkia Himarë, Qarku i Vlorës, 9425, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Livadhi",
+    "inCity": [
+     {
+      "name": "Livadhi - Jale",
+      "type": "road",
+      "category": "highway",
+      "lat": 40.1088494,
+      "lon": 19.717786,
+      "municipality": "Bashkia Himarë",
+      "county": "Qarku i Vlorës",
+      "display": "Livadhi - Jale, Spile, Himarë, Bashkia Himarë, Qarku i Vlorës, 9425, Shqipëria"
+     },
+     {
+      "name": "BakeHouse Livadhi",
+      "type": "shop",
+      "category": "shop",
+      "lat": 40.1106835,
+      "lon": 19.7218824,
+      "municipality": "Bashkia Himarë",
+      "county": "Qarku i Vlorës",
+      "display": "BakeHouse Livadhi, Rruga Shen Varvara (Aj Varvara), Spile, Himarë, Bashkia Himarë, Qarku i Vlorës, 9425, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Palasë",
+    "inCity": [
+     {
+      "name": "Palasë",
+      "type": "village",
+      "category": "place",
+      "lat": 40.166793,
+      "lon": 19.6239829,
+      "municipality": "Bashkia Himarë",
+      "county": "Qarku i Vlorës",
+      "display": "Palasë, Himarë, Bashkia Himarë, Qarku i Vlorës, 9425, Shqipëria"
+     },
+     {
+      "name": "Palasë",
+      "type": "residential",
+      "category": "landuse",
+      "lat": 40.1650504,
+      "lon": 19.6231419,
+      "municipality": "Bashkia Himarë",
+      "county": "Qarku i Vlorës",
+      "display": "Palasë, Kallam (Dhermi), Palasë, Himarë, Bashkia Himarë, Qarku i Vlorës, 9425, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Llamani",
+    "inCity": [],
+    "elsewhere": []
+   },
+   {
+    "zone": "Vuno",
+    "inCity": [
+     {
+      "name": "Vuno – Gjipe",
+      "type": "road",
+      "category": "highway",
+      "lat": 40.1338353,
+      "lon": 19.6825438,
+      "municipality": "Bashkia Himarë",
+      "county": "Qarku i Vlorës",
+      "display": "Vuno – Gjipe, Vunoi, Himarë, Bashkia Himarë, Qarku i Vlorës, 9425, Shqipëria"
+     },
+     {
+      "name": "Vuno – Gjipe",
+      "type": "road",
+      "category": "highway",
+      "lat": 40.126929,
+      "lon": 19.6706937,
+      "municipality": "Bashkia Himarë",
+      "county": "Qarku i Vlorës",
+      "display": "Vuno – Gjipe, Ilias, Himarë, Bashkia Himarë, Qarku i Vlorës, 9425, Shqipëria"
+     },
+     {
+      "name": "Shkolla Vuno",
+      "type": "building",
+      "category": "building",
+      "lat": 40.1380171,
+      "lon": 19.6955842,
+      "municipality": "Bashkia Himarë",
+      "county": "Qarku i Vlorës",
+      "display": "Shkolla Vuno, SH8, Vunoi, Himarë, Bashkia Himarë, Qarku i Vlorës, 9425, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Ilias",
+    "inCity": [
+     {
+      "name": "Ilias",
+      "type": "village",
+      "category": "place",
+      "lat": 40.1426557,
+      "lon": 19.671131,
+      "municipality": "Bashkia Himarë",
+      "county": "Qarku i Vlorës",
+      "display": "Ilias, Himarë, Bashkia Himarë, Qarku i Vlorës, 9425, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Qeparo",
+    "inCity": [
+     {
+      "name": "Qeparo",
+      "type": "village",
+      "category": "place",
+      "lat": 40.0549728,
+      "lon": 19.8303928,
+      "municipality": "Bashkia Himarë",
+      "county": "Qarku i Vlorës",
+      "display": "Qeparo, Himarë, Bashkia Himarë, Qarku i Vlorës, 9425, Shqipëria"
+     },
+     {
+      "name": "Qeparo i Sipërm",
+      "type": "village",
+      "category": "place",
+      "lat": 40.0678221,
+      "lon": 19.8267781,
+      "municipality": "Bashkia Himarë",
+      "county": "Qarku i Vlorës",
+      "display": "Qeparo i Sipërm, Himarë, Bashkia Himarë, Qarku i Vlorës, 9425, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Borsh",
+    "inCity": [
+     {
+      "name": "Borsh",
+      "type": "village",
+      "category": "place",
+      "lat": 40.0614485,
+      "lon": 19.8576784,
+      "municipality": "Bashkia Himarë",
+      "county": "Qarku i Vlorës",
+      "display": "Borsh, Lukovë, Bashkia Himarë, Qarku i Vlorës, 9713, Shqipëria"
+     },
+     {
+      "name": "Borsh  BeachCamp",
+      "type": "tourism",
+      "category": "tourism",
+      "lat": 40.0486367,
+      "lon": 19.8445185,
+      "municipality": "Bashkia Himarë",
+      "county": "Qarku i Vlorës",
+      "display": "Borsh  BeachCamp, SH8, Picak (Borsh), Borsh, Lukovë, Bashkia Himarë, Qarku i Vlorës, 9713, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   }
+  ]
+ },
+ {
+  "city": "Pukë",
+  "osm": {
+   "name": "Pukë",
+   "type": "town",
+   "category": "boundary",
+   "lat": 42.0443192,
+   "lon": 19.9001376,
+   "municipality": "Bashkia Pukë",
+   "county": "Qarku i Shkodrës",
+   "display": "Pukë, Bashkia Pukë, Qarku i Shkodrës, 4401, Shqipëria"
+  },
+  "municipality": "Bashkia Pukë",
+  "county": "Qarku i Shkodrës",
+  "zones": [
+   {
+    "zone": "Qendër",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Qendër",
+      "type": "city",
+      "category": "boundary",
+      "lat": 42.2015792,
+      "lon": 19.3616511,
+      "municipality": "Bashkia Malësi e Madhe",
+      "county": "Qarku i Shkodrës",
+      "display": "Qendër, Bashkia Malësi e Madhe, Qarku i Shkodrës, 4301, Shqipëria"
+     },
+     {
+      "name": "Qendër",
+      "type": "city",
+      "category": "boundary",
+      "lat": 40.7430422,
+      "lon": 19.5557986,
+      "municipality": "Bashkia Fier",
+      "county": "Qarku i Fierit",
+      "display": "Qendër, Bashkia Fier, Qarku i Fierit, 9302, Shqipëria"
+     },
+     {
+      "name": "Qendër",
+      "type": "residential",
+      "category": "landuse",
+      "lat": 40.4453063,
+      "lon": 19.8007105,
+      "municipality": "Bashkia Mallakastër",
+      "county": "Qarku i Fierit",
+      "display": "Qendër, Çorrush, Kutë, Bashkia Mallakastër, Qarku i Fierit, 9329, Shqipëria"
+     },
+     {
+      "name": "Qendër Ersekë",
+      "type": "city",
+      "category": "boundary",
+      "lat": 40.3356012,
+      "lon": 20.72269,
+      "municipality": "Bashkia Kolonjë",
+      "county": "Qarku i Korçës",
+      "display": "Qendër Ersekë, Bashkia Kolonjë, Qarku i Korçës, 7401, Shqipëria"
+     },
+     {
+      "name": "Librazhd Qendër",
+      "type": "city",
+      "category": "boundary",
+      "lat": 41.2119415,
+      "lon": 20.3238168,
+      "municipality": "Bashkia Librazhd",
+      "county": "Qarku i Elbasanit",
+      "display": "Librazhd Qendër, Bashkia Librazhd, Qarku i Elbasanit, 3402, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Fushë-Arrëz",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Fushë-Arrëz",
+      "type": "town",
+      "category": "boundary",
+      "lat": 42.0701304,
+      "lon": 20.0338708,
+      "municipality": "Bashkia Fushë-Arrëz",
+      "county": "Qarku i Shkodrës",
+      "display": "Fushë-Arrëz, Bashkia Fushë-Arrëz, Qarku i Shkodrës, 4402, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Qelëz",
+    "inCity": [
+     {
+      "name": "Qelëz",
+      "type": "city",
+      "category": "boundary",
+      "lat": 42.0990953,
+      "lon": 19.8933109,
+      "municipality": "Bashkia Pukë",
+      "county": "Qarku i Shkodrës",
+      "display": "Qelëz, Bashkia Pukë, Qarku i Shkodrës, 4405, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Iballë",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Iballë",
+      "type": "village",
+      "category": "place",
+      "lat": 42.1895854,
+      "lon": 20.0033844,
+      "municipality": "Bashkia Fushë-Arrëz",
+      "county": "Qarku i Shkodrës",
+      "display": "Iballë, Iballe, Bashkia Fushë-Arrëz, Qarku i Shkodrës, 4403, Shqipëria"
+     },
+     {
+      "name": "Iballe",
+      "type": "city",
+      "category": "boundary",
+      "lat": 42.179975,
+      "lon": 19.9578978,
+      "municipality": "Bashkia Fushë-Arrëz",
+      "county": "Qarku i Shkodrës",
+      "display": "Iballe, Bashkia Fushë-Arrëz, Qarku i Shkodrës, 4403, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Gjegjan",
+    "inCity": [
+     {
+      "name": "Gjegjan",
+      "type": "village",
+      "category": "boundary",
+      "lat": 41.9326835,
+      "lon": 20.0106318,
+      "municipality": "Bashkia Pukë",
+      "county": "Qarku i Shkodrës",
+      "display": "Gjegjan, Bashkia Pukë, Qarku i Shkodrës, 4408, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   }
+  ]
+ },
+ {
+  "city": "Rrogozhinë",
+  "osm": {
+   "name": "Rrogozhinë",
+   "type": "town",
+   "category": "boundary",
+   "lat": 41.0758988,
+   "lon": 19.6649775,
+   "municipality": "Bashkia Rrogozhinë",
+   "county": "Qarku i Tiranës",
+   "display": "Rrogozhinë, Bashkia Rrogozhinë, Qarku i Tiranës, 2503, Shqipëria"
+  },
+  "municipality": "Bashkia Rrogozhinë",
+  "county": "Qarku i Tiranës",
+  "zones": [
+   {
+    "zone": "Qendër",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Qendër",
+      "type": "city",
+      "category": "boundary",
+      "lat": 42.2015792,
+      "lon": 19.3616511,
+      "municipality": "Bashkia Malësi e Madhe",
+      "county": "Qarku i Shkodrës",
+      "display": "Qendër, Bashkia Malësi e Madhe, Qarku i Shkodrës, 4301, Shqipëria"
+     },
+     {
+      "name": "Qendër",
+      "type": "city",
+      "category": "boundary",
+      "lat": 40.7430422,
+      "lon": 19.5557986,
+      "municipality": "Bashkia Fier",
+      "county": "Qarku i Fierit",
+      "display": "Qendër, Bashkia Fier, Qarku i Fierit, 9302, Shqipëria"
+     },
+     {
+      "name": "Qendër",
+      "type": "residential",
+      "category": "landuse",
+      "lat": 40.4453063,
+      "lon": 19.8007105,
+      "municipality": "Bashkia Mallakastër",
+      "county": "Qarku i Fierit",
+      "display": "Qendër, Çorrush, Kutë, Bashkia Mallakastër, Qarku i Fierit, 9329, Shqipëria"
+     },
+     {
+      "name": "Qendër Ersekë",
+      "type": "city",
+      "category": "boundary",
+      "lat": 40.3356012,
+      "lon": 20.72269,
+      "municipality": "Bashkia Kolonjë",
+      "county": "Qarku i Korçës",
+      "display": "Qendër Ersekë, Bashkia Kolonjë, Qarku i Korçës, 7401, Shqipëria"
+     },
+     {
+      "name": "Librazhd Qendër",
+      "type": "city",
+      "category": "boundary",
+      "lat": 41.2119415,
+      "lon": 20.3238168,
+      "municipality": "Bashkia Librazhd",
+      "county": "Qarku i Elbasanit",
+      "display": "Librazhd Qendër, Bashkia Librazhd, Qarku i Elbasanit, 3402, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Kryevidh",
+    "inCity": [
+     {
+      "name": "Kryevidh",
+      "type": "village",
+      "category": "boundary",
+      "lat": 41.0907515,
+      "lon": 19.5326194,
+      "municipality": "Bashkia Rrogozhinë",
+      "county": "Qarku i Tiranës",
+      "display": "Kryevidh, Bashkia Rrogozhinë, Qarku i Tiranës, 2510, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Sinaballaj",
+    "inCity": [
+     {
+      "name": "Sinaballaj",
+      "type": "village",
+      "category": "boundary",
+      "lat": 41.070294,
+      "lon": 19.6992606,
+      "municipality": "Bashkia Rrogozhinë",
+      "county": "Qarku i Tiranës",
+      "display": "Sinaballaj, Bashkia Rrogozhinë, Qarku i Tiranës, 2511, Shqipëria"
+     },
+     {
+      "name": "Rrogozhinë - Peqin",
+      "type": "primary",
+      "category": "highway",
+      "lat": 41.0637833,
+      "lon": 19.689064,
+      "municipality": "Bashkia Rrogozhinë",
+      "county": "Qarku i Tiranës",
+      "display": "Rrogozhinë - Peqin, Sinaballaj, Bashkia Rrogozhinë, Qarku i Tiranës, 2511, Shqipëria"
+     },
+     {
+      "name": "Rrogozhinë - Peqin",
+      "type": "primary",
+      "category": "highway",
+      "lat": 41.0689018,
+      "lon": 19.6752185,
+      "municipality": "Bashkia Rrogozhinë",
+      "county": "Qarku i Tiranës",
+      "display": "Rrogozhinë - Peqin, Rrogozhinë, Bashkia Rrogozhinë, Qarku i Tiranës, 2503, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   },
+   {
+    "zone": "Shezë",
+    "inCity": [],
+    "elsewhere": [
+     {
+      "name": "Shezë",
+      "type": "village",
+      "category": "boundary",
+      "lat": 41.0256514,
+      "lon": 19.8173878,
+      "municipality": "Bashkia Peqin",
+      "county": "Qarku i Elbasanit",
+      "display": "Shezë, Bashkia Peqin, Qarku i Elbasanit, 3504, Shqipëria"
+     }
+    ]
+   },
+   {
+    "zone": "Lekaj",
+    "inCity": [
+     {
+      "name": "Lekaj",
+      "type": "village",
+      "category": "boundary",
+      "lat": 41.1152488,
+      "lon": 19.6117968,
+      "municipality": "Bashkia Rrogozhinë",
+      "county": "Qarku i Tiranës",
+      "display": "Lekaj, Bashkia Rrogozhinë, Qarku i Tiranës, 2507, Shqipëria"
+     }
+    ],
+    "elsewhere": []
+   }
+  ]
  }
 ]
