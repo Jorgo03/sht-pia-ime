@@ -44,8 +44,29 @@ async function search(q) {
     display: r.display_name,
   }))
   cache[q] = rows
-  fs.writeFileSync(CACHE, JSON.stringify(cache, null, 1))
+  save(CACHE, cache)
   return rows
+}
+
+// Windows refuses a write while another process (git, an editor) has the
+// file open; try again a few times rather than lose the run.
+function save(file, data) {
+  for (let i = 0; ; i++) {
+    try {
+      fs.writeFileSync(file, JSON.stringify(data, null, 1))
+      return
+    } catch (err) {
+      if (i >= 5) throw err
+      Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 500)
+    }
+  }
+}
+
+/** The town itself: "<name>, Shqipëri" first, then the bare name (Durrës
+ *  found nothing the first way). */
+async function findCity(city) {
+  const pick = (rows) => rows.find((r) => ['city', 'town'].includes(r.type)) ?? rows.find(isPlace) ?? null
+  return pick(await search(`${city}, Shqipëri`)) ?? pick(await search(city))
 }
 
 const PLACE_TYPES = new Set(['city', 'town', 'village', 'suburb', 'neighbourhood', 'quarter', 'hamlet', 'municipality', 'locality', 'isolated_dwelling', 'city_district', 'borough'])
@@ -53,8 +74,7 @@ const isPlace = (r) => PLACE_TYPES.has(r.type)
 
 const results = []
 for (const { city, zones } of LOCATIONS) {
-  const cityRows = await search(`${city}, Shqipëri`)
-  const cityHit = cityRows.find((r) => ['city', 'town'].includes(r.type)) ?? cityRows.find(isPlace) ?? cityRows[0] ?? null
+  const cityHit = await findCity(city)
   const cityMunicipality = cityHit?.municipality ?? null
   const entry = { city, osm: cityHit, municipality: cityMunicipality, county: cityHit?.county ?? null, zones: [] }
   for (const zone of zones) {
@@ -70,7 +90,7 @@ for (const { city, zones } of LOCATIONS) {
     process.stdout.write('.')
   }
   results.push(entry)
-  fs.writeFileSync(OUT, JSON.stringify(results, null, 1))
+  save(OUT, results)
   console.log(`\n${city}: ${zones.length} zones done`)
 }
 console.log('done')
