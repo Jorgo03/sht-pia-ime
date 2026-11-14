@@ -121,23 +121,23 @@ Counted as fixed in code: **20 of 31**. Live in production: 003, 004, 007, 017.
 |---|---|---|---|
 | Unit (`npm test`) | 531 | **604** | Apple gate, viewing errors, Tirana time, listing result, attachment purge, migration versions, `.env.example`, list paging, realtime catch-up, web icons, iOS permission texts, offline state, wanted matches, app links (plus tests from other sessions merged on master) |
 | Website e2e | 269 passed | **271 passed, 9 skipped** | F-N28 (favourites order); F4-N12 now tests LinkedIn |
-| Expo-app e2e | 314 passed | **328 passed, 46 skipped** | X103 (failed load), X104 (Tirana time in London), X105 (favourites order); X42 updated; start-screen spec from master |
+| Expo-app e2e | 314 passed | **334 passed, 46 skipped** | X103 (failed load), X104 (Tirana time in London), X105 (favourites order), X106 (offline banner); X42 updated; start-screen spec from master |
 | Live SQL checks | existing files | **+4 files** | `rls_full_matrix.sql` 51/51, `rls_viewing_schedule.sql` 12/12, `rls_anon_grants.sql` 8/8, `rls_wanted_match.sql` 9/9 (with the unapplied migration, in a rolled-back block) |
 | `expo-doctor` | 19/20 | **20/20** | |
 | Lint | 0 errors, 34 warnings | 0 errors, 34 warnings | |
 | `tsc` | clean | clean | |
 
-## Final checks (14 Nov)
+## Final checks (14 Nov, after the execution pass)
 
 | Check | Result |
 |---|---|
 | Lint | 0 errors |
 | `tsc` | clean |
-| Unit tests | 570/570 |
+| Unit tests | 604/604 |
 | Website build | passes |
 | `expo-doctor` | 20/20 |
 | Expo web export | passes |
 | Website e2e | 271 passed, 9 skipped, 0 failed |
-| Expo-app e2e | 328 passed, 46 skipped, 0 failed |
+| Expo-app e2e | 334 passed, 46 skipped, 0 failed (adds X106 offline) |
 
 The test suites fail on any page error, console error or server 5xx, so a passing run also means no console errors in normal use.
