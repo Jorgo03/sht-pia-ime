@@ -822,6 +822,10 @@
         "title": "New homes for you",
         "body": "A new home matches your saved search",
         "bodyMany": "{{total}} new homes match your saved search"
+      },
+      "wanted_match": {
+        "title": "A home for your request",
+        "body": "A new listing fits the home you asked for"
       }
     },
     "settings": "Notification settings"

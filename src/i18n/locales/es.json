@@ -831,6 +831,10 @@
         "title": "Viviendas nuevas para ti",
         "body": "Una vivienda nueva coincide con tu búsqueda",
         "bodyMany": "{{total}} viviendas nuevas coinciden con tu búsqueda"
+      },
+      "wanted_match": {
+        "title": "Una vivienda para tu solicitud",
+        "body": "Un anuncio nuevo encaja con la vivienda que buscas"
       }
     },
     "settings": "Ajustes de notificaciones"

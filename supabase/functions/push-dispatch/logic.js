@@ -45,6 +45,18 @@ const STRINGS = {
   ru: { message: (n) => (n ? `Новое сообщение от ${n}` : 'Новое сообщение'), requested: 'Новая заявка на просмотр', confirmed: 'Ваш просмотр подтверждён', declined: 'Ваш просмотр отклонён', cancelled: 'Просмотр отменён', updated: 'Просмотр изменён' },
 }
 
+// A published listing fits a home the reader asked for (AUDIT-025).
+const WANTED = {
+  sq: 'Një pronë e re përputhet me shtëpinë që kërkon',
+  en: 'A new home fits what you are looking for',
+  de: 'Ein neues Angebot passt zu deinem Suchauftrag',
+  it: 'Un nuovo immobile corrisponde a ciò che cerchi',
+  es: 'Una vivienda nueva encaja con lo que buscas',
+  fr: 'Un nouveau bien correspond à ce que vous cherchez',
+  pl: 'Nowa oferta pasuje do tego, czego szukasz',
+  ru: 'Новый объект подходит под ваш запрос',
+}
+
 /** First name only: enough to recognise, little to expose on a lock screen. */
 export function firstName(fullName) {
   return String(fullName ?? '').trim().split(/\s+/)[0]?.slice(0, 40) ?? ''
@@ -71,6 +83,9 @@ export function buildPush({ kind, data, lang, senderName }) {
       body: count > 1 ? copy.many(count) : copy.one,
       url: count === 1 && data?.property_id ? `/property/${data.property_id}` : '/saved-searches',
     }
+  }
+  if (kind === 'wanted_match') {
+    return { title: 'Shtëpia.ime', body: WANTED[lang] ?? WANTED.en, url: `/property/${data.property_id}` }
   }
   if (kind === 'welcome') return { title: 'Shtëpia.ime', body: m.welcome, url: '/notifications' }
   // The people sending announcements wrote these words for everyone to read.

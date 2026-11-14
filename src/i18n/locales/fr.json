@@ -831,6 +831,10 @@
         "title": "Nouveaux biens pour vous",
         "body": "Un nouveau bien correspond à votre recherche",
         "bodyMany": "{{total}} nouveaux biens correspondent à votre recherche"
+      },
+      "wanted_match": {
+        "title": "Un bien pour votre demande",
+        "body": "Une nouvelle annonce correspond au bien que vous cherchez"
       }
     },
     "settings": "Réglages des notifications"

@@ -22,6 +22,7 @@ runs a `DELETE`.
 | `rls_full_matrix.sql` | Writes on every table as a signed-out visitor, the owner and another account; viewing D1–D3 (docs/audit/AUDIT_REPORT.md) | `passed=51/51` live after migrations `20261113194202`/`194212`/`194218` (48/51 before) |
 | `rls_viewing_schedule.sql` | No double booking per listing or agent, no moving a viewing into the past, a client's move sends a confirmed viewing back to requested (AUDIT-003/004) | `passed=12/12` with the migrations (5/12 before) |
 | `rls_anon_grants.sql` | Signed-out visitors hold no grants on private tables; listings and plans read-only; view counts insert-only (AUDIT-017) | `passed=8/8` with migration `20261113194218` (4/8 before) |
+| `rls_wanted_match.sql` | A published listing notifies each open wanted home it fits (city, sale or rent, budget in EUR, bedrooms), once, never the publisher, never drafts or held listings (AUDIT-025) | `passed=9/9` with migration `20261114120000` run in the block (5/9 without); not applied live |
 | `rls_performance_report.sql` | Raporti im: each agent sees only their own report and baseline, clients and signed-out visitors get none, the status history cannot be written directly, viewings complete only by their agent after their time, and the counting rules (corrections, duplicates, periods) (migration `20261108005947`) | `passed=22/22` |
 
 Run one in the Supabase SQL editor, with the Supabase MCP `execute_sql` tool,

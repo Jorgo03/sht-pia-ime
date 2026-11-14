@@ -822,6 +822,10 @@
         "title": "Prona të reja për ty",
         "body": "Një pronë e re përputhet me kërkimin tënd",
         "bodyMany": "{{total}} prona të reja përputhen me kërkimin tënd"
+      },
+      "wanted_match": {
+        "title": "Një pronë për kërkesën tënde",
+        "body": "U publikua një pronë që përputhet me shtëpinë që kërkon"
       }
     },
     "settings": "Cilësimet e njoftimeve"

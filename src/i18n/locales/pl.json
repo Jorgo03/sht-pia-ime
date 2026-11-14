@@ -840,6 +840,10 @@
         "title": "Nowe oferty dla Ciebie",
         "body": "Nowa oferta pasuje do Twojego wyszukiwania",
         "bodyMany": "Nowe oferty pasujące do wyszukiwania: {{total}}"
+      },
+      "wanted_match": {
+        "title": "Oferta dla Twojego zapytania",
+        "body": "Nowe ogłoszenie pasuje do domu, którego szukasz"
       }
     },
     "settings": "Ustawienia powiadomień"

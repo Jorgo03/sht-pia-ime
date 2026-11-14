@@ -822,6 +822,10 @@
         "title": "Neue Angebote für dich",
         "body": "Ein neues Angebot passt zu deiner Suche",
         "bodyMany": "{{total}} neue Angebote passen zu deiner Suche"
+      },
+      "wanted_match": {
+        "title": "Ein Angebot für deine Anfrage",
+        "body": "Ein neues Angebot passt zu deinem Suchauftrag"
       }
     },
     "settings": "Benachrichtigungseinstellungen"

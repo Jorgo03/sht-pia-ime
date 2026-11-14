@@ -831,6 +831,10 @@
         "title": "Nuovi immobili per te",
         "body": "Un nuovo immobile corrisponde alla tua ricerca",
         "bodyMany": "{{total}} nuovi immobili corrispondono alla tua ricerca"
+      },
+      "wanted_match": {
+        "title": "Un immobile per la tua richiesta",
+        "body": "Un nuovo annuncio corrisponde alla casa che cerchi"
       }
     },
     "settings": "Impostazioni notifiche"

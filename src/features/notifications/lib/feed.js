@@ -19,6 +19,8 @@ export function notificationRoute(n) {
     case 'listing_restored':
       return UUID.test(data.property_id ?? '') ? `/property/${data.property_id}` : null
     case 'saved_search':
+    // A published listing that fits one of the reader's wanted homes (AUDIT-025).
+    case 'wanted_match':
       return UUID.test(data.property_id ?? '') ? `/property/${data.property_id}` : '/saved-searches'
     default:
       return null
