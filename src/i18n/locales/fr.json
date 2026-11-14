@@ -384,6 +384,7 @@
     "currentPasswordWrong": "Votre mot de passe actuel est incorrect.",
     "providerUnavailable": "Cette option de connexion n’est pas encore disponible. Choisissez-en une autre.",
     "loadFailed": "Chargement impossible. Vérifiez votre connexion et réessayez.",
+    "offline": "Vous êtes hors ligne. Tout se chargera dès le retour de la connexion.",
     "tooManyAttempts": "Trop de tentatives incorrectes. Réessayez dans {{seconds}} secondes.",
     "codeIncorrect": "Code de vérification incorrect. Veuillez réessayer.",
     "codeExpired": "Votre code de vérification a expiré. Veuillez en demander un nouveau.",

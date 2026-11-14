@@ -384,6 +384,7 @@
     "currentPasswordWrong": "La password attuale non è corretta.",
     "providerUnavailable": "Questo metodo di accesso non è ancora disponibile. Scegline un altro.",
     "loadFailed": "Impossibile caricare. Controlla la connessione e riprova.",
+    "offline": "Sei offline. I contenuti si caricheranno appena torna la connessione.",
     "tooManyAttempts": "Troppi tentativi errati. Riprova tra {{seconds}} secondi.",
     "codeIncorrect": "Codice di verifica errato. Riprova.",
     "codeExpired": "Il tuo codice di verifica è scaduto. Richiedine uno nuovo.",

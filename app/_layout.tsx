@@ -36,6 +36,9 @@ import { FavoritesProvider } from '@/contexts/favorites-context';
 import { FiltersProvider } from '@/contexts/filters-context';
 import { ThemeProvider, useTheme } from '@/contexts/theme-context';
 import { queryClient } from '@/lib/query-client';
+// NetInfo drives React Query's online state (AUDIT-009); side effect only.
+import '@/lib/online-manager';
+import { OfflineBanner } from '@/components/ui/offline-banner';
 import { installGlobalErrorReporting } from '@/lib/report-error';
 import { configureForegroundNotifications } from '@/lib/push';
 import { LaunchDoorSplash } from '@/components/brand/door-splash';
@@ -206,6 +209,8 @@ function ThemedNavigation() {
           <Stack.Screen name="auth/callback" options={{ headerShown: false }} />
           <Stack.Screen name="+not-found" options={{ headerShown: false }} />
         </Stack>
+        {/* Above every screen while the phone is offline (AUDIT-009). */}
+        <OfflineBanner />
       </WebColumn>
       <StatusBar style={theme === 'dark' ? 'light' : 'dark'} />
     </NavigationThemeProvider>

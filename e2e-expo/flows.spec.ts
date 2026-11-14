@@ -2421,3 +2421,23 @@ test.describe('listing that fails to load', () => {
     await expect(page.getByRole('heading', { name: FEATURED.title as string, level: 1 })).toBeVisible();
   });
 });
+
+// AUDIT-009: going offline shows a banner, and it goes away by itself when the
+// connection is back. No third-party reachability request on the web.
+test.describe('offline', () => {
+  test.use({ allowConsoleErrors: [/Failed to load resource|ERR_INTERNET_DISCONNECTED|Failed to fetch|Network request failed/] });
+
+  test('X106 offline shows the banner; back online it goes away', async ({ page, context }) => {
+    const external: string[] = [];
+    page.on('request', (r) => { if (/google\.com|generate_204/.test(r.url())) external.push(r.url()); });
+    await page.goto('/');
+    await ready(page);
+    await expect(page.getByTestId('offline-banner')).toHaveCount(0);
+    await context.setOffline(true);
+    await expect(page.getByTestId('offline-banner')).toBeVisible();
+    await expect(page.getByText(t('errors.offline'))).toBeVisible();
+    await context.setOffline(false);
+    await expect(page.getByTestId('offline-banner')).toHaveCount(0);
+    expect(external).toEqual([]);
+  });
+});

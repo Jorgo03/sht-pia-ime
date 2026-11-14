@@ -392,6 +392,7 @@
     "currentPasswordWrong": "Obecne hasło jest nieprawidłowe.",
     "providerUnavailable": "Ta metoda logowania nie jest jeszcze dostępna. Wybierz inną.",
     "loadFailed": "Nie udało się wczytać. Sprawdź połączenie i spróbuj ponownie.",
+    "offline": "Jesteś offline. Treści załadują się, gdy połączenie wróci.",
     "tooManyAttempts": "Zbyt wiele błędnych prób. Spróbuj ponownie za {{seconds}} s.",
     "codeIncorrect": "Nieprawidłowy kod weryfikacyjny. Spróbuj ponownie.",
     "codeExpired": "Twój kod weryfikacyjny wygasł. Poproś o nowy.",

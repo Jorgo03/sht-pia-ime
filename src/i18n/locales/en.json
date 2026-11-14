@@ -404,6 +404,7 @@
     "currentPasswordWrong": "Your current password is incorrect.",
     "providerUnavailable": "This sign-in option isn't available yet. Please choose another one.",
     "loadFailed": "Couldn't load this. Check your connection and try again.",
+    "offline": "You're offline. Things will load again when you're back online.",
     "tooManyAttempts": "Too many wrong attempts. Try again in {{seconds}} seconds.",
     "codeIncorrect": "Incorrect verification code. Please try again.",
     "codeExpired": "Your verification code has expired. Please request a new one.",

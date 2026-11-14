@@ -376,6 +376,7 @@
     "currentPasswordWrong": "Dein aktuelles Passwort ist falsch.",
     "providerUnavailable": "Diese Anmeldeoption ist noch nicht verfügbar. Bitte wähle eine andere.",
     "loadFailed": "Konnte nicht geladen werden. Prüfe deine Verbindung und versuche es erneut.",
+    "offline": "Du bist offline. Inhalte laden wieder, sobald die Verbindung zurück ist.",
     "tooManyAttempts": "Zu viele falsche Versuche. Versuchen Sie es in {{seconds}} Sekunden erneut.",
     "codeIncorrect": "Falscher Bestätigungscode. Bitte versuche es erneut.",
     "codeExpired": "Dein Bestätigungscode ist abgelaufen. Bitte fordere einen neuen an.",

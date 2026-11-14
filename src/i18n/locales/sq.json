@@ -352,6 +352,7 @@
     "currentPasswordWrong": "Fjalëkalimi aktual është i pasaktë.",
     "providerUnavailable": "Kjo mënyrë hyrjeje nuk është ende e disponueshme. Zgjidh një tjetër.",
     "loadFailed": "Nuk u ngarkua dot. Kontrollo lidhjen dhe provo sërish.",
+    "offline": "Je pa internet. Do të ngarkohet sapo të kthehet lidhja.",
     "tooManyAttempts": "Shumë përpjekje të gabuara. Provo përsëri pas {{seconds}} sekondash.",
     "codeIncorrect": "Kodi i verifikimit është i pasaktë. Provo sërish.",
     "codeExpired": "Kodi i verifikimit ka skaduar. Kërko një kod të ri.",
