@@ -1,6 +1,7 @@
 // Zone and reference-number search (docs/LAUNCH_TASKS.md F19), shared by the
 // website and the phone app so both read, show and query them the same way.
-import LOCATIONS from '../data/locations.js'
+import LOCATIONS, { CITIES } from '../data/locations.js'
+import { findCity, fold, resolveZone } from './places.js'
 
 /**
  * Case- and diacritic-insensitive form: "TIRANA" / "Tiranë" / "tirane" all
@@ -26,8 +27,9 @@ function norm(s) {
 export function zonesFor(city) {
   const wanted = norm(city)
   if (!wanted) return []
-  const exact = LOCATIONS.find((l) => norm(l.city) === wanted)
-  if (exact) return exact.zones
+  // Any name or alias of a city: "Tirana", "Durazzo", "Dibër" (Peshkopi).
+  const known = findCity(city)
+  if (known) return LOCATIONS.find((l) => l.city === known.city)?.zones ?? []
   if (wanted.length < 2) return []
   const seen = new Set()
   const out = []
@@ -57,6 +59,9 @@ export function validZone(city, zone) {
   if (!zone) return null
   const wanted = norm(zone)
   if (!wanted) return null
+  // A zone's own name or alias ("Laprakë" for Lapraka) first.
+  const known = city ? resolveZone(city, zone) : null
+  if (known) return known
   const candidates = city ? zonesFor(city) : []
   const pool = candidates.length ? candidates : LOCATIONS.flatMap((l) => l.zones)
   const exact = pool.find((z) => norm(z) === wanted)
@@ -67,6 +72,9 @@ export function validZone(city, zone) {
       return n.startsWith(wanted) || n.includes(wanted)
     }))]
     if (hits.length === 1) return hits[0]
+    // "Bllok" matches Blloku and Blloku Gintash: the one the others extend.
+    const base = hits.find((h) => hits.every((o) => norm(o).startsWith(norm(h))))
+    if (base) return base
   }
   return null
 }
@@ -123,7 +131,20 @@ export function freeTextFilter(term) {
   const cleaned = cleanFreeText(term)
   if (!cleaned) return null
   const p = `%${cleaned}%`
-  return `city.ilike.${p},zone.ilike.${p},address.ilike.${p}`
+  const parts = [`city.ilike.${p}`, `zone.ilike.${p}`, `address.ilike.${p}`]
+  // A city or zone typed any way ("tirana", "Durazzo", "lapraka") also finds
+  // the listings stored under its canonical name, which ilike alone misses
+  // when the diacritics differ ("tirane" is not a substring of "Tiranë").
+  // Only when the ilike would miss it: the canonical name already contains
+  // what was typed, letter for letter, needs nothing extra.
+  const missed = (name) => !name.toLowerCase().includes(cleaned.toLowerCase())
+  const city = findCity(cleaned)
+  if (city && missed(city.city)) parts.push(`city.eq."${city.city}"`)
+  const k = fold(cleaned)
+  const zones = new Set()
+  for (const c of CITIES) for (const z of c.zones) if ((fold(z.name) === k || z.keys.includes(k)) && missed(z.name)) zones.add(z.name)
+  for (const z of zones) parts.push(`zone.eq."${z}"`)
+  return parts.join(',')
 }
 
 export function applyFreeText(query, term) {

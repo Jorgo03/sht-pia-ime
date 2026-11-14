@@ -525,7 +525,9 @@
     "actionView": "Ver",
     "actionStats": "Estadísticas",
     "actionSold": "Vendido",
-    "actionRented": "Alquilado"
+    "actionRented": "Alquilado",
+    "pinOutsideAlbania": "El marcador está fuera de Albania. Colócalo donde está la propiedad.",
+    "pinOutsideCity": "El marcador está fuera del municipio de {{city}}. Muévelo o elige la ciudad correcta."
   },
   "dashboard": {
     "title": "Dashboard de propiedad",
@@ -1193,5 +1195,8 @@
     "listingsFailed": "No se pudieron cargar las propiedades.",
     "open": "Abrir el perfil de {{name}}",
     "call": "Llamar al {{phone}}"
+  },
+  "locations": {
+    "noMatch": "Ningún lugar coincide"
   }
 }

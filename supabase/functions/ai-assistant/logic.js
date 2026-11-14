@@ -7,6 +7,8 @@
 // (supabase/migrations, properties table) and turns them into the same kind
 // of PostgREST filters the apps use (data/properties.ts applyFilters).
 
+import { CITY_KEYS } from './places.js'
+
 export const LISTING_TYPES = ['sale', 'rent', 'daily_rent']
 export const PROPERTY_TYPES = ['apartment', 'house', 'villa', 'land', 'commercial', 'office', 'garage']
 /** The amenities a listing can carry (app/listing/new.tsx FEATURES_LIST, plus legacy heating). */
@@ -79,7 +81,9 @@ export function normalizeCriteria(raw) {
   if (LISTING_TYPES.includes(r.listing_type)) out.listing_type = r.listing_type
   if (PROPERTY_TYPES.includes(r.property_type)) out.property_type = r.property_type
   const city = cleanText(r.city, 60)
-  if (city) out.city = city
+  // "Tirana", "Durazzo", "Dibër": the app's own city name (places.js, from
+  // the locations audit), so the search below matches what listings store.
+  if (city) out.city = canonicalCity(city) ?? city
   const zone = cleanText(r.zone, 80)
   if (zone) out.zone = zone
 
@@ -184,6 +188,12 @@ export function boundsAround(lat, lng, km) {
  * non-held listings; RLS still applies on top because index.ts queries as the
  * caller. `anchor` is the near_property_id listing's coordinates, when known.
  */
+/** The app's city for any name or alias of it, or null. */
+export function canonicalCity(name) {
+  const k = String(name ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[-‐–]/g, ' ').replace(/\s+/g, ' ').trim()
+  return Object.hasOwn(CITY_KEYS, k) ? CITY_KEYS[k] : null
+}
+
 export function applyCriteria(query, c, anchor) {
   let q = query.eq('status', 'active').eq('moderation_hold', false)
   if (c.listing_type) q = q.eq('listing_type', c.listing_type)
@@ -414,8 +424,8 @@ const criteriaSchema = {
   properties: {
     listing_type: { type: 'string', enum: LISTING_TYPES, description: 'sale, rent (monthly) or daily_rent' },
     property_type: { type: 'string', enum: PROPERTY_TYPES, description: 'commercial = business premises/shop' },
-    city: { type: 'string', description: 'City in Albanian spelling, e.g. Tiranë, Durrës, Vlorë' },
-    zone: { type: 'string', description: 'Neighbourhood, e.g. Blloku, Plazh, Ali Demi' },
+    city: { type: 'string', description: 'Albanian town or municipality, in Albanian spelling, e.g. Tiranë, Durrës, Vlorë, Sarandë' },
+    zone: { type: 'string', description: 'Neighbourhood or area within the city, e.g. Blloku, Ali Demi, Komuna e Parisit' },
     min_price: { type: 'number' },
     max_price: { type: 'number' },
     currency: { type: 'string', enum: ['EUR', 'ALL', 'USD'], description: 'Currency of min_price/max_price as the person said it' },

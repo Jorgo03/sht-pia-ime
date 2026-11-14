@@ -74,3 +74,19 @@ test('free text searches city, zone and address; wildcards cannot break it', () 
   applyFreeText(q, '%,,__')
   assert.equal(ors.length, before)
 })
+
+// Locations audit: a city or zone typed in another spelling or language
+// still finds listings saved under the canonical name.
+test('free text resolves aliases and exonyms to the canonical names', () => {
+  const ors = []
+  const q = { or: (s) => { ors.push(s); return q }, eq: () => q }
+  applyFreeText(q, 'tirana')
+  assert.ok(ors[0].includes('city.eq."Tiranë"'))
+  applyFreeText(q, 'Durazzo')
+  assert.ok(ors[1].includes('city.eq."Durrës"'))
+  applyFreeText(q, 'laprake')
+  assert.ok(ors[2].includes('zone.eq."Lapraka"'))
+  assert.ok(zonesFor('Tirana').includes('Blloku'), 'the exonym offers the zones too')
+  assert.ok(zonesFor('Dibër').includes('Maqellarë'), 'the municipality name finds its seat town')
+  assert.equal(validZone('Tiranë', 'Laprakë'), 'Lapraka')
+})

@@ -525,7 +525,9 @@
     "actionView": "Vedi",
     "actionStats": "Statistiche",
     "actionSold": "Venduto",
-    "actionRented": "Affittato"
+    "actionRented": "Affittato",
+    "pinOutsideAlbania": "Il segnaposto è fuori dall’Albania. Mettilo dove si trova l’immobile.",
+    "pinOutsideCity": "Il segnaposto è fuori dal comune di {{city}}. Spostalo o scegli la città giusta."
   },
   "dashboard": {
     "title": "Dashboard immobile",
@@ -1193,5 +1195,8 @@
     "listingsFailed": "Impossibile caricare gli immobili.",
     "open": "Apri il profilo di {{name}}",
     "call": "Chiama {{phone}}"
+  },
+  "locations": {
+    "noMatch": "Nessun luogo corrisponde"
   }
 }

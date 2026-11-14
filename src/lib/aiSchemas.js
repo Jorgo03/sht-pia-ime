@@ -2,6 +2,7 @@
 // module can be unit-tested with `node --test`.
 
 import { UNITS_PER_EUR } from '../features/properties/lib/priceRange.js'
+import { resolveCity } from '../features/properties/lib/places.js'
 
 const LISTING_TYPES = ['sale', 'rent', 'daily_rent']
 const PROPERTY_TYPES = ['apartment', 'villa', 'house', 'land', 'commercial', 'office', 'garage']
@@ -19,7 +20,9 @@ export function sanitizeSearchFilters(raw) {
   const out = {}
 
   if (typeof raw.city === 'string' && raw.city.trim()) {
-    out.city = raw.city.trim().slice(0, 60)
+    // The model may answer "Tirana", "Durazzo" or "Dibër": the app's own
+    // city name is what the city filter and picker understand.
+    out.city = resolveCity(raw.city) ?? raw.city.trim().slice(0, 60)
   }
   if (LISTING_TYPES.includes(raw.listing_type)) out.listing = raw.listing_type
   if (PROPERTY_TYPES.includes(raw.property_type)) out.type = raw.property_type

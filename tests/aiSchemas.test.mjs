@@ -61,3 +61,9 @@ test('prices in lekë or dollars become euros, the unit of the search fields', (
   // A lek amount too small for one euro still keeps a usable bound.
   assert.deepEqual(sanitizeSearchFilters({ min_price: 50, currency: 'ALL' }), { minPrice: '1' })
 })
+
+test('a city in another spelling or language becomes the city name the app uses', () => {
+  assert.equal(sanitizeSearchFilters({ city: 'Tirana' }).city, 'Tiranë')
+  assert.equal(sanitizeSearchFilters({ city: 'durazzo' }).city, 'Durrës')
+  assert.equal(sanitizeSearchFilters({ city: 'Dibër' }).city, 'Peshkopi')
+})

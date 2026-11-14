@@ -2,6 +2,7 @@ import { memo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Home, MapPin, BedDouble, Bath, Euro, Hash } from 'lucide-react'
 import LOCATIONS from '../data/locations'
+import { cityLabel } from '../lib/places'
 import { zonesFor } from '../lib/searchFilters'
 import { PROPERTY_TYPES, BED_OPTIONS, BATH_OPTIONS, PRICE_MIN, PRICE_STEP } from '../data/filterOptions'
 
@@ -45,7 +46,7 @@ function FilterBar({ values, onChange }) {
           >
             <option value="">{t('search.city')}</option>
             {LOCATIONS.map(l => (
-              <option key={l.city} value={l.city}>{l.city}</option>
+              <option key={l.city} value={l.city}>{cityLabel(l.city)}</option>
             ))}
           </select>
         </label>

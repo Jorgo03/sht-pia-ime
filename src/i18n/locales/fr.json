@@ -525,7 +525,9 @@
     "actionView": "Voir",
     "actionStats": "Statistiques",
     "actionSold": "Vendu",
-    "actionRented": "Loué"
+    "actionRented": "Loué",
+    "pinOutsideAlbania": "Le repère est hors d’Albanie. Placez-le là où se trouve le bien.",
+    "pinOutsideCity": "Le repère est hors de la commune de {{city}}. Déplacez-le ou choisissez la bonne ville."
   },
   "dashboard": {
     "title": "Tableau de bord du bien",
@@ -1193,5 +1195,8 @@
     "listingsFailed": "Impossible de charger les biens.",
     "open": "Ouvrir le profil de {{name}}",
     "call": "Appeler le {{phone}}"
+  },
+  "locations": {
+    "noMatch": "Aucun lieu ne correspond"
   }
 }

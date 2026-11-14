@@ -34,7 +34,8 @@ import { usePropertiesCountQuery } from '@/hooks/use-property-queries';
 // already uses to pull locales out of src/.
 import LOCATIONS from '@/src/features/properties/data/locations';
 import { AMENITIES, toggleAmenity } from '@/src/features/properties/lib/amenities';
-import { normalizeRef, zonesFor } from '@/src/features/properties/lib/searchFilters';
+import { normalizeRef } from '@/src/features/properties/lib/searchFilters';
+import { cityLabel, findCity } from '@/src/features/properties/lib/places';
 import { sheetColumn } from '@/constants/web-frame';
 
 type PropertyType = NonNullable<Property['property_type']>;
@@ -264,15 +265,16 @@ export function FilterSheet({
               accessibilityLabel={t('search.city')}
               options={[
                 { value: '', label: t('search.anyCity') },
-                ...CITIES.map((city) => ({ value: city, label: city })),
+                ...CITIES.map((city) => ({ value: city, label: cityLabel(city), keys: findCity(city)?.keys ?? [] })),
               ]}
+              searchable
               onChange={(v) => {
                 setFilter('city', v || null);
                 // A zone only means something inside its own city.
                 setFilter('zone', null);
               }}
             />
-            {zonesFor(filters.city).length > 0 ? (
+            {(findCity(filters.city)?.zones.length ?? 0) > 0 ? (
               <View style={styles.zoneField}>
                 <SelectField
                   value={filters.zone ?? ''}
@@ -280,8 +282,9 @@ export function FilterSheet({
                   accessibilityLabel={t('search.zone')}
                   options={[
                     { value: '', label: t('search.anyZone') },
-                    ...zonesFor(filters.city).map((z) => ({ value: z, label: z })),
+                    ...(findCity(filters.city)?.zones ?? []).map((z) => ({ value: z.name, label: z.name, keys: z.keys })),
                   ]}
+                  searchable
                   onChange={(v) => setFilter('zone', v || null)}
                 />
               </View>

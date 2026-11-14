@@ -14,6 +14,8 @@ import { translatePropertyContent } from '../../../lib/translate'
 import { geocodeCity } from '../../../lib/roadSearch'
 import { formToColumns, propertyToForm, removedMediaPaths } from '../lib/listingForm'
 import { zonesFor } from '../../properties/lib/searchFilters'
+import LOCATIONS from '../../properties/data/locations'
+import { checkPin, cityLabel, findCity } from '../../properties/lib/places'
 import { FORM_LIMITS, isValidEmail } from '../../../lib/formLimits'
 import { isValidPhone } from '../../auth/lib/profileForm'
 import { uploadPath } from '../../../lib/uploadNames'
@@ -85,7 +87,9 @@ const PROPERTY_TYPES = ['apartment', 'villa', 'house', 'land', 'commercial', 'of
 // daily_rent removed from creation (owner decision 2026-07-14); display
 // helpers in lib/format keep supporting it in case legacy rows ever exist.
 const LISTING_TYPES = ['sale', 'rent']
-const CITIES = ['Tiranë', 'Durrës', 'Vlorë', 'Shkodër', 'Elbasan', 'Korçë', 'Fier', 'Berat', 'Lushnjë', 'Pogradec', 'Kavajë', 'Gjirokastër', 'Sarandë']
+// Every city both apps offer (data/locations.js, the locations audit), not a
+// hand-kept list: this one had 13 of them while the phone app had 31.
+const CITIES = LOCATIONS.map((l) => l.city)
 // 'heating' is no longer offered; existing listings with it still display it.
 const FEATURES_LIST = ['balcony', 'parking', 'elevator', 'garden', 'pool', 'furnished', 'airConditioning', 'security', 'storage']
 
@@ -295,7 +299,8 @@ export default function NewListing() {
 
   const update = (key, value) => {
     setForm(prev => ({ ...prev, [key]: value }))
-    setErrors(prev => ({ ...prev, [key]: undefined }))
+    // Moving the pin answers a pin error.
+    setErrors(prev => ({ ...prev, [key]: undefined, ...(key === 'latitude' || key === 'longitude' ? { pin: undefined } : {}) }))
   }
 
   /**
@@ -386,6 +391,12 @@ export default function NewListing() {
     }
     if (s === 1) {
       if (!form.city) errs.city = t('listing.required')
+      // The database refuses the same pins (supabase/pending/locations.sql).
+      else if (form.latitude != null && form.longitude != null) {
+        const pin = checkPin(form.city, form.latitude, form.longitude)
+        if (pin === 'outside-albania') errs.pin = t('listing.pinOutsideAlbania')
+        else if (pin === 'outside-city') errs.pin = t('listing.pinOutsideCity', { city: findCity(form.city)?.bashki ?? form.city })
+      }
     }
     if (s === 2) {
       if (!form.price || Number(form.price) <= 0) errs.price = t('listing.required')
@@ -683,7 +694,7 @@ export default function NewListing() {
             <div className="nl-field">
               <label>{t('listing.city')}</label>
               <select value={form.city} onChange={e => selectCity(e.target.value)}>
-                {CITIES.map(c => <option key={c} value={c}>{c}</option>)}
+                {CITIES.map(c => <option key={c} value={c}>{cityLabel(c)}</option>)}
               </select>
               {errors.city && <span className="nl-error">{errors.city}</span>}
             </div>
@@ -753,6 +764,7 @@ export default function NewListing() {
                 )}
               </div>
 
+              {errors.pin && <span className="nl-error" role="alert">{errors.pin}</span>}
               <span className="mt-2 block text-xs leading-relaxed text-fho-text-muted">
                 {form.latitude != null && form.longitude != null
                   ? t('listing.pinAdjustHint')

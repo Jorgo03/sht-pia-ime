@@ -10,6 +10,7 @@ import SkeletonCard from '../../../shared/SkeletonCard'
 import { useProperties } from '../hooks/useProperties'
 import { useDragSheet } from '../../../hooks/useDragSheet'
 import LOCATIONS from '../data/locations'
+import { cityLabel } from '../lib/places'
 import { normalizeRef, zonesFor } from '../lib/searchFilters'
 import {
   PROPERTY_TYPES, BED_OPTIONS, BATH_OPTIONS,
@@ -273,7 +274,7 @@ export default function Search() {
                 <MapPin size={15} aria-hidden="true" />
                 <select value={city} onChange={e => updateFilter('city', e.target.value)} aria-label={t('search.city')}>
                   <option value="">{t('search.anyCity')}</option>
-                  {LOCATIONS.map(l => <option key={l.city} value={l.city}>{l.city}</option>)}
+                  {LOCATIONS.map(l => <option key={l.city} value={l.city}>{cityLabel(l.city)}</option>)}
                 </select>
               </div>
               {zonesFor(city).length > 0 && (

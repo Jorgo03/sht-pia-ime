@@ -568,7 +568,9 @@
     "actionView": "View",
     "actionStats": "Stats",
     "actionSold": "Sold",
-    "actionRented": "Rented"
+    "actionRented": "Rented",
+    "pinOutsideAlbania": "The pin is outside Albania. Place it where the property is.",
+    "pinOutsideCity": "The pin is outside the {{city}} municipality. Move it, or choose the right city."
   },
   "dashboard": {
     "title": "Property Dashboard",
@@ -1183,5 +1185,8 @@
     "listingsFailed": "Couldn't load the properties.",
     "open": "Open {{name}}'s profile",
     "call": "Call {{phone}}"
+  },
+  "locations": {
+    "noMatch": "No place matches"
   }
 }

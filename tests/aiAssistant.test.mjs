@@ -292,3 +292,12 @@ test('app storage: per account, capped, and forgotten after 30 days or when malf
   assert.equal(C.fromStored('{not json', now), null)
   assert.equal(C.fromStored({ v: 2, messages: [] }, now), null)
 })
+
+// Locations audit: the model's city in any spelling or language becomes the
+// city the listings store, so the search matches them.
+test('a city alias from the model becomes the city the app uses', () => {
+  assert.equal(A.normalizeCriteria({ city: 'Tirana' }).city, 'Tiranë')
+  assert.equal(A.normalizeCriteria({ city: 'Durazzo' }).city, 'Durrës')
+  assert.equal(A.normalizeCriteria({ city: 'Saranda' }).city, 'Sarandë')
+  assert.equal(A.normalizeCriteria({ city: 'Atlantis' }).city, 'Atlantis')
+})

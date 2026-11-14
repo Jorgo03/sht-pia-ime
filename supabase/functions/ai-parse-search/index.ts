@@ -113,7 +113,7 @@ Deno.serve(async (req) => {
           input_schema: {
             type: 'object',
             properties: {
-              city: { type: 'string', description: 'City name in Albanian spelling, e.g. Tiranë, Durrës' },
+              city: { type: 'string', description: 'Albanian town or municipality, in Albanian spelling, e.g. Tiranë, Durrës, Vlorë' },
               listing_type: { type: 'string', enum: ['sale', 'rent', 'daily_rent'] },
               property_type: { type: 'string', enum: ['apartment', 'villa', 'house', 'land', 'commercial', 'office', 'garage'] },
               min_price: { type: 'number' },

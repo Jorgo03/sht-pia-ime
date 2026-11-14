@@ -62,6 +62,7 @@ import {
 import LOCATIONS from '@/src/features/properties/data/locations';
 import { AMENITIES } from '@/src/features/properties/lib/amenities';
 import { zonesFor } from '@/src/features/properties/lib/searchFilters';
+import { checkPin, cityLabel, findCity } from '@/src/features/properties/lib/places';
 import { useReadableColumn, useResponsive } from '@/hooks/use-responsive';
 
 /**
@@ -116,6 +117,11 @@ const PROPERTY_TYPES: PropertyType[] = [
 const CURRENCIES: Currency[] = ['EUR', 'ALL', 'USD'];
 
 const CITIES: string[] = (LOCATIONS as { city: string }[]).map((l) => l.city);
+/** Every city, by its picker label, findable by any of its names. */
+const CITY_OPTIONS = CITIES.map((c) => ({ value: c, label: cityLabel(c), keys: findCity(c)?.keys ?? [] }));
+/** A city's zones, findable by their aliases and old spellings. */
+const zoneOptions = (city: string) =>
+  (findCity(city)?.zones ?? []).map((z) => ({ value: z.name, label: z.name, keys: z.keys }));
 
 const FEATURES_LIST = AMENITIES;
 
@@ -177,6 +183,8 @@ interface FormErrors {
   title?: string;
   description?: string;
   city?: string;
+  /** The map pin is outside Albania or outside the city's municipality. */
+  pin?: string;
   price?: string;
   sqft?: string;
   beds?: string;
@@ -462,6 +470,13 @@ function ListingWizard({ editId }: { editId?: string }) {
     }
     if (s === 1) {
       if (!form.city) errs.city = t('listing.required');
+      // The database refuses the same pins (public.locations, migration
+      // supabase/pending/locations.sql); saying so here is kinder.
+      else if (form.latitude != null && form.longitude != null) {
+        const pin = checkPin(form.city, form.latitude, form.longitude);
+        if (pin === 'outside-albania') errs.pin = t('listing.pinOutsideAlbania');
+        else if (pin === 'outside-city') errs.pin = t('listing.pinOutsideCity', { city: findCity(form.city)?.bashki ?? form.city });
+      }
     }
     if (s === 2) {
       if (!form.price || Number(form.price) <= 0) errs.price = t('listing.required');
@@ -838,7 +853,8 @@ function ListingWizard({ editId }: { editId?: string }) {
         <SelectField
           variant="form"
           value={form.city}
-          options={CITIES.map((c) => ({ value: c, label: c }))}
+          options={CITY_OPTIONS}
+          searchable
           placeholder={t('listing.city')}
           icon="location-city"
           onChange={(v) => {
@@ -874,8 +890,9 @@ function ListingWizard({ editId }: { editId?: string }) {
             value={form.zone}
             options={[
               { value: '', label: t('listing.zoneNone') },
-              ...zonesFor(form.city).map((z) => ({ value: z, label: z })),
+              ...zoneOptions(form.city),
             ]}
+            searchable
             placeholder={t('listing.zoneNone')}
             icon="place"
             onChange={(v) => update('zone', v)}
@@ -906,8 +923,14 @@ function ListingWizard({ editId }: { editId?: string }) {
           latitude={form.latitude}
           longitude={form.longitude}
           focus={mapFocus}
-          onChange={(lat, lng) => setForm((prev) => ({ ...prev, latitude: lat, longitude: lng }))}
+          onChange={(lat, lng) => {
+            setForm((prev) => ({ ...prev, latitude: lat, longitude: lng }));
+            clearError('pin');
+          }}
         />
+        {errors.pin ? (
+          <Text style={styles.errorText} accessibilityLiveRegion="polite">{errors.pin}</Text>
+        ) : null}
       </View>
     </>
   );

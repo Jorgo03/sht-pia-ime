@@ -516,7 +516,9 @@
     "actionView": "Ansehen",
     "actionStats": "Statistik",
     "actionSold": "Verkauft",
-    "actionRented": "Vermietet"
+    "actionRented": "Vermietet",
+    "pinOutsideAlbania": "Die Markierung liegt außerhalb Albaniens. Setze sie dorthin, wo die Immobilie liegt.",
+    "pinOutsideCity": "Die Markierung liegt außerhalb der Gemeinde {{city}}. Verschiebe sie oder wähle die richtige Stadt."
   },
   "dashboard": {
     "title": "Immobilien-Dashboard",
@@ -1183,5 +1185,8 @@
     "listingsFailed": "Die Immobilien konnten nicht geladen werden.",
     "open": "Profil von {{name}} öffnen",
     "call": "{{phone}} anrufen"
+  },
+  "locations": {
+    "noMatch": "Kein Ort gefunden"
   }
 }

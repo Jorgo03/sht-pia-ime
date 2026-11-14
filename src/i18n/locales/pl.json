@@ -534,7 +534,9 @@
     "actionView": "Zobacz",
     "actionStats": "Statystyki",
     "actionSold": "Sprzedane",
-    "actionRented": "Wynajęte"
+    "actionRented": "Wynajęte",
+    "pinOutsideAlbania": "Pinezka jest poza Albanią. Umieść ją tam, gdzie jest nieruchomość.",
+    "pinOutsideCity": "Pinezka jest poza gminą {{city}}. Przesuń ją albo wybierz właściwe miasto."
   },
   "dashboard": {
     "title": "Dashboard nieruchomości",
@@ -1203,5 +1205,8 @@
     "listingsFailed": "Nie udało się wczytać nieruchomości.",
     "open": "Otwórz profil: {{name}}",
     "call": "Zadzwoń: {{phone}}"
+  },
+  "locations": {
+    "noMatch": "Brak pasującego miejsca"
   }
 }

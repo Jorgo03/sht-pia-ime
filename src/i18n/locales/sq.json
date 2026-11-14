@@ -568,7 +568,9 @@
     "actionView": "Shiko",
     "actionStats": "Statistika",
     "actionSold": "Shitur",
-    "actionRented": "Me qira"
+    "actionRented": "Me qira",
+    "pinOutsideAlbania": "Pika është jashtë Shqipërisë. Vendose aty ku ndodhet prona.",
+    "pinOutsideCity": "Pika është jashtë bashkisë {{city}}. Lëvize, ose zgjidh qytetin e duhur."
   },
   "dashboard": {
     "title": "Paneli i pronës",
@@ -1183,5 +1185,8 @@
     "listingsFailed": "Pronat nuk u ngarkuan.",
     "open": "Hap profilin e {{name}}",
     "call": "Telefono {{phone}}"
+  },
+  "locations": {
+    "noMatch": "Asnjë vend nuk përputhet"
   }
 }
