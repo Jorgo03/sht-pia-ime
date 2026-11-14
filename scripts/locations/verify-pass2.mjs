@@ -59,7 +59,7 @@ for (const name of Object.keys(BASHKI)) {
 console.log('\nboundaries:', Object.values(bounds).filter(Boolean).length, 'of', Object.keys(BASHKI).length)
 
 // 2. Spelling variants for zones that were not found as a place.
-const strip = (s) => s.normalize('NFD').replace(/[̀-ͯ]/g, '')
+const strip = (s) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
 const definite = (s) => (/ë$/.test(s) ? s.replace(/ë$/, 'a') : /e$/.test(s) ? s : `${s}i`)
 const classified = JSON.parse(fs.readFileSync(path.join(root, 'docs/locations/classified.json'), 'utf8'))
 const retry = classified.filter((z) => ['not-found', 'not-a-place', 'not-a-place-elsewhere', 'wrong-municipality'].includes(z.status))

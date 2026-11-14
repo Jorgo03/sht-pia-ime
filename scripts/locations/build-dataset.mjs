@@ -81,7 +81,7 @@ const km = (a, b) => {
 }
 
 // ---------- names ----------
-export const fold = (s) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
+export const fold = (s) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
   .replace(/^(lagjja|lagja|lagje|fshati|bashkia|njësia administrative|njesia administrative)\s+/, '')
   .replace(/[-‐–]/g, ' ').replace(/\s+/g, ' ').trim()
 const slugify = (s) => fold(s).replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
@@ -203,7 +203,7 @@ function add(entry) {
   out.push(entry)
   return entry
 }
-function entry({ type, name, parent, tags, osm, centroid, centroidSource, extra = {} }) {
+function entry({ type, name, parent, tags, osm, centroid, centroidSource, shape: outline, extra = {} }) {
   const { names, aliases } = namesFor(tags)
   const sqLabel = names.sq
   // Albanian Wikipedia titles a town by its definite form (Durrësi, Kamza,
@@ -229,6 +229,9 @@ function entry({ type, name, parent, tags, osm, centroid, centroidSource, extra 
     names,
     aliases: [...aliases].filter(Boolean).sort(),
     centroid: centroid ? { lat: +centroid.lat.toFixed(6), lng: +centroid.lon.toFixed(6), source: centroidSource } : null,
+    // The outline's box [minLat, minLng, maxLat, maxLng]: the database checks a
+    // listing's pin against its municipality's box (no PostGIS needed).
+    ...(outline ? { bbox: [outline.minLat, outline.minLon, outline.maxLat, outline.maxLon].map((v) => +v.toFixed(5)) } : {}),
     postal_code: tags.postal_code ?? tags['addr:postcode'] ?? null,
     ...extra,
     source: { osm, wikidata: tags.wikidata ?? null },
@@ -239,7 +242,7 @@ const qarkEntries = new Map()
 for (const q of qarqe.sort((a, b) => a.name.localeCompare(b.name, 'sq'))) {
   const seat = bashki.find((b) => b.name === q.name)?.seat
   qarkEntries.set(q, add(entry({
-    type: 'qark', name: q.name, tags: q.e.tags, osm: `relation/${q.e.id}`,
+    type: 'qark', name: q.name, tags: q.e.tags, osm: `relation/${q.e.id}`, shape: q.shape,
     centroid: seat ?? interiorPoint(q.shape), centroidSource: seat ? 'seat town (OSM node)' : 'inside outline (OSM)',
     extra: { iso_3166_2: q.e.tags['ISO3166-2'] ?? null, official_name: q.e.tags.name },
   })))
@@ -249,7 +252,7 @@ for (const b of bashki.sort((a, b) => a.name.localeCompare(b.name, 'sq'))) {
   const seatTags = b.seat?.tags ?? {}
   const tags = { ...b.e.tags, ...(seatTags.wikidata ? { wikidata: seatTags.wikidata } : {}), postal_code: seatTags.postal_code ?? b.e.tags.postal_code }
   bashkiEntries.set(b, add(entry({
-    type: 'bashki', name: b.name, parent: qarkEntries.get(b.qark), tags, osm: `relation/${b.e.id}`,
+    type: 'bashki', name: b.name, parent: qarkEntries.get(b.qark), tags, osm: `relation/${b.e.id}`, shape: b.shape,
     centroid: b.seat ?? interiorPoint(b.shape), centroidSource: b.seat ? 'seat town (OSM node)' : 'inside outline (OSM)',
     extra: { official_name: `Bashkia ${b.name}`, seat: b.seat?.tags.name ?? null, municipality_wikidata: b.e.tags.wikidata ?? null },
   })))
@@ -266,7 +269,7 @@ for (const u of units.filter((x) => x.bashki).sort((a, b) => a.name.localeCompar
   const node = (centre && places.find((p) => p.id === centre.ref)) ??
     places.find((p) => p.unit === u && fold(p.tags.name) === fold(u.name))
   unitEntries.set(u, add(entry({
-    type: 'njesi', name: u.name, parent: bashkiEntries.get(u.bashki), tags: u.e.tags, osm: `relation/${u.e.id}`,
+    type: 'njesi', name: u.name, parent: bashkiEntries.get(u.bashki), tags: u.e.tags, osm: `relation/${u.e.id}`, shape: u.derived ? null : u.shape,
     centroid: node ?? u.point, centroidSource: node ? 'unit centre (OSM node)' : 'inside outline (OSM)',
     extra: u.derived ? { note: 'OpenStreetMap has no outline for this unit: it is the municipality minus Paskuqan' } : {},
   })))
@@ -277,13 +280,19 @@ for (const u of units.filter((x) => x.bashki).sort((a, b) => a.name.localeCompar
   if (u.osmName && u.osmName !== u.name && !ue.aliases.includes(u.osmName)) ue.aliases.push(u.osmName)
 }
 
-// Lagje and villages: in full for the main markets, plus anything the app
-// already offers that was verified (added by validate.mjs through `keep`).
-const keep = new Set(fs.existsSync(path.join(CACHE, 'keep-places.json')) ? read('keep-places.json') : [])
+// Lagje and villages: in full for the main markets, plus every zone the app
+// offers, as approved at Checkpoint 1 (docs/locations/decisions.json).
+const DECISIONS = path.join(root, 'docs', 'locations', 'decisions.json')
+const approved = fs.existsSync(DECISIONS)
+  ? JSON.parse(fs.readFileSync(DECISIONS, 'utf8')).decisions.flatMap((d) => (d.action === 'remove' ? [] : d.to.map((t) => ({ ...t, landmark: !!d.landmark }))))
+  : []
+// "Babrru" is known from hamlets named "Maçaj (Babrru)": the area, not the hamlet.
+const indirect = (t) => /^area named in OSM place/.test(t.kind)
+const approvedNodes = new Set(approved.filter((t) => t.osm.startsWith('node/') && !t.landmark && !indirect(t)).map((t) => Number(t.osm.slice(5))))
 for (const p of places.sort((a, b) => a.tags.name.localeCompare(b.tags.name, 'sq'))) {
   if (!p.unit || TOWN.has(p.tags.place)) continue
   const main = MAIN_MARKETS.includes(p.bashki?.name) && (LAGJE.has(p.tags.place) || p.tags.place === 'village')
-  if (!main && !keep.has(p.id)) continue
+  if (!main && !approvedNodes.has(p.id)) continue
   // A village that is its own unit's centre is already the unit.
   if (fold(p.tags.name) === fold(p.unit.name) && !LAGJE.has(p.tags.place)) continue
   add(entry({
@@ -301,15 +310,22 @@ for (const e of lagjeAreas) {
   }))
 }
 
-// Places the app offers that OpenStreetMap maps as an area rather than a
-// point (found through Nominatim by validate.mjs).
-const extra = fs.existsSync(path.join(CACHE, 'keep-extra.json')) ? read('keep-extra.json') : []
-for (const x of extra) {
-  const unit = units.find((u) => u.inside(x.lat, x.lon))
-  if (!unit) continue
+// The rest of the approved zones: places OpenStreetMap maps as an area
+// (found through Nominatim), and area names that are a street, square,
+// lake, beach or landmark ("zone"). Named as the app names them.
+for (const t of approved) {
+  const name = t.as ?? t.name
+  if (out.some((e) => e.source.osm === t.osm && fold(e.name.indefinite) === fold(name))) continue
+  // A beach's centre can sit just off the mapped coastline: then the nearest
+  // unit of the municipality validation placed it in.
+  const unit = units.find((u) => u.inside(t.lat, t.lon)) ??
+    units.filter((u) => u.bashki.name === t.bashki && u.point).sort((x, y) => km(x.point, t) - km(y.point, t))[0]
+  if (!unit) { problems.push(`approved zone ${name} (${t.osm}) is in no unit`); continue }
+  const type = t.landmark || indirect(t) ? 'zone' : LAGJE.has(t.kind) ? 'lagje' : 'fshat'
   add(entry({
-    type: LAGJE.has(x.osm_place) ? 'lagje' : 'fshat', name: x.name, parent: unitEntries.get(unit), tags: {},
-    osm: x.osm, centroid: { lat: x.lat, lon: x.lon }, centroidSource: 'OSM area centre (Nominatim)', extra: { osm_place: x.osm_place },
+    type, name, parent: unitEntries.get(unit), tags: {},
+    osm: t.osm, centroid: { lat: t.lat, lon: t.lon }, centroidSource: t.osm.startsWith('nominatim:') ? 'OSM object (Nominatim)' : 'OSM object',
+    extra: { osm_place: t.kind, ...(t.landmark ? { landmark: `${t.category}=${t.kind}: ${t.name}` } : {}) },
   }))
 }
 

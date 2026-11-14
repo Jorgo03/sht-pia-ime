@@ -2,7 +2,11 @@
 // (src/features/properties/data/locations.js), the live listings'
 // coordinates and the map defaults against data/albania-locations.json and
 // the OpenStreetMap lookups cached by verify-osm.mjs / verify-pass2.mjs.
-// Writes docs/locations/validation.json and docs/locations/VALIDATION_REPORT.md.
+// Writes docs/locations/validation-current.json, or the file given as the
+// first argument. docs/locations/validation.json (and VALIDATION_REPORT.md,
+// via report.mjs) are the Checkpoint 1 validation of the ORIGINAL list,
+// kept as the record of what was approved:
+//   node scripts/locations/validate.mjs docs/locations/validation.json
 //
 //   node scripts/locations/validate.mjs && node scripts/locations/build-dataset.mjs
 //
@@ -98,7 +102,9 @@ const sameWords = (a, b) => key(a).split(' ').sort().join(' ') === key(b).split(
 const cityRows = []
 const cityBashki = new Map()
 for (const { city } of APP) {
-  const town = places.find((p) => TOWN.has(p.tags.place) && fold(p.tags.name) === fold(city) && p.bashki)
+  // A municipality's seat first: some are villages (Jorgucat for Dropull).
+  const town = bashki.find((x) => x.seat && fold(x.seat.tags.name) === fold(city))?.seat ??
+    places.find((p) => TOWN.has(p.tags.place) && fold(p.tags.name) === fold(city) && p.bashki)
   const b = town?.bashki ?? null
   cityBashki.set(city, b)
   const seatOf = bashki.find((x) => x.seat === town)
@@ -130,16 +136,18 @@ for (const { city, zones } of APP) {
     const nomHere = nomList.filter((n) => n.bashki === b && (key(n.name) === key(zone) || loose(n.name) === loose(zone)))
     const nomHerePlace = nomHere.filter((n) => NOM_PLACE.has(n.kind) && n.category !== 'highway')
     let hit
+    // What each status points at, for generate-app-list.mjs.
+    const m = (c) => ({ name: c.name, bashki: c.bashki.name, osm: c.osm, lat: c.lat, lon: c.lon, kind: c.kind, category: c.category ?? 'place' })
     if (zone === 'Qendër') {
       const qUnit = units.find((u) => u.bashki === b && u.name === 'Qendër')
       if (qUnit) {
-        Object.assign(row, { status: 'valid', proposal: 'Keep. Qendër is an official unit of this municipality', evidence: `Law 115/2014 unit list; OSM relation/${qUnit.e.id}` })
+        Object.assign(row, { status: 'valid', proposal: 'Keep. Qendër is an official unit of this municipality', evidence: `Law 115/2014 unit list; OSM relation/${qUnit.e.id}`, match: [{ name: 'Qendër', bashki: b.name, osm: `relation/${qUnit.e.id}`, kind: 'njësi administrative' }] })
       } else {
         const seatUnit = units.find((u) => u.bashki === b && fold(u.name) === fold(b.name)) ?? units.find((u) => u.bashki === b && u.inside(b.seat.lat, b.seat.lon))
-        Object.assign(row, { status: 'unverified', proposal: `Not a place name: it means "the centre". Replace with the town's own unit, ${seatUnit?.name ?? b.seat.tags.name}, or keep it as a "town centre" label`, evidence: `No place named Qendër in Bashkia ${b.name} (OSM); the law has no unit Qendër here` })
+        Object.assign(row, { status: 'unverified', proposal: `Not a place name: it means "the centre". Replace with the town's own unit, ${seatUnit?.name ?? b.seat.tags.name}, or keep it as a "town centre" label`, evidence: `No place named Qendër in Bashkia ${b.name} (OSM); the law has no unit Qendër here`, generic: true })
       }
     } else if ((hit = here.find(exact))) {
-      Object.assign(row, { status: 'valid', proposal: 'Keep', evidence: `${hit.kind} "${hit.name}" in ${hit.unit?.name ? `${hit.unit.name}, ` : ''}Bashkia ${b.name} (OSM ${hit.osm}, ${hit.lat.toFixed(4)}, ${hit.lon.toFixed(4)})` })
+      Object.assign(row, { status: 'valid', proposal: 'Keep', evidence: `${hit.kind} "${hit.name}" in ${hit.unit?.name ? `${hit.unit.name}, ` : ''}Bashkia ${b.name} (OSM ${hit.osm}, ${hit.lat.toFixed(4)}, ${hit.lon.toFixed(4)})`, match: [m(hit)] })
       if (hit.osm.startsWith('node/')) keepNodes.add(Number(hit.osm.slice(5)))
     } else if (nomHerePlace.length) {
       hit = nomHerePlace[0]
@@ -148,20 +156,23 @@ for (const { city, zones } of APP) {
         status: renamed ? 'spelling' : 'valid',
         proposal: renamed ? `Rename to "${hit.name}"` : 'Keep',
         evidence: `${hit.kind} "${hit.name}" in Bashkia ${b.name} (OSM ${hit.osm}, via Nominatim: ${hit.display})`,
+        match: [m(hit)],
       })
       keepExtra.push({ name: hit.name, lat: hit.lat, lon: hit.lon, osm: hit.osm, osm_place: hit.kind })
     } else if ((hit = here.find(looseEq))) {
-      Object.assign(row, { status: 'spelling', proposal: `Rename to "${hit.name}"`, evidence: `${hit.kind} "${hit.name}" in Bashkia ${b.name} (OSM ${hit.osm})` })
+      Object.assign(row, { status: 'spelling', proposal: `Rename to "${hit.name}"`, evidence: `${hit.kind} "${hit.name}" in Bashkia ${b.name} (OSM ${hit.osm})`, match: [m(hit)] })
       if (hit.osm.startsWith('node/')) keepNodes.add(Number(hit.osm.slice(5)))
     } else if ((hit = here.filter((c) => !c.indirect && prefixOf(c.name, zone))).length) {
-      Object.assign(row, { status: 'spelling', proposal: `Use the full name: ${[...new Set(hit.map((c) => `"${c.name}"`))].join(' or ')}`, evidence: hit.slice(0, 3).map((c) => `${c.kind} "${c.name}" in Bashkia ${b.name} (OSM ${c.osm})`).join('; ') })
+      Object.assign(row, { status: 'spelling', proposal: `Use the full name: ${[...new Set(hit.map((c) => `"${c.name}"`))].join(' or ')}`, evidence: hit.slice(0, 3).map((c) => `${c.kind} "${c.name}" in Bashkia ${b.name} (OSM ${c.osm})`).join('; '), match: [...new Map(hit.map((c) => [c.name, m(c)])).values()] })
       for (const c of hit) if (c.osm.startsWith('node/')) keepNodes.add(Number(c.osm.slice(5)))
     } else {
       const elsewhere = candidates.filter((c) => exact(c) || looseEq(c) || (!c.indirect && prefixOf(c.name, zone)))
       const elsewhereNom = nomList.filter((n) => key(n.name) === key(zone) && NOM_PLACE.has(n.kind) && n.category !== 'highway')
       // Nearest first: "Golem" next to Durrës is the Golem in Kavajë, not the one in Shkodër.
       const seat = b.seat
-      const all = [...elsewhere, ...elsewhereNom].map((c) => ({ ...c, km: km(seat, c) })).sort((x, y) => x.km - y.km)
+      const all = [...elsewhere, ...elsewhereNom].map((c) => ({ ...c, km: km(seat, c) }))
+        // A place itself before an area only known from its hamlets' names.
+        .sort((x, y) => (x.indirect ? 1 : 0) - (y.indirect ? 1 : 0) || x.km - y.km)
         // A zone is part of the town it is listed under: a namesake 40 km away is not it.
         .filter((c) => c.km <= 40)
       const realHere = nomHere[0]
@@ -171,6 +182,7 @@ for (const { city, zones } of APP) {
           status: 'unverified',
           proposal: `Real ${realHere.category}/${realHere.kind} in Bashkia ${b.name}, not a lagje or village. Keep only if buyers use it as an area name; else remove`,
           evidence: `OSM ${realHere.osm}: ${realHere.display}${all.length ? `. (A place of this name exists ${all[0].km.toFixed(0)} km away, in Bashkia ${all[0].bashki.name}.)` : ''}`,
+          match: [m(realHere)], landmark: true,
         })
       } else if (all.length) {
         const nearest = all[0]
@@ -182,12 +194,13 @@ for (const { city, zones } of APP) {
             ? `Move to ${target} (it is in Bashkia ${nearest.bashki.name}, ${nearest.km.toFixed(0)} km from ${city})`
             : `Not in Bashkia ${b.name}: it is in Bashkia ${nearest.bashki.name} (${nearest.km.toFixed(0)} km away), which the app does not list as a city. Move it under that municipality, else remove`,
           evidence: `${nearest.kind} "${nearest.name}" in Bashkia ${nearest.bashki.name} (OSM ${nearest.osm})${others.length ? `; same name also in Bashkia ${others.join(', ')}` : ''}`,
+          match: [m(nearest)],
         })
         for (const c of elsewhere) if (c.osm.startsWith('node/') && c.bashki === nearest.bashki) keepNodes.add(Number(c.osm.slice(5)))
       } else {
         const near = here.map((c) => ({ c, d: lev(key(c.name), key(zone)) })).filter((x) => x.d <= 2 && key(zone).length > 4).sort((a, b2) => a.d - b2.d)[0]
         if (near) {
-          Object.assign(row, { status: 'spelling', proposal: `Probably "${near.c.name}" (${near.c.kind}); confirm before renaming`, evidence: `Closest name in Bashkia ${b.name}: OSM ${near.c.osm}, ${near.d} letter(s) different. No place spelled "${zone}" in OpenStreetMap` })
+          Object.assign(row, { status: 'spelling', proposal: `Probably "${near.c.name}" (${near.c.kind}); confirm before renaming`, evidence: `Closest name in Bashkia ${b.name}: OSM ${near.c.osm}, ${near.d} letter(s) different. No place spelled "${zone}" in OpenStreetMap`, match: [m(near.c)] })
         } else if ((hit = traces(zone)).length) {
           const inB = hit.filter((n) => n.bashki === b)
           const show = (inB.length ? inB : hit).slice(0, 3)
@@ -195,6 +208,7 @@ for (const { city, zones } of APP) {
             status: 'unverified',
             proposal: `No place of this name in OpenStreetMap, but ${inB.length ? `Bashkia ${b.name}` : `Bashkia ${[...new Set(hit.map((n) => n.bashki.name))].join(' / ')}`} has things named after it. Needs a local source (cadastre or the municipality) before keeping; else remove`,
             evidence: show.map((n) => `${n.category}/${n.kind} "${n.name}" (OSM ${n.osm})`).join('; '),
+            traceOnly: true,
           })
         } else {
           Object.assign(row, { status: 'missing', proposal: 'Remove. No replacement proposed: nothing real carries this name', evidence: 'No trace in any source checked: the 373 units of Law 115/2014, 4,560 named places in OpenStreetMap, and Nominatim searches with and without diacritics, in definite and genitive form, as "Lagjja …" and with the city name' })
@@ -230,9 +244,7 @@ for (const x of LIVE) {
 // ---------- output ----------
 const rows = [...cityRows, ...zoneRows, ...coordRows]
 const cache = path.join(root, 'docs/locations/cache')
-fs.writeFileSync(path.join(cache, 'keep-places.json'), JSON.stringify([...keepNodes]))
-fs.writeFileSync(path.join(cache, 'keep-extra.json'), JSON.stringify(keepExtra, null, 1))
-fs.writeFileSync(path.join(root, 'docs/locations/validation.json'), JSON.stringify(rows, null, 1))
+fs.writeFileSync(path.join(root, process.argv[2] ?? 'docs/locations/validation-current.json'), JSON.stringify(rows, null, 1))
 const counts = {}
 for (const r of rows) counts[r.status] = (counts[r.status] ?? 0) + 1
 console.log('counts', counts)
