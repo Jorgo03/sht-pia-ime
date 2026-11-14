@@ -55,10 +55,14 @@ test.describe('signed in', () => {
     await page.getByRole('button', { name: t('safety.menu') }).click();
     await page.getByRole('menuitem', { name: t('safety.reportUser') }).click();
     const dialog = page.getByRole('dialog', { name: t('safety.reportUser') });
-    await dialog.getByRole('radio', { name: t('safety.reason.offensive') }).check();
+    // A person is reported with person reasons (migration 20261114154750);
+    // the listing ones are not offered here.
+    await expect(dialog.getByRole('radio')).toHaveCount(6);
+    await expect(dialog.getByRole('radio', { name: t('safety.reason.wrong_info') })).toHaveCount(0);
+    await dialog.getByRole('radio', { name: t('safety.reason.harassment') }).check();
     await dialog.getByRole('button', { name: t('safety.send') }).click();
     await expect(dialog.getByRole('status')).toHaveText(t('safety.sent'));
-    expect(writes.find((w) => w.table === 'content_reports')?.body).toEqual({ reported_user_id: CHAT_CLIENT_ID, reason: 'offensive' });
+    expect(writes.find((w) => w.table === 'content_reports')?.body).toEqual({ reported_user_id: CHAT_CLIENT_ID, reason: 'harassment' });
   });
 });
 
