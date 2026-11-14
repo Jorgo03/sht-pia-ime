@@ -119,7 +119,7 @@ step).
 | Lint | 0 errors |
 | Last full Playwright run | before the favourites test fix: website 269 passed, 2 failed (F-N28); Expo app 326 passed, 2 failed (X105). Both are since fixed and passed repeated runs. |
 
-### Left to do
+### Left to do (done 14 Nov: full rerun green, report written; only the PR remains)
 
 1. Rerun both full Playwright suites once (they never run in parallel).
 2. Write `docs/audit/AUDIT_REPORT.md`:

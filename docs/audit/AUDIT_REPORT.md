@@ -109,8 +109,8 @@ Correction on record: `dd93746` first described AUDIT-028 as a double save. That
 | Suite | Before (13 Nov) | After | Added |
 |---|---|---|---|
 | Unit (`npm test`) | 531 | **570** | Apple gate, viewing errors, Tirana time, listing result, attachment purge, migration versions, `.env.example`, list paging, realtime catch-up, web icons, iOS permission texts |
-| Website e2e | 269 passed | **(final run in progress)** | F-N28 (favourites order); F4-N12 now tests LinkedIn |
-| Expo-app e2e | 314 passed | **(final run in progress)** | X103 (failed load), X104 (Tirana time in London), X105 (favourites order); X42 updated; start-screen spec from master |
+| Website e2e | 269 passed | **271 passed, 9 skipped** | F-N28 (favourites order); F4-N12 now tests LinkedIn |
+| Expo-app e2e | 314 passed | **328 passed, 46 skipped** | X103 (failed load), X104 (Tirana time in London), X105 (favourites order); X42 updated; start-screen spec from master |
 | Live SQL checks | existing files | **+3 files** | `rls_full_matrix.sql` 51/51, `rls_viewing_schedule.sql` 12/12, `rls_anon_grants.sql` 8/8 |
 | `expo-doctor` | 19/20 | **20/20** | |
 | Lint | 0 errors, 34 warnings | 0 errors, 34 warnings | |
@@ -118,4 +118,15 @@ Correction on record: `dd93746` first described AUDIT-028 as a double save. That
 
 ## Final checks (14 Nov)
 
-Lint 0 errors, `tsc` clean, 570 unit tests, website build, `expo-doctor` 20/20: all pass. The final Playwright run is in progress.
+| Check | Result |
+|---|---|
+| Lint | 0 errors |
+| `tsc` | clean |
+| Unit tests | 570/570 |
+| Website build | passes |
+| `expo-doctor` | 20/20 |
+| Expo web export | passes |
+| Website e2e | 271 passed, 9 skipped, 0 failed |
+| Expo-app e2e | 328 passed, 46 skipped, 0 failed |
+
+The test suites fail on any page error, console error or server 5xx, so a passing run also means no console errors in normal use.
