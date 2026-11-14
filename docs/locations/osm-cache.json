@@ -1,0 +1,2201 @@
+{
+ "Tiranë, Shqipëri": [
+  {
+   "name": "Nëna Shqipëri",
+   "type": "historic",
+   "category": "historic",
+   "lat": 41.3085403,
+   "lon": 19.840069,
+   "municipality": "Bashkia Tiranë",
+   "county": "Qarku i Tiranës",
+   "display": "Nëna Shqipëri, Rruga e Elbasanit, Sauk, Njësia Bashkiake Nr. 2, Tiranë, Bashkia Tiranë, Qarku i Tiranës, 1044, Shqipëria"
+  },
+  {
+   "name": "Ambasada e Libisë në Shqipëri",
+   "type": "office",
+   "category": "office",
+   "lat": 41.3104903,
+   "lon": 19.8388751,
+   "municipality": "Bashkia Tiranë",
+   "county": "Qarku i Tiranës",
+   "display": "Ambasada e Libisë në Shqipëri, 9, Rruga Kuvajt, Qyteti Studenti, Njësia Bashkiake Nr. 2, Tiranë, Bashkia Tiranë, Qarku i Tiranës, 1044, Shqipëria"
+  },
+  {
+   "name": "ACPD Shqipëri / Qendra për Popullsinë dhe Zhvillimin",
+   "type": "office",
+   "category": "office",
+   "lat": 41.3226263,
+   "lon": 19.8096699,
+   "municipality": "Bashkia Tiranë",
+   "county": "Qarku i Tiranës",
+   "display": "ACPD Shqipëri / Qendra për Popullsinë dhe Zhvillimin, Nd.26, H.6, Ap.5, Bulevardi Gjergj Fishta, 21 Dhjetori, Njësia Bashkiake Nr. 7, Tiranë, Bashkia Tiranë, Qarku i Tiranës, 1001, Shqipëria"
+  },
+  {
+   "name": "Radio Maria Shqipëri",
+   "type": "amenity",
+   "category": "amenity",
+   "lat": 41.3578976,
+   "lon": 19.8414249,
+   "municipality": "Bashkia Kamëz",
+   "county": "Qarku i Tiranës",
+   "display": "Radio Maria Shqipëri, 4, Rruga Papa Gjon Pali II, Kafja e Rremës, Maçaj (Babrru), Njësia Administrative Paskuqan Bashkia Kamëz, Paskuqan, Bashkia Kamëz, Qarku i Tiranës, 1047, Shqipëria"
+  }
+ ],
+ "Blloku, Tiranë": [
+  {
+   "name": "Blloku",
+   "type": "quarter",
+   "category": "place",
+   "lat": 41.3213333,
+   "lon": 19.8160663,
+   "municipality": "Bashkia Tiranë",
+   "county": "Qarku i Tiranës",
+   "display": "Blloku, Njësia Bashkiake Nr. 5, Tiranë, Bashkia Tiranë, Qarku i Tiranës, 1111, Shqipëria"
+  }
+ ],
+ "Liqeni i Thatë, Tiranë": [
+  {
+   "name": "Liqeni i Thatë",
+   "type": "lake",
+   "category": "water",
+   "lat": 41.3031658,
+   "lon": 19.8154204,
+   "municipality": "Bashkia Tiranë",
+   "county": "Qarku i Tiranës",
+   "display": "Liqeni i Thatë, Garunjas (Sauk), Mjull-Bathore, Farkë, Bashkia Tiranë, Qarku i Tiranës, 1045, Shqipëria"
+  },
+  {
+   "name": "Liqeni i Thatë",
+   "type": "highway",
+   "category": "highway",
+   "lat": 41.3057468,
+   "lon": 19.8148647,
+   "municipality": "Bashkia Tiranë",
+   "county": "Qarku i Tiranës",
+   "display": "Liqeni i Thatë, Rruga Liqeni i Thatë, Garunjas (Sauk), Njësia Bashkiake Nr. 2, Tiranë, Bashkia Tiranë, Qarku i Tiranës, 1045, Shqipëria"
+  }
+ ],
+ "Myslym Shyri, Tiranë": [
+  {
+   "name": "Instituti i Sigurimeve Shoqërore, Agjencia Tiranë",
+   "type": "office",
+   "category": "office",
+   "lat": 41.3248656,
+   "lon": 19.8131313,
+   "municipality": "Bashkia Tiranë",
+   "county": "Qarku i Tiranës",
+   "display": "Instituti i Sigurimeve Shoqërore, Agjencia Tiranë, Rruga Myslym Shyri, Tregu Çam, Njësia Bashkiake Nr. 10, Tiranë, Bashkia Tiranë, Qarku i Tiranës, 1014, Shqipëria"
+  }
+ ],
+ "Selvia, Tiranë": [
+  {
+   "name": "Selvia",
+   "type": "quarter",
+   "category": "place",
+   "lat": 41.3332615,
+   "lon": 19.8232656,
+   "municipality": "Bashkia Tiranë",
+   "county": "Qarku i Tiranës",
+   "display": "Selvia, Njësia Bashkiake Nr. 8, Tiranë, Bashkia Tiranë, Qarku i Tiranës, 1017, Shqipëria"
+  },
+  {
+   "name": "Selvia",
+   "type": "historic",
+   "category": "historic",
+   "lat": 41.3327638,
+   "lon": 19.8227811,
+   "municipality": "Bashkia Tiranë",
+   "county": "Qarku i Tiranës",
+   "display": "Selvia, Rruga e Dibrës, Selvia, Njësia Bashkiake Nr. 8, Tiranë, Bashkia Tiranë, Qarku i Tiranës, 1017, Shqipëria"
+  }
+ ],
+ "Ali Demi, Tiranë": [
+  {
+   "name": "Ali Demi",
+   "type": "quarter",
+   "category": "place",
+   "lat": 41.327689,
+   "lon": 19.8393238,
+   "municipality": "Bashkia Tiranë",
+   "county": "Qarku i Tiranës",
+   "display": "Ali Demi, Njësia Bashkiake Nr. 1, Tiranë, Bashkia Tiranë, Qarku i Tiranës, 1004, Shqipëria"
+  },
+  {
+   "name": "Ali Demi",
+   "type": "highway",
+   "category": "highway",
+   "lat": 41.3277754,
+   "lon": 19.8316493,
+   "municipality": "Bashkia Tiranë",
+   "county": "Qarku i Tiranës",
+   "display": "Ali Demi, Rruga Ali Demi, Ali Demi, Njësia Bashkiake Nr. 1, Tiranë, Bashkia Tiranë, Qarku i Tiranës, 1000, Shqipëria"
+  },
+  {
+   "name": "Ali Demi",
+   "type": "amenity",
+   "category": "amenity",
+   "lat": 41.3281607,
+   "lon": 19.8362872,
+   "municipality": "Bashkia Tiranë",
+   "county": "Qarku i Tiranës",
+   "display": "Ali Demi, Rruga Ali Demi, Ali Demi, Njësia Bashkiake Nr. 1, Tiranë, Bashkia Tiranë, Qarku i Tiranës, 1008, Shqipëria"
+  },
+  {
+   "name": "Ali Demi",
+   "type": "historic",
+   "category": "historic",
+   "lat": 41.327836,
+   "lon": 19.8292793,
+   "municipality": "Bashkia Tiranë",
+   "county": "Qarku i Tiranës",
+   "display": "Ali Demi, Rruga Ali Demi, Ali Demi, Njësia Bashkiake Nr. 1, Tiranë, Bashkia Tiranë, Qarku i Tiranës, 1000, Shqipëria"
+  }
+ ],
+ "Komuna e Parisit, Tiranë": [
+  {
+   "name": "Komuna e Parisit",
+   "type": "quarter",
+   "category": "place",
+   "lat": 41.3156139,
+   "lon": 19.8048399,
+   "municipality": "Bashkia Tiranë",
+   "county": "Qarku i Tiranës",
+   "display": "Komuna e Parisit, Njësia Bashkiake Nr. 5, Tiranë, Bashkia Tiranë, Qarku i Tiranës, 1060, Shqipëria"
+  }
+ ],
+ "Sauk, Tiranë": [
+  {
+   "name": "Sauk",
+   "type": "quarter",
+   "category": "place",
+   "lat": 41.3004474,
+   "lon": 19.8321262,
+   "municipality": "Bashkia Tiranë",
+   "county": "Qarku i Tiranës",
+   "display": "Sauk, Njësia Bashkiake Nr. 2, Tiranë, Bashkia Tiranë, Qarku i Tiranës, 1524, Shqipëria"
+  }
+ ],
+ "Lunder, Tiranë": [
+  {
+   "name": "Lundër",
+   "type": "village",
+   "category": "place",
+   "lat": 41.2884684,
+   "lon": 19.8671977,
+   "municipality": "Bashkia Tiranë",
+   "county": "Qarku i Tiranës",
+   "display": "Lundër, Farkë, Bashkia Tiranë, Qarku i Tiranës, 1045, Shqipëria"
+  },
+  {
+   "name": "Lundër",
+   "type": "highway",
+   "category": "highway",
+   "lat": 41.2960353,
+   "lon": 19.8743396,
+   "municipality": "Bashkia Tiranë",
+   "county": "Qarku i Tiranës",
+   "display": "Lundër, Unaza e Madhe e Tiranës, Aga (Lundra), Lundër, Farkë, Bashkia Tiranë, Qarku i Tiranës, 1045, Shqipëria"
+  }
+ ],
+ "21 Dhjetori, Tiranë": [
+  {
+   "name": "21 Dhjetori",
+   "type": "quarter",
+   "category": "place",
+   "lat": 41.3258217,
+   "lon": 19.8034331,
+   "municipality": "Bashkia Tiranë",
+   "county": "Qarku i Tiranës",
+   "display": "21 Dhjetori, Njësia Bashkiake Nr. 7, Tiranë, Bashkia Tiranë, Qarku i Tiranës, 1023, Shqipëria"
+  }
+ ],
+ "Yzberisht, Tiranë": [
+  {
+   "name": "Yzberisht",
+   "type": "quarter",
+   "category": "place",
+   "lat": 41.3233443,
+   "lon": 19.7737453,
+   "municipality": "Bashkia Tiranë",
+   "county": "Qarku i Tiranës",
+   "display": "Yzberisht, Njësia Bashkiake Nr. 6, Tiranë, Bashkia Tiranë, Qarku i Tiranës, 1027, Shqipëria"
+  }
+ ],
+ "Rruga e Kavajës, Tiranë": [
+  {
+   "name": "Rruga e Kavajës",
+   "type": "primary",
+   "category": "highway",
+   "lat": 41.3245844,
+   "lon": 19.799465,
+   "municipality": "Bashkia Tiranë",
+   "county": "Qarku i Tiranës",
+   "display": "Rruga e Kavajës, Kompleksi Delijorgji, 21 Dhjetori, Njësia Bashkiake Nr. 7, Tiranë, Bashkia Tiranë, Qarku i Tiranës, 1023, Shqipëria"
+  },
+  {
+   "name": "Rruga e Kavajës",
+   "type": "secondary",
+   "category": "highway",
+   "lat": 41.3281708,
+   "lon": 19.814249,
+   "municipality": "Bashkia Tiranë",
+   "county": "Qarku i Tiranës",
+   "display": "Rruga e Kavajës, Tregu Çam, Njësia Bashkiake Nr. 10, Tiranë, Bashkia Tiranë, Qarku i Tiranës, 1014, Shqipëria"
+  },
+  {
+   "name": "Rruga e Kavajës",
+   "type": "living_street",
+   "category": "highway",
+   "lat": 41.3264603,
+   "lon": 19.8047571,
+   "municipality": "Bashkia Tiranë",
+   "county": "Qarku i Tiranës",
+   "display": "Rruga e Kavajës, 21 Dhjetori, Njësia Bashkiake Nr. 7, Tiranë, Bashkia Tiranë, Qarku i Tiranës, 1023, Shqipëria"
+  },
+  {
+   "name": "Rruga e Kavajës",
+   "type": "secondary",
+   "category": "highway",
+   "lat": 41.3268945,
+   "lon": 19.8073178,
+   "municipality": "Bashkia Tiranë",
+   "county": "Qarku i Tiranës",
+   "display": "Rruga e Kavajës, Njësia Bashkiake Nr. 10, Tiranë, Bashkia Tiranë, Qarku i Tiranës, 1023, Shqipëria"
+  },
+  {
+   "name": "Rruga e Kavajës",
+   "type": "secondary",
+   "category": "highway",
+   "lat": 41.3262883,
+   "lon": 19.8050163,
+   "municipality": "Bashkia Tiranë",
+   "county": "Qarku i Tiranës",
+   "display": "Rruga e Kavajës, 21 Dhjetori, Njësia Bashkiake Nr. 7, Tiranë, Bashkia Tiranë, Qarku i Tiranës, 1023, Shqipëria"
+  },
+  {
+   "name": "Rruga e Kavajës",
+   "type": "secondary",
+   "category": "highway",
+   "lat": 41.3273628,
+   "lon": 19.8088324,
+   "municipality": "Bashkia Tiranë",
+   "county": "Qarku i Tiranës",
+   "display": "Rruga e Kavajës, Tregu Çam, Njësia Bashkiake Nr. 10, Tiranë, Bashkia Tiranë, Qarku i Tiranës, 1023, Shqipëria"
+  },
+  {
+   "name": "Rruga e Kavajës",
+   "type": "primary",
+   "category": "highway",
+   "lat": 41.3257421,
+   "lon": 19.8032612,
+   "municipality": "Bashkia Tiranë",
+   "county": "Qarku i Tiranës",
+   "display": "Rruga e Kavajës, 21 Dhjetori, Njësia Bashkiake Nr. 7, Tiranë, Bashkia Tiranë, Qarku i Tiranës, 1023, Shqipëria"
+  }
+ ],
+ "Pazari i Ri, Tiranë": [
+  {
+   "name": "Pazari i Ri",
+   "type": "amenity",
+   "category": "amenity",
+   "lat": 41.3302464,
+   "lon": 19.8243503,
+   "municipality": "Bashkia Tiranë",
+   "county": "Qarku i Tiranës",
+   "display": "Pazari i Ri, Rruga Luigj Gurakuqi, Njësia Bashkiake Nr. 2, Tiranë, Bashkia Tiranë, Qarku i Tiranës, 1017, Shqipëria"
+  },
+  {
+   "name": "Pazari i Ri",
+   "type": "amenity",
+   "category": "amenity",
+   "lat": 41.329841,
+   "lon": 19.8243837,
+   "municipality": "Bashkia Tiranë",
+   "county": "Qarku i Tiranës",
+   "display": "Pazari i Ri, 4, Rruga Shenasi Dishnica, Njësia Bashkiake Nr. 2, Tiranë, Bashkia Tiranë, Qarku i Tiranës, 1017, Shqipëria"
+  },
+  {
+   "name": "Pazari I Ri",
+   "type": "amenity",
+   "category": "amenity",
+   "lat": 41.3298321,
+   "lon": 19.8243905,
+   "municipality": "Bashkia Tiranë",
+   "county": "Qarku i Tiranës",
+   "display": "Pazari I Ri, 4, Rruga Shenasi Dishnica, Njësia Bashkiake Nr. 2, Tiranë, Bashkia Tiranë, Qarku i Tiranës, 1017, Shqipëria"
+  },
+  {
+   "name": "Pazari i Ri",
+   "type": "highway",
+   "category": "highway",
+   "lat": 41.3290544,
+   "lon": 19.8238637,
+   "municipality": "Bashkia Tiranë",
+   "county": "Qarku i Tiranës",
+   "display": "Pazari i Ri, Rruga Luigj Gurakuqi, Njësia Bashkiake Nr. 2, Tiranë, Bashkia Tiranë, Qarku i Tiranës, 1017, Shqipëria"
+  }
+ ],
+ "Don Bosko, Tiranë": [
+  {
+   "name": "Tiranë",
+   "type": "river",
+   "category": "waterway",
+   "lat": 41.3483748,
+   "lon": 19.7977482,
+   "municipality": "Bashkia Tiranë",
+   "county": "Qarku i Tiranës",
+   "display": "Tiranë, Don Bosko, Njësia Bashkiake Nr. 11, Tiranë, Bashkia Tiranë, Qarku i Tiranës, 1047, Shqipëria"
+  },
+  {
+   "name": "Don Bosko",
+   "type": "quarter",
+   "category": "place",
+   "lat": 41.3408491,
+   "lon": 19.8012378,
+   "municipality": "Bashkia Tiranë",
+   "county": "Qarku i Tiranës",
+   "display": "Don Bosko, Njësia Bashkiake Nr. 11, Tiranë, Bashkia Tiranë, Qarku i Tiranës, 1025, Shqipëria"
+  },
+  {
+   "name": "Tiranë",
+   "type": "river",
+   "category": "waterway",
+   "lat": 41.3483639,
+   "lon": 19.7942244,
+   "municipality": "Bashkia Tiranë",
+   "county": "Qarku i Tiranës",
+   "display": "Tiranë, Lapraka, Njësia Bashkiake Nr. 11, Tiranë, Bashkia Tiranë, Qarku i Tiranës, 1024, Shqipëria"
+  },
+  {
+   "name": "Don Bosko",
+   "type": "highway",
+   "category": "highway",
+   "lat": 41.3346263,
+   "lon": 19.8078126,
+   "municipality": "Bashkia Tiranë",
+   "county": "Qarku i Tiranës",
+   "display": "Don Bosko, Rruga Asim Vokshi, Brraka, Njësia Bashkiake Nr. 9, Tiranë, Bashkia Tiranë, Qarku i Tiranës, 1016, Shqipëria"
+  }
+ ],
+ "Tirana e Re, Tiranë": [
+  {
+   "name": "Tirana e Re",
+   "type": "quarter",
+   "category": "place",
+   "lat": 41.317413,
+   "lon": 19.8120048,
+   "municipality": "Bashkia Tiranë",
+   "county": "Qarku i Tiranës",
+   "display": "Tirana e Re, Njësia Bashkiake Nr. 5, Tiranë, Bashkia Tiranë, Qarku i Tiranës, 1060, Shqipëria"
+  }
+ ],
+ "Kombinat, Tiranë": [
+  {
+   "name": "Kombinat",
+   "type": "quarter",
+   "category": "place",
+   "lat": 41.3119059,
+   "lon": 19.762674,
+   "municipality": "Bashkia Tiranë",
+   "county": "Qarku i Tiranës",
+   "display": "Kombinat, Lagjja e Re (Sharrë), Njësia Bashkiake Nr. 6, Tiranë, Bashkia Tiranë, Qarku i Tiranës, 1027, Shqipëria"
+  },
+  {
+   "name": "Kombinat",
+   "type": "highway",
+   "category": "highway",
+   "lat": 41.314207,
+   "lon": 19.7676098,
+   "municipality": "Bashkia Tiranë",
+   "county": "Qarku i Tiranës",
+   "display": "Kombinat, Rruga Llazi Miho, Kombinat, Njësia Bashkiake Nr. 6, Tiranë, Bashkia Tiranë, Qarku i Tiranës, 1027, Shqipëria"
+  },
+  {
+   "name": "Kombinat",
+   "type": "highway",
+   "category": "highway",
+   "lat": 41.3142481,
+   "lon": 19.7670283,
+   "municipality": "Bashkia Tiranë",
+   "county": "Qarku i Tiranës",
+   "display": "Kombinat, Rruga Shaban Bardhoshi, Kombinat, Njësia Bashkiake Nr. 6, Tiranë, Bashkia Tiranë, Qarku i Tiranës, 1027, Shqipëria"
+  },
+  {
+   "name": "Rruga Kavajës;Kombinat",
+   "type": "highway",
+   "category": "highway",
+   "lat": 41.3191191,
+   "lon": 19.7917028,
+   "municipality": "Bashkia Tiranë",
+   "county": "Qarku i Tiranës",
+   "display": "Rruga Kavajës;Kombinat, Unaza e Madhe e Tiranës, Ish Fusha e Druve, Njësia Bashkiake Nr. 6, Tiranë, Bashkia Tiranë, Qarku i Tiranës, 1046, Shqipëria"
+  }
+ ],
+ "Laprakë, Tiranë": [
+  {
+   "name": "Laprakë",
+   "type": "highway",
+   "category": "highway",
+   "lat": 41.3383716,
+   "lon": 19.7931901,
+   "municipality": "Bashkia Tiranë",
+   "county": "Qarku i Tiranës",
+   "display": "Laprakë, Rruga Gjergj Legisi, Blloku Gintash, Lapraka, Njësia Bashkiake Nr. 11, Tiranë, Bashkia Tiranë, Qarku i Tiranës, 1025, Shqipëria"
+  },
+  {
+   "name": "Laprakë",
+   "type": "highway",
+   "category": "highway",
+   "lat": 41.3384076,
+   "lon": 19.7934112,
+   "municipality": "Bashkia Tiranë",
+   "county": "Qarku i Tiranës",
+   "display": "Laprakë, Rruga Lord Bajroni, Blloku Gintash, Lapraka, Njësia Bashkiake Nr. 11, Tiranë, Bashkia Tiranë, Qarku i Tiranës, 1025, Shqipëria"
+  }
+ ],
+ "Astir, Tiranë": [
+  {
+   "name": "Astir",
+   "type": "quarter",
+   "category": "place",
+   "lat": 41.3291659,
+   "lon": 19.7831572,
+   "municipality": "Bashkia Tiranë",
+   "county": "Qarku i Tiranës",
+   "display": "Astir, Mëzez, Kashar, Bashkia Tiranë, Qarku i Tiranës, 1051, Shqipëria"
+  }
+ ],
+ "Fresk, Tiranë": [],
+ "Fresk": [],
+ "Kinostudio, Tiranë": [
+  {
+   "name": "Kinostudio",
+   "type": "quarter",
+   "category": "place",
+   "lat": 41.3459521,
+   "lon": 19.8481646,
+   "municipality": "Bashkia Tiranë",
+   "county": "Qarku i Tiranës",
+   "display": "Kinostudio, Njësia Bashkiake Nr. 4, Tiranë, Bashkia Tiranë, Qarku i Tiranës, 1007, Shqipëria"
+  },
+  {
+   "name": "Kinostudio",
+   "type": "highway",
+   "category": "highway",
+   "lat": 41.3469056,
+   "lon": 19.846358,
+   "municipality": "Bashkia Tiranë",
+   "county": "Qarku i Tiranës",
+   "display": "Kinostudio, Rruga Aleksandër Moisiu, Kinostudio, Njësia Bashkiake Nr. 4, Tiranë, Bashkia Tiranë, Qarku i Tiranës, 1007, Shqipëria"
+  }
+ ],
+ "Medreseja, Tiranë": [
+  {
+   "name": "Medreseja",
+   "type": "quarter",
+   "category": "place",
+   "lat": 41.3379612,
+   "lon": 19.8263032,
+   "municipality": "Bashkia Tiranë",
+   "county": "Qarku i Tiranës",
+   "display": "Medreseja, Njësia Bashkiake Nr. 8, Tiranë, Bashkia Tiranë, Qarku i Tiranës, 1015, Shqipëria"
+  },
+  {
+   "name": "Medreseja",
+   "type": "highway",
+   "category": "highway",
+   "lat": 41.3380655,
+   "lon": 19.8257208,
+   "municipality": "Bashkia Tiranë",
+   "county": "Qarku i Tiranës",
+   "display": "Medreseja, Rruga e Dibrës, Medreseja, Njësia Bashkiake Nr. 8, Tiranë, Bashkia Tiranë, Qarku i Tiranës, 1015, Shqipëria"
+  },
+  {
+   "name": "Medreseja",
+   "type": "highway",
+   "category": "highway",
+   "lat": 41.3382089,
+   "lon": 19.8260599,
+   "municipality": "Bashkia Tiranë",
+   "county": "Qarku i Tiranës",
+   "display": "Medreseja, Rruga e Dibrës, Medreseja, Njësia Bashkiake Nr. 8, Tiranë, Bashkia Tiranë, Qarku i Tiranës, 1018, Shqipëria"
+  }
+ ],
+ "Porcelan, Tiranë": [],
+ "Porcelan": [],
+ "Shkozë, Tiranë": [
+  {
+   "name": "Shkozë",
+   "type": "quarter",
+   "category": "place",
+   "lat": 41.33276,
+   "lon": 19.8569417,
+   "municipality": "Bashkia Tiranë",
+   "county": "Qarku i Tiranës",
+   "display": "Shkozë, Njësia Bashkiake Nr. 1, Tiranë, Bashkia Tiranë, Qarku i Tiranës, 1062, Shqipëria"
+  },
+  {
+   "name": "Shkozë",
+   "type": "highway",
+   "category": "highway",
+   "lat": 41.3344079,
+   "lon": 19.8483523,
+   "municipality": "Bashkia Tiranë",
+   "county": "Qarku i Tiranës",
+   "display": "Shkozë, Bulevardi Zhan d'Ark, Varri i Bamit, Njësia Bashkiake Nr. 3, Tiranë, Bashkia Tiranë, Qarku i Tiranës, 1006, Shqipëria"
+  },
+  {
+   "name": "Breg-Shkozë",
+   "type": "village",
+   "category": "place",
+   "lat": 41.4585471,
+   "lon": 19.6897656,
+   "municipality": null,
+   "county": "Qarku i Tiranës",
+   "display": "Breg-Shkozë, Bashkia Vorë, Qarku i Tiranës, 1502, Shqipëria"
+  }
+ ],
+ "Bathore, Tiranë": [
+  {
+   "name": "Bathore",
+   "type": "highway",
+   "category": "highway",
+   "lat": 41.3705915,
+   "lon": 19.7677225,
+   "municipality": "Bashkia Kamëz",
+   "county": "Qarku i Tiranës",
+   "display": "Bathore, Bulevardi Nënë Tereza, Njësia Administrative Nr. 2 Bashkia Kamëz, Kamëz, Bashkia Kamëz, Qarku i Tiranës, 1030, Shqipëria"
+  },
+  {
+   "name": "Bathore",
+   "type": "highway",
+   "category": "highway",
+   "lat": 41.3706822,
+   "lon": 19.7677708,
+   "municipality": "Bashkia Kamëz",
+   "county": "Qarku i Tiranës",
+   "display": "Bathore, Bulevardi Nënë Tereza, Njësia Administrative Bathore Bashkia Kamëz, Kamëz, Bashkia Kamëz, Qarku i Tiranës, 1054, Shqipëria"
+  },
+  {
+   "name": "Mjull-Bathore",
+   "type": "village",
+   "category": "place",
+   "lat": 41.2894844,
+   "lon": 19.8325529,
+   "municipality": "Bashkia Tiranë",
+   "county": "Qarku i Tiranës",
+   "display": "Mjull-Bathore, Farkë, Bashkia Tiranë, Qarku i Tiranës, 1045, Shqipëria"
+  },
+  {
+   "name": "Njësia Administrative Bathore Bashkia Kamëz",
+   "type": "city_district",
+   "category": "boundary",
+   "lat": 41.3743144,
+   "lon": 19.7861869,
+   "municipality": "Bashkia Kamëz",
+   "county": "Qarku i Tiranës",
+   "display": "Njësia Administrative Bathore Bashkia Kamëz, Kamëz, Bashkia Kamëz, Qarku i Tiranës, 1054, Shqipëria"
+  }
+ ],
+ "Kashar, Tiranë": [
+  {
+   "name": "Kashar",
+   "type": "village",
+   "category": "boundary",
+   "lat": 41.3520234,
+   "lon": 19.7191727,
+   "municipality": "Bashkia Tiranë",
+   "county": "Qarku i Tiranës",
+   "display": "Kashar, Bashkia Tiranë, Qarku i Tiranës, 1051, Shqipëria"
+  },
+  {
+   "name": "Kashar (Shkozë)",
+   "type": "hamlet",
+   "category": "place",
+   "lat": 41.3295797,
+   "lon": 19.8723,
+   "municipality": "Bashkia Tiranë",
+   "county": "Qarku i Tiranës",
+   "display": "Kashar (Shkozë), Farkë e Madhe, Farkë, Bashkia Tiranë, Qarku i Tiranës, 1045, Shqipëria"
+  }
+ ],
+ "Farkë, Tiranë": [
+  {
+   "name": "Farkë",
+   "type": "city",
+   "category": "boundary",
+   "lat": 41.3024396,
+   "lon": 19.8748219,
+   "municipality": "Bashkia Tiranë",
+   "county": "Qarku i Tiranës",
+   "display": "Farkë, Bashkia Tiranë, Qarku i Tiranës, 1045, Shqipëria"
+  }
+ ],
+ "Shëngjergj, Tiranë": [
+  {
+   "name": "Shëngjergj",
+   "type": "village",
+   "category": "boundary",
+   "lat": 41.3324813,
+   "lon": 20.1078951,
+   "municipality": "Bashkia Tiranë",
+   "county": "Qarku i Tiranës",
+   "display": "Shëngjergj, Bashkia Tiranë, Qarku i Tiranës, 1043, Shqipëria"
+  }
+ ],
+ "Petrelë, Tiranë": [
+  {
+   "name": "Petrelë",
+   "type": "village",
+   "category": "boundary",
+   "lat": 41.2542744,
+   "lon": 19.856542,
+   "municipality": "Bashkia Tiranë",
+   "county": "Qarku i Tiranës",
+   "display": "Petrelë, Bashkia Tiranë, Qarku i Tiranës, 1034, Shqipëria"
+  }
+ ],
+ "Vaqarr, Tiranë": [
+  {
+   "name": "Vaqarr",
+   "type": "village",
+   "category": "boundary",
+   "lat": 41.2995708,
+   "lon": 19.7415883,
+   "municipality": "Bashkia Tiranë",
+   "county": "Qarku i Tiranës",
+   "display": "Vaqarr, Bashkia Tiranë, Qarku i Tiranës, 1041, Shqipëria"
+  }
+ ],
+ "Zall-Herr, Tiranë": [
+  {
+   "name": "Zall-Herr",
+   "type": "village",
+   "category": "boundary",
+   "lat": 41.3892869,
+   "lon": 19.8259662,
+   "municipality": "Bashkia Tiranë",
+   "county": "Qarku i Tiranës",
+   "display": "Zall-Herr, Bashkia Tiranë, Qarku i Tiranës, 1048, Shqipëria"
+  }
+ ],
+ "Pezë, Tiranë": [
+  {
+   "name": "Pezë",
+   "type": "city",
+   "category": "boundary",
+   "lat": 41.2068323,
+   "lon": 19.7192764,
+   "municipality": "Bashkia Tiranë",
+   "county": "Qarku i Tiranës",
+   "display": "Pezë, Bashkia Tiranë, Qarku i Tiranës, 1038, Shqipëria"
+  },
+  {
+   "name": "Pezë e Madhe",
+   "type": "village",
+   "category": "place",
+   "lat": 41.2178664,
+   "lon": 19.6934416,
+   "municipality": "Bashkia Tiranë",
+   "county": "Qarku i Tiranës",
+   "display": "Pezë e Madhe, Pezë, Bashkia Tiranë, Qarku i Tiranës, 1038, Shqipëria"
+  }
+ ],
+ "Kodër-Kamëz, Tiranë": [
+  {
+   "name": "Kodër Kamëz",
+   "type": "highway",
+   "category": "highway",
+   "lat": 41.3578316,
+   "lon": 19.773826,
+   "municipality": "Bashkia Tiranë",
+   "county": "Qarku i Tiranës",
+   "display": "Kodër Kamëz, Rruga Kastriotet, Njësia Bashkiake Nr. 11, Tiranë, Bashkia Tiranë, Qarku i Tiranës, 1029, Shqipëria"
+  }
+ ],
+ "Paskuqan, Tiranë": [
+  {
+   "name": "Paskuqan",
+   "type": "village",
+   "category": "place",
+   "lat": 41.3549573,
+   "lon": 19.80515,
+   "municipality": "Bashkia Kamëz",
+   "county": "Qarku i Tiranës",
+   "display": "Paskuqan, Bashkia Kamëz, Qarku i Tiranës, 1047, Shqipëria"
+  }
+ ],
+ "Paskuqan": [
+  {
+   "name": "Paskuqan",
+   "type": "village",
+   "category": "place",
+   "lat": 41.3549573,
+   "lon": 19.80515,
+   "municipality": "Bashkia Kamëz",
+   "county": "Qarku i Tiranës",
+   "display": "Paskuqan, Bashkia Kamëz, Qarku i Tiranës, 1047, Shqipëria"
+  }
+ ],
+ "Babrru, Tiranë": [
+  {
+   "name": "Maçaj (Babrru)",
+   "type": "hamlet",
+   "category": "place",
+   "lat": 41.3658829,
+   "lon": 19.83868,
+   "municipality": "Bashkia Kamëz",
+   "county": "Qarku i Tiranës",
+   "display": "Maçaj (Babrru), Njësia Administrative Paskuqan Bashkia Kamëz, Kamëz, Bashkia Kamëz, Qarku i Tiranës, 1047, Shqipëria"
+  },
+  {
+   "name": "Rrapaj (Babrru)",
+   "type": "hamlet",
+   "category": "place",
+   "lat": 41.3674208,
+   "lon": 19.8355579,
+   "municipality": "Bashkia Kamëz",
+   "county": "Qarku i Tiranës",
+   "display": "Rrapaj (Babrru), Njësia Administrative Paskuqan Bashkia Kamëz, Kamëz, Bashkia Kamëz, Qarku i Tiranës, 1047, Shqipëria"
+  },
+  {
+   "name": "Tiranë",
+   "type": "river",
+   "category": "waterway",
+   "lat": 41.3581944,
+   "lon": 19.8457505,
+   "municipality": "Bashkia Kamëz",
+   "county": "Qarku i Tiranës",
+   "display": "Tiranë, Kafja e Rremës, Maçaj (Babrru), Njësia Administrative Paskuqan Bashkia Kamëz, Kamëz, Bashkia Kamëz, Qarku i Tiranës, 1047, Shqipëria"
+  },
+  {
+   "name": "Qendra Shëndetësore Babrru",
+   "type": "amenity",
+   "category": "amenity",
+   "lat": 41.3533582,
+   "lon": 19.8289919,
+   "municipality": "Bashkia Kamëz",
+   "county": "Qarku i Tiranës",
+   "display": "Qendra Shëndetësore Babrru, Rruga Shyqeri Alimerko, Njësia Administrative Paskuqan Bashkia Kamëz, Paskuqan, Bashkia Kamëz, Qarku i Tiranës, 1047, Shqipëria"
+  }
+ ],
+ "Babrru": [
+  {
+   "name": "Maçaj (Babrru)",
+   "type": "hamlet",
+   "category": "place",
+   "lat": 41.3658829,
+   "lon": 19.83868,
+   "municipality": "Bashkia Kamëz",
+   "county": "Qarku i Tiranës",
+   "display": "Maçaj (Babrru), Njësia Administrative Paskuqan Bashkia Kamëz, Kamëz, Bashkia Kamëz, Qarku i Tiranës, 1047, Shqipëria"
+  },
+  {
+   "name": "Rrapaj (Babrru)",
+   "type": "hamlet",
+   "category": "place",
+   "lat": 41.3674208,
+   "lon": 19.8355579,
+   "municipality": "Bashkia Kamëz",
+   "county": "Qarku i Tiranës",
+   "display": "Rrapaj (Babrru), Njësia Administrative Paskuqan Bashkia Kamëz, Kamëz, Bashkia Kamëz, Qarku i Tiranës, 1047, Shqipëria"
+  },
+  {
+   "name": "Qendra Shëndetësore Babrru",
+   "type": "amenity",
+   "category": "amenity",
+   "lat": 41.3533582,
+   "lon": 19.8289919,
+   "municipality": "Bashkia Kamëz",
+   "county": "Qarku i Tiranës",
+   "display": "Qendra Shëndetësore Babrru, Rruga Shyqeri Alimerko, Njësia Administrative Paskuqan Bashkia Kamëz, Paskuqan, Bashkia Kamëz, Qarku i Tiranës, 1047, Shqipëria"
+  }
+ ],
+ "Vorë, Tiranë": [
+  {
+   "name": "Bashkia Vorë",
+   "type": "town",
+   "category": "boundary",
+   "lat": 41.3939118,
+   "lon": 19.6546268,
+   "municipality": null,
+   "county": "Qarku i Tiranës",
+   "display": "Bashkia Vorë, Qarku i Tiranës, Shqipëria"
+  },
+  {
+   "name": "Vorë",
+   "type": "city_district",
+   "category": "boundary",
+   "lat": 41.3752459,
+   "lon": 19.6509302,
+   "municipality": null,
+   "county": "Qarku i Tiranës",
+   "display": "Vorë, Bashkia Vorë, Qarku i Tiranës, 1032, Shqipëria"
+  },
+  {
+   "name": "Tiranë",
+   "type": "river",
+   "category": "waterway",
+   "lat": 41.4347092,
+   "lon": 19.697467,
+   "municipality": null,
+   "county": "Qarku i Tiranës",
+   "display": "Tiranë, Prezë, Bashkia Vorë, Qarku i Tiranës, 1039, Shqipëria"
+  },
+  {
+   "name": "Tiranë",
+   "type": "river",
+   "category": "waterway",
+   "lat": 41.3970294,
+   "lon": 19.7075474,
+   "municipality": "Bashkia Kamëz",
+   "county": "Qarku i Tiranës",
+   "display": "Tiranë, Bërxullë, Bashkia Vorë, Bashkia Kamëz, Qarku i Tiranës, 1030, Shqipëria"
+  },
+  {
+   "name": "Tiranë",
+   "type": "river",
+   "category": "waterway",
+   "lat": 41.3981898,
+   "lon": 19.7042873,
+   "municipality": null,
+   "county": "Qarku i Tiranës",
+   "display": "Tiranë, Brukë (Bërxullë), Bërxullë, Bashkia Vorë, Qarku i Tiranës, 1053, Shqipëria"
+  },
+  {
+   "name": "Tiranë",
+   "type": "river",
+   "category": "waterway",
+   "lat": 41.388904,
+   "lon": 19.7223992,
+   "municipality": "Bashkia Kamëz",
+   "county": "Qarku i Tiranës",
+   "display": "Tiranë, Njësia Administrative Nr. 1 Bashkia Kamëz, Kamëz, Bashkia Kamëz, Qarku i Tiranës, 1030, Shqipëria"
+  }
+ ],
+ "Vorë": [
+  {
+   "name": "Bashkia Vorë",
+   "type": "town",
+   "category": "boundary",
+   "lat": 41.3939118,
+   "lon": 19.6546268,
+   "municipality": null,
+   "county": "Qarku i Tiranës",
+   "display": "Bashkia Vorë, Qarku i Tiranës, Shqipëria"
+  },
+  {
+   "name": "Vorë",
+   "type": "city_district",
+   "category": "boundary",
+   "lat": 41.3752459,
+   "lon": 19.6509302,
+   "municipality": null,
+   "county": "Qarku i Tiranës",
+   "display": "Vorë, Bashkia Vorë, Qarku i Tiranës, 1032, Shqipëria"
+  }
+ ],
+ "Maminas, Tiranë": [],
+ "Maminas": [
+  {
+   "name": "Maminas",
+   "type": "city",
+   "category": "boundary",
+   "lat": 41.3758018,
+   "lon": 19.5991995,
+   "municipality": "Bashkia Shijak",
+   "county": "Qarku i Durrësit",
+   "display": "Maminas, Bashkia Shijak, Qarku i Durrësit, 2020, Shqipëria"
+  },
+  {
+   "name": "Maminas",
+   "type": "village",
+   "category": "place",
+   "lat": 41.3778218,
+   "lon": 19.6073814,
+   "municipality": "Bashkia Shijak",
+   "county": "Qarku i Durrësit",
+   "display": "Maminas, Bashkia Shijak, Qarku i Durrësit, 2020, Shqipëria"
+  }
+ ],
+ "Durrës, Shqipëri": [],
+ "Plazh, Durrës": [
+  {
+   "name": "Xhamia Islame,Plazh",
+   "type": "amenity",
+   "category": "amenity",
+   "lat": 41.3089062,
+   "lon": 19.4906226,
+   "municipality": null,
+   "county": "Qarku i Durrësit",
+   "display": "Xhamia Islame,Plazh, Rruga Jusuf Myzyri, Durrës, Bashkia Durrës, Qarku i Durrësit, 2001, Shqipëria"
+  },
+  {
+   "name": "Durrës Plazh",
+   "type": "railway",
+   "category": "railway",
+   "lat": 41.3094834,
+   "lon": 19.4923139,
+   "municipality": null,
+   "county": "Qarku i Durrësit",
+   "display": "Durrës Plazh, Rruga Turgut Ozal, Durrës, Bashkia Durrës, Qarku i Durrësit, 2001, Shqipëria"
+  },
+  {
+   "name": "Zyra Postare Plazh",
+   "type": "amenity",
+   "category": "amenity",
+   "lat": 41.3067638,
+   "lon": 19.4921562,
+   "municipality": null,
+   "county": "Qarku i Durrësit",
+   "display": "Zyra Postare Plazh, 281, Rruga Pavarësia, Durrës, Bashkia Durrës, Qarku i Durrësit, 2008, Shqipëria"
+  },
+  {
+   "name": "Stacioni i Policise Plazh Durres",
+   "type": "amenity",
+   "category": "amenity",
+   "lat": 41.291825,
+   "lon": 19.5076422,
+   "municipality": null,
+   "county": "Qarku i Durrësit",
+   "display": "Stacioni i Policise Plazh Durres, Rruga Prometeu, Durrës, Bashkia Durrës, Qarku i Durrësit, 2001, Shqipëria"
+  }
+ ],
+ "Plazh": [
+  {
+   "name": "Plazh",
+   "type": "beach",
+   "category": "natural",
+   "lat": 42.0647482,
+   "lon": 19.4348137,
+   "municipality": "Bashkia Shkodër",
+   "county": "Qarku i Shkodrës",
+   "display": "Plazh, Lagjja 1, Shirokë, Shkodër, Bashkia Shkodër, Qarku i Shkodrës, Shqipëria"
+  },
+  {
+   "name": "Plazh",
+   "type": "beach",
+   "category": "natural",
+   "lat": 42.0670126,
+   "lon": 19.4287819,
+   "municipality": "Bashkia Shkodër",
+   "county": "Qarku i Shkodrës",
+   "display": "Plazh, Lagjja 1, Shkodër, Bashkia Shkodër, Qarku i Shkodrës, Shqipëria"
+  }
+ ],
+ "Shkëmbi i Kavajës, Durrës": [
+  {
+   "name": "Shkembi i Kavajes",
+   "type": "peak",
+   "category": "natural",
+   "lat": 41.2805805,
+   "lon": 19.5159754,
+   "municipality": null,
+   "county": "Qarku i Durrësit",
+   "display": "Shkembi i Kavajes, Bashkia Durrës, Qarku i Durrësit, 2021, Shqipëria"
+  },
+  {
+   "name": "Shkembi i Kavajes",
+   "type": "residential",
+   "category": "highway",
+   "lat": 41.330788,
+   "lon": 19.4574015,
+   "municipality": null,
+   "county": "Qarku i Durrësit",
+   "display": "Shkembi i Kavajes, Durrës, Bashkia Durrës, Qarku i Durrësit, 2001, Shqipëria"
+  }
+ ],
+ "Shkëmbi i Kavajës": [
+  {
+   "name": "Shkembi i Kavajes",
+   "type": "peak",
+   "category": "natural",
+   "lat": 41.2805805,
+   "lon": 19.5159754,
+   "municipality": null,
+   "county": "Qarku i Durrësit",
+   "display": "Shkembi i Kavajes, Bashkia Durrës, Qarku i Durrësit, 2021, Shqipëria"
+  },
+  {
+   "name": "Shkembi i Kavajes",
+   "type": "residential",
+   "category": "highway",
+   "lat": 41.330788,
+   "lon": 19.4574015,
+   "municipality": null,
+   "county": "Qarku i Durrësit",
+   "display": "Shkembi i Kavajes, Durrës, Bashkia Durrës, Qarku i Durrësit, 2001, Shqipëria"
+  }
+ ],
+ "Kënetë, Durrës": [
+  {
+   "name": "Kënetë",
+   "type": "village",
+   "category": "place",
+   "lat": 41.3252894,
+   "lon": 19.6206107,
+   "municipality": "Bashkia Shijak",
+   "county": "Qarku i Durrësit",
+   "display": "Kënetë, Gjepalaj, Bashkia Shijak, Qarku i Durrësit, 2022, Shqipëria"
+  }
+ ],
+ "Kënetë": [
+  {
+   "name": "Kënetë",
+   "type": "village",
+   "category": "place",
+   "lat": 41.3252894,
+   "lon": 19.6206107,
+   "municipality": "Bashkia Shijak",
+   "county": "Qarku i Durrësit",
+   "display": "Kënetë, Gjepalaj, Bashkia Shijak, Qarku i Durrësit, 2022, Shqipëria"
+  }
+ ],
+ "Spitallë, Durrës": [
+  {
+   "name": "Spitallë",
+   "type": "village",
+   "category": "place",
+   "lat": 41.3407845,
+   "lon": 19.4434979,
+   "municipality": null,
+   "county": "Qarku i Durrësit",
+   "display": "Spitallë, Bashkia Durrës, Qarku i Durrësit, 2000, Shqipëria"
+  }
+ ],
+ "Spitallë": [
+  {
+   "name": "Spitallë",
+   "type": "village",
+   "category": "place",
+   "lat": 41.3407845,
+   "lon": 19.4434979,
+   "municipality": null,
+   "county": "Qarku i Durrësit",
+   "display": "Spitallë, Bashkia Durrës, Qarku i Durrësit, 2000, Shqipëria"
+  }
+ ],
+ "Arapaj, Durrës": [
+  {
+   "name": "Arapaj",
+   "type": "suburb",
+   "category": "place",
+   "lat": 41.3023312,
+   "lon": 19.5096812,
+   "municipality": null,
+   "county": "Qarku i Durrësit",
+   "display": "Arapaj, Rashbull, Bashkia Durrës, Qarku i Durrësit, 2021, Shqipëria"
+  }
+ ],
+ "Arapaj": [
+  {
+   "name": "Arapaj",
+   "type": "suburb",
+   "category": "place",
+   "lat": 41.3023312,
+   "lon": 19.5096812,
+   "municipality": null,
+   "county": "Qarku i Durrësit",
+   "display": "Arapaj, Rashbull, Bashkia Durrës, Qarku i Durrësit, 2021, Shqipëria"
+  },
+  {
+   "name": "Arapaj",
+   "type": "village",
+   "category": "place",
+   "lat": 40.8048417,
+   "lon": 19.722074,
+   "municipality": null,
+   "county": "Qarku i Fierit",
+   "display": "Arapaj, Bashkia Roskovec, Qarku i Fierit, 9319, Shqipëria"
+  }
+ ],
+ "Currila, Durrës": [
+  {
+   "name": "Kodër Currila",
+   "type": "highway",
+   "category": "highway",
+   "lat": 41.3201878,
+   "lon": 19.4317326,
+   "municipality": null,
+   "county": "Qarku i Durrësit",
+   "display": "Kodër Currila, Rruga e Currilave, Durrës, Bashkia Durrës, Qarku i Durrësit, 2001, Shqipëria"
+  }
+ ],
+ "Currila": [
+  {
+   "name": "Kodër Currila",
+   "type": "highway",
+   "category": "highway",
+   "lat": 41.3201878,
+   "lon": 19.4317326,
+   "municipality": null,
+   "county": "Qarku i Durrësit",
+   "display": "Kodër Currila, Rruga e Currilave, Durrës, Bashkia Durrës, Qarku i Durrësit, 2001, Shqipëria"
+  }
+ ],
+ "Plepa, Durrës": [
+  {
+   "name": "Plepa",
+   "type": "highway",
+   "category": "highway",
+   "lat": 41.2924146,
+   "lon": 19.507927,
+   "municipality": null,
+   "county": "Qarku i Durrësit",
+   "display": "Plepa, Rruga Pavarësia, Durrës, Bashkia Durrës, Qarku i Durrësit, 2001, Shqipëria"
+  },
+  {
+   "name": "Plepa",
+   "type": "highway",
+   "category": "highway",
+   "lat": 41.2919398,
+   "lon": 19.5081513,
+   "municipality": null,
+   "county": "Qarku i Durrësit",
+   "display": "Plepa, Rruga Prometeu, Durrës, Bashkia Durrës, Qarku i Durrësit, 2001, Shqipëria"
+  }
+ ],
+ "Plepa": [
+  {
+   "name": "Plepa",
+   "type": "highway",
+   "category": "highway",
+   "lat": 41.2924146,
+   "lon": 19.507927,
+   "municipality": null,
+   "county": "Qarku i Durrësit",
+   "display": "Plepa, Rruga Pavarësia, Durrës, Bashkia Durrës, Qarku i Durrësit, 2001, Shqipëria"
+  },
+  {
+   "name": "Plepa",
+   "type": "highway",
+   "category": "highway",
+   "lat": 41.2919398,
+   "lon": 19.5081513,
+   "municipality": null,
+   "county": "Qarku i Durrësit",
+   "display": "Plepa, Rruga Prometeu, Durrës, Bashkia Durrës, Qarku i Durrësit, 2001, Shqipëria"
+  }
+ ],
+ "Shkallnur, Durrës": [
+  {
+   "name": "Shkallnur",
+   "type": "village",
+   "category": "place",
+   "lat": 41.2892573,
+   "lon": 19.5174258,
+   "municipality": null,
+   "county": "Qarku i Durrësit",
+   "display": "Shkallnur, Bashkia Durrës, Qarku i Durrësit, 2021, Shqipëria"
+  }
+ ],
+ "Shkallnur": [
+  {
+   "name": "Shkallnur",
+   "type": "village",
+   "category": "place",
+   "lat": 41.2892573,
+   "lon": 19.5174258,
+   "municipality": null,
+   "county": "Qarku i Durrësit",
+   "display": "Shkallnur, Bashkia Durrës, Qarku i Durrësit, 2021, Shqipëria"
+  }
+ ],
+ "Romanat, Durrës": [],
+ "Romanat": [],
+ "Fllakë, Durrës": [
+  {
+   "name": "Fllakë",
+   "type": "village",
+   "category": "place",
+   "lat": 41.3737624,
+   "lon": 19.4955861,
+   "municipality": null,
+   "county": "Qarku i Durrësit",
+   "display": "Fllakë, Bashkia Durrës, Qarku i Durrësit, 2017, Shqipëria"
+  }
+ ],
+ "Fllakë": [
+  {
+   "name": "Fllakë",
+   "type": "village",
+   "category": "place",
+   "lat": 41.3737624,
+   "lon": 19.4955861,
+   "municipality": null,
+   "county": "Qarku i Durrësit",
+   "display": "Fllakë, Bashkia Durrës, Qarku i Durrësit, 2017, Shqipëria"
+  }
+ ],
+ "Bisht-Kamëz, Durrës": [
+  {
+   "name": "Bisht Kamëz",
+   "type": "village",
+   "category": "place",
+   "lat": 41.3911427,
+   "lon": 19.4777972,
+   "municipality": null,
+   "county": "Qarku i Durrësit",
+   "display": "Bisht Kamëz, Bashkia Durrës, Qarku i Durrësit, 2017, Shqipëria"
+  }
+ ],
+ "Bisht-Kamëz": [
+  {
+   "name": "Bisht Kamëz",
+   "type": "village",
+   "category": "place",
+   "lat": 41.3911427,
+   "lon": 19.4777972,
+   "municipality": null,
+   "county": "Qarku i Durrësit",
+   "display": "Bisht Kamëz, Bashkia Durrës, Qarku i Durrësit, 2017, Shqipëria"
+  }
+ ],
+ "Rrashbull, Durrës": [
+  {
+   "name": "Rrashbull",
+   "type": "village",
+   "category": "place",
+   "lat": 41.3223741,
+   "lon": 19.5106972,
+   "municipality": null,
+   "county": "Qarku i Durrësit",
+   "display": "Rrashbull, Bashkia Durrës, Qarku i Durrësit, 2021, Shqipëria"
+  }
+ ],
+ "Rrashbull": [
+  {
+   "name": "Rrashbull",
+   "type": "village",
+   "category": "place",
+   "lat": 41.3223741,
+   "lon": 19.5106972,
+   "municipality": null,
+   "county": "Qarku i Durrësit",
+   "display": "Rrashbull, Bashkia Durrës, Qarku i Durrësit, 2021, Shqipëria"
+  }
+ ],
+ "Porto Romano, Durrës": [
+  {
+   "name": "Muret e Portës",
+   "type": "historic",
+   "category": "historic",
+   "lat": 41.37415,
+   "lon": 19.4220795,
+   "municipality": null,
+   "county": "Qarku i Durrësit",
+   "display": "Muret e Portës, Bareze, Durrës, Bashkia Durrës, Qarku i Durrësit, 2001, Shqipëria"
+  },
+  {
+   "name": "Porto Romano",
+   "type": "industrial",
+   "category": "landuse",
+   "lat": 41.3828342,
+   "lon": 19.4275183,
+   "municipality": null,
+   "county": "Qarku i Durrësit",
+   "display": "Porto Romano, Katundi i Ri, Bashkia Durrës, Qarku i Durrësit, 2017, Shqipëria"
+  },
+  {
+   "name": "Porto Romano",
+   "type": "amenity",
+   "category": "amenity",
+   "lat": 41.3790041,
+   "lon": 19.4240198,
+   "municipality": null,
+   "county": "Qarku i Durrësit",
+   "display": "Porto Romano, Shën Pali, Katundi i Ri, Bashkia Durrës, Qarku i Durrësit, 2017, Shqipëria"
+  }
+ ],
+ "Porto Romano": [
+  {
+   "name": "Muret e Portës",
+   "type": "historic",
+   "category": "historic",
+   "lat": 41.37415,
+   "lon": 19.4220795,
+   "municipality": null,
+   "county": "Qarku i Durrësit",
+   "display": "Muret e Portës, Bareze, Durrës, Bashkia Durrës, Qarku i Durrësit, 2001, Shqipëria"
+  },
+  {
+   "name": "Porto Romano",
+   "type": "industrial",
+   "category": "landuse",
+   "lat": 41.3828342,
+   "lon": 19.4275183,
+   "municipality": null,
+   "county": "Qarku i Durrësit",
+   "display": "Porto Romano, Katundi i Ri, Bashkia Durrës, Qarku i Durrësit, 2017, Shqipëria"
+  },
+  {
+   "name": "Porto Romano",
+   "type": "amenity",
+   "category": "amenity",
+   "lat": 41.3790041,
+   "lon": 19.4240198,
+   "municipality": null,
+   "county": "Qarku i Durrësit",
+   "display": "Porto Romano, Shën Pali, Katundi i Ri, Bashkia Durrës, Qarku i Durrësit, 2017, Shqipëria"
+  }
+ ],
+ "Mali i Robit, Durrës": [],
+ "Mali i Robit": [
+  {
+   "name": "Mali i Robit",
+   "type": "quarter",
+   "category": "place",
+   "lat": 41.2362684,
+   "lon": 19.5175605,
+   "municipality": "Bashkia Kavajë",
+   "county": "Qarku i Tiranës",
+   "display": "Mali i Robit, Golem, Bashkia Kavajë, Qarku i Tiranës, 2504, Shqipëria"
+  },
+  {
+   "name": "Mali i Robit",
+   "type": "residential",
+   "category": "highway",
+   "lat": 41.2339646,
+   "lon": 19.5155574,
+   "municipality": "Bashkia Kavajë",
+   "county": "Qarku i Tiranës",
+   "display": "Mali i Robit, Qerret, Golem, Bashkia Kavajë, Qarku i Tiranës, 2504, Shqipëria"
+  },
+  {
+   "name": "Royal G Max",
+   "type": "building",
+   "category": "building",
+   "lat": 41.2346421,
+   "lon": 19.5153413,
+   "municipality": "Bashkia Kavajë",
+   "county": "Qarku i Tiranës",
+   "display": "Royal G Max, Mali i Robit, Qerret, Golem, Bashkia Kavajë, Qarku i Tiranës, 2504, Shqipëria"
+  },
+  {
+   "name": "Royal G Max",
+   "type": "building",
+   "category": "building",
+   "lat": 41.2343132,
+   "lon": 19.5151263,
+   "municipality": "Bashkia Kavajë",
+   "county": "Qarku i Tiranës",
+   "display": "Royal G Max, Mali i Robit, Bulevardi i Pishave, Mali i Robit, Qerret, Golem, Bashkia Kavajë, Qarku i Tiranës, 2504, Shqipëria"
+  },
+  {
+   "name": "Mali i Robit",
+   "type": "tourism",
+   "category": "tourism",
+   "lat": 41.2328645,
+   "lon": 19.517263,
+   "municipality": "Bashkia Kavajë",
+   "county": "Qarku i Tiranës",
+   "display": "Mali i Robit, Rruga Mak Albania, Mali i Robit, Qerret, Golem, Bashkia Kavajë, Qarku i Tiranës, 2504, Shqipëria"
+  }
+ ],
+ "Qerret, Durrës": [
+  {
+   "name": "Qerret",
+   "type": "village",
+   "category": "place",
+   "lat": 41.3923154,
+   "lon": 19.4917403,
+   "municipality": null,
+   "county": "Qarku i Durrësit",
+   "display": "Qerret, Bashkia Durrës, Qarku i Durrësit, 2017, Shqipëria"
+  }
+ ],
+ "Qerret": [
+  {
+   "name": "Qerret",
+   "type": "city",
+   "category": "boundary",
+   "lat": 42.0140035,
+   "lon": 19.8225031,
+   "municipality": "Bashkia Pukë",
+   "county": "Qarku i Shkodrës",
+   "display": "Qerret, Bashkia Pukë, Qarku i Shkodrës, Shqipëria"
+  },
+  {
+   "name": "Qerret",
+   "type": "village",
+   "category": "place",
+   "lat": 41.3923154,
+   "lon": 19.4917403,
+   "municipality": null,
+   "county": "Qarku i Durrësit",
+   "display": "Qerret, Bashkia Durrës, Qarku i Durrësit, 2017, Shqipëria"
+  },
+  {
+   "name": "Qerret",
+   "type": "village",
+   "category": "place",
+   "lat": 41.2166061,
+   "lon": 19.5276902,
+   "municipality": "Bashkia Kavajë",
+   "county": "Qarku i Tiranës",
+   "display": "Qerret, Golem, Bashkia Kavajë, Qarku i Tiranës, 2504, Shqipëria"
+  },
+  {
+   "name": "Qerret",
+   "type": "village",
+   "category": "place",
+   "lat": 41.2176138,
+   "lon": 20.197453,
+   "municipality": "Bashkia Elbasan",
+   "county": "Qarku i Elbasanit",
+   "display": "Qerret, Labinot Mal, Bashkia Elbasan, Qarku i Elbasanit, 3024, Shqipëria"
+  },
+  {
+   "name": "Qerret",
+   "type": "village",
+   "category": "place",
+   "lat": 40.9047707,
+   "lon": 20.168481,
+   "municipality": "Bashkia Gramsh",
+   "county": "Qarku i Elbasanit",
+   "display": "Qerret, Pishaj, Bashkia Gramsh, Qarku i Elbasanit, 3302, Shqipëria"
+  },
+  {
+   "name": "Qerret",
+   "type": "village",
+   "category": "place",
+   "lat": 42.1174732,
+   "lon": 19.8121153,
+   "municipality": "Bashkia Vau-Dejës",
+   "county": "Qarku i Shkodrës",
+   "display": "Qerret, Temal, Bashkia Vau-Dejës, Qarku i Shkodrës, 4008, Shqipëria"
+  },
+  {
+   "name": "Qerret",
+   "type": "hamlet",
+   "category": "place",
+   "lat": 41.8819155,
+   "lon": 19.4111311,
+   "municipality": "Bashkia Shkodër",
+   "county": "Qarku i Shkodrës",
+   "display": "Qerret, Pulaj, Velipojë, Bashkia Shkodër, Qarku i Shkodrës, 4020, Shqipëria"
+  },
+  {
+   "name": "Qerret",
+   "type": "hamlet",
+   "category": "place",
+   "lat": 42.1130447,
+   "lon": 19.8208683,
+   "municipality": "Bashkia Vau-Dejës",
+   "county": "Qarku i Shkodrës",
+   "display": "Qerret, Temal, Bashkia Vau-Dejës, Qarku i Shkodrës, 4008, Shqipëria"
+  }
+ ],
+ "Golem, Durrës": [
+  {
+   "name": "Golem",
+   "type": "highway",
+   "category": "highway",
+   "lat": 41.2665409,
+   "lon": 19.5225007,
+   "municipality": null,
+   "county": "Qarku i Durrësit",
+   "display": "Golem, SH4, Rashbull, Bashkia Durrës, Qarku i Durrësit, 2021, Shqipëria"
+  },
+  {
+   "name": "Rruga Durres-Kryemdhej",
+   "type": "secondary",
+   "category": "highway",
+   "lat": 41.2607165,
+   "lon": 19.5251217,
+   "municipality": "Bashkia Kavajë",
+   "county": "Qarku i Tiranës",
+   "display": "Rruga Durres-Kryemdhej, Kryemëdhenj, Golem, Bashkia Kavajë, Qarku i Tiranës, 2504, Shqipëria"
+  },
+  {
+   "name": "Rruga Durres-Kryemdhej",
+   "type": "residential",
+   "category": "highway",
+   "lat": 41.2621645,
+   "lon": 19.5234431,
+   "municipality": "Bashkia Kavajë",
+   "county": "Qarku i Tiranës",
+   "display": "Rruga Durres-Kryemdhej, Kryemëdhenj, Golem, Bashkia Kavajë, Qarku i Tiranës, 2504, Shqipëria"
+  }
+ ],
+ "Golem": [
+  {
+   "name": "Golem",
+   "type": "city",
+   "category": "boundary",
+   "lat": 40.9743912,
+   "lon": 19.687044,
+   "municipality": "Bashkia Lushnjë",
+   "county": "Qarku i Fierit",
+   "display": "Golem, Bashkia Lushnjë, Qarku i Fierit, 9012, Shqipëria"
+  },
+  {
+   "name": "Golem",
+   "type": "village",
+   "category": "boundary",
+   "lat": 41.2434439,
+   "lon": 19.5223942,
+   "municipality": "Bashkia Kavajë",
+   "county": "Qarku i Tiranës",
+   "display": "Golem, Bashkia Kavajë, Qarku i Tiranës, 2504, Shqipëria"
+  },
+  {
+   "name": "Golem",
+   "type": "village",
+   "category": "place",
+   "lat": 40.9673917,
+   "lon": 19.6817049,
+   "municipality": "Bashkia Lushnjë",
+   "county": "Qarku i Fierit",
+   "display": "Golem, Bashkia Lushnjë, Qarku i Fierit, 9012, Shqipëria"
+  },
+  {
+   "name": "Golem",
+   "type": "village",
+   "category": "place",
+   "lat": 40.1716881,
+   "lon": 19.9350131,
+   "municipality": "Bashkia Gjirokastër",
+   "county": "Qarku i Gjirokastrës",
+   "display": "Golem, Picar, Bashkia Gjirokastër, Qarku i Gjirokastrës, 6010, Shqipëria"
+  },
+  {
+   "name": "Golem",
+   "type": "village",
+   "category": "place",
+   "lat": 42.0919898,
+   "lon": 19.5246595,
+   "municipality": "Bashkia Shkodër",
+   "county": "Qarku i Shkodrës",
+   "display": "Golem, Rrethinat, Bashkia Shkodër, Qarku i Shkodrës, 4000, Shqipëria"
+  }
+ ],
+ "Iliria, Durrës": [
+  {
+   "name": "Iliria",
+   "type": "residential",
+   "category": "highway",
+   "lat": 41.4798689,
+   "lon": 19.7278219,
+   "municipality": null,
+   "county": "Qarku i Durrësit",
+   "display": "Iliria, Fushë-Krujë, Bashkia Krujë, Qarku i Durrësit, 1502, Shqipëria"
+  },
+  {
+   "name": "Iliria",
+   "type": "amenity",
+   "category": "amenity",
+   "lat": 41.3020638,
+   "lon": 19.4978454,
+   "municipality": null,
+   "county": "Qarku i Durrësit",
+   "display": "Iliria, Rruga Pavarësia, Durrës, Bashkia Durrës, Qarku i Durrësit, 2001, Shqipëria"
+  },
+  {
+   "name": "Iliria",
+   "type": "highway",
+   "category": "highway",
+   "lat": 41.3022596,
+   "lon": 19.4980871,
+   "municipality": null,
+   "county": "Qarku i Durrësit",
+   "display": "Iliria, Rruga Pavarësia, Durrës, Bashkia Durrës, Qarku i Durrësit, 2001, Shqipëria"
+  },
+  {
+   "name": "ILIRIA",
+   "type": "amenity",
+   "category": "amenity",
+   "lat": 41.2995014,
+   "lon": 19.4971451,
+   "municipality": null,
+   "county": "Qarku i Durrësit",
+   "display": "ILIRIA, Rruga E Palmave, Durrës, Bashkia Durrës, Qarku i Durrësit, 2001, Shqipëria"
+  },
+  {
+   "name": "Rruga Iliria",
+   "type": "residential",
+   "category": "highway",
+   "lat": 41.3002594,
+   "lon": 19.4987629,
+   "municipality": null,
+   "county": "Qarku i Durrësit",
+   "display": "Rruga Iliria, Durrës, Bashkia Durrës, Qarku i Durrësit, 2001, Shqipëria"
+  },
+  {
+   "name": "Sheshi Iliria",
+   "type": "pedestrian",
+   "category": "highway",
+   "lat": 41.3132971,
+   "lon": 19.4460778,
+   "municipality": null,
+   "county": "Qarku i Durrësit",
+   "display": "Sheshi Iliria, Durrës, Bashkia Durrës, Qarku i Durrësit, 2001, Shqipëria"
+  }
+ ],
+ "Iliria": [
+  {
+   "name": "Iliria",
+   "type": "residential",
+   "category": "highway",
+   "lat": 41.4798689,
+   "lon": 19.7278219,
+   "municipality": null,
+   "county": "Qarku i Durrësit",
+   "display": "Iliria, Fushë-Krujë, Bashkia Krujë, Qarku i Durrësit, 1502, Shqipëria"
+  },
+  {
+   "name": "Iliria",
+   "type": "unclassified",
+   "category": "highway",
+   "lat": 41.5777518,
+   "lon": 19.6968598,
+   "municipality": "Bashkia Kurbin",
+   "county": "Qarku i Lezhës",
+   "display": "Iliria, Droj, Mamurras, Bashkia Kurbin, Qarku i Lezhës, 4704, Shqipëria"
+  },
+  {
+   "name": "Iliria",
+   "type": "living_street",
+   "category": "highway",
+   "lat": 41.578221,
+   "lon": 19.6967742,
+   "municipality": "Bashkia Kurbin",
+   "county": "Qarku i Lezhës",
+   "display": "Iliria, Droj, Mamurras, Bashkia Kurbin, Qarku i Lezhës, 4704, Shqipëria"
+  },
+  {
+   "name": "Iliria",
+   "type": "residential",
+   "category": "highway",
+   "lat": 41.5782285,
+   "lon": 19.6980579,
+   "municipality": "Bashkia Kurbin",
+   "county": "Qarku i Lezhës",
+   "display": "Iliria, Droj, Mamurras, Bashkia Kurbin, Qarku i Lezhës, 4704, Shqipëria"
+  },
+  {
+   "name": "Iliria",
+   "type": "residential",
+   "category": "highway",
+   "lat": 41.9257546,
+   "lon": 19.5540746,
+   "municipality": "Bashkia Vau-Dejës",
+   "county": "Qarku i Shkodrës",
+   "display": "Iliria, Karametaj, Barbullush, Bushat, Bashkia Vau-Dejës, Qarku i Shkodrës, 4021, Shqipëria"
+  },
+  {
+   "name": "Iliria",
+   "type": "residential",
+   "category": "highway",
+   "lat": 41.9248687,
+   "lon": 19.5529302,
+   "municipality": "Bashkia Vau-Dejës",
+   "county": "Qarku i Shkodrës",
+   "display": "Iliria, Karametaj, Barbullush, Bushat, Bashkia Vau-Dejës, Qarku i Shkodrës, 4506, Shqipëria"
+  },
+  {
+   "name": "Iliria",
+   "type": "amenity",
+   "category": "amenity",
+   "lat": 41.3020638,
+   "lon": 19.4978454,
+   "municipality": null,
+   "county": "Qarku i Durrësit",
+   "display": "Iliria, Rruga Pavarësia, Durrës, Bashkia Durrës, Qarku i Durrësit, 2001, Shqipëria"
+  },
+  {
+   "name": "ILIRIA",
+   "type": "amenity",
+   "category": "amenity",
+   "lat": 41.2995014,
+   "lon": 19.4971451,
+   "municipality": null,
+   "county": "Qarku i Durrësit",
+   "display": "ILIRIA, Rruga E Palmave, Durrës, Bashkia Durrës, Qarku i Durrësit, 2001, Shqipëria"
+  }
+ ],
+ "Përmet i Durrësit, Durrës": [],
+ "Përmet i Durrësit": [],
+ "Vlorë, Shqipëri": [],
+ "Lungomare, Vlorë": [
+  {
+   "name": "Lungomare",
+   "type": "suburb",
+   "category": "place",
+   "lat": 40.442011,
+   "lon": 19.4959128,
+   "municipality": "Bashkia Vlorë",
+   "county": "Qarku i Vlorës",
+   "display": "Lungomare, Vlorë, Bashkia Vlorë, Qarku i Vlorës, 9400, Shqipëria"
+  },
+  {
+   "name": "Lungomare",
+   "type": "pedestrian",
+   "category": "highway",
+   "lat": 40.4491104,
+   "lon": 19.4905873,
+   "municipality": "Bashkia Vlorë",
+   "county": "Qarku i Vlorës",
+   "display": "Lungomare, Vlorë, Bashkia Vlorë, Qarku i Vlorës, 9401, Shqipëria"
+  }
+ ],
+ "Lungomare": [
+  {
+   "name": "Lungomare",
+   "type": "suburb",
+   "category": "place",
+   "lat": 40.442011,
+   "lon": 19.4959128,
+   "municipality": "Bashkia Vlorë",
+   "county": "Qarku i Vlorës",
+   "display": "Lungomare, Vlorë, Bashkia Vlorë, Qarku i Vlorës, 9400, Shqipëria"
+  },
+  {
+   "name": "Lungomare",
+   "type": "pedestrian",
+   "category": "highway",
+   "lat": 40.4491104,
+   "lon": 19.4905873,
+   "municipality": "Bashkia Vlorë",
+   "county": "Qarku i Vlorës",
+   "display": "Lungomare, Vlorë, Bashkia Vlorë, Qarku i Vlorës, 9401, Shqipëria"
+  }
+ ],
+ "Uji i Ftohtë, Vlorë": [
+  {
+   "name": "Uji i Ftohtë (Vlorë)",
+   "type": "hamlet",
+   "category": "place",
+   "lat": 40.4207265,
+   "lon": 19.492576,
+   "municipality": "Bashkia Vlorë",
+   "county": "Qarku i Vlorës",
+   "display": "Uji i Ftohtë (Vlorë), Vlorë, Bashkia Vlorë, Qarku i Vlorës, 9402, Shqipëria"
+  }
+ ],
+ "Uji i Ftohtë": [
+  {
+   "name": "Uji i Ftohtë (Vlorë)",
+   "type": "hamlet",
+   "category": "place",
+   "lat": 40.4207265,
+   "lon": 19.492576,
+   "municipality": "Bashkia Vlorë",
+   "county": "Qarku i Vlorës",
+   "display": "Uji i Ftohtë (Vlorë), Vlorë, Bashkia Vlorë, Qarku i Vlorës, 9402, Shqipëria"
+  },
+  {
+   "name": "Uji i Ftohtë",
+   "type": "amenity",
+   "category": "amenity",
+   "lat": 40.6236012,
+   "lon": 20.6248782,
+   "municipality": "Bashkia Korçë",
+   "county": "Qarku i Korçës",
+   "display": "Uji i Ftohtë, SH63, Voskopojë, Bashkia Korçë, Qarku i Korçës, 7029, Shqipëria"
+  },
+  {
+   "name": "Uji i Ftohtë",
+   "type": "natural",
+   "category": "natural",
+   "lat": 40.2504261,
+   "lon": 20.0648607,
+   "municipality": "Bashkia Tepelenë",
+   "county": "Qarku i Gjirokastrës",
+   "display": "Uji i Ftohtë, SH4, Lekël, Qendër Tepelenë, Bashkia Tepelenë, Qarku i Gjirokastrës, Shqipëria"
+  }
+ ],
+ "Skelë, Vlorë": [],
+ "Skelë": [],
+ "Radhimë, Vlorë": [
+  {
+   "name": "Radhimë",
+   "type": "village",
+   "category": "place",
+   "lat": 40.3699401,
+   "lon": 19.4950193,
+   "municipality": "Bashkia Vlorë",
+   "county": "Qarku i Vlorës",
+   "display": "Radhimë, Orikum, Bashkia Vlorë, Qarku i Vlorës, 9426, Shqipëria"
+  }
+ ],
+ "Radhimë": [
+  {
+   "name": "Radhimë",
+   "type": "village",
+   "category": "place",
+   "lat": 40.3699401,
+   "lon": 19.4950193,
+   "municipality": "Bashkia Vlorë",
+   "county": "Qarku i Vlorës",
+   "display": "Radhimë, Orikum, Bashkia Vlorë, Qarku i Vlorës, 9426, Shqipëria"
+  }
+ ],
+ "Orikum, Vlorë": [
+  {
+   "name": "Orikum",
+   "type": "town",
+   "category": "boundary",
+   "lat": 40.3268432,
+   "lon": 19.4748818,
+   "municipality": "Bashkia Vlorë",
+   "county": "Qarku i Vlorës",
+   "display": "Orikum, Bashkia Vlorë, Qarku i Vlorës, 9426, Shqipëria"
+  }
+ ],
+ "Orikum": [
+  {
+   "name": "Orikum",
+   "type": "town",
+   "category": "boundary",
+   "lat": 40.3268432,
+   "lon": 19.4748818,
+   "municipality": "Bashkia Vlorë",
+   "county": "Qarku i Vlorës",
+   "display": "Orikum, Bashkia Vlorë, Qarku i Vlorës, 9426, Shqipëria"
+  }
+ ],
+ "Zvërnec, Vlorë": [
+  {
+   "name": "Zvërnec",
+   "type": "village",
+   "category": "place",
+   "lat": 40.5148611,
+   "lon": 19.4187572,
+   "municipality": "Bashkia Vlorë",
+   "county": "Qarku i Vlorës",
+   "display": "Zvërnec, Qendër Vlorë, Bashkia Vlorë, Qarku i Vlorës, 9414, Shqipëria"
+  },
+  {
+   "name": "Ishulli i Zvërnecit",
+   "type": "islet",
+   "category": "place",
+   "lat": 40.5175527,
+   "lon": 19.4013143,
+   "municipality": "Bashkia Vlorë",
+   "county": "Qarku i Vlorës",
+   "display": "Ishulli i Zvërnecit, Çobenjt (Zvërnec), Zvërnec, Qendër Vlorë, Bashkia Vlorë, Qarku i Vlorës, Shqipëria"
+  },
+  {
+   "name": "Kisha e Manastirit të Zvernecit",
+   "type": "amenity",
+   "category": "amenity",
+   "lat": 40.5174108,
+   "lon": 19.4023423,
+   "municipality": "Bashkia Vlorë",
+   "county": "Qarku i Vlorës",
+   "display": "Kisha e Manastirit të Zvernecit, Rruga Manastirit, Çobenjt (Zvërnec), Zvërnec, Qendër Vlorë, Bashkia Vlorë, Qarku i Vlorës, 9414, Shqipëria"
+  }
+ ],
+ "Zvërnec": [
+  {
+   "name": "Zvërnec",
+   "type": "village",
+   "category": "place",
+   "lat": 40.5148611,
+   "lon": 19.4187572,
+   "municipality": "Bashkia Vlorë",
+   "county": "Qarku i Vlorës",
+   "display": "Zvërnec, Qendër Vlorë, Bashkia Vlorë, Qarku i Vlorës, 9414, Shqipëria"
+  },
+  {
+   "name": "Ishulli i Zvërnecit",
+   "type": "islet",
+   "category": "place",
+   "lat": 40.5175527,
+   "lon": 19.4013143,
+   "municipality": "Bashkia Vlorë",
+   "county": "Qarku i Vlorës",
+   "display": "Ishulli i Zvërnecit, Çobenjt (Zvërnec), Zvërnec, Qendër Vlorë, Bashkia Vlorë, Qarku i Vlorës, Shqipëria"
+  },
+  {
+   "name": "Kisha e Manastirit të Zvernecit",
+   "type": "amenity",
+   "category": "amenity",
+   "lat": 40.5174108,
+   "lon": 19.4023423,
+   "municipality": "Bashkia Vlorë",
+   "county": "Qarku i Vlorës",
+   "display": "Kisha e Manastirit të Zvernecit, Rruga Manastirit, Çobenjt (Zvërnec), Zvërnec, Qendër Vlorë, Bashkia Vlorë, Qarku i Vlorës, 9414, Shqipëria"
+  }
+ ],
+ "Kanina, Vlorë": [
+  {
+   "name": "Rruga Beqir Velo Kanina",
+   "type": "tertiary",
+   "category": "highway",
+   "lat": 40.4575249,
+   "lon": 19.5067063,
+   "municipality": "Bashkia Vlorë",
+   "county": "Qarku i Vlorës",
+   "display": "Rruga Beqir Velo Kanina, Lungomare, Vlorë, Bashkia Vlorë, Qarku i Vlorës, 9401, Shqipëria"
+  },
+  {
+   "name": "Rruga Beqir Velo Kanina",
+   "type": "residential",
+   "category": "highway",
+   "lat": 40.4580556,
+   "lon": 19.5038745,
+   "municipality": "Bashkia Vlorë",
+   "county": "Qarku i Vlorës",
+   "display": "Rruga Beqir Velo Kanina, Lungomare, Vlorë, Bashkia Vlorë, Qarku i Vlorës, 9401, Shqipëria"
+  },
+  {
+   "name": "Kaninë",
+   "type": "village",
+   "category": "place",
+   "lat": 40.4379849,
+   "lon": 19.5210825,
+   "municipality": "Bashkia Vlorë",
+   "county": "Qarku i Vlorës",
+   "display": "Kaninë, Qendër Vlorë, Bashkia Vlorë, Qarku i Vlorës, 9400, Shqipëria"
+  }
+ ],
+ "Kanina": [
+  {
+   "name": "Kanina",
+   "type": "amenity",
+   "category": "amenity",
+   "lat": 41.3531251,
+   "lon": 19.8131926,
+   "municipality": "Bashkia Kamëz",
+   "county": "Qarku i Tiranës",
+   "display": "Kanina, Rruga Azem Galica, Njësia Administrative Paskuqan Bashkia Kamëz, Paskuqan, Bashkia Kamëz, Qarku i Tiranës, 1047, Shqipëria"
+  },
+  {
+   "name": "Rruga Beqir Velo Kanina",
+   "type": "tertiary",
+   "category": "highway",
+   "lat": 40.4575249,
+   "lon": 19.5067063,
+   "municipality": "Bashkia Vlorë",
+   "county": "Qarku i Vlorës",
+   "display": "Rruga Beqir Velo Kanina, Lungomare, Vlorë, Bashkia Vlorë, Qarku i Vlorës, 9401, Shqipëria"
+  },
+  {
+   "name": "Rruga Beqir Velo Kanina",
+   "type": "residential",
+   "category": "highway",
+   "lat": 40.4580556,
+   "lon": 19.5038745,
+   "municipality": "Bashkia Vlorë",
+   "county": "Qarku i Vlorës",
+   "display": "Rruga Beqir Velo Kanina, Lungomare, Vlorë, Bashkia Vlorë, Qarku i Vlorës, 9401, Shqipëria"
+  }
+ ],
+ "Tragjas, Vlorë": [
+  {
+   "name": "Tragjas",
+   "type": "village",
+   "category": "place",
+   "lat": 40.327654,
+   "lon": 19.5099606,
+   "municipality": "Bashkia Vlorë",
+   "county": "Qarku i Vlorës",
+   "display": "Tragjas, Orikum, Bashkia Vlorë, Qarku i Vlorës, 9426, Shqipëria"
+  }
+ ],
+ "Tragjas": [
+  {
+   "name": "Tragjas",
+   "type": "village",
+   "category": "place",
+   "lat": 40.327654,
+   "lon": 19.5099606,
+   "municipality": "Bashkia Vlorë",
+   "county": "Qarku i Vlorës",
+   "display": "Tragjas, Orikum, Bashkia Vlorë, Qarku i Vlorës, 9426, Shqipëria"
+  }
+ ],
+ "Novosejë, Vlorë": [],
+ "Novosejë": [
+  {
+   "name": "Novosejë",
+   "type": "village",
+   "category": "place",
+   "lat": 41.9825538,
+   "lon": 20.5877606,
+   "municipality": null,
+   "county": "Qarku i Kukësit",
+   "display": "Novosejë, Bashkia Kukës, Qarku i Kukësit, 8517, Shqipëria"
+  }
+ ],
+ "Vlorë Qendër, Vlorë": [
+  {
+   "name": "Bypass Vlorë",
+   "type": "primary",
+   "category": "highway",
+   "lat": 40.4921315,
+   "lon": 19.4835676,
+   "municipality": "Bashkia Vlorë",
+   "county": "Qarku i Vlorës",
+   "display": "Bypass Vlorë, Babicë e Vogël, Qendër Vlorë, Bashkia Vlorë, Qarku i Vlorës, 9401, Shqipëria"
+  },
+  {
+   "name": "Bypass Vlorë",
+   "type": "primary",
+   "category": "highway",
+   "lat": 40.432659,
+   "lon": 19.5091897,
+   "municipality": "Bashkia Vlorë",
+   "county": "Qarku i Vlorës",
+   "display": "Bypass Vlorë, Kaninë, Qendër Vlorë, Bashkia Vlorë, Qarku i Vlorës, 9400, Shqipëria"
+  },
+  {
+   "name": "Bypass Vlorë",
+   "type": "primary",
+   "category": "highway",
+   "lat": 40.4723591,
+   "lon": 19.521561,
+   "municipality": "Bashkia Vlorë",
+   "county": "Qarku i Vlorës",
+   "display": "Bypass Vlorë, Hasanaj (Babicë), Babicë e Madhe, Qendër Vlorë, Bashkia Vlorë, Qarku i Vlorës, 9401, Shqipëria"
+  },
+  {
+   "name": "Bypass Vlorë",
+   "type": "primary",
+   "category": "highway",
+   "lat": 40.4902793,
+   "lon": 19.5147165,
+   "municipality": "Bashkia Vlorë",
+   "county": "Qarku i Vlorës",
+   "display": "Bypass Vlorë, Babicë e Madhe, Qendër Vlorë, Bashkia Vlorë, Qarku i Vlorës, 9401, Shqipëria"
+  }
+ ],
+ "Vlorë Qendër": [
+  {
+   "name": "Qendër Vlorë",
+   "type": "city",
+   "category": "boundary",
+   "lat": 40.4783863,
+   "lon": 19.5319877,
+   "municipality": "Bashkia Vlorë",
+   "county": "Qarku i Vlorës",
+   "display": "Qendër Vlorë, Bashkia Vlorë, Qarku i Vlorës, Shqipëria"
+  }
+ ],
+ "Shushicë, Vlorë": [
+  {
+   "name": "Shushicë",
+   "type": "village",
+   "category": "boundary",
+   "lat": 40.5379256,
+   "lon": 19.5341914,
+   "municipality": "Bashkia Vlorë",
+   "county": "Qarku i Vlorës",
+   "display": "Shushicë, Bashkia Vlorë, Qarku i Vlorës, 9406, Shqipëria"
+  }
+ ],
+ "Shushicë": [
+  {
+   "name": "Shushicë",
+   "type": "village",
+   "category": "boundary",
+   "lat": 41.1008191,
+   "lon": 20.1388668,
+   "municipality": "Bashkia Elbasan",
+   "county": "Qarku i Elbasanit",
+   "display": "Shushicë, Bashkia Elbasan, Qarku i Elbasanit, 3025, Shqipëria"
+  },
+  {
+   "name": "Shushicë",
+   "type": "village",
+   "category": "boundary",
+   "lat": 40.5379256,
+   "lon": 19.5341914,
+   "municipality": "Bashkia Vlorë",
+   "county": "Qarku i Vlorës",
+   "display": "Shushicë, Bashkia Vlorë, Qarku i Vlorës, 9406, Shqipëria"
+  },
+  {
+   "name": "Shushicë Vogël",
+   "type": "village",
+   "category": "place",
+   "lat": 40.9630356,
+   "lon": 20.089039,
+   "municipality": "Bashkia Cërrik",
+   "county": "Qarku i Elbasanit",
+   "display": "Shushicë Vogël, Gostimë, Bashkia Cërrik, Qarku i Elbasanit, 3018, Shqipëria"
+  }
+ ],
+ "Dukat, Vlorë": [
+  {
+   "name": "Dukat",
+   "type": "village",
+   "category": "place",
+   "lat": 40.2512302,
+   "lon": 19.5649741,
+   "municipality": "Bashkia Vlorë",
+   "county": "Qarku i Vlorës",
+   "display": "Dukat, Orikum, Bashkia Vlorë, Qarku i Vlorës, 9426, Shqipëria"
+  }
+ ],
+ "Dukat": [
+  {
+   "name": "Dukat",
+   "type": "village",
+   "category": "place",
+   "lat": 40.2512302,
+   "lon": 19.5649741,
+   "municipality": "Bashkia Vlorë",
+   "county": "Qarku i Vlorës",
+   "display": "Dukat, Orikum, Bashkia Vlorë, Qarku i Vlorës, 9426, Shqipëria"
+  }
+ ],
+ "Palasë, Vlorë": [
+  {
+   "name": "Palasë",
+   "type": "village",
+   "category": "place",
+   "lat": 40.166793,
+   "lon": 19.6239829,
+   "municipality": "Bashkia Himarë",
+   "county": "Qarku i Vlorës",
+   "display": "Palasë, Himarë, Bashkia Himarë, Qarku i Vlorës, 9425, Shqipëria"
+  },
+  {
+   "name": "Palasë",
+   "type": "residential",
+   "category": "landuse",
+   "lat": 40.1650504,
+   "lon": 19.6231419,
+   "municipality": "Bashkia Himarë",
+   "county": "Qarku i Vlorës",
+   "display": "Palasë, Kallam (Dhermi), Palasë, Himarë, Bashkia Himarë, Qarku i Vlorës, 9425, Shqipëria"
+  }
+ ],
+ "Palasë": [
+  {
+   "name": "Palasë",
+   "type": "village",
+   "category": "place",
+   "lat": 40.166793,
+   "lon": 19.6239829,
+   "municipality": "Bashkia Himarë",
+   "county": "Qarku i Vlorës",
+   "display": "Palasë, Himarë, Bashkia Himarë, Qarku i Vlorës, 9425, Shqipëria"
+  },
+  {
+   "name": "Palasë",
+   "type": "residential",
+   "category": "landuse",
+   "lat": 40.1650504,
+   "lon": 19.6231419,
+   "municipality": "Bashkia Himarë",
+   "county": "Qarku i Vlorës",
+   "display": "Palasë, Kallam (Dhermi), Palasë, Himarë, Bashkia Himarë, Qarku i Vlorës, 9425, Shqipëria"
+  }
+ ],
+ "Dhërmi, Vlorë": [
+  {
+   "name": "Dhërmi",
+   "type": "village",
+   "category": "place",
+   "lat": 40.151199,
+   "lon": 19.6414118,
+   "municipality": "Bashkia Himarë",
+   "county": "Qarku i Vlorës",
+   "display": "Dhërmi, Himarë, Bashkia Himarë, Qarku i Vlorës, 9425, Shqipëria"
+  }
+ ]
+}
