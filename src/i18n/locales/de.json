@@ -302,17 +302,8 @@
     "sendFailed": "Nachricht nicht gesendet — bitte erneut versuchen",
     "unavailable": "Dieses Gespräch ist nicht verfügbar",
     "loadFailed": "Diese Unterhaltung konnte nicht geladen werden.",
-    "attach": "Anhängen",
-    "attachPhoto": "Foto",
-    "attachDocument": "Dokument",
-    "attachTooBig": "Dateien dürfen höchstens {{max}} MB groß sein.",
-    "attachType": "Du kannst ein Foto, PDF, Word-, Excel- oder Textdatei senden.",
-    "attachPermission": "Erlaube den Zugriff auf deine Fotos, um eines zu senden.",
     "attachFailed": "Die Datei wurde nicht gesendet. Versuche es erneut.",
-    "removeAttachment": "Datei entfernen",
-    "openAttachment": "{{name}} öffnen",
-    "sendingFile": "Datei wird gesendet…",
-    "photoSent": "Foto"
+    "openAttachment": "{{name}} öffnen"
   },
   "notFound": {
     "title": "Seite nicht gefunden",
@@ -735,18 +726,24 @@
       "wrong_info": "Falsche Angaben",
       "unavailable": "Nicht mehr verfügbar",
       "offensive": "Anstößiger Inhalt",
-      "other": "Sonstiges"
+      "other": "Sonstiges",
+      "inappropriate": "Unangemessenes Verhalten",
+      "fake_account": "Gefälschtes Konto",
+      "fraud": "Betrug oder verdächtige Aktivität",
+      "harassment": "Belästigung"
     },
     "detailsPlaceholder": "Möchten Sie noch etwas hinzufügen? (optional)",
     "send": "Meldung senden",
     "sent": "Danke. Wir sehen uns das an.",
     "already": "Sie haben dies bereits gemeldet.",
     "failed": "Die Meldung konnte nicht gesendet werden. Bitte erneut versuchen.",
-    "blockConfirm": "{{name}} blockieren? Diese Person kann Ihnen dann keine Nachrichten mehr senden.",
+    "blockConfirm": "Möchtest du {{name}} wirklich blockieren? Ihr könnt euch nicht mehr schreiben, bis du die Blockierung aufhebst.",
     "blocked": "Sie haben diesen Nutzer blockiert. Er kann Ihnen keine Nachrichten senden.",
     "cannotMessage": "Sie können diesem Nutzer keine Nachrichten senden.",
     "blockedBadge": "Blockiert",
-    "signInToReport": "Melden Sie sich an, um etwas zu melden."
+    "signInToReport": "Melden Sie sich an, um etwas zu melden.",
+    "blockedUsers": "Blockierte Nutzer",
+    "noBlocked": "Du hast niemanden blockiert."
   },
   "notifications": {
     "title": "Benachrichtigungen",

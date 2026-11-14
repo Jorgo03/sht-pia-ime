@@ -302,17 +302,8 @@
     "sendFailed": "Mesazhi nuk u dërgua — provo përsëri",
     "unavailable": "Kjo bisedë nuk është e disponueshme",
     "loadFailed": "Biseda nuk u ngarkua dot.",
-    "attach": "Bashkëngjit",
-    "attachPhoto": "Foto",
-    "attachDocument": "Dokument",
-    "attachTooBig": "Skedari mund të jetë deri në {{max}} MB.",
-    "attachType": "Mund të dërgosh një foto, PDF, Word, Excel ose skedar teksti.",
-    "attachPermission": "Lejo qasjen te fotot për të dërguar një.",
     "attachFailed": "Skedari nuk u dërgua. Provo përsëri.",
-    "removeAttachment": "Hiq skedarin",
-    "openAttachment": "Hap {{name}}",
-    "sendingFile": "Po dërgohet skedari…",
-    "photoSent": "Foto"
+    "openAttachment": "Hap {{name}}"
   },
   "notFound": {
     "title": "Faqja nuk u gjet",
@@ -735,18 +726,24 @@
       "wrong_info": "Informacion i gabuar",
       "unavailable": "Nuk është më në dispozicion",
       "offensive": "Përmbajtje fyese",
-      "other": "Tjetër"
+      "other": "Tjetër",
+      "inappropriate": "Sjellje e papërshtatshme",
+      "fake_account": "Llogari e rreme",
+      "fraud": "Mashtrim ose veprim i dyshimtë",
+      "harassment": "Ngacmim"
     },
     "detailsPlaceholder": "Diçka tjetër që duhet të dimë? (opsionale)",
     "send": "Dërgo raportin",
     "sent": "Faleminderit. Do ta shqyrtojmë.",
     "already": "E keni raportuar tashmë.",
     "failed": "Raporti nuk u dërgua. Provo përsëri.",
-    "blockConfirm": "Ta bllokoni {{name}}? Nuk do të mund t'ju dërgojë mesazhe.",
+    "blockConfirm": "Jeni i sigurt që doni të bllokoni {{name}}? Nuk do të mund t'i shkruani njëri-tjetrit derisa ta zhbllokoni.",
     "blocked": "E keni bllokuar këtë përdorues. Nuk mund t'ju dërgojë mesazhe.",
     "cannotMessage": "Nuk mund t'i dërgoni mesazhe këtij përdoruesi.",
     "blockedBadge": "I bllokuar",
-    "signInToReport": "Hyni për të raportuar."
+    "signInToReport": "Hyni për të raportuar.",
+    "blockedUsers": "Përdoruesit e bllokuar",
+    "noBlocked": "Nuk keni bllokuar askënd."
   },
   "notifications": {
     "title": "Njoftimet",

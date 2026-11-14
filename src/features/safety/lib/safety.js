@@ -7,19 +7,30 @@
 // same thing by the same person fails with 23505; a block is visible only to
 // the person who made it, and a blocked person's messages are refused (42501).
 
+// Reasons for reporting a listing, and for reporting a person (a chat, a profile;
+// migration 20261114154750_chat_safety, which the database checks too).
 export const REPORT_REASONS = ['spam', 'scam', 'wrong_info', 'unavailable', 'offensive', 'other']
+export const USER_REPORT_REASONS = ['inappropriate', 'spam', 'fake_account', 'fraud', 'harassment', 'other']
+
+/** The reasons offered for this target: a listing, or a person. */
+export function reportReasonsFor({ propertyId, userId }) {
+  return !propertyId && userId ? USER_REPORT_REASONS : REPORT_REASONS
+}
 export const MAX_REPORT_DETAILS = 1000
 
 /**
- * Report a listing or a user. Resolves to 'sent', 'already' (this person has
+ * Report a listing or a user, from a chat when conversationId is given (the
+ * database accepts only a chat the reporter is in, naming its other
+ * participant). Resolves to 'sent', 'already' (this person has
  * an open report of the same thing) or 'failed'. Never throws.
  */
-export async function fileReport(client, { propertyId, userId, reason, details }) {
-  if (!REPORT_REASONS.includes(reason)) return 'failed'
+export async function fileReport(client, { propertyId, userId, conversationId, reason, details }) {
   if (!propertyId && !userId) return 'failed'
+  if (!reportReasonsFor({ propertyId, userId }).includes(reason)) return 'failed'
   const row = { reason }
   if (propertyId) row.property_id = propertyId
   if (userId) row.reported_user_id = userId
+  if (conversationId && userId) row.conversation_id = conversationId
   const text = (details ?? '').trim().slice(0, MAX_REPORT_DETAILS)
   if (text) row.details = text
   try {

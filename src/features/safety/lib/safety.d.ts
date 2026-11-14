@@ -1,8 +1,12 @@
 // Types for safety.js, so the phone app (TypeScript) can import it.
-export type ReportReason = 'spam' | 'scam' | 'wrong_info' | 'unavailable' | 'offensive' | 'other';
+export type ReportReason =
+  | 'spam' | 'scam' | 'wrong_info' | 'unavailable' | 'offensive' | 'other'
+  | 'inappropriate' | 'fake_account' | 'fraud' | 'harassment';
 export type ReportResult = 'sent' | 'already' | 'failed';
 
 export const REPORT_REASONS: readonly ReportReason[];
+export const USER_REPORT_REASONS: readonly ReportReason[];
+export function reportReasonsFor(target: { propertyId?: string | null; userId?: string | null }): readonly ReportReason[];
 export const MAX_REPORT_DETAILS: number;
 
 // Any Supabase client; typed loosely so both apps' clients fit.
@@ -10,7 +14,13 @@ type Client = { from: (table: string) => any };
 
 export function fileReport(
   client: Client,
-  target: { propertyId?: string | null; userId?: string | null; reason: ReportReason; details?: string | null },
+  target: {
+    propertyId?: string | null;
+    userId?: string | null;
+    conversationId?: string | null;
+    reason: ReportReason;
+    details?: string | null;
+  },
 ): Promise<ReportResult>;
 export function blockUser(client: Client, blockedId: string): Promise<boolean>;
 export function unblockUser(client: Client, blockedId: string): Promise<boolean>;

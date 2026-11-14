@@ -332,17 +332,8 @@
     "sendFailed": "Message not sent — try again",
     "unavailable": "This conversation is not available",
     "loadFailed": "Couldn't load this conversation.",
-    "attach": "Attach",
-    "attachPhoto": "Photo",
-    "attachDocument": "Document",
-    "attachTooBig": "Files can be up to {{max}} MB.",
-    "attachType": "You can send a photo, PDF, Word, Excel or text file.",
-    "attachPermission": "Allow access to your photos to send one.",
     "attachFailed": "The file wasn't sent. Try again.",
-    "removeAttachment": "Remove file",
-    "openAttachment": "Open {{name}}",
-    "sendingFile": "Sending file…",
-    "photoSent": "Photo"
+    "openAttachment": "Open {{name}}"
   },
   "property": {
     "beds": "Bedrooms",
@@ -735,18 +726,24 @@
       "wrong_info": "Wrong information",
       "unavailable": "No longer available",
       "offensive": "Offensive content",
-      "other": "Something else"
+      "other": "Something else",
+      "inappropriate": "Inappropriate behaviour",
+      "fake_account": "Fake account",
+      "fraud": "Fraud or suspicious activity",
+      "harassment": "Harassment"
     },
     "detailsPlaceholder": "Anything else we should know? (optional)",
     "send": "Send report",
     "sent": "Thank you. We will look into it.",
     "already": "You have already reported this.",
     "failed": "The report could not be sent. Try again.",
-    "blockConfirm": "Block {{name}}? They will no longer be able to message you.",
+    "blockConfirm": "Are you sure you want to block {{name}}? You won't be able to message each other until you unblock them.",
     "blocked": "You blocked this user. They cannot message you.",
     "cannotMessage": "You can't send messages to this user.",
     "blockedBadge": "Blocked",
-    "signInToReport": "Sign in to report."
+    "signInToReport": "Sign in to report.",
+    "blockedUsers": "Blocked users",
+    "noBlocked": "You haven't blocked anyone."
   },
   "notifications": {
     "title": "Notifications",

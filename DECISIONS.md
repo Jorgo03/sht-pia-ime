@@ -1034,3 +1034,25 @@ Listings on a profile are matched by `owner_id` or `agent_id` (all three live
 listings today are client-published, with no `agent_id`, which the old agent
 page missed) and only `status = 'active'`: drafts, paused, sold and rented stay
 off, as on every other public list.
+
+## 21. Chats are text only; reports and blocks tightened — 2026-11-14 (owner)
+
+Owner: the chat composer is a text box and Send, nothing else. The paperclip,
+the Photo / Document menu and all sending code are removed. Files sent before
+(the feature lived 2026-11-13 to 2026-11-14) still show in their bubbles, so
+history stays whole; the private `message-attachments` bucket and
+`messages.attachment` stay for them. To bring sending back, restore it from
+commit 17e7c18.
+
+Same request, applied live as migration `20261114154750_chat_safety`
+(test `supabase/tests/rls_chat_safety.sql`, 14/14, rolled back):
+- Reporting a person has its own reasons (inappropriate behaviour, spam, fake
+  account, fraud, harassment, other); a report from a chat records the
+  conversation, which must be the reporter's own and name its other
+  participant. Listing reports keep the listing reasons. Duplicates stay
+  refused (one open report per reporter and target).
+- A block now stops messages both ways (before, the blocker could still write
+  through the API) and stops new conversations between the two, about any
+  listing. The block checks answer only about the caller, so nobody can learn
+  whether two others blocked each other.
+- Blocked people are listed under Profile → Blocked users, with Unblock.

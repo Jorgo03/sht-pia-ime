@@ -310,17 +310,8 @@
     "sendFailed": "Messaggio non inviato — riprova",
     "unavailable": "Questa conversazione non è disponibile",
     "loadFailed": "Impossibile caricare questa conversazione.",
-    "attach": "Allega",
-    "attachPhoto": "Foto",
-    "attachDocument": "Documento",
-    "attachTooBig": "I file possono essere al massimo di {{max}} MB.",
-    "attachType": "Puoi inviare una foto, un PDF, un file Word, Excel o di testo.",
-    "attachPermission": "Consenti l'accesso alle foto per inviarne una.",
     "attachFailed": "Il file non è stato inviato. Riprova.",
-    "removeAttachment": "Rimuovi file",
-    "openAttachment": "Apri {{name}}",
-    "sendingFile": "Invio del file…",
-    "photoSent": "Foto"
+    "openAttachment": "Apri {{name}}"
   },
   "notFound": {
     "title": "Pagina non trovata",
@@ -744,18 +735,24 @@
       "wrong_info": "Informazioni errate",
       "unavailable": "Non più disponibile",
       "offensive": "Contenuto offensivo",
-      "other": "Altro"
+      "other": "Altro",
+      "inappropriate": "Comportamento inappropriato",
+      "fake_account": "Account falso",
+      "fraud": "Frode o attività sospetta",
+      "harassment": "Molestie"
     },
     "detailsPlaceholder": "C'è altro che dovremmo sapere? (facoltativo)",
     "send": "Invia segnalazione",
     "sent": "Grazie. Lo verificheremo.",
     "already": "Hai già segnalato questo contenuto.",
     "failed": "Impossibile inviare la segnalazione. Riprova.",
-    "blockConfirm": "Bloccare {{name}}? Non potrà più inviarti messaggi.",
+    "blockConfirm": "Sei sicuro di voler bloccare {{name}}? Non potrete scrivervi finché non lo sblocchi.",
     "blocked": "Hai bloccato questo utente. Non può inviarti messaggi.",
     "cannotMessage": "Non puoi inviare messaggi a questo utente.",
     "blockedBadge": "Bloccato",
-    "signInToReport": "Accedi per segnalare."
+    "signInToReport": "Accedi per segnalare.",
+    "blockedUsers": "Utenti bloccati",
+    "noBlocked": "Non hai bloccato nessuno."
   },
   "notifications": {
     "title": "Notifiche",

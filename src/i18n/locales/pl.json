@@ -318,17 +318,8 @@
     "sendFailed": "Wiadomość nie została wysłana — spróbuj ponownie",
     "unavailable": "Ta rozmowa jest niedostępna",
     "loadFailed": "Nie udało się wczytać tej rozmowy.",
-    "attach": "Załącz",
-    "attachPhoto": "Zdjęcie",
-    "attachDocument": "Dokument",
-    "attachTooBig": "Plik może mieć maksymalnie {{max}} MB.",
-    "attachType": "Możesz wysłać zdjęcie, PDF, plik Word, Excel lub tekstowy.",
-    "attachPermission": "Zezwól na dostęp do zdjęć, aby je wysłać.",
     "attachFailed": "Plik nie został wysłany. Spróbuj ponownie.",
-    "removeAttachment": "Usuń plik",
-    "openAttachment": "Otwórz {{name}}",
-    "sendingFile": "Wysyłanie pliku…",
-    "photoSent": "Zdjęcie"
+    "openAttachment": "Otwórz {{name}}"
   },
   "notFound": {
     "title": "Nie znaleziono strony",
@@ -753,18 +744,24 @@
       "wrong_info": "Błędne informacje",
       "unavailable": "Już niedostępne",
       "offensive": "Obraźliwe treści",
-      "other": "Inne"
+      "other": "Inne",
+      "inappropriate": "Niewłaściwe zachowanie",
+      "fake_account": "Fałszywe konto",
+      "fraud": "Oszustwo lub podejrzana aktywność",
+      "harassment": "Nękanie"
     },
     "detailsPlaceholder": "Coś jeszcze, co powinniśmy wiedzieć? (opcjonalnie)",
     "send": "Wyślij zgłoszenie",
     "sent": "Dziękujemy. Sprawdzimy to.",
     "already": "To zostało już przez Ciebie zgłoszone.",
     "failed": "Nie udało się wysłać zgłoszenia. Spróbuj ponownie.",
-    "blockConfirm": "Zablokować {{name}}? Ta osoba nie będzie mogła wysyłać Ci wiadomości.",
+    "blockConfirm": "Czy na pewno chcesz zablokować: {{name}}? Nie będziecie mogli do siebie pisać, dopóki nie odblokujesz.",
     "blocked": "Ten użytkownik jest zablokowany. Nie może wysyłać Ci wiadomości.",
     "cannotMessage": "Nie możesz wysyłać wiadomości do tego użytkownika.",
     "blockedBadge": "Zablokowany",
-    "signInToReport": "Zaloguj się, aby zgłosić."
+    "signInToReport": "Zaloguj się, aby zgłosić.",
+    "blockedUsers": "Zablokowani użytkownicy",
+    "noBlocked": "Nikogo nie zablokowano."
   },
   "notifications": {
     "title": "Powiadomienia",

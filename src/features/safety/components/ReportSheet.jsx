@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { X, Flag } from 'lucide-react'
 import { supabase } from '../../../lib/supabase'
-import { MAX_REPORT_DETAILS, REPORT_REASONS, fileReport } from '../lib/safety'
+import { MAX_REPORT_DETAILS, fileReport, reportReasonsFor } from '../lib/safety'
 
 /**
  * Report a listing (propertyId) or a person (userId). Same bottom sheet as
@@ -59,7 +59,7 @@ export default function ReportSheet({ propertyId, userId, onClose }) {
               <legend className="addsheet-miniform__title mb-2 flex items-center gap-2">
                 <Flag size={16} aria-hidden="true" /> {t('safety.reportTitle')}
               </legend>
-              {REPORT_REASONS.map((r, i) => (
+              {reportReasonsFor({ propertyId, userId }).map((r, i) => (
                 <label
                   key={r}
                   className={`flex min-h-11 cursor-pointer items-center gap-3 rounded-xl border px-3 py-2 text-[15px] ${reason === r ? 'border-fho-orange-1 bg-fho-surface-2' : 'border-fho-border'}`}

@@ -802,6 +802,16 @@ export default function ProfileScreen() {
                 <Text style={styles.menuRowText}>{t('listing.myListings')}</Text>
                 <MaterialIcons name="chevron-right" size={18} color={colors.textSecondary} />
               </TouchableOpacity>
+              <View style={styles.menuDivider} />
+              <TouchableOpacity
+                accessibilityRole="button"
+                style={styles.menuRow}
+                onPress={() => router.push('/blocked-users' as Href)}
+                activeOpacity={0.7}>
+                <MaterialIcons name="block" size={20} color={colors.textPrimary} />
+                <Text style={styles.menuRowText}>{t('safety.blockedUsers')}</Text>
+                <MaterialIcons name="chevron-right" size={18} color={colors.textSecondary} />
+              </TouchableOpacity>
               {isAgentAccount && (
                 <>
                   <View style={styles.menuDivider} />

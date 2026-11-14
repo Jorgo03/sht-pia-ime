@@ -192,6 +192,7 @@ function ThemedNavigation() {
             name="user/[id]"
             options={{ headerShown: false, presentation: 'card' }}
           />
+          <Stack.Screen name="blocked-users" options={{ headerShown: false, presentation: 'card' }} />
           <Stack.Screen name="agents/index" options={{ headerShown: false, presentation: 'card' }} />
           <Stack.Screen name="compare" options={{ headerShown: false, presentation: 'card' }} />
           <Stack.Screen name="listing/import" options={{ headerShown: false, presentation: 'card' }} />

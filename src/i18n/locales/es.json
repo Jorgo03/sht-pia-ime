@@ -310,17 +310,8 @@
     "sendFailed": "Mensaje no enviado — inténtalo de nuevo",
     "unavailable": "Esta conversación no está disponible",
     "loadFailed": "No se pudo cargar esta conversación.",
-    "attach": "Adjuntar",
-    "attachPhoto": "Foto",
-    "attachDocument": "Documento",
-    "attachTooBig": "Los archivos pueden ocupar hasta {{max}} MB.",
-    "attachType": "Puedes enviar una foto, un PDF o un archivo de Word, Excel o texto.",
-    "attachPermission": "Permite el acceso a tus fotos para enviar una.",
     "attachFailed": "El archivo no se envió. Inténtalo de nuevo.",
-    "removeAttachment": "Quitar archivo",
-    "openAttachment": "Abrir {{name}}",
-    "sendingFile": "Enviando archivo…",
-    "photoSent": "Foto"
+    "openAttachment": "Abrir {{name}}"
   },
   "notFound": {
     "title": "Página no encontrada",
@@ -744,18 +735,24 @@
       "wrong_info": "Información incorrecta",
       "unavailable": "Ya no está disponible",
       "offensive": "Contenido ofensivo",
-      "other": "Otro motivo"
+      "other": "Otro motivo",
+      "inappropriate": "Comportamiento inapropiado",
+      "fake_account": "Cuenta falsa",
+      "fraud": "Fraude o actividad sospechosa",
+      "harassment": "Acoso"
     },
     "detailsPlaceholder": "¿Algo más que debamos saber? (opcional)",
     "send": "Enviar denuncia",
     "sent": "Gracias. Lo revisaremos.",
     "already": "Ya has denunciado esto.",
     "failed": "No se pudo enviar la denuncia. Inténtalo de nuevo.",
-    "blockConfirm": "¿Bloquear a {{name}}? Ya no podrá enviarte mensajes.",
+    "blockConfirm": "¿Seguro que quieres bloquear a {{name}}? No podréis escribiros hasta que lo desbloquees.",
     "blocked": "Has bloqueado a este usuario. No puede enviarte mensajes.",
     "cannotMessage": "No puedes enviar mensajes a este usuario.",
     "blockedBadge": "Bloqueado",
-    "signInToReport": "Inicia sesión para denunciar."
+    "signInToReport": "Inicia sesión para denunciar.",
+    "blockedUsers": "Usuarios bloqueados",
+    "noBlocked": "No has bloqueado a nadie."
   },
   "notifications": {
     "title": "Notificaciones",

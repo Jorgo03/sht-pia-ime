@@ -310,17 +310,8 @@
     "sendFailed": "Message non envoyé — réessayez",
     "unavailable": "Cette conversation n'est pas disponible",
     "loadFailed": "Impossible de charger cette conversation.",
-    "attach": "Joindre",
-    "attachPhoto": "Photo",
-    "attachDocument": "Document",
-    "attachTooBig": "Les fichiers peuvent faire jusqu'à {{max}} Mo.",
-    "attachType": "Vous pouvez envoyer une photo, un PDF, un fichier Word, Excel ou texte.",
-    "attachPermission": "Autorisez l'accès à vos photos pour en envoyer une.",
     "attachFailed": "Le fichier n'a pas été envoyé. Réessayez.",
-    "removeAttachment": "Retirer le fichier",
-    "openAttachment": "Ouvrir {{name}}",
-    "sendingFile": "Envoi du fichier…",
-    "photoSent": "Photo"
+    "openAttachment": "Ouvrir {{name}}"
   },
   "notFound": {
     "title": "Page introuvable",
@@ -744,18 +735,24 @@
       "wrong_info": "Informations erronées",
       "unavailable": "N'est plus disponible",
       "offensive": "Contenu offensant",
-      "other": "Autre"
+      "other": "Autre",
+      "inappropriate": "Comportement inapproprié",
+      "fake_account": "Faux compte",
+      "fraud": "Fraude ou activité suspecte",
+      "harassment": "Harcèlement"
     },
     "detailsPlaceholder": "Autre chose à nous signaler ? (facultatif)",
     "send": "Envoyer le signalement",
     "sent": "Merci. Nous allons l'examiner.",
     "already": "Vous avez déjà signalé ceci.",
     "failed": "Impossible d'envoyer le signalement. Réessayez.",
-    "blockConfirm": "Bloquer {{name}} ? Cette personne ne pourra plus vous écrire.",
+    "blockConfirm": "Voulez-vous vraiment bloquer {{name}} ? Vous ne pourrez plus vous écrire tant que vous ne l'aurez pas débloqué.",
     "blocked": "Vous avez bloqué cet utilisateur. Il ne peut pas vous écrire.",
     "cannotMessage": "Vous ne pouvez pas envoyer de messages à cet utilisateur.",
     "blockedBadge": "Bloqué",
-    "signInToReport": "Connectez-vous pour signaler."
+    "signInToReport": "Connectez-vous pour signaler.",
+    "blockedUsers": "Utilisateurs bloqués",
+    "noBlocked": "Vous n'avez bloqué personne."
   },
   "notifications": {
     "title": "Notifications",

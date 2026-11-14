@@ -1,7 +1,7 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import {
-  REPORT_REASONS, MAX_REPORT_DETAILS, blockUser, fileReport, isBlockedSendError, loadBlockedIds, unblockUser,
+  REPORT_REASONS, USER_REPORT_REASONS, MAX_REPORT_DETAILS, blockUser, reportReasonsFor, fileReport, isBlockedSendError, loadBlockedIds, unblockUser,
 } from '../src/features/safety/lib/safety.js'
 
 // Report and block (migration 20261016181934). The database enforces the
@@ -26,6 +26,11 @@ function fakeClient(reply = { error: null }) {
 
 test('the reasons match the database check constraint', () => {
   assert.deepEqual([...REPORT_REASONS], ['spam', 'scam', 'wrong_info', 'unavailable', 'offensive', 'other'])
+  // Reporting a person (migration 20261114154750_chat_safety).
+  assert.deepEqual([...USER_REPORT_REASONS], ['inappropriate', 'spam', 'fake_account', 'fraud', 'harassment', 'other'])
+  assert.equal(reportReasonsFor({ userId: 'u2' }), USER_REPORT_REASONS)
+  assert.equal(reportReasonsFor({ propertyId: 'p1' }), REPORT_REASONS)
+  assert.equal(reportReasonsFor({ propertyId: 'p1', userId: 'u2' }), REPORT_REASONS)
   assert.equal(MAX_REPORT_DETAILS, 1000)
 })
 
@@ -37,8 +42,23 @@ test('reporting a listing sends only the columns a client may fill', async () =>
 
 test('reporting a user, with empty details left out', async () => {
   const c = fakeClient()
-  assert.equal(await fileReport(c, { userId: 'u2', reason: 'offensive', details: '   ' }), 'sent')
-  assert.deepEqual(c.calls[0].row, { reported_user_id: 'u2', reason: 'offensive' })
+  assert.equal(await fileReport(c, { userId: 'u2', reason: 'harassment', details: '   ' }), 'sent')
+  assert.deepEqual(c.calls[0].row, { reported_user_id: 'u2', reason: 'harassment' })
+})
+
+test('a person is reported with person reasons; a listing reason for a person is refused', async () => {
+  const c = fakeClient()
+  for (const reason of USER_REPORT_REASONS) assert.equal(await fileReport(c, { userId: 'u2', reason }), 'sent', reason)
+  assert.equal(await fileReport(c, { userId: 'u2', reason: 'wrong_info' }), 'failed')
+  assert.equal(await fileReport(c, { propertyId: 'p1', reason: 'harassment' }), 'failed')
+})
+
+test('a report from a chat carries the conversation, a listing report never does', async () => {
+  const c = fakeClient()
+  await fileReport(c, { userId: 'u2', conversationId: 'c9', reason: 'fraud', details: 'Kërkoi para paraprakisht' })
+  assert.deepEqual(c.calls[0].row, { reported_user_id: 'u2', conversation_id: 'c9', reason: 'fraud', details: 'Kërkoi para paraprakisht' })
+  await fileReport(c, { propertyId: 'p1', conversationId: 'c9', reason: 'spam' })
+  assert.deepEqual(c.calls[1].row, { property_id: 'p1', reason: 'spam' })
 })
 
 test('details are capped at 1000 characters', async () => {

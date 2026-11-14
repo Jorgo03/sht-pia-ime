@@ -22,8 +22,8 @@ import { useTheme } from '@/contexts/theme-context';
 import { supabase } from '@/lib/supabase';
 import {
   MAX_REPORT_DETAILS,
-  REPORT_REASONS,
   fileReport,
+  reportReasonsFor,
   type ReportReason,
   type ReportResult,
 } from '@/src/features/safety/lib/safety';
@@ -32,16 +32,21 @@ import { sheetColumn } from '@/constants/web-frame';
 /**
  * Report a listing (propertyId) or a person (userId) — the phone twin of
  * web's ReportSheet. Shown only to a signed-in user; the parent checks that.
+ * A person gets person reasons; from a chat, the report also records the
+ * conversation (migration 20261114154750_chat_safety checks it is the
+ * reporter's own, naming its other participant).
  */
 export function ReportSheet({
   visible,
   propertyId,
   userId,
+  conversationId,
   onClose,
 }: {
   visible: boolean;
   propertyId?: string | null;
   userId?: string | null;
+  conversationId?: string | null;
   onClose: () => void;
 }) {
   const { t } = useTranslation();
@@ -62,7 +67,7 @@ export function ReportSheet({
   const submit = async () => {
     if (!reason || sending) return;
     setSending(true);
-    setResult(await fileReport(supabase, { propertyId, userId, reason, details }));
+    setResult(await fileReport(supabase, { propertyId, userId, conversationId, reason, details }));
     setSending(false);
   };
 
@@ -96,7 +101,7 @@ export function ReportSheet({
             <ScrollView contentContainerStyle={styles.body} keyboardShouldPersistTaps="handled">
               <Text style={styles.question}>{t('safety.reportTitle')}</Text>
               <View accessibilityRole="radiogroup" style={styles.reasons}>
-                {REPORT_REASONS.map((r) => {
+                {reportReasonsFor({ propertyId, userId }).map((r) => {
                   const on = reason === r;
                   return (
                     <Pressable
