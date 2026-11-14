@@ -1,10 +1,12 @@
 # Findings: Shtëpia.ime full sweep (checkpoint 1)
 
+> Snapshot taken at checkpoint 1. **Current status of every finding, including AUDIT-024 to 031, is in `AUDIT_REPORT.md`.**
+
 Updated 2026-11-13, branch `audit/full-sweep`.
 
 - **Evidence:** every finding cites a file:line, a command output, a live query, or repro steps. Anything not reproduced is marked **SUSPECTED**.
 - **Severity:** 🔴 Critical · 🟠 High · 🟡 Medium · ⚪ Low.
-- **Full evidence** for AUDIT-001 to AUDIT-023 is in `AUDIT_REPORT.md`, with each fix's test, before/after numbers and commit.
+- **Full evidence** for AUDIT-001 to AUDIT-023 is in `FIRST_PASS_DETAIL.md` (summary: `AUDIT_REPORT.md`), with each fix's test, before/after numbers and commit.
 
 ## Health score
 

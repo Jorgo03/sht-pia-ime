@@ -2,7 +2,7 @@
 
 A running log so the work can be picked up again if a session stops. Newest
 entry last. The findings are in `FINDINGS.md`; the full report is
-`AUDIT_REPORT.md` at the repo root (it moves to `docs/audit/` in the final
+`docs/audit/AUDIT_REPORT.md` (first-pass detail in `FIRST_PASS_DETAIL.md`; moved from the repo root in the final
 step).
 
 ## 2026-11-13: first pass (audit, approved fixes, live apply)

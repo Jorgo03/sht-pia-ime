@@ -1,6 +1,6 @@
 -- Full RLS write matrix: every public table, as a signed-out visitor (anon),
 -- the row's owner, and another signed-in account (non-owner).
--- Written for AUDIT_REPORT.md (2026-11-13). One DO block that always ends in
+-- Written for docs/audit/AUDIT_REPORT.md (2026-11-13). One DO block that always ends in
 -- `raise exception 'RESULTS …'`, so every write is rolled back. No DELETE of
 -- real rows survives: deletes run inside the same rolled-back block.
 --
@@ -9,7 +9,7 @@
 -- database refuses, FAIL when it accepts). Expected after the audit fixes:
 -- everything passes.
 -- Result live 2026-11-13 (before fixes): passed=48/51, failing D1, D2, D3
--- (AUDIT_REPORT.md AUDIT-003 and AUDIT-004). All 27 anon inserts: 42501.
+-- (docs/audit/AUDIT_REPORT.md AUDIT-003 and AUDIT-004). All 27 anon inserts: 42501.
 -- Result live 2026-11-13 after migrations 20261113194202/194212/194218 were
 -- applied: passed=51/51.
 do $$
