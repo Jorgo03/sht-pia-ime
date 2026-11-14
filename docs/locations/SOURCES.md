@@ -98,13 +98,28 @@ OpenStreetMap data © OpenStreetMap contributors, ODbL 1.0. Wikidata is CC0.
 
 ## Rebuilding
 
+The audit, run once against the original list (Checkpoint 1):
+
 ```
 node scripts/locations/fetch-sources.mjs     # downloads (once)
 node scripts/locations/verify-osm.mjs        # Nominatim, pass 1 (cached)
 node scripts/locations/classify.mjs          # pass-1 summary, feeds pass 2
 node scripts/locations/verify-pass2.mjs      # Nominatim, spelling variants (cached)
-node scripts/locations/validate.mjs          # checks the app's locations
-node scripts/locations/build-dataset.mjs     # data/albania-locations.json
+node scripts/locations/validate.mjs docs/locations/validation.json
 node scripts/locations/report.mjs            # VALIDATION_REPORT.md
+node scripts/locations/decide.mjs            # decisions.json: the approved outcome, frozen
 node scripts/locations/inventory.mjs         # INVENTORY.md
 ```
+
+After that, to change the places the apps offer, change the sources (or
+`decisions.json`), never the generated files, and run:
+
+```
+node scripts/locations/build-dataset.mjs     # data/albania-locations.json
+node scripts/locations/generate-app-list.mjs # src/…/data/locations.js, the AI's places.js, the database seed
+node scripts/locations/validate.mjs          # validation-current.json: checks the new list
+npm test -- tests/locations.test.mjs
+```
+
+The database copy is updated by running the regenerated
+`supabase/pending/locations_seed.sql` (it updates rows in place).
