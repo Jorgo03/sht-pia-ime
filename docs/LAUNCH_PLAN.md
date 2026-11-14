@@ -47,9 +47,11 @@ Store texts, privacy answers and reviewer notes are drafted in
    - Keep the `exp://` development entries until the store apps are out.
    - Use exact paths for production; wildcards only for preview builds.
 5. 👤 **Google Cloud → OAuth client (web):** add `https://<domain>` to the authorised origins. The Supabase callback `https://xzzzhlwmzotibrxdqmcm.supabase.co/auth/v1/callback` stays the redirect URI.
-6. ✅/👤 **Update the app for the domain.**
-   - ✅ I'll make the code change: set `EXPO_PUBLIC_SITE_URL` and `EXPO_PUBLIC_WEB_ORIGIN` to the domain, and add iOS associated domains and Android app links (AUDIT-008), once you tell me the domain.
-   - 👤 You add the same values in EAS for the store builds.
+6. ✅/👤 **App links** (AUDIT-008):
+   - ✅ The code is ready.
+   - 👤 Run `APPLE_TEAM_ID=… ANDROID_CERT_SHA256=… node scripts/write-app-links.cjs` and commit the two `public/.well-known` files. The Team ID is under developer.apple.com → Membership; the fingerprint is in Play Console → App integrity → App signing key.
+   - 👤 Set `APP_LINK_DOMAIN=<domain>`, `EXPO_PUBLIC_SITE_URL` and `EXPO_PUBLIC_WEB_ORIGIN` in EAS for the store builds.
+   - Shared `/property`, `/user` and `/agent` links then open the app.
 7. **SEO basics:**
    - ✅ Done: title, meta description, Open Graph tags, `og-image.png`, `robots.txt`, `sitemap.xml`, favicon, manifest.
    - 👤 After the domain is live, add it in Google Search Console and submit `/sitemap.xml`.
