@@ -73,7 +73,7 @@ Nothing below has run on the live database:
 
 1. **Apply `supabase/pending/locations.sql`, then `locations_seed.sql`.** This adds the table, the two columns and the guard, then fills the 1,334 places. It is additive.
 2. **Apply `locations_map_listings.sql`.** It backs up every listing and wanted home into `locations_backup_20261114`, then sets `location_id` on the 3 live listings. Their city, zone, address and pin are not changed. Expected result: two listings point to Bashkia Tiranë and one to Bashkia Durrës.
-3. **Deploy `ai-assistant`.** This applies the city aliases and the clearer prompt examples. It does not switch the assistant on or off.
+3. **Deploy `ai-assistant` and `ai-parse-search`.** This applies the city aliases and the clearer prompt examples (no "Plazh"). It does not switch either one on or off.
 
 Undo: `supabase/pending/locations_rollback.sql`.
 
