@@ -2898,5 +2898,536 @@
    "county": "Qarku i Vlorës",
    "display": "Partizani, Rruga Ali Demi, Vlorë, Bashkia Vlorë, Qarku i Vlorës, 9401, Shqipëria"
   }
+ ],
+ "5 Maji, Elbasan": [
+  {
+   "name": "Rruga 5 Maji",
+   "type": "residential",
+   "category": "highway",
+   "lat": 41.0290194,
+   "lon": 19.9952998,
+   "municipality": "Bashkia Cërrik",
+   "county": "Qarku i Elbasanit",
+   "display": "Rruga 5 Maji, Malasej, Gostimë, Bashkia Cërrik, Qarku i Elbasanit, 3018, Shqipëria"
+  },
+  {
+   "name": "Rruga 1 Maji",
+   "type": "residential",
+   "category": "highway",
+   "lat": 41.1086381,
+   "lon": 20.0791352,
+   "municipality": "Bashkia Elbasan",
+   "county": "Qarku i Elbasanit",
+   "display": "Rruga 1 Maji, Vreshtas, Elbasan, Bashkia Elbasan, Qarku i Elbasanit, 3006, Shqipëria"
+  },
+  {
+   "name": "Rruga 14 Maji",
+   "type": "residential",
+   "category": "highway",
+   "lat": 41.0266995,
+   "lon": 19.990165,
+   "municipality": "Bashkia Cërrik",
+   "county": "Qarku i Elbasanit",
+   "display": "Rruga 14 Maji, Cërrik, Bashkia Cërrik, Qarku i Elbasanit, 3007, Shqipëria"
+  }
+ ],
+ "11 Nëntori, Elbasan": [
+  {
+   "name": "Rruga 11 Nëntori",
+   "type": "primary",
+   "category": "highway",
+   "lat": 41.1069992,
+   "lon": 20.0664705,
+   "municipality": "Bashkia Elbasan",
+   "county": "Qarku i Elbasanit",
+   "display": "Rruga 11 Nëntori, Kusarth, Elbasan, Bashkia Elbasan, Qarku i Elbasanit, 3006, Shqipëria"
+  },
+  {
+   "name": "Rruga 25 Nëntori",
+   "type": "tertiary",
+   "category": "highway",
+   "lat": 41.1080614,
+   "lon": 20.0768985,
+   "municipality": "Bashkia Elbasan",
+   "county": "Qarku i Elbasanit",
+   "display": "Rruga 25 Nëntori, Vreshtas, Elbasan, Bashkia Elbasan, Qarku i Elbasanit, 3006, Shqipëria"
+  },
+  {
+   "name": "Rruga 28 Nëntori",
+   "type": "secondary",
+   "category": "highway",
+   "lat": 41.1191201,
+   "lon": 20.0824819,
+   "municipality": "Bashkia Elbasan",
+   "county": "Qarku i Elbasanit",
+   "display": "Rruga 28 Nëntori, Elbasan, Bashkia Elbasan, Qarku i Elbasanit, 3001, Shqipëria"
+  },
+  {
+   "name": "Rruga 28 Nëntori",
+   "type": "residential",
+   "category": "highway",
+   "lat": 41.1113893,
+   "lon": 20.0866498,
+   "municipality": "Bashkia Elbasan",
+   "county": "Qarku i Elbasanit",
+   "display": "Rruga 28 Nëntori, Elbasan, Bashkia Elbasan, Qarku i Elbasanit, 3001, Shqipëria"
+  },
+  {
+   "name": "Rruga 8 Nëntori",
+   "type": "residential",
+   "category": "highway",
+   "lat": 41.1206098,
+   "lon": 20.077875,
+   "municipality": "Bashkia Elbasan",
+   "county": "Qarku i Elbasanit",
+   "display": "Rruga 8 Nëntori, Kusarth, Elbasan, Bashkia Elbasan, Qarku i Elbasanit, 3001, Shqipëria"
+  },
+  {
+   "name": "Rruga 28 Nëntori",
+   "type": "residential",
+   "category": "highway",
+   "lat": 41.1094189,
+   "lon": 20.08824,
+   "municipality": "Bashkia Elbasan",
+   "county": "Qarku i Elbasanit",
+   "display": "Rruga 28 Nëntori, Vreshtas, Elbasan, Bashkia Elbasan, Qarku i Elbasanit, 3005, Shqipëria"
+  },
+  {
+   "name": "Rruga 25 Nëntori",
+   "type": "residential",
+   "category": "highway",
+   "lat": 41.1091918,
+   "lon": 20.0780531,
+   "municipality": "Bashkia Elbasan",
+   "county": "Qarku i Elbasanit",
+   "display": "Rruga 25 Nëntori, Elbasan, Bashkia Elbasan, Qarku i Elbasanit, 3006, Shqipëria"
+  },
+  {
+   "name": "10 Nëntori",
+   "type": "residential",
+   "category": "highway",
+   "lat": 41.1802419,
+   "lon": 20.3201857,
+   "municipality": "Bashkia Librazhd",
+   "county": "Qarku i Elbasanit",
+   "display": "10 Nëntori, Librazhd, Bashkia Librazhd, Qarku i Elbasanit, 3401, Shqipëria"
+  }
+ ],
+ "Kala, Elbasan": [
+  {
+   "name": "Maja Kala",
+   "type": "peak",
+   "category": "natural",
+   "lat": 40.947767,
+   "lon": 20.0324745,
+   "municipality": "Bashkia Cërrik",
+   "county": "Qarku i Elbasanit",
+   "display": "Maja Kala, Klos, Bashkia Cërrik, Qarku i Elbasanit, 3020, Shqipëria"
+  },
+  {
+   "name": "Taverna Kala",
+   "type": "amenity",
+   "category": "amenity",
+   "lat": 41.113174,
+   "lon": 20.0818055,
+   "municipality": "Bashkia Elbasan",
+   "county": "Qarku i Elbasanit",
+   "display": "Taverna Kala, Rruga Avni Rustemi, Scampa, Elbasan, Bashkia Elbasan, Qarku i Elbasanit, 3001, Shqipëria"
+  }
+ ],
+ "Zaranikë, Elbasan": [],
+ "Zaranikë": [],
+ "Bradashesh, Elbasan": [
+  {
+   "name": "Bradashesh",
+   "type": "village",
+   "category": "boundary",
+   "lat": 41.1038965,
+   "lon": 20.0214812,
+   "municipality": "Bashkia Elbasan",
+   "county": "Qarku i Elbasanit",
+   "display": "Bradashesh, Bashkia Elbasan, Qarku i Elbasanit, 3009, Shqipëria"
+  }
+ ],
+ "Shirgjan, Elbasan": [
+  {
+   "name": "Shirgjan",
+   "type": "city",
+   "category": "boundary",
+   "lat": 41.06615,
+   "lon": 20.0495369,
+   "municipality": "Bashkia Elbasan",
+   "county": "Qarku i Elbasanit",
+   "display": "Shirgjan, Bashkia Elbasan, Qarku i Elbasanit, 3011, Shqipëria"
+  },
+  {
+   "name": "Shirgjan",
+   "type": "village",
+   "category": "place",
+   "lat": 41.0526616,
+   "lon": 20.0524727,
+   "municipality": "Bashkia Elbasan",
+   "county": "Qarku i Elbasanit",
+   "display": "Shirgjan, Bashkia Elbasan, Qarku i Elbasanit, 3011, Shqipëria"
+  }
+ ],
+ "Labinot-Fushë, Elbasan": [
+  {
+   "name": "Labinot Fushë",
+   "type": "village",
+   "category": "boundary",
+   "lat": 41.1479733,
+   "lon": 20.1618355,
+   "municipality": "Bashkia Elbasan",
+   "county": "Qarku i Elbasanit",
+   "display": "Labinot Fushë, Bashkia Elbasan, Qarku i Elbasanit, 3010, Shqipëria"
+  }
+ ],
+ "Labinot-Mal, Elbasan": [
+  {
+   "name": "Labinot Mal",
+   "type": "village",
+   "category": "boundary",
+   "lat": 41.1998032,
+   "lon": 20.1511858,
+   "municipality": "Bashkia Elbasan",
+   "county": "Qarku i Elbasanit",
+   "display": "Labinot Mal, Bashkia Elbasan, Qarku i Elbasanit, 3024, Shqipëria"
+  }
+ ],
+ "Paper, Elbasan": [
+  {
+   "name": "Papër",
+   "type": "city",
+   "category": "boundary",
+   "lat": 41.085829,
+   "lon": 19.9560756,
+   "municipality": "Bashkia Elbasan",
+   "county": "Qarku i Elbasanit",
+   "display": "Papër, Bashkia Elbasan, Qarku i Elbasanit, 3016, Shqipëria"
+  },
+  {
+   "name": "Papër",
+   "type": "village",
+   "category": "place",
+   "lat": 41.053038,
+   "lon": 19.9565889,
+   "municipality": "Bashkia Elbasan",
+   "county": "Qarku i Elbasanit",
+   "display": "Papër, Bashkia Elbasan, Qarku i Elbasanit, 3016, Shqipëria"
+  }
+ ],
+ "Gracën, Elbasan": [
+  {
+   "name": "Gracen",
+   "type": "city",
+   "category": "boundary",
+   "lat": 41.1580978,
+   "lon": 19.9247041,
+   "municipality": "Bashkia Elbasan",
+   "county": "Qarku i Elbasanit",
+   "display": "Gracen, Bashkia Elbasan, Qarku i Elbasanit, 3012, Shqipëria"
+  },
+  {
+   "name": "Gracen",
+   "type": "village",
+   "category": "place",
+   "lat": 41.1526634,
+   "lon": 19.9667291,
+   "municipality": "Bashkia Elbasan",
+   "county": "Qarku i Elbasanit",
+   "display": "Gracen, Bashkia Elbasan, Qarku i Elbasanit, 3012, Shqipëria"
+  }
+ ],
+ "Tregan, Elbasan": [
+  {
+   "name": "Tregan",
+   "type": "city",
+   "category": "boundary",
+   "lat": 41.0104576,
+   "lon": 20.0980564,
+   "municipality": "Bashkia Elbasan",
+   "county": "Qarku i Elbasanit",
+   "display": "Tregan, Bashkia Elbasan, Qarku i Elbasanit, 3026, Shqipëria"
+  },
+  {
+   "name": "Tregan",
+   "type": "village",
+   "category": "place",
+   "lat": 41.0240788,
+   "lon": 20.0807914,
+   "municipality": "Bashkia Elbasan",
+   "county": "Qarku i Elbasanit",
+   "display": "Tregan, Bashkia Elbasan, Qarku i Elbasanit, 3026, Shqipëria"
+  }
+ ],
+ "Shushicë, Elbasan": [
+  {
+   "name": "Shushicë",
+   "type": "village",
+   "category": "boundary",
+   "lat": 41.1008191,
+   "lon": 20.1388668,
+   "municipality": "Bashkia Elbasan",
+   "county": "Qarku i Elbasanit",
+   "display": "Shushicë, Bashkia Elbasan, Qarku i Elbasanit, 3025, Shqipëria"
+  },
+  {
+   "name": "Shushicë Vogël",
+   "type": "village",
+   "category": "place",
+   "lat": 40.9630356,
+   "lon": 20.089039,
+   "municipality": "Bashkia Cërrik",
+   "county": "Qarku i Elbasanit",
+   "display": "Shushicë Vogël, Gostimë, Bashkia Cërrik, Qarku i Elbasanit, 3018, Shqipëria"
+  }
+ ],
+ "Fier, Shqipëri": [],
+ "Fier": [
+  {
+   "name": "Fier",
+   "type": "city",
+   "category": "boundary",
+   "lat": 40.7251118,
+   "lon": 19.5582079,
+   "municipality": "Bashkia Fier",
+   "county": "Qarku i Fierit",
+   "display": "Fier, Bashkia Fier, Qarku i Fierit, Shqipëria"
+  },
+  {
+   "name": "Qarku i Fierit",
+   "type": "county",
+   "category": "boundary",
+   "lat": 40.7419751,
+   "lon": 19.5701208,
+   "municipality": null,
+   "county": "Qarku i Fierit",
+   "display": "Qarku i Fierit, Shqipëria"
+  }
+ ],
+ "Qendër, Fier": [
+  {
+   "name": "Qendër",
+   "type": "city",
+   "category": "boundary",
+   "lat": 40.7430422,
+   "lon": 19.5557986,
+   "municipality": "Bashkia Fier",
+   "county": "Qarku i Fierit",
+   "display": "Qendër, Bashkia Fier, Qarku i Fierit, 9302, Shqipëria"
+  },
+  {
+   "name": "Qendër",
+   "type": "residential",
+   "category": "landuse",
+   "lat": 40.4453063,
+   "lon": 19.8007105,
+   "municipality": "Bashkia Mallakastër",
+   "county": "Qarku i Fierit",
+   "display": "Qendër, Çorrush, Kutë, Bashkia Mallakastër, Qarku i Fierit, 9329, Shqipëria"
+  }
+ ],
+ "Apolloni, Fier": [],
+ "Apolloni": [],
+ "Liri, Fier": [
+  {
+   "name": "Liri",
+   "type": "neighbourhood",
+   "category": "place",
+   "lat": 40.7309988,
+   "lon": 19.5692253,
+   "municipality": "Bashkia Fier",
+   "county": "Qarku i Fierit",
+   "display": "Liri, Sheq i Vogël, Fier, Bashkia Fier, Qarku i Fierit, 9300, Shqipëria"
+  }
+ ],
+ "Sheq i Madh, Fier": [
+  {
+   "name": "Sheq i Madh",
+   "type": "village",
+   "category": "place",
+   "lat": 40.7346488,
+   "lon": 19.5788803,
+   "municipality": "Bashkia Fier",
+   "county": "Qarku i Fierit",
+   "display": "Sheq i Madh, Qendër, Bashkia Fier, Qarku i Fierit, 9300, Shqipëria"
+  }
+ ],
+ "Sheq i Vogël, Fier": [
+  {
+   "name": "Fier",
+   "type": "railway",
+   "category": "railway",
+   "lat": 40.7300053,
+   "lon": 19.5530284,
+   "municipality": "Bashkia Fier",
+   "county": "Qarku i Fierit",
+   "display": "Fier, Rruga Rauf Nallbani, 15 Tetori, Sheq i Vogël, Fier, Bashkia Fier, Qarku i Fierit, 9301, Shqipëria"
+  },
+  {
+   "name": "Sheq i Vogël",
+   "type": "village",
+   "category": "place",
+   "lat": 40.7247342,
+   "lon": 19.5697752,
+   "municipality": "Bashkia Fier",
+   "county": "Qarku i Fierit",
+   "display": "Sheq i Vogël, Fier, Bashkia Fier, Qarku i Fierit, 9300, Shqipëria"
+  }
+ ],
+ "Levan, Fier": [
+  {
+   "name": "Levan",
+   "type": "city",
+   "category": "boundary",
+   "lat": 40.6770854,
+   "lon": 19.4805949,
+   "municipality": "Bashkia Fier",
+   "county": "Qarku i Fierit",
+   "display": "Levan, Bashkia Fier, Qarku i Fierit, 9314, Shqipëria"
+  },
+  {
+   "name": "Levan",
+   "type": "village",
+   "category": "place",
+   "lat": 40.6758517,
+   "lon": 19.489382,
+   "municipality": "Bashkia Fier",
+   "county": "Qarku i Fierit",
+   "display": "Levan, Bashkia Fier, Qarku i Fierit, 9314, Shqipëria"
+  }
+ ],
+ "Cakran, Fier": [
+  {
+   "name": "Cakran",
+   "type": "city",
+   "category": "boundary",
+   "lat": 40.6021275,
+   "lon": 19.6119561,
+   "municipality": "Bashkia Fier",
+   "county": "Qarku i Fierit",
+   "display": "Cakran, Bashkia Fier, Qarku i Fierit, 9311, Shqipëria"
+  },
+  {
+   "name": "Cakran",
+   "type": "village",
+   "category": "place",
+   "lat": 40.6000415,
+   "lon": 19.619923,
+   "municipality": "Bashkia Fier",
+   "county": "Qarku i Fierit",
+   "display": "Cakran, Bashkia Fier, Qarku i Fierit, 9311, Shqipëria"
+  }
+ ],
+ "Dërmenas, Fier": [
+  {
+   "name": "Dërmenas",
+   "type": "city",
+   "category": "boundary",
+   "lat": 40.7167256,
+   "lon": 19.4305755,
+   "municipality": "Bashkia Fier",
+   "county": "Qarku i Fierit",
+   "display": "Dërmenas, Bashkia Fier, Qarku i Fierit, Shqipëria"
+  },
+  {
+   "name": "Dërmenas",
+   "type": "village",
+   "category": "place",
+   "lat": 40.7454366,
+   "lon": 19.4942104,
+   "municipality": "Bashkia Fier",
+   "county": "Qarku i Fierit",
+   "display": "Dërmenas, Bashkia Fier, Qarku i Fierit, 9302, Shqipëria"
+  }
+ ],
+ "Topojë, Fier": [
+  {
+   "name": "Topojë",
+   "type": "city",
+   "category": "boundary",
+   "lat": 40.8036844,
+   "lon": 19.4271652,
+   "municipality": "Bashkia Fier",
+   "county": "Qarku i Fierit",
+   "display": "Topojë, Bashkia Fier, Qarku i Fierit, Shqipëria"
+  },
+  {
+   "name": "Topojë",
+   "type": "village",
+   "category": "place",
+   "lat": 40.7641702,
+   "lon": 19.4346292,
+   "municipality": "Bashkia Fier",
+   "county": "Qarku i Fierit",
+   "display": "Topojë, Bashkia Fier, Qarku i Fierit, Shqipëria"
+  }
+ ],
+ "Mbrostar, Fier": [
+  {
+   "name": "Mbrostar",
+   "type": "village",
+   "category": "place",
+   "lat": 40.7529385,
+   "lon": 19.5842305,
+   "municipality": "Bashkia Fier",
+   "county": "Qarku i Fierit",
+   "display": "Mbrostar, Mbrostar Ura, Bashkia Fier, Qarku i Fierit, 9304, Shqipëria"
+  },
+  {
+   "name": "Mbrostar",
+   "type": "neighbourhood",
+   "category": "place",
+   "lat": 40.7378927,
+   "lon": 19.5560932,
+   "municipality": "Bashkia Fier",
+   "county": "Qarku i Fierit",
+   "display": "Mbrostar, Sheq i Vogël, Fier, Bashkia Fier, Qarku i Fierit, 9304, Shqipëria"
+  },
+  {
+   "name": "Mbrostar Ura",
+   "type": "city",
+   "category": "boundary",
+   "lat": 40.7788403,
+   "lon": 19.6180256,
+   "municipality": "Bashkia Fier",
+   "county": "Qarku i Fierit",
+   "display": "Mbrostar Ura, Bashkia Fier, Qarku i Fierit, Shqipëria"
+  }
+ ],
+ "Portëz, Fier": [
+  {
+   "name": "Portëz",
+   "type": "city",
+   "category": "boundary",
+   "lat": 40.6737798,
+   "lon": 19.5840247,
+   "municipality": "Bashkia Fier",
+   "county": "Qarku i Fierit",
+   "display": "Portëz, Bashkia Fier, Qarku i Fierit, 9318, Shqipëria"
+  },
+  {
+   "name": "Portëz",
+   "type": "village",
+   "category": "place",
+   "lat": 40.6996714,
+   "lon": 19.5780721,
+   "municipality": "Bashkia Fier",
+   "county": "Qarku i Fierit",
+   "display": "Portëz, Bashkia Fier, Qarku i Fierit, 9318, Shqipëria"
+  }
+ ],
+ "Frakull, Fier": [
+  {
+   "name": "Frakull",
+   "type": "city",
+   "category": "boundary",
+   "lat": 40.6222298,
+   "lon": 19.5216144,
+   "municipality": "Bashkia Fier",
+   "county": "Qarku i Fierit",
+   "display": "Frakull, Bashkia Fier, Qarku i Fierit, 9313, Shqipëria"
+  }
  ]
 }
