@@ -1,6 +1,5 @@
 -- Tell a buyer when a listing matching their "wanted home" is published
--- (AUDIT-025). Not applied live without the owner's OK; the version is
--- renamed to the live one when it is (AUDIT-012 rule).
+-- (AUDIT-025). Applied live on the owner's OK, 2026-11-14 (version 20261114224508).
 --
 -- Before: wanted_homes were only shown on agents' dashboards (newest 10, any
 -- city). Nothing reached the buyer who posted the request.

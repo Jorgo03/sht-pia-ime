@@ -3,7 +3,8 @@
 -- fixture and notification is rolled back. Expected: passed=9/9.
 -- Live 2026-11-14: 5/9 without the migration (M1, M5, M7, M9: nothing is
 -- ever notified); 9/9 with the migration run inside the same rolled-back
--- block. Cities are canonical names (public.locations guard), e.g. Tiranë.
+-- block; 9/9 live after the migration was applied (2026-11-14). Cities are
+-- canonical names (public.locations guard), e.g. Tiranë.
 do $$
 declare
   agent uuid; buyer uuid; buyer2 uuid;

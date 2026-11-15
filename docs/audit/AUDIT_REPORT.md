@@ -1,4 +1,4 @@
- Trigger `notify_wanted_matches` queues a `wanted_match` notification; feed, push text and 8 languages | ✅ in code; migration `20261114120000` verified 9/9 (5/9 before) but **not applied** (needs OK); push-dispatch not redeployed | `a398636` |
+# Shtëpia.ime full audit: report
 
 Covers 2026-11-13 and 2026-11-14, branch `audit/full-sweep`.
 
@@ -41,7 +41,7 @@ The app was in good shape before the audit, with no Critical issues. The audit f
 |---|---|---|---|---|
 | 🔴 Critical | 0 | 0 | 0 | 0 |
 | 🟠 High | 2 | 1 | 1 | 0 |
-| 🟡 Medium | 8 | 8 (008 and 025 need the domain or an OK to take effect) | 0 | 0 |
+| 🟡 Medium | 8 | 8 (008 takes effect with the domain) | 0 | 0 |
 | ⚪ Low | 21 | 11 | 7 | 3 |
 | **Total** | **31** | **20** | **8** | **3** |
 
@@ -60,7 +60,7 @@ Status: ✅ fixed · ✅🔴 fixed and **live** in production (DB or Edge Functi
 | AUDIT-007 | 🟡 | Privacy | all | Account deletion left chat files in storage | `delete-account/index.ts:57` (before) | Empties each of the account's conversation folders first | ✅🔴 deployed v2 | `ef96e81` |
 | AUDIT-008 | 🟡 | Deep links | iOS, Android | No universal links or app links | `app.json` | iOS associated domains and Android verified links from `APP_LINK_DOMAIN`; `scripts/write-app-links.cjs` writes the `.well-known` files; Vercel serves them as JSON | ✅ in code (switches on with the domain, Team ID and signing fingerprint) | `59ad8bc` |
 | AUDIT-024 | 🟡 | Chat | all | An open thread and the unread badge missed messages sent during a dropped connection or while the app was in the background | `app/messages/[id].tsx:200-214` (before) | `createCatchUp`: re-read on resubscribe and on returning to the foreground; merge by id | ✅ | `5752d09` |
-| AUDIT-025 | 🟡 | Wanted homes | backend | No notification when a listing matches a wanted home; agents see only the newest 10, from any city | only `buyer_has_open_wanted_home` mentions the table; `agent-dashboard/index.tsx:124` | Trigger `notify_wanted_matches` queues a `wanted_match` notification (in-app and push); feed, push text, 8 languages | ✅ in code; migration `20261114120000` verified 9/9 (5/9 before), **not applied** (needs OK); push-dispatch not redeployed | `a398636` |
+| AUDIT-025 | 🟡 | Wanted homes | backend | No notification when a listing matches a wanted home; agents see only the newest 10, from any city | only `buyer_has_open_wanted_home` mentions the table; `agent-dashboard/index.tsx:124` | Trigger `notify_wanted_matches` queues a `wanted_match` notification (in-app and push); feed, push text, 8 languages | ✅🔴 **live** (migration `20261114224508`, applied on the owner's OK); `rls_wanted_match.sql` 9/9 live (5/9 before); push-dispatch v5 deployed | `a398636` |
 | AUDIT-009 | ⚪ | Offline | iOS, Android | No offline detection or banner | `lib/query-client.ts` | NetInfo 12.0.1 drives React Query on phones; the website keeps the browser listener; offline banner in 8 languages | ✅ (e2e X106) | `2b6c503` |
 | AUDIT-010 | ⚪ | Dependencies | dev | npm audit: 1 high, 9 moderate | `npm audit` | `npm audit fix` without major upgrades; 8 dev/build-only moderates remain | ✅ | `5efa93f` |
 | AUDIT-011 | ⚪ | Dependencies | iOS, Android | Expo patch versions behind | `expo-doctor` 19/20 | Patch versions installed; 20/20 | ✅ | `2d603df` |
@@ -90,11 +90,11 @@ Correction on record: `dd93746` first described AUDIT-028 as a double save. That
 | Status | Findings |
 |---|---|
 | **Already fixed** (13–14 Nov, verified) | 001, 003, 004, 005, 006, 007, 010, 011, 012, 014, 015, 017, 024, 026, 027, 028, 031 |
-| **Fixed in this pass** | 009 (offline, live in the next app build); 008 (ready, switches on with the domain); 025 (code ready; the migration needs your OK to apply) |
+| **Fixed in this pass** | 009 (offline, in the next app build); 008 (ready, switches on with the domain); 025 (live: migration applied and push-dispatch deployed on 14 Nov) |
 | **Blocked** (owner, account or decision) | 002 Confirm email (after SMTP); 013 delete `.env.local.backup`, rotate the Clerk secret; 016 upload size by type (needs a live upload test, or a video bucket you choose); 019 delete the retired function; 022 leaked-password protection (Pro); 023 test or switch off LinkedIn; 029 AI model choice; 030 Sentry or in-house crash reports |
 | **Deferred** (reasons below) | 018, 020, 021, and the generated-types part of 026 |
 
-Counted as fixed in code: **20 of 31**. Live in production: 003, 004, 007, 017.
+Counted as fixed in code: **20 of 31**. Live in production: 003, 004, 007, 017, 025.
 
 ## Deferred, with reasons
 
@@ -122,7 +122,7 @@ Counted as fixed in code: **20 of 31**. Live in production: 003, 004, 007, 017.
 | Unit (`npm test`) | 531 | **604** | Apple gate, viewing errors, Tirana time, listing result, attachment purge, migration versions, `.env.example`, list paging, realtime catch-up, web icons, iOS permission texts, offline state, wanted matches, app links (plus tests from other sessions merged on master) |
 | Website e2e | 269 passed | **271 passed, 9 skipped** | F-N28 (favourites order); F4-N12 now tests LinkedIn |
 | Expo-app e2e | 314 passed | **334 passed, 46 skipped** | X103 (failed load), X104 (Tirana time in London), X105 (favourites order), X106 (offline banner); X42 updated; start-screen spec from master |
-| Live SQL checks | existing files | **+4 files** | `rls_full_matrix.sql` 51/51, `rls_viewing_schedule.sql` 12/12, `rls_anon_grants.sql` 8/8, `rls_wanted_match.sql` 9/9 (with the unapplied migration, in a rolled-back block) |
+| Live SQL checks | existing files | **+4 files** | `rls_full_matrix.sql` 51/51, `rls_viewing_schedule.sql` 12/12, `rls_anon_grants.sql` 8/8, `rls_wanted_match.sql` 9/9 live |
 | `expo-doctor` | 19/20 | **20/20** | |
 | Lint | 0 errors, 34 warnings | 0 errors, 34 warnings | |
 | `tsc` | clean | clean | |
