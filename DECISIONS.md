@@ -32,6 +32,19 @@ first (it was rejected with 401 on 2026-11-04).
 
 ## ═══ WEBSITE FROM THE APP — 2026-11-16 ═══
 
+### W7. Website parity pass (JUDGMENT CALLS, 2026-11-16, owner may reverse)
+
+From the owner's parity brief (docs/APP_WEBSITE_PARITY_REPORT.md):
+- City lists show Tirana, then Durrës, then the rest alphabetically
+  (`orderCities`); the generated dataset itself is unchanged.
+- Agent-only screens (dashboard, leads, report) show a client an
+  "agents only" notice; the database already gave clients nothing.
+- Plazh and Currila are not in the location dataset. Not added: that changes
+  the source data and the live `locations` table, which needs the owner's yes.
+- The page keeps scrolling inside its container (React Native for web); the
+  wheel now also works over the margins. A true document scroll would mean
+  restructuring every screen.
+
 ### W6. The production website is the Expo web build (DECIDED by owner, 2026-11-16)
 
 The owner: "change it with the link of web on vercel, because that is a
