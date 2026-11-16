@@ -11,10 +11,9 @@ import { isOnline } from '@/src/lib/networkState';
  * lib/query-client.ts). Imported once, for its side effect, from
  * app/_layout.tsx.
  *
- * The website keeps React Query's own listener: it follows the browser's
- * online and offline events, needs no extra request (NetInfo's web version
- * would fetch a Google URL to test reachability), and does nothing during the
- * pre-render, which has no window.
+ * The website follows the browser's online and offline events (below): no
+ * extra request (NetInfo's web version would fetch a Google URL to test
+ * reachability), and nothing during the pre-render, which has no window.
  */
 if (Platform.OS !== 'web') {
   onlineManager.setEventListener((setOnline) =>
@@ -22,4 +21,19 @@ if (Platform.OS !== 'web') {
       setOnline(isOnline(state));
     }),
   );
+} else if (typeof window !== 'undefined') {
+  // The website: the browser's online/offline events, as React Query's own
+  // listener does, plus the browser's current state when listening starts.
+  // Without it, a connection lost before the page finished starting went
+  // unnoticed until the next change, and the offline bar never showed.
+  onlineManager.setEventListener((setOnline) => {
+    const update = () => setOnline(navigator.onLine);
+    window.addEventListener('online', update);
+    window.addEventListener('offline', update);
+    update();
+    return () => {
+      window.removeEventListener('online', update);
+      window.removeEventListener('offline', update);
+    };
+  });
 }
