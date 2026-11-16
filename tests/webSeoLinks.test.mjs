@@ -50,3 +50,17 @@ test('listing pages swap the template links for their own', () => {
   assert.match(html, /hreflang="en" href="https:\/\/shtepia.example\/property\/1\?lang=en"/)
   assert.match(html, /hreflang="x-default" href="https:\/\/shtepia.example\/property\/1"/)
 })
+
+test('a pre-rendered page with no head tags gets title, description, canonical and language links', async () => {
+  const { STATIC_PAGES, staticPageHead } = await import('../scripts/expo-web/seo.mjs')
+  const sq = { seo: { siteTitle: 'Shtëpia.ime — Shtëpi', siteDescription: 'Përshkrim' }, search: { title: 'Kërko prona' } }
+  const page = STATIC_PAGES.find((p) => p.path === '/explore')
+  const html = applyHead('<html><head></head><body></body></html>', staticPageHead(page, sq, SITE))
+  assert.match(html, /<title>Kërko prona \| Shtëpia\.ime<\/title>/)
+  assert.match(html, /name="description" content="Përshkrim"/)
+  assert.match(html, /rel="canonical" href="https:\/\/shtepia.example\/explore"/)
+  assert.match(html, /hreflang="el"/)
+  const home = applyHead('<html><head></head></html>', staticPageHead(STATIC_PAGES[0], sq, SITE))
+  assert.match(home, /<title>Shtëpia\.ime — Shtëpi<\/title>/)
+  assert.match(home, /rel="canonical" href="https:\/\/shtepia.example"/)
+})

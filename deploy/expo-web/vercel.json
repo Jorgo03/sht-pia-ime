@@ -60,6 +60,10 @@
     {
       "source": "/listing/:id/analytics",
       "destination": "/listing/[id]/analytics"
+    },
+    {
+      "source": "/user/:id",
+      "destination": "/user/[id]"
     }
   ],
   "headers": [

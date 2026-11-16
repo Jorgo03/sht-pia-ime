@@ -40,7 +40,19 @@ export function applyHead(html, head) {
     // The template's own links point at "/property/[id]"; drop them.
     .replace(/<link data-rh="true" rel="(canonical|alternate)"[^>]*\/>/g, '')
     .replace(/<meta data-rh="true" property="og:url" content="[^"]*"\/>/g, '');
+  // The static render writes no head tags of its own today (expo-router/head
+  // only fills them in the browser), so add them when they are missing:
+  // search engines and link previews read this HTML, not the running app.
+  const missing = !/<title[\s>]/.test(out)
+    ? [
+        `<title>${escapeText(head.title)}</title>`,
+        `<meta name="description" content="${escapeAttr(head.description)}"/>`,
+        `<meta property="og:title" content="${escapeAttr(head.title)}"/>`,
+        `<meta property="og:description" content="${escapeAttr(head.description)}"/>`,
+      ]
+    : [];
   const extra = [
+    ...missing,
     `<link rel="canonical" href="${escapeAttr(head.url)}"/>`,
     `<meta property="og:url" content="${escapeAttr(head.url)}"/>`,
     head.image ? `<meta property="og:image" content="${escapeAttr(head.image)}"/>` : '',
@@ -52,6 +64,38 @@ export function applyHead(html, head) {
   ].join('');
   out = out.replace('</head>', `${extra}</head>`);
   return out;
+}
+
+/**
+ * The public pages' pre-rendered files and the Albanian locale key of each
+ * page's title (as components/web/page-head.tsx's ROUTE_TITLES); null is the
+ * site title (Home).
+ */
+export const STATIC_PAGES = [
+  { path: '/', file: 'index.html', key: null },
+  { path: '/explore', file: 'explore.html', key: 'search.title' },
+  { path: '/wanted', file: 'wanted.html', key: 'wanted.homeTitle' },
+  { path: '/guide', file: 'guide.html', key: 'legal.buyingGuide' },
+  { path: '/agents', file: 'agents/index.html', key: 'site.nav.agencies' },
+  { path: '/privacy', file: 'privacy.html', key: 'legal.privacyPolicy' },
+  { path: '/terms', file: 'terms.html', key: 'legal.termsOfService' },
+  { path: '/cookies', file: 'cookies.html', key: 'legal.cookiePolicy' },
+  { path: '/pricing', file: 'pricing.html', key: 'pricing.title' },
+];
+
+const lookup = (obj, key) => key.split('.').reduce((o, k) => (o == null ? o : o[k]), obj);
+
+/** Head values for a static public page, in Albanian. */
+export function staticPageHead(page, sq, site) {
+  const label = page.key ? lookup(sq, page.key) : null;
+  return {
+    title: label ? `${label} | ${SITE_NAME}` : lookup(sq, 'seo.siteTitle'),
+    description: lookup(sq, 'seo.siteDescription'),
+    url: `${site}${page.path === '/' ? '' : page.path}`,
+    site,
+    path: page.path,
+    image: null,
+  };
 }
 
 export function sitemapXml(site, listings) {

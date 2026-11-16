@@ -16,7 +16,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { ASSET_FROM, ASSET_TO, applyHead, isListingId, listingHead, relocateAssetRefs, robotsTxt, sitemapXml } from './expo-web/seo.mjs';
+import { ASSET_FROM, ASSET_TO, STATIC_PAGES, applyHead, isListingId, listingHead, relocateAssetRefs, robotsTxt, sitemapXml, staticPageHead } from './expo-web/seo.mjs';
 
 const dir = path.resolve(process.argv[2] || 'dist-expo');
 if (!fs.existsSync(path.join(dir, 'index.html'))) {
@@ -80,8 +80,21 @@ try {
   console.warn(`expo-web-postbuild: listing pages and sitemap listings skipped (${e.message})`);
 }
 
+const sq = JSON.parse(fs.readFileSync(new URL('../src/i18n/locales/sq.json', import.meta.url), 'utf8'));
 const template = fs.readFileSync(path.join(dir, 'property', '[id].html'), 'utf8');
-const siteDescription = (template.match(/<meta data-rh="true" name="description" content="([^"]*)"/) || [])[1] || '';
+const siteDescription = (template.match(/<meta data-rh="true" name="description" content="([^"]*)"/) || [])[1] || sq.seo.siteDescription;
+
+// Public pages: title, description, canonical and language links in the HTML.
+if (site.startsWith('https://')) {
+  let headed = 0;
+  for (const page of STATIC_PAGES) {
+    const file = path.join(dir, page.file);
+    if (!fs.existsSync(file)) continue;
+    fs.writeFileSync(file, applyHead(fs.readFileSync(file, 'utf8'), staticPageHead(page, sq, site)));
+    headed += 1;
+  }
+  console.log(`expo-web-postbuild: head tags written into ${headed} public pages`);
+}
 if (site.startsWith('https://')) {
   for (const row of listings) {
     const html = applyHead(template, listingHead(row, { site, siteDescription }));

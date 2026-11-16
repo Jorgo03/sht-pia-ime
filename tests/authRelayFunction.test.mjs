@@ -54,12 +54,14 @@ test('any other address never receives the code: back to the page without rt', (
   assert.equal(call('/auth/callback?rt=').location, '/auth/callback')
 })
 
-test('vercel.json sends only /auth/callback with rt to the function, before the page catch-all', () => {
+test('vercel.json sends only /auth/callback with rt to the function, before any page rewrite', () => {
   const { rewrites } = JSON.parse(fs.readFileSync(new URL('../vercel.json', import.meta.url), 'utf8'))
   assert.deepEqual(rewrites[0], {
     source: '/auth/callback',
     has: [{ type: 'query', key: 'rt' }],
     destination: '/api/auth-relay',
   })
-  assert.equal(rewrites.at(-1).source, '/(.*)')
+  // The website is pre-rendered page by page (DECISIONS.md W6): no catch-all
+  // to one index.html, so an unknown address gets the real 404 page.
+  assert.ok(!rewrites.some((r) => r.source === '/(.*)'))
 })

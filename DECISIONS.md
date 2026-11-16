@@ -32,6 +32,20 @@ first (it was rejected with 401 on 2026-11-04).
 
 ## ═══ WEBSITE FROM THE APP — 2026-11-16 ═══
 
+### W6. The production website is the Expo web build (DECIDED by owner, 2026-11-16)
+
+The owner: "change it with the link of web on vercel, because that is a
+mobile version, add this one instead of it". W1 stage 2 and W2's hold are
+lifted for the website: the production Vercel project
+(real-estate-app-hazel-seven.vercel.app) now builds the Expo web export from
+the root `vercel.json` instead of the Vite site, on the same address. No
+domain or dashboard change: the build reuses the project's VITE_SUPABASE_*
+variables when EXPO_PUBLIC_ ones are absent. `src/` is kept, unbuilt, for a
+rollback window: to roll back, promote the last Vite deployment in Vercel, or
+restore the previous root `vercel.json`. The build also writes title,
+description, canonical and language links into every public page's HTML
+(the static render no longer writes head tags by itself).
+
 ### W5. The website looks like a website, not like the app (DECIDED by owner, 2026-11-16)
 
 The owner pointed at equitifyasset.com: "i want it just like this one, don't
