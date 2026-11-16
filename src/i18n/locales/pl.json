@@ -292,7 +292,9 @@
     "reference": "Nr ref.",
     "publishedBy": "Opublikowane przez",
     "video": "Wideo",
-    "videoFailed": "Nie udało się odtworzyć wideo."
+    "videoFailed": "Nie udało się odtworzyć wideo.",
+    "priceHistory": "Historia cen",
+    "priceListed": "Pierwsza cena"
   },
   "messages": {
     "subtitle": "Rozmowy z agentami",
@@ -1229,5 +1231,11 @@
   },
   "locations": {
     "noMatch": "Brak pasującego miejsca"
+  },
+  "currency": {
+    "title": "Pokazuj ceny w",
+    "asListed": "Jak w ogłoszeniu",
+    "asListedShort": "Oryginał",
+    "converted": "Orientacyjnie, po dzisiejszym kursie. Cena w ogłoszeniu: {{price}}"
   }
 }

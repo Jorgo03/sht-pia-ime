@@ -13,9 +13,10 @@ import { useFavorites } from '@/contexts/favorites-context';
 import { useTheme } from '@/contexts/theme-context';
 import { useResponsive } from '@/hooks/use-responsive';
 import { Property } from '@/data/types';
-import { formatDate, formatPrice, getLocalizedText, listingBadgeKey, priceSuffixKey } from '@/lib/format';
+import { formatDate, getLocalizedText, listingBadgeKey, priceSuffixKey } from '@/lib/format';
 import { cardImageUrl } from '@/lib/image';
 import { CARD_CONTAINER_A11Y } from '@/components/property/card-a11y';
+import { useCurrency } from '@/contexts/currency-context';
 
 const COMPACT_GAP = 12;
 
@@ -66,7 +67,8 @@ function PropertyCardBase({ property, onPress, variant = 'grid', detailed = fals
   const { pressStyle, onPressIn, onPressOut } = usePressScale();
   const heartStyle = useHeartPop(favorited);
   const title = getLocalizedText(property.title_i18n, i18n.language) || property.title;
-  const price = formatPrice(property.price, i18n.language, property.currency);
+  const { formatListingPrice } = useCurrency();
+  const price = formatListingPrice(property.price, property.currency);
   const suffixKey = priceSuffixKey(property.listing_type);
   const suffix = suffixKey ? t(suffixKey) : '';
 

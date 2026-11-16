@@ -292,7 +292,9 @@
     "reference": "Ref.",
     "publishedBy": "Published by",
     "video": "Video",
-    "videoFailed": "The video couldn't be played."
+    "videoFailed": "The video couldn't be played.",
+    "priceHistory": "Price history",
+    "priceListed": "First price"
   },
   "favourites": {
     "title": "Favorites",
@@ -1209,5 +1211,11 @@
   },
   "locations": {
     "noMatch": "No place matches"
+  },
+  "currency": {
+    "title": "Show prices in",
+    "asListed": "As listed",
+    "asListedShort": "Original",
+    "converted": "Approximate, at today's rate. Listed price: {{price}}"
   }
 }

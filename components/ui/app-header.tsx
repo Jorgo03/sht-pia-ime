@@ -22,6 +22,8 @@ import { ThemeToggleButton } from '@/components/ui/theme-toggle-button';
 import { Fonts, Radii, Shadows, type AtticoPalette } from '@/constants/theme';
 import { IS_WEB, WEB_MAX_WIDTH } from '@/constants/web-frame';
 import { useAuth } from '@/contexts/auth-context';
+import { useCurrency } from '@/contexts/currency-context';
+import { DISPLAY_CURRENCIES } from '@/lib/currency';
 import { useTheme } from '@/contexts/theme-context';
 import { supabase } from '@/lib/supabase';
 
@@ -127,6 +129,7 @@ export function AppHeader({
     [colors, onDark, onBack, floating],
   );
   const [langOpen, setLangOpen] = useState(false);
+  const { currency, setCurrency } = useCurrency();
   const insets = useSafeAreaInsets();
   const { width: windowWidth, height: windowHeight } = useWindowDimensions();
   // The menu hangs under the bar: the top inset, the bar's 54 (10 + 34 + 10)
@@ -316,6 +319,26 @@ export function AppHeader({
                   </Pressable>
                 );
               })}
+              {/* Price currency (ALL / EUR / USD / GBP) for visitors from
+                  abroad; in the same menu as the language, since both are
+                  "show me this in my terms". */}
+              <Text style={styles.currencyLabel}>{t('currency.title')}</Text>
+              <View style={styles.currencyRow}>
+                {([null, ...DISPLAY_CURRENCIES] as const).map((c) => {
+                  const active = c === currency;
+                  return (
+                    <Pressable
+                      key={c ?? 'listed'}
+                      onPress={() => setCurrency(c)}
+                      accessibilityRole="button"
+                      accessibilityState={{ selected: active }}
+                      accessibilityLabel={c ?? t('currency.asListed')}
+                      style={[styles.currencyChip, active && { backgroundColor: colors.accent, borderColor: colors.accent }]}>
+                      <Text style={[styles.currencyChipText, active && styles.langRowActive]}>{c ?? t('currency.asListedShort')}</Text>
+                    </Pressable>
+                  );
+                })}
+              </View>
             </ScrollView>
           </Pressable>
         </Pressable>
@@ -515,6 +538,40 @@ const createStyles = (
     },
     langRowActive: {
       color: '#fff',
+    },
+    currencyLabel: {
+      fontFamily: Fonts.sansSemiBold,
+      fontSize: 12,
+      color: colors.textSecondary,
+      paddingHorizontal: 14,
+      paddingTop: 10,
+      paddingBottom: 4,
+      borderTopWidth: StyleSheet.hairlineWidth,
+      borderTopColor: colors.border,
+      marginTop: 4,
+    },
+    currencyRow: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: 6,
+      paddingHorizontal: 10,
+      paddingBottom: 8,
+      maxWidth: 220,
+    },
+    currencyChip: {
+      minHeight: 36,
+      minWidth: 44,
+      paddingHorizontal: 10,
+      alignItems: 'center',
+      justifyContent: 'center',
+      borderRadius: 10,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    currencyChipText: {
+      fontFamily: Fonts.sansMedium,
+      fontSize: 13,
+      color: colors.textPrimary,
     },
   });
 };

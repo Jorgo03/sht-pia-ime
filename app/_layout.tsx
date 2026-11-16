@@ -32,6 +32,7 @@ import { applyPreferredLanguage } from '@/i18n';
 
 import { AuthProvider, useAuth } from '@/contexts/auth-context';
 import { CompareProvider } from '@/contexts/compare-context';
+import { CurrencyProvider } from '@/contexts/currency-context';
 import { FavoritesProvider } from '@/contexts/favorites-context';
 import { FiltersProvider } from '@/contexts/filters-context';
 import { ThemeProvider, useTheme } from '@/contexts/theme-context';
@@ -269,6 +270,7 @@ function AppGate({ fontsReady }: { fontsReady: boolean }) {
         <CompareProvider>
         {/* Above the navigator so the list and map tabs share one filter state. */}
         <FiltersProvider>
+          <CurrencyProvider>
           <ThemeProvider>
             <NotificationsProvider>
               <ThemedNavigation />
@@ -278,6 +280,7 @@ function AppGate({ fontsReady }: { fontsReady: boolean }) {
               <SignedOutStart />
             </NotificationsProvider>
           </ThemeProvider>
+          </CurrencyProvider>
         </FiltersProvider>
         </CompareProvider>
       </FavoritesProvider>

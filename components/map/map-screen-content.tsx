@@ -20,8 +20,9 @@ import { Property } from '@/data/types';
 import { useMapPropertiesQuery } from '@/hooks/use-property-queries';
 import { Cluster, clusterProperties, MARKER_COLORS } from '@/lib/cluster';
 import { boundsToRegion, geometryBounds, pointInGeometry, type GeoJSONGeometry } from '@/lib/geo';
-import { formatPrice, getLocalizedText, priceSuffixKey } from '@/lib/format';
+import { getLocalizedText, priceSuffixKey } from '@/lib/format';
 import albaniaCountiesRaw from '@/data/albania-counties.json';
+import { useCurrency } from '@/contexts/currency-context';
 
 /** How long to wait for a fresh position before using the last known one. */
 const LOCATE_TIMEOUT_MS = 12_000;
@@ -78,6 +79,7 @@ function groupByCounty(properties: Property[]): CountyGroup[] {
 export function MapScreenContent() {
   const router = useRouter();
   const { t, i18n } = useTranslation();
+  const { formatListingPrice } = useCurrency();
   const { queryFilters, activeCount } = useFilters();
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
@@ -348,7 +350,7 @@ export function MapScreenContent() {
                 {getLocalizedText(previewProperty.title_i18n, i18n.language) || previewProperty.title}
               </Text>
               <Text style={styles.previewPrice}>
-                {formatPrice(previewProperty.price, i18n.language, previewProperty.currency)}
+                {formatListingPrice(previewProperty.price, previewProperty.currency)}
                 {(() => {
                   const key = priceSuffixKey(previewProperty.listing_type);
                   return key ? t(key) : '';

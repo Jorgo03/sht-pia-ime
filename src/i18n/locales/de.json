@@ -278,7 +278,9 @@
     "reference": "Ref.",
     "publishedBy": "Veröffentlicht von",
     "video": "Video",
-    "videoFailed": "Das Video konnte nicht abgespielt werden."
+    "videoFailed": "Das Video konnte nicht abgespielt werden.",
+    "priceHistory": "Preisverlauf",
+    "priceListed": "Erster Preis"
   },
   "messages": {
     "subtitle": "Gespräche mit Maklern",
@@ -1209,5 +1211,11 @@
   },
   "locations": {
     "noMatch": "Kein Ort gefunden"
+  },
+  "currency": {
+    "title": "Preise anzeigen in",
+    "asListed": "Wie inseriert",
+    "asListedShort": "Original",
+    "converted": "Ungefähr, zum Tageskurs. Inserierter Preis: {{price}}"
   }
 }

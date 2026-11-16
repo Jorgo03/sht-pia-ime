@@ -12,13 +12,14 @@ import { useFavorites } from '@/contexts/favorites-context';
 import { useTheme } from '@/contexts/theme-context';
 import { Property } from '@/data/types';
 import {
-  formatPrice,
+  
   getLocalizedText,
   listingBadgeKey,
   priceSuffixKey,
 } from '@/lib/format';
 import { CARD_CONTAINER_A11Y } from '@/components/property/card-a11y';
 import { cardImageUrl } from '@/lib/image';
+import { useCurrency } from '@/contexts/currency-context';
 
 const IMAGE_SIZE = 108;
 
@@ -54,12 +55,13 @@ function PropertyRowBase({ property }: { property: Property }) {
 
   const title = getLocalizedText(property.title_i18n, i18n.language) || property.title;
   const suffixKey = priceSuffixKey(property.listing_type);
-  const price = formatPrice(property.price, i18n.language, property.currency);
+  const { formatListingPrice } = useCurrency();
+  const price = formatListingPrice(property.price, property.currency);
   const isSale = property.listing_type === 'sale';
   const area = Number(property.sqft) > 0 ? Number(property.sqft) : null;
   const perSqm =
     isSale && area && Number(property.price) > 0
-      ? formatPrice(Number(property.price) / area, i18n.language, property.currency)
+      ? formatListingPrice(Number(property.price) / area, property.currency).replace(/^≈ /, '')
       : null;
   const beds = Number(property.beds) > 0 ? Number(property.beds) : null;
   const baths = trimNumber(property.baths);

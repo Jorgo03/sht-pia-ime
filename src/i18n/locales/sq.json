@@ -278,7 +278,9 @@
     "reference": "Ref.",
     "publishedBy": "Publikuar nga",
     "video": "Video",
-    "videoFailed": "Videoja nuk u luajt dot."
+    "videoFailed": "Videoja nuk u luajt dot.",
+    "priceHistory": "Historiku i çmimit",
+    "priceListed": "Çmimi i parë"
   },
   "messages": {
     "subtitle": "Bisedat me agjentët",
@@ -1209,5 +1211,11 @@
   },
   "locations": {
     "noMatch": "Asnjë vend nuk përputhet"
+  },
+  "currency": {
+    "title": "Monedha e çmimeve",
+    "asListed": "Si në njoftim",
+    "asListedShort": "Origjinale",
+    "converted": "Çmim i përafërt me kursin ditor. Çmimi i njoftimit: {{price}}"
   }
 }

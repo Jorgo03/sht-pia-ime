@@ -54,6 +54,7 @@ import { formatPrice, listingBadgeKey, priceSuffixKey, telUrl, whatsappUrl } fro
 import { sheetColumn } from '@/constants/web-frame';
 import { useAppDimensions } from '@/hooks/use-app-dimensions';
 import { PageHead } from '@/components/web/page-head';
+import { PriceHistory } from '@/components/property/price-history';
 import { CARD_CONTAINER_A11Y } from '@/components/property/card-a11y';
 import { ViewingTimePicker } from '@/components/viewings/viewing-time-picker';
 import { FORM_LIMITS } from '@/src/lib/formLimits';
@@ -61,6 +62,7 @@ import { confirmAction } from '@/lib/confirm';
 import { viewingRequestErrorKey } from '@/src/features/viewings/lib/viewingErrors';
 import { LoadError } from '@/components/ui/load-error';
 import { deviceUsesTiranaTime } from '@/src/lib/tiranaTime';
+import { useCurrency } from '@/contexts/currency-context';
 
 // Rounds "now + 1h" to the next half hour — same default the web app's
 // ViewingRequestSheet uses.
@@ -75,6 +77,7 @@ export default function PropertyDetailScreen() {
   const router = useRouter();
   const { t, i18n } = useTranslation();
   const { user } = useAuth();
+  const { formatListingPrice } = useCurrency();
   const { isFavorite, toggle } = useFavorites();
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
@@ -328,7 +331,7 @@ export default function PropertyDetailScreen() {
   );
 
   const images = property.image_urls?.length ? property.image_urls : [];
-  const price = formatPrice(property.price, i18n.language, property.currency);
+  const price = formatListingPrice(property.price, property.currency);
   const suffixKey = priceSuffixKey(property.listing_type);
   const suffix = suffixKey ? t(suffixKey) : '';
   // listingBadgeKey() handles all 3 listing types (sale/rent/daily_rent) —
@@ -599,7 +602,7 @@ export default function PropertyDetailScreen() {
           </Text>
           {pricePerSqm != null && (
             <Text style={styles.pricePerSqm}>
-              ≈ {formatPrice(pricePerSqm, i18n.language, property.currency)}{t('detail.perSqm')}
+              ≈ {formatListingPrice(pricePerSqm, property.currency).replace(/^≈ /, '')}{t('detail.perSqm')}
             </Text>
           )}
         </View>
@@ -615,6 +618,14 @@ export default function PropertyDetailScreen() {
           <Text style={styles.compareBtnText}>{compare.has(property.id) ? t('compare.added') : t('compare.add')}</Text>
         </TouchableOpacity>
       </View>
+      {price.startsWith('≈') && (
+        // A converted price says so, with the lister's own figure.
+        <Text style={styles.pricePerSqm}>
+          {t('currency.converted', { price: formatPrice(property.price, i18n.language, property.currency) })}
+        </Text>
+      )}
+
+      <PriceHistory propertyId={property.id} />
 
       {!isOwnListing && (
         // Web's sticky CTA is `.cta-pill` (globals.css:229) — 54px gradient

@@ -285,7 +285,9 @@
     "reference": "Ref.",
     "publishedBy": "Publicado por",
     "video": "Vídeo",
-    "videoFailed": "No se pudo reproducir el vídeo."
+    "videoFailed": "No se pudo reproducir el vídeo.",
+    "priceHistory": "Historial de precios",
+    "priceListed": "Primer precio"
   },
   "messages": {
     "subtitle": "Conversaciones con agentes",
@@ -1219,5 +1221,11 @@
   },
   "locations": {
     "noMatch": "Ningún lugar coincide"
+  },
+  "currency": {
+    "title": "Mostrar precios en",
+    "asListed": "Como en el anuncio",
+    "asListedShort": "Original",
+    "converted": "Aproximado, al cambio del día. Precio del anuncio: {{price}}"
   }
 }

@@ -13,8 +13,9 @@ import { useTheme } from '@/contexts/theme-context';
 import { useResponsive } from '@/hooks/use-responsive';
 import { cardImageUrl } from '@/lib/image';
 import { Property } from '@/data/types';
-import { formatPrice, getLocalizedText, listingBadgeKey, priceSuffixKey } from '@/lib/format';
+import { getLocalizedText, listingBadgeKey, priceSuffixKey } from '@/lib/format';
 import { CARD_CONTAINER_A11Y } from '@/components/property/card-a11y';
+import { useCurrency } from '@/contexts/currency-context';
 
 /** Matches web's .featured-card__img exactly — a fixed height regardless of
  *  viewport width, not an aspect ratio (src/styles/home.css has no media
@@ -47,7 +48,8 @@ function FeaturedPropertyCardBase({
   const { pressStyle, onPressIn, onPressOut } = usePressScale();
   const heartStyle = useHeartPop(favorited);
   const title = getLocalizedText(property.title_i18n, i18n.language) || property.title;
-  const price = formatPrice(property.price, i18n.language, property.currency);
+  const { formatListingPrice } = useCurrency();
+  const price = formatListingPrice(property.price, property.currency);
   const suffixKey = priceSuffixKey(property.listing_type);
   const suffix = suffixKey ? t(suffixKey) : '';
   // Matches web's listingBadgeKey() — the badge reads "For Sale"/"For Rent"/

@@ -285,7 +285,9 @@
     "reference": "Réf.",
     "publishedBy": "Publié par",
     "video": "Vidéo",
-    "videoFailed": "Impossible de lire la vidéo."
+    "videoFailed": "Impossible de lire la vidéo.",
+    "priceHistory": "Historique des prix",
+    "priceListed": "Premier prix"
   },
   "messages": {
     "subtitle": "Conversations avec les agents",
@@ -1219,5 +1221,11 @@
   },
   "locations": {
     "noMatch": "Aucun lieu ne correspond"
+  },
+  "currency": {
+    "title": "Afficher les prix en",
+    "asListed": "Comme dans l'annonce",
+    "asListedShort": "Originale",
+    "converted": "Approximatif, au taux du jour. Prix de l'annonce : {{price}}"
   }
 }
