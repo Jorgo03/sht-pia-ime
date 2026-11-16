@@ -414,7 +414,10 @@
     "deleteAccount": "Konto löschen",
     "deleteConfirmBody": "Dadurch werden Ihr Profil, Ihre Inserate, Fotos, Favoriten, gespeicherten Suchen und Nachrichten dauerhaft gelöscht. Dies kann nicht rückgängig gemacht werden.",
     "deleteConfirmCta": "Endgültig löschen",
-    "deleteFailed": "Ihr Konto konnte nicht gelöscht werden. Bitte versuchen Sie es erneut."
+    "deleteFailed": "Ihr Konto konnte nicht gelöscht werden. Bitte versuchen Sie es erneut.",
+    "downloadData": "Meine Daten herunterladen",
+    "downloadDataBusy": "Daten werden vorbereitet…",
+    "downloadDataFailed": "Deine Daten konnten nicht heruntergeladen werden. Bitte versuche es erneut."
   },
   "listing": {
     "newListing": "Neues Inserat",
@@ -708,13 +711,26 @@
   },
   "wanted": {
     "describePlaceholder": "Beschreibe, was du suchst … z. B. „2-Zimmer-Wohnung in Tirana bis 150.000 €\"",
-    "matchesNow": "Passende Inserate aktuell: {{n}}"
+    "matchesNow": "Passende Inserate aktuell: {{n}}",
+    "boardPre": "Gesuchte",
+    "boardEm": "Wohnungen",
+    "boardIntro": "Du findest nicht das richtige Zuhause? Nenne Budget, Stadt und Zimmer. Makler sehen die Anfragen, und wir benachrichtigen dich, sobald ein passendes Objekt erscheint.",
+    "postCta": "Suchanfrage aufgeben",
+    "agentHint": "Wenn du ein passendes Objekt veröffentlichst, wird der Käufer automatisch benachrichtigt.",
+    "step1": "Gib Stadt, Art, Budget und Zimmer an.",
+    "step2": "Makler sehen deine Anfrage und suchen für dich.",
+    "step3": "Du wirst benachrichtigt, sobald ein passendes Objekt erscheint.",
+    "homeSub": "Sag, was du suchst, Makler finden dich",
+    "homeTitle": "Gesuchte Wohnungen"
   },
   "legal": {
     "privacyPolicy": "Datenschutzerklärung",
     "termsOfService": "Nutzungsbedingungen",
     "lastUpdated": "Zuletzt aktualisiert am {{date}}",
-    "languageNote": "Dieses Dokument liegt auf Albanisch und Englisch vor. Unten steht die englische Fassung; maßgeblich ist die albanische."
+    "languageNote": "Dieses Dokument liegt auf Albanisch und Englisch vor. Unten steht die englische Fassung; maßgeblich ist die albanische.",
+    "cookiePolicy": "Cookie-Richtlinie",
+    "buyingGuide": "Kaufen aus dem Ausland",
+    "buyingGuideHint": "Schritte, Dokumente und wie du sicher bleibst"
   },
   "safety": {
     "reportListing": "Dieses Inserat melden",

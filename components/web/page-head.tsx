@@ -1,8 +1,10 @@
 import Head from 'expo-router/head';
-import { useSegments } from 'expo-router';
+import { usePathname, useSegments } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
 import { IS_WEB } from '@/constants/web-frame';
+import { SITE_URL } from '@/lib/site';
+import { isPrivatePath, languageLinks } from '@/lib/web-seo';
 
 const SITE = 'Shtëpia.ime';
 
@@ -14,16 +16,25 @@ const SITE = 'Shtëpia.ime';
  * `title` omitted gives the site title (the home page).
  */
 export function PageHead({ title, description }: { title?: string | null; description?: string | null }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const pathname = usePathname();
   if (!IS_WEB) return null;
   const full = title ? `${title} | ${SITE}` : t('seo.siteTitle');
   const text = description || t('seo.siteDescription');
+  // Public pages: a canonical address and one link per language, so search
+  // engines index every language (hreflang). Signed-in pages get neither.
+  // Listing pages are pre-rendered from the "[id]" template, so the build
+  // (scripts/expo-web/seo.mjs applyHead) writes their real links instead.
+  const links = isPrivatePath(pathname) ? null : languageLinks(SITE_URL, pathname, i18n.language);
   return (
     <Head>
       <title>{full}</title>
       <meta name="description" content={text} />
       <meta property="og:title" content={full} />
       <meta property="og:description" content={text} />
+      {links ? <link rel="canonical" href={links.canonical} /> : null}
+      {links ? <meta property="og:url" content={links.canonical} /> : null}
+      {links?.alternates.map((a) => <link key={a.hreflang} rel="alternate" hrefLang={a.hreflang} href={a.href} />)}
     </Head>
   );
 }
@@ -47,6 +58,9 @@ const ROUTE_TITLES: Record<string, string> = {
   'agent-dashboard': 'agentDashboard.title',
   privacy: 'legal.privacyPolicy',
   terms: 'legal.termsOfService',
+  cookies: 'legal.cookiePolicy',
+  guide: 'legal.buyingGuide',
+  wanted: 'wanted.homeTitle',
   pricing: 'pricing.title',
   moderation: 'moderation.title',
   '+not-found': 'notFound.title',

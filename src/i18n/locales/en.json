@@ -466,7 +466,10 @@
     "deleteAccount": "Delete account",
     "deleteConfirmBody": "This permanently deletes your profile, listings, photos, favourites, saved searches and messages. This cannot be undone.",
     "deleteConfirmCta": "Delete permanently",
-    "deleteFailed": "Could not delete your account. Please try again."
+    "deleteFailed": "Could not delete your account. Please try again.",
+    "downloadData": "Download my data",
+    "downloadDataBusy": "Preparing your data…",
+    "downloadDataFailed": "Could not download your data. Please try again."
   },
   "listing": {
     "newListing": "New Listing",
@@ -708,13 +711,26 @@
   },
   "wanted": {
     "describePlaceholder": "Describe what you want… e.g. \"2-bed apartment in Tirana up to €150k\"",
-    "matchesNow": "Listings matching right now: {{n}}"
+    "matchesNow": "Listings matching right now: {{n}}",
+    "boardPre": "Homes",
+    "boardEm": "wanted",
+    "boardIntro": "Can't find the home you want? Tell us your budget, city and rooms. Agents see the requests, and we let you know as soon as a matching home is published.",
+    "postCta": "Post what you're looking for",
+    "agentHint": "When you publish a listing that fits a request, the buyer is told automatically.",
+    "step1": "Write the city, type, budget and rooms you need.",
+    "step2": "Agents see your request and look for you.",
+    "step3": "Get a notification as soon as a home that fits is listed.",
+    "homeSub": "Say what you want, agents find you",
+    "homeTitle": "Wanted homes"
   },
   "legal": {
     "privacyPolicy": "Privacy Policy",
     "termsOfService": "Terms of Service",
     "lastUpdated": "Last updated {{date}}",
-    "languageNote": "This document is available in Albanian and English. The English version is shown below; the Albanian version prevails."
+    "languageNote": "This document is available in Albanian and English. The English version is shown below; the Albanian version prevails.",
+    "cookiePolicy": "Cookie policy",
+    "buyingGuide": "Buying from abroad",
+    "buyingGuideHint": "Steps, documents and how to stay safe"
   },
   "safety": {
     "reportListing": "Report this listing",

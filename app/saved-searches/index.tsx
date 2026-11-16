@@ -1,7 +1,7 @@
 import { LoadError } from '@/components/ui/load-error';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useRouter, type Href } from 'expo-router';
+import { useLocalSearchParams, useRouter, type Href } from 'expo-router';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
@@ -89,14 +89,17 @@ export default function SavedSearchesScreen() {
   const styles = useMemo(() => createStyles(colors), [colors]);
   // A centred column on an unfolded Fold or a spanned Duo (hooks/use-responsive).
   const readable = useReadableColumn();
-  const [tab, setTab] = useState<Tab>('searches');
+  // `?tab=wanted&new=1` (the wanted-homes board's button) opens straight on
+  // the new-request form.
+  const params = useLocalSearchParams<{ tab?: string; new?: string }>();
+  const [tab, setTab] = useState<Tab>(params.tab === 'wanted' ? 'wanted' : 'searches');
   const [searches, setSearches] = useState<SavedSearch[]>([]);
   const [wanted, setWanted] = useState<WantedHome[]>([]);
   const [loading, setLoading] = useState(true);
   // A failed read: shown with a retry rather than as an empty list.
   const [loadError, setLoadError] = useState(false);
   const [actionError, setActionError] = useState(false);
-  const [formOpen, setFormOpen] = useState(false);
+  const [formOpen, setFormOpen] = useState(params.tab === 'wanted' && params.new === '1');
   // Current number of matching listings per saved search (id -> count|null).
   const [matchCounts, setMatchCounts] = useState<Record<string, number | null>>({});
 

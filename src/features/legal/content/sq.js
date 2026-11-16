@@ -200,3 +200,5 @@ export const contact = {
   withEmail: 'Për pyetje rreth këtij dokumenti ose të dhënave tuaja: ',
   withoutEmail: 'Të dhënat tuaja mund t\'i shihni, korrigjoni dhe fshini vetë në aplikacion, te Profili.',
 }
+
+export { cookies, guide } from './pages-sq.js'

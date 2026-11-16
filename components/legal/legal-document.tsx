@@ -14,9 +14,17 @@ import * as sq from '@/src/features/legal/content/sq';
 import type { LegalContact, LegalSection } from '@/src/features/legal/content/types';
 import { useReadableColumn } from '@/hooks/use-responsive';
 
-type Doc = 'privacy' | 'terms';
+type Doc = 'privacy' | 'terms' | 'cookies' | 'guide';
 
-const TITLE_KEYS: Record<Doc, string> = { privacy: 'legal.privacyPolicy', terms: 'legal.termsOfService' };
+const TITLE_KEYS: Record<Doc, string> = {
+  privacy: 'legal.privacyPolicy',
+  terms: 'legal.termsOfService',
+  cookies: 'legal.cookiePolicy',
+  guide: 'legal.buyingGuide',
+};
+
+// The links at the foot of each page: the other documents.
+const ALL_DOCS: Doc[] = ['privacy', 'terms', 'cookies'];
 
 // The same documents the website showed (src/features/legal/content):
 // Albanian is the governing text and English its translation; every other
@@ -40,7 +48,7 @@ export function LegalDocument({ doc }: { doc: Doc }) {
   const lang = (i18n.resolvedLanguage || i18n.language || 'sq').slice(0, 2);
   const content = lang === 'sq' ? sq : en;
   const body = content[doc];
-  const other: Doc = doc === 'privacy' ? 'terms' : 'privacy';
+  const others = ALL_DOCS.filter((d) => d !== doc);
 
   return (
     <GradientBackground>
@@ -57,7 +65,9 @@ export function LegalDocument({ doc }: { doc: Doc }) {
             <Section key={section.h} section={section} contact={content.contact} styles={styles} />
           ))}
           <View style={styles.footer}>
-            <Link href={`/${other}` as Href} style={styles.link}>{t(TITLE_KEYS[other])}</Link>
+            {others.map((d) => (
+              <Link key={d} href={`/${d}` as Href} style={styles.link}>{t(TITLE_KEYS[d])}</Link>
+            ))}
           </View>
         </ScrollView>
       </SafeAreaView>
@@ -118,6 +128,6 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   paragraph: { fontFamily: Fonts?.sans, fontSize: 15, lineHeight: 23, color: colors.textSecondary },
   bulletRow: { flexDirection: 'row', gap: 8, paddingLeft: 4 },
   bulletText: { flex: 1 },
-  footer: { marginTop: 18, paddingTop: 16, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: colors.border },
+  footer: { flexDirection: 'row', flexWrap: 'wrap', gap: 16, marginTop: 18, paddingTop: 16, borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: colors.border },
   link: { fontFamily: Fonts?.sans, fontSize: 15, color: colors.accentText, textDecorationLine: 'underline' },
 });

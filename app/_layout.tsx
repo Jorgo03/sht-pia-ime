@@ -204,6 +204,9 @@ function ThemedNavigation() {
               only (their native files redirect home). */}
           <Stack.Screen name="privacy" options={{ headerShown: false }} />
           <Stack.Screen name="terms" options={{ headerShown: false }} />
+          <Stack.Screen name="cookies" options={{ headerShown: false }} />
+          <Stack.Screen name="guide" options={{ headerShown: false }} />
+          <Stack.Screen name="wanted" options={{ headerShown: false }} />
           <Stack.Screen name="pricing" options={{ headerShown: false }} />
           <Stack.Screen name="moderation" options={{ headerShown: false }} />
           <Stack.Screen name="auth/callback" options={{ headerShown: false }} />

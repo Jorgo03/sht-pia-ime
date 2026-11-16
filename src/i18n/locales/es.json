@@ -423,7 +423,10 @@
     "deleteAccount": "Eliminar cuenta",
     "deleteConfirmBody": "Esto elimina permanentemente tu perfil, anuncios, fotos, favoritos, búsquedas guardadas y mensajes. No se puede deshacer.",
     "deleteConfirmCta": "Eliminar permanentemente",
-    "deleteFailed": "No se pudo eliminar tu cuenta. Inténtalo de nuevo."
+    "deleteFailed": "No se pudo eliminar tu cuenta. Inténtalo de nuevo.",
+    "downloadData": "Descargar mis datos",
+    "downloadDataBusy": "Preparando tus datos…",
+    "downloadDataFailed": "No se pudieron descargar tus datos. Inténtalo de nuevo."
   },
   "listing": {
     "newListing": "Nuevo anuncio",
@@ -717,13 +720,26 @@
   },
   "wanted": {
     "describePlaceholder": "Describe lo que buscas… p. ej. \"piso de 2 habitaciones en Tirana hasta 150.000 €\"",
-    "matchesNow": "Anuncios que coinciden ahora: {{n}}"
+    "matchesNow": "Anuncios que coinciden ahora: {{n}}",
+    "boardPre": "Casas",
+    "boardEm": "buscadas",
+    "boardIntro": "¿No encuentras la casa que buscas? Indica presupuesto, ciudad y habitaciones. Los agentes ven las solicitudes y te avisamos en cuanto se publique una casa que encaje.",
+    "postCta": "Publica lo que buscas",
+    "agentHint": "Cuando publicas un anuncio que encaja con una solicitud, el comprador recibe un aviso automáticamente.",
+    "step1": "Escribe la ciudad, el tipo, el presupuesto y las habitaciones que necesitas.",
+    "step2": "Los agentes ven tu solicitud y buscan por ti.",
+    "step3": "Recibe un aviso en cuanto aparezca una casa que encaje.",
+    "homeSub": "Di lo que buscas y los agentes te encuentran",
+    "homeTitle": "Casas buscadas"
   },
   "legal": {
     "privacyPolicy": "Política de privacidad",
     "termsOfService": "Términos del servicio",
     "lastUpdated": "Última actualización: {{date}}",
-    "languageNote": "Este documento está disponible en albanés e inglés. A continuación se muestra la versión en inglés; prevalece la versión en albanés."
+    "languageNote": "Este documento está disponible en albanés e inglés. A continuación se muestra la versión en inglés; prevalece la versión en albanés.",
+    "cookiePolicy": "Política de cookies",
+    "buyingGuide": "Comprar desde el extranjero",
+    "buyingGuideHint": "Pasos, documentos y cómo mantenerte seguro"
   },
   "safety": {
     "reportListing": "Denunciar este anuncio",

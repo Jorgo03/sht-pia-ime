@@ -11,6 +11,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 
 import { AgentRail } from '@/components/home/agent-rail';
+import { DiscoverLinks } from '@/components/home/discover-links';
 import { CityRail } from '@/components/home/city-rail';
 import { useTabBarClearance } from '@/components/liquid-tab-bar';
 import { NotificationInvite } from '@/components/notifications/notification-invite';
@@ -212,6 +213,10 @@ export default function HomeScreen() {
                   />
                 </View>
               )}
+
+              <View style={styles.section}>
+                <DiscoverLinks />
+              </View>
 
               {matched.length > 0 && (
                 <View style={styles.section}>

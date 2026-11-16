@@ -466,7 +466,10 @@
     "deleteAccount": "Fshi llogarinë",
     "deleteConfirmBody": "Kjo fshin përgjithmonë profilin, listimet, fotot, të preferuarat, kërkimet e ruajtura dhe mesazhet tuaja. Nuk mund të zhbëhet.",
     "deleteConfirmCta": "Fshi përgjithmonë",
-    "deleteFailed": "Llogaria nuk u fshi dot. Provoni përsëri."
+    "deleteFailed": "Llogaria nuk u fshi dot. Provoni përsëri.",
+    "downloadData": "Shkarko të dhënat e mia",
+    "downloadDataBusy": "Po përgatiten të dhënat…",
+    "downloadDataFailed": "Të dhënat nuk u shkarkuan. Provo përsëri."
   },
   "listing": {
     "newListing": "Listim i ri",
@@ -708,13 +711,26 @@
   },
   "wanted": {
     "describePlaceholder": "Përshkruaj çfarë kërkon… p.sh. \"apartament 2+1 në Tiranë deri në 150 mijë euro\"",
-    "matchesNow": "Prona që përputhen tani: {{n}}"
+    "matchesNow": "Prona që përputhen tani: {{n}}",
+    "boardPre": "Shtëpi të",
+    "boardEm": "kërkuara",
+    "boardIntro": "Nuk e gjeni shtëpinë që kërkoni? Shkruani buxhetin, qytetin dhe dhomat. Agjentët i shohin kërkesat dhe ju njoftojmë sapo publikohet një pronë që ju përshtatet.",
+    "postCta": "Posto çfarë kërkon",
+    "agentHint": "Kur publikoni një pronë që përputhet me një kërkesë, blerësi njoftohet vetë.",
+    "step1": "Shkruani qytetin, llojin, buxhetin dhe dhomat që ju duhen.",
+    "step2": "Agjentët e shohin kërkesën dhe kërkojnë për ju.",
+    "step3": "Merrni njoftim sapo del një pronë që ju përshtatet.",
+    "homeSub": "Thuaj çfarë kërkon, agjentët të gjejnë",
+    "homeTitle": "Shtëpi të kërkuara"
   },
   "legal": {
     "privacyPolicy": "Politika e privatësisë",
     "termsOfService": "Kushtet e shërbimit",
     "lastUpdated": "Përditësuar më {{date}}",
-    "languageNote": "Ky dokument është i disponueshëm në shqip dhe anglisht. Më poshtë është versioni në anglisht; versioni në shqip mbizotëron."
+    "languageNote": "Ky dokument është i disponueshëm në shqip dhe anglisht. Më poshtë është versioni në anglisht; versioni në shqip mbizotëron.",
+    "cookiePolicy": "Politika e cookies",
+    "buyingGuide": "Blerja nga jashtë",
+    "buyingGuideHint": "Hapat, dokumentet dhe si të qëndroni të sigurt"
   },
   "safety": {
     "reportListing": "Raporto këtë shpallje",

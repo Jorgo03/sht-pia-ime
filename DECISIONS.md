@@ -30,6 +30,26 @@ first (it was rejected with 401 on 2026-11-04).
 
 ---
 
+## ═══ WEBSITE FROM THE APP — 2026-11-16 ═══
+
+### W4. The website is built from the Expo app, to the owner's brief (DECIDED by owner, 2026-11-16)
+
+Un-parks W2's website work (not the domain). Gap report: `docs/WEBSITE_GAP.md`.
+The owner approved the recommendations as a set:
+- **Languages:** add Greek (el) and Turkish (tr), keep Polish and Russian:
+  10 languages. el and tr are machine-translated and need a human review.
+- **Desktop layout:** wide screens get a desktop layout on Home, Search
+  (filter sidebar on the left) and Property; every other screen stays a
+  centred column.
+- **Database:** the live schema stays; no renames to the brief's names.
+- **Deploy:** the `deploy/expo-web` preview project may be set up; the
+  production domain stays on the Vite site (W2 stage 2 still off).
+- **Built without database changes:** hreflang and canonical tags, cookies
+  page, public wanted-homes board, remote-buying guide, data-export request.
+- **Database changes approved:** price history and a currency toggle with
+  daily rates. Fair price and listing integrity wait for a new Anthropic
+  key. Agent verification and stats in moderation: not approved yet.
+
 ## ═══ ONE CODEBASE — 2026-10-21 ═══
 
 ### W1. The Expo app is the source of truth; the website becomes its web build (DECIDED by owner)

@@ -1,11 +1,12 @@
 // Pure helpers for scripts/expo-web-postbuild.mjs (the website built from the
 // Expo app). Kept free of I/O so tests/expoWebSeo.test.mjs can check them.
 
-export const SITE_NAME = 'Shtëpia.ime';
+import { PRIVATE_ROUTES, languageLinks } from '../../lib/web-seo.js';
 
-// Signed-in pages: kept out of search results.
-export const PRIVATE_ROUTES = ['/profile', '/messages', '/favorites', '/my-listings', '/listing/', '/viewings', '/saved-searches', '/agent-dashboard', '/auth/', '/moderation'];
-export const PUBLIC_ROUTES = ['/', '/explore', '/privacy', '/terms', '/pricing'];
+export { PRIVATE_ROUTES };
+
+export const SITE_NAME = 'Shtëpia.ime';
+export const PUBLIC_ROUTES = ['/', '/explore', '/wanted', '/guide', '/agents', '/privacy', '/terms', '/cookies', '/pricing'];
 
 const escapeAttr = (s) => String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 const escapeText = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -22,7 +23,7 @@ export function listingHead(row, { site, siteDescription }) {
   const full = `${city ? `${title} - ${city}` : title || SITE_NAME} | ${SITE_NAME}`;
   const text = clean(row.description_i18n?.sq || row.description).slice(0, 160) || siteDescription;
   const image = Array.isArray(row.image_urls) ? row.image_urls.find((u) => typeof u === 'string' && u.startsWith('https://')) : null;
-  return { title: full, description: text, url: `${site}/property/${row.id}`, image: image || null };
+  return { title: full, description: text, url: `${site}/property/${row.id}`, site, path: `/property/${row.id}`, image: image || null };
 }
 
 /**
@@ -35,11 +36,19 @@ export function applyHead(html, head) {
     .replace(/<title data-rh="true">[^<]*<\/title>/, `<title data-rh="true">${escapeText(head.title)}</title>`)
     .replace(/<meta data-rh="true" name="description" content="[^"]*"\/>/, `<meta data-rh="true" name="description" content="${escapeAttr(head.description)}"/>`)
     .replace(/<meta data-rh="true" property="og:title" content="[^"]*"\/>/, `<meta data-rh="true" property="og:title" content="${escapeAttr(head.title)}"/>`)
-    .replace(/<meta data-rh="true" property="og:description" content="[^"]*"\/>/, `<meta data-rh="true" property="og:description" content="${escapeAttr(head.description)}"/>`);
+    .replace(/<meta data-rh="true" property="og:description" content="[^"]*"\/>/, `<meta data-rh="true" property="og:description" content="${escapeAttr(head.description)}"/>`)
+    // The template's own links point at "/property/[id]"; drop them.
+    .replace(/<link data-rh="true" rel="(canonical|alternate)"[^>]*\/>/g, '')
+    .replace(/<meta data-rh="true" property="og:url" content="[^"]*"\/>/g, '');
   const extra = [
     `<link rel="canonical" href="${escapeAttr(head.url)}"/>`,
     `<meta property="og:url" content="${escapeAttr(head.url)}"/>`,
     head.image ? `<meta property="og:image" content="${escapeAttr(head.image)}"/>` : '',
+    ...(head.site && head.path
+      ? languageLinks(head.site, head.path, 'sq').alternates.map(
+          (a) => `<link rel="alternate" hreflang="${escapeAttr(a.hreflang)}" href="${escapeAttr(a.href)}"/>`,
+        )
+      : []),
   ].join('');
   out = out.replace('</head>', `${extra}</head>`);
   return out;

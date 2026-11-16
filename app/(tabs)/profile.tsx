@@ -7,6 +7,7 @@ import { Provider } from '@supabase/supabase-js';
 import { PRIVACY_POLICY_URL, TERMS_URL } from '@/lib/legal';
 import { IS_WEB } from '@/constants/web-frame';
 import { isModerator } from '@/src/features/moderation/lib/moderation';
+import { collectMyData, deliverMyData } from '@/lib/data-export';
 import { supabase } from '@/lib/supabase';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useLocalSearchParams, useRouter, type Href } from 'expo-router';
@@ -205,6 +206,22 @@ export default function ProfileScreen() {
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState(false);
+  // "Download my data" (privacy policy §8): one JSON file of the person's own rows.
+  const [exporting, setExporting] = useState(false);
+  const [exportError, setExportError] = useState(false);
+
+  const handleDownloadData = async () => {
+    if (exporting || !user) return;
+    setExporting(true);
+    setExportError(false);
+    try {
+      await deliverMyData(await collectMyData(user.id));
+    } catch {
+      setExportError(true);
+    } finally {
+      setExporting(false);
+    }
+  };
 
   const handleDeleteAccount = async () => {
     if (deleting) return;
@@ -853,6 +870,16 @@ export default function ProfileScreen() {
               <Text style={styles.signOutText}>{t('common.signOut')}</Text>
             </TouchableOpacity>
 
+            <TouchableOpacity
+              accessibilityRole="button"
+              accessibilityState={{ busy: exporting }}
+              style={styles.deleteAccountButton}
+              onPress={handleDownloadData}
+              activeOpacity={0.7}>
+              <Text style={styles.legalLink}>{exporting ? t('account.downloadDataBusy') : t('account.downloadData')}</Text>
+            </TouchableOpacity>
+            {exportError && <Text style={styles.deleteErrorText}>{t('account.downloadDataFailed')}</Text>}
+
             {/* Store-required: the user must be able to start account deletion
                 from inside the app. Deliberately the last item, plain text
                 rather than a button, so it reads as deliberate and is hard to
@@ -875,6 +902,15 @@ export default function ProfileScreen() {
               <Text style={styles.legalLink} accessibilityRole="link" onPress={() => openLegal('terms')}>
                 {t('legal.termsOfService')}
               </Text>
+              {/* Only the website stores anything in a browser. */}
+              {IS_WEB && (
+                <>
+                  <Text style={styles.legalDot}>·</Text>
+                  <Text style={styles.legalLink} accessibilityRole="link" onPress={() => router.push('/cookies' as Href)}>
+                    {t('legal.cookiePolicy')}
+                  </Text>
+                </>
+              )}
             </View>
           </ScrollView>
         </SafeAreaView>
@@ -1740,6 +1776,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   legalRow: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     justifyContent: 'center',
     alignItems: 'center',
     gap: 8,

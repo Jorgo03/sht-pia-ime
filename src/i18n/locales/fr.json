@@ -423,7 +423,10 @@
     "deleteAccount": "Supprimer le compte",
     "deleteConfirmBody": "Cela supprime définitivement votre profil, vos annonces, photos, favoris, recherches enregistrées et messages. Cette action est irréversible.",
     "deleteConfirmCta": "Supprimer définitivement",
-    "deleteFailed": "Impossible de supprimer votre compte. Veuillez réessayer."
+    "deleteFailed": "Impossible de supprimer votre compte. Veuillez réessayer.",
+    "downloadData": "Télécharger mes données",
+    "downloadDataBusy": "Préparation de vos données…",
+    "downloadDataFailed": "Impossible de télécharger vos données. Réessayez."
   },
   "listing": {
     "newListing": "Nouvelle annonce",
@@ -717,13 +720,26 @@
   },
   "wanted": {
     "describePlaceholder": "Décrivez ce que vous cherchez… p. ex. « appartement 2 pièces à Tirana jusqu'à 150 000 € »",
-    "matchesNow": "Annonces correspondantes actuellement : {{n}}"
+    "matchesNow": "Annonces correspondantes actuellement : {{n}}",
+    "boardPre": "Logements",
+    "boardEm": "recherchés",
+    "boardIntro": "Vous ne trouvez pas le logement idéal ? Indiquez votre budget, la ville et les pièces. Les agents voient les demandes et nous vous prévenons dès qu'un bien correspondant est publié.",
+    "postCta": "Publier votre recherche",
+    "agentHint": "Quand vous publiez une annonce qui correspond à une demande, l'acheteur est prévenu automatiquement.",
+    "step1": "Indiquez la ville, le type, le budget et les pièces souhaités.",
+    "step2": "Les agents voient votre demande et cherchent pour vous.",
+    "step3": "Recevez une notification dès qu'un logement adapté est publié.",
+    "homeSub": "Dites ce que vous cherchez, les agents vous trouvent",
+    "homeTitle": "Logements recherchés"
   },
   "legal": {
     "privacyPolicy": "Politique de confidentialité",
     "termsOfService": "Conditions d'utilisation",
     "lastUpdated": "Dernière mise à jour : {{date}}",
-    "languageNote": "Ce document est disponible en albanais et en anglais. La version anglaise figure ci-dessous ; la version albanaise fait foi."
+    "languageNote": "Ce document est disponible en albanais et en anglais. La version anglaise figure ci-dessous ; la version albanaise fait foi.",
+    "cookiePolicy": "Politique relative aux cookies",
+    "buyingGuide": "Acheter depuis l'étranger",
+    "buyingGuideHint": "Étapes, documents et comment rester prudent"
   },
   "safety": {
     "reportListing": "Signaler cette annonce",

@@ -202,3 +202,5 @@ export const contact = {
   withEmail: 'Questions about this document or your data: ',
   withoutEmail: 'You can see, correct and delete your data yourself in the app, under Profile.',
 }
+
+export { cookies, guide } from './pages-en.js'

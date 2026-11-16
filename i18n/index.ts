@@ -7,9 +7,11 @@ import { Platform } from 'react-native';
 // Native bundles every language; the web bundles Albanian and fetches the
 // others on first use (i18n/locales.ts and locales.web.ts).
 import { bundledResources, loadLocale } from './locales';
+import { LANGUAGES } from './languages';
+import { languageFromSearch } from '../lib/web-seo';
 
 const STORAGE_KEY = 'fho_lang';
-const SUPPORTED = ['sq', 'en', 'de', 'it', 'es', 'pl', 'ru', 'fr'] as const;
+const SUPPORTED = LANGUAGES;
 const isSSR = typeof window === 'undefined';
 
 function getDeviceLanguage(): string {
@@ -35,6 +37,12 @@ const deferToHydration = Platform.OS === 'web';
 let languageReady = !deferToHydration;
 
 async function preferredLanguage(): Promise<string> {
+  // Web: a language link (`?lang=en`, the hreflang alternates) wins, and is
+  // then remembered like a choice made in the menu.
+  if (Platform.OS === 'web' && !isSSR) {
+    const fromUrl = languageFromSearch(window.location.search);
+    if (fromUrl) return fromUrl;
+  }
   const saved = await AsyncStorage.getItem(STORAGE_KEY).catch(() => null);
   return isSupported(saved) ? saved : getDeviceLanguage();
 }

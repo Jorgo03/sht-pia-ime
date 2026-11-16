@@ -432,7 +432,10 @@
     "deleteAccount": "Usuń konto",
     "deleteConfirmBody": "Spowoduje to trwałe usunięcie profilu, ogłoszeń, zdjęć, ulubionych, zapisanych wyszukiwań i wiadomości. Tej operacji nie można cofnąć.",
     "deleteConfirmCta": "Usuń trwale",
-    "deleteFailed": "Nie udało się usunąć konta. Spróbuj ponownie."
+    "deleteFailed": "Nie udało się usunąć konta. Spróbuj ponownie.",
+    "downloadData": "Pobierz moje dane",
+    "downloadDataBusy": "Przygotowywanie danych…",
+    "downloadDataFailed": "Nie udało się pobrać danych. Spróbuj ponownie."
   },
   "listing": {
     "newListing": "Nowe ogłoszenie",
@@ -726,13 +729,26 @@
   },
   "wanted": {
     "describePlaceholder": "Opisz, czego szukasz… np. „mieszkanie 2-pokojowe w Tiranie do 150 tys. euro\"",
-    "matchesNow": "Pasujące ogłoszenia teraz: {{n}}"
+    "matchesNow": "Pasujące ogłoszenia teraz: {{n}}",
+    "boardPre": "Poszukiwane",
+    "boardEm": "domy",
+    "boardIntro": "Nie możesz znaleźć wymarzonego domu? Podaj budżet, miasto i liczbę pokoi. Agenci widzą zgłoszenia, a my powiadomimy Cię, gdy pojawi się pasująca oferta.",
+    "postCta": "Dodaj swoje zgłoszenie",
+    "agentHint": "Gdy opublikujesz ofertę pasującą do zgłoszenia, kupujący dostanie powiadomienie automatycznie.",
+    "step1": "Wpisz miasto, rodzaj, budżet i liczbę pokoi.",
+    "step2": "Agenci widzą Twoje zgłoszenie i szukają dla Ciebie.",
+    "step3": "Otrzymasz powiadomienie, gdy pojawi się pasujący dom.",
+    "homeSub": "Powiedz, czego szukasz, agenci znajdą Ciebie",
+    "homeTitle": "Poszukiwane domy"
   },
   "legal": {
     "privacyPolicy": "Polityka prywatności",
     "termsOfService": "Regulamin",
     "lastUpdated": "Ostatnia aktualizacja: {{date}}",
-    "languageNote": "Ten dokument jest dostępny po albańsku i angielsku. Poniżej znajduje się wersja angielska; rozstrzygająca jest wersja albańska."
+    "languageNote": "Ten dokument jest dostępny po albańsku i angielsku. Poniżej znajduje się wersja angielska; rozstrzygająca jest wersja albańska.",
+    "cookiePolicy": "Polityka plików cookie",
+    "buyingGuide": "Zakup z zagranicy",
+    "buyingGuideHint": "Kroki, dokumenty i jak zachować bezpieczeństwo"
   },
   "safety": {
     "reportListing": "Zgłoś to ogłoszenie",

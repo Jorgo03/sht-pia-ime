@@ -5,8 +5,8 @@ outside the repo) with what this repo already has. The brief is written for
 an empty repo. Most of it exists already, so this report lists only what is
 missing and what clashes with decisions already made.
 
-Status: **waiting for the owner's answers on C1–C6** (bottom). Nothing has
-been built yet.
+Status: **approved 2026-11-16, "as recommended"** (DECISIONS.md W4). Being
+built on `feat/website-from-expo`.
 
 Key: ✅ exists · 🟡 partly there · ❌ missing · ⚠️ conflicts with a decision
 
@@ -95,7 +95,7 @@ The Anthropic key was rejected on 2026-11-04; any new AI work needs a new key fi
 | Brief | Repo | |
 |---|---|---|
 | `web.output: "static"`, favicon | `app.json` | ✅ |
-| theme colour meta | Not set | ❌ small |
+| theme colour meta | Set in `app/+html.tsx` | ✅ |
 | Per-page title, description, Open Graph | `components/web/page-head.tsx`; listing pages pre-rendered with image + canonical | ✅ |
 | **hreflang** alternates | None (the language lives on the device, not in the URL) | ❌ |
 | Canonical on non-listing pages | Listing pages only | 🟡 |
