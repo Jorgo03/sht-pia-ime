@@ -31,7 +31,7 @@ test('the app wires NetInfo into onlineManager and shows the banner', () => {
   assert.match(online, /NetInfo\.addEventListener\(/)
   const layout = fs.readFileSync('app/_layout.tsx', 'utf8')
   assert.match(layout, /<OfflineBanner \/>/)
-  assert.match(layout, /from '@/lib/online-manager'/)
+  assert.match(layout, /from '@\/lib\/online-manager'/)
 })
 
 test('the offline message exists in all 8 locales', () => {
