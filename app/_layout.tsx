@@ -48,6 +48,7 @@ import { PushBridge } from '@/components/push-bridge';
 import { SignedOutStart } from '@/components/auth/signed-out-start';
 import { NotificationsProvider } from '@/contexts/notifications-context';
 import { IS_WEB, WEB_MAX_WIDTH } from '@/constants/web-frame';
+import { useAppDimensions } from '@/hooks/use-app-dimensions';
 import { RouteHead } from '@/components/web/page-head';
 import { debugWarn } from '@/lib/debug';
 
@@ -103,14 +104,19 @@ configureForegroundNotifications();
  */
 function WebColumn({ children }: { children: ReactNode }) {
   const { colors } = useTheme();
-  const { width } = useWindowDimensions();
+  const { width } = useAppDimensions();
+  const { width: windowWidth } = useWindowDimensions();
   if (!IS_WEB) return <>{children}</>;
-  const framed = width > WEB_MAX_WIDTH;
+  const column = width;
+  const framed = windowWidth > column;
   return (
     <View style={[styles.webPage, { backgroundColor: colors.primary }]}>
       <View
         style={[
           styles.webColumn,
+          // Wider only for the desktop routes; the pre-rendered page (no
+          // window size yet) keeps the phone column from the stylesheet.
+          column > WEB_MAX_WIDTH && { maxWidth: column },
           framed && { borderLeftWidth: StyleSheet.hairlineWidth, borderRightWidth: StyleSheet.hairlineWidth, borderColor: colors.border },
         ]}>
         {children}

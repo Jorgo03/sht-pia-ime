@@ -28,7 +28,8 @@ const MANROPE = {
 /** True for a language written in a script Newsreader lacks. */
 export function needsHeadlineFallback(language) {
   const base = String(language ?? '').toLowerCase().split(/[-_]/)[0]
-  return base === 'ru'
+  // Newsreader has no Cyrillic and no Greek.
+  return base === 'ru' || base === 'el'
 }
 
 /** The font file a headline role uses in this language. */

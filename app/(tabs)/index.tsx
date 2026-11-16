@@ -28,6 +28,7 @@ import { SearchHeader } from '@/components/ui/search-header';
 import { SkeletonCard } from '@/components/ui/skeleton-card';
 import { Fonts, InlineTarget, type AtticoPalette } from '@/constants/theme';
 import { useFilters } from '@/contexts/filters-context';
+import { useIsDesktopWeb } from '@/hooks/use-app-dimensions';
 import { useTheme } from '@/contexts/theme-context';
 import { useReadableColumn, useResponsive } from '@/hooks/use-responsive';
 import {
@@ -77,6 +78,7 @@ export default function HomeScreen() {
   // A centred column on an unfolded Fold or a spanned Duo, so the rows and
   // search bar match the capped featured card instead of running edge to edge.
   const readable = useReadableColumn();
+  const desktop = useIsDesktopWeb();
   // On a short screen (360x380 Flip cover) a pinned headline + search bar
   // left a ~50px sliver of list; there they scroll away with the content.
   // Native only: the web build is pre-rendered without a screen height, so a
@@ -153,7 +155,9 @@ export default function HomeScreen() {
           contentContainerStyle={[
             styles.scroll,
             shortScreen && styles.scrollShort,
-            readable,
+            // Desktop website: the sections use the full width (the card
+            // grid below); the headline and search stay in the centred column.
+            desktop ? styles.desktopScroll : readable,
             { paddingBottom: tabBarClearance },
           ]}
           showsVerticalScrollIndicator={false}>
@@ -312,13 +316,27 @@ export default function HomeScreen() {
                     </ScrollView>
                   )}
 
-                  <View style={styles.rows}>
-                    {newest.slice(0, NEWEST_VISIBLE).map((item, i) => (
-                      <RiseIn key={item.id} index={i}>
-                        <PropertyRow property={item} />
-                      </RiseIn>
-                    ))}
-                  </View>
+                  {desktop ? (
+                    // Desktop website: a card grid; full-width rows read
+                    // badly at 1,200px.
+                    <View style={styles.desktopGrid}>
+                      {newest.slice(0, NEWEST_VISIBLE).map((item, i) => (
+                        <RiseIn key={item.id} index={i} style={{ width: `${100 / columns}%` }}>
+                          <View style={styles.desktopCell}>
+                            <PropertyCard property={item} />
+                          </View>
+                        </RiseIn>
+                      ))}
+                    </View>
+                  ) : (
+                    <View style={styles.rows}>
+                      {newest.slice(0, NEWEST_VISIBLE).map((item, i) => (
+                        <RiseIn key={item.id} index={i}>
+                          <PropertyRow property={item} />
+                        </RiseIn>
+                      ))}
+                    </View>
+                  )}
 
                   <TouchableOpacity
                     style={styles.moreButton}
@@ -338,6 +356,9 @@ export default function HomeScreen() {
 }
 
 const createStyles = (colors: AtticoPalette) => StyleSheet.create({
+  desktopGrid: { flexDirection: 'row', flexWrap: 'wrap', marginHorizontal: -8 },
+  desktopCell: { padding: 8 },
+  desktopScroll: { paddingHorizontal: 40 },
   container: {
     flex: 1,
   },

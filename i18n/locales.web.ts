@@ -1,6 +1,6 @@
 // The website bundles only Albanian (the language every page is first drawn
 // in, see i18n/index.ts) and fetches another language the first time it is
-// chosen. The eight files are ~316KB; most visitors use one of them.
+// chosen. The ten files are ~316KB; most visitors use one of them.
 import sq from '../src/i18n/locales/sq.json';
 
 export const bundledResources = {
@@ -15,6 +15,8 @@ const loaders: Record<string, () => Promise<{ default: Record<string, unknown> }
   pl: () => import('../src/i18n/locales/pl.json'),
   ru: () => import('../src/i18n/locales/ru.json'),
   fr: () => import('../src/i18n/locales/fr.json'),
+  el: () => import('../src/i18n/locales/el.json'),
+  tr: () => import('../src/i18n/locales/tr.json'),
 };
 
 export const loadLocale: ((lng: string) => Promise<Record<string, unknown>>) | null = async (lng) => {

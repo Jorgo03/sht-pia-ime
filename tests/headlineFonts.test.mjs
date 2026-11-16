@@ -7,7 +7,7 @@ import { HEADLINE_FONT_FILES, headlineFont, needsHeadlineFallback } from '../src
 // (which has it) instead of each phone's system font.
 
 test('Russian headlines use Manrope; every other language keeps Newsreader', () => {
-  for (const lang of ['ru', 'ru-RU', 'RU', 'ru_RU']) {
+  for (const lang of ['ru', 'ru-RU', 'RU', 'ru_RU', 'el', 'el-GR']) {
     assert.equal(needsHeadlineFallback(lang), true, lang)
     // The same weight as the Newsreader file it replaces, never heavier:
     // one step heavier made all Russian text look bold (2026-11-12).

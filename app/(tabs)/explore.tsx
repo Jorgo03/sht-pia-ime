@@ -18,7 +18,7 @@ import { useRouter, type Href } from 'expo-router';
 import { useTabBarClearance } from '@/components/liquid-tab-bar';
 import { AppHeader } from '@/components/ui/app-header';
 import { MapScreenContent } from '@/components/map/map-screen-content';
-import { FilterSheet } from '@/components/property/filter-sheet';
+import { FilterSheet, FilterSidebar } from '@/components/property/filter-sheet';
 import { PropertyCard } from '@/components/property/property-card';
 import { FilterTabs } from '@/components/ui/filter-tabs';
 import { GradientBackground } from '@/components/ui/gradient-background';
@@ -27,6 +27,7 @@ import { type AtticoPalette, Fonts } from '@/constants/theme';
 import { SaveSearchButton } from '@/components/property/save-search-button';
 import { useFilters } from '@/contexts/filters-context';
 import { KeyboardDoneBar } from '@/components/ui/keyboard-done-bar';
+import { useIsDesktopWeb } from '@/hooks/use-app-dimensions';
 import { useTheme } from '@/contexts/theme-context';
 import { Property } from '@/data/types';
 import { useInfinitePropertiesQuery, usePrefetchListingTabs, usePropertiesCountQuery } from '@/hooks/use-property-queries';
@@ -43,7 +44,11 @@ export default function ExploreScreen() {
   // The nav pill floats above content rather than pushing it up, so the list
   // has to reserve its full footprint or the last row sits under it.
   const tabBarClearance = useTabBarClearance();
-  const { columns, height: screenHeight } = useResponsive();
+  const { columns: deviceColumns, height: screenHeight, width: layoutWidth } = useResponsive();
+  // Desktop website: filters sit in a sidebar beside the results, and the
+  // grid gets one column per ~300px of what is left.
+  const desktop = useIsDesktopWeb();
+  const columns = desktop ? Math.max(2, Math.floor((layoutWidth - SIDEBAR_WIDTH - 60) / 300)) : deviceColumns;
   // A centred column for the title/search/tabs on an unfolded Fold or a
   // spanned Duo; the grid below keeps the full width for its columns.
   const readable = useReadableColumn();
@@ -221,7 +226,7 @@ export default function ExploreScreen() {
                 />
               </Pressable>
             </View>
-            <Pressable
+            {!desktop && <Pressable
               accessibilityRole="button"
               style={styles.filterButton}
               onPress={() => setSheetOpen(true)}
@@ -236,7 +241,7 @@ export default function ExploreScreen() {
                   <Text style={styles.badgeText}>{activeCount}</Text>
                 </View>
               )}
-            </Pressable>
+            </Pressable>}
           </View>
         </View>
       </View>
@@ -311,6 +316,13 @@ export default function ExploreScreen() {
         <AppHeader />
         {!chromeInList && chrome}
 
+        <View style={desktop ? styles.desktopBody : styles.flex}>
+        {desktop && (
+          <View style={styles.desktopSidebar}>
+            <FilterSidebar />
+          </View>
+        )}
+        <View style={styles.flex}>
         {viewMode === 'map' ? (
           <View style={styles.mapWrap}>
             <MapScreenContent />
@@ -409,6 +421,8 @@ export default function ExploreScreen() {
             }
           />
         )}
+        </View>
+        </View>
 
         <FilterSheet
           visible={sheetOpen}
@@ -420,7 +434,12 @@ export default function ExploreScreen() {
   );
 }
 
+const SIDEBAR_WIDTH = 320;
+
 const createStyles = (colors: AtticoPalette) => StyleSheet.create({
+  flex: { flex: 1 },
+  desktopBody: { flex: 1, flexDirection: 'row', gap: 20, paddingLeft: 20 },
+  desktopSidebar: { width: SIDEBAR_WIDTH, paddingBottom: 24 },
   container: {
     flex: 1,
   },

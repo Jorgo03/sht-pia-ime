@@ -21,7 +21,7 @@ import i18next from 'i18next'
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const ROOT = join(__dirname, '..')
 const LOCALES_DIR = join(ROOT, 'src', 'i18n', 'locales')
-const LANGS = ['sq', 'en', 'de', 'it', 'es', 'pl', 'ru', 'fr']
+const LANGS = ['sq', 'en', 'de', 'it', 'es', 'pl', 'ru', 'fr', 'el', 'tr']
 const PLURAL_SUFFIX_RE = /_(zero|one|two|few|many|other)$/
 
 const locales = Object.fromEntries(

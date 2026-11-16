@@ -44,6 +44,8 @@ const LANGUAGES = [
   { code: 'pl', name: 'Polski', flag: '🇵🇱' },
   { code: 'ru', name: 'Русский', flag: '🇷🇺' },
   { code: 'fr', name: 'Français', flag: '🇫🇷' },
+  { code: 'el', name: 'Ελληνικά', flag: '🇬🇷' },
+  { code: 'tr', name: 'Türkçe', flag: '🇹🇷' },
 ];
 
 /**

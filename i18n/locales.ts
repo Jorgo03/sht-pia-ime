@@ -8,6 +8,8 @@ import es from '../src/i18n/locales/es.json';
 import pl from '../src/i18n/locales/pl.json';
 import ru from '../src/i18n/locales/ru.json';
 import fr from '../src/i18n/locales/fr.json';
+import el from '../src/i18n/locales/el.json';
+import tr from '../src/i18n/locales/tr.json';
 
 export const bundledResources = {
   sq: { translation: sq },
@@ -18,6 +20,8 @@ export const bundledResources = {
   pl: { translation: pl },
   ru: { translation: ru },
   fr: { translation: fr },
+  el: { translation: el },
+  tr: { translation: tr },
 };
 
 /** Loads a language that is not bundled; null when every language is. */

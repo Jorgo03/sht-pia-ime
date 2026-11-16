@@ -161,8 +161,7 @@ export function FilterSheet({
   onClose: () => void;
 }) {
   const { t } = useTranslation();
-  const { filters, queryFilters, setFilter, reset, priceInvalid, areaInvalid } =
-    useFilters();
+  const { queryFilters, reset } = useFilters();
   const { colors } = useTheme();
   const { height: windowHeight } = useWindowDimensions();
   // A definite pixel height, not `maxHeight: '88%'` — on native Yoga (unlike
@@ -252,6 +251,46 @@ export function FilterSheet({
         <ScrollView
           contentContainerStyle={styles.scroll}
           keyboardShouldPersistTaps="handled">
+          <FilterFields styles={styles} />
+        </ScrollView>
+
+        <Pressable accessibilityRole="button" style={styles.cta} onPress={onClose}>
+          <LinearGradient
+            colors={[colors.accent, colors.accentEnd]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.ctaGradient}
+          />
+          <Text style={styles.ctaText}>
+            {/* A failed count is not "loading" forever: the button still applies the filters. */}
+            {count != null
+              ? t('search.showHomes', { count })
+              : countFailed
+                ? t('search.showHomesAny')
+                : t('common.loading')}
+          </Text>
+        </Pressable>
+          <KeyboardDoneBar />
+        </KeyboardAvoidingView>
+        </Animated.View>
+      </View>
+    </Modal>
+  );
+}
+
+
+type FilterStyles = ReturnType<typeof createStyles>;
+
+/**
+ * The filter fields themselves, shared by the phone's bottom sheet and the
+ * website's desktop sidebar (FilterSidebar), so the two never drift apart.
+ */
+function FilterFields({ styles }: { styles: FilterStyles }) {
+  const { t } = useTranslation();
+  const { filters, setFilter, priceInvalid, areaInvalid } = useFilters();
+  const { colors } = useTheme();
+  return (
+    <>
           {/* Order matches web's Search.jsx filter sheet exactly: City,
               Listing Type, Price, Surface, Bedrooms, Bathrooms, Sort,
               Property Type. */}
@@ -469,33 +508,44 @@ export function FilterSheet({
               ))}
             </View>
           </Section>
-        </ScrollView>
+    </>
+  );
+}
 
-        <Pressable accessibilityRole="button" style={styles.cta} onPress={onClose}>
-          <LinearGradient
-            colors={[colors.accent, colors.accentEnd]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.ctaGradient}
-          />
-          <Text style={styles.ctaText}>
-            {/* A failed count is not "loading" forever: the button still applies the filters. */}
-            {count != null
-              ? t('search.showHomes', { count })
-              : countFailed
-                ? t('search.showHomesAny')
-                : t('common.loading')}
-          </Text>
+/**
+ * Desktop website: the same filters as a column beside the results, applied
+ * as they change (the list re-queries from the debounced filters), so there
+ * is no "show homes" button to press.
+ */
+export function FilterSidebar() {
+  const { t } = useTranslation();
+  const { reset } = useFilters();
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors, 0), [colors]);
+  return (
+    <View style={styles.sidebar} accessibilityRole="search" accessibilityLabel={t('search.filtersTitle')}>
+      <View style={styles.header}>
+        <Text style={styles.title}>{t('search.filtersTitle')}</Text>
+        <Pressable accessibilityRole="button" onPress={reset} hitSlop={12}>
+          <Text style={styles.resetText}>{t('search.reset')}</Text>
         </Pressable>
-          <KeyboardDoneBar />
-        </KeyboardAvoidingView>
-        </Animated.View>
       </View>
-    </Modal>
+      <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
+        <FilterFields styles={styles} />
+      </ScrollView>
+    </View>
   );
 }
 
 const createStyles = (colors: AtticoPalette, sheetHeight: number = 0) => StyleSheet.create({
+  sidebar: {
+    flex: 1,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: colors.surface ?? colors.glass,
+    overflow: 'hidden',
+  },
   backdrop: {
     flex: 1,
     justifyContent: 'flex-end',

@@ -29,3 +29,23 @@ export const READABLE_MAX_WIDTH = 640;
 export const sheetColumn: ViewStyle = IS_WEB
   ? { width: '100%', maxWidth: WEB_MAX_WIDTH, alignSelf: 'center', marginHorizontal: 'auto' }
   : { width: '100%', maxWidth: READABLE_MAX_WIDTH, alignSelf: 'center' };
+
+/**
+ * Desktop website (DECISIONS.md W4): on a browser at least this wide, Home,
+ * Search and Property get a desktop layout up to DESKTOP_MAX_WIDTH; every
+ * other screen stays the phone-width column above.
+ */
+export const DESKTOP_MIN_WIDTH = 1024;
+export const DESKTOP_MAX_WIDTH = 1280;
+
+/** Addresses that get the desktop layout: Home, Search and a listing. */
+export function isDesktopRoute(pathname: string): boolean {
+  return pathname === '/' || pathname === '/explore' || /^\/property\/[^/]+$/.test(pathname);
+}
+
+/** Width of the website's column for this address and browser width. */
+export function webColumnWidth(pathname: string, windowWidth: number): number {
+  return windowWidth >= DESKTOP_MIN_WIDTH && isDesktopRoute(pathname)
+    ? Math.min(windowWidth, DESKTOP_MAX_WIDTH)
+    : Math.min(windowWidth, WEB_MAX_WIDTH);
+}
