@@ -28,8 +28,8 @@ test('every headline font file is loaded by the app', () => {
   for (const family of HEADLINE_FONT_FILES) assert.match(layout, new RegExp(`\\b${family}\\b`), family)
 })
 
-test('the app supports exactly one language that needs the fallback', () => {
+test('the languages that need the headline fallback are exactly Greek and Russian', () => {
   // If a Cyrillic or other non-Latin locale is added, decide its headline font.
   const locales = fs.readdirSync(new URL('../src/i18n/locales/', import.meta.url)).map((f) => f.replace(/\.json$/, ''))
-  assert.deepEqual(locales.filter((l) => needsHeadlineFallback(l)), ['ru'])
+  assert.deepEqual(locales.filter((l) => needsHeadlineFallback(l)), ['el', 'ru'])
 })
