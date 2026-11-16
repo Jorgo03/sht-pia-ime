@@ -3,9 +3,9 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { usePathname, useRouter, type Href } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Modal, Pressable, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
+import { Modal, Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 
-import { AppHeader } from '@/components/ui/app-header';
+import { AppHeader, LanguageOptions } from '@/components/ui/app-header';
 import { ThemeToggleButton } from '@/components/ui/theme-toggle-button';
 import { Fonts, type AtticoPalette } from '@/constants/theme';
 import { useAuth } from '@/contexts/auth-context';
@@ -44,8 +44,9 @@ export function SiteHeader() {
   // browser folds it after the first draw if the window is narrow.
   const hydrated = useHydrated();
   const wide = !hydrated || width >= FULL_MENU_MIN_WIDTH;
-  // A phone: logo, language, account and the menu button only; "List your
-  // home" and the theme switch move into the menu.
+  // A phone: logo, notifications and the menu button only; everything else
+  // (list your home, messages, account, language and currency, theme) is in
+  // the menu, so the bar fits a 280px foldable cover screen.
   const narrow = hydrated && width < 640;
   const [menuOpen, setMenuOpen] = useState(false);
   const unread = useUnreadMessages();
@@ -86,7 +87,7 @@ export function SiteHeader() {
           ))}
         </View>
       )}
-      {user && (
+      {user && !narrow && (
         <Pressable
           accessibilityRole="link"
           accessibilityLabel={t('common.messages')}
@@ -97,7 +98,7 @@ export function SiteHeader() {
         </Pressable>
       )}
       {!narrow && listCta}
-      {account}
+      {!narrow && account}
       {!wide && (
         <Pressable
           accessibilityRole="button"
@@ -116,11 +117,21 @@ export function SiteHeader() {
       <AppHeader site compact={narrow} trailing={trailing} />
       <Modal visible={menuOpen} transparent animationType="fade" onRequestClose={() => setMenuOpen(false)}>
         <Pressable style={styles.backdrop} onPress={() => setMenuOpen(false)}>
-          <View style={styles.menu} accessibilityRole="menu">
+          <ScrollView style={styles.menu} contentContainerStyle={styles.menuContent} accessibilityRole="menu">
             {narrow && (
-              <Pressable accessibilityRole="menuitem" onPress={() => go('/listing/new')} style={styles.menuItem}>
-                <Text style={[styles.menuText, styles.linkActive]}>{t('site.listHome')}</Text>
-              </Pressable>
+              <>
+                <Pressable accessibilityRole="menuitem" onPress={() => go('/listing/new')} style={styles.menuItem}>
+                  <Text style={[styles.menuText, styles.linkActive]}>{t('site.listHome')}</Text>
+                </Pressable>
+                {user && (
+                  <Pressable accessibilityRole="menuitem" onPress={() => go('/messages')} style={styles.menuItem}>
+                    <Text style={styles.menuText}>{t('common.messages')}</Text>
+                  </Pressable>
+                )}
+                <Pressable accessibilityRole="menuitem" onPress={() => go('/profile')} style={styles.menuItem}>
+                  <Text style={styles.menuText}>{user ? t('common.profile') : t('common.signIn')}</Text>
+                </Pressable>
+              </>
             )}
             {SITE_LINKS.map((l) => (
               <Pressable key={l.href} accessibilityRole="menuitem" onPress={() => go(l.href)} style={styles.menuItem}>
@@ -128,11 +139,16 @@ export function SiteHeader() {
               </Pressable>
             ))}
             {narrow && (
-              <View style={styles.menuItem}>
-                <ThemeToggleButton style={styles.iconBtn} iconColor={colors.textPrimary} />
-              </View>
+              <>
+                <View style={styles.menuDivider} />
+                <Text style={styles.menuLabel}>{t('common.language')}</Text>
+                <LanguageOptions onChosen={() => setMenuOpen(false)} />
+                <View style={styles.menuItem}>
+                  <ThemeToggleButton style={styles.iconBtn} iconColor={colors.textPrimary} />
+                </View>
+              </>
             )}
-          </View>
+          </ScrollView>
         </Pressable>
       </Modal>
     </View>
@@ -172,7 +188,10 @@ const createStyles = (colors: AtticoPalette) =>
     accountText: { fontFamily: Fonts.sansSemiBold, fontSize: 14, color: colors.textPrimary },
     pressed: { opacity: 0.8 },
     backdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.3)', alignItems: 'flex-end', paddingTop: 70, paddingRight: 16 },
-    menu: { minWidth: 220, padding: 6, borderRadius: 16, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border },
+    menu: { minWidth: 240, maxHeight: '85%', flexGrow: 0, borderRadius: 16, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border },
+    menuContent: { padding: 6 },
+    menuDivider: { height: StyleSheet.hairlineWidth, backgroundColor: colors.border, marginVertical: 6 },
+    menuLabel: { fontFamily: Fonts.sansSemiBold, fontSize: 12, color: colors.textSecondary, paddingHorizontal: 16, paddingVertical: 6 },
     menuItem: { minHeight: 48, justifyContent: 'center', paddingHorizontal: 16 },
     menuText: { fontFamily: Fonts.sansMedium, fontSize: 16, color: colors.textPrimary },
   });

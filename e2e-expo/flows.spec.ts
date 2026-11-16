@@ -24,6 +24,27 @@ const escape = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 // The website's header (components/web/site-header): a link by its name,
 // and going somewhere through it, opening the folded menu on narrow screens.
 const siteLink = (page: Page, name: string) => page.getByRole('link', { name, exact: true }).first();
+// The language menu: a header button, or inside the folded menu on a phone.
+async function openLanguage(page: Page, label = t('common.language')) {
+  const button = page.getByRole('button', { name: label, exact: true });
+  if (await button.isVisible()) return button.click();
+  await page.getByRole('button', { name: t('site.menu') }).click();
+}
+// Opens the folded site menu when the screen is narrow; no-op when wide.
+async function openSiteMenu(page: Page) {
+  const menu = page.getByRole('button', { name: t('site.menu') });
+  if (await menu.isVisible()) await menu.click();
+}
+// Search's filters: a sheet behind a button on a phone, a sidebar that is
+// always open on a desktop website (no button). Returns whether a sheet opened.
+async function openFilters(page: Page) {
+  const button = page.getByRole('button', { name: t('search.filtersTitle') });
+  if (await button.isVisible()) {
+    await button.click();
+    return true;
+  }
+  return false;
+}
 async function goSite(page: Page, name: string) {
   const link = siteLink(page, name);
   if (await link.isVisible()) return link.click();
@@ -51,10 +72,10 @@ test('X02 search: Sale/Rent pills and the search box narrow the results', async 
   // "7 prona në shikim" / "1 pronë në shikim"
   const count = page.getByText(/në shikim/);
   await expect(count).toContainText(String(LISTINGS.length));
-  await page.getByRole('button', { name: t('search.rent'), exact: true }).click();
+  await page.getByRole('button', { name: t('search.rent'), exact: true }).first().click();
   const rentals = LISTINGS.filter((l) => l.listing_type === 'rent').length;
   await expect(count).toContainText(String(rentals));
-  await page.getByRole('button', { name: t('common.all'), exact: true }).click();
+  await page.getByRole('button', { name: t('common.all'), exact: true }).first().click();
   await expect(count).toContainText(String(LISTINGS.length));
 });
 
@@ -92,9 +113,9 @@ test.describe('signed in', () => {
     await page.goto('/explore');
     await ready(page);
     await expect(page.getByRole('button', { name: t('search.saveSearch') })).toHaveCount(0);
-    await page.getByRole('button', { name: t('search.filtersTitle') }).click();
+    const sheet = await openFilters(page);
     await page.getByRole('button', { name: t('listing.feature.pool'), exact: true }).click();
-    await page.getByRole('button', { name: /^Shfaq [0-9]/ }).click();
+    if (sheet) await page.getByRole('button', { name: /^Shfaq [0-9]/ }).click();
     await page.getByRole('button', { name: t('search.saveSearch') }).click();
     await expect(page.getByRole('button', { name: t('search.searchSaved') })).toBeVisible();
     expect(sent[0]).toMatchObject({ alerts_enabled: true, filters: { features: ['pool'] } });
@@ -213,9 +234,9 @@ test.describe('signed in', () => {
       await page.goto(trip.from);
       await ready(page);
 
-      await siteLink(page, t('common.messages')).click();
+      await goSite(page, t('common.messages'));
       await expect(page).toHaveURL(/\/messages$/);
-      await expect(siteLink(page, t('common.messages'))).toBeVisible();
+      await expect(page.getByRole('link', { name: 'Shtëpia.ime' }).first()).toBeVisible();
       await expect(page.getByRole('button', { name: t('common.back'), exact: true })).toHaveCount(0);
 
       await page.getByRole('button', { name: new RegExp(escape(LISTINGS[0].title as string)) }).click();
@@ -230,7 +251,7 @@ test.describe('signed in', () => {
 
       await goSite(page, trip.next());
       await expect(page).toHaveURL(trip.nextUrl);
-      await expect(siteLink(page, t('common.messages'))).toBeVisible();
+      await expect(page.getByRole('link', { name: 'Shtëpia.ime' }).first()).toBeVisible();
     });
   }
 
@@ -239,13 +260,13 @@ test.describe('signed in', () => {
     await ready(page);
     await page.getByRole('button', { name: new RegExp(t('common.messages')) }).click();
     await expect(page).toHaveURL(/\/messages$/);
-    await expect(siteLink(page, t('common.messages'))).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Shtëpia.ime' }).first()).toBeVisible();
 
     await page.goto('/agent-dashboard');
     await ready(page);
     await page.getByRole('button', { name: new RegExp(t('agentDashboard.statConversations')) }).click();
     await expect(page).toHaveURL(/\/messages$/);
-    await expect(siteLink(page, t('common.messages'))).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Shtëpia.ime' }).first()).toBeVisible();
   });
 
   test('X42 viewing request: the website has a date and time field, and the chosen time is sent', async ({ page, writes }) => {
@@ -293,12 +314,12 @@ test.describe('signed in', () => {
 test('X07 language: switching to English sticks after a reload', async ({ page }) => {
   await page.goto('/');
   await ready(page);
-  await page.getByRole('button', { name: t('common.language') }).click();
+  await openLanguage(page);
   await page.getByRole('button', { name: /English/ }).click();
-  await expect(page.getByRole('tab', { name: 'Home' })).toBeVisible();
+  await expect(page.locator('html')).toHaveAttribute('lang', 'en');
   await page.reload();
   await ready(page);
-  await expect(page.getByRole('tab', { name: 'Home' })).toBeVisible();
+  await expect(page.getByRole('heading', { level: 1 })).toContainText('Find the right home');
   // Screen readers pick their voice from <html lang>.
   await expect(page.locator('html')).toHaveAttribute('lang', 'en');
 });
@@ -323,7 +344,7 @@ test('X64 Russian headlines switch to Manrope at once, and back to Newsreader in
     });
   // The menu button's own label is in the current language.
   const pickLanguage = async (menuLabel: string, name: RegExp) => {
-    await page.getByRole('button', { name: menuLabel, exact: true }).click();
+    await openLanguage(page, menuLabel);
     await page.getByRole('button', { name }).click();
   };
   await page.goto('/');
@@ -340,20 +361,19 @@ test('X64 Russian headlines switch to Manrope at once, and back to Newsreader in
   await expect(page.locator('html')).toHaveAttribute('lang', 'sq');
   await expect.poll(async () => (await families()).newsreader).toBeGreaterThan(0);
   // Same weight as the serif it replaces: Russian draws no more bold text than
-  // Albanian (the Sale chip and the active tab in both). One step heavier made
-  // everything look bold on the phone (2026-11-12).
+  // Albanian. One step heavier made everything look bold on the phone
+  // (2026-11-12).
   await expect.poll(async () => (await families()).bold).toBe(russianBold);
-  expect(russianBold).toBeLessThanOrEqual(2);
 });
 
-test('X76 the bottom menu says what each button is, and sign-up is in view without scrolling', async ({ page }) => {
+test('X76 the site menu says where each link goes, and sign-up is in view without scrolling', async ({ page }) => {
   await page.goto('/profile');
   await ready(page);
-  const menu = page.getByRole('tablist');
-  for (const word of [t('common.home'), t('common.search'), t('common.messages'), t('common.profile')]) {
-    await expect(menu.getByText(word, { exact: true })).toBeVisible();
+  await openSiteMenu(page);
+  for (const word of [t('common.home'), t('site.nav.search'), t('wanted.homeTitle'), t('site.nav.agencies'), t('legal.buyingGuide')]) {
+    await expect(page.getByText(word, { exact: true }).first()).toBeVisible();
   }
-  await expect(page.getByText(t('common.addShort'), { exact: true })).toBeVisible();
+  await page.keyboard.press('Escape');
   // Above the other sign-in options, so a new person does not have to scroll.
   const join = await page.getByText(t('common.signUp'), { exact: true }).first().boundingBox();
   const others = await page.getByText(t('auth.signInWith'), { exact: true }).boundingBox();
@@ -393,46 +413,30 @@ test.describe('Published by', () => {
   });
 });
 
-test.describe('headline typewriter', () => {
-  const first = `${t('home.heroPhrases.0.lead')} ${t('home.heroPhrases.0.accent')}`;
-  const second = t('home.heroPhrases.1.lead');
-
-  test.describe('with motion', () => {
-    test.use({ contextOptions: { reducedMotion: 'no-preference' } });
-
-    test('X85 types the next phrase, never moves the search bar, and follows the language', async ({ page }) => {
-      await page.goto('/');
-      await ready(page);
-      const heading = page.getByRole('heading', { level: 1 });
-      await expect(heading).toContainText(first.slice(0, 12));
-      const search = page.getByText(t('home.searchPlaceholder')).first();
-      const startY = (await search.boundingBox())!.y;
-      const ys = new Set<number>([Math.round(startY)]);
-      await expect
-        .poll(async () => {
-          ys.add(Math.round((await search.boundingBox())!.y));
-          return (await heading.textContent()) ?? '';
-        }, { timeout: 15_000, intervals: [120] })
-        .toContain(second);
-      expect([...ys]).toEqual([Math.round(startY)]);
-      // A cursor while animating, in the same run of text.
-      await expect(heading).toContainText('|');
-
-      await page.getByRole('button', { name: t('common.language') }).click();
-      await page.getByRole('button', { name: /Русский/ }).click();
-      await expect
-        .poll(async () => /[\u0400-\u04FF]/.test((await heading.textContent()) ?? ''), { timeout: 15_000, intervals: [150] })
-        .toBe(true);
-    });
-  });
-
-  test('X86 with reduced motion it is one still phrase and no cursor', async ({ page }) => {
+// The website's Home is a landing page (DECISIONS.md W5); the typewriter
+// headline stays in the phone apps.
+test.describe('website home', () => {
+  test('X85 one headline, a search that opens Search on the city typed, live numbers, and the footer', async ({ page }) => {
     await page.goto('/');
     await ready(page);
     const heading = page.getByRole('heading', { level: 1 });
-    await expect(heading).toHaveText(first);
-    await page.waitForTimeout(3500);
-    await expect(heading).toHaveText(first);
+    await expect(heading).toHaveText(`${t('site.hero.title')} ${t('site.hero.titleEm')}`);
+    await expect(page.getByText(t('site.stats.listings'), { exact: true })).toBeVisible();
+    await expect(page.getByText(t('site.steps.title'), { exact: true })).toBeVisible();
+    await expect(page.getByRole('contentinfo')).toBeVisible();
+    await page.getByRole('textbox', { name: t('home.searchPlaceholder') }).fill('Durrës');
+    await page.getByRole('button', { name: t('common.search'), exact: true }).click();
+    await expect(page).toHaveURL(/\/explore$/);
+  });
+
+  test('X86 with reduced motion the headline is still and has no cursor', async ({ page }) => {
+    await page.goto('/');
+    await ready(page);
+    const heading = page.getByRole('heading', { level: 1 });
+    const text = await heading.textContent();
+    await page.waitForTimeout(2500);
+    await expect(heading).toHaveText(text ?? '');
+    await expect(heading).not.toContainText('|');
   });
 });
 
@@ -577,7 +581,8 @@ test('X08 legal pages: reachable from Profile, each links to the other', async (
   await page.getByRole('link', { name: t('legal.privacyPolicy') }).first().click();
   await expect(page).toHaveURL(/\/privacy$/);
   await expect(page.getByRole('heading', { name: t('legal.privacyPolicy'), level: 1 })).toBeVisible();
-  await page.getByRole('link', { name: t('legal.termsOfService') }).click();
+  // The page's own link comes before the footer's.
+  await page.getByRole('link', { name: t('legal.termsOfService') }).first().click();
   await expect(page).toHaveURL(/\/terms$/);
   await expect(page).toHaveTitle(new RegExp(t('legal.termsOfService')));
 });
@@ -589,16 +594,17 @@ test('X09 old website addresses redirect to the new ones', async ({ page }) => {
   await expect(page).toHaveURL(new RegExp(`/listing/${FEATURED.id}/analytics$`));
 });
 
-test('X10 a wide screen shows the app as a phone-width column', async ({ page, isMobile }) => {
+test('X10 a wide screen shows a website: a full-width header with the menu, and wide pages', async ({ page, isMobile }) => {
   test.skip(isMobile, 'desktop only');
   await page.goto('/');
   await ready(page);
-  const tabs = await page.getByRole('tablist').boundingBox();
-  expect(tabs).not.toBeNull();
-  const viewport = page.viewportSize()!;
-  expect(tabs!.width).toBeLessThanOrEqual(480);
-  // Centred: equal space either side, within a pixel or two.
-  expect(Math.abs(tabs!.x - (viewport.width - tabs!.x - tabs!.width))).toBeLessThan(40);
+  // No app tab bar on the website (DECISIONS.md W5).
+  await expect(page.getByRole('tablist')).toHaveCount(0);
+  await expect(page.getByRole('link', { name: t('site.nav.agencies'), exact: true }).first()).toBeVisible();
+  const brand = await page.getByRole('link', { name: 'Shtëpia.ime' }).first().boundingBox();
+  expect(brand!.x).toBeLessThan(80);
+  const heading = await page.getByRole('heading', { level: 1 }).boundingBox();
+  expect(heading!.width).toBeGreaterThan(480);
 });
 
 test.describe('not found', () => {
@@ -631,7 +637,7 @@ test.describe('time of day', () => {
       await page.goto('/');
       await ready(page);
       const heading = page.getByRole('heading', { level: 1 });
-      await expect(heading).toHaveText(`${t('home.heroPhrases.0.lead')} ${t('home.heroPhrases.0.accent')}`);
+      await expect(heading).toHaveText(`${t('site.hero.title')} ${t('site.hero.titleEm')}`);
       for (const key of ['home.greetingMorning', 'home.greetingAfternoon', 'home.greetingEvening']) {
         await expect(page.getByText(t(key))).toHaveCount(0);
       }
@@ -798,7 +804,7 @@ test.describe('discovery', () => {
     // Home stays mounted behind the tab, so its cards are still in the page:
     // the count is Explore's own.
     await expect(page.getByText(/në shikim/)).toContainText('1');
-    await expect(page.getByText('Apartament pranë plazhit').first()).toBeVisible();
+    await expect(page.getByText('Apartament pranë plazhit').filter({ visible: true }).first()).toBeVisible();
   });
 
   test('X95 the agencies directory lists, searches and opens an agent', async ({ page }) => {
@@ -836,7 +842,7 @@ test.describe('discovery', () => {
   test('X98 amenity filters narrow the search, count on the badge and clear with reset', async ({ page }) => {
     await page.goto('/explore');
     await ready(page);
-    await page.getByRole('button', { name: t('search.filtersTitle') }).click();
+    await openFilters(page);
     await page.getByRole('button', { name: t('listing.feature.pool'), exact: true }).click();
     await expect(page.getByText(/në shikim/)).toContainText('1');
     await page.getByRole('button', { name: t('search.reset') }).click();
@@ -1085,6 +1091,7 @@ async function layoutProblems(page: Page) {
       for (const el of controls) {
         const r = el.getBoundingClientRect();
         if (r.top > 80) continue;
+        if (el.contains(brand) || brand.contains(el)) continue;
         if (Math.min(b.right, r.right) - Math.max(b.left, r.left) > 0 && Math.min(b.bottom, r.bottom) - Math.max(b.top, r.top) > 0) {
           problems.push(`wordmark overlaps ${el.getAttribute('aria-label')}`);
         }
@@ -1520,8 +1527,8 @@ test('X35 All/Sale/Rent: the tab lights up at once and its homes are already loa
   await page.waitForLoadState('networkidle');
 
   const before = asked.length;
-  const rent = page.getByRole('button', { name: t('search.rent'), exact: true });
-  const all = page.getByRole('button', { name: t('common.all'), exact: true });
+  const rent = page.getByRole('button', { name: t('search.rent'), exact: true }).first();
+  const all = page.getByRole('button', { name: t('common.all'), exact: true }).first();
   const background = (el: typeof rent) => el.evaluate((n) => getComputedStyle(n).backgroundColor);
   const activeBg = await background(all);
   await rent.click();
@@ -1549,7 +1556,7 @@ test.describe('brand headline', () => {
         await page.goto('/');
         await ready(page);
         const heading = page.getByRole('heading', { level: 1 });
-        await expect(heading).toHaveText(`${t('home.heroPhrases.0.lead')} ${t('home.heroPhrases.0.accent')}`);
+        await expect(heading).toHaveText(`${t('site.hero.title')} ${t('site.hero.titleEm')}`);
         await expect(heading).not.toContainText(SIGNED_IN_USER.user_metadata.full_name.split(' ')[0]);
         const m = await heading.evaluate((el, accent) => {
           const span = Array.from(el.querySelectorAll('span')).find((s) => s.textContent?.trim() === accent) as HTMLElement;
@@ -1565,7 +1572,7 @@ test.describe('brand headline', () => {
             accentColor: span ? rgb(getComputedStyle(span).color) : null,
             accentFont: span ? getComputedStyle(span).fontFamily : null,
           };
-        }, t('home.heroPhrases.0.accent'));
+        }, t('site.hero.titleEm'));
         await info.attach('headline.json', { body: JSON.stringify(m, null, 2), contentType: 'application/json' });
         expect(m.pageScrolls).toBe(false);
         expect(m.overflows).toBe(false);
@@ -1583,12 +1590,12 @@ test.describe('brand headline', () => {
   }
 });
 
-test('X36 Home has no kicker above the headline and no "editor\'s pick" label', async ({ page }) => {
+test('X36 Home has no "editor\'s pick" label, and shows the newest homes', async ({ page }) => {
   await page.goto('/');
   await ready(page);
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
   await expect(page.getByText(t('home.editorsPick'))).toHaveCount(0);
-  await expect(page.getByText(t('home.featured'))).toBeVisible();
+  await expect(page.getByText(t('site.listings.title'))).toBeVisible();
 });
 
 // Unfolding a Galaxy Fold widens the window under a running app (on the web
@@ -1621,9 +1628,8 @@ test.describe('unfolding mid-session', () => {
 
     await page.setViewportSize({ width: 690, height: 829 });
     // Still the second photo, a whole page in: not photo one, not half of each.
-    // Each photo is a 480 page (the column), shown through a scroller 478
-    // wide (the column's hairline edges), so page two starts at 480.
-    await expect.poll(() => carousel()).toEqual({ left: 480, width: 478 });
+    // The listing page is as wide as the window (DECISIONS.md W5).
+    await expect.poll(() => carousel()).toEqual({ left: 690, width: 690 });
   });
 
   test('X38 Explore keeps the chosen tab and its homes when the screen widens', async ({ page, isMobile }) => {

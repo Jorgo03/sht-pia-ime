@@ -279,7 +279,7 @@ const createStyles = (colors: AtticoPalette) =>
       backgroundColor: colors.surface,
       maxWidth: 640,
     },
-    searchInput: { flex: 1, minHeight: 48, fontFamily: Fonts.sans, fontSize: 16, color: colors.textPrimary },
+    searchInput: { flex: 1, minWidth: 0, width: 0, minHeight: 48, fontFamily: Fonts.sans, fontSize: 16, color: colors.textPrimary },
     searchBtn: { minHeight: 48, paddingHorizontal: 24, borderRadius: 26, overflow: 'hidden', justifyContent: 'center' },
     searchBtnText: { fontFamily: Fonts.sansBold, fontSize: 15, color: '#fff' },
     heroLinks: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },

@@ -30,7 +30,13 @@ test('S2 the sign-in screen as first screen offers browsing, which goes Home and
   await expect(page.getByRole('button', { name: t('auth.stepInside') })).toBeVisible();
   await browse(page).click();
   await expect(page).toHaveURL(/\/$/);
-  await page.getByRole('link', { name: t('common.signIn'), exact: true }).first().click();
+  // The site header's sign-in link, inside the folded menu on a phone.
+  const signIn = page.getByRole('link', { name: t('common.signIn'), exact: true }).first();
+  if (await signIn.isVisible()) await signIn.click();
+  else {
+    await page.getByRole('button', { name: t('site.menu') }).click();
+    await page.getByRole('menuitem', { name: t('common.signIn'), exact: true }).click();
+  }
   await expect(page).toHaveURL(/\/profile$/);
   await expect(page.getByRole('button', { name: t('auth.stepInside') })).toBeVisible();
   await expect(browse(page)).toHaveCount(0);

@@ -107,7 +107,8 @@ export function AppHeader({
   site = false,
   compact = false,
 }: {
-  /** Language only, without notifications and theme (a narrow site header). */
+  /** Notifications only, without language and theme (the site header on a
+   *  phone, whose menu holds those two). */
   compact?: boolean;
   /** The website's own top header (components/web/site-header). */
   site?: boolean;
@@ -130,7 +131,6 @@ export function AppHeader({
   identityLabel?: string;
 }) {
   const { t, i18n } = useTranslation();
-  const { user } = useAuth();
   const { theme, colors } = useTheme();
   // Website: the site header (components/web/site-header, which passes
   // `site`) shows the brand, menu and controls once at the top of every
@@ -144,7 +144,6 @@ export function AppHeader({
     [colors, onDark, onBack, floating],
   );
   const [langOpen, setLangOpen] = useState(false);
-  const { currency, setCurrency } = useCurrency();
   const insets = useSafeAreaInsets();
   const { width: windowWidth, height: windowHeight } = useWindowDimensions();
   // The menu hangs under the bar: the top inset, the bar's 54 (10 + 34 + 10)
@@ -175,16 +174,6 @@ export function AppHeader({
   const currentFlag =
     LANGUAGES.find((l) => l.code === i18n.language)?.flag ?? LANGUAGES[0].flag;
 
-  // Mirrors web's Header.jsx changeLanguage(): i18next's own storage-backed
-  // detector persists the choice, and it's also written to the profile row so
-  // the preference follows the account across devices.
-  const changeLanguage = async (next: string) => {
-    await i18n.changeLanguage(next);
-    setLangOpen(false);
-    if (user) {
-      await supabase.from('profiles').update({ preferred_language: next }).eq('id', user.id);
-    }
-  };
 
   if (empty) return null;
 
@@ -280,17 +269,19 @@ export function AppHeader({
           <>
             {/* Labelled: the visible content is only a flag emoji, which a
                 screen reader reads as "flag" rather than "Language". */}
+            {!compact && (
             <Pressable
-              style={styles.langBtn}
-              hitSlop={6}
-              onPress={() => setLangOpen(true)}
-              accessibilityRole="button"
-              accessibilityLabel={t('common.language')}>
-              <Text style={styles.langCode}>{currentFlag}</Text>
-              <MaterialIcons name="expand-more" size={14} color={styles.langCode.color} />
-            </Pressable>
+                style={styles.langBtn}
+                hitSlop={6}
+                onPress={() => setLangOpen(true)}
+                accessibilityRole="button"
+                accessibilityLabel={t('common.language')}>
+                <Text style={styles.langCode}>{currentFlag}</Text>
+                <MaterialIcons name="expand-more" size={14} color={styles.langCode.color} />
+              </Pressable>
+            )}
 
-            {!compact && <NotificationBell style={styles.iconBtn} iconColor={styles.langCode.color} />}
+            <NotificationBell style={styles.iconBtn} iconColor={styles.langCode.color} />
             {!compact && <ThemeToggleButton style={styles.iconBtn} iconColor={styles.langCode.color} />}
           </>
         )}
@@ -317,6 +308,38 @@ export function AppHeader({
               style={{ flexGrow: 0, maxHeight: menuMaxHeight }}
               contentContainerStyle={styles.langList}
               bounces={false}>
+              <LanguageOptions onChosen={() => setLangOpen(false)} />
+            </ScrollView>
+          </Pressable>
+        </Pressable>
+      </Modal>
+    </View>
+  );
+}
+
+
+/**
+ * The language list and the price-currency choice: the app header's
+ * dropdown, and the website's menu on a phone (components/web/site-header).
+ */
+export function LanguageOptions({ onChosen }: { onChosen?: () => void }) {
+  const { t, i18n } = useTranslation();
+  const { user } = useAuth();
+  const { colors } = useTheme();
+  const { currency, setCurrency } = useCurrency();
+  const styles = useMemo(() => createStyles(colors, false, false, false), [colors]);
+  // Mirrors web's Header.jsx changeLanguage(): i18next's own storage-backed
+  // detector persists the choice, and it's also written to the profile row so
+  // the preference follows the account across devices.
+  const changeLanguage = async (next: string) => {
+    await i18n.changeLanguage(next);
+    onChosen?.();
+    if (user) {
+      await supabase.from('profiles').update({ preferred_language: next }).eq('id', user.id);
+    }
+  };
+  return (
+    <>
               {LANGUAGES.map((lang) => {
                 const active = lang.code === i18n.language;
                 return (
@@ -362,11 +385,7 @@ export function AppHeader({
                   );
                 })}
               </View>
-            </ScrollView>
-          </Pressable>
-        </Pressable>
-      </Modal>
-    </View>
+    </>
   );
 }
 
