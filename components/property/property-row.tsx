@@ -19,6 +19,7 @@ import {
 } from '@/lib/format';
 import { CARD_CONTAINER_A11Y } from '@/components/property/card-a11y';
 import { cardImageUrl } from '@/lib/image';
+import { pricePerM2 } from '@/src/features/properties/lib/compare';
 import { useCurrency } from '@/contexts/currency-context';
 
 const IMAGE_SIZE = 108;
@@ -59,10 +60,9 @@ function PropertyRowBase({ property }: { property: Property }) {
   const price = formatListingPrice(property.price, property.currency);
   const isSale = property.listing_type === 'sale';
   const area = Number(property.sqft) > 0 ? Number(property.sqft) : null;
-  const perSqm =
-    isSale && area && Number(property.price) > 0
-      ? formatListingPrice(Number(property.price) / area, property.currency).replace(/^≈ /, '')
-      : null;
+  // Sales only (src/features/properties/lib/compare.js): never on a rental.
+  const perM2 = pricePerM2(property);
+  const perSqm = perM2 != null ? formatListingPrice(perM2, property.currency).replace(/^≈ /, '') : null;
   const beds = Number(property.beds) > 0 ? Number(property.beds) : null;
   const baths = trimNumber(property.baths);
   // search.<type> holds every property_type the schema allows (apartment,

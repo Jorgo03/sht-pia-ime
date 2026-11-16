@@ -9,6 +9,7 @@ import { AppHeader } from '@/components/ui/app-header';
 import { ScreenHero } from '@/components/ui/screen-hero';
 import { GradientBackground } from '@/components/ui/gradient-background';
 import { SignInPrompt } from '@/components/ui/sign-in-prompt';
+import { AgentsOnly } from '@/components/ui/agents-only';
 import { type AtticoPalette, Fonts, InlineTarget } from '@/constants/theme';
 import { useAuth } from '@/contexts/auth-context';
 import { useTheme } from '@/contexts/theme-context';
@@ -65,7 +66,7 @@ interface ClientProfile {
 export default function AgentDashboardScreen() {
   const router = useRouter();
   const { t, i18n } = useTranslation();
-  const { user, loading: authLoading } = useAuth();
+  const { user, profile, isAgent, loading: authLoading } = useAuth();
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
   // A centred column on an unfolded Fold or a spanned Duo (hooks/use-responsive).
@@ -183,6 +184,8 @@ export default function AgentDashboardScreen() {
   // Signed out (a deep link, or after signing out) the load never starts, so
   // this used to be a spinner forever.
   if (!user) return authLoading ? null : <SignInPrompt />;
+  // Agents only: a client is told so instead of seeing the agent tools.
+  if (profile && !isAgent) return <AgentsOnly />;
 
   return (
     <GradientBackground>

@@ -111,3 +111,14 @@ export function cityCentre(city) {
   const c = findCity(city)
   return c ? { latitude: c.lat, longitude: c.lng } : null
 }
+
+// The cities people pick most come first in every city list, then the rest in
+// the dataset's own (alphabetical) order. Display order only: the generated
+// data file (data/locations.js) is never hand-edited.
+export const FIRST_CITIES = Object.freeze(['Tiranë', 'Durrës'])
+
+/** City names in display order: Tirana, Durrës, then the rest as given. */
+export function orderCities(names) {
+  const first = FIRST_CITIES.filter((c) => names.includes(c))
+  return [...first, ...names.filter((c) => !FIRST_CITIES.includes(c))]
+}

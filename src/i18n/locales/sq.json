@@ -1302,6 +1302,7 @@
       "legal": "Ligjore",
       "tagline": "Tregu i pronave në Shqipëri, në gjuhën tuaj.",
       "copyright": "© {{year}} Future Home Orange. Të gjitha të drejtat e rezervuara."
-    }
+    },
+    "agentsOnly": "Kjo faqe është vetëm për agjentët."
   }
 }

@@ -1312,6 +1312,7 @@
       "legal": "Mentions légales",
       "tagline": "Le marché immobilier de l'Albanie, dans votre langue.",
       "copyright": "© {{year}} Future Home Orange. Tous droits réservés."
-    }
+    },
+    "agentsOnly": "Cette page est réservée aux agents."
   }
 }

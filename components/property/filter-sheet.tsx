@@ -35,7 +35,7 @@ import { usePropertiesCountQuery } from '@/hooks/use-property-queries';
 import LOCATIONS from '@/src/features/properties/data/locations';
 import { AMENITIES, toggleAmenity } from '@/src/features/properties/lib/amenities';
 import { normalizeRef } from '@/src/features/properties/lib/searchFilters';
-import { cityLabel, findCity } from '@/src/features/properties/lib/places';
+import { cityLabel, findCity, orderCities } from '@/src/features/properties/lib/places';
 import { sheetColumn } from '@/constants/web-frame';
 
 type PropertyType = NonNullable<Property['property_type']>;
@@ -52,7 +52,7 @@ const LISTING_TYPES: ListingType[] = ['sale', 'rent'];
 const COUNT_OPTIONS = [1, 2, 3, 4];
 const SORTS: PropertySort[] = ['newest', 'price_asc', 'price_desc'];
 
-const CITIES: string[] = (LOCATIONS as { city: string }[]).map((l) => l.city);
+const CITIES: string[] = orderCities((LOCATIONS as { city: string }[]).map((l) => l.city));
 
 /** Numeric text -> filter value. Empty string clears the facet. */
 function toNumber(text: string): number | null {

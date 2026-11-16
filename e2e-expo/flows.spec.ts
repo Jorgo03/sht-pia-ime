@@ -823,6 +823,22 @@ test.describe('discovery', () => {
     await expect(page.getByText(/Durrës/).filter({ visible: true }).first()).toBeVisible();
   });
 
+  test('X108 search by city, then neighbourhood: each narrows to that place, Tirana first in the list', async ({ page }) => {
+    await page.goto('/explore');
+    await ready(page);
+    await openFilters(page);
+    await page.getByRole('button', { name: t('search.city'), exact: true }).first().click();
+    // Tirana, then Durrës, then the rest (src/features/properties/lib/places.js).
+    const y = async (name: RegExp) => (await page.getByRole('button', { name }).last().boundingBox())!.y;
+    const [tirana, durres, berat] = [await y(/^Tiranë/), await y(/^Durrës/), await y(/^Berat/)];
+    expect(tirana).toBeLessThan(durres);
+    expect(durres).toBeLessThan(berat);
+    await page.getByRole('button', { name: /^Tiranë/ }).last().click();
+    await expect(page.getByText(/në shikim/)).not.toContainText(String(LISTINGS.length));
+    const inTirana = LISTINGS.filter((l) => l.city === 'Tiranë').length;
+    await expect(page.getByText(/në shikim/)).toContainText(String(inTirana));
+  });
+
   test('X95 the agencies directory lists, searches and opens an agent', async ({ page }) => {
     await page.goto('/agents');
     await ready(page);
@@ -2378,6 +2394,23 @@ test.describe('performance report', () => {
     await page.waitForTimeout(300);
     expect(reportCalls(writes)).toHaveLength(0);
   });
+
+  // The parity brief: agent tools never show to a client (the database
+  // returns a client nothing of an agent's anyway).
+  for (const path of ['/agent-dashboard', '/leads', '/performance']) {
+    test(`X107 a signed-in client opening ${path} is told it is for agents, with no agent tools`, async ({ page }) => {
+      await page.route('**/rest/v1/profiles*', (route) => {
+        const row = { id: SIGNED_IN_USER.id, role: 'buyer', full_name: 'Ana Klientja', agency_name: null, avatar_url: null, preferred_language: 'sq' };
+        const one = (route.request().headers()['accept'] ?? '').includes('vnd.pgrst.object');
+        return json(route, one ? row : [row]);
+      });
+      await page.goto(path);
+      await ready(page);
+      await expect(page.getByText(path === '/performance' ? t('performance.agentsOnly') : t('site.agentsOnly'))).toBeVisible();
+      await expect(page.getByText(t('agentDashboard.wantedFeed'))).toHaveCount(0);
+      await expect(page.getByRole('button', { name: t('leads.add') })).toHaveCount(0);
+    });
+  }
 
   test('X70 marking a listing sold asks first: cancel changes nothing, confirm marks it', async ({ page, writes }) => {
     await page.goto('/my-listings');

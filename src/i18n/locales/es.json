@@ -1312,6 +1312,7 @@
       "legal": "Legal",
       "tagline": "El mercado inmobiliario de Albania, en tu idioma.",
       "copyright": "© {{year}} Future Home Orange. Todos los derechos reservados."
-    }
+    },
+    "agentsOnly": "Esta página es solo para agentes."
   }
 }

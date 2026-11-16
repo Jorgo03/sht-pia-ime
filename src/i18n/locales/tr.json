@@ -1302,6 +1302,7 @@
       "legal": "Yasal",
       "tagline": "Arnavutluk'un emlak pazarı, kendi dilinizde.",
       "copyright": "© {{year}} Future Home Orange. Tüm hakları saklıdır."
-    }
+    },
+    "agentsOnly": "Bu sayfa yalnızca emlakçılar içindir."
   }
 }

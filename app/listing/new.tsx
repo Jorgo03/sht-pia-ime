@@ -62,7 +62,7 @@ import {
 import LOCATIONS from '@/src/features/properties/data/locations';
 import { AMENITIES } from '@/src/features/properties/lib/amenities';
 import { zonesFor } from '@/src/features/properties/lib/searchFilters';
-import { checkPin, cityLabel, findCity } from '@/src/features/properties/lib/places';
+import { checkPin, cityLabel, findCity, orderCities } from '@/src/features/properties/lib/places';
 import { useReadableColumn, useResponsive } from '@/hooks/use-responsive';
 
 /**
@@ -116,7 +116,7 @@ const PROPERTY_TYPES: PropertyType[] = [
 
 const CURRENCIES: Currency[] = ['EUR', 'ALL', 'USD'];
 
-const CITIES: string[] = (LOCATIONS as { city: string }[]).map((l) => l.city);
+const CITIES: string[] = orderCities((LOCATIONS as { city: string }[]).map((l) => l.city));
 /** Every city, by its picker label, findable by any of its names. */
 const CITY_OPTIONS = CITIES.map((c) => ({ value: c, label: cityLabel(c), keys: findCity(c)?.keys ?? [] }));
 /** A city's zones, findable by their aliases and old spellings. */

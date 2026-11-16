@@ -54,6 +54,7 @@ import { formatPrice, listingBadgeKey, priceSuffixKey, telUrl, whatsappUrl } fro
 import { sheetColumn } from '@/constants/web-frame';
 import { useAppDimensions } from '@/hooks/use-app-dimensions';
 import { PageHead } from '@/components/web/page-head';
+import { pricePerM2 } from '@/src/features/properties/lib/compare';
 import { PriceHistory } from '@/components/property/price-history';
 import { CARD_CONTAINER_A11Y } from '@/components/property/card-a11y';
 import { ViewingTimePicker } from '@/components/viewings/viewing-time-picker';
@@ -363,7 +364,9 @@ export default function PropertyDetailScreen() {
         };
   const features = property.features ?? [];
   // Sales only: a monthly or daily rent per m² is not a figure anyone compares.
-  const pricePerSqm = !suffixKey && property.sqft && property.sqft > 0 ? Math.round(property.price / property.sqft) : null;
+  // One rule for every screen (src/features/properties/lib/compare.js): sales
+  // only; a rental's price per m² means nothing.
+  const pricePerSqm = pricePerM2(property);
 
   const amenities = [
     // *Count keys: property.beds/baths are the form-field labels and have no

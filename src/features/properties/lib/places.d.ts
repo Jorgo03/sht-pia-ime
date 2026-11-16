@@ -40,3 +40,6 @@ export function locationIdFor(city: unknown, zone?: unknown): string | null;
 export function searchPlaces(term: unknown, options?: { limit?: number; city?: string | null }): PlaceResult[];
 export function checkPin(city: unknown, lat: unknown, lng: unknown): PinCheck;
 export function cityCentre(city: unknown): { latitude: number; longitude: number } | null;
+
+export declare const FIRST_CITIES: readonly string[];
+export declare function orderCities(names: string[]): string[];

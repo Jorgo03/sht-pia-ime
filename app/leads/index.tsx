@@ -21,6 +21,7 @@ import { GradientBackground } from '@/components/ui/gradient-background';
 import { LoadError } from '@/components/ui/load-error';
 import { ScreenHero } from '@/components/ui/screen-hero';
 import { SignInPrompt } from '@/components/ui/sign-in-prompt';
+import { AgentsOnly } from '@/components/ui/agents-only';
 import { Fonts, Radii, Spacing, type AtticoPalette } from '@/constants/theme';
 import { useAuth } from '@/contexts/auth-context';
 import { useTheme } from '@/contexts/theme-context';
@@ -51,7 +52,7 @@ function statusColor(colors: AtticoPalette, status: LeadStatus): string {
 export default function LeadsScreen() {
   const router = useRouter();
   const { t } = useTranslation();
-  const { user, loading: authLoading } = useAuth();
+  const { user, profile, isAgent, loading: authLoading } = useAuth();
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const readable = useReadableColumn();
@@ -196,6 +197,8 @@ export default function LeadsScreen() {
   );
 
   if (!user) return authLoading ? null : <SignInPrompt />;
+  // Agents only: a client is told so instead of seeing the agent tools.
+  if (profile && !isAgent) return <AgentsOnly />;
 
   const filters: Filter[] = ['all', ...LEAD_STATUSES];
 

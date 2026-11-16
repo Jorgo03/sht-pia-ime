@@ -1302,6 +1302,7 @@
       "legal": "Legal",
       "tagline": "Albania's property marketplace, in your language.",
       "copyright": "© {{year}} Future Home Orange. All rights reserved."
-    }
+    },
+    "agentsOnly": "This page is for agents only."
   }
 }

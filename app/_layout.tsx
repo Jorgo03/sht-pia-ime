@@ -23,8 +23,8 @@ import { DarkTheme, DefaultTheme, Stack, ThemeProvider as NavigationThemeProvide
 import { loadAsync as loadFontsAsync, useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect, useState, type ReactNode } from 'react';
-import { Platform, StyleSheet, View, useWindowDimensions } from 'react-native';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { Platform, StyleSheet, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import 'react-native-reanimated';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -49,6 +49,7 @@ import { SignedOutStart } from '@/components/auth/signed-out-start';
 import { NotificationsProvider } from '@/contexts/notifications-context';
 import { APP_SCREEN_MAX_WIDTH, IS_WEB, SITE_MAX_WIDTH, isWebsiteRoute } from '@/constants/web-frame';
 import { SiteHeader } from '@/components/web/site-header';
+import { forwardWheel } from '@/lib/web/forward-wheel';
 import { RouteHead } from '@/components/web/page-head';
 import { debugWarn } from '@/lib/debug';
 
@@ -97,22 +98,32 @@ installGlobalErrorReporting();
 configureForegroundNotifications();
 
 /**
- * The website is this app's web build. On a screen wider than a phone it is
- * drawn in a centred phone-width column (constants/web-frame.ts), with a
- * hairline edge, so it looks like the app instead of a stretched page.
+ * The website is this app's web build (DECISIONS.md W5): the site header
+ * across the window, and the page in a centred column (constants/web-frame.ts)
+ * whose width depends on the page.
  * Native builds render the navigator directly.
  */
 function WebColumn({ children }: { children: ReactNode }) {
   const { colors } = useTheme();
   const pathname = usePathname();
+  const pageRef = useRef<unknown>(null);
+  const columnRef = useRef<unknown>(null);
+  // A wheel over the margins beside the column scrolls the page too.
+  useEffect(() => {
+    if (!IS_WEB) return;
+    const page = pageRef.current as unknown as HTMLElement | null;
+    const column = columnRef.current as unknown as HTMLElement | null;
+    if (!page || !column) return;
+    return forwardWheel(page, column);
+  }, []);
   if (!IS_WEB) return <>{children}</>;
   // The column's width depends only on the address, never on the window, so
   // the pre-rendered page and the browser's first draw agree.
   const maxWidth = isWebsiteRoute(pathname) ? SITE_MAX_WIDTH : APP_SCREEN_MAX_WIDTH;
   return (
-    <View style={[styles.webPage, { backgroundColor: colors.primary }]}>
+    <View ref={pageRef as never} style={[styles.webPage, { backgroundColor: colors.primary }]}>
       <SiteHeader />
-      <View style={[styles.webColumn, { maxWidth }]}>{children}</View>
+      <View ref={columnRef as never} style={[styles.webColumn, { maxWidth }]}>{children}</View>
     </View>
   );
 }

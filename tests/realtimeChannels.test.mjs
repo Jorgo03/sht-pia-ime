@@ -15,6 +15,7 @@ test('the Messages lists subscribe under a new name every time', () => {
 })
 
 test('price per m² is for sales only, on both listing pages', () => {
-  assert.match(read('app/property/[id].tsx'), /const pricePerSqm = !suffixKey &&/)
+  // The app uses the shared sales-only rule (tests/rentalPriceRule.test.mjs).
+  assert.match(read('app/property/[id].tsx'), /const pricePerSqm = pricePerM2\(property\)/)
   assert.match(read('src/features/properties/pages/PropertyDetail.jsx'), /const pricePerSqm = !suffixKey &&/)
 })
