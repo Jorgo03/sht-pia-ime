@@ -1,7 +1,7 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": null,
-  "buildCommand": "NODE_ENV=production EXPO_PUBLIC_SUPABASE_URL=${EXPO_PUBLIC_SUPABASE_URL:-$VITE_SUPABASE_URL} EXPO_PUBLIC_SUPABASE_ANON_KEY=${EXPO_PUBLIC_SUPABASE_ANON_KEY:-$VITE_SUPABASE_ANON_KEY} EXPO_PUBLIC_SITE_URL=${EXPO_PUBLIC_SITE_URL:-https://real-estate-app-hazel-seven.vercel.app} sh -c 'npm run build:web-expo -- --output-dir dist && node scripts/expo-web-postbuild.mjs dist'",
+  "buildCommand": "node scripts/vercel-build.mjs",
   "outputDirectory": "dist",
   "cleanUrls": true,
   "trailingSlash": false,
