@@ -23,7 +23,7 @@ test('both city pickers use the shared order', async () => {
 })
 
 test('the brief\'s examples resolve to the existing records', () => {
-  for (const [q, city] of [['Astir', 'Tiranë'], ['Blloku', 'Tiranë'], ['Komuna e Parisit', 'Tiranë'], ['Iliria', 'Durrës']]) {
+  for (const [q, city] of [['Astir', 'Tiranë'], ['Blloku', 'Tiranë'], ['Komuna e Parisit', 'Tiranë'], ['Iliria', 'Durrës'], ['Plazh', 'Durrës'], ['Plazhi', 'Durrës'], ['Currila', 'Durrës']]) {
     assert.equal(searchPlaces(q, { limit: 1 })[0]?.city, city, q)
   }
 })

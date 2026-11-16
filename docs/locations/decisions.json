@@ -2,10 +2,10 @@
  "approved": "2026-11-14",
  "by": "owner, Checkpoint 1: \"Approve all\"",
  "counts": {
-  "keep": 203,
+  "keep": 205,
   "rename": 15,
   "move": 47,
-  "remove": 58
+  "remove": 56
  },
  "decisions": [
   {
@@ -690,8 +690,21 @@
    "status": "unverified",
    "where": "src/features/properties/data/locations.js:17",
    "evidence": "amenity/amenity \"Xhamia Islame,Plazh\" (OSM nominatim:Xhamia Islame,Plazh, Rruga Jusuf Myzyri, Durrës, Bashkia Durrës, Qarku i Durrësit, 2001, Shqipëria); railway/railway \"Durrës Plazh\" (OSM nominatim:Durrës Plazh, Rruga Turgut Ozal, Durrës, Bashkia Durrës, Qarku i Durrësit, 2001, Shqipëria); amenity/amenity \"Zyra Postare Plazh\" (OSM nominatim:Zyra Postare Plazh, 281, Rruga Pavarësia, Durrës, Bashkia Durrës, Qarku i Durrësit, 2008, Shqipëria)",
-   "action": "remove",
-   "note": "no source for it as a place"
+   "action": "keep",
+   "note": "kept by the owner, 2026-11-16 (DECISIONS.md W8): a real-estate area name used in Durrës, located by the \"Durrës Plazh\" railway halt (OSM node/11001912339); not an official lagje",
+   "landmark": true,
+   "to": [
+    {
+     "name": "Durrës Plazh",
+     "bashki": "Durrës",
+     "osm": "node/11001912339",
+     "lat": 41.3094834,
+     "lon": 19.4923139,
+     "kind": "halt",
+     "category": "railway",
+     "as": "Plazh"
+    }
+   ]
   },
   {
    "city": "Durrës",
@@ -777,8 +790,21 @@
    "status": "unverified",
    "where": "src/features/properties/data/locations.js:18",
    "evidence": "highway/highway \"Kodër Currila\" (OSM nominatim:Kodër Currila, Rruga e Currilave, Durrës, Bashkia Durrës, Qarku i Durrësit, 2001, Shqipëria); highway/highway \"Kodër Currila\" (OSM node/12572443763)",
-   "action": "remove",
-   "note": "no source for it as a place"
+   "action": "keep",
+   "note": "kept by the owner, 2026-11-16 (DECISIONS.md W8): a real-estate area name used in Durrës, located by the \"Kodër Currila\" stop on Rruga e Currilave (OSM node/12572443763); not an official lagje",
+   "landmark": true,
+   "to": [
+    {
+     "name": "Kodër Currila",
+     "bashki": "Durrës",
+     "osm": "node/12572443763",
+     "lat": 41.3201878,
+     "lon": 19.4317326,
+     "kind": "bus_stop",
+     "category": "highway",
+     "as": "Currila"
+    }
+   ]
   },
   {
    "city": "Durrës",

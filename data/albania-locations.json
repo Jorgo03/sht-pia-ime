@@ -18,7 +18,7 @@
   "njesi": 373,
   "lagje": 150,
   "fshat": 715,
-  "zone": 21
+  "zone": 23
  },
  "locations": [
   {
@@ -41610,6 +41610,37 @@
    }
   },
   {
+   "id": "zone/durres/durres/durres/plazh",
+   "slug": "plazh",
+   "type": "zone",
+   "parent_id": "njesi/durres/durres/durres",
+   "name": {
+    "indefinite": "Plazh",
+    "definite": "Plazhi",
+    "definite_source": "rule"
+   },
+   "names": {
+    "sq": "Plazh"
+   },
+   "aliases": [
+    "Plazhi",
+    "plazh",
+    "plazhi"
+   ],
+   "centroid": {
+    "lat": 41.309483,
+    "lng": 19.492314,
+    "source": "OSM object"
+   },
+   "postal_code": null,
+   "osm_place": "halt",
+   "landmark": "railway=halt: Durrës Plazh",
+   "source": {
+    "osm": "node/11001912339",
+    "wikidata": null
+   }
+  },
+  {
    "id": "zone/durres/durres/rrashbull/shkembi-i-kavajes",
    "slug": "shkembi-i-kavajes",
    "type": "zone",
@@ -41635,6 +41666,35 @@
    "landmark": "natural=peak: Shkembi i Kavajes",
    "source": {
     "osm": "nominatim:Shkembi i Kavajes, Bashkia Durrës, Qarku i Durrësit, 2021, Shqipëria",
+    "wikidata": null
+   }
+  },
+  {
+   "id": "zone/durres/durres/durres/currila",
+   "slug": "currila",
+   "type": "zone",
+   "parent_id": "njesi/durres/durres/durres",
+   "name": {
+    "indefinite": "Currila",
+    "definite": "Currila",
+    "definite_source": "rule"
+   },
+   "names": {
+    "sq": "Currila"
+   },
+   "aliases": [
+    "currila"
+   ],
+   "centroid": {
+    "lat": 41.320188,
+    "lng": 19.431733,
+    "source": "OSM object"
+   },
+   "postal_code": null,
+   "osm_place": "bus_stop",
+   "landmark": "highway=bus_stop: Kodër Currila",
+   "source": {
+    "osm": "node/12572443763",
     "wikidata": null
    }
   },

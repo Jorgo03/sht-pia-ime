@@ -32,6 +32,18 @@ first (it was rejected with 401 on 2026-11-04).
 
 ## ═══ WEBSITE FROM THE APP — 2026-11-16 ═══
 
+### W8. Plazh and Currila are Durrës areas again (DECIDED by owner, 2026-11-16)
+
+The locations audit (2026-11-14) removed both: no official source lists them
+as a place. The owner asked for them back. They are kept as real-estate area
+names (type `zone`, like "Myslym Shyri"), located by OpenStreetMap: Plazh at
+the "Durrës Plazh" railway halt (node/11001912339), Currila at the "Kodër
+Currila" stop on Rruga e Currilave (node/12572443763). Changed in
+`docs/locations/decisions.json`, regenerated per docs/locations/SOURCES.md,
+and the two rows added to the live `public.locations` (661 rows). The
+database guard accepts them on a Durrës listing and still refuses invented
+zones.
+
 ### W7. Website parity pass (JUDGMENT CALLS, 2026-11-16, owner may reverse)
 
 From the owner's parity brief (docs/APP_WEBSITE_PARITY_REPORT.md):
@@ -39,8 +51,7 @@ From the owner's parity brief (docs/APP_WEBSITE_PARITY_REPORT.md):
   (`orderCities`); the generated dataset itself is unchanged.
 - Agent-only screens (dashboard, leads, report) show a client an
   "agents only" notice; the database already gave clients nothing.
-- Plazh and Currila are not in the location dataset. Not added: that changes
-  the source data and the live `locations` table, which needs the owner's yes.
+- Plazh and Currila: added on the owner's yes (W8).
 - The page keeps scrolling inside its container (React Native for web); the
   wheel now also works over the margins. A true document scroll would mean
   restructuring every screen.

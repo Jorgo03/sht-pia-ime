@@ -63,7 +63,12 @@ test('every zone is a real place inside its own municipality', () => {
 test('nothing the audit removed is offered again', () => {
   const offered = new Set(CITIES.flatMap((c) => c.zones.map((z) => `${c.city}|${fold(z.name)}`)))
   const removed = decisions.filter((d) => d.action === 'remove' && d.zone !== 'Qendër')
-  assert.ok(removed.length > 30)
+  // 31 at the audit; Plazh and Currila came back on the owner's word (DECISIONS.md W8).
+  assert.equal(removed.length, 29)
+  for (const z of ['Plazh', 'Currila']) {
+    assert.ok(offered.has(`Durrës|${fold(z)}`), `${z} is offered in Durrës`)
+    assert.match(decisions.find((d) => d.city === 'Durrës' && d.zone === z).note, /owner/)
+  }
   for (const d of removed) assert.ok(!offered.has(`${d.city}|${fold(d.zone)}`), `${d.city}/${d.zone} is back`)
   for (const fake of ['Përmet i Durrësit', 'Himara Jugor', 'Liqeni i Korçës', 'Kukës i Ri', 'Kukës i Vjetër', 'Rrethi i Ri', 'Skelë', 'Dunavat']) {
     assert.ok(!CITIES.some((c) => c.zones.some((z) => fold(z.name) === fold(fake))), `${fake} is offered`)

@@ -28,7 +28,7 @@ Mobile and website share one file unless the Website column says otherwise.
 | Navigation | `app/(tabs)/_layout.tsx`, `components/liquid-tab-bar.tsx` | `components/web/site-header.tsx` (top bar; folded menu < 980px) | different by design (W5) | — | ✅ |
 | Homepage | `app/(tabs)/index.tsx` | `app/(tabs)/index.web.tsx` → `components/web/website-home.tsx` | landing page by design (W5); same data | — | ✅ |
 | Search and filters | `app/(tabs)/explore.tsx`, `components/property/filter-sheet.tsx` | same; desktop filter sidebar (`FilterSidebar`) | none | — | ✅ |
-| Locations | `src/features/properties/data/locations.js` (generated), `lib/places.js` | same | Plazh, Currila absent from the dataset | owner decision: add to source + live `locations` | ⚠️ |
+| Locations | `src/features/properties/data/locations.js` (generated), `lib/places.js` | same | Plazh, Currila were absent | added (DECISIONS.md W8), live table too | ✅ |
 | City order | `orderCities` in `lib/places.js` | same | was alphabetical | fixed: Tirana, Durrës, rest | ✅ |
 | Rental price rule | `pricePerM2` in `src/features/properties/lib/compare.js` | same | detail and row had own copies | fixed: one rule, tested | ✅ |
 | Property cards | `components/property/property-card.tsx`, `property-row.tsx` | same | none | — | ✅ |

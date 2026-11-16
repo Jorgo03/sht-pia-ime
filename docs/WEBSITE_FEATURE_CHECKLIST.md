@@ -9,7 +9,7 @@ live check.
 |---|---|---|---|
 | 1 | Homepage: hero, search, live numbers, latest homes, steps, services, cities, footer | X85, X36, X01, screenshots of the live site | ✅ |
 | 2 | Search and filters: sale/rent, type, city, zone, price, rooms, baths, area, amenities, sort, reference | X02, X35, X98, X101, X108 | ✅ |
-| 3 | Locations: generated dataset, aliases, Tirana then Durrës first | X108, tests/cityOrder.test.mjs | ✅ (Plazh, Currila missing from the data: owner decision) |
+| 3 | Locations: generated dataset, aliases, Tirana then Durrës first | X108, tests/cityOrder.test.mjs | ✅ (Plazh and Currila added, W8) |
 | 4 | Rental price rule: no price per m² on rentals | X77, tests/rentalPriceRule.test.mjs | ✅ |
 | 5 | Property cards and details, own URL, meta tags | X01, X48, X99, X103; live `/property/<id>` with title, canonical, hreflang | ✅ |
 | 6 | Publish and edit listings, photos to storage | X20, X21, X22, X23, X53, X70, X102 | ✅ |

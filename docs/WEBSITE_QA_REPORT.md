@@ -32,7 +32,6 @@ requests from this run.
 
 ## Remaining
 
-- Plazh and Currila are not in the location dataset (owner decision to add).
 - No browser push notifications.
 - The page scrolls inside its container, not the browser document.
 - Visual comparison with the running phone app was not possible here (no

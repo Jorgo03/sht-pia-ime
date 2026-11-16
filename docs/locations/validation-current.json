@@ -2080,6 +2080,17 @@
   ]
  },
  {
+  "value": "Currila",
+  "city": "Durrës",
+  "kind": "zone",
+  "where": "src/features/properties/data/locations.js:0",
+  "userData": "N",
+  "status": "unverified",
+  "proposal": "No place of this name in OpenStreetMap, but Bashkia Durrës has things named after it. Needs a local source (cadastre or the municipality) before keeping; else remove",
+  "evidence": "highway/highway \"Kodër Currila\" (OSM nominatim:Kodër Currila, Rruga e Currilave, Durrës, Bashkia Durrës, Qarku i Durrësit, 2001, Shqipëria); highway/highway \"Kodër Currila\" (OSM node/12572443763)",
+  "traceOnly": true
+ },
+ {
   "value": "Fllakë",
   "city": "Durrës",
   "kind": "zone",
@@ -2184,6 +2195,17 @@
     "category": "place"
    }
   ]
+ },
+ {
+  "value": "Plazh",
+  "city": "Durrës",
+  "kind": "zone",
+  "where": "src/features/properties/data/locations.js:0",
+  "userData": "N",
+  "status": "unverified",
+  "proposal": "No place of this name in OpenStreetMap, but Bashkia Durrës has things named after it. Needs a local source (cadastre or the municipality) before keeping; else remove",
+  "evidence": "amenity/amenity \"Xhamia Islame,Plazh\" (OSM nominatim:Xhamia Islame,Plazh, Rruga Jusuf Myzyri, Durrës, Bashkia Durrës, Qarku i Durrësit, 2001, Shqipëria); railway/railway \"Durrës Plazh\" (OSM nominatim:Durrës Plazh, Rruga Turgut Ozal, Durrës, Bashkia Durrës, Qarku i Durrësit, 2001, Shqipëria); amenity/amenity \"Zyra Postare Plazh\" (OSM nominatim:Zyra Postare Plazh, 281, Rruga Pavarësia, Durrës, Bashkia Durrës, Qarku i Durrësit, 2008, Shqipëria)",
+  "traceOnly": true
  },
  {
   "value": "Plepa",
