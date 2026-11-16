@@ -385,8 +385,9 @@ test('X76 the site menu says where each link goes, and sign-up is in view withou
   await page.goto('/profile');
   await ready(page);
   await openSiteMenu(page);
+  // Links by name: the wide menu writes them in capitals, the folded one not.
   for (const word of [t('common.home'), t('site.nav.search'), t('wanted.homeTitle'), t('site.nav.agencies'), t('legal.buyingGuide')]) {
-    await expect(page.getByText(word, { exact: true }).first()).toBeVisible();
+    await expect(page.getByRole(await page.getByRole('menu').count() ? 'menuitem' : 'link', { name: word, exact: true }).first()).toBeVisible();
   }
   await page.keyboard.press('Escape');
   // Above the other sign-in options, so a new person does not have to scroll.
@@ -813,8 +814,10 @@ test.describe('discovery', () => {
   test('X94 a city tile shows only that city when opened', async ({ page }) => {
     await page.goto('/');
     await ready(page);
-    await expect(page.getByText(t('home.exploreCities'))).toBeVisible();
-    await page.getByRole('button', { name: /^Durrës,/ }).click();
+    // The cities sit near the end of the website's Home (DECISIONS.md W9).
+    const tile = page.getByRole('button', { name: /^Durrës,/ });
+    await tile.scrollIntoViewIfNeeded();
+    await tile.click();
     await expect(page).toHaveURL(/\/explore/);
     // Home stays mounted behind the tab, so its cards are still in the page:
     // the count is Explore's own.
@@ -1581,7 +1584,7 @@ test.describe('brand headline', () => {
 
   for (const width of [280, 320, 390, 480]) {
     for (const scheme of ['light', 'dark'] as const) {
-      test(`X65 at ${width}px, ${scheme}: the headline wraps on screen with an orange ending`, async ({ page, isMobile }, info) => {
+      test(`X65 at ${width}px, ${scheme}: the headline wraps on screen, white on the hero`, async ({ page, isMobile }, info) => {
         test.skip(!isMobile, 'phone project only');
         await page.setViewportSize({ width, height: 760 });
         await page.emulateMedia({ colorScheme: scheme });
@@ -1590,33 +1593,24 @@ test.describe('brand headline', () => {
         const heading = page.getByRole('heading', { level: 1 });
         await expect(heading).toHaveText(`${t('site.hero.title')} ${t('site.hero.titleEm')}`);
         await expect(heading).not.toContainText(SIGNED_IN_USER.user_metadata.full_name.split(' ')[0]);
-        const m = await heading.evaluate((el, accent) => {
-          const span = Array.from(el.querySelectorAll('span')).find((s) => s.textContent?.trim() === accent) as HTMLElement;
+        // The website's hero (DECISIONS.md W9): one headline, white on the
+        // dark hero, wrapping inside the screen at every width.
+        const m = await heading.evaluate((el) => {
           const r = el.getBoundingClientRect();
           const rgb = (c: string) => c.match(/\d+/g)!.slice(0, 3).map(Number);
           return {
             left: r.left, right: r.right, viewport: window.innerWidth,
             pageScrolls: document.documentElement.scrollWidth > window.innerWidth,
             overflows: el.scrollWidth > el.clientWidth,
-            lines: Math.round(r.height / parseFloat(getComputedStyle(el).lineHeight)),
-            accentRight: span ? Math.max(...Array.from(span.getClientRects()).map((x) => x.right)) : null,
-            headlineColor: rgb(getComputedStyle(el).color),
-            accentColor: span ? rgb(getComputedStyle(span).color) : null,
-            accentFont: span ? getComputedStyle(span).fontFamily : null,
+            color: rgb(getComputedStyle(el).color),
           };
-        }, t('site.hero.titleEm'));
+        });
         await info.attach('headline.json', { body: JSON.stringify(m, null, 2), contentType: 'application/json' });
         expect(m.pageScrolls).toBe(false);
         expect(m.overflows).toBe(false);
         expect(m.left).toBeGreaterThanOrEqual(0);
         expect(m.right).toBeLessThanOrEqual(m.viewport);
-        expect(m.accentRight).not.toBeNull();
-        expect(m.accentRight!).toBeLessThanOrEqual(m.viewport);
-        // Orange: red well above blue, and not the colour of the rest.
-        const [r, , b] = m.accentColor!;
-        expect(r - b).toBeGreaterThan(100);
-        expect(m.accentColor).not.toEqual(m.headlineColor);
-        expect(m.accentFont).toMatch(/Newsreader/);
+        expect(Math.min(...m.color)).toBeGreaterThan(230);
       });
     }
   }

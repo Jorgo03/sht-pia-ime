@@ -32,6 +32,27 @@ first (it was rejected with 401 on 2026-11-04).
 
 ## ═══ WEBSITE FROM THE APP — 2026-11-16 ═══
 
+### W9. The website follows the reference site's look closely (DECIDED by owner, 2026-11-16)
+
+The owner, pointing at equitifyasset.com again: "make just like this one".
+Followed: its layout and visual language, studied in a browser (computed
+fonts, colours, sections). Not copied: its name, text, logos or photos.
+Shtëpia.ime keeps its own words, orange and data. On the web:
+- Home is full-bleed: a full-screen dark hero under a transparent header
+  (white uppercase links in a pill, orange pill button) that turns solid once
+  scrolled past (`lib/web/hero-state.js`);
+- big thin headings with tight letter-spacing (Manrope 400; the reference
+  uses Aspekta, which the app does not ship);
+- light sections framed by thin grid lines with small orange corner squares,
+  numbered cards (01, 02), a dark "how it works" band, live numbers in large
+  thin figures, a dark services grid with an orange glow, the newest homes
+  in a horizontal row, a dark closing band;
+- a black footer: large headline, call to action, link columns, the brand
+  symbol large in the corner.
+Photos: the reference's hero and closing band are photographs. The repo has
+none, so both are dark with an orange glow until the owner supplies (or
+approves) photos.
+
 ### W8. Plazh and Currila are Durrës areas again (DECIDED by owner, 2026-11-16)
 
 The locations audit (2026-11-14) removed both: no official source lists them

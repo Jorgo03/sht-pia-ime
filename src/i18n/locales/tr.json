@@ -1234,7 +1234,9 @@
     "stats": {
       "listings": "Aktif ilanlar",
       "cities": "İlanı olan şehirler",
-      "agencies": "Ofisler ve emlakçılar"
+      "agencies": "Ofisler ve emlakçılar",
+      "title": "Rakamlarla Shtëpia.ime",
+      "body": "Bugün yayınlanan ilanlardan doğrudan okunan gerçek rakamlar."
     },
     "listings": {
       "eyebrow": "Yeni ilanlar",
@@ -1301,7 +1303,8 @@
       "sell": "Sat veya kirala",
       "legal": "Yasal",
       "tagline": "Arnavutluk'un emlak pazarı, kendi dilinizde.",
-      "copyright": "© {{year}} Future Home Orange. Tüm hakları saklıdır."
+      "copyright": "© {{year}} Future Home Orange. Tüm hakları saklıdır.",
+      "contact": "İletişim"
     },
     "agentsOnly": "Bu sayfa yalnızca emlakçılar içindir."
   }

@@ -1234,7 +1234,9 @@
     "stats": {
       "listings": "Prona aktive",
       "cities": "Qytete me prona",
-      "agencies": "Agjenci dhe agjentë"
+      "agencies": "Agjenci dhe agjentë",
+      "title": "Shtëpia.ime në shifra",
+      "body": "Numra të vërtetë, të lexuar drejtpërdrejt nga pronat e publikuara sot."
     },
     "listings": {
       "eyebrow": "Të rejat",
@@ -1301,7 +1303,8 @@
       "sell": "Shit ose jep me qira",
       "legal": "Ligjore",
       "tagline": "Tregu i pronave në Shqipëri, në gjuhën tuaj.",
-      "copyright": "© {{year}} Future Home Orange. Të gjitha të drejtat e rezervuara."
+      "copyright": "© {{year}} Future Home Orange. Të gjitha të drejtat e rezervuara.",
+      "contact": "Kontakt"
     },
     "agentsOnly": "Kjo faqe është vetëm për agjentët."
   }

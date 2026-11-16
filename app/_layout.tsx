@@ -119,11 +119,16 @@ function WebColumn({ children }: { children: ReactNode }) {
   if (!IS_WEB) return <>{children}</>;
   // The column's width depends only on the address, never on the window, so
   // the pre-rendered page and the browser's first draw agree.
-  const maxWidth = isWebsiteRoute(pathname) ? SITE_MAX_WIDTH : APP_SCREEN_MAX_WIDTH;
+  // Home is full-bleed: its hero runs edge to edge under a floating header,
+  // and each section keeps its own content width (components/web/website-home).
+  const home = pathname === '/';
+  const maxWidth = home ? undefined : isWebsiteRoute(pathname) ? SITE_MAX_WIDTH : APP_SCREEN_MAX_WIDTH;
   return (
     <View ref={pageRef as never} style={[styles.webPage, { backgroundColor: colors.primary }]}>
-      <SiteHeader />
-      <View ref={columnRef as never} style={[styles.webColumn, { maxWidth }]}>{children}</View>
+      <View style={home ? styles.headerFloating : undefined}>
+        <SiteHeader />
+      </View>
+      <View ref={columnRef as never} style={[styles.webColumn, maxWidth ? { maxWidth } : null]}>{children}</View>
     </View>
   );
 }
@@ -362,5 +367,6 @@ export default function RootLayout() {
 
 const styles = StyleSheet.create({
   webPage: { flex: 1 },
+  headerFloating: { position: 'absolute', top: 0, left: 0, right: 0, zIndex: 20 },
   webColumn: { flex: 1, width: '100%', alignSelf: 'center', overflow: 'hidden' },
 });

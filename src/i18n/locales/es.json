@@ -1244,7 +1244,9 @@
     "stats": {
       "listings": "Anuncios activos",
       "cities": "Ciudades con anuncios",
-      "agencies": "Agencias y agentes"
+      "agencies": "Agencias y agentes",
+      "title": "Shtëpia.ime en cifras",
+      "body": "Cifras reales, leídas directamente de los inmuebles publicados hoy."
     },
     "listings": {
       "eyebrow": "Recién publicados",
@@ -1311,7 +1313,8 @@
       "sell": "Vende o alquila",
       "legal": "Legal",
       "tagline": "El mercado inmobiliario de Albania, en tu idioma.",
-      "copyright": "© {{year}} Future Home Orange. Todos los derechos reservados."
+      "copyright": "© {{year}} Future Home Orange. Todos los derechos reservados.",
+      "contact": "Contacto"
     },
     "agentsOnly": "Esta página es solo para agentes."
   }

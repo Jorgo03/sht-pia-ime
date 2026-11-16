@@ -1,7 +1,7 @@
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { usePathname, useRouter, type Href } from 'expo-router';
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useSyncExternalStore } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Modal, Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 
@@ -12,6 +12,7 @@ import { useAuth } from '@/contexts/auth-context';
 import { useTheme } from '@/contexts/theme-context';
 import { useHydrated } from '@/hooks/use-hydrated';
 import { useUnreadMessages } from '@/hooks/use-unread-messages';
+import { getOverHero, subscribeOverHero } from '@/lib/web/hero-state';
 
 /** The website's menu, in order. */
 export const SITE_LINKS: { href: string; key: string }[] = [
@@ -50,6 +51,10 @@ export function SiteHeader() {
   const narrow = hydrated && width < 640;
   const [menuOpen, setMenuOpen] = useState(false);
   const unread = useUnreadMessages();
+  // Home's full-screen hero: transparent bar, white text, until scrolled past.
+  const overHero = useSyncExternalStore(subscribeOverHero, getOverHero, () => true);
+  const overlay = pathname === '/' && overHero;
+  const ink = overlay ? '#fff' : colors.textPrimary;
 
   const go = (href: string) => {
     setMenuOpen(false);
@@ -62,27 +67,29 @@ export function SiteHeader() {
       accessibilityRole="link"
       accessibilityLabel={user ? t('common.profile') : t('common.signIn')}
       onPress={() => go('/profile')}
-      style={({ pressed }) => [styles.account, pressed && styles.pressed]}>
-      <MaterialIcons name={user ? 'account-circle' : 'login'} size={20} color={colors.textPrimary} />
-      {wide && <Text style={styles.accountText}>{user ? t('common.profile') : t('common.signIn')}</Text>}
+      style={({ pressed }) => [styles.account, overlay && styles.accountOverlay, pressed && styles.pressed]}>
+      <MaterialIcons name={user ? 'account-circle' : 'login'} size={20} color={ink} />
+      {wide && <Text style={[styles.accountText, { color: ink }]}>{user ? t('common.profile') : t('common.signIn')}</Text>}
     </Pressable>
   );
 
   const listCta = (
     <Pressable accessibilityRole="link" accessibilityLabel={t('site.listHome')} onPress={() => go('/listing/new')} style={({ pressed }) => [styles.cta, pressed && styles.pressed]}>
       <LinearGradient colors={[colors.accent, colors.accentEnd]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={StyleSheet.absoluteFill} />
-      <MaterialIcons name="add" size={18} color="#fff" />
-      {wide && <Text style={styles.ctaText}>{t('site.listHome')}</Text>}
+      {!wide && <MaterialIcons name="add" size={18} color="#fff" />}
+      {wide && <Text style={styles.ctaText}>{t('site.listHome').toUpperCase()}</Text>}
     </Pressable>
   );
 
   const trailing = (
     <View style={styles.trailing}>
       {wide && (
-        <View style={styles.links} accessibilityRole="navigation">
+        <View style={[styles.links, overlay && styles.linksOverlay]} accessibilityRole="navigation">
           {SITE_LINKS.map((l) => (
-            <Pressable key={l.href} accessibilityRole="link" onPress={() => go(l.href)} style={styles.link}>
-              <Text style={[styles.linkText, isActive(l.href) && styles.linkActive]}>{t(l.key)}</Text>
+            <Pressable key={l.href} accessibilityRole="link" accessibilityLabel={t(l.key)} onPress={() => go(l.href)} style={styles.link}>
+              <Text style={[styles.linkText, overlay && styles.linkTextOverlay, isActive(l.href) && (overlay ? styles.linkActiveOverlay : styles.linkActive)]}>
+                {t(l.key).toUpperCase()}
+              </Text>
             </Pressable>
           ))}
         </View>
@@ -93,7 +100,7 @@ export function SiteHeader() {
           accessibilityLabel={t('common.messages')}
           onPress={() => go('/messages')}
           style={styles.iconBtn}>
-          <MaterialIcons name="chat-bubble-outline" size={20} color={colors.textPrimary} />
+          <MaterialIcons name="chat-bubble-outline" size={20} color={ink} />
           {unread > 0 && <View style={styles.dot} />}
         </Pressable>
       )}
@@ -106,7 +113,7 @@ export function SiteHeader() {
           accessibilityState={{ expanded: menuOpen }}
           onPress={() => setMenuOpen(true)}
           style={styles.iconBtn}>
-          <MaterialIcons name="menu" size={24} color={colors.textPrimary} />
+          <MaterialIcons name="menu" size={24} color={ink} />
         </Pressable>
       )}
     </View>
@@ -114,8 +121,8 @@ export function SiteHeader() {
 
   return (
     // testID once hydrated: the final layout is drawn (tests wait for it).
-    <View style={styles.bar} testID={hydrated ? 'site-header' : undefined}>
-      <AppHeader site compact={narrow} trailing={trailing} />
+    <View style={[styles.bar, overlay && styles.barOverlay]} testID={hydrated ? 'site-header' : undefined}>
+      <AppHeader site floating={overlay} compact={narrow} trailing={trailing} />
       <Modal visible={menuOpen} transparent animationType="none" onRequestClose={() => setMenuOpen(false)}>
         <Pressable style={styles.backdrop} onPress={() => setMenuOpen(false)}>
           <ScrollView style={styles.menu} contentContainerStyle={styles.menuContent} accessibilityRole="menu">
@@ -159,11 +166,19 @@ export function SiteHeader() {
 const createStyles = (colors: AtticoPalette) =>
   StyleSheet.create({
     bar: { width: '100%', zIndex: 10 },
+    // Over Home's hero: no bar, the photo shows through (a soft shade keeps
+    // the white text readable on a light photo).
+    barOverlay: { backgroundColor: 'rgba(0,0,0,0.18)' },
     trailing: { flexDirection: 'row', alignItems: 'center', gap: 8, marginLeft: 8 },
-    links: { flexDirection: 'row', alignItems: 'center', gap: 4, marginRight: 8 },
-    link: { minHeight: 44, justifyContent: 'center', paddingHorizontal: 12 },
-    linkText: { fontFamily: Fonts.sansMedium, fontSize: 15, color: colors.textSecondary },
-    linkActive: { color: colors.accentText, fontFamily: Fonts.sansSemiBold },
+    // The links sit together in one soft pill, as on the brief's reference.
+    links: { flexDirection: 'row', alignItems: 'center', gap: 2, marginRight: 8, paddingHorizontal: 6, borderRadius: 24, backgroundColor: colors.glass },
+    linksOverlay: { backgroundColor: 'rgba(255,255,255,0.12)' },
+    link: { minHeight: 40, justifyContent: 'center', paddingHorizontal: 12 },
+    linkText: { fontFamily: Fonts.sansMedium, fontSize: 13, letterSpacing: 0.4, color: colors.textSecondary },
+    linkTextOverlay: { color: 'rgba(255,255,255,0.85)' },
+    linkActive: { color: colors.textPrimary, fontFamily: Fonts.sansBold },
+    linkActiveOverlay: { color: '#fff', fontFamily: Fonts.sansBold },
+    accountOverlay: { borderColor: 'rgba(255,255,255,0.4)' },
     iconBtn: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center', borderRadius: 22 },
     dot: { position: 'absolute', top: 10, right: 10, width: 8, height: 8, borderRadius: 4, backgroundColor: colors.accent },
     cta: {
@@ -171,11 +186,11 @@ const createStyles = (colors: AtticoPalette) =>
       flexDirection: 'row',
       alignItems: 'center',
       gap: 6,
-      paddingHorizontal: 14,
-      borderRadius: 20,
+      paddingHorizontal: 18,
+      borderRadius: 40,
       overflow: 'hidden',
     },
-    ctaText: { fontFamily: Fonts.sansBold, fontSize: 14, color: '#fff' },
+    ctaText: { fontFamily: Fonts.sansSemiBold, fontSize: 13, letterSpacing: 0.4, color: '#fff' },
     account: {
       minHeight: 40,
       flexDirection: 'row',

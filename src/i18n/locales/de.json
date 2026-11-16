@@ -1234,7 +1234,9 @@
     "stats": {
       "listings": "Aktive Inserate",
       "cities": "Städte mit Inseraten",
-      "agencies": "Agenturen und Makler"
+      "agencies": "Agenturen und Makler",
+      "title": "Shtëpia.ime in Zahlen",
+      "body": "Echte Zahlen, direkt aus den heute veröffentlichten Immobilien."
     },
     "listings": {
       "eyebrow": "Neu eingestellt",
@@ -1301,7 +1303,8 @@
       "sell": "Verkaufen oder vermieten",
       "legal": "Rechtliches",
       "tagline": "Der Immobilienmarkt Albaniens, in deiner Sprache.",
-      "copyright": "© {{year}} Future Home Orange. Alle Rechte vorbehalten."
+      "copyright": "© {{year}} Future Home Orange. Alle Rechte vorbehalten.",
+      "contact": "Kontakt"
     },
     "agentsOnly": "Diese Seite ist nur für Makler."
   }
