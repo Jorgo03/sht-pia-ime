@@ -38,7 +38,7 @@ import { FiltersProvider } from '@/contexts/filters-context';
 import { ThemeProvider, useTheme } from '@/contexts/theme-context';
 import { queryClient } from '@/lib/query-client';
 // NetInfo drives React Query's online state (AUDIT-009); side effect only.
-import '@/lib/online-manager';
+import { startWebOnlineState } from '@/lib/online-manager';
 import { OfflineBanner } from '@/components/ui/offline-banner';
 import { installGlobalErrorReporting } from '@/lib/report-error';
 import { configureForegroundNotifications } from '@/lib/push';
@@ -254,6 +254,7 @@ function AppGate({ fontsReady }: { fontsReady: boolean }) {
   // the visitor's own language. No-op on native.
   useEffect(() => {
     applyPreferredLanguage();
+    startWebOnlineState();
   }, []);
 
   if (!ready) {

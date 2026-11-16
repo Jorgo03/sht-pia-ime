@@ -2464,6 +2464,9 @@ test.describe('offline', () => {
     await page.goto('/');
     await ready(page);
     await expect(page.getByTestId('offline-banner')).toHaveCount(0);
+    // Once the page has started: going offline mid-start makes React redraw the
+    // page (#418), which this test is not about.
+    await headerReady(page);
     await context.setOffline(true);
     await expect(page.getByTestId('offline-banner')).toBeVisible();
     await expect(page.getByText(t('errors.offline'))).toBeVisible();

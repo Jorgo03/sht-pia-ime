@@ -15,6 +15,10 @@ import { isOnline } from '@/src/lib/networkState';
  * extra request (NetInfo's web version would fetch a Google URL to test
  * reachability), and nothing during the pre-render, which has no window.
  */
+// Declared first: setEventListener runs its setup immediately.
+let webStarted = false;
+let webUpdate: (() => void) | null = null;
+
 if (Platform.OS !== 'web') {
   onlineManager.setEventListener((setOnline) =>
     NetInfo.addEventListener((state) => {
@@ -23,17 +27,28 @@ if (Platform.OS !== 'web') {
   );
 } else if (typeof window !== 'undefined') {
   // The website: the browser's online/offline events, as React Query's own
-  // listener does, plus the browser's current state when listening starts.
-  // Without it, a connection lost before the page finished starting went
-  // unnoticed until the next change, and the offline bar never showed.
+  // listener does, plus the browser's current state once the page has started
+  // (startWebOnlineState). Before that the page must draw exactly what was
+  // pre-rendered, online (React #418 otherwise); after it, a connection lost
+  // while the page was starting is noticed at once instead of never.
   onlineManager.setEventListener((setOnline) => {
-    const update = () => setOnline(navigator.onLine);
+    const update = () => {
+      if (webStarted) setOnline(navigator.onLine);
+    };
+    webUpdate = update;
     window.addEventListener('online', update);
     window.addEventListener('offline', update);
     update();
     return () => {
+      webUpdate = null;
       window.removeEventListener('online', update);
       window.removeEventListener('offline', update);
     };
   });
+}
+
+/** Website: called once the page has hydrated (app/_layout.tsx). */
+export function startWebOnlineState(): void {
+  webStarted = true;
+  webUpdate?.();
 }
