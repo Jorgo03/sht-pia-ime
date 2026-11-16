@@ -1652,6 +1652,7 @@ test.describe('unfolding mid-session', () => {
     test.skip(!isMobile, 'phone project only');
     await page.goto('/explore');
     await ready(page);
+    await headerReady(page);
     await page.getByRole('button', { name: t('search.rent'), exact: true }).click();
     const rentals = LISTINGS.filter((l) => l.listing_type === 'rent').length;
     const count = page.getByText(/në shikim/);
