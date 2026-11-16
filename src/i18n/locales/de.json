@@ -1217,5 +1217,91 @@
     "asListed": "Wie inseriert",
     "asListedShort": "Original",
     "converted": "Ungefähr, zum Tageskurs. Inserierter Preis: {{price}}"
+  },
+  "site": {
+    "nav": {
+      "search": "Suchen",
+      "agencies": "Makler"
+    },
+    "listHome": "Immobilie inserieren",
+    "menu": "Menü",
+    "hero": {
+      "eyebrow": "Immobilien in Albanien, wo immer du bist",
+      "title": "Finde das richtige Zuhause",
+      "titleEm": "in Albanien.",
+      "lead": "Wohnungen, Villen und Büros zum Kauf und zur Miete, in deiner Sprache. Sprich direkt mit Maklern und Eigentümern."
+    },
+    "stats": {
+      "listings": "Aktive Inserate",
+      "cities": "Städte mit Inseraten",
+      "agencies": "Agenturen und Makler"
+    },
+    "listings": {
+      "eyebrow": "Neu eingestellt",
+      "title": "Neueste Immobilien"
+    },
+    "steps": {
+      "eyebrow": "So funktioniert's",
+      "title": "Von der Suche bis zum Schlüssel, Schritt für Schritt",
+      "search": {
+        "title": "Suchen",
+        "body": "Filtere nach Stadt, Viertel, Preis und Zimmern, als Liste oder auf der Karte."
+      },
+      "compare": {
+        "title": "Vergleichen",
+        "body": "Stelle bis zu drei Immobilien nebeneinander und sieh den Preisverlauf."
+      },
+      "visit": {
+        "title": "Besichtigen",
+        "body": "Buche eine Besichtigung oder schreib dem Makler in der App, per WhatsApp oder ruf an."
+      },
+      "buy": {
+        "title": "Sicher kaufen",
+        "body": "Folge unserem Leitfaden und nimm für die rechtlichen Schritte einen zugelassenen Anwalt und Notar."
+      }
+    },
+    "services": {
+      "eyebrow": "Was du bekommst",
+      "title": "Alles für dein neues Zuhause an einem Ort",
+      "wanted": {
+        "title": "Suchanfragen",
+        "body": "Sag, was du suchst, und wir melden uns, sobald etwas Passendes erscheint."
+      },
+      "priceHistory": {
+        "title": "Preisverlauf",
+        "body": "Sieh, wie sich der Preis jedes Inserats seit der Veröffentlichung verändert hat."
+      },
+      "currency": {
+        "title": "Preise in deiner Währung",
+        "body": "Sieh Preise in Lek, Euro, Dollar oder Pfund zum Tageskurs."
+      },
+      "viewings": {
+        "title": "Besichtigungen mit einem Klick",
+        "body": "Wähle eine Zeit, der Makler bestätigt, und du wirst benachrichtigt."
+      },
+      "chat": {
+        "title": "Direkter Chat",
+        "body": "Schreib dem Makler oder Eigentümer, mit Fotos, ohne Umwege."
+      },
+      "guide": {
+        "title": "Kaufen aus dem Ausland",
+        "body": "Die Schritte, die Dokumente und wie du aus der Ferne sicher kaufst."
+      }
+    },
+    "cities": {
+      "eyebrow": "Städte"
+    },
+    "cta": {
+      "title": "Bereit für dein neues Zuhause?",
+      "body": "Kostenlos suchen, oder deine Immobilie kostenlos inserieren und Käufer in Albanien und im Ausland erreichen.",
+      "search": "Immobilien suchen"
+    },
+    "footer": {
+      "explore": "Entdecken",
+      "sell": "Verkaufen oder vermieten",
+      "legal": "Rechtliches",
+      "tagline": "Der Immobilienmarkt Albaniens, in deiner Sprache.",
+      "copyright": "© {{year}} Future Home Orange. Alle Rechte vorbehalten."
+    }
   }
 }

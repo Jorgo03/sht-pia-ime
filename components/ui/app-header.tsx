@@ -1,7 +1,7 @@
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useIsFocused } from 'expo-router';
+import { useIsFocused, useRouter, type Href } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useMemo, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -104,7 +104,13 @@ export function AppHeader({
   titleIsHeading = false,
   onIdentityPress,
   identityLabel,
+  site = false,
+  compact = false,
 }: {
+  /** Language only, without notifications and theme (a narrow site header). */
+  compact?: boolean;
+  /** The website's own top header (components/web/site-header). */
+  site?: boolean;
   trailing?: ReactNode;
   onBack?: () => void;
   title?: string;
@@ -126,6 +132,13 @@ export function AppHeader({
   const { t, i18n } = useTranslation();
   const { user } = useAuth();
   const { theme, colors } = useTheme();
+  // Website: the site header (components/web/site-header, which passes
+  // `site`) shows the brand, menu and controls once at the top of every
+  // page. A screen's own header then only keeps what is specific to it: a
+  // back button, a title, or the actions over a listing's photos.
+  const router = useRouter();
+  const onWebScreen = IS_WEB && !site;
+  if (onWebScreen) showControls = false;
   const styles = useMemo(
     () => createStyles(colors, onDark || floating, !!onBack, floating),
     [colors, onDark, onBack, floating],
@@ -141,7 +154,7 @@ export function AppHeader({
   // not the 480 column, so the menu is anchored to the column's right edge.
   const menuTop = insets.top + 66;
   const menuMaxHeight = Math.max(120, windowHeight - menuTop - insets.bottom - 24);
-  const menuRight = IS_WEB
+  const menuRight = IS_WEB && !site
     ? Math.max(HEADER_GUTTER, (windowWidth - WEB_MAX_WIDTH) / 2 + HEADER_GUTTER)
     : HEADER_GUTTER;
   // Widths of the bar, its two sides and the wordmark, so the centred
@@ -156,6 +169,9 @@ export function AppHeader({
   const side = Math.max(box.lead, box.act);
   const brandFits = box.bar > 0 && box.brand > 0 && box.brand <= box.bar - 2 * (HEADER_GUTTER + side + BRAND_CLEARANCE);
 
+  // Nothing of its own to show on a website page: the site header covers it.
+  const empty = onWebScreen && !onBack && !title && !floating && !trailing;
+
   const currentFlag =
     LANGUAGES.find((l) => l.code === i18n.language)?.flag ?? LANGUAGES[0].flag;
 
@@ -169,6 +185,8 @@ export function AppHeader({
       await supabase.from('profiles').update({ preferred_language: next }).eq('id', user.id);
     }
   };
+
+  if (empty) return null;
 
   return (
     // Reaches up behind the clock and battery, so the bar's colour runs to the
@@ -229,7 +247,10 @@ export function AppHeader({
           /* `.header-brand`: serif 22/600 in orange, with `.ime` a lighter
              weight. These are static per-weight files, so the pair is
              Newsreader 600 + 500 rather than one family at two weights. */
-          <Text style={styles.brand}>
+          <Text
+            style={styles.brand}
+            accessibilityRole={site ? 'link' : undefined}
+            onPress={site ? () => router.push('/' as Href) : undefined}>
             Shtëpia<Text style={styles.brandIme}>.ime</Text>
           </Text>
         ) : null}
@@ -269,8 +290,8 @@ export function AppHeader({
               <MaterialIcons name="expand-more" size={14} color={styles.langCode.color} />
             </Pressable>
 
-            <NotificationBell style={styles.iconBtn} iconColor={styles.langCode.color} />
-            <ThemeToggleButton style={styles.iconBtn} iconColor={styles.langCode.color} />
+            {!compact && <NotificationBell style={styles.iconBtn} iconColor={styles.langCode.color} />}
+            {!compact && <ThemeToggleButton style={styles.iconBtn} iconColor={styles.langCode.color} />}
           </>
         )}
 

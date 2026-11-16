@@ -21,6 +21,16 @@ const json = (route: Route, body: unknown, status = 200) =>
 const FEATURED = LISTINGS[0];
 const escape = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
+// The website's header (components/web/site-header): a link by its name,
+// and going somewhere through it, opening the folded menu on narrow screens.
+const siteLink = (page: Page, name: string) => page.getByRole('link', { name, exact: true }).first();
+async function goSite(page: Page, name: string) {
+  const link = siteLink(page, name);
+  if (await link.isVisible()) return link.click();
+  await page.getByRole('button', { name: t('site.menu') }).click();
+  await page.getByRole('menuitem', { name, exact: true }).click();
+}
+
 async function ready(page: Page) {
   await page.waitForLoadState('networkidle');
 }
@@ -188,10 +198,11 @@ test.describe('signed in', () => {
     });
   });
 
-  // Messages is a real tab: the menu stays, nothing jumps back by itself,
-  // and the person picks where to go next.
+  // Messages keeps the site menu (DECISIONS.md W5: the website has a top
+  // menu, not the app's tab bar), nothing jumps back by itself, and the
+  // person picks where to go next.
   for (const trip of [
-    { from: '/', next: () => t('common.search'), nextUrl: /\/explore$/ },
+    { from: '/', next: () => t('site.nav.search'), nextUrl: /\/explore$/ },
     { from: '/explore', next: () => t('common.profile'), nextUrl: /\/profile$/ },
     { from: '/profile', next: () => t('common.home'), nextUrl: /\/$/ },
   ]) {
@@ -199,13 +210,12 @@ test.describe('signed in', () => {
       await page.route(`**/rest/v1/profiles*id=eq.${CHAT_CLIENT_ID}*`, (route) =>
         json(route, { full_name: 'Ana Klientja', agency_name: null }),
       );
-      const tab = (name: string) => page.getByRole('tab', { name, exact: true });
       await page.goto(trip.from);
       await ready(page);
 
-      await tab(t('common.messages')).click();
+      await siteLink(page, t('common.messages')).click();
       await expect(page).toHaveURL(/\/messages$/);
-      await expect(tab(trip.next())).toBeVisible();
+      await expect(siteLink(page, t('common.messages'))).toBeVisible();
       await expect(page.getByRole('button', { name: t('common.back'), exact: true })).toHaveCount(0);
 
       await page.getByRole('button', { name: new RegExp(escape(LISTINGS[0].title as string)) }).click();
@@ -218,25 +228,24 @@ test.describe('signed in', () => {
       await page.waitForTimeout(400);
       await expect(page).toHaveURL(/\/messages$/);
 
-      await tab(trip.next()).click();
+      await goSite(page, trip.next());
       await expect(page).toHaveURL(trip.nextUrl);
-      await expect(tab(t('common.messages'))).toBeVisible();
+      await expect(siteLink(page, t('common.messages'))).toBeVisible();
     });
   }
 
   test('X73 the Profile menu and the agent dashboard both open the Messages tab, with the menu', async ({ page }) => {
-    const tab = (name: string) => page.getByRole('tab', { name, exact: true });
     await page.goto('/profile');
     await ready(page);
     await page.getByRole('button', { name: new RegExp(t('common.messages')) }).click();
     await expect(page).toHaveURL(/\/messages$/);
-    await expect(tab(t('common.home'))).toBeVisible();
+    await expect(siteLink(page, t('common.messages'))).toBeVisible();
 
     await page.goto('/agent-dashboard');
     await ready(page);
     await page.getByRole('button', { name: new RegExp(t('agentDashboard.statConversations')) }).click();
     await expect(page).toHaveURL(/\/messages$/);
-    await expect(tab(t('common.home'))).toBeVisible();
+    await expect(siteLink(page, t('common.messages'))).toBeVisible();
   });
 
   test('X42 viewing request: the website has a date and time field, and the chosen time is sent', async ({ page, writes }) => {

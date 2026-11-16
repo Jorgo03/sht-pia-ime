@@ -1217,5 +1217,91 @@
     "asListed": "Si në njoftim",
     "asListedShort": "Origjinale",
     "converted": "Çmim i përafërt me kursin ditor. Çmimi i njoftimit: {{price}}"
+  },
+  "site": {
+    "nav": {
+      "search": "Kërko",
+      "agencies": "Agjenci"
+    },
+    "listHome": "Listo pronën",
+    "menu": "Menyja",
+    "hero": {
+      "eyebrow": "Shtëpi në Shqipëri, për ju kudo që jeni",
+      "title": "Gjeni shtëpinë e duhur",
+      "titleEm": "në Shqipëri.",
+      "lead": "Apartamente, vila dhe zyra për shitje dhe qira, në gjuhën tuaj. Flisni drejtpërdrejt me agjentët dhe pronarët."
+    },
+    "stats": {
+      "listings": "Prona aktive",
+      "cities": "Qytete me prona",
+      "agencies": "Agjenci dhe agjentë"
+    },
+    "listings": {
+      "eyebrow": "Të rejat",
+      "title": "Pronat më të fundit"
+    },
+    "steps": {
+      "eyebrow": "Si funksionon",
+      "title": "Nga kërkimi te çelësat, hap pas hapi",
+      "search": {
+        "title": "Kërkoni",
+        "body": "Filtroni sipas qytetit, zonës, çmimit dhe dhomave, në listë ose në hartë."
+      },
+      "compare": {
+        "title": "Krahasoni",
+        "body": "Vendosni deri në tre shtëpi krah për krah dhe shihni historikun e çmimit."
+      },
+      "visit": {
+        "title": "Vizitoni",
+        "body": "Kërkoni një vizitë ose shkruani agjentit në aplikacion, në WhatsApp ose me telefon."
+      },
+      "buy": {
+        "title": "Blini të sigurt",
+        "body": "Ndiqni udhëzuesin tonë dhe përdorni avokat e noter të licencuar për hapat ligjorë."
+      }
+    },
+    "services": {
+      "eyebrow": "Çfarë ofrojmë",
+      "title": "Gjithçka për të gjetur shtëpinë, në një vend",
+      "wanted": {
+        "title": "Shtëpi të kërkuara",
+        "body": "Thoni çfarë kërkoni dhe ju njoftojmë kur del një pronë që ju përshtatet."
+      },
+      "priceHistory": {
+        "title": "Historiku i çmimit",
+        "body": "Shihni si ka ndryshuar çmimi i çdo njoftimi që kur u publikua."
+      },
+      "currency": {
+        "title": "Çmime në monedhën tuaj",
+        "body": "Shihni çmimet në lekë, euro, dollarë ose paund, me kursin ditor."
+      },
+      "viewings": {
+        "title": "Vizita me një klik",
+        "body": "Zgjidhni orën, agjenti e konfirmon dhe ju merrni njoftim."
+      },
+      "chat": {
+        "title": "Bisedë e drejtpërdrejtë",
+        "body": "Shkruani agjentit ose pronarit, me foto, pa ndërmjetës."
+      },
+      "guide": {
+        "title": "Blerja nga jashtë",
+        "body": "Hapat, dokumentet dhe si të qëndroni të sigurt kur blini nga larg."
+      }
+    },
+    "cities": {
+      "eyebrow": "Qytetet"
+    },
+    "cta": {
+      "title": "Gati të gjeni shtëpinë tuaj?",
+      "body": "Kërkoni falas, ose listoni pronën tuaj falas dhe arrini blerës nga Shqipëria dhe diaspora.",
+      "search": "Kërko shtëpi"
+    },
+    "footer": {
+      "explore": "Eksploro",
+      "sell": "Shit ose jep me qira",
+      "legal": "Ligjore",
+      "tagline": "Tregu i pronave në Shqipëri, në gjuhën tuaj.",
+      "copyright": "© {{year}} Future Home Orange. Të gjitha të drejtat e rezervuara."
+    }
   }
 }

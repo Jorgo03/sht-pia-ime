@@ -26,6 +26,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Shadows, Fonts } from '@/constants/theme';
 import { useTheme } from '@/contexts/theme-context';
 import { useUnreadMessages } from '@/hooks/use-unread-messages';
+import { IS_WEB } from '@/constants/web-frame';
 
 /** The pill's own height and its offset from the bottom edge — exported so
  *  scrollable tab screens can reserve the right amount of space instead of
@@ -135,6 +136,8 @@ function NavItem({
  */
 export function useTabBarClearance(extraGap: number = 12) {
   const insets = useSafeAreaInsets();
+  // The website has no bottom bar (it has a top menu).
+  if (IS_WEB) return 24 + extraGap;
   return insets.bottom + TAB_BAR_BOTTOM_OFFSET + TAB_BAR_HEIGHT + extraGap;
 }
 

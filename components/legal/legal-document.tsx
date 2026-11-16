@@ -5,6 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 
 import { AppHeader } from '@/components/ui/app-header';
+import { SiteFooter } from '@/components/web/site-footer';
 import { GradientBackground } from '@/components/ui/gradient-background';
 import { type AtticoPalette, Fonts } from '@/constants/theme';
 import { useTheme } from '@/contexts/theme-context';
@@ -69,6 +70,7 @@ export function LegalDocument({ doc }: { doc: Doc }) {
               <Link key={d} href={`/${d}` as Href} style={styles.link}>{t(TITLE_KEYS[d])}</Link>
             ))}
           </View>
+          <SiteFooter />
         </ScrollView>
       </SafeAreaView>
     </GradientBackground>

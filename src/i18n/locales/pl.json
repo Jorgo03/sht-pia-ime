@@ -1237,5 +1237,91 @@
     "asListed": "Jak w ogłoszeniu",
     "asListedShort": "Oryginał",
     "converted": "Orientacyjnie, po dzisiejszym kursie. Cena w ogłoszeniu: {{price}}"
+  },
+  "site": {
+    "nav": {
+      "search": "Szukaj",
+      "agencies": "Agencje"
+    },
+    "listHome": "Dodaj ogłoszenie",
+    "menu": "Menu",
+    "hero": {
+      "eyebrow": "Domy w Albanii, gdziekolwiek jesteś",
+      "title": "Znajdź właściwy dom",
+      "titleEm": "w Albanii.",
+      "lead": "Mieszkania, wille i biura na sprzedaż i wynajem, w Twoim języku. Rozmawiaj bezpośrednio z agentami i właścicielami."
+    },
+    "stats": {
+      "listings": "Aktywne ogłoszenia",
+      "cities": "Miasta z ogłoszeniami",
+      "agencies": "Agencje i agenci"
+    },
+    "listings": {
+      "eyebrow": "Nowe ogłoszenia",
+      "title": "Najnowsze oferty"
+    },
+    "steps": {
+      "eyebrow": "Jak to działa",
+      "title": "Od wyszukiwania do kluczy, krok po kroku",
+      "search": {
+        "title": "Szukaj",
+        "body": "Filtruj według miasta, dzielnicy, ceny i pokoi, na liście lub na mapie."
+      },
+      "compare": {
+        "title": "Porównaj",
+        "body": "Zestaw do trzech domów obok siebie i zobacz historię cen."
+      },
+      "visit": {
+        "title": "Odwiedź",
+        "body": "Umów oglądanie lub napisz do agenta w aplikacji, przez WhatsApp lub zadzwoń."
+      },
+      "buy": {
+        "title": "Kupuj bezpiecznie",
+        "body": "Skorzystaj z naszego poradnika, a przy krokach prawnych korzystaj z licencjonowanego prawnika i notariusza."
+      }
+    },
+    "services": {
+      "eyebrow": "Co oferujemy",
+      "title": "Wszystko, by znaleźć dom, w jednym miejscu",
+      "wanted": {
+        "title": "Poszukiwane domy",
+        "body": "Powiedz, czego szukasz, a powiadomimy Cię, gdy pojawi się pasująca oferta."
+      },
+      "priceHistory": {
+        "title": "Historia cen",
+        "body": "Zobacz, jak zmieniała się cena każdego ogłoszenia od publikacji."
+      },
+      "currency": {
+        "title": "Ceny w Twojej walucie",
+        "body": "Zobacz ceny w lekach, euro, dolarach lub funtach, po dziennym kursie."
+      },
+      "viewings": {
+        "title": "Oglądanie jednym kliknięciem",
+        "body": "Wybierz godzinę, agent potwierdza, a Ty dostajesz powiadomienie."
+      },
+      "chat": {
+        "title": "Bezpośredni czat",
+        "body": "Pisz do agenta lub właściciela, ze zdjęciami, bez pośredników."
+      },
+      "guide": {
+        "title": "Zakup z zagranicy",
+        "body": "Kroki, dokumenty i jak bezpiecznie kupować na odległość."
+      }
+    },
+    "cities": {
+      "eyebrow": "Miasta"
+    },
+    "cta": {
+      "title": "Gotowy, by znaleźć swój dom?",
+      "body": "Szukaj za darmo lub dodaj ofertę za darmo i dotrzyj do kupujących w Albanii i za granicą.",
+      "search": "Szukaj domów"
+    },
+    "footer": {
+      "explore": "Odkrywaj",
+      "sell": "Sprzedaj lub wynajmij",
+      "legal": "Informacje prawne",
+      "tagline": "Rynek nieruchomości w Albanii, w Twoim języku.",
+      "copyright": "© {{year}} Future Home Orange. Wszelkie prawa zastrzeżone."
+    }
   }
 }

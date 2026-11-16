@@ -5,6 +5,7 @@ import { StyleSheet, View } from 'react-native';
 
 import { LiquidTabBar } from '@/components/liquid-tab-bar';
 import { ComparePill } from '@/components/property/compare-pill';
+import { IS_WEB } from '@/constants/web-frame';
 
 // Home, Search, Messages and Profile are real tabs (state-preserving,
 // switched via the floating pill below), so the menu stays on screen in
@@ -19,7 +20,8 @@ export default function TabLayout() {
   return (
     <View style={styles.fill}>
       <Tabs
-        tabBar={(props) => <LiquidTabBar {...props} />}
+        // The website has a top menu (components/web/site-header) instead.
+        tabBar={(props) => (IS_WEB ? null : <LiquidTabBar {...props} />)}
         screenOptions={{ headerShown: false }}>
         <Tabs.Screen name="index" options={{ title: t('common.home') }} />
         <Tabs.Screen name="explore" options={{ title: t('common.search') }} />

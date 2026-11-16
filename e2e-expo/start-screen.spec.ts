@@ -30,7 +30,7 @@ test('S2 the sign-in screen as first screen offers browsing, which goes Home and
   await expect(page.getByRole('button', { name: t('auth.stepInside') })).toBeVisible();
   await browse(page).click();
   await expect(page).toHaveURL(/\/$/);
-  await page.getByRole('tab', { name: t('common.profile'), exact: true }).click();
+  await page.getByRole('link', { name: t('common.signIn'), exact: true }).first().click();
   await expect(page).toHaveURL(/\/profile$/);
   await expect(page.getByRole('button', { name: t('auth.stepInside') })).toBeVisible();
   await expect(browse(page)).toHaveCount(0);

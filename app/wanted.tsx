@@ -3,13 +3,14 @@ import { useInfiniteQuery } from '@tanstack/react-query';
 import { useRouter, type Href } from 'expo-router';
 import { memo, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FlatList, StyleSheet, Text, View } from 'react-native';
+import { FlatList, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { ActionButton } from '@/components/ui/action-button';
 import { AppHeader } from '@/components/ui/app-header';
 import { GradientBackground } from '@/components/ui/gradient-background';
 import { ScreenHero } from '@/components/ui/screen-hero';
+import { SiteFooter } from '@/components/web/site-footer';
 import { Fonts, type AtticoPalette } from '@/constants/theme';
 import { useAuth } from '@/contexts/auth-context';
 import { useTheme } from '@/contexts/theme-context';
@@ -84,10 +85,11 @@ export default function WantedBoardScreen() {
             {[0, 1, 2, 3].map((i) => <View key={i} style={styles.skeleton} />)}
           </View>
         ) : !isAgent ? (
-          <View style={styles.list}>
+          <ScrollView contentContainerStyle={[styles.list, { paddingBottom: 24 + insets.bottom }]}>
             {explainer}
             <Steps styles={styles} />
-          </View>
+            <SiteFooter />
+          </ScrollView>
         ) : board.isError ? (
           <View style={styles.center}>
             <Text style={styles.centerText} accessibilityLiveRegion="polite">{t('common.error')}</Text>
@@ -107,13 +109,16 @@ export default function WantedBoardScreen() {
               </View>
             }
             ListFooterComponent={
-              board.hasNextPage ? (
-                <ActionButton
-                  variant="secondary"
-                  title={board.isFetchingNextPage ? t('common.loading') : t('agents.loadMore')}
-                  onPress={() => void board.fetchNextPage()}
-                />
-              ) : undefined
+              <>
+                {board.hasNextPage ? (
+                  <ActionButton
+                    variant="secondary"
+                    title={board.isFetchingNextPage ? t('common.loading') : t('agents.loadMore')}
+                    onPress={() => void board.fetchNextPage()}
+                  />
+                ) : null}
+                <SiteFooter />
+              </>
             }
             renderItem={({ item }) => (
               <WantedCard row={item} lang={i18n.language} styles={styles} iconColor={colors.textSecondary} />

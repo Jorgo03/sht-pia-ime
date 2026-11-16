@@ -31,21 +31,29 @@ export const sheetColumn: ViewStyle = IS_WEB
   : { width: '100%', maxWidth: READABLE_MAX_WIDTH, alignSelf: 'center' };
 
 /**
- * Desktop website (DECISIONS.md W4): on a browser at least this wide, Home,
- * Search and Property get a desktop layout up to DESKTOP_MAX_WIDTH; every
- * other screen stays the phone-width column above.
+ * The website (DECISIONS.md W4, W5): a classic site with a full-width header
+ * and footer, not the phone app in a column. Public "website" pages (Home,
+ * Search, a listing, the wanted-homes board, the guide, agencies, legal
+ * pages) are drawn up to SITE_MAX_WIDTH; signed-in app screens (profile,
+ * messages, forms) in a centred APP_SCREEN_MAX_WIDTH column, where forms and
+ * lists stay readable. At DESKTOP_MIN_WIDTH and up, Home, Search and a
+ * listing switch to their desktop layouts.
  */
 export const DESKTOP_MIN_WIDTH = 1024;
 export const DESKTOP_MAX_WIDTH = 1280;
+export const SITE_MAX_WIDTH = DESKTOP_MAX_WIDTH;
+export const APP_SCREEN_MAX_WIDTH = 720;
 
-/** Addresses that get the desktop layout: Home, Search and a listing. */
-export function isDesktopRoute(pathname: string): boolean {
-  return pathname === '/' || pathname === '/explore' || /^\/property\/[^/]+$/.test(pathname);
+/** Addresses drawn as wide website pages. */
+export function isWebsiteRoute(pathname: string): boolean {
+  return (
+    pathname === '/' ||
+    /^\/(explore|wanted|guide|agents|privacy|terms|cookies|pricing|compare)$/.test(pathname) ||
+    /^\/(property|agent|user)\/[^/]+$/.test(pathname)
+  );
 }
 
 /** Width of the website's column for this address and browser width. */
 export function webColumnWidth(pathname: string, windowWidth: number): number {
-  return windowWidth >= DESKTOP_MIN_WIDTH && isDesktopRoute(pathname)
-    ? Math.min(windowWidth, DESKTOP_MAX_WIDTH)
-    : Math.min(windowWidth, WEB_MAX_WIDTH);
+  return Math.min(windowWidth, isWebsiteRoute(pathname) ? SITE_MAX_WIDTH : APP_SCREEN_MAX_WIDTH);
 }

@@ -32,6 +32,25 @@ first (it was rejected with 401 on 2026-11-04).
 
 ## ═══ WEBSITE FROM THE APP — 2026-11-16 ═══
 
+### W5. The website looks like a website, not like the app (DECIDED by owner, 2026-11-16)
+
+The owner pointed at equitifyasset.com: "i want it just like this one, don't
+make like app", and chose "website style". Reverses W1's "the website looks
+like the app" for the web only; the phone apps are unchanged, and the
+website is still the Expo app's web export (one codebase, same features,
+same orange palette and fonts). Its structure was followed, not its text,
+brand or images. On the web:
+- a full-width site header (components/web/site-header) on every page:
+  brand, menu (Home, Search, Wanted homes, Agencies, Buying from abroad),
+  language/currency, notifications, theme, "List your home", account. No
+  bottom tab bar;
+- Home is a landing page (components/web/website-home, app/(tabs)/index.web.tsx):
+  hero with search, live numbers from the database, newest homes, how it
+  works (4 steps), what the site offers (6 cards), cities, a closing call to
+  action and the footer (components/web/site-footer);
+- public pages are drawn up to 1280px; signed-in app screens in a centred
+  720px column (constants/web-frame.ts).
+
 ### W4. The website is built from the Expo app, to the owner's brief (DECIDED by owner, 2026-11-16)
 
 Un-parks W2's website work (not the domain). Gap report: `docs/WEBSITE_GAP.md`.

@@ -1227,5 +1227,91 @@
     "asListed": "Come nell'annuncio",
     "asListedShort": "Originale",
     "converted": "Approssimativo, al cambio del giorno. Prezzo dell'annuncio: {{price}}"
+  },
+  "site": {
+    "nav": {
+      "search": "Cerca",
+      "agencies": "Agenzie"
+    },
+    "listHome": "Pubblica il tuo immobile",
+    "menu": "Menu",
+    "hero": {
+      "eyebrow": "Case in Albania, ovunque tu sia",
+      "title": "Trova la casa giusta",
+      "titleEm": "in Albania.",
+      "lead": "Appartamenti, ville e uffici in vendita e in affitto, nella tua lingua. Parla direttamente con agenti e proprietari."
+    },
+    "stats": {
+      "listings": "Annunci attivi",
+      "cities": "Città con annunci",
+      "agencies": "Agenzie e agenti"
+    },
+    "listings": {
+      "eyebrow": "Appena pubblicati",
+      "title": "Gli immobili più recenti"
+    },
+    "steps": {
+      "eyebrow": "Come funziona",
+      "title": "Dalla ricerca alle chiavi, passo dopo passo",
+      "search": {
+        "title": "Cerca",
+        "body": "Filtra per città, quartiere, prezzo e stanze, in elenco o sulla mappa."
+      },
+      "compare": {
+        "title": "Confronta",
+        "body": "Metti fino a tre case a confronto e guarda lo storico dei prezzi."
+      },
+      "visit": {
+        "title": "Visita",
+        "body": "Prenota una visita o scrivi all'agente nell'app, su WhatsApp o per telefono."
+      },
+      "buy": {
+        "title": "Compra in sicurezza",
+        "body": "Segui la nostra guida e affidati a un avvocato e un notaio abilitati per i passaggi legali."
+      }
+    },
+    "services": {
+      "eyebrow": "Cosa offriamo",
+      "title": "Tutto per trovare casa, in un unico posto",
+      "wanted": {
+        "title": "Case cercate",
+        "body": "Di' cosa cerchi e ti avvisiamo quando esce una casa adatta."
+      },
+      "priceHistory": {
+        "title": "Storico dei prezzi",
+        "body": "Guarda come è cambiato il prezzo di ogni annuncio dalla pubblicazione."
+      },
+      "currency": {
+        "title": "Prezzi nella tua valuta",
+        "body": "Guarda i prezzi in lek, euro, dollari o sterline, al cambio del giorno."
+      },
+      "viewings": {
+        "title": "Visite con un clic",
+        "body": "Scegli l'orario, l'agente conferma e ricevi una notifica."
+      },
+      "chat": {
+        "title": "Chat diretta",
+        "body": "Scrivi all'agente o al proprietario, con foto, senza intermediari."
+      },
+      "guide": {
+        "title": "Acquistare dall'estero",
+        "body": "I passaggi, i documenti e come comprare in sicurezza da lontano."
+      }
+    },
+    "cities": {
+      "eyebrow": "Città"
+    },
+    "cta": {
+      "title": "Pronto a trovare casa?",
+      "body": "Cerca gratis, o pubblica gratis il tuo immobile e raggiungi acquirenti in Albania e all'estero.",
+      "search": "Cerca case"
+    },
+    "footer": {
+      "explore": "Esplora",
+      "sell": "Vendi o affitta",
+      "legal": "Note legali",
+      "tagline": "Il mercato immobiliare dell'Albania, nella tua lingua.",
+      "copyright": "© {{year}} Future Home Orange. Tutti i diritti riservati."
+    }
   }
 }

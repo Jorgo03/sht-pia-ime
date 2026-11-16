@@ -19,7 +19,7 @@ import {
 import { QueryClientProvider } from '@tanstack/react-query';
 // As of SDK 56, expo-router no longer allows importing @react-navigation/*
 // directly (Metro throws) — it re-exports what's still needed itself.
-import { DarkTheme, DefaultTheme, Stack, ThemeProvider as NavigationThemeProvider } from 'expo-router';
+import { DarkTheme, DefaultTheme, Stack, ThemeProvider as NavigationThemeProvider, usePathname } from 'expo-router';
 import { loadAsync as loadFontsAsync, useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
@@ -47,8 +47,8 @@ import { NotificationBanner } from '@/components/notifications/notification-bann
 import { PushBridge } from '@/components/push-bridge';
 import { SignedOutStart } from '@/components/auth/signed-out-start';
 import { NotificationsProvider } from '@/contexts/notifications-context';
-import { IS_WEB, WEB_MAX_WIDTH } from '@/constants/web-frame';
-import { useAppDimensions } from '@/hooks/use-app-dimensions';
+import { APP_SCREEN_MAX_WIDTH, IS_WEB, SITE_MAX_WIDTH, isWebsiteRoute } from '@/constants/web-frame';
+import { SiteHeader } from '@/components/web/site-header';
 import { RouteHead } from '@/components/web/page-head';
 import { debugWarn } from '@/lib/debug';
 
@@ -104,23 +104,15 @@ configureForegroundNotifications();
  */
 function WebColumn({ children }: { children: ReactNode }) {
   const { colors } = useTheme();
-  const { width } = useAppDimensions();
-  const { width: windowWidth } = useWindowDimensions();
+  const pathname = usePathname();
   if (!IS_WEB) return <>{children}</>;
-  const column = width;
-  const framed = windowWidth > column;
+  // The column's width depends only on the address, never on the window, so
+  // the pre-rendered page and the browser's first draw agree.
+  const maxWidth = isWebsiteRoute(pathname) ? SITE_MAX_WIDTH : APP_SCREEN_MAX_WIDTH;
   return (
     <View style={[styles.webPage, { backgroundColor: colors.primary }]}>
-      <View
-        style={[
-          styles.webColumn,
-          // Wider only for the desktop routes; the pre-rendered page (no
-          // window size yet) keeps the phone column from the stylesheet.
-          column > WEB_MAX_WIDTH && { maxWidth: column },
-          framed && { borderLeftWidth: StyleSheet.hairlineWidth, borderRightWidth: StyleSheet.hairlineWidth, borderColor: colors.border },
-        ]}>
-        {children}
-      </View>
+      <SiteHeader />
+      <View style={[styles.webColumn, { maxWidth }]}>{children}</View>
     </View>
   );
 }
@@ -358,5 +350,5 @@ export default function RootLayout() {
 
 const styles = StyleSheet.create({
   webPage: { flex: 1 },
-  webColumn: { flex: 1, width: '100%', maxWidth: WEB_MAX_WIDTH, alignSelf: 'center', overflow: 'hidden' },
+  webColumn: { flex: 1, width: '100%', alignSelf: 'center', overflow: 'hidden' },
 });

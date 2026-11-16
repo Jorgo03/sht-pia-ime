@@ -1227,5 +1227,91 @@
     "asListed": "Comme dans l'annonce",
     "asListedShort": "Originale",
     "converted": "Approximatif, au taux du jour. Prix de l'annonce : {{price}}"
+  },
+  "site": {
+    "nav": {
+      "search": "Rechercher",
+      "agencies": "Agences"
+    },
+    "listHome": "Publier votre bien",
+    "menu": "Menu",
+    "hero": {
+      "eyebrow": "Des logements en Albanie, où que vous soyez",
+      "title": "Trouvez le bon logement",
+      "titleEm": "en Albanie.",
+      "lead": "Appartements, villas et bureaux à vendre et à louer, dans votre langue. Parlez directement aux agents et aux propriétaires."
+    },
+    "stats": {
+      "listings": "Annonces actives",
+      "cities": "Villes avec des annonces",
+      "agencies": "Agences et agents"
+    },
+    "listings": {
+      "eyebrow": "Nouveautés",
+      "title": "Les derniers biens"
+    },
+    "steps": {
+      "eyebrow": "Comment ça marche",
+      "title": "De la recherche aux clés, étape par étape",
+      "search": {
+        "title": "Cherchez",
+        "body": "Filtrez par ville, quartier, prix et pièces, en liste ou sur la carte."
+      },
+      "compare": {
+        "title": "Comparez",
+        "body": "Comparez jusqu'à trois biens côte à côte et voyez l'historique des prix."
+      },
+      "visit": {
+        "title": "Visitez",
+        "body": "Réservez une visite ou écrivez à l'agent dans l'app, sur WhatsApp ou par téléphone."
+      },
+      "buy": {
+        "title": "Achetez en sécurité",
+        "body": "Suivez notre guide et faites appel à un avocat et un notaire agréés pour les étapes juridiques."
+      }
+    },
+    "services": {
+      "eyebrow": "Ce que nous offrons",
+      "title": "Tout pour trouver votre logement, au même endroit",
+      "wanted": {
+        "title": "Logements recherchés",
+        "body": "Dites ce que vous cherchez, nous vous prévenons dès qu'un bien correspond."
+      },
+      "priceHistory": {
+        "title": "Historique des prix",
+        "body": "Voyez comment le prix de chaque annonce a évolué depuis sa publication."
+      },
+      "currency": {
+        "title": "Prix dans votre devise",
+        "body": "Affichez les prix en leks, euros, dollars ou livres, au taux du jour."
+      },
+      "viewings": {
+        "title": "Visites en un clic",
+        "body": "Choisissez l'heure, l'agent confirme et vous êtes prévenu."
+      },
+      "chat": {
+        "title": "Discussion directe",
+        "body": "Écrivez à l'agent ou au propriétaire, avec photos, sans intermédiaire."
+      },
+      "guide": {
+        "title": "Acheter depuis l'étranger",
+        "body": "Les étapes, les documents et comment acheter à distance en sécurité."
+      }
+    },
+    "cities": {
+      "eyebrow": "Villes"
+    },
+    "cta": {
+      "title": "Prêt à trouver votre logement ?",
+      "body": "Cherchez gratuitement, ou publiez votre bien gratuitement et touchez des acheteurs en Albanie et à l'étranger.",
+      "search": "Chercher un logement"
+    },
+    "footer": {
+      "explore": "Explorer",
+      "sell": "Vendre ou louer",
+      "legal": "Mentions légales",
+      "tagline": "Le marché immobilier de l'Albanie, dans votre langue.",
+      "copyright": "© {{year}} Future Home Orange. Tous droits réservés."
+    }
   }
 }

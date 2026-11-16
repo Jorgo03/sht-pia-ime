@@ -1217,5 +1217,91 @@
     "asListed": "İlandaki gibi",
     "asListedShort": "Orijinal",
     "converted": "Yaklaşık, bugünkü kurla. İlan fiyatı: {{price}}"
+  },
+  "site": {
+    "nav": {
+      "search": "Ara",
+      "agencies": "Ofisler"
+    },
+    "listHome": "Mülkünüzü ilan edin",
+    "menu": "Menü",
+    "hero": {
+      "eyebrow": "Nerede olursanız olun, Arnavutluk'ta evler",
+      "title": "Doğru evi bulun",
+      "titleEm": "Arnavutluk'ta.",
+      "lead": "Satılık ve kiralık daireler, villalar ve ofisler, kendi dilinizde. Emlakçılar ve ev sahipleriyle doğrudan konuşun."
+    },
+    "stats": {
+      "listings": "Aktif ilanlar",
+      "cities": "İlanı olan şehirler",
+      "agencies": "Ofisler ve emlakçılar"
+    },
+    "listings": {
+      "eyebrow": "Yeni ilanlar",
+      "title": "En yeni evler"
+    },
+    "steps": {
+      "eyebrow": "Nasıl çalışır",
+      "title": "Aramadan anahtara, adım adım",
+      "search": {
+        "title": "Arayın",
+        "body": "Şehre, semte, fiyata ve odalara göre listede veya haritada filtreleyin."
+      },
+      "compare": {
+        "title": "Karşılaştırın",
+        "body": "En fazla üç evi yan yana koyun ve fiyat geçmişini görün."
+      },
+      "visit": {
+        "title": "Ziyaret edin",
+        "body": "Ziyaret ayarlayın veya emlakçıya uygulamadan, WhatsApp'tan ya da telefonla yazın."
+      },
+      "buy": {
+        "title": "Güvenle satın alın",
+        "body": "Rehberimizi izleyin ve yasal adımlar için lisanslı bir avukat ve noter kullanın."
+      }
+    },
+    "services": {
+      "eyebrow": "Neler sunuyoruz",
+      "title": "Ev bulmak için her şey tek bir yerde",
+      "wanted": {
+        "title": "Aranan evler",
+        "body": "Ne istediğinizi söyleyin, uygun bir ev ilan edildiğinde haber verelim."
+      },
+      "priceHistory": {
+        "title": "Fiyat geçmişi",
+        "body": "Her ilanın fiyatının yayınlandığından beri nasıl değiştiğini görün."
+      },
+      "currency": {
+        "title": "Kendi para biriminizde fiyatlar",
+        "body": "Fiyatları günlük kurla lek, euro, dolar veya sterlin olarak görün."
+      },
+      "viewings": {
+        "title": "Tek tıkla ziyaret",
+        "body": "Saati seçin, emlakçı onaylasın, size bildirim gelsin."
+      },
+      "chat": {
+        "title": "Doğrudan sohbet",
+        "body": "Emlakçıya veya ev sahibine fotoğraflarla, aracısız yazın."
+      },
+      "guide": {
+        "title": "Yurt dışından satın alma",
+        "body": "Uzaktan güvenle satın almak için adımlar ve belgeler."
+      }
+    },
+    "cities": {
+      "eyebrow": "Şehirler"
+    },
+    "cta": {
+      "title": "Evinizi bulmaya hazır mısınız?",
+      "body": "Ücretsiz arayın veya mülkünüzü ücretsiz ilan edip Arnavutluk'taki ve yurt dışındaki alıcılara ulaşın.",
+      "search": "Ev ara"
+    },
+    "footer": {
+      "explore": "Keşfet",
+      "sell": "Sat veya kirala",
+      "legal": "Yasal",
+      "tagline": "Arnavutluk'un emlak pazarı, kendi dilinizde.",
+      "copyright": "© {{year}} Future Home Orange. Tüm hakları saklıdır."
+    }
   }
 }
