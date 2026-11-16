@@ -113,7 +113,8 @@ export function SiteHeader() {
   );
 
   return (
-    <View style={styles.bar}>
+    // testID once hydrated: the final layout is drawn (tests wait for it).
+    <View style={styles.bar} testID={hydrated ? 'site-header' : undefined}>
       <AppHeader site compact={narrow} trailing={trailing} />
       <Modal visible={menuOpen} transparent animationType="fade" onRequestClose={() => setMenuOpen(false)}>
         <Pressable style={styles.backdrop} onPress={() => setMenuOpen(false)}>

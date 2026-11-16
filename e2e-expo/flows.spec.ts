@@ -23,15 +23,20 @@ const escape = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
 // The website's header (components/web/site-header): a link by its name,
 // and going somewhere through it, opening the folded menu on narrow screens.
-const siteLink = (page: Page, name: string) => page.getByRole('link', { name, exact: true }).first();
+const siteLink = (page: Page, name: string) => page.getByRole('link', { name, exact: true }).filter({ visible: true }).first();
+// The header draws its final layout (folded on a phone) once the page has
+// started; until then it is the pre-rendered wide one.
+const headerReady = (page: Page) => expect(page.getByTestId('site-header')).toBeVisible();
 // The language menu: a header button, or inside the folded menu on a phone.
-async function openLanguage(page: Page, label = t('common.language')) {
-  const button = page.getByRole('button', { name: label, exact: true });
-  if (await button.isVisible()) return button.click();
-  await page.getByRole('button', { name: t('site.menu') }).click();
+async function openLanguage(page: Page, label = t('common.language'), menuLabel = t('site.menu')) {
+  await headerReady(page);
+  const button = page.getByRole('button', { name: label, exact: true }).filter({ visible: true });
+  if (await button.count()) return button.first().click();
+  await page.getByRole('button', { name: menuLabel }).click();
 }
 // Opens the folded site menu when the screen is narrow; no-op when wide.
 async function openSiteMenu(page: Page) {
+  await headerReady(page);
   const menu = page.getByRole('button', { name: t('site.menu') });
   if (await menu.isVisible()) await menu.click();
 }
@@ -46,8 +51,9 @@ async function openFilters(page: Page) {
   return false;
 }
 async function goSite(page: Page, name: string) {
+  await headerReady(page);
   const link = siteLink(page, name);
-  if (await link.isVisible()) return link.click();
+  if (await link.count()) return link.click();
   await page.getByRole('button', { name: t('site.menu') }).click();
   await page.getByRole('menuitem', { name, exact: true }).click();
 }
@@ -343,8 +349,8 @@ test('X64 Russian headlines switch to Manrope at once, and back to Newsreader in
       return count;
     });
   // The menu button's own label is in the current language.
-  const pickLanguage = async (menuLabel: string, name: RegExp) => {
-    await openLanguage(page, menuLabel);
+  const pickLanguage = async (menuLabel: string, name: RegExp, siteMenu?: string) => {
+    await openLanguage(page, menuLabel, siteMenu);
     await page.getByRole('button', { name }).click();
   };
   await page.goto('/');
@@ -357,7 +363,7 @@ test('X64 Russian headlines switch to Manrope at once, and back to Newsreader in
   expect((await families()).cyrillicInNewsreader).toBe(0);
   const russianBold = (await families()).bold;
 
-  await pickLanguage('Язык', /Shqip/);
+  await pickLanguage('Язык', /Shqip/, 'Меню');
   await expect(page.locator('html')).toHaveAttribute('lang', 'sq');
   await expect.poll(async () => (await families()).newsreader).toBeGreaterThan(0);
   // Same weight as the serif it replaces: Russian draws no more bold text than
@@ -804,7 +810,8 @@ test.describe('discovery', () => {
     // Home stays mounted behind the tab, so its cards are still in the page:
     // the count is Explore's own.
     await expect(page.getByText(/në shikim/)).toContainText('1');
-    await expect(page.getByText('Apartament pranë plazhit').filter({ visible: true }).first()).toBeVisible();
+    // Search's cards name the city, not the title.
+    await expect(page.getByText(/Durrës/).filter({ visible: true }).first()).toBeVisible();
   });
 
   test('X95 the agencies directory lists, searches and opens an agent', async ({ page }) => {
