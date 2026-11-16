@@ -43,6 +43,9 @@ async function openSiteMenu(page: Page) {
 // Search's filters: a sheet behind a button on a phone, a sidebar that is
 // always open on a desktop website (no button). Returns whether a sheet opened.
 async function openFilters(page: Page) {
+  // After the page has started: the pre-rendered page is the phone layout,
+  // with the button, even on a desktop.
+  await headerReady(page);
   const button = page.getByRole('button', { name: t('search.filtersTitle') });
   if (await button.isVisible()) {
     await button.click();
@@ -53,9 +56,15 @@ async function openFilters(page: Page) {
 async function goSite(page: Page, name: string) {
   await headerReady(page);
   const link = siteLink(page, name);
-  if (await link.count()) return link.click();
-  await page.getByRole('button', { name: t('site.menu') }).click();
-  await page.getByRole('menuitem', { name, exact: true }).click();
+  const menu = page.getByRole('button', { name: t('site.menu') });
+  // Signed-in links (Messages) appear once the account has loaded.
+  await expect(link.or(menu).first()).toBeVisible();
+  if (await menu.isVisible()) {
+    await menu.click();
+    await page.getByRole('menuitem', { name, exact: true }).click();
+    return;
+  }
+  await link.click();
 }
 
 async function ready(page: Page) {
