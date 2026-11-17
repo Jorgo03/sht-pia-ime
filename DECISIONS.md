@@ -49,9 +49,11 @@ Shtëpia.ime keeps its own words, orange and data. On the web:
   in a horizontal row, a dark closing band;
 - a black footer: large headline, call to action, link columns, the brand
   symbol large in the corner.
-Photos: the reference's hero and closing band are photographs. The repo has
-none, so both are dark with an orange glow until the owner supplies (or
-approves) photos.
+Photos (owner, 2026-11-17: "Pick free stock photos"): two free Unsplash
+photos, credited in `assets/web/CREDITS.md`: Tirana's towers for the hero,
+Sarandë from the air for the closing band, each under a dark shade so the
+white text reads. A photo of Skanderbeg Square was left out: it is covered in
+sponsors' banners.
 
 ### W8. Plazh and Currila are Durrës areas again (DECIDED by owner, 2026-11-16)
 

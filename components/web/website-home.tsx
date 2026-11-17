@@ -1,4 +1,5 @@
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter, type Href } from 'expo-router';
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
@@ -19,6 +20,11 @@ import { useAgentDirectoryQuery, useCityTilesQuery, usePropertiesCountQuery, use
 import { setOverHero } from '@/lib/web/hero-state';
 
 type IconName = keyof typeof MaterialIcons.glyphMap;
+
+// Free Unsplash photos (assets/web/CREDITS.md): Tirana for the hero,
+// Sarandë for the closing band, as the reference site uses photographs there.
+const HERO_PHOTO = require('@/assets/web/hero-tirana.jpg');
+const BAND_PHOTO = require('@/assets/web/band-sarande.jpg');
 
 const LATEST_COUNT = 8;
 const CONTENT_MAX = 1280;
@@ -98,11 +104,21 @@ export function WebsiteHome() {
       onScroll={(e) => setOverHero(e.nativeEvent.contentOffset.y < heroHeight - 90)}>
       {/* ── Hero ── */}
       <View style={[styles.hero, { minHeight: heroHeight }]}>
-        <Glow size={phone ? 420 : 760} style={{ right: phone ? -180 : -120, top: phone ? 40 : -80 }} />
-        <Glow size={phone ? 260 : 420} opacity={0.28} style={{ left: -140, bottom: -160 }} />
+        <Image
+          source={HERO_PHOTO}
+          style={StyleSheet.absoluteFill}
+          contentFit="cover"
+          contentPosition="center"
+          priority="high"
+          accessibilityLabel="Tiranë"
+        />
+        {/* Darkens the photo so the white text reads on it, most at the
+            bottom where the headline sits, as on the reference. */}
+        <View style={[StyleSheet.absoluteFill, styles.photoShade]} />
         <LinearGradient
-          colors={['rgba(11,10,9,0)', 'rgba(11,10,9,0.55)']}
-          start={{ x: 0, y: 0.3 }}
+          colors={['rgba(11,10,9,0.35)', 'rgba(11,10,9,0.05)', 'rgba(11,10,9,0.8)']}
+          locations={[0, 0.35, 1]}
+          start={{ x: 0, y: 0 }}
           end={{ x: 0, y: 1 }}
           style={StyleSheet.absoluteFill}
         />
@@ -321,7 +337,8 @@ export function WebsiteHome() {
 
       {/* ── Closing band ── */}
       <View style={[styles.dark, styles.band]}>
-        <Glow size={phone ? 380 : 620} opacity={0.5} style={{ left: '50%', top: -260, marginLeft: phone ? -190 : -310 }} />
+        <Image source={BAND_PHOTO} style={StyleSheet.absoluteFill} contentFit="cover" accessibilityLabel="Sarandë" />
+        <View style={[StyleSheet.absoluteFill, styles.bandShade]} />
         <Contain style={styles.bandInner}>
           <Text style={[styles.bandTitle, phone && styles.h2Phone]} accessibilityRole="header" aria-level={2}>
             {t('site.cta.title')}
@@ -449,6 +466,8 @@ const createStyles = (colors: AtticoPalette) =>
     pressed: { opacity: 0.85 },
 
     hero: { backgroundColor: INK, overflow: 'hidden', justifyContent: 'flex-end' },
+    photoShade: { backgroundColor: 'rgba(11,10,9,0.28)' },
+    bandShade: { backgroundColor: 'rgba(11,10,9,0.55)' },
     heroInner: { paddingTop: 140, paddingBottom: 72, gap: 18 },
     heroEyebrow: { fontFamily: Fonts.sansMedium, fontSize: 13, letterSpacing: 1.4, color: ON_INK_SOFT, textTransform: 'uppercase' },
     heroTitle: { fontFamily: Fonts.sans, fontSize: 60, lineHeight: 62, letterSpacing: -1.8, color: ON_INK, maxWidth: 900 },
