@@ -59,11 +59,15 @@ export const ROUTES: RouteSpec[] = [
   { path: `/listing/${LISTING}/analytics`, name: 'listing-analytics', access: 'agent' },
 ];
 
+// The responsive brief's sizes (RESPONSIVE_TEST_RESULTS.md): desktop, laptop,
+// tablet and phones down to 320 wide.
 const SIZES: [number, number][] = [
-  [1920, 1080], [1600, 900], [1440, 900], [1366, 768], [1024, 768],
-  [768, 1024], [430, 932], [390, 844], [375, 812], [360, 800],
+  [1920, 1080], [1600, 900], [1440, 900], [1366, 768], [1280, 800], [1024, 768],
+  [820, 1180], [768, 1024], [430, 932], [414, 896], [390, 844], [375, 812], [360, 800], [320, 720],
 ];
-const SHOT_SIZES = new Set(['1440x900', '390x844']);
+// Signed-in pages and the client/agent passes: one size per class of screen.
+const ROLE_WIDTHS = [1920, 1440, 1280, 1024, 820, 768, 390, 375, 320];
+const SHOT_SIZES = new Set(['1440x900', '820x1180', '390x844', '375x812']);
 
 type Role = 'visitor' | 'client' | 'agent';
 
@@ -101,6 +105,24 @@ function measure(page: Page) {
       const r = el.getBoundingClientRect();
       if (r.left < -1 || r.right > W + 1) offScreen.push(`${(el.getAttribute('aria-label') || (el as HTMLElement).innerText || el.tagName).slice(0, 40)} ${Math.round(r.left)}-${Math.round(r.right)}`);
     }
+    // Two controls drawn on top of each other (neither inside the other):
+    // text and buttons overlapping. Ignores controls stacked in a scroller.
+    const controls = [...document.querySelectorAll('[role=button],[role=link],a,button,input,textarea')]
+      .filter((el) => shown(el) && !inScroller(el))
+      .filter((el) => getComputedStyle(el).position !== 'fixed');
+    const overlaps: string[] = [];
+    const label = (el: Element) => (el.getAttribute('aria-label') || (el as HTMLElement).innerText || el.tagName).replace(/\s+/g, ' ').slice(0, 30);
+    for (let i = 0; i < controls.length && overlaps.length < 10; i++) {
+      const a = controls[i].getBoundingClientRect();
+      for (let j = i + 1; j < controls.length; j++) {
+        const x = controls[j];
+        if (controls[i].contains(x) || x.contains(controls[i])) continue;
+        const b = x.getBoundingClientRect();
+        const w = Math.min(a.right, b.right) - Math.max(a.left, b.left);
+        const h = Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top);
+        if (w > 4 && h > 4 && w * h > 0.25 * Math.min(a.width * a.height, b.width * b.height)) overlaps.push(`${label(controls[i])} × ${label(x)}`);
+      }
+    }
     const images = [...document.querySelectorAll('img')].filter(shown).map((img) => {
       const r = img.getBoundingClientRect();
       const fit = getComputedStyle(img).objectFit;
@@ -123,6 +145,7 @@ function measure(page: Page) {
       textLength: document.body.innerText.trim().length,
       pageWider: document.documentElement.scrollWidth > W + 1,
       offScreen,
+      overlaps,
       images,
       links: [...new Set(links)],
       robots,
@@ -144,7 +167,7 @@ for (const role of ['visitor', 'client', 'agent'] as Role[]) {
         test.setTimeout(180_000);
         if (role === 'client') await asClient(page);
         // The fake backend answers unknown addresses with the 404 page.
-        const sizes = role === 'visitor' && spec.access === 'public' ? SIZES : SIZES.filter(([w]) => [1920, 1440, 1024, 768, 390, 360].includes(w));
+        const sizes = role === 'visitor' && spec.access === 'public' ? SIZES : SIZES.filter(([w]) => ROLE_WIDTHS.includes(w));
         const results: Record<string, unknown> = {};
         for (const [w, h] of sizes) {
           await page.setViewportSize({ width: w, height: h });
@@ -163,6 +186,7 @@ for (const role of ['visitor', 'client', 'agent'] as Role[]) {
           expect.soft(m.textLength, `${spec.path} at ${key} is blank`).toBeGreaterThan(40);
           expect.soft(m.pageWider, `${spec.path} at ${key} is wider than the window`).toBe(false);
           expect.soft(m.offScreen, `${spec.path} at ${key}: controls off screen`).toEqual([]);
+          expect.soft(m.overlaps, `${spec.path} at ${key}: controls on top of each other`).toEqual([]);
           expect.soft(m.images.filter((i) => i.broken).map((i) => i.src), `${spec.path} at ${key}: broken images`).toEqual([]);
           expect.soft(m.images.filter((i) => i.stretched).map((i) => i.size), `${spec.path} at ${key}: stretched images`).toEqual([]);
 
