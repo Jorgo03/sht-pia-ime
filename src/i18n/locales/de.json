@@ -311,6 +311,7 @@
     "address": "Adresse",
     "addressPlaceholder": "Straßenname und Hausnummer",
     "price": "Preis",
+    "priceLabel": "Preis",
     "currency": "Währung",
     "surface": "Fläche",
     "floor": "Etage",

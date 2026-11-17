@@ -327,6 +327,7 @@
     "address": "Адрес",
     "addressPlaceholder": "Улица и номер дома",
     "price": "Цена",
+    "priceLabel": "Цена",
     "currency": "Валюта",
     "surface": "Площадь",
     "floor": "Этаж",

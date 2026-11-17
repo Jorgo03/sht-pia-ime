@@ -363,6 +363,7 @@
     "address": "Address",
     "addressPlaceholder": "Street name and number",
     "price": "Price",
+    "priceLabel": "Price",
     "currency": "Currency",
     "surface": "Surface area",
     "floor": "Floor",

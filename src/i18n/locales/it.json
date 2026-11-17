@@ -319,6 +319,7 @@
     "address": "Indirizzo",
     "addressPlaceholder": "Via e numero civico",
     "price": "Prezzo",
+    "priceLabel": "Prezzo",
     "currency": "Valuta",
     "surface": "Superficie",
     "floor": "Piano",

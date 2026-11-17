@@ -363,6 +363,7 @@
     "address": "Adresa",
     "addressPlaceholder": "Emri i rrugës dhe numri",
     "price": "Çmimi",
+    "priceLabel": "Çmimi",
     "currency": "Monedha",
     "surface": "Sipërfaqja",
     "floor": "Kati",

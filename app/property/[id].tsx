@@ -102,7 +102,10 @@ export default function PropertyDetailScreen() {
   const requireSignIn = () => {
     Alert.alert(t('favourites.loginPrompt'), '', [
       { text: t('common.cancel'), style: 'cancel' },
-      { text: t('auth.signIn'), onPress: () => router.push('/(tabs)/profile' as Href) },
+      // common.signIn, not auth.signIn: the auth namespace has signInTitle /
+      // signInWith / signInWithEmail but never a bare signIn, so this button
+      // rendered the literal text "auth.signIn" in every language.
+      { text: t('common.signIn'), onPress: () => router.push('/(tabs)/profile' as Href) },
     ]);
   };
 

@@ -319,6 +319,7 @@
     "address": "Dirección",
     "addressPlaceholder": "Calle y número",
     "price": "Precio",
+    "priceLabel": "Precio",
     "currency": "Moneda",
     "surface": "Superficie",
     "floor": "Planta",

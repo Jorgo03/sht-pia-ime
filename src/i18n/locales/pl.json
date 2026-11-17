@@ -327,6 +327,7 @@
     "address": "Adres",
     "addressPlaceholder": "Ulica i numer",
     "price": "Cena",
+    "priceLabel": "Cena",
     "currency": "Waluta",
     "surface": "Powierzchnia",
     "floor": "Piętro",

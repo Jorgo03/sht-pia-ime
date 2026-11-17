@@ -319,6 +319,7 @@
     "address": "Adresse",
     "addressPlaceholder": "Nom de rue et numéro",
     "price": "Prix",
+    "priceLabel": "Prix",
     "currency": "Devise",
     "surface": "Surface",
     "floor": "Étage",
