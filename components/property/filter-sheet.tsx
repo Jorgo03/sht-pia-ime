@@ -543,7 +543,9 @@ const createStyles = (colors: AtticoPalette, sheetHeight: number = 0) => StyleSh
     borderRadius: 20,
     borderWidth: 1,
     borderColor: colors.border,
-    backgroundColor: colors.surface ?? colors.glass,
+    // The theme's card colour: `surface` is white in both palettes, which
+    // left a white panel with light text on the dark website.
+    backgroundColor: colors.primaryLight,
     overflow: 'hidden',
   },
   backdrop: {

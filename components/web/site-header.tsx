@@ -204,7 +204,7 @@ const createStyles = (colors: AtticoPalette) =>
     accountText: { fontFamily: Fonts.sansSemiBold, fontSize: 14, color: colors.textPrimary },
     pressed: { opacity: 0.8 },
     backdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.3)', alignItems: 'flex-end', paddingTop: 70, paddingRight: 16 },
-    menu: { minWidth: 240, maxHeight: '85%', flexGrow: 0, borderRadius: 16, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border },
+    menu: { minWidth: 240, maxHeight: '85%', flexGrow: 0, borderRadius: 16, backgroundColor: colors.primaryLight, borderWidth: 1, borderColor: colors.border },
     menuContent: { padding: 6 },
     menuDivider: { height: StyleSheet.hairlineWidth, backgroundColor: colors.border, marginVertical: 6 },
     menuLabel: { fontFamily: Fonts.sansSemiBold, fontSize: 12, color: colors.textSecondary, paddingHorizontal: 16, paddingVertical: 6 },
