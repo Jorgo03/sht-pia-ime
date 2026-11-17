@@ -64,6 +64,24 @@ controls hidden under a dialog as overlapping (`e2e-expo/site-audit.spec.ts`).
 | `npm test` | 634 / 634 |
 | `npm run test:e2e:expo` | see the deployment note in the final message |
 
+## Applied to the live backend (owner's yes, 2026-11-17)
+
+- Migration `ai_take_quota` applied. Tested: two calls allowed, the third
+  refused; only the service role may run it (anon and signed-in: no).
+- Deployed with `verify_jwt` unchanged (on): `ai-parse-search` v7,
+  `ai-listing-assistant` v8, `ai-assistant` v3, `translate-property` v10.
+  Live checks: malformed bodies now get 400 (were 503); a real search was
+  recorded by the new quota; a signed-out translation returned 200 with
+  "2+1" and "Bllok" intact. The deployed `ai-assistant` was read back and
+  compared file by file with the repository: identical, except one regex in
+  `logic.js` whose accent range came back as literal characters instead of
+  escapes (the same characters, same behaviour).
+- **Found while testing, needs the owner:** Anthropic rejects the project's
+  `ANTHROPIC_API_KEY` (401). Translation falls back to the free engine, but
+  AI search, the listing assistant and the site assistant answer "AI
+  unavailable" until a valid key (with credits) is set in Supabase → Edge
+  Functions → Secrets. Not caused by these changes.
+
 ## Not fixed, and why
 
 - **15 "setState inside an effect" lint warnings in the Expo app** (agent
@@ -73,9 +91,5 @@ controls hidden under a dialog as overlapping (`e2e-expo/site-audit.spec.ts`).
   load-on-open; behaviour is correct. The right fix is moving these screens
   to TanStack Query (already used by `app/wanted.tsx`) — a 15-file refactor,
   proposed as its own task. The other 19 warnings are in legacy `src/`.
-- **Edge Function changes are not live yet.** The migration must be applied
-  first, then the four functions deployed; deploying the functions first
-  would make every AI call fail closed. Both change the live backend and wait
-  for the owner's yes.
 - Not changed on purpose: `CORS *` (Bearer auth, no cookies), the
   `push-dispatch` count reads, Leaflet's untyped objects.
