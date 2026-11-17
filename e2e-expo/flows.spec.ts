@@ -46,7 +46,7 @@ async function openFilters(page: Page) {
   // After the page has started: the pre-rendered page is the phone layout,
   // with the button, even on a desktop.
   await headerReady(page);
-  const button = page.getByRole('button', { name: t('search.filtersTitle') });
+  const button = page.getByRole('button', { name: t('search.filtersTitle'), exact: true });
   // Website from tablet width: the filter panel above the results, with the
   // amenities behind "More filters". Wait for whichever this layout draws.
   const more = page.getByRole('button', { name: t('search.panel.moreFilters') });
