@@ -199,7 +199,7 @@ export function NotificationsSheet({ userId, onClose }: { userId: string; onClos
               />
             ) : null}
             {state === 'blocked' ? (
-              <PrimaryCTA label={t('notifications.openSettings')} icon="settings" onPress={() => void Linking.openSettings()} />
+              <PrimaryCTA label={t('notifications.openSettings')} icon="settings" onPress={() => Linking.openSettings().catch(() => {})} />
             ) : null}
 
             {(['messages', 'viewings'] as const).map((key) => {

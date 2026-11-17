@@ -32,3 +32,15 @@ export function confirmAction({
     { text: confirmText, style: destructive ? 'destructive' : 'default', onPress: onConfirm },
   ]);
 }
+
+/**
+ * Tells the user something, on every platform. Alert.alert is empty on the
+ * web (see above), so a message built on it alone never appears there.
+ */
+export function notify(title: string, message?: string): void {
+  if (Platform.OS === 'web') {
+    if (typeof window !== 'undefined') window.alert([title, message].filter(Boolean).join('\n\n'));
+    return;
+  }
+  Alert.alert(title, message ?? '');
+}

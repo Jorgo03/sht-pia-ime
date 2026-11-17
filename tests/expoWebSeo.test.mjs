@@ -90,3 +90,17 @@ test('the sitemap lists the public profile of each lister, once', () => {
   const xml = sitemapXml(SITE, [{ ...ROW, owner_id: owner }, { ...ROW, id: 'e2e00000-0000-4000-b000-000000000002', owner_id: owner }])
   assert.equal(xml.match(new RegExp(`/user/${owner}`, 'g')).length, 1)
 })
+
+test('"$&" and "$\'" in listing text stay literal in the pre-rendered page', () => {
+  const html = applyHead(TEMPLATE, {
+    title: "Vila $& me pishinë $' | Shtëpia.ime",
+    description: 'Çmimi $& $` $1',
+    url: `${SITE}/property/x`,
+    site: SITE,
+    path: '/property/x',
+    image: null,
+  })
+  assert.match(html, /<title data-rh="true">Vila \$&amp; me pishinë \$' \| Shtëpia\.ime<\/title>/)
+  assert.match(html, /name="description" content="Çmimi \$&amp; \$` \$1"/)
+  assert.equal((html.match(/<title/g) || []).length, 1)
+})

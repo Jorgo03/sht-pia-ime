@@ -78,6 +78,7 @@ const PROFILE_FETCH_TIMEOUT_MS = 4000;
  * not an error path.
  */
 const timedOut = Symbol('timedOut');
+const PROFILE_FAILED = Symbol('profileFailed');
 function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T | typeof timedOut> {
   return new Promise((resolve) => {
     const timer = setTimeout(() => resolve(timedOut), ms);
@@ -124,8 +125,8 @@ const IS_EXPO_GO = isRunningInExpoGo();
 // silent 'cancel' indistinguishable from the user closing the browser.
 // Without these the next such failure is invisible.
 function oauthDebug(label: string, data?: Record<string, unknown>) {
-  if (!__DEV__) return;
-  console.log(`[oauth] ${label}`, data ?? '');
+  // Through the redacting dev-only logger (lib/debug), never raw console.
+  debugWarn('oauth', `${label} ${data ? JSON.stringify(data) : ''}`);
 }
 
 type Role = 'buyer' | 'agent';
@@ -226,10 +227,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // arrived. Mirrors web's AuthContext.
   const generation = useRef(0);
 
+  // null = this account has no profile row; a failed read throws instead, so
+  // a network blip is never mistaken for "no profile" (which hides the
+  // agent tools and the role until the next sign-in).
   const loadProfile = async (userId: string): Promise<Profile | null> => {
-    const { data } = await supabase.from('profiles').select('*').eq('id', userId).single();
+    const { data, error } = await supabase.from('profiles').select('*').eq('id', userId).maybeSingle();
+    if (error) throw error;
     return (data as Profile | null) ?? null;
   };
+  // On a failed read keep what we had for this same account.
+  const keepOnFailure = (userId: string) => (prev: Profile | null) => (prev?.id === userId ? prev : null);
 
   // Mirrors web's AuthContext.applyPendingRole. OAuth and email-code signups
   // can't carry the role toggle through the provider/magic-link redirect, so
@@ -287,15 +294,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Started once, awaited with a ceiling, and still honoured if it lands
       // late — so a slow network delays the profile, never the whole app.
       const user = s.user;
-      const profilePromise = loadProfile(user.id)
+      const profilePromise: Promise<Profile | null | typeof PROFILE_FAILED> = loadProfile(user.id)
         .then((p) => applyPendingRole(user, p))
-        .catch(() => null);
+        .catch(() => PROFILE_FAILED);
 
       const result = await withTimeout(profilePromise, PROFILE_FETCH_TIMEOUT_MS);
       if (!active || myGeneration !== generation.current) return;
 
       setSession(s);
-      if (result !== timedOut) setProfile(result);
+      if (result === PROFILE_FAILED) setProfile(keepOnFailure(user.id));
+      else if (result !== timedOut) setProfile(result);
       setLoading(false);
 
       // Took too long to block on, but the answer is still wanted: apply it
@@ -303,7 +311,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (result === timedOut) {
         profilePromise.then((late) => {
           if (!active || myGeneration !== generation.current) return;
-          setProfile(late);
+          if (late === PROFILE_FAILED) setProfile(keepOnFailure(user.id));
+          else setProfile(late);
         });
       }
     };
@@ -373,8 +382,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const refreshProfile = async () => {
     if (!session?.user) return;
-    const p = await loadProfile(session.user.id);
-    setProfile(p);
+    const id = session.user.id;
+    try {
+      setProfile(await loadProfile(id));
+    } catch {
+      setProfile(keepOnFailure(id));
+    }
   };
 
   const signUp = async (

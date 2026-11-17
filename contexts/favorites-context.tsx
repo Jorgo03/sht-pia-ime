@@ -68,13 +68,15 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
       const { data, error } = await supabase
         .from('favorites')
         .select('property_id, properties(*)')
-        .eq('user_id', uid);
+        .eq('user_id', uid)
+        // Bounded: far more saved homes than anyone keeps, never unbounded.
+        .limit(500);
 
       if (fetchingFor.current !== uid) return;
       if (error) throw error;
 
       const props = (data ?? [])
-        .map((f: any) => f.properties)
+        .map((f) => (f as unknown as { properties: Property | null }).properties)
         .filter(Boolean) as Property[];
       const ids = new Set(props.map((p) => p.id));
 

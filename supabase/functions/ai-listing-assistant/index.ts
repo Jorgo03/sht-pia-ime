@@ -34,18 +34,17 @@ const admin = createClient(
   Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
 );
 
+// One atomic step in the database (ai_take_quota): count the last hour and
+// record this call together, so parallel requests cannot all slip through.
 async function rateLimit(key: string, feature: string, max: number): Promise<boolean> {
-  const since = new Date(Date.now() - 3600_000).toISOString();
-  const { count, error } = await admin
-    .from('ai_usage')
-    .select('id', { count: 'exact', head: true })
-    .eq('key', key)
-    .eq('feature', feature)
-    .gte('created_at', since);
-  // Fail closed: if usage cannot be counted, no paid call is made.
-  if (error || (count ?? 0) >= max) return false;
-  await admin.from('ai_usage').insert({ key, feature });
-  return true;
+  const { data, error } = await admin.rpc('ai_take_quota', {
+    p_key: key,
+    p_feature: feature,
+    p_max: max,
+    p_window_seconds: 3600,
+  });
+  // Fail closed: if usage cannot be recorded, no paid call is made.
+  return !error && data === true;
 }
 
 // Project-wide ceiling on paid AI calls per feature per 24 hours, across every
@@ -64,14 +63,23 @@ async function underDailyCap(feature: string): Promise<boolean> {
     .eq('feature', feature)
     .gte('created_at', since);
   if (error) return false;
-  return (count ?? 0) <= AI_DAILY_CALL_CAP;
+  return (count ?? 0) < AI_DAILY_CALL_CAP;
+}
+
+// Signed-out callers are bucketed by IP. The left-most x-forwarded-for entry
+// is whatever the client sent; Cloudflare's cf-connecting-ip and the right-most
+// hop are written by the platform in front of us, so a caller cannot pick a
+// fresh bucket by sending a made-up header.
+function clientIp(req: Request): string {
+  const hops = (req.headers.get('x-forwarded-for') ?? '').split(',').map((h) => h.trim()).filter(Boolean);
+  return req.headers.get('cf-connecting-ip')?.trim() || hops[hops.length - 1] || 'anon';
 }
 
 async function callerKey(req: Request): Promise<string> {
   const token = req.headers.get('Authorization')?.replace('Bearer ', '') ?? '';
   const { data } = await admin.auth.getUser(token);
   if (data?.user) return data.user.id;
-  return req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'anon';
+  return clientIp(req);
 }
 
 const LANG_NAMES: Record<string, string> = {
@@ -85,8 +93,19 @@ Deno.serve(async (req) => {
   try {
     if (!ANTHROPIC_KEY) return json({ error: 'ai_unavailable' }, 503);
 
-    const { property_id, messages = [], language = 'sq' } = await req.json();
-    if (!property_id) return json({ error: 'missing_property' }, 400);
+    // A malformed body is the caller's mistake (400), not "AI unavailable".
+    let body: { property_id?: unknown; messages?: unknown; language?: unknown };
+    try {
+      body = await req.json();
+    } catch {
+      return json({ error: 'bad_request' }, 400);
+    }
+    const property_id = typeof body?.property_id === 'string' ? body.property_id : '';
+    const messages = Array.isArray(body?.messages) ? body.messages.filter((m) => m && typeof m === 'object') : [];
+    const language = typeof body?.language === 'string' ? body.language : 'sq';
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(property_id)) {
+      return json({ error: 'missing_property' }, 400);
+    }
 
     if (!(await rateLimit(await callerKey(req), 'listing-assistant', RATE_LIMIT_PER_HOUR))) {
       return json({ error: 'rate_limited' }, 429);
@@ -105,7 +124,7 @@ Deno.serve(async (req) => {
       .maybeSingle();
     if (!property) return json({ error: 'not_found' }, 404);
 
-    const langName = LANG_NAMES[language] ?? 'Albanian';
+    const langName = Object.hasOwn(LANG_NAMES, language) ? LANG_NAMES[language] : 'Albanian';
 
     // Cap history: last 10 turns, 1000 chars each.
     const history = (Array.isArray(messages) ? messages : [])
@@ -150,7 +169,8 @@ Deno.serve(async (req) => {
     });
 
     if (!r.ok) {
-      console.error('Anthropic error', r.status, await r.text());
+      // Status only: the upstream body can echo the prompt (listing text).
+      console.error('Anthropic error', r.status);
       return json({ error: 'ai_unavailable' }, 503);
     }
 
@@ -163,7 +183,7 @@ Deno.serve(async (req) => {
     const { reply, contact } = parseReply(text);
     return json({ reply: reply || null, contact });
   } catch (err) {
-    console.error('ai-listing-assistant error', err);
+    console.error('ai-listing-assistant error', err instanceof Error ? err.message : String(err));
     return json({ error: 'ai_unavailable' }, 503);
   }
 });

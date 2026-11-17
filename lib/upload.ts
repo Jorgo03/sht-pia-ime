@@ -254,6 +254,11 @@ export async function uploadPropertyVideo(
   userId: string,
 ): Promise<{ url: string; path: string }> {
   const bytes = await readLocal(video.uri);
+  // The picker often reports no size on Android, so pickVideo() could not
+  // check it: check the real bytes before anything is sent.
+  if (bytes.byteLength > MAX_VIDEO_MB * 1024 * 1024) {
+    throw Object.assign(new Error('video too large'), { videoTooLarge: true });
+  }
 
   // Named from the checked type, never the person's file name (src/lib/uploadNames.js).
   const path = `${userId}/video-${randomName()}.${extensionFor(video.mimeType) ?? 'mp4'}`;

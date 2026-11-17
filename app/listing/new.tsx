@@ -719,7 +719,9 @@ function ListingWizard({ editId }: { editId?: string }) {
       // and the picked photos stay as they are, so the agent can retry.
       const outOfRangeErr = err?.code === '22003' || /out of range/i.test(err?.message ?? '');
       const message =
-        err?.stage === 'prepare'
+        err?.videoTooLarge
+          ? t('errors.videoTooLarge', { max: MAX_VIDEO_MB })
+          : err?.stage === 'prepare'
           ? t('errors.photoPrepareFailed')
           : err?.stage === 'read' || err?.uploadFailed
             ? t('errors.imageUploadFailed')

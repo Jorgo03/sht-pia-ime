@@ -98,11 +98,30 @@ export default function AgentDashboardScreen() {
       const since = new Date();
       since.setDate(since.getDate() - 30);
 
-      const { data: myProps } = await supabase
+      // Supabase returns errors instead of throwing: each read is checked so
+      // a failure shows the retry state, not a dashboard of zeros.
+      const { data: myProps, error: propsError } = await supabase
         .from('properties')
         .select('id, status, title, title_i18n, city, listing_type, price, currency, beds')
         .or(`owner_id.eq.${user.id},agent_id.eq.${user.id}`);
+      if (propsError) throw propsError;
       const propIds = (myProps ?? []).map((p) => p.id);
+      // Views in batches of ids: one `in` list of thousands of ids would
+      // overflow the request URL for a large agency.
+      const viewCount = async () => {
+        let total = 0;
+        for (let i = 0; i < propIds.length; i += 150) {
+          const { count, error: e } = await supabase
+            .from('property_activity')
+            .select('id', { count: 'exact', head: true })
+            .in('property_id', propIds.slice(i, i + 150))
+            .eq('type', 'view')
+            .gte('created_at', since.toISOString());
+          if (e) throw e;
+          total += count ?? 0;
+        }
+        return { count: total, error: null };
+      };
 
       // Today in Tirana, where the viewings happen (AUDIT-005). The next
       // day's midnight, not +24h, so the DST change days stay whole.
@@ -110,14 +129,7 @@ export default function AgentDashboardScreen() {
       const dayEnd = tiranaDayStart(new Date(dayStart.getTime() + 36 * 60 * 60 * 1000));
 
       const [viewsRes, convRes, leadsRes, viewingsRes, wantedRes, todayRes] = await Promise.all([
-        propIds.length
-          ? supabase
-              .from('property_activity')
-              .select('id', { count: 'exact', head: true })
-              .in('property_id', propIds)
-              .eq('type', 'view')
-              .gte('created_at', since.toISOString())
-          : Promise.resolve({ count: 0 }),
+        viewCount(),
         supabase.from('conversations').select('id', { count: 'exact', head: true }).eq('agent_id', user.id),
         supabase.from('leads').select('id', { count: 'exact', head: true }).eq('agent_id', user.id),
         supabase
@@ -138,6 +150,8 @@ export default function AgentDashboardScreen() {
           .order('scheduled_at', { ascending: true })
           .limit(20),
       ]);
+      const failed = [convRes, leadsRes, viewingsRes, wantedRes, todayRes].find((r) => r.error);
+      if (failed?.error) throw failed.error;
 
       setStats({
         listings: (myProps ?? []).filter((p) => p.status === 'active').length,
@@ -155,7 +169,8 @@ export default function AgentDashboardScreen() {
 
       const clientIds = [...new Set([...pv, ...tv].map((v) => v.client_id).concat(wf.map((w) => w.client_id)))];
       if (clientIds.length) {
-        const { data: profs } = await supabase.from('profiles').select('id, full_name, phone').in('id', clientIds);
+        const { data: profs, error: profError } = await supabase.from('profiles').select('id, full_name, phone').in('id', clientIds);
+        if (profError) throw profError;
         setClientProfiles(Object.fromEntries((profs ?? []).map((p) => [p.id, p])));
       }
     } catch {

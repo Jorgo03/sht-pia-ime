@@ -122,6 +122,8 @@ function ThreadScreen({ embedded = false }: { embedded?: boolean } = {}) {
     else router.replace('/messages' as Href);
   }, [router]);
 
+  const userId = user?.id;
+
   const markRead = useCallback(
     (convo: ConversationInfo, isClient: boolean) => {
       const patch = isClient ? { unread_for_client: 0 } : { unread_for_agent: 0 };
@@ -134,7 +136,7 @@ function ThreadScreen({ embedded = false }: { embedded?: boolean } = {}) {
   // the message history, then subscribes for new INSERTs — same shape as
   // the web app's Thread component.
   useEffect(() => {
-    if (!id || !user) return;
+    if (!id || !userId) return;
     let cancelled = false;
 
     (async () => {
@@ -154,7 +156,7 @@ function ThreadScreen({ embedded = false }: { embedded?: boolean } = {}) {
       }
       setConversation(convo);
 
-      const otherId = convo.client_id === user.id ? convo.agent_id : convo.client_id;
+      const otherId = convo.client_id === userId ? convo.agent_id : convo.client_id;
       setOtherId(otherId);
       // public_profile() rather than the profiles table: the table hides a
       // client from another client, so writing to a client who published a
@@ -184,7 +186,7 @@ function ThreadScreen({ embedded = false }: { embedded?: boolean } = {}) {
       // Anything realtime delivered meanwhile stays, without duplicates.
       setMessages((prev) => [...msgs, ...prev.filter((m) => !msgs.some((l) => l.id === m.id))]);
       setLoading(false);
-      markRead(convo, convo.client_id === user.id);
+      markRead(convo, convo.client_id === userId);
     })();
 
     // Realtime does not replay what was missed while the channel was down or
@@ -194,7 +196,7 @@ function ThreadScreen({ embedded = false }: { embedded?: boolean } = {}) {
       if (cancelled || !fresh) return;
       setMessages((prev) => mergeMessages(prev, fresh));
       const convo = conversationRef.current;
-      if (convo) markRead(convo, convo.client_id === user.id);
+      if (convo) markRead(convo, convo.client_id === userId);
     });
     const appStateSub = AppState.addEventListener('change', catchUp.onAppState);
 
@@ -206,7 +208,7 @@ function ThreadScreen({ embedded = false }: { embedded?: boolean } = {}) {
         ({ new: msg }: { new: Message }) => {
           setMessages((prev) => (prev.some((m) => m.id === msg.id) ? prev : [...prev, msg]));
           const convo = conversationRef.current;
-          if (msg.sender_id !== user.id && convo) markRead(convo, convo.client_id === user.id);
+          if (msg.sender_id !== userId && convo) markRead(convo, convo.client_id === userId);
         },
       )
       .subscribe((status) => catchUp.onStatus(status));
@@ -219,8 +221,10 @@ function ThreadScreen({ embedded = false }: { embedded?: boolean } = {}) {
     // conversation is intentionally excluded — the realtime handler reads
     // conversationRef instead, so this effect doesn't need to restart (and
     // resubscribe the channel) every time conversation state loads/changes.
+    // The user's id, not the user object: a token refresh stores a new
+    // object every hour, which used to drop and re-open the chat channel.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id, user, markRead, reloadKey]);
+  }, [id, userId, markRead, reloadKey]);
 
   useEffect(() => {
     if (messages.length > 0) listRef.current?.scrollToEnd({ animated: true });

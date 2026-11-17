@@ -2,10 +2,9 @@ import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter, Href } from 'expo-router';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { type ComponentProps, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
-  Alert,
   FlatList,
   KeyboardAvoidingView,
   Linking,
@@ -52,15 +51,14 @@ import { isPlayableVideo, ListingVideo } from '@/components/property/listing-vid
 import { useCompare } from '@/contexts/compare-context';
 import { formatPrice, listingBadgeKey, priceSuffixKey, telUrl, whatsappUrl } from '@/lib/format';
 import { sheetColumn } from '@/constants/web-frame';
-import { useAppDimensions } from '@/hooks/use-app-dimensions';
+import { useAppDimensions, useIsDesktopWeb } from '@/hooks/use-app-dimensions';
 import { PageHead } from '@/components/web/page-head';
 import { pricePerM2 } from '@/src/features/properties/lib/compare';
-import { useIsDesktopWeb } from '@/hooks/use-app-dimensions';
 import { PriceHistory } from '@/components/property/price-history';
 import { CARD_CONTAINER_A11Y } from '@/components/property/card-a11y';
 import { ViewingTimePicker } from '@/components/viewings/viewing-time-picker';
 import { FORM_LIMITS } from '@/src/lib/formLimits';
-import { confirmAction } from '@/lib/confirm';
+import { confirmAction, notify } from '@/lib/confirm';
 import { viewingRequestErrorKey } from '@/src/features/viewings/lib/viewingErrors';
 import { LoadError } from '@/components/ui/load-error';
 import { deviceUsesTiranaTime } from '@/src/lib/tiranaTime';
@@ -78,6 +76,8 @@ export default function PropertyDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const { t, i18n } = useTranslation();
+  // A phone link on a device that cannot call, WhatsApp not installed, etc.
+  const notifyLinkFailed = () => notify(t('errors.generic'));
   const { user } = useAuth();
   const { formatListingPrice } = useCurrency();
   const { isFavorite, toggle } = useFavorites();
@@ -246,7 +246,7 @@ export default function PropertyDetailScreen() {
   const handleCall = () => {
     if (!property || !contactPhone) return;
     logActivity(property.id, 'call');
-    Linking.openURL(telUrl(contactPhone));
+    Linking.openURL(telUrl(contactPhone)).catch(() => notifyLinkFailed());
   };
 
   const handleWhatsApp = () => {
@@ -254,7 +254,7 @@ export default function PropertyDetailScreen() {
     // What the box holds, or the suggestion when nothing was typed: the same
     // message the in-app chat button sends.
     logActivity(property.id, 'message');
-    Linking.openURL(whatsappUrl(contactPhone, messageToSend));
+    Linking.openURL(whatsappUrl(contactPhone, messageToSend)).catch(() => notifyLinkFailed());
   };
 
   const openViewingSheet = () => {
@@ -267,7 +267,7 @@ export default function PropertyDetailScreen() {
   const submitViewingRequest = async () => {
     if (!property || !user) return;
     if (viewingDate.getTime() < Date.now()) {
-      Alert.alert(t('common.error'), t('viewings.pastDate'));
+      notify(t('common.error'), t('viewings.pastDate'));
       return;
     }
     setRequestingViewing(true);
@@ -280,12 +280,12 @@ export default function PropertyDetailScreen() {
     });
     setRequestingViewing(false);
     if (error) {
-      Alert.alert(t('common.error'), t(viewingRequestErrorKey(error)));
+      notify(t('common.error'), t(viewingRequestErrorKey(error)));
       return;
     }
     logActivity(property.id, 'meeting');
     setViewingSheetOpen(false);
-    Alert.alert(t('viewings.requestSuccess'));
+    notify(t('viewings.requestSuccess'));
   };
 
   if (loading) {
@@ -481,7 +481,7 @@ export default function PropertyDetailScreen() {
         {amenities.map((a) => (
           <View key={a.id} style={styles.amenityItem}>
             <View style={styles.amenityIcon}>
-              <MaterialIcons name={a.icon as any} size={22} color={colors.accent} />
+              <MaterialIcons name={a.icon as ComponentProps<typeof MaterialIcons>['name']} size={22} color={colors.accent} />
             </View>
             <Text style={styles.amenityLabel}>{a.name}</Text>
           </View>
@@ -518,7 +518,7 @@ export default function PropertyDetailScreen() {
             accessibilityRole="button"
             style={styles.openMapsLink}
             onPress={() =>
-              Linking.openURL(`https://www.google.com/maps?q=${property.latitude},${property.longitude}`)
+              Linking.openURL(`https://www.google.com/maps?q=${property.latitude},${property.longitude}`).catch(() => notifyLinkFailed())
             }
             activeOpacity={0.7}>
             <MaterialIcons name="open-in-new" size={14} color={colors.accent} />

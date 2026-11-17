@@ -24,7 +24,9 @@ const isSSR = typeof window === 'undefined';
 
 const storage =
   !isSSR && Platform.OS !== 'web'
-    ? require('@react-native-async-storage/async-storage').default
+    ? // Loaded only on a phone: the web build's server render has no native storage module.
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
+      require('@react-native-async-storage/async-storage').default
     : isSSR
       ? {
           getItem: () => Promise.resolve(null),

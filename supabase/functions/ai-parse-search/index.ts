@@ -31,18 +31,17 @@ const admin = createClient(
   Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
 );
 
+// One atomic step in the database (ai_take_quota): count the last hour and
+// record this call together, so parallel requests cannot all slip through.
 async function rateLimit(key: string, feature: string, max: number): Promise<boolean> {
-  const since = new Date(Date.now() - 3600_000).toISOString();
-  const { count, error } = await admin
-    .from('ai_usage')
-    .select('id', { count: 'exact', head: true })
-    .eq('key', key)
-    .eq('feature', feature)
-    .gte('created_at', since);
-  // Fail closed: if usage cannot be counted, no paid call is made.
-  if (error || (count ?? 0) >= max) return false;
-  await admin.from('ai_usage').insert({ key, feature });
-  return true;
+  const { data, error } = await admin.rpc('ai_take_quota', {
+    p_key: key,
+    p_feature: feature,
+    p_max: max,
+    p_window_seconds: 3600,
+  });
+  // Fail closed: if usage cannot be recorded, no paid call is made.
+  return !error && data === true;
 }
 
 // Project-wide ceiling on paid AI calls per feature per 24 hours, across every
@@ -61,14 +60,23 @@ async function underDailyCap(feature: string): Promise<boolean> {
     .eq('feature', feature)
     .gte('created_at', since);
   if (error) return false;
-  return (count ?? 0) <= AI_DAILY_CALL_CAP;
+  return (count ?? 0) < AI_DAILY_CALL_CAP;
+}
+
+// Signed-out callers are bucketed by IP. The left-most x-forwarded-for entry
+// is whatever the client sent; Cloudflare's cf-connecting-ip and the right-most
+// hop are written by the platform in front of us, so a caller cannot pick a
+// fresh bucket by sending a made-up header.
+function clientIp(req: Request): string {
+  const hops = (req.headers.get('x-forwarded-for') ?? '').split(',').map((h) => h.trim()).filter(Boolean);
+  return req.headers.get('cf-connecting-ip')?.trim() || hops[hops.length - 1] || 'anon';
 }
 
 async function callerKey(req: Request): Promise<string> {
   const token = req.headers.get('Authorization')?.replace('Bearer ', '') ?? '';
   const { data } = await admin.auth.getUser(token);
   if (data?.user) return data.user.id;
-  return req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'anon';
+  return clientIp(req);
 }
 
 Deno.serve(async (req) => {
@@ -77,7 +85,12 @@ Deno.serve(async (req) => {
   try {
     if (!ANTHROPIC_KEY) return json({ error: 'ai_unavailable' }, 503);
 
-    const { query } = await req.json();
+    let query: unknown;
+    try {
+      ({ query } = await req.json());
+    } catch {
+      return json({ error: 'bad_request' }, 400);
+    }
     const q = String(query ?? '').trim().slice(0, 300);
     if (!q) return json({ error: 'empty_query' }, 400);
 
@@ -129,7 +142,8 @@ Deno.serve(async (req) => {
     });
 
     if (!r.ok) {
-      console.error('Anthropic error', r.status, await r.text());
+      // Status only: the upstream body can echo the visitor's query.
+      console.error('Anthropic error', r.status);
       return json({ error: 'ai_unavailable' }, 503);
     }
 
@@ -139,7 +153,7 @@ Deno.serve(async (req) => {
 
     return json({ filters: toolUse.input });
   } catch (err) {
-    console.error('ai-parse-search error', err);
+    console.error('ai-parse-search error', err instanceof Error ? err.message : String(err));
     return json({ error: 'ai_unavailable' }, 503);
   }
 });

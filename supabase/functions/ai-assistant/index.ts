@@ -39,19 +39,17 @@ const ANON_KEY = Deno.env.get('SUPABASE_ANON_KEY')!;
 const admin = createClient(SUPABASE_URL, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
 const anthropic = ANTHROPIC_KEY ? new Anthropic({ apiKey: ANTHROPIC_KEY, timeout: 25_000, maxRetries: 1 }) : null;
 
-// Same accounting as the other AI functions (ai-listing-assistant).
+// One atomic step in the database (ai_take_quota): count the last hour and
+// record this call together, so parallel requests cannot all slip through.
 async function rateLimit(key: string, max: number): Promise<boolean> {
-  const since = new Date(Date.now() - 3600_000).toISOString();
-  const { count, error } = await admin
-    .from('ai_usage')
-    .select('id', { count: 'exact', head: true })
-    .eq('key', key)
-    .eq('feature', FEATURE)
-    .gte('created_at', since);
-  // Fail closed: if usage cannot be counted, no paid call is made.
-  if (error || (count ?? 0) >= max) return false;
-  await admin.from('ai_usage').insert({ key, feature: FEATURE });
-  return true;
+  const { data, error } = await admin.rpc('ai_take_quota', {
+    p_key: key,
+    p_feature: FEATURE,
+    p_max: max,
+    p_window_seconds: 3600,
+  });
+  // Fail closed: if usage cannot be recorded, no paid call is made.
+  return !error && data === true;
 }
 
 const AI_DAILY_CALL_CAP = Number(Deno.env.get('AI_DAILY_CALL_CAP') ?? '2000');
@@ -64,13 +62,22 @@ async function underDailyCap(): Promise<boolean> {
     .eq('feature', FEATURE)
     .gte('created_at', since);
   if (error) return false;
-  return (count ?? 0) <= AI_DAILY_CALL_CAP;
+  return (count ?? 0) < AI_DAILY_CALL_CAP;
+}
+
+// Signed-out callers are bucketed by IP. The left-most x-forwarded-for entry
+// is whatever the client sent; Cloudflare's cf-connecting-ip and the right-most
+// hop are written by the platform in front of us, so a caller cannot pick a
+// fresh bucket by sending a made-up header.
+function clientIp(req: Request): string {
+  const hops = (req.headers.get('x-forwarded-for') ?? '').split(',').map((h) => h.trim()).filter(Boolean);
+  return req.headers.get('cf-connecting-ip')?.trim() || hops[hops.length - 1] || 'anon';
 }
 
 async function callerKey(token: string, req: Request): Promise<string> {
   const { data } = await admin.auth.getUser(token);
   if (data?.user) return data.user.id;
-  return req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'anon';
+  return clientIp(req);
 }
 
 // Every column the assistant can read. No owner ids, contact details or

@@ -7,6 +7,7 @@ import type { ErrorBoundaryProps } from 'expo-router';
 import i18n from '@/i18n';
 import { AtticoColorsDark, Fonts } from '@/constants/theme';
 import { reportError } from '@/lib/report-error';
+import { debugWarn } from '@/lib/debug';
 
 /**
  * Route-level crash screen, exported from app/_layout.tsx so expo-router
@@ -28,10 +29,8 @@ export function AppErrorBoundary({ error, retry }: ErrorBoundaryProps) {
     void reportError('render', error, null);
   }, [error]);
 
-  if (__DEV__) {
-    // Full detail stays in the dev console, never on screen.
-    console.error('[ErrorBoundary] uncaught render error:', error);
-  }
+  // Detail stays in the dev console (redacted, dev builds only), never on screen.
+  debugWarn('ErrorBoundary', error);
 
   return (
     <View style={styles.container} accessibilityRole="alert">

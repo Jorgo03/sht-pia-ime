@@ -103,7 +103,7 @@ function Section({ section, contact, styles }: { section: LegalSection; contact:
             {contact.withEmail}
             {/* The address is plain, selectable text too: a mailto link does
                 nothing on a device with no mail app. */}
-            <Text style={styles.link} selectable onPress={() => Linking.openURL(`mailto:${LEGAL_CONTACT_EMAIL}`)}>
+            <Text style={styles.link} selectable onPress={() => Linking.openURL(`mailto:${LEGAL_CONTACT_EMAIL}`).catch(() => {})}>
               {LEGAL_CONTACT_EMAIL}
             </Text>
           </Text>

@@ -112,7 +112,14 @@ function measure(page: Page) {
     // text and buttons overlapping. Ignores controls stacked in a scroller.
     const controls = [...document.querySelectorAll('[role=button],[role=link],a,button,input,textarea')]
       .filter((el) => shown(el) && !inScroller(el))
-      .filter((el) => getComputedStyle(el).position !== 'fixed');
+      .filter((el) => getComputedStyle(el).position !== 'fixed')
+      // Only what the user can reach: a control under a dialog's backdrop is
+      // covered, not overlapping.
+      .filter((el) => {
+        const r = el.getBoundingClientRect();
+        const top = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+        return !!top && (el === top || el.contains(top) || top.contains(el));
+      });
     const overlaps: string[] = [];
     const label = (el: Element) => (el.getAttribute('aria-label') || (el as HTMLElement).innerText || el.tagName).replace(/\s+/g, ' ').slice(0, 30);
     for (let i = 0; i < controls.length && overlaps.length < 10; i++) {

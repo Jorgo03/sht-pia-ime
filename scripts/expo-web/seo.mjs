@@ -33,10 +33,10 @@ export function listingHead(row, { site, siteDescription }) {
  */
 export function applyHead(html, head) {
   let out = html
-    .replace(/<title data-rh="true">[^<]*<\/title>/, `<title data-rh="true">${escapeText(head.title)}</title>`)
-    .replace(/<meta data-rh="true" name="description" content="[^"]*"\/>/, `<meta data-rh="true" name="description" content="${escapeAttr(head.description)}"/>`)
-    .replace(/<meta data-rh="true" property="og:title" content="[^"]*"\/>/, `<meta data-rh="true" property="og:title" content="${escapeAttr(head.title)}"/>`)
-    .replace(/<meta data-rh="true" property="og:description" content="[^"]*"\/>/, `<meta data-rh="true" property="og:description" content="${escapeAttr(head.description)}"/>`)
+    .replace(/<title data-rh="true">[^<]*<\/title>/, () => `<title data-rh="true">${escapeText(head.title)}</title>`)
+    .replace(/<meta data-rh="true" name="description" content="[^"]*"\/>/, () => `<meta data-rh="true" name="description" content="${escapeAttr(head.description)}"/>`)
+    .replace(/<meta data-rh="true" property="og:title" content="[^"]*"\/>/, () => `<meta data-rh="true" property="og:title" content="${escapeAttr(head.title)}"/>`)
+    .replace(/<meta data-rh="true" property="og:description" content="[^"]*"\/>/, () => `<meta data-rh="true" property="og:description" content="${escapeAttr(head.description)}"/>`)
     // The template's own links point at "/property/[id]"; drop them.
     .replace(/<link data-rh="true" rel="(canonical|alternate)"[^>]*\/>/g, '')
     .replace(/<meta data-rh="true" property="og:url" content="[^"]*"\/>/g, '');
@@ -62,7 +62,8 @@ export function applyHead(html, head) {
         )
       : []),
   ].join('');
-  out = out.replace('</head>', `${extra}</head>`);
+  // A function, not a string: "$&" or "$'" in a listing's text must stay literal.
+  out = out.replace('</head>', () => `${extra}</head>`);
   return out;
 }
 
@@ -120,7 +121,7 @@ export function applyPrivateHead(html, title) {
     /<title[\s>]/.test(html) ? '' : `<title>${escapeText(title)}</title>`,
     '<meta name="robots" content="noindex, nofollow"/>',
   ].join('');
-  return html.replace('</head>', `${tags}</head>`);
+  return html.replace('</head>', () => `${tags}</head>`);
 }
 
 export function sitemapXml(site, listings) {

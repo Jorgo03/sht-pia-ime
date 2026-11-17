@@ -95,7 +95,11 @@ export default function ViewingsScreen() {
     const { data, error } = await supabase
       .from('viewings')
       .select('*, property:properties(id, title, title_i18n, city, owner_id, agent_id)')
-      .order('scheduled_at', { ascending: true });
+      // Bounded (no unbounded reads): the past year and everything ahead,
+      // at most 500 rows — far more than any one person's viewings.
+      .gte('scheduled_at', new Date(Date.now() - 365 * 24 * 60 * 60 * 1000).toISOString())
+      .order('scheduled_at', { ascending: true })
+      .limit(500);
     if (error) {
       setLoadError(true);
       setLoading(false);

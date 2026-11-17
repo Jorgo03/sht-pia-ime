@@ -39,7 +39,10 @@ export function useUnreadMessages(): number {
       const { data, error } = await supabase
         .from('conversations')
         .select('client_id, agent_id, unread_for_client, unread_for_agent')
-        .or(`client_id.eq.${user.id},agent_id.eq.${user.id}`);
+        // Only conversations with something unread on this user's side: the
+        // badge needs no other rows, so the read stays small for anyone.
+        .or(`and(client_id.eq.${user.id},unread_for_client.gt.0),and(agent_id.eq.${user.id},unread_for_agent.gt.0)`)
+        .limit(1000);
       if (!active || run !== latest) return;
       // A failed read keeps the last count rather than hiding unread messages.
       if (error) return;

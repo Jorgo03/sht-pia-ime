@@ -85,18 +85,17 @@ const admin = createClient(
   Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
 );
 
+// One atomic step in the database (ai_take_quota): count the last hour and
+// record this call together, so parallel requests cannot all slip through.
 async function rateLimit(key: string, feature: string, max: number): Promise<boolean> {
-  const since = new Date(Date.now() - 3600_000).toISOString();
-  const { count, error } = await admin
-    .from('ai_usage')
-    .select('id', { count: 'exact', head: true })
-    .eq('key', key)
-    .eq('feature', feature)
-    .gte('created_at', since);
-  // Fail closed: if usage cannot be counted, no paid call is made.
-  if (error || (count ?? 0) >= max) return false;
-  await admin.from('ai_usage').insert({ key, feature });
-  return true;
+  const { data, error } = await admin.rpc('ai_take_quota', {
+    p_key: key,
+    p_feature: feature,
+    p_max: max,
+    p_window_seconds: 3600,
+  });
+  // Fail closed: if usage cannot be recorded, no paid call is made.
+  return !error && data === true;
 }
 
 // Project-wide ceiling on paid AI calls per feature per 24 hours, across every
@@ -115,7 +114,7 @@ async function underDailyCap(feature: string): Promise<boolean> {
     .eq('feature', feature)
     .gte('created_at', since);
   if (error) return false;
-  return (count ?? 0) <= AI_DAILY_CALL_CAP;
+  return (count ?? 0) < AI_DAILY_CALL_CAP;
 }
 
 /**
@@ -130,9 +129,10 @@ async function underDailyCap(feature: string): Promise<boolean> {
  * forwarding header shares one bucket instead of escaping the limit entirely.
  */
 function clientIp(req: Request): string {
-  const forwarded = req.headers.get('x-forwarded-for') ?? '';
-  const first = forwarded.split(',')[0]?.trim();
-  return `ip:${first || req.headers.get('cf-connecting-ip')?.trim() || 'unknown'}`;
+  // cf-connecting-ip and the right-most hop are written by the platform; the
+  // left-most entry is whatever the client sent (audit 2026-11-17).
+  const hops = (req.headers.get('x-forwarded-for') ?? '').split(',').map((h) => h.trim()).filter(Boolean);
+  return `ip:${req.headers.get('cf-connecting-ip')?.trim() || hops[hops.length - 1] || 'unknown'}`;
 }
 
 /**

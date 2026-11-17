@@ -1,16 +1,5 @@
 import { t as translate } from 'i18next';
 
-const GRADIENTS = [
-  'linear-gradient(135deg, #a08868 0%, #7a5d3f 50%, #4a3520 100%)',
-  'linear-gradient(135deg, #9eb09a, #5f7158)',
-  'linear-gradient(135deg, #c2a895, #8a6f5a)',
-  'linear-gradient(135deg, #8b9d83, #5d6b56)',
-  'linear-gradient(135deg, #b8a89d, #8a7868)',
-  'linear-gradient(135deg, #6b7d8a, #485966)',
-  'linear-gradient(135deg, #a99580, #756352)',
-  'linear-gradient(135deg, #8a9b8e, #5c6b5e)',
-];
-
 const FALLBACK_COLORS: [string, string][] = [
   ['#a08868', '#4a3520'],
   ['#9eb09a', '#5f7158'],

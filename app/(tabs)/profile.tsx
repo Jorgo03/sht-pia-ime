@@ -137,7 +137,7 @@ export default function ProfileScreen() {
   // open them on the website (lib/legal.ts).
   const openLegal = (doc: 'privacy' | 'terms') => {
     if (IS_WEB) router.push(`/${doc}` as Href);
-    else Linking.openURL(doc === 'privacy' ? PRIVACY_POLICY_URL : TERMS_URL);
+    else Linking.openURL(doc === 'privacy' ? PRIVACY_POLICY_URL : TERMS_URL).catch(() => {});
   };
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
