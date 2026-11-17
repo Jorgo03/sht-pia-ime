@@ -363,7 +363,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   richRef: { fontFamily: Fonts.sansSemiBold, fontSize: 12, letterSpacing: 0.4, color: colors.accentText },
   richTitle: { fontFamily: Fonts.sansBold, fontSize: 15, color: colors.textPrimary, textTransform: 'uppercase' },
   richSpecs: { flexDirection: 'row', flexWrap: 'wrap', columnGap: 12, rowGap: 4, marginTop: 4 },
-  richPrice: { fontFamily: Fonts.sansExtraBold, fontSize: 20, color: colors.textPrimary, marginTop: 6 },
+  richPrice: { fontFamily: Fonts.sansBold, fontSize: 20, color: colors.textPrimary, marginTop: 6 },
   locationRow: {
     flexDirection: 'row',
     alignItems: 'center',
