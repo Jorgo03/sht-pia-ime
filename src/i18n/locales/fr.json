@@ -230,7 +230,7 @@
       "otherFilters": "Autres filtres",
       "moreFilters": "Plus de filtres",
       "fewerFilters": "Moins de filtres",
-      "refPlaceholder": "ID / Référence",
+      "refPlaceholder": "ID / Mot-clé",
       "results": "{{shown}} sur {{total}} résultats",
       "removeFilter": "Retirer le filtre {{name}}"
     }

@@ -226,7 +226,7 @@
       "otherFilters": "Filtra të tjerë",
       "moreFilters": "Më shumë filtra",
       "fewerFilters": "Më pak filtra",
-      "refPlaceholder": "ID / Referenca",
+      "refPlaceholder": "ID / Fjalë kyçe",
       "results": "Shfaqur {{shown}} nga {{total}} rezultate",
       "removeFilter": "Hiq filtrin {{name}}"
     }

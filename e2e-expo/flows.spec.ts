@@ -51,6 +51,10 @@ async function openFilters(page: Page) {
     await button.click();
     return true;
   }
+  // Website from tablet width: the filter panel above the results, with the
+  // amenities behind "More filters".
+  const more = page.getByRole('button', { name: t('search.panel.moreFilters') });
+  if (await more.isVisible()) await more.click();
   return false;
 }
 async function goSite(page: Page, name: string) {
@@ -85,7 +89,7 @@ test('X02 search: Sale/Rent pills and the search box narrow the results', async 
   await page.goto('/explore');
   await ready(page);
   // "7 prona në shikim" / "1 pronë në shikim"
-  const count = page.getByText(/në shikim/);
+  const count = page.getByText(/në shikim|rezultate/);
   await expect(count).toContainText(String(LISTINGS.length));
   await page.getByRole('button', { name: t('search.rent'), exact: true }).first().click();
   const rentals = LISTINGS.filter((l) => l.listing_type === 'rent').length;
@@ -821,7 +825,7 @@ test.describe('discovery', () => {
     await expect(page).toHaveURL(/\/explore/);
     // Home stays mounted behind the tab, so its cards are still in the page:
     // the count is Explore's own.
-    await expect(page.getByText(/në shikim/)).toContainText('1');
+    await expect(page.getByText(/në shikim|rezultate/)).toContainText('1');
     // Search's cards name the city, not the title.
     await expect(page.getByText(/Durrës/).filter({ visible: true }).first()).toBeVisible();
   });
@@ -837,9 +841,9 @@ test.describe('discovery', () => {
     expect(tirana).toBeLessThan(durres);
     expect(durres).toBeLessThan(berat);
     await page.getByRole('button', { name: /^Tiranë/ }).last().click();
-    await expect(page.getByText(/në shikim/)).not.toContainText(String(LISTINGS.length));
+    await expect(page.getByText(/në shikim|rezultate/)).not.toContainText(String(LISTINGS.length));
     const inTirana = LISTINGS.filter((l) => l.city === 'Tiranë').length;
-    await expect(page.getByText(/në shikim/)).toContainText(String(inTirana));
+    await expect(page.getByText(/në shikim|rezultate/)).toContainText(String(inTirana));
   });
 
   test('X95 the agencies directory lists, searches and opens an agent', async ({ page }) => {
@@ -879,9 +883,9 @@ test.describe('discovery', () => {
     await ready(page);
     await openFilters(page);
     await page.getByRole('button', { name: t('listing.feature.pool'), exact: true }).click();
-    await expect(page.getByText(/në shikim/)).toContainText('1');
-    await page.getByRole('button', { name: t('search.reset') }).click();
-    await expect(page.getByText(/në shikim/)).toContainText(String(LISTINGS.length));
+    await expect(page.getByText(/në shikim|rezultate/)).toContainText('1');
+    await page.getByRole('button', { name: new RegExp(`^(${t('search.reset')}|${t('search.panel.clearAll')})$`) }).first().click();
+    await expect(page.getByText(/në shikim|rezultate/)).toContainText(String(LISTINGS.length));
   });
 
   test('X99 a listing with a video offers it, opens the player and says so if it cannot play', async ({ page }) => {
@@ -902,7 +906,7 @@ test.describe('discovery', () => {
     await context.setGeolocation({ latitude: 41.33, longitude: 19.82 });
     await page.goto('/explore');
     await ready(page);
-    await page.getByRole('button', { name: t('search.mapView') }).click();
+    await page.getByRole('button', { name: new RegExp(`^(${t('search.mapView')}|${t('search.panel.showOnMap')})$`) }).first().click();
     await page.getByRole('button', { name: t('nearMe.button') }).click();
     const five = page.getByRole('button', { name: '5 km', exact: true });
     await expect(five).toBeVisible();
@@ -1571,7 +1575,7 @@ test('X35 All/Sale/Rent: the tab lights up at once and its homes are already loa
   // Sampled every 20 ms: the default intervals (100, 250…) look only twice in 200.
   await expect.poll(() => background(rent), { timeout: 200, intervals: [20] }).toBe(activeBg);
   const rentals = LISTINGS.filter((l) => l.listing_type === 'rent').length;
-  await expect(page.getByText(/në shikim/)).toContainText(String(rentals), { timeout: 300 });
+  await expect(page.getByText(/në shikim|rezultate/)).toContainText(String(rentals), { timeout: 300 });
   // Shown from the prefetched cache: tapping asked the server for nothing new.
   expect(asked.slice(before).filter((u) => u.includes('listing_type=eq.rent'))).toEqual([]);
 });
@@ -1665,7 +1669,7 @@ test.describe('unfolding mid-session', () => {
     await headerReady(page);
     await page.getByRole('button', { name: t('search.rent'), exact: true }).click();
     const rentals = LISTINGS.filter((l) => l.listing_type === 'rent').length;
-    const count = page.getByText(/në shikim/);
+    const count = page.getByText(/në shikim|rezultate/);
     await expect(count).toContainText(String(rentals));
     await page.setViewportSize({ width: 690, height: 829 });
     await expect(page).toHaveURL(/\/explore/);

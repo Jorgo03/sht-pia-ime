@@ -234,7 +234,7 @@
       "otherFilters": "Inne filtry",
       "moreFilters": "Więcej filtrów",
       "fewerFilters": "Mniej filtrów",
-      "refPlaceholder": "ID / Numer",
+      "refPlaceholder": "ID / Słowo kluczowe",
       "results": "Wyświetlono {{shown}} z {{total}} wyników",
       "removeFilter": "Usuń filtr {{name}}"
     }

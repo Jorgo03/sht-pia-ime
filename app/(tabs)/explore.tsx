@@ -297,6 +297,8 @@ export default function ExploreScreen() {
 
   const filterPanel = (
     <FilterPanel
+      search={searchText}
+      onSearch={setSearchText}
       viewMode={viewMode}
       onViewMode={setViewMode}
       onShowResults={() => {
@@ -372,7 +374,7 @@ export default function ExploreScreen() {
             ListHeaderComponent={
               <>
                 {panel ? filterPanel : null}
-                {panel && !loading && !failedEmpty ? <ResultsBar shown={properties.length} total={total} /> : null}
+                {panel && !loading && !failedEmpty ? <ResultsBar shown={properties.length} total={total} tabs={<FilterTabs tabs={listingTabs} activeTab={activeTab} onTabChange={handleTabChange} />} /> : null}
                 {/* Short screens only (chromeInList above). The list pads its
                     sides by 14 and the chrome brings its own 20, so it steps
                     back out to the screen edge. */}

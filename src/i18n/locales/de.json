@@ -226,7 +226,7 @@
       "otherFilters": "Weitere Filter",
       "moreFilters": "Mehr Filter",
       "fewerFilters": "Weniger Filter",
-      "refPlaceholder": "ID / Referenz",
+      "refPlaceholder": "ID / Stichwort",
       "results": "{{shown}} von {{total}} Ergebnissen",
       "removeFilter": "Filter {{name}} entfernen"
     }

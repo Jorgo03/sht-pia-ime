@@ -1,5 +1,5 @@
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import { type ComponentProps, useMemo, useState } from 'react';
+import { type ComponentProps, type ReactNode, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 
@@ -13,6 +13,7 @@ import { usePropertiesCountQuery } from '@/hooks/use-property-queries';
 import LOCATIONS from '@/src/features/properties/data/locations';
 import { AMENITIES, toggleAmenity } from '@/src/features/properties/lib/amenities';
 import { cityLabel, findCity, orderCities } from '@/src/features/properties/lib/places';
+import { normalizeRef } from '@/src/features/properties/lib/searchFilters';
 
 type PropertyType = NonNullable<Property['property_type']>;
 type Icon = ComponentProps<typeof MaterialIcons>['name'];
@@ -40,7 +41,10 @@ const toNumber = (text: string): number | null => {
  * then the other filters in rows of fields. The same filters as the phone's
  * sheet (filters-context), applied as they change. Website, tablet and up.
  */
-export function FilterPanel({ viewMode, onViewMode, onShowResults }: {
+export function FilterPanel({ viewMode, onViewMode, onShowResults, search, onSearch }: {
+  /** The free-text search (city or area), Explore's own debounced field. */
+  search: string;
+  onSearch: (text: string) => void;
   viewMode: 'list' | 'map';
   onViewMode: (mode: 'list' | 'map') => void;
   onShowResults: () => void;
@@ -55,6 +59,9 @@ export function FilterPanel({ viewMode, onViewMode, onShowResults }: {
   // Ten fields: five a row on a wide page, two on a tablet, never a ragged row.
   const { width } = useAppDimensions();
   const colStyle = { flexBasis: width >= 1100 ? '18%' : '46%' } as const;
+  // The keyword box takes two places on a wide page, so nine fields fill
+  // two even rows (and a whole row on a tablet).
+  const keywordStyle = { flexBasis: width >= 1100 ? '37%' : '100%' } as const;
 
   const chips = activeChips(filters, t);
   const selectStyle = styles.select;
@@ -135,32 +142,26 @@ export function FilterPanel({ viewMode, onViewMode, onShowResults }: {
 
       <Text style={styles.sectionLabel}>{t('search.panel.otherFilters')}</Text>
       <View style={styles.grid}>
-        <View style={[styles.field, colStyle]}>
+        {/* "ID / keyword": a listing reference (SH-…) finds that listing;
+            anything else searches by city or area, like the phone's box. */}
+        <View style={[styles.field, keywordStyle]}>
           <MaterialIcons name="search" size={16} color={colors.textSecondary} />
           <TextInput
             style={styles.input}
-            autoCapitalize="characters"
             autoCorrect={false}
             placeholder={t('search.panel.refPlaceholder')}
-            accessibilityLabel={t('search.reference')}
+            accessibilityLabel={t('search.placeholder')}
             placeholderTextColor={colors.textSecondary}
-            value={filters.refCode ?? ''}
-            onChangeText={(v) => setFilter('refCode', v || null)}
-          />
-        </View>
-        <View style={[styles.cell, colStyle]}>
-          <SelectField
-            value={filters.listingType ?? ''}
-            placeholder={t('search.listingType')}
-            accessibilityLabel={t('search.listingType')}
-            icon="sell"
-            style={selectStyle}
-            options={[
-              { value: '', label: t('common.all') },
-              { value: 'sale', label: t('search.sale') },
-              { value: 'rent', label: t('search.rent') },
-            ]}
-            onChange={(v) => setFilter('listingType', (v || null) as Property['listing_type'] | null)}
+            value={filters.refCode ?? search}
+            onChangeText={(v) => {
+              if (normalizeRef(v)) {
+                setFilter('refCode', v);
+                onSearch('');
+              } else {
+                if (filters.refCode) setFilter('refCode', null);
+                onSearch(v);
+              }
+            }}
           />
         </View>
         <View style={[styles.cell, colStyle]}>
@@ -273,7 +274,7 @@ function activeChips(f: PropertyFilters, t: Translate): { key: string; label: st
 }
 
 /** "Showing 12 of 2,789 results", the sort and the view, above the grid. */
-export function ResultsBar({ shown, total }: { shown: number; total: number }) {
+export function ResultsBar({ shown, total, tabs }: { shown: number; total: number; tabs?: ReactNode }) {
   const { t, i18n } = useTranslation();
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
@@ -285,6 +286,8 @@ export function ResultsBar({ shown, total }: { shown: number; total: number }) {
       <Text style={styles.resultsText} accessibilityLiveRegion="polite">
         {t('search.panel.results', { shown: n(shown), total: n(total) })}
       </Text>
+      <View style={styles.resultsRight}>
+      {tabs}
       <View style={styles.sortCell}>
         <SelectField
           value={filters.sort ?? 'newest'}
@@ -295,6 +298,7 @@ export function ResultsBar({ shown, total }: { shown: number; total: number }) {
           options={SORTS.map((s) => ({ value: s, label: t(`search.sort.${s}`) }))}
           onChange={(v) => setFilter('sort', v as PropertySort)}
         />
+      </View>
       </View>
     </View>
   );
@@ -371,5 +375,6 @@ const createStyles = (c: AtticoPalette) =>
     amenity: { minHeight: 38, paddingHorizontal: 14, justifyContent: 'center', borderRadius: 10, borderWidth: 1, borderColor: c.border, backgroundColor: c.primary },
     resultsBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap', marginTop: 28, marginBottom: 16 },
     resultsText: { fontFamily: Fonts.sansSemiBold, fontSize: 18, color: c.textPrimary },
+    resultsRight: { flexDirection: 'row', alignItems: 'center', gap: 16, flexWrap: 'wrap' },
     sortCell: { width: 240, maxWidth: '100%' },
   });

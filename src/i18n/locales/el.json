@@ -278,7 +278,7 @@
       "otherFilters": "Άλλα φίλτρα",
       "moreFilters": "Περισσότερα φίλτρα",
       "fewerFilters": "Λιγότερα φίλτρα",
-      "refPlaceholder": "ID / Κωδικός",
+      "refPlaceholder": "ID / Λέξη-κλειδί",
       "results": "Εμφανίζονται {{shown}} από {{total}} αποτελέσματα",
       "removeFilter": "Αφαίρεση φίλτρου {{name}}"
     }

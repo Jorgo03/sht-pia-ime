@@ -234,7 +234,7 @@
       "otherFilters": "Другие фильтры",
       "moreFilters": "Больше фильтров",
       "fewerFilters": "Меньше фильтров",
-      "refPlaceholder": "ID / Номер",
+      "refPlaceholder": "ID / Ключевое слово",
       "results": "Показано {{shown}} из {{total}}",
       "removeFilter": "Убрать фильтр {{name}}"
     }

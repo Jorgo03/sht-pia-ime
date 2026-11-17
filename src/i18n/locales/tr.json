@@ -278,7 +278,7 @@
       "otherFilters": "Diğer filtreler",
       "moreFilters": "Daha fazla filtre",
       "fewerFilters": "Daha az filtre",
-      "refPlaceholder": "ID / Referans",
+      "refPlaceholder": "ID / Anahtar kelime",
       "results": "{{total}} sonuçtan {{shown}} gösteriliyor",
       "removeFilter": "{{name}} filtresini kaldır"
     }
