@@ -120,12 +120,8 @@ async function underDailyCap(feature: string): Promise<boolean> {
 /**
  * Best-effort caller IP, used only as a rate-limit bucket for signed-out callers.
  *
- * x-forwarded-for is client-controlled, so this cannot be trusted to identify
- * anyone — a determined caller spoofs it and gets a fresh bucket. That is
- * acceptable for what it guards: a spend ceiling on translating text the visitor
- * can already read on the page. It is not, and must not become, an authorization
- * check. The leftmost entry is the original client where the platform appends
- * rather than replaces, and the fixed fallback means a request arriving with no
+ * It guards a spend ceiling, never access: it is not, and must not become, an
+ * authorization check. The fixed fallback means a request arriving with no
  * forwarding header shares one bucket instead of escaping the limit entirely.
  */
 function clientIp(req: Request): string {
@@ -464,7 +460,8 @@ async function translateViaAnthropic(
   });
 
   if (!response.ok) {
-    console.error('Anthropic error', response.status, await response.text());
+    // Status only: the upstream body can echo the listing text.
+    console.error('Anthropic error', response.status);
     throw Object.assign(new Error('upstream'), { upstreamStatus: response.status });
   }
 
@@ -627,7 +624,7 @@ Deno.serve(async (req) => {
         503,
       );
     }
-    console.error('translate-property error', err);
+    console.error('translate-property error', err instanceof Error ? err.message : String(err));
     return json({ error: 'ai_unavailable' }, 503);
   }
 });
