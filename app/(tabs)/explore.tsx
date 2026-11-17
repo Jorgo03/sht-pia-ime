@@ -76,6 +76,8 @@ export default function ExploreScreen() {
   // Matches web's Search.jsx viewMode toggle exactly — map is a view mode
   // of this same screen, not a separate tab/route.
   const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
+  // The website panel's "More filters", open from the start when amenities are set.
+  const [moreFilters, setMoreFilters] = useState((filters.features?.length ?? 0) > 0);
 
   // react-query caches each (filters, page) combination — flipping the
   // Sale/Rent tab back and forth, or returning to a filter set visited
@@ -299,6 +301,8 @@ export default function ExploreScreen() {
     <FilterPanel
       search={searchText}
       onSearch={setSearchText}
+      more={moreFilters}
+      onMore={setMoreFilters}
       viewMode={viewMode}
       onViewMode={setViewMode}
       onShowResults={() => {

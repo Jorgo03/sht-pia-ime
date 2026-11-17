@@ -1,5 +1,5 @@
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import { type ComponentProps, type ReactNode, useMemo, useState } from 'react';
+import { type ComponentProps, type ReactNode, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 
@@ -41,7 +41,10 @@ const toNumber = (text: string): number | null => {
  * then the other filters in rows of fields. The same filters as the phone's
  * sheet (filters-context), applied as they change. Website, tablet and up.
  */
-export function FilterPanel({ viewMode, onViewMode, onShowResults, search, onSearch }: {
+export function FilterPanel({ viewMode, onViewMode, onShowResults, search, onSearch, more, onMore }: {
+  /** "More filters" open: kept by the screen, so it survives the list remounting. */
+  more: boolean;
+  onMore: (open: boolean) => void;
   /** The free-text search (city or area), Explore's own debounced field. */
   search: string;
   onSearch: (text: string) => void;
@@ -54,7 +57,6 @@ export function FilterPanel({ viewMode, onViewMode, onShowResults, search, onSea
   const styles = useMemo(() => createStyles(colors), [colors]);
   const { filters, queryFilters, setFilter, reset, priceInvalid, areaInvalid } = useFilters();
   const { data: count } = usePropertiesCountQuery(queryFilters, true);
-  const [more, setMore] = useState((filters.features?.length ?? 0) > 0);
   const zones = findCity(filters.city)?.zones ?? [];
   // Ten fields: five a row on a wide page, two on a tablet, never a ragged row.
   const { width } = useAppDimensions();
@@ -87,18 +89,19 @@ export function FilterPanel({ viewMode, onViewMode, onShowResults, search, onSea
       <View style={styles.head}>
         <Text style={styles.title} accessibilityRole="header">{t('search.panel.title')}</Text>
         <View style={styles.headActions}>
-          <Pressable accessibilityRole="button" onPress={reset} style={styles.linkButton} hitSlop={6}>
+          <Pressable accessibilityRole="button" accessibilityLabel={t('search.panel.clearAll')} onPress={reset} style={styles.linkButton} hitSlop={6}>
             <Text style={styles.linkText}>{t('search.panel.clearAll')}</Text>
             <MaterialIcons name="restart-alt" size={18} color={colors.textPrimary} />
           </Pressable>
           <Pressable
             accessibilityRole="button"
+            accessibilityLabel={viewMode === 'map' ? t('search.panel.showList') : t('search.panel.showOnMap')}
             onPress={() => onViewMode(viewMode === 'map' ? 'list' : 'map')}
             style={styles.outlineButton}>
             <MaterialIcons name={viewMode === 'map' ? 'grid-view' : 'map'} size={17} color={colors.textSecondary} />
             <Text style={styles.outlineText}>{viewMode === 'map' ? t('search.panel.showList') : t('search.panel.showOnMap')}</Text>
           </Pressable>
-          <Pressable accessibilityRole="button" onPress={onShowResults} style={[styles.primaryButton, { backgroundColor: colors.accentEnd }]}>
+          <Pressable accessibilityRole="button" accessibilityLabel={count != null ? t('search.showHomes', { count }) : t('search.showHomesAny')} onPress={onShowResults} style={[styles.primaryButton, { backgroundColor: colors.accentEnd }]}>
             <Text style={styles.primaryText}>{count != null ? t('search.showHomes', { count }) : t('search.showHomesAny')}</Text>
             <MaterialIcons name="arrow-forward" size={18} color="#fff" />
           </Pressable>
@@ -223,7 +226,7 @@ export function FilterPanel({ viewMode, onViewMode, onShowResults, search, onSea
       </View>
       {priceInvalid || areaInvalid ? <Text style={styles.warning}>{t('search.rangeInvalid')}</Text> : null}
 
-      <Pressable accessibilityRole="button" accessibilityState={{ expanded: more }} onPress={() => setMore((m) => !m)} style={styles.moreToggle}>
+      <Pressable accessibilityRole="button" accessibilityLabel={more ? t('search.panel.fewerFilters') : t('search.panel.moreFilters')} accessibilityState={{ expanded: more }} onPress={() => onMore(!more)} style={styles.moreToggle}>
         <Text style={styles.moreText}>{more ? t('search.panel.fewerFilters') : t('search.panel.moreFilters')}</Text>
         <MaterialIcons name={more ? 'expand-less' : 'expand-more'} size={18} color={colors.accentText} />
       </Pressable>
