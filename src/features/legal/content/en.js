@@ -4,7 +4,7 @@
 // update this file whenever a processor, a data field or a retention period
 // changes. Not legal advice; have a lawyer review before relying on it.
 
-export const UPDATED = '2026-10-14'
+export const UPDATED = '2026-11-17'
 
 export const privacy = {
   intro: [
@@ -113,7 +113,7 @@ export const terms = {
   sections: [
     {
       h: '1. Who we are',
-      p: ['Shtëpia.ime is operated by Future Home Orange ("FHO", "we", "us"), a company registered in the Republic of Albania.'],
+      p: ['Shtëpia.ime is built and operated by Jorgji Dhaskali ("we", "us").'],
     },
     {
       h: '2. What Shtëpia.ime is',
@@ -144,7 +144,7 @@ export const terms = {
     {
       h: '5. Your content',
       p: [
-        'You keep ownership of what you upload. You give FHO a non-exclusive, royalty-free licence to host, display, resize and translate it in order to run and promote the service, for as long as it is on Shtëpia.ime.',
+        'You keep ownership of what you upload. You give us a non-exclusive, royalty-free licence to host, display, resize and translate it in order to run and promote the service, for as long as it is on Shtëpia.ime.',
       ],
     },
     {
@@ -176,7 +176,7 @@ export const terms = {
     {
       h: '10. Liability',
       p: [
-        'Listings are published by users, and we do not guarantee that they are accurate, available or lawful. The service is provided "as is". To the extent the law allows, FHO is not liable for losses arising from listings, from dealings between users, or from the service being unavailable. Nothing in these terms limits rights you have as a consumer under the law.',
+        'Listings are published by users, and we do not guarantee that they are accurate, available or lawful. The service is provided "as is". To the extent the law allows, we are not liable for losses arising from listings, from dealings between users, or from the service being unavailable. Nothing in these terms limits rights you have as a consumer under the law.',
       ],
     },
     {
