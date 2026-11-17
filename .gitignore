@@ -45,3 +45,6 @@ playwright-report-expo/
 
 # Locations audit: raw OpenStreetMap / Wikidata downloads (scripts/locations/fetch-sources.mjs)
 docs/locations/cache/
+
+# Website audit screenshots (e2e-expo/site-audit.spec.ts)
+qa-screens/

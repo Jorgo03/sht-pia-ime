@@ -72,7 +72,8 @@ test.describe('signed in as the agent', () => {
     await expect(page).toHaveURL(new RegExp(`/user/${CHAT_CLIENT_ID}$`));
     await page.goBack();
     await expect(page).toHaveURL(new RegExp(`/messages/${CONVERSATIONS[0].id}$`));
-    await page.getByRole('button', { name: LISTINGS[0].title }).click();
+    // The chat's own link (on a desktop the conversation list beside it names it too).
+    await page.getByRole('button', { name: LISTINGS[0].title, exact: true }).last().click();
     await expect(page).toHaveURL(new RegExp(`/property/${LISTINGS[0].id}$`));
   });
 });

@@ -16,7 +16,7 @@ import { expect, test } from '../e2e/support/test';
 
 // Screenshots land here; each test's measurements are attached to the report
 // (run with --reporter=json) as "audit.json".
-const SHOTS = 'test-results/site-audit/screens';
+const SHOTS = 'qa-screens';
 
 const LISTING = LISTINGS[0].id;
 const CONV = CONVERSATIONS[0].id;
