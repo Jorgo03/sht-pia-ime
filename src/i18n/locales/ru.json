@@ -225,7 +225,19 @@
     "rangeMax": "До",
     "showHomesAny": "Показать объекты",
     "saveSearch": "Сохранить этот поиск",
-    "searchSaved": "Сохранено · Уведомления включены"
+    "searchSaved": "Сохранено · Уведомления включены",
+    "panel": {
+      "title": "Фильтр объектов",
+      "clearAll": "Сбросить все фильтры",
+      "showOnMap": "Показать на карте",
+      "showList": "Показать список",
+      "otherFilters": "Другие фильтры",
+      "moreFilters": "Больше фильтров",
+      "fewerFilters": "Меньше фильтров",
+      "refPlaceholder": "ID / Номер",
+      "results": "Показано {{shown}} из {{total}}",
+      "removeFilter": "Убрать фильтр {{name}}"
+    }
   },
   "favourites": {
     "title": "Избранное",

@@ -269,7 +269,19 @@
     "rangeMax": "Max",
     "showHomesAny": "Show homes",
     "saveSearch": "Save this search",
-    "searchSaved": "Saved · Alerts on"
+    "searchSaved": "Saved · Alerts on",
+    "panel": {
+      "title": "Filter homes",
+      "clearAll": "Clear all filters",
+      "showOnMap": "Show on map",
+      "showList": "Show list",
+      "otherFilters": "Other filters",
+      "moreFilters": "More filters",
+      "fewerFilters": "Fewer filters",
+      "refPlaceholder": "ID / Reference",
+      "results": "Showing {{shown}} of {{total}} results",
+      "removeFilter": "Remove filter {{name}}"
+    }
   },
   "detail": {
     "forSale": "For Sale",

@@ -221,7 +221,19 @@
     "rangeMax": "Máx",
     "showHomesAny": "Ver viviendas",
     "saveSearch": "Guardar esta búsqueda",
-    "searchSaved": "Guardada · Alertas activas"
+    "searchSaved": "Guardada · Alertas activas",
+    "panel": {
+      "title": "Filtrar inmuebles",
+      "clearAll": "Borrar todos los filtros",
+      "showOnMap": "Ver en el mapa",
+      "showList": "Ver lista",
+      "otherFilters": "Otros filtros",
+      "moreFilters": "Más filtros",
+      "fewerFilters": "Menos filtros",
+      "refPlaceholder": "ID / Referencia",
+      "results": "Mostrando {{shown}} de {{total}} resultados",
+      "removeFilter": "Quitar filtro {{name}}"
+    }
   },
   "favourites": {
     "title": "Favoritos",

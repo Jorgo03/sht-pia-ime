@@ -221,7 +221,19 @@
     "rangeMax": "Max",
     "showHomesAny": "Voir les biens",
     "saveSearch": "Enregistrer cette recherche",
-    "searchSaved": "Enregistrée · Alertes activées"
+    "searchSaved": "Enregistrée · Alertes activées",
+    "panel": {
+      "title": "Filtrer les biens",
+      "clearAll": "Effacer tous les filtres",
+      "showOnMap": "Voir sur la carte",
+      "showList": "Voir la liste",
+      "otherFilters": "Autres filtres",
+      "moreFilters": "Plus de filtres",
+      "fewerFilters": "Moins de filtres",
+      "refPlaceholder": "ID / Référence",
+      "results": "{{shown}} sur {{total}} résultats",
+      "removeFilter": "Retirer le filtre {{name}}"
+    }
   },
   "favourites": {
     "title": "Favoris",

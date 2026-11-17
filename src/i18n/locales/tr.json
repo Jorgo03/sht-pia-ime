@@ -269,7 +269,19 @@
     "rangeMax": "Maks.",
     "showHomesAny": "Evleri göster",
     "saveSearch": "Bu aramayı kaydet",
-    "searchSaved": "Kaydedildi · Bildirimler açık"
+    "searchSaved": "Kaydedildi · Bildirimler açık",
+    "panel": {
+      "title": "Mülkleri filtrele",
+      "clearAll": "Tüm filtreleri temizle",
+      "showOnMap": "Haritada göster",
+      "showList": "Listeyi göster",
+      "otherFilters": "Diğer filtreler",
+      "moreFilters": "Daha fazla filtre",
+      "fewerFilters": "Daha az filtre",
+      "refPlaceholder": "ID / Referans",
+      "results": "{{total}} sonuçtan {{shown}} gösteriliyor",
+      "removeFilter": "{{name}} filtresini kaldır"
+    }
   },
   "detail": {
     "forSale": "Satılık",

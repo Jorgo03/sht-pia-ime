@@ -221,7 +221,19 @@
     "rangeMax": "Max",
     "showHomesAny": "Mostra le case",
     "saveSearch": "Salva questa ricerca",
-    "searchSaved": "Salvata · Avvisi attivi"
+    "searchSaved": "Salvata · Avvisi attivi",
+    "panel": {
+      "title": "Filtra immobili",
+      "clearAll": "Cancella tutti i filtri",
+      "showOnMap": "Mostra sulla mappa",
+      "showList": "Mostra elenco",
+      "otherFilters": "Altri filtri",
+      "moreFilters": "Più filtri",
+      "fewerFilters": "Meno filtri",
+      "refPlaceholder": "ID / Riferimento",
+      "results": "{{shown}} di {{total}} risultati",
+      "removeFilter": "Rimuovi filtro {{name}}"
+    }
   },
   "favourites": {
     "title": "Preferiti",

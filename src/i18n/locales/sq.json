@@ -217,7 +217,19 @@
     "rangeMax": "Maks",
     "showHomesAny": "Shfaq shtëpitë",
     "saveSearch": "Ruaj këtë kërkim",
-    "searchSaved": "U ruajt · Njoftimet aktive"
+    "searchSaved": "U ruajt · Njoftimet aktive",
+    "panel": {
+      "title": "Filtro pronat",
+      "clearAll": "Pastro të gjitha filtrat",
+      "showOnMap": "Shiko në hartë",
+      "showList": "Shiko listën",
+      "otherFilters": "Filtra të tjerë",
+      "moreFilters": "Më shumë filtra",
+      "fewerFilters": "Më pak filtra",
+      "refPlaceholder": "ID / Referenca",
+      "results": "Shfaqur {{shown}} nga {{total}} rezultate",
+      "removeFilter": "Hiq filtrin {{name}}"
+    }
   },
   "favourites": {
     "title": "Të preferuarat",

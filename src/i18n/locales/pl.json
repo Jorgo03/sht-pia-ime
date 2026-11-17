@@ -225,7 +225,19 @@
     "rangeMax": "Maks",
     "showHomesAny": "Pokaż nieruchomości",
     "saveSearch": "Zapisz to wyszukiwanie",
-    "searchSaved": "Zapisano · Powiadomienia włączone"
+    "searchSaved": "Zapisano · Powiadomienia włączone",
+    "panel": {
+      "title": "Filtruj nieruchomości",
+      "clearAll": "Wyczyść wszystkie filtry",
+      "showOnMap": "Pokaż na mapie",
+      "showList": "Pokaż listę",
+      "otherFilters": "Inne filtry",
+      "moreFilters": "Więcej filtrów",
+      "fewerFilters": "Mniej filtrów",
+      "refPlaceholder": "ID / Numer",
+      "results": "Wyświetlono {{shown}} z {{total}} wyników",
+      "removeFilter": "Usuń filtr {{name}}"
+    }
   },
   "favourites": {
     "title": "Ulubione",

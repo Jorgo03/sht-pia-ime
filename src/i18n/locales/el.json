@@ -269,7 +269,19 @@
     "rangeMax": "Μέγ.",
     "showHomesAny": "Εμφάνιση σπιτιών",
     "saveSearch": "Αποθήκευση αναζήτησης",
-    "searchSaved": "Αποθηκεύτηκε · Ειδοποιήσεις ενεργές"
+    "searchSaved": "Αποθηκεύτηκε · Ειδοποιήσεις ενεργές",
+    "panel": {
+      "title": "Φίλτρα ακινήτων",
+      "clearAll": "Καθαρισμός όλων των φίλτρων",
+      "showOnMap": "Προβολή στον χάρτη",
+      "showList": "Προβολή λίστας",
+      "otherFilters": "Άλλα φίλτρα",
+      "moreFilters": "Περισσότερα φίλτρα",
+      "fewerFilters": "Λιγότερα φίλτρα",
+      "refPlaceholder": "ID / Κωδικός",
+      "results": "Εμφανίζονται {{shown}} από {{total}} αποτελέσματα",
+      "removeFilter": "Αφαίρεση φίλτρου {{name}}"
+    }
   },
   "detail": {
     "forSale": "Πωλείται",

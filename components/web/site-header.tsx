@@ -54,7 +54,9 @@ export function SiteHeader() {
   // Home's full-screen hero: transparent bar, white text, until scrolled past.
   const overHero = useSyncExternalStore(subscribeOverHero, getOverHero, () => true);
   const overlay = pathname === '/' && overHero;
-  const ink = overlay ? '#fff' : colors.textPrimary;
+  // A dark bar on every page (owner's reference, 2026-11-17): white text,
+  // the current page in orange. Over Home's photo it stays see-through.
+  const ink = '#fff';
 
   const go = (href: string) => {
     setMenuOpen(false);
@@ -67,7 +69,7 @@ export function SiteHeader() {
       accessibilityRole="link"
       accessibilityLabel={user ? t('common.profile') : t('common.signIn')}
       onPress={() => go('/profile')}
-      style={({ pressed }) => [styles.account, overlay && styles.accountOverlay, pressed && styles.pressed]}>
+      style={({ pressed }) => [styles.account, styles.accountOverlay, pressed && styles.pressed]}>
       <MaterialIcons name={user ? 'account-circle' : 'login'} size={20} color={ink} />
       {wide && <Text style={[styles.accountText, { color: ink }]}>{user ? t('common.profile') : t('common.signIn')}</Text>}
     </Pressable>
@@ -84,10 +86,10 @@ export function SiteHeader() {
   const trailing = (
     <View style={styles.trailing}>
       {wide && (
-        <View style={[styles.links, overlay && styles.linksOverlay]} accessibilityRole="navigation">
+        <View style={[styles.links, overlay ? styles.linksOverlay : styles.linksDark]} accessibilityRole="navigation">
           {SITE_LINKS.map((l) => (
             <Pressable key={l.href} accessibilityRole="link" accessibilityLabel={t(l.key)} onPress={() => go(l.href)} style={styles.link}>
-              <Text style={[styles.linkText, overlay && styles.linkTextOverlay, isActive(l.href) && (overlay ? styles.linkActiveOverlay : styles.linkActive)]}>
+              <Text style={[styles.linkText, styles.linkTextOverlay, isActive(l.href) && (overlay ? styles.linkActiveOverlay : styles.linkActiveDark)]}>
                 {t(l.key).toUpperCase()}
               </Text>
             </Pressable>
@@ -121,8 +123,8 @@ export function SiteHeader() {
 
   return (
     // testID once hydrated: the final layout is drawn (tests wait for it).
-    <View style={[styles.bar, overlay && styles.barOverlay]} testID={hydrated ? 'site-header' : undefined}>
-      <AppHeader site floating={overlay} compact={narrow} trailing={trailing} />
+    <View style={[styles.bar, overlay ? styles.barOverlay : styles.barDark]} testID={hydrated ? 'site-header' : undefined}>
+      <AppHeader site floating={overlay} onDark compact={narrow} trailing={trailing} />
       <Modal visible={menuOpen} transparent animationType="none" onRequestClose={() => setMenuOpen(false)}>
         <Pressable style={styles.backdrop} onPress={() => setMenuOpen(false)}>
           <ScrollView style={styles.menu} contentContainerStyle={styles.menuContent} accessibilityRole="menu">
@@ -169,15 +171,18 @@ const createStyles = (colors: AtticoPalette) =>
     // Over Home's hero: no bar, the photo shows through (a soft shade keeps
     // the white text readable on a light photo).
     barOverlay: { backgroundColor: 'rgba(0,0,0,0.18)' },
+    barDark: { backgroundColor: '#000000' },
     trailing: { flexDirection: 'row', alignItems: 'center', gap: 8, marginLeft: 8 },
     // The links sit together in one soft pill, as on the brief's reference.
     links: { flexDirection: 'row', alignItems: 'center', gap: 2, marginRight: 8, paddingHorizontal: 6, borderRadius: 24, backgroundColor: colors.glass },
     linksOverlay: { backgroundColor: 'rgba(255,255,255,0.12)' },
+    linksDark: { backgroundColor: 'transparent' },
     link: { minHeight: 40, justifyContent: 'center', paddingHorizontal: 12 },
     linkText: { fontFamily: Fonts.sansMedium, fontSize: 13, letterSpacing: 0.4, color: colors.textSecondary },
     linkTextOverlay: { color: 'rgba(255,255,255,0.85)' },
     linkActive: { color: colors.textPrimary, fontFamily: Fonts.sansBold },
     linkActiveOverlay: { color: '#fff', fontFamily: Fonts.sansBold },
+    linkActiveDark: { color: colors.accent, fontFamily: Fonts.sansBold },
     accountOverlay: { borderColor: 'rgba(255,255,255,0.4)' },
     iconBtn: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center', borderRadius: 22 },
     dot: { position: 'absolute', top: 10, right: 10, width: 8, height: 8, borderRadius: 4, backgroundColor: colors.accent },

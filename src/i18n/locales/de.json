@@ -217,7 +217,19 @@
     "rangeMax": "Max.",
     "showHomesAny": "Immobilien anzeigen",
     "saveSearch": "Diese Suche speichern",
-    "searchSaved": "Gespeichert · Benachrichtigungen an"
+    "searchSaved": "Gespeichert · Benachrichtigungen an",
+    "panel": {
+      "title": "Immobilien filtern",
+      "clearAll": "Alle Filter löschen",
+      "showOnMap": "Auf der Karte zeigen",
+      "showList": "Liste zeigen",
+      "otherFilters": "Weitere Filter",
+      "moreFilters": "Mehr Filter",
+      "fewerFilters": "Weniger Filter",
+      "refPlaceholder": "ID / Referenz",
+      "results": "{{shown}} von {{total}} Ergebnissen",
+      "removeFilter": "Filter {{name}} entfernen"
+    }
   },
   "favourites": {
     "title": "Favoriten",

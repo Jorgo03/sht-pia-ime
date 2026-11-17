@@ -18,7 +18,8 @@ import { useRouter, type Href } from 'expo-router';
 import { useTabBarClearance } from '@/components/liquid-tab-bar';
 import { AppHeader } from '@/components/ui/app-header';
 import { MapScreenContent } from '@/components/map/map-screen-content';
-import { FilterSheet, FilterSidebar } from '@/components/property/filter-sheet';
+import { FilterSheet } from '@/components/property/filter-sheet';
+import { FilterPanel, ResultsBar } from '@/components/web/filter-panel';
 import { PropertyCard } from '@/components/property/property-card';
 import { FilterTabs } from '@/components/ui/filter-tabs';
 import { GradientBackground } from '@/components/ui/gradient-background';
@@ -48,7 +49,12 @@ export default function ExploreScreen() {
   // Desktop website: filters sit in a sidebar beside the results, and the
   // grid gets one column per ~300px of what is left.
   const desktop = useIsDesktopWeb();
-  const columns = desktop ? Math.max(2, Math.floor((layoutWidth - SIDEBAR_WIDTH - 60) / 300)) : deviceColumns;
+  // The website from tablet width up: the filters as one wide panel above
+  // the results (FilterPanel), and up to four cards a row, as on a listings
+  // portal (owner's reference, 2026-11-17). Phones keep the sheet.
+  const panel = IS_WEB && layoutWidth >= 768;
+  const columns = panel ? Math.min(4, Math.max(2, Math.floor((layoutWidth - 40) / 290))) : deviceColumns;
+  const listRef = useRef<FlatList<Property>>(null);
   // A centred column for the title/search/tabs on an unfolded Fold or a
   // spanned Duo; the grid below keeps the full width for its columns.
   // On the website the grid already spans the page, so the title and search
@@ -176,10 +182,10 @@ export default function ExploreScreen() {
   const renderItem = useCallback(
     ({ item, index }: { item: Property; index: number }) => (
       <RiseIn index={index} style={gridItemStyle} quick>
-        <PropertyCard property={item} />
+        <PropertyCard property={item} rich={panel} />
       </RiseIn>
     ),
-    [gridItemStyle],
+    [gridItemStyle, panel],
   );
 
   // On a short screen (360x380 Flip cover) the pinned title, search and tabs
@@ -289,6 +295,17 @@ export default function ExploreScreen() {
     </View>
   );
 
+  const filterPanel = (
+    <FilterPanel
+      viewMode={viewMode}
+      onViewMode={setViewMode}
+      onShowResults={() => {
+        setViewMode('list');
+        listRef.current?.scrollToOffset({ offset: 380, animated: true });
+      }}
+    />
+  );
+
   const loader = (
     <View style={styles.loader}>
       <ActivityIndicator size="large" color={colors.accent} />
@@ -318,17 +335,13 @@ export default function ExploreScreen() {
         {/* Replaces the plain `common.appName` text this screen used to show
             — web renders the full `.app-header` here like everywhere else. */}
         <AppHeader />
-        {!chromeInList && chrome}
+        {!chromeInList && !panel && chrome}
 
-        <View style={desktop ? styles.desktopBody : styles.flex}>
-        {desktop && (
-          <View style={styles.desktopSidebar}>
-            <FilterSidebar />
-          </View>
-        )}
+        <View style={styles.flex}>
         <View style={styles.flex}>
         {viewMode === 'map' ? (
           <View style={styles.mapWrap}>
+            {panel ? <View style={styles.panelWrap}>{filterPanel}</View> : null}
             <MapScreenContent />
           </View>
         ) : loading && !chromeInList ? (
@@ -355,8 +368,11 @@ export default function ExploreScreen() {
             removeClippedSubviews
             onEndReached={loadMore}
             onEndReachedThreshold={0.5}
+            ref={listRef}
             ListHeaderComponent={
               <>
+                {panel ? filterPanel : null}
+                {panel && !loading && !failedEmpty ? <ResultsBar shown={properties.length} total={total} /> : null}
                 {/* Short screens only (chromeInList above). The list pads its
                     sides by 14 and the chrome brings its own 20, so it steps
                     back out to the screen edge. */}
@@ -364,7 +380,7 @@ export default function ExploreScreen() {
                 {/* Web's `.result-count`: bold total + "homes in view" on the
                     left, a mono-caps eyebrow naming the current sort on the
                     right. Mobile only had the bare count. */}
-                {!loading && !failedEmpty && (
+                {!panel && !loading && !failedEmpty && (
                   <View style={styles.countRow}>
                     <Text style={styles.count}>
                       <Text style={styles.countStrong}>{total}</Text>{' '}
@@ -438,13 +454,11 @@ export default function ExploreScreen() {
   );
 }
 
-const SIDEBAR_WIDTH = 320;
 
 const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   flex: { flex: 1 },
-  desktopBody: { flex: 1, flexDirection: 'row', gap: 20, paddingLeft: 20 },
   webChrome: { width: '100%', maxWidth: 820 },
-  desktopSidebar: { width: SIDEBAR_WIDTH, paddingBottom: 24 },
+  panelWrap: { paddingHorizontal: 20, paddingBottom: 16 },
   container: {
     flex: 1,
   },

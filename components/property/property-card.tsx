@@ -5,6 +5,7 @@ import { memo, useMemo } from 'react';
 import { Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { useTranslation } from 'react-i18next';
+import { formatRef } from '@/src/features/properties/lib/searchFilters';
 
 import { useHeartPop, usePressScale } from '@/components/ui/motion';
 
@@ -52,9 +53,12 @@ interface PropertyCardProps {
    *  list of one person's listings (their public profile), where each card
    *  has to say which home it is. Off everywhere else. */
   detailed?: boolean;
+  /** Website results grid: reference, title, place, specs and a large price,
+   *  as on a listings portal (owner's reference, 2026-11-17). */
+  rich?: boolean;
 }
 
-function PropertyCardBase({ property, onPress, variant = 'grid', detailed = false }: PropertyCardProps) {
+function PropertyCardBase({ property, onPress, variant = 'grid', detailed = false, rich = false }: PropertyCardProps) {
   const { t, i18n } = useTranslation();
   const { isFavorite, toggle } = useFavorites();
   const router = useRouter();
@@ -199,6 +203,35 @@ function PropertyCardBase({ property, onPress, variant = 'grid', detailed = fals
           </Text>
         </View>
       </View>
+      {rich ? (
+        <View style={styles.richInfo}>
+          {property.ref_code ? <Text style={styles.richRef} numberOfLines={1}>{formatRef(property.ref_code)}</Text> : null}
+          <Text style={styles.richTitle} numberOfLines={1} accessibilityRole="link" accessibilityLabel={[title, `${price}${suffix}`, specsLabel].filter(Boolean).join(', ')} onPress={handlePress}>
+            {title}
+          </Text>
+          <View style={styles.locationRow}>
+            <MaterialIcons name="location-on" size={12} color={colors.textSecondary} />
+            <Text style={styles.location} numberOfLines={1}>
+              {[property.zone, place].filter(Boolean).join(', ')}
+            </Text>
+          </View>
+          <View style={styles.richSpecs} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+            {specs.map((sp) => (
+              <View key={sp.icon} style={styles.spec}>
+                <MaterialIcons name={sp.icon} size={13} color={colors.textSecondary} />
+                <Text style={styles.specText}>{sp.value}</Text>
+              </View>
+            ))}
+            {typeLabel ? (
+              <View style={styles.spec}>
+                <MaterialIcons name="home-work" size={13} color={colors.textSecondary} />
+                <Text style={styles.specText}>{typeLabel}</Text>
+              </View>
+            ) : null}
+          </View>
+          <Text style={styles.richPrice}>{price}{suffix}</Text>
+        </View>
+      ) : (
       <View style={styles.info}>
         {detailed && title ? (
           <Text style={styles.detailTitle} numberOfLines={2} accessibilityElementsHidden importantForAccessibility="no">
@@ -236,6 +269,7 @@ function PropertyCardBase({ property, onPress, variant = 'grid', detailed = fals
           </Text>
         ) : null}
       </View>
+      )}
     </Pressable>
     </Animated.View>
   );
@@ -325,6 +359,11 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   info: {
     gap: 2,
   },
+  richInfo: { gap: 4, paddingHorizontal: 4, paddingBottom: 4 },
+  richRef: { fontFamily: Fonts.sansSemiBold, fontSize: 12, letterSpacing: 0.4, color: colors.accentText },
+  richTitle: { fontFamily: Fonts.sansBold, fontSize: 15, color: colors.textPrimary, textTransform: 'uppercase' },
+  richSpecs: { flexDirection: 'row', flexWrap: 'wrap', columnGap: 12, rowGap: 4, marginTop: 4 },
+  richPrice: { fontFamily: Fonts.sansExtraBold, fontSize: 20, color: colors.textPrimary, marginTop: 6 },
   locationRow: {
     flexDirection: 'row',
     alignItems: 'center',
