@@ -17,6 +17,7 @@ written to production.
 | Confirm email | Off (`mailer_autoconfirm: true`) | `GET /auth/v1/settings` |
 | New account, profile, role | Last new email account (2026-11-08) created, signed in, profile `buyer`; last new agent (2026-11-06) has role `agent` and an office | `auth.users` ⨝ `profiles` (no addresses read) |
 | Live site, existing address (before the fix) | One faint line, no next step | Playwright on the live site, 422 replayed in the browser |
+| Live site after deploy `c11d7f3` (Vercel READY), in Albanian | **PASSED**: sign-up → "Ky email është regjistruar më parë." + hint + Hyr me këtë email / Ke harruar fjalëkalimin? / Vazhdo me Google; "Hyr me këtë email" keeps the address; wrong password → "Email ose fjalëkalim i gabuar." + reset and Google | Playwright on the live site, server answers replayed in the browser, nothing sent to Supabase |
 
 ## Automated
 
