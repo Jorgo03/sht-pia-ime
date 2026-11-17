@@ -47,14 +47,15 @@ async function openFilters(page: Page) {
   // with the button, even on a desktop.
   await headerReady(page);
   const button = page.getByRole('button', { name: t('search.filtersTitle') });
+  // Website from tablet width: the filter panel above the results, with the
+  // amenities behind "More filters". Wait for whichever this layout draws.
+  const more = page.getByRole('button', { name: t('search.panel.moreFilters') });
+  await expect(button.or(more).first()).toBeVisible();
   if (await button.isVisible()) {
     await button.click();
     return true;
   }
-  // Website from tablet width: the filter panel above the results, with the
-  // amenities behind "More filters".
-  const more = page.getByRole('button', { name: t('search.panel.moreFilters') });
-  if (await more.isVisible()) await more.click();
+  await more.click();
   return false;
 }
 async function goSite(page: Page, name: string) {
@@ -884,7 +885,7 @@ test.describe('discovery', () => {
     await openFilters(page);
     await page.getByRole('button', { name: t('listing.feature.pool'), exact: true }).click();
     await expect(page.getByText(/në shikim|rezultate/)).toContainText('1');
-    await page.getByRole('button', { name: new RegExp(`^(${t('search.reset')}|${t('search.panel.clearAll')})$`) }).first().click();
+    await page.getByRole('button', { name: new RegExp(`^(${t('search.reset')}|${t('search.panel.clearAll')})$`) }).filter({ visible: true }).first().click();
     await expect(page.getByText(/në shikim|rezultate/)).toContainText(String(LISTINGS.length));
   });
 
@@ -906,7 +907,7 @@ test.describe('discovery', () => {
     await context.setGeolocation({ latitude: 41.33, longitude: 19.82 });
     await page.goto('/explore');
     await ready(page);
-    await page.getByRole('button', { name: new RegExp(`^(${t('search.mapView')}|${t('search.panel.showOnMap')})$`) }).first().click();
+    await page.getByRole('button', { name: new RegExp(`^(${t('search.mapView')}|${t('search.panel.showOnMap')})$`) }).filter({ visible: true }).first().click();
     await page.getByRole('button', { name: t('nearMe.button') }).click();
     const five = page.getByRole('button', { name: '5 km', exact: true });
     await expect(five).toBeVisible();
