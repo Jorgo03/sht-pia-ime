@@ -1,3 +1,5 @@
+import { useAuth } from '@/contexts/auth-context';
+import { SignInPrompt } from '@/components/ui/sign-in-prompt';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useMemo, useState } from 'react';
@@ -50,6 +52,7 @@ const BAR_GAP = 4;
 const CHART_HEIGHT = 140;
 
 export default function PropertyAnalyticsScreen() {
+  const { user, loading: authLoading } = useAuth();
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const { t, i18n } = useTranslation();
@@ -123,6 +126,8 @@ export default function PropertyAnalyticsScreen() {
   const maxCount = Math.max(1, ...dailySeries.map((d) => d.count));
   const recent = activity.slice(0, 50);
 
+  // Signed out: ask to sign in, not an empty "nothing yet" screen (website audit).
+  if (!user) return authLoading ? null : <SignInPrompt />;
   return (
     <GradientBackground>
       <SafeAreaView style={[styles.container, readable]} edges={['top']}>

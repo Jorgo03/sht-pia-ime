@@ -305,7 +305,8 @@
     "unavailable": "Kjo bisedë nuk është e disponueshme",
     "loadFailed": "Biseda nuk u ngarkua dot.",
     "attachFailed": "Skedari nuk u dërgua. Provo përsëri.",
-    "openAttachment": "Hap {{name}}"
+    "openAttachment": "Hap {{name}}",
+    "selectConversation": "Zgjidh një bisedë nga lista."
   },
   "notFound": {
     "title": "Faqja nuk u gjet",

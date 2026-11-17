@@ -1,3 +1,5 @@
+import { useAuth } from '@/contexts/auth-context';
+import { SignInPrompt } from '@/components/ui/sign-in-prompt';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { Image } from 'expo-image';
 import { useRouter, type Href } from 'expo-router';
@@ -29,6 +31,7 @@ import { useReadableColumn } from '@/hooks/use-responsive';
 // primary nav destination — reached from Profile's menu list instead, same
 // as Messages/Viewings/My Listings.
 export default function FavoritesScreen() {
+  const { user, loading: authLoading } = useAuth();
   const router = useRouter();
   const { t, i18n } = useTranslation();
   const { favoriteProperties, loading, error, reload, toggle } = useFavorites();
@@ -37,6 +40,8 @@ export default function FavoritesScreen() {
   // A centred column on an unfolded Fold or a spanned Duo (hooks/use-responsive).
   const readable = useReadableColumn();
 
+  // Signed out: ask to sign in, not an empty "nothing yet" screen (website audit).
+  if (!user) return authLoading ? null : <SignInPrompt />;
   return (
     <GradientBackground>
       <SafeAreaView style={[styles.container, readable]} edges={['top']}>

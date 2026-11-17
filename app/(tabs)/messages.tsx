@@ -1,7 +1,7 @@
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useFocusEffect, useRouter, type Href } from 'expo-router';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { ActivityIndicator, BackHandler, FlatList, Platform, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
@@ -12,6 +12,7 @@ import { LIST_PAGE_SIZE, pageWindow } from '@/src/lib/pageWindow';
 import { AppHeader } from '@/components/ui/app-header';
 import { ScreenHero } from '@/components/ui/screen-hero';
 import { GradientBackground } from '@/components/ui/gradient-background';
+import { useIsDesktopWeb } from '@/hooks/use-app-dimensions';
 import { type AtticoPalette, Fonts } from '@/constants/theme';
 import { useAuth } from '@/contexts/auth-context';
 import { useTheme } from '@/contexts/theme-context';
@@ -64,14 +65,20 @@ let inboxCache: InboxCache | null = null;
 // token refresh) threw "cannot add postgres_changes callbacks after subscribe()".
 let inboxChannelSeq = 0;
 
-export default function MessagesInboxScreen() {
+/**
+ * The conversation list. `embedded` draws it as the left pane of the
+ * website's two-pane Messages page (no page column of its own); `activeId`
+ * marks the conversation open beside it.
+ */
+export function MessagesInbox({ embedded = false, activeId }: { embedded?: boolean; activeId?: string } = {}) {
   const router = useRouter();
   const { t, i18n } = useTranslation();
   const { user, isAgent } = useAuth();
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
   // A centred column on an unfolded Fold or a spanned Duo (hooks/use-responsive).
-  const readable = useReadableColumn();
+  const readableColumn = useReadableColumn();
+  const readable = embedded ? null : readableColumn;
   // A real tab: the bottom menu stays on screen and the person chooses
   // where to go next. Nothing here sends them anywhere by itself.
   const tabBarClearance = useTabBarClearance();
@@ -302,9 +309,10 @@ export default function MessagesInboxScreen() {
               return (
                 <TouchableOpacity
                   accessibilityRole="button"
-                  style={[styles.row, myUnread > 0 && styles.rowUnread]}
+                  style={[styles.row, myUnread > 0 && styles.rowUnread, item.id === activeId && styles.rowActive]}
+                  accessibilityState={{ selected: item.id === activeId }}
                   activeOpacity={0.7}
-                  onPress={() => router.push(`/messages/${item.id}` as Href)}>
+                  onPress={() => (embedded ? router.replace(`/messages/${item.id}` as Href) : router.push(`/messages/${item.id}` as Href))}>
                   <LinearGradient colors={[colors.accent, colors.accentEnd]} style={styles.avatar}>
                     <Text style={styles.avatarText}>{name[0]?.toUpperCase() || '?'}</Text>
                   </LinearGradient>
@@ -425,6 +433,10 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     borderBottomColor: colors.border,
   },
   // Mirrors web's .msg-row.unread { background: var(--fho-surface) }.
+  rowActive: {
+    borderColor: colors.accent,
+    borderWidth: 1,
+  },
   rowUnread: {
     backgroundColor: colors.primaryLight,
   },
@@ -488,4 +500,53 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     borderRadius: 4,
     backgroundColor: colors.accent,
   },
+});
+
+/**
+ * Messages. Phones and narrow windows: the list, and a chat opens over it.
+ * Desktop website (website audit): the list on the left and the open chat
+ * on the right, as a desktop mail or chat app; here no chat is open yet.
+ */
+export default function MessagesInboxScreen() {
+  const desktop = useIsDesktopWeb();
+  if (!desktop) return <MessagesInbox />;
+  return (
+    <MessagesTwoPane>
+      <ChooseConversation />
+    </MessagesTwoPane>
+  );
+}
+
+/** The website's two-pane frame: the conversation list beside `children`. */
+export function MessagesTwoPane({ activeId, children }: { activeId?: string; children: ReactNode }) {
+  const { colors } = useTheme();
+  return (
+    <View style={paneStyles.row}>
+      <View style={[paneStyles.list, { borderColor: colors.border }]}>
+        <MessagesInbox embedded activeId={activeId} />
+      </View>
+      <View style={paneStyles.pane}>{children}</View>
+    </View>
+  );
+}
+
+function ChooseConversation() {
+  const { t } = useTranslation();
+  const { colors } = useTheme();
+  return (
+    <GradientBackground>
+      <View style={paneStyles.choose}>
+        <MaterialIcons name="forum" size={44} color={colors.accent} />
+        <Text style={[paneStyles.chooseText, { color: colors.textSecondary }]}>{t('messages.selectConversation')}</Text>
+      </View>
+    </GradientBackground>
+  );
+}
+
+const paneStyles = StyleSheet.create({
+  row: { flex: 1, flexDirection: 'row' },
+  list: { width: 380, borderRightWidth: 1 },
+  pane: { flex: 1 },
+  choose: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 14, padding: 32 },
+  chooseText: { fontFamily: Fonts.sans, fontSize: 16, textAlign: 'center' },
 });

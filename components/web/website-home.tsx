@@ -110,6 +110,8 @@ export function WebsiteHome() {
           contentFit="cover"
           contentPosition="center"
           priority="high"
+          // The page's main image: fetched at once, not when scrolled to.
+          loading="eager"
           accessibilityLabel="Tiranë"
         />
         {/* Darkens the photo so the white text reads on it, most at the

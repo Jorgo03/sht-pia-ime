@@ -335,7 +335,8 @@
     "unavailable": "Bu sohbet mevcut değil",
     "loadFailed": "Bu sohbet yüklenemedi.",
     "attachFailed": "Dosya gönderilmedi. Tekrar deneyin.",
-    "openAttachment": "{{name}} dosyasını aç"
+    "openAttachment": "{{name}} dosyasını aç",
+    "selectConversation": "Listeden bir sohbet seçin."
   },
   "property": {
     "beds": "Yatak odası",

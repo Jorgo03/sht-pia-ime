@@ -64,3 +64,8 @@ test('a pre-rendered page with no head tags gets title, description, canonical a
   assert.match(home, /<title>Shtëpia\.ime — Shtëpi<\/title>/)
   assert.match(home, /rel="canonical" href="https:\/\/shtepia.example"/)
 })
+
+test('signed-in pages are marked noindex in their head', async () => {
+  const fs = await import('node:fs')
+  assert.match(fs.readFileSync('components/web/page-head.tsx', 'utf8'), /name="robots" content="noindex, nofollow"/)
+})

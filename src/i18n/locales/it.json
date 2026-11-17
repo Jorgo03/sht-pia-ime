@@ -313,7 +313,8 @@
     "unavailable": "Questa conversazione non è disponibile",
     "loadFailed": "Impossibile caricare questa conversazione.",
     "attachFailed": "Il file non è stato inviato. Riprova.",
-    "openAttachment": "Apri {{name}}"
+    "openAttachment": "Apri {{name}}",
+    "selectConversation": "Scegli una conversazione dall'elenco."
   },
   "notFound": {
     "title": "Pagina non trovata",

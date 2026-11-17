@@ -62,7 +62,7 @@ async function activeListings() {
   // Supabase caps a response at 1000 rows by default, so page through.
   for (let offset = 0; offset < 50000; offset += 1000) {
     const res = await fetch(
-      `${supabaseUrl}/rest/v1/properties?select=id,title,title_i18n,description,description_i18n,city,image_urls,updated_at&status=eq.active&order=updated_at.desc&limit=1000&offset=${offset}`,
+      `${supabaseUrl}/rest/v1/properties?select=id,owner_id,title,title_i18n,description,description_i18n,city,image_urls,updated_at&status=eq.active&order=updated_at.desc&limit=1000&offset=${offset}`,
       { headers: { apikey: anonKey }, signal: AbortSignal.timeout(10000) },
     );
     if (!res.ok) throw new Error(`HTTP ${res.status}`);

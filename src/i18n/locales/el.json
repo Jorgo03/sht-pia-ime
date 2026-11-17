@@ -335,7 +335,8 @@
     "unavailable": "Αυτή η συνομιλία δεν είναι διαθέσιμη",
     "loadFailed": "Η συνομιλία δεν φορτώθηκε.",
     "attachFailed": "Το αρχείο δεν στάλθηκε. Δοκιμάστε ξανά.",
-    "openAttachment": "Άνοιγμα {{name}}"
+    "openAttachment": "Άνοιγμα {{name}}",
+    "selectConversation": "Επιλέξτε μια συνομιλία από τη λίστα."
   },
   "property": {
     "beds": "Υπνοδωμάτια",

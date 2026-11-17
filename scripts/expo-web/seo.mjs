@@ -105,6 +105,8 @@ export function sitemapXml(site, listings) {
     '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">',
     ...PUBLIC_ROUTES.map((r) => url(r)),
     ...listings.map((l) => url(`/property/${l.id}`, l.updated_at)),
+    // Public profiles of everyone with a live listing (app/user/[id]).
+    ...[...new Set(listings.map((l) => l.owner_id).filter((id) => isListingId(id)))].map((id) => url(`/user/${id}`)),
     '</urlset>',
     '',
   ].join('\n');

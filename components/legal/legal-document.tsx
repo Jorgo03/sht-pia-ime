@@ -53,22 +53,30 @@ export function LegalDocument({ doc }: { doc: Doc }) {
 
   return (
     <GradientBackground>
-      <SafeAreaView style={[styles.container, readable]} edges={['top']}>
-        <AppHeader onBack={() => (router.canGoBack() ? router.back() : router.replace('/'))} />
-        <ScrollView contentContainerStyle={styles.content}>
-          <Text style={styles.title} accessibilityRole="header">{t(TITLE_KEYS[doc])}</Text>
-          <Text style={styles.updated}>{t('legal.lastUpdated', { date: formatUpdated(content.UPDATED) })}</Text>
-          {lang !== 'sq' && lang !== 'en' && <Text style={styles.note}>{t('legal.languageNote')}</Text>}
-          {body.intro.map((text, i) => (
-            <Text key={i} style={styles.intro}>{text}</Text>
-          ))}
-          {body.sections.map((section) => (
-            <Section key={section.h} section={section} contact={content.contact} styles={styles} />
-          ))}
-          <View style={styles.footer}>
-            {others.map((d) => (
-              <Link key={d} href={`/${d}` as Href} style={styles.link}>{t(TITLE_KEYS[d])}</Link>
-            ))}
+      {/* The column is only for the text: the site footer runs the full width
+          of the page (inside the column it was cramped). */}
+      <SafeAreaView style={styles.container} edges={['top']}>
+        <View style={readable}>
+          <AppHeader onBack={() => (router.canGoBack() ? router.back() : router.replace('/'))} />
+        </View>
+        <ScrollView>
+          <View style={readable}>
+            <View style={styles.content}>
+              <Text style={styles.title} accessibilityRole="header">{t(TITLE_KEYS[doc])}</Text>
+              <Text style={styles.updated}>{t('legal.lastUpdated', { date: formatUpdated(content.UPDATED) })}</Text>
+              {lang !== 'sq' && lang !== 'en' && <Text style={styles.note}>{t('legal.languageNote')}</Text>}
+              {body.intro.map((text, i) => (
+                <Text key={i} style={styles.intro}>{text}</Text>
+              ))}
+              {body.sections.map((section) => (
+                <Section key={section.h} section={section} contact={content.contact} styles={styles} />
+              ))}
+              <View style={styles.footer}>
+                {others.map((d) => (
+                  <Link key={d} href={`/${d}` as Href} style={styles.link}>{t(TITLE_KEYS[d])}</Link>
+                ))}
+              </View>
+            </View>
           </View>
           <SiteFooter />
         </ScrollView>

@@ -32,6 +32,9 @@ export function PageHead({ title, description }: { title?: string | null; descri
       <meta name="description" content={text} />
       <meta property="og:title" content={full} />
       <meta property="og:description" content={text} />
+      {/* Signed-in pages: never in search results, even if linked from elsewhere
+          (robots.txt only asks crawlers not to fetch them). */}
+      {links ? null : <meta name="robots" content="noindex, nofollow" />}
       {links ? <link rel="canonical" href={links.canonical} /> : null}
       {links ? <meta property="og:url" content={links.canonical} /> : null}
       {links?.alternates.map((a) => <link key={a.hreflang} rel="alternate" hrefLang={a.hreflang} href={a.href} />)}

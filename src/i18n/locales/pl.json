@@ -321,7 +321,8 @@
     "unavailable": "Ta rozmowa jest niedostępna",
     "loadFailed": "Nie udało się wczytać tej rozmowy.",
     "attachFailed": "Plik nie został wysłany. Spróbuj ponownie.",
-    "openAttachment": "Otwórz {{name}}"
+    "openAttachment": "Otwórz {{name}}",
+    "selectConversation": "Wybierz rozmowę z listy."
   },
   "notFound": {
     "title": "Nie znaleziono strony",

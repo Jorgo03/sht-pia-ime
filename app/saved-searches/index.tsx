@@ -1,3 +1,4 @@
+import { SignInPrompt } from '@/components/ui/sign-in-prompt';
 import { LoadError } from '@/components/ui/load-error';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -83,7 +84,7 @@ interface WantedHome {
 export default function SavedSearchesScreen() {
   const router = useRouter();
   const { t, i18n } = useTranslation();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const { setFilter, reset: resetFilters } = useFilters();
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
@@ -273,6 +274,8 @@ export default function SavedSearchesScreen() {
     load();
   };
 
+  // Signed out: ask to sign in, not an empty "nothing yet" screen (website audit).
+  if (!user) return authLoading ? null : <SignInPrompt />;
   return (
     <GradientBackground>
       <SafeAreaView style={[styles.container, readable]} edges={['top']}>

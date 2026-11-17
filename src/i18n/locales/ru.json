@@ -321,7 +321,8 @@
     "unavailable": "Этот разговор недоступен",
     "loadFailed": "Не удалось загрузить переписку.",
     "attachFailed": "Файл не отправлен. Попробуйте ещё раз.",
-    "openAttachment": "Открыть {{name}}"
+    "openAttachment": "Открыть {{name}}",
+    "selectConversation": "Выберите разговор из списка."
   },
   "notFound": {
     "title": "Страница не найдена",

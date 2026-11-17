@@ -72,3 +72,9 @@ test('only real listing ids become file names', () => {
   assert.equal(isListingId('../../etc/passwd'), false)
   assert.equal(isListingId('[id]'), false)
 })
+
+test('the sitemap lists the public profile of each lister, once', () => {
+  const owner = 'e2e00000-0000-4000-a000-0000000000a1'
+  const xml = sitemapXml(SITE, [{ ...ROW, owner_id: owner }, { ...ROW, id: 'e2e00000-0000-4000-b000-000000000002', owner_id: owner }])
+  assert.equal(xml.match(new RegExp(`/user/${owner}`, 'g')).length, 1)
+})

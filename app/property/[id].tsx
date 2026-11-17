@@ -55,6 +55,7 @@ import { sheetColumn } from '@/constants/web-frame';
 import { useAppDimensions } from '@/hooks/use-app-dimensions';
 import { PageHead } from '@/components/web/page-head';
 import { pricePerM2 } from '@/src/features/properties/lib/compare';
+import { useIsDesktopWeb } from '@/hooks/use-app-dimensions';
 import { PriceHistory } from '@/components/property/price-history';
 import { CARD_CONTAINER_A11Y } from '@/components/property/card-a11y';
 import { ViewingTimePicker } from '@/components/viewings/viewing-time-picker';
@@ -87,6 +88,7 @@ export default function PropertyDetailScreen() {
   // (Fold open 673x841) it was ~210-240px, too narrow for the agent row,
   // price and CTA. Below that the content stacks in the readable column.
   const split = isTablet && layoutWidth >= 820;
+  const desktopWeb = useIsDesktopWeb();
   const readable = useReadableColumn();
   const favorited = isFavorite(id ?? '');
   const { data: property = null, isLoading: loading, isError: loadFailed, refetch } = usePropertyQuery(id);
@@ -326,10 +328,14 @@ export default function PropertyDetailScreen() {
   // screenHeight is already constrained.
   // Clamped on short screens (360x380 Flip cover, where 42% pinned the hero
   // over most of what was left); unchanged from ~552 tall up.
-  const imageHeight = Math.min(
-    screenHeight * (isTablet ? 0.32 : 0.42),
-    Math.max(120, screenHeight - 320),
-  );
+  // Desktop website: a big gallery, as the website audit asks (288px left a
+  // portrait photo as a thin strip).
+  const imageHeight = desktopWeb
+    ? Math.min(640, Math.max(420, screenHeight * 0.66))
+    : Math.min(
+        screenHeight * (isTablet ? 0.32 : 0.42),
+        Math.max(120, screenHeight - 320),
+      );
 
   const images = property.image_urls?.length ? property.image_urls : [];
   const price = formatListingPrice(property.price, property.currency);

@@ -335,7 +335,8 @@
     "unavailable": "This conversation is not available",
     "loadFailed": "Couldn't load this conversation.",
     "attachFailed": "The file wasn't sent. Try again.",
-    "openAttachment": "Open {{name}}"
+    "openAttachment": "Open {{name}}",
+    "selectConversation": "Choose a conversation from the list."
   },
   "property": {
     "beds": "Bedrooms",

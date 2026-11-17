@@ -49,7 +49,10 @@ export function isWebsiteRoute(pathname: string): boolean {
   return (
     pathname === '/' ||
     /^\/(explore|wanted|guide|agents|privacy|terms|cookies|pricing|compare)$/.test(pathname) ||
-    /^\/(property|agent|user)\/[^/]+$/.test(pathname)
+    /^\/(property|agent|user)\/[^/]+$/.test(pathname) ||
+    /^\/agent-dashboard$/.test(pathname) ||
+    // Messages is two panes on a desktop (the list beside the open chat).
+    /^\/messages(\/[^/]+)?$/.test(pathname)
   );
 }
 

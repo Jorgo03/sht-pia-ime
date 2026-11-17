@@ -15,6 +15,7 @@ import { useTheme } from '@/contexts/theme-context';
 import { PAGE_SIZE } from '@/data/properties';
 import { useAgentDirectoryQuery } from '@/hooks/use-property-queries';
 import { useReadableColumn } from '@/hooks/use-responsive';
+import { useIsDesktopWeb } from '@/hooks/use-app-dimensions';
 import { filterAgents, type AgentEntry } from '@/src/features/properties/lib/discovery';
 
 const Row = memo(function Row({ agent, onPress, styles, chevron }: {
@@ -43,7 +44,11 @@ export default function AgentsScreen() {
   const { t } = useTranslation();
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
-  const readable = useReadableColumn();
+  const readableColumn = useReadableColumn();
+  // Desktop website: a grid of agencies across the page (website audit).
+  const desktop = useIsDesktopWeb();
+  const readable = desktop ? null : readableColumn;
+  const columns = desktop ? 3 : 1;
   const insets = useSafeAreaInsets();
   const { data: agents = [], isLoading, isError, refetch } = useAgentDirectoryQuery();
   const [query, setQuery] = useState('');
@@ -75,6 +80,9 @@ export default function AgentsScreen() {
           </View>
         ) : (
           <FlatList
+            key={`cols-${columns}`}
+            numColumns={columns}
+            columnWrapperStyle={columns > 1 ? styles.gridRow : undefined}
             data={shown}
             keyExtractor={(a) => a.id}
             contentContainerStyle={[styles.list, { paddingBottom: 24 + insets.bottom }]}
@@ -104,7 +112,11 @@ export default function AgentsScreen() {
                 <ActionButton variant="secondary" title={t('agents.loadMore')} onPress={() => setVisible((v) => v + PAGE_SIZE)} />
               ) : undefined
             }
-            renderItem={({ item }) => <Row agent={item} onPress={openAgent} styles={styles} chevron={colors.textSecondary} />}
+            renderItem={({ item }) => (
+              <View style={columns > 1 ? styles.gridCell : undefined}>
+                <Row agent={item} onPress={openAgent} styles={styles} chevron={colors.textSecondary} />
+              </View>
+            )}
           />
         )}
       </SafeAreaView>
@@ -116,6 +128,8 @@ const createStyles = (colors: AtticoPalette) =>
   StyleSheet.create({
     container: { flex: 1 },
     list: { paddingHorizontal: 20, gap: 10 },
+    gridRow: { gap: 12 },
+    gridCell: { flex: 1, maxWidth: '33.333%' },
     skeleton: { height: 88, borderRadius: 18, backgroundColor: colors.glass },
     center: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12, padding: 32 },
     centerText: { fontSize: 16, fontFamily: Fonts.sansSemiBold, color: colors.textPrimary, textAlign: 'center' },

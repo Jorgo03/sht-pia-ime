@@ -1,3 +1,4 @@
+import { SignInPrompt } from '@/components/ui/sign-in-prompt';
 import { LoadError } from '@/components/ui/load-error';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useQueryClient } from '@tanstack/react-query';
@@ -40,7 +41,7 @@ function statusColor(colors: AtticoPalette, status: string): string {
 export default function MyListingsScreen() {
   const router = useRouter();
   const { t, i18n } = useTranslation();
-  const { user, isAgent } = useAuth();
+  const { user, isAgent, loading: authLoading } = useAuth();
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
   // A centred column on an unfolded Fold or a spanned Duo (hooks/use-responsive).
@@ -133,6 +134,8 @@ export default function MyListingsScreen() {
       },
     });
 
+  // Signed out: ask to sign in, not an empty "nothing yet" screen (website audit).
+  if (!user) return authLoading ? null : <SignInPrompt />;
   return (
     <GradientBackground>
       <SafeAreaView style={[styles.container, readable]} edges={['top']}>

@@ -305,7 +305,8 @@
     "unavailable": "Dieses Gespräch ist nicht verfügbar",
     "loadFailed": "Diese Unterhaltung konnte nicht geladen werden.",
     "attachFailed": "Die Datei wurde nicht gesendet. Versuche es erneut.",
-    "openAttachment": "{{name}} öffnen"
+    "openAttachment": "{{name}} öffnen",
+    "selectConversation": "Wähle links eine Unterhaltung aus."
   },
   "notFound": {
     "title": "Seite nicht gefunden",

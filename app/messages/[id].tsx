@@ -1,6 +1,8 @@
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter, type Href } from 'expo-router';
+import { MessagesTwoPane } from '@/app/(tabs)/messages';
+import { useIsDesktopWeb } from '@/hooks/use-app-dimensions';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
@@ -63,7 +65,7 @@ interface ConversationInfo {
   property_id: string | null;
 }
 
-export default function ThreadScreen() {
+function ThreadScreen({ embedded = false }: { embedded?: boolean } = {}) {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const { t, i18n } = useTranslation();
@@ -71,7 +73,8 @@ export default function ThreadScreen() {
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
   // A centred column on an unfolded Fold or a spanned Duo (hooks/use-responsive).
-  const readable = useReadableColumn();
+  const readableColumn = useReadableColumn();
+  const readable = embedded ? null : readableColumn;
   // The composer pads itself clear of the home indicator / Android nav bar
   // (SafeAreaView edges below); the KAV offset takes that inset back off so
   // the row still sits flush on the iOS keyboard.
@@ -722,3 +725,18 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     color: colors.textPrimary,
   },
 });
+
+/**
+ * A conversation. Desktop website (website audit): beside the conversation
+ * list, as one two-pane Messages page; elsewhere the chat alone.
+ */
+export default function ThreadRoute() {
+  const desktop = useIsDesktopWeb();
+  const { id } = useLocalSearchParams<{ id: string }>();
+  if (!desktop) return <ThreadScreen />;
+  return (
+    <MessagesTwoPane activeId={id}>
+      <ThreadScreen key={id} embedded />
+    </MessagesTwoPane>
+  );
+}

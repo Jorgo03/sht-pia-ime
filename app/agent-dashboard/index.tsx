@@ -17,6 +17,7 @@ import { supabase } from '@/lib/supabase';
 import { formatViewingClock, tiranaDayStart } from '@/src/lib/tiranaTime';
 import { formatDate, formatPrice, getLocalizedText } from '@/lib/format';
 import { useReadableColumn } from '@/hooks/use-responsive';
+import { useAppDimensions, useIsDesktopWeb } from '@/hooks/use-app-dimensions';
 import { wantedMatches } from '@/src/features/leads/lib/leads';
 
 interface Stats {
@@ -70,7 +71,11 @@ export default function AgentDashboardScreen() {
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
   // A centred column on an unfolded Fold or a spanned Duo (hooks/use-responsive).
-  const readable = useReadableColumn();
+  const readableColumn = useReadableColumn();
+  // Desktop website: a wide dashboard (website audit), stats in one row.
+  const desktop = useIsDesktopWeb();
+  const { width: pageWidth } = useAppDimensions();
+  const readable = desktop ? { paddingHorizontal: Math.max(24, (pageWidth - 1080) / 2) } : readableColumn;
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [stats, setStats] = useState<Stats>({ listings: 0, views: 0, conversations: 0, leads: 0 });
@@ -218,7 +223,7 @@ export default function AgentDashboardScreen() {
                 <TouchableOpacity
                   accessibilityRole="button"
                   key={card.label}
-                  style={styles.statCard}
+                  style={[styles.statCard, desktop && styles.statCardWide]}
                   disabled={!card.to}
                   // Messages is a tab under this screen: go down to it, not a second copy on top.
                   onPress={() => card.to && (card.to === '/messages' ? router.dismissTo(card.to) : router.push(card.to))}
@@ -468,6 +473,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     flexWrap: 'wrap',
     gap: 10,
   },
+  statCardWide: { flexBasis: '22%' },
   statCard: {
     flexGrow: 1,
     flexBasis: '45%',
