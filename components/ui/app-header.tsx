@@ -197,7 +197,7 @@ export function AppHeader({
         </>
       )}
 
-      <View style={styles.leading} onLayout={track('lead')}>
+      <View style={[styles.leading, site && { flexShrink: 0 }]} onLayout={track('lead')}>
         {onBack && (
           <Pressable
             style={styles.backBtn}

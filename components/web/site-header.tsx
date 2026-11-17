@@ -24,7 +24,7 @@ export const SITE_LINKS: { href: string; key: string }[] = [
 ];
 
 /** Below this browser width the links fold into a menu button. */
-const FULL_MENU_MIN_WIDTH = 980;
+const FULL_MENU_MIN_WIDTH = 1140;
 
 /**
  * The website's header (DECISIONS.md W5): a classic site header across the

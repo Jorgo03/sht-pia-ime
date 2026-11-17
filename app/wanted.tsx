@@ -42,6 +42,7 @@ export default function WantedBoardScreen() {
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const readable = useReadableColumn();
+  const listCol = { gap: 10, paddingHorizontal: 20 + (readable?.paddingHorizontal ?? 0) };
   const insets = useSafeAreaInsets();
   const { user, isAgent, loading: authLoading } = useAuth();
 
@@ -77,17 +78,25 @@ export default function WantedBoardScreen() {
 
   return (
     <GradientBackground>
-      <SafeAreaView style={[styles.container, readable]} edges={['top']}>
-        <AppHeader onBack={back} />
-        <ScreenHero pre={t('wanted.boardPre')} em={t('wanted.boardEm')} />
+      {/* The column is only for the content: the site footer below is drawn
+          the full width of the page (inside the column it was cramped). */}
+      <SafeAreaView style={styles.container} edges={['top']}>
+        <View style={readable}>
+          <AppHeader onBack={back} />
+          <ScreenHero pre={t('wanted.boardPre')} em={t('wanted.boardEm')} />
+        </View>
         {authLoading || (isAgent && board.isLoading) ? (
-          <View style={styles.list}>
+          <View style={listCol}>
             {[0, 1, 2, 3].map((i) => <View key={i} style={styles.skeleton} />)}
           </View>
         ) : !isAgent ? (
-          <ScrollView contentContainerStyle={[styles.list, { paddingBottom: 24 + insets.bottom }]}>
-            {explainer}
-            <Steps styles={styles} />
+          <ScrollView contentContainerStyle={{ paddingBottom: 24 + insets.bottom }}>
+            <View style={readable}>
+              <View style={styles.list}>
+                {explainer}
+                <Steps styles={styles} />
+              </View>
+            </View>
             <SiteFooter />
           </ScrollView>
         ) : board.isError ? (
@@ -99,9 +108,9 @@ export default function WantedBoardScreen() {
           <FlatList
             data={rows}
             keyExtractor={(r) => r.id}
-            contentContainerStyle={[styles.list, { paddingBottom: 24 + insets.bottom }]}
+            contentContainerStyle={{ gap: 10, paddingBottom: 24 + insets.bottom }}
             showsVerticalScrollIndicator={false}
-            ListHeaderComponent={explainer}
+            ListHeaderComponent={<View style={listCol}>{explainer}</View>}
             ListEmptyComponent={
               <View style={styles.center}>
                 <MaterialIcons name="person-search" size={40} color={colors.textSecondary} />
@@ -111,17 +120,21 @@ export default function WantedBoardScreen() {
             ListFooterComponent={
               <>
                 {board.hasNextPage ? (
-                  <ActionButton
-                    variant="secondary"
-                    title={board.isFetchingNextPage ? t('common.loading') : t('agents.loadMore')}
-                    onPress={() => void board.fetchNextPage()}
-                  />
+                  <View style={listCol}>
+                    <ActionButton
+                      variant="secondary"
+                      title={board.isFetchingNextPage ? t('common.loading') : t('agents.loadMore')}
+                      onPress={() => void board.fetchNextPage()}
+                    />
+                  </View>
                 ) : null}
                 <SiteFooter />
               </>
             }
             renderItem={({ item }) => (
-              <WantedCard row={item} lang={i18n.language} styles={styles} iconColor={colors.textSecondary} />
+              <View style={listCol}>
+                <WantedCard row={item} lang={i18n.language} styles={styles} iconColor={colors.textSecondary} />
+              </View>
             )}
           />
         )}
