@@ -111,7 +111,7 @@ export const terms = {
   sections: [
     {
       h: '1. Kush jemi',
-      p: ['Shtëpia.ime operohet nga Future Home Orange ("FHO", "ne"), shoqëri e regjistruar në Republikën e Shqipërisë.'],
+      p: ['Shtëpia.ime është krijuar dhe operohet nga Jorgji Dhaskali ("ne").'],
     },
     {
       h: '2. Çfarë është Shtëpia.ime',
@@ -142,7 +142,7 @@ export const terms = {
     {
       h: '5. Përmbajtja juaj',
       p: [
-        'Përmbajtja që ngarkoni mbetet e juaja. I jepni FHO-së një licencë jo-ekskluzive dhe pa pagesë për ta ruajtur, shfaqur, përshtatur në madhësi dhe përkthyer, me qëllim ofrimin dhe promovimin e shërbimit, për aq kohë sa ajo ndodhet në Shtëpia.ime.',
+        'Përmbajtja që ngarkoni mbetet e juaja. Na jepni një licencë jo-ekskluzive dhe pa pagesë për ta ruajtur, shfaqur, përshtatur në madhësi dhe përkthyer, me qëllim ofrimin dhe promovimin e shërbimit, për aq kohë sa ajo ndodhet në Shtëpia.ime.',
       ],
     },
     {
@@ -174,7 +174,7 @@ export const terms = {
     {
       h: '10. Përgjegjësia',
       p: [
-        'Shpalljet publikohen nga përdoruesit dhe ne nuk garantojmë që janë të sakta, të disponueshme ose të ligjshme. Shërbimi ofrohet "siç është". Për aq sa e lejon ligji, FHO nuk mban përgjegjësi për humbje që vijnë nga shpalljet, nga marrëdhëniet mes përdoruesve ose nga mosfunksionimi i shërbimit. Asgjë në këto kushte nuk kufizon të drejtat që keni si konsumator sipas ligjit.',
+        'Shpalljet publikohen nga përdoruesit dhe ne nuk garantojmë që janë të sakta, të disponueshme ose të ligjshme. Shërbimi ofrohet "siç është". Për aq sa e lejon ligji, ne nuk mbajmë përgjegjësi për humbje që vijnë nga shpalljet, nga marrëdhëniet mes përdoruesve ose nga mosfunksionimi i shërbimit. Asgjë në këto kushte nuk kufizon të drejtat që keni si konsumator sipas ligjit.',
       ],
     },
     {

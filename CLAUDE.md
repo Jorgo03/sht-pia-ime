@@ -10,7 +10,7 @@ Act as technical co-founder and principal engineer, not a code-completion tool. 
 
 ## Product
 
-Shtëpia.ime ("My Home") is a multilingual real estate marketplace built by **Future Home Orange (FHO)**, Albanian-first, connecting buyers/renters, agents, and agencies across Albania — genuinely usable by diaspora (Italy, Germany, etc.) and foreign investors in their own language.
+Shtëpia.ime ("My Home") is a multilingual real estate marketplace built and operated by **Jorgji Dhaskali** (the `fho` prefix in code, e.g. `--fho-*` tokens and `fho_*` storage keys, is a historical name: keep it, renaming would wipe users' saved settings), Albanian-first, connecting buyers/renters, agents, and agencies across Albania — genuinely usable by diaspora (Italy, Germany, etc.) and foreign investors in their own language.
 
 **Design/product bar** — study these, don't clone them:
 
