@@ -1,3 +1,5 @@
+import { SignInPrompt } from '@/components/ui/sign-in-prompt';
+import { LoadError } from '@/components/ui/load-error';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useRouter, type Href } from 'expo-router';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -6,14 +8,17 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 
 import { AppHeader } from '@/components/ui/app-header';
+import { ScreenHero } from '@/components/ui/screen-hero';
 import { GradientBackground } from '@/components/ui/gradient-background';
 import { type AtticoPalette, Fonts } from '@/constants/theme';
 import { useAuth } from '@/contexts/auth-context';
 import { useTheme } from '@/contexts/theme-context';
 import { supabase } from '@/lib/supabase';
-import { formatDate, getLocalizedText } from '@/lib/format';
+import { getLocalizedText } from '@/lib/format';
+import { deviceUsesTiranaTime, formatViewingWhen } from '@/src/lib/tiranaTime';
+import { useReadableColumn } from '@/hooks/use-responsive';
 
-type ViewingStatus = 'requested' | 'confirmed' | 'declined' | 'cancelled';
+type ViewingStatus = 'requested' | 'confirmed' | 'declined' | 'cancelled' | 'completed' | 'no_show';
 
 interface ViewingProperty {
   id: string;
@@ -49,25 +54,34 @@ function statusColor(colors: AtticoPalette, status: ViewingStatus): string {
     confirmed: colors.statusActive,
     declined: colors.statusSold,
     cancelled: colors.statusDraft,
+    completed: colors.statusActive,
+    no_show: colors.statusSold,
   };
   return map[status] ?? colors.statusDraft;
 }
 
-function formatWhen(iso: string, lang: string) {
-  const time = new Intl.DateTimeFormat(lang, { hour: '2-digit', minute: '2-digit' }).format(new Date(iso));
-  return `${formatDate(iso, lang)} · ${time}`;
+/** Tirana time, labelled when this device is in another zone (AUDIT-005). */
+function formatWhen(iso: string, tiranaLabel: string) {
+  const when = formatViewingWhen(iso);
+  return deviceUsesTiranaTime(new Date(iso)) ? when : `${when} (${tiranaLabel})`;
 }
 
 export default function ViewingsScreen() {
   const router = useRouter();
   const { t, i18n } = useTranslation();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
+  // A centred column on an unfolded Fold or a spanned Duo (hooks/use-responsive).
+  const readable = useReadableColumn();
   const [viewings, setViewings] = useState<Viewing[]>([]);
   const [profiles, setProfiles] = useState<Record<string, ClientProfile>>({});
   const [loading, setLoading] = useState(true);
+  // A failed read: shown with a retry rather than as an empty list.
+  const [loadError, setLoadError] = useState(false);
   const [actionError, setActionError] = useState(false);
+  // When the list was loaded: which confirmed viewings are already past.
+  const [loadedAt, setLoadedAt] = useState(() => Date.now());
 
   // Mirrors the web app's Viewings.jsx load() — RLS already scopes rows to
   // where the user is the client, the agent, or the property owner.
@@ -77,11 +91,22 @@ export default function ViewingsScreen() {
       setLoading(false);
       return;
     }
-    const { data } = await supabase
+    setLoadError(false);
+    const { data, error } = await supabase
       .from('viewings')
       .select('*, property:properties(id, title, title_i18n, city, owner_id, agent_id)')
-      .order('scheduled_at', { ascending: true });
+      // Bounded (no unbounded reads): the past year and everything ahead,
+      // at most 500 rows — far more than any one person's viewings.
+      .gte('scheduled_at', new Date(Date.now() - 365 * 24 * 60 * 60 * 1000).toISOString())
+      .order('scheduled_at', { ascending: true })
+      .limit(500);
+    if (error) {
+      setLoadError(true);
+      setLoading(false);
+      return;
+    }
     const rows = (data ?? []) as Viewing[];
+    setLoadedAt(Date.now());
     setViewings(rows);
 
     const clientIds = [...new Set(rows.filter((v) => v.client_id !== user.id).map((v) => v.client_id))];
@@ -118,6 +143,7 @@ export default function ViewingsScreen() {
       <View key={v.id} style={styles.card}>
         <View style={styles.cardHead}>
           <TouchableOpacity
+            accessibilityRole="button"
             disabled={!v.property}
             onPress={() => v.property && router.push(`/property/${v.property.id}` as Href)}
             style={styles.cardTitleWrap}>
@@ -130,7 +156,7 @@ export default function ViewingsScreen() {
 
         <View style={styles.cardMetaRow}>
           <MaterialIcons name="calendar-today" size={13} color={colors.textSecondary} />
-          <Text style={styles.cardMetaText}>{formatWhen(v.scheduled_at, i18n.language)}</Text>
+          <Text style={styles.cardMetaText}>{formatWhen(v.scheduled_at, t('viewings.tiranaTime'))}</Text>
           {v.property?.city ? (
             <>
               <MaterialIcons name="location-on" size={13} color={colors.textSecondary} style={{ marginLeft: 8 }} />
@@ -150,18 +176,33 @@ export default function ViewingsScreen() {
         <View style={styles.cardActions}>
           {isIncoming && v.status === 'requested' && (
             <>
-              <TouchableOpacity style={styles.actionButton} onPress={() => setStatus(v.id, 'confirmed')} activeOpacity={0.7}>
+              <TouchableOpacity accessibilityRole="button" style={styles.actionButton} onPress={() => setStatus(v.id, 'confirmed')} activeOpacity={0.7}>
                 <MaterialIcons name="check" size={14} color={colors.textPrimary} />
                 <Text style={styles.actionButtonText}>{t('viewings.confirm')}</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.actionButton} onPress={() => setStatus(v.id, 'declined')} activeOpacity={0.7}>
+              <TouchableOpacity accessibilityRole="button" style={styles.actionButton} onPress={() => setStatus(v.id, 'declined')} activeOpacity={0.7}>
                 <MaterialIcons name="close" size={14} color={colors.textPrimary} />
                 <Text style={styles.actionButtonText}>{t('viewings.decline')}</Text>
               </TouchableOpacity>
             </>
           )}
+          {/* Once a confirmed viewing's time has passed, its agent records
+              whether it happened: the report counts only completed ones, and
+              the database refuses this earlier or from anyone else. */}
+          {isIncoming && v.status === 'confirmed' && new Date(v.scheduled_at).getTime() <= loadedAt && (
+            <>
+              <TouchableOpacity accessibilityRole="button" style={styles.actionButton} onPress={() => setStatus(v.id, 'completed')} activeOpacity={0.7}>
+                <MaterialIcons name="done-all" size={14} color={colors.textPrimary} />
+                <Text style={styles.actionButtonText}>{t('viewings.markCompleted')}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity accessibilityRole="button" style={styles.actionButton} onPress={() => setStatus(v.id, 'no_show')} activeOpacity={0.7}>
+                <MaterialIcons name="person-off" size={14} color={colors.textPrimary} />
+                <Text style={styles.actionButtonText}>{t('viewings.markNoShow')}</Text>
+              </TouchableOpacity>
+            </>
+          )}
           {!isIncoming && (v.status === 'requested' || v.status === 'confirmed') && (
-            <TouchableOpacity style={styles.actionButton} onPress={() => setStatus(v.id, 'cancelled')} activeOpacity={0.7}>
+            <TouchableOpacity accessibilityRole="button" style={styles.actionButton} onPress={() => setStatus(v.id, 'cancelled')} activeOpacity={0.7}>
               <MaterialIcons name="close" size={14} color={colors.textPrimary} />
               <Text style={styles.actionButtonText}>{t('viewings.cancel')}</Text>
             </TouchableOpacity>
@@ -171,21 +212,18 @@ export default function ViewingsScreen() {
     );
   };
 
+  // Signed out: ask to sign in, not an empty "nothing yet" screen (website audit).
+  if (!user) return authLoading ? null : <SignInPrompt />;
   return (
     <GradientBackground>
-      <SafeAreaView style={styles.container} edges={['top']}>
+      <SafeAreaView style={[styles.container, readable]} edges={['top']}>
         <AppHeader onBack={() => router.back()} />
 
         {/* Matches web's Viewings.jsx screen-kicker/screen-headline hero. */}
-        <View style={styles.heroBlock}>
-          <View style={styles.kickerRow}>
-            <View style={styles.kickerDash} />
-            <Text style={styles.kicker}>{t('viewings.kicker')}</Text>
-          </View>
-          <Text style={styles.headline}>
-            {t('viewings.headlinePre')} <Text style={styles.headlineEm}>{t('viewings.headlineEm')}</Text>
-          </Text>
-        </View>
+        <ScreenHero
+          pre={t('viewings.headlinePre')}
+          em={t('viewings.headlineEm')}
+        />
 
         {actionError && <Text style={styles.errorBanner}>{t('errors.updateFailed')}</Text>}
 
@@ -193,6 +231,13 @@ export default function ViewingsScreen() {
           <View style={styles.center}>
             <ActivityIndicator size="large" color={colors.accent} />
           </View>
+        ) : loadError ? (
+          <LoadError
+            onRetry={() => {
+              setLoading(true);
+              load();
+            }}
+          />
         ) : viewings.length === 0 ? (
           <View style={styles.center}>
             <View style={styles.emptyIcon}>
@@ -226,41 +271,6 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   container: {
     flex: 1,
   },
-  // Matches web's .screen-kicker / .screen-headline exactly.
-  heroBlock: {
-    paddingHorizontal: 20,
-    paddingTop: 16,
-    paddingBottom: 4,
-  },
-  kickerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    marginBottom: 6,
-  },
-  kickerDash: {
-    width: 14,
-    height: 1,
-    backgroundColor: colors.accent,
-  },
-  kicker: {
-    fontFamily: Fonts?.mono,
-    fontSize: 11,
-    letterSpacing: 1.5,
-    textTransform: 'uppercase',
-    color: colors.textSecondary,
-    fontWeight: '600',
-  },
-  headline: {
-    fontFamily: Fonts?.serif,
-    fontSize: 28,
-    fontWeight: '500',
-    color: colors.textPrimary,
-  },
-  headlineEm: {
-    fontStyle: 'italic',
-    color: colors.accent,
-  },
   center: {
     flex: 1,
     justifyContent: 'center',
@@ -281,17 +291,19 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   subtitle: {
     fontSize: 17,
-    fontWeight: '600',
+    fontFamily: Fonts.sansSemiBold,
     color: colors.textPrimary,
     textAlign: 'center',
   },
   description: {
+    fontFamily: Fonts.sans,
     fontSize: 14,
     color: colors.textSecondary,
     textAlign: 'center',
   },
   errorBanner: {
     textAlign: 'center',
+    fontFamily: Fonts.sans,
     fontSize: 12,
     color: colors.error,
     paddingVertical: 4,
@@ -308,7 +320,6 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   sectionTitle: {
     fontFamily: Fonts?.serif,
     fontSize: 18,
-    fontWeight: '500',
     color: colors.textPrimary,
   },
   card: {
@@ -330,7 +341,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   cardTitle: {
     fontSize: 14,
-    fontWeight: '600',
+    fontFamily: Fonts.sansSemiBold,
     color: colors.textPrimary,
   },
   statusPill: {
@@ -339,8 +350,8 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     paddingVertical: 3,
   },
   statusPillText: {
-    fontSize: 10,
-    fontWeight: '700',
+    fontSize: 12,
+    fontFamily: Fonts.sansBold,
   },
   cardMetaRow: {
     flexDirection: 'row',
@@ -348,14 +359,17 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     gap: 4,
   },
   cardMetaText: {
+    fontFamily: Fonts.sans,
     fontSize: 13,
     color: colors.textSecondary,
   },
   cardFrom: {
+    fontFamily: Fonts.sans,
     fontSize: 13,
     color: colors.textPrimary,
   },
   cardNotes: {
+    fontFamily: Fonts.sans,
     fontSize: 13,
     color: colors.textSecondary,
   },
@@ -377,7 +391,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   actionButtonText: {
     fontSize: 12,
-    fontWeight: '600',
+    fontFamily: Fonts.sansSemiBold,
     color: colors.textPrimary,
   },
 });

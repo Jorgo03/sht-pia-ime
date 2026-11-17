@@ -1,12 +1,14 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { Property } from '@/data/types';
 import { translatePropertyContent, type LangCode } from '@/lib/translate';
 
 const cache: Record<string, { title: string; description: string }> = {};
 
-function cacheKey(propertyId: string, lang: string): string {
-  return `${propertyId}:${lang}`;
+// Keyed by the source text too, so an agent's edit is translated afresh
+// instead of showing the old title's translation for the rest of the session.
+function cacheKey(propertyId: string, lang: string, title: string, description: string): string {
+  return `${propertyId}:${lang}:${title}\u0000${description}`;
 }
 
 interface TranslatedProperty {
@@ -33,31 +35,26 @@ export function useTranslatedProperty(
   const [description, setDescription] = useState('');
   const [translating, setTranslating] = useState(false);
   const [isTranslated, setIsTranslated] = useState(false);
-  const activeRef = useRef(true);
+
+  const id = property?.id;
+  const origTitle = property?.title || '';
+  const origDesc = property?.description || '';
+  const storedTitle = property?.title_i18n?.[language];
+  const storedDesc = property?.description_i18n?.[language];
 
   useEffect(() => {
-    activeRef.current = true;
-    return () => {
-      activeRef.current = false;
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!property) return;
-
-    const origTitle = property.title || '';
-    const origDesc = property.description || '';
+    if (!id) return;
+    // A reply for an older listing or language must not overwrite this one.
+    let current = true;
 
     if (language === 'sq') {
-      setTitle(property.title_i18n?.sq || origTitle);
-      setDescription(property.description_i18n?.sq || origDesc);
+      setTitle(storedTitle || origTitle);
+      setDescription(storedDesc || origDesc);
       setIsTranslated(false);
       setTranslating(false);
       return;
     }
 
-    const storedTitle = property.title_i18n?.[language];
-    const storedDesc = property.description_i18n?.[language];
     if ((storedTitle || !origTitle) && (storedDesc || !origDesc)) {
       setTitle(storedTitle || origTitle);
       setDescription(storedDesc || origDesc);
@@ -66,7 +63,7 @@ export function useTranslatedProperty(
       return;
     }
 
-    const key = cacheKey(property.id, language);
+    const key = cacheKey(id, language, origTitle, origDesc);
     const cached = cache[key];
     if (cached) {
       setTitle(cached.title);
@@ -95,12 +92,13 @@ export function useTranslatedProperty(
       targetLanguage: language as LangCode,
     })
       .then((result) => {
-        if (!activeRef.current) return;
-
         const translatedTitle = origTitle ? result.title || origTitle : '';
         const translatedDesc = origDesc ? result.description || origDesc : '';
 
+        // Still a correct translation of its own text, so keep it even if
+        // the screen has moved on.
         cache[key] = { title: translatedTitle, description: translatedDesc };
+        if (!current) return;
         setTitle(translatedTitle);
         setDescription(translatedDesc);
         setIsTranslated(true);
@@ -109,10 +107,13 @@ export function useTranslatedProperty(
       .catch(() => {
         // The original text is already on screen from the setState above, so a
         // failure degrades to untranslated rather than to an empty card.
-        if (!activeRef.current) return;
+        if (!current) return;
         setTranslating(false);
       });
-  }, [property?.id, language]);
+    return () => {
+      current = false;
+    };
+  }, [id, language, origTitle, origDesc, storedTitle, storedDesc]);
 
   return { title, description, translating, isTranslated };
 }

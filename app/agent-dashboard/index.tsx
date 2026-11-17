@@ -6,12 +6,19 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 
 import { AppHeader } from '@/components/ui/app-header';
+import { ScreenHero } from '@/components/ui/screen-hero';
 import { GradientBackground } from '@/components/ui/gradient-background';
-import { type AtticoPalette, Fonts } from '@/constants/theme';
+import { SignInPrompt } from '@/components/ui/sign-in-prompt';
+import { AgentsOnly } from '@/components/ui/agents-only';
+import { type AtticoPalette, Fonts, InlineTarget } from '@/constants/theme';
 import { useAuth } from '@/contexts/auth-context';
 import { useTheme } from '@/contexts/theme-context';
 import { supabase } from '@/lib/supabase';
+import { formatViewingClock, tiranaDayStart } from '@/src/lib/tiranaTime';
 import { formatDate, formatPrice, getLocalizedText } from '@/lib/format';
+import { useReadableColumn } from '@/hooks/use-responsive';
+import { useAppDimensions, useIsDesktopWeb } from '@/hooks/use-app-dimensions';
+import { wantedMatches } from '@/src/features/leads/lib/leads';
 
 interface Stats {
   listings: number;
@@ -24,6 +31,7 @@ interface PendingViewing {
   id: string;
   client_id: string;
   scheduled_at: string;
+  status?: string;
   property: { id: string; title: string; title_i18n: Record<string, string> | null; city: string | null } | null;
 }
 
@@ -38,6 +46,19 @@ interface WantedHome {
   created_at: string;
 }
 
+/** One of the agent's own listings, enough to match buyer requests against it. */
+interface OwnListing {
+  id: string;
+  status: string;
+  title: string;
+  title_i18n: Record<string, string> | null;
+  city: string | null;
+  listing_type: string | null;
+  price: number | null;
+  currency: string | null;
+  beds: number | null;
+}
+
 interface ClientProfile {
   full_name: string | null;
   phone: string | null;
@@ -46,14 +67,23 @@ interface ClientProfile {
 export default function AgentDashboardScreen() {
   const router = useRouter();
   const { t, i18n } = useTranslation();
-  const { user } = useAuth();
+  const { user, profile, isAgent, loading: authLoading } = useAuth();
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
+  // A centred column on an unfolded Fold or a spanned Duo (hooks/use-responsive).
+  const readableColumn = useReadableColumn();
+  // Desktop website: a wide dashboard (website audit), stats in one row.
+  const desktop = useIsDesktopWeb();
+  const { width: pageWidth } = useAppDimensions();
+  const readable = desktop ? { paddingHorizontal: Math.max(24, (pageWidth - 1080) / 2) } : readableColumn;
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [stats, setStats] = useState<Stats>({ listings: 0, views: 0, conversations: 0, leads: 0 });
   const [pendingViewings, setPendingViewings] = useState<PendingViewing[]>([]);
   const [wantedFeed, setWantedFeed] = useState<WantedHome[]>([]);
+  const [todayViewings, setTodayViewings] = useState<PendingViewing[]>([]);
+  const [ownListings, setOwnListings] = useState<OwnListing[]>([]);
+  const [openMatches, setOpenMatches] = useState<string | null>(null);
   const [clientProfiles, setClientProfiles] = useState<Record<string, ClientProfile>>({});
   const [actionError, setActionError] = useState(false);
 
@@ -68,21 +98,38 @@ export default function AgentDashboardScreen() {
       const since = new Date();
       since.setDate(since.getDate() - 30);
 
-      const { data: myProps } = await supabase
+      // Supabase returns errors instead of throwing: each read is checked so
+      // a failure shows the retry state, not a dashboard of zeros.
+      const { data: myProps, error: propsError } = await supabase
         .from('properties')
-        .select('id, status')
+        .select('id, status, title, title_i18n, city, listing_type, price, currency, beds')
         .or(`owner_id.eq.${user.id},agent_id.eq.${user.id}`);
+      if (propsError) throw propsError;
       const propIds = (myProps ?? []).map((p) => p.id);
+      // Views in batches of ids: one `in` list of thousands of ids would
+      // overflow the request URL for a large agency.
+      const viewCount = async () => {
+        let total = 0;
+        for (let i = 0; i < propIds.length; i += 150) {
+          const { count, error: e } = await supabase
+            .from('property_activity')
+            .select('id', { count: 'exact', head: true })
+            .in('property_id', propIds.slice(i, i + 150))
+            .eq('type', 'view')
+            .gte('created_at', since.toISOString());
+          if (e) throw e;
+          total += count ?? 0;
+        }
+        return { count: total, error: null };
+      };
 
-      const [viewsRes, convRes, leadsRes, viewingsRes, wantedRes] = await Promise.all([
-        propIds.length
-          ? supabase
-              .from('property_activity')
-              .select('id', { count: 'exact', head: true })
-              .in('property_id', propIds)
-              .eq('type', 'view')
-              .gte('created_at', since.toISOString())
-          : Promise.resolve({ count: 0 }),
+      // Today in Tirana, where the viewings happen (AUDIT-005). The next
+      // day's midnight, not +24h, so the DST change days stay whole.
+      const dayStart = tiranaDayStart();
+      const dayEnd = tiranaDayStart(new Date(dayStart.getTime() + 36 * 60 * 60 * 1000));
+
+      const [viewsRes, convRes, leadsRes, viewingsRes, wantedRes, todayRes] = await Promise.all([
+        viewCount(),
         supabase.from('conversations').select('id', { count: 'exact', head: true }).eq('agent_id', user.id),
         supabase.from('leads').select('id', { count: 'exact', head: true }).eq('agent_id', user.id),
         supabase
@@ -93,7 +140,18 @@ export default function AgentDashboardScreen() {
           .order('scheduled_at', { ascending: true })
           .limit(10),
         supabase.from('wanted_homes').select('*').eq('status', 'open').order('created_at', { ascending: false }).limit(10),
+        supabase
+          .from('viewings')
+          .select('id, client_id, scheduled_at, status, property:properties(id, title, title_i18n, city)')
+          .in('status', ['requested', 'confirmed'])
+          .neq('client_id', user.id)
+          .gte('scheduled_at', dayStart.toISOString())
+          .lt('scheduled_at', dayEnd.toISOString())
+          .order('scheduled_at', { ascending: true })
+          .limit(20),
       ]);
+      const failed = [convRes, leadsRes, viewingsRes, wantedRes, todayRes].find((r) => r.error);
+      if (failed?.error) throw failed.error;
 
       setStats({
         listings: (myProps ?? []).filter((p) => p.status === 'active').length,
@@ -101,14 +159,18 @@ export default function AgentDashboardScreen() {
         conversations: convRes.count ?? 0,
         leads: leadsRes.count ?? 0,
       });
+      setOwnListings((myProps ?? []) as OwnListing[]);
       const pv = (viewingsRes.data ?? []) as PendingViewing[];
       setPendingViewings(pv);
+      const tv = (todayRes.data ?? []) as unknown as PendingViewing[];
+      setTodayViewings(tv);
       const wf = (wantedRes.data ?? []) as WantedHome[];
       setWantedFeed(wf);
 
-      const clientIds = [...new Set([...pv.map((v) => v.client_id), ...wf.map((w) => w.client_id)])];
+      const clientIds = [...new Set([...pv, ...tv].map((v) => v.client_id).concat(wf.map((w) => w.client_id)))];
       if (clientIds.length) {
-        const { data: profs } = await supabase.from('profiles').select('id, full_name, phone').in('id', clientIds);
+        const { data: profs, error: profError } = await supabase.from('profiles').select('id, full_name, phone').in('id', clientIds);
+        if (profError) throw profError;
         setClientProfiles(Object.fromEntries((profs ?? []).map((p) => [p.id, p])));
       }
     } catch {
@@ -136,24 +198,25 @@ export default function AgentDashboardScreen() {
     { icon: 'apartment', label: t('agentDashboard.statListings'), value: stats.listings, to: '/my-listings' as Href },
     { icon: 'visibility', label: t('agentDashboard.statViews'), value: stats.views },
     { icon: 'mail-outline', label: t('agentDashboard.statConversations'), value: stats.conversations, to: '/messages' as Href },
-    { icon: 'people-outline', label: t('agentDashboard.statLeads'), value: stats.leads },
+    { icon: 'people-outline', label: t('agentDashboard.statLeads'), value: stats.leads, to: '/leads' as Href },
   ];
+
+  // Signed out (a deep link, or after signing out) the load never starts, so
+  // this used to be a spinner forever.
+  if (!user) return authLoading ? null : <SignInPrompt />;
+  // Agents only: a client is told so instead of seeing the agent tools.
+  if (profile && !isAgent) return <AgentsOnly />;
 
   return (
     <GradientBackground>
-      <SafeAreaView style={styles.container} edges={['top']}>
+      <SafeAreaView style={[styles.container, readable]} edges={['top']}>
         <AppHeader onBack={() => router.back()} />
 
         {/* Matches web's AgentDashboard.jsx screen-kicker/screen-headline hero. */}
-        <View style={styles.heroBlock}>
-          <View style={styles.kickerRow}>
-            <View style={styles.kickerDash} />
-            <Text style={styles.kicker}>{t('agentDashboard.kicker')}</Text>
-          </View>
-          <Text style={styles.headline}>
-            {t('agentDashboard.headlinePre')} <Text style={styles.headlineEm}>{t('agentDashboard.headlineEm')}</Text>
-          </Text>
-        </View>
+        <ScreenHero
+          pre={t('agentDashboard.headlinePre')}
+          em={t('agentDashboard.headlineEm')}
+        />
 
         {actionError && <Text style={styles.errorBanner}>{t('errors.updateFailed')}</Text>}
 
@@ -164,7 +227,7 @@ export default function AgentDashboardScreen() {
         ) : error ? (
           <View style={styles.center}>
             <Text style={styles.description}>{t('common.error')}</Text>
-            <TouchableOpacity style={styles.retryButton} onPress={load} activeOpacity={0.8}>
+            <TouchableOpacity accessibilityRole="button" style={styles.retryButton} onPress={load} activeOpacity={0.8}>
               <Text style={styles.retryButtonText}>{t('common.retry')}</Text>
             </TouchableOpacity>
           </View>
@@ -173,10 +236,12 @@ export default function AgentDashboardScreen() {
             <View style={styles.statGrid}>
               {statCards.map((card) => (
                 <TouchableOpacity
+                  accessibilityRole="button"
                   key={card.label}
-                  style={styles.statCard}
+                  style={[styles.statCard, desktop && styles.statCardWide]}
                   disabled={!card.to}
-                  onPress={() => card.to && router.push(card.to)}
+                  // Messages is a tab under this screen: go down to it, not a second copy on top.
+                  onPress={() => card.to && (card.to === '/messages' ? router.dismissTo(card.to) : router.push(card.to))}
                   activeOpacity={card.to ? 0.7 : 1}>
                   <MaterialIcons name={card.icon} size={20} color={colors.accent} />
                   <Text style={styles.statValue}>{card.value}</Text>
@@ -185,10 +250,61 @@ export default function AgentDashboardScreen() {
               ))}
             </View>
 
+            {/* The agent's private performance report (docs/PERFORMANCE_REPORT.md). */}
+            <TouchableOpacity
+              accessibilityRole="button"
+              style={styles.reportRow}
+              onPress={() => router.push('/performance' as Href)}
+              activeOpacity={0.7}>
+              <MaterialIcons name="insights" size={22} color={colors.accent} />
+              <View style={styles.reportText}>
+                <Text style={styles.reportTitle}>{t('performance.entry')}</Text>
+                <Text style={styles.statLabel}>{t('performance.entrySub')}</Text>
+              </View>
+              <MaterialIcons name="chevron-right" size={22} color={colors.textSecondary} />
+            </TouchableOpacity>
+
+            <View style={styles.section}>
+              <View style={styles.sectionHead}>
+                <Text style={styles.sectionTitle}>{t('agentDashboard.today')}</Text>
+                <Text style={styles.sectionSub}>{formatDate(new Date().toISOString(), i18n.language)}</Text>
+              </View>
+              {todayViewings.length === 0 ? (
+                <View style={styles.emptyCard}>
+                  <MaterialIcons name="event-available" size={20} color={colors.textSecondary} />
+                  <Text style={styles.emptyCardText}>{t('agentDashboard.todayEmpty')}</Text>
+                </View>
+              ) : (
+                todayViewings.map((v) => {
+                  const title = v.property ? getLocalizedText(v.property.title_i18n, i18n.language) || v.property.title : '';
+                  const client = clientProfiles[v.client_id];
+                  // 24-hour, as in Albania; also where the browser has no data
+                  // for the language and would fall back to "05:00 PM".
+                  const time = formatViewingClock(v.scheduled_at);
+                  return (
+                    <TouchableOpacity
+                      key={v.id}
+                      accessibilityRole="button"
+                      style={[styles.listCard, styles.agendaRow]}
+                      onPress={() => v.property && router.push(`/property/${v.property.id}` as Href)}
+                      activeOpacity={0.7}>
+                      <Text style={styles.agendaTime}>{time}</Text>
+                      <View style={styles.agendaBody}>
+                        <Text style={styles.listCardTitle} numberOfLines={1}>{title}</Text>
+                        <Text style={styles.listCardMeta} numberOfLines={1}>
+                          {[client?.full_name, t(`viewings.status.${v.status}`, v.status ?? '')].filter(Boolean).join(' · ')}
+                        </Text>
+                      </View>
+                    </TouchableOpacity>
+                  );
+                })
+              )}
+            </View>
+
             <View style={styles.section}>
               <View style={styles.sectionHead}>
                 <Text style={styles.sectionTitle}>{t('agentDashboard.pendingViewings')}</Text>
-                <TouchableOpacity onPress={() => router.push('/viewings' as Href)}>
+                <TouchableOpacity accessibilityRole="button" onPress={() => router.push('/viewings' as Href)} style={InlineTarget}>
                   <Text style={styles.sectionLink}>{t('home.seeAll')}</Text>
                 </TouchableOpacity>
               </View>
@@ -200,9 +316,7 @@ export default function AgentDashboardScreen() {
                 pendingViewings.map((v) => {
                   const title = v.property ? getLocalizedText(v.property.title_i18n, i18n.language) || v.property.title : '';
                   const client = clientProfiles[v.client_id];
-                  const time = new Intl.DateTimeFormat(i18n.language, { hour: '2-digit', minute: '2-digit' }).format(
-                    new Date(v.scheduled_at),
-                  );
+                  const time = formatViewingClock(v.scheduled_at);
                   return (
                     <View key={v.id} style={styles.listCard}>
                       <Text style={styles.listCardTitle}>{title}</Text>
@@ -215,6 +329,7 @@ export default function AgentDashboardScreen() {
                       </View>
                       <View style={styles.listCardActions}>
                         <TouchableOpacity
+                          accessibilityRole="button"
                           style={styles.actionButton}
                           onPress={() => setViewingStatus(v.id, 'confirmed')}
                           activeOpacity={0.7}>
@@ -222,6 +337,7 @@ export default function AgentDashboardScreen() {
                           <Text style={styles.actionButtonText}>{t('viewings.confirm')}</Text>
                         </TouchableOpacity>
                         <TouchableOpacity
+                          accessibilityRole="button"
                           style={styles.actionButton}
                           onPress={() => setViewingStatus(v.id, 'declined')}
                           activeOpacity={0.7}>
@@ -273,6 +389,50 @@ export default function AgentDashboardScreen() {
                         {client?.full_name ? <Text style={styles.listCardMeta}>· {client.full_name}</Text> : null}
                       </View>
                       {w.notes ? <Text style={styles.listCardMeta}>{w.notes}</Text> : null}
+                      {(() => {
+                        const matches = wantedMatches(w, ownListings);
+                        const shown = openMatches === w.id;
+                        return (
+                          <>
+                            <View style={styles.matchRow}>
+                              <MaterialIcons
+                                name={matches.length ? 'auto-awesome' : 'search-off'}
+                                size={14}
+                                color={matches.length ? colors.accentText : colors.textSecondary}
+                              />
+                              <Text style={[styles.matchText, !matches.length && styles.matchTextNone]}>
+                                {matches.length ? t('agentDashboard.matches', { count: matches.length }) : t('agentDashboard.noMatches')}
+                              </Text>
+                              {matches.length ? (
+                                <TouchableOpacity
+                                  accessibilityRole="button"
+                                  accessibilityState={{ expanded: shown }}
+                                  onPress={() => setOpenMatches(shown ? null : w.id)}
+                                  hitSlop={8}>
+                                  <Text style={styles.sectionLink}>{shown ? t('agentDashboard.hideMatches') : t('agentDashboard.showMatches')}</Text>
+                                </TouchableOpacity>
+                              ) : null}
+                            </View>
+                            {shown
+                              ? matches.slice(0, 5).map((m) => (
+                                  <TouchableOpacity
+                                    key={m.id}
+                                    accessibilityRole="link"
+                                    style={styles.matchItem}
+                                    onPress={() => router.push(`/property/${m.id}` as Href)}
+                                    activeOpacity={0.7}>
+                                    <Text style={styles.matchItemTitle} numberOfLines={1}>
+                                      {getLocalizedText(m.title_i18n, i18n.language) || m.title}
+                                    </Text>
+                                    <Text style={styles.matchItemPrice}>
+                                      {m.price != null ? formatPrice(m.price, i18n.language, m.currency ?? 'EUR') : ''}
+                                    </Text>
+                                  </TouchableOpacity>
+                                ))
+                              : null}
+                          </>
+                        );
+                      })()}
                     </View>
                   );
                 })
@@ -289,41 +449,6 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   container: {
     flex: 1,
   },
-  // Matches web's .screen-kicker / .screen-headline exactly.
-  heroBlock: {
-    paddingHorizontal: 20,
-    paddingTop: 16,
-    paddingBottom: 4,
-  },
-  kickerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    marginBottom: 6,
-  },
-  kickerDash: {
-    width: 14,
-    height: 1,
-    backgroundColor: colors.accent,
-  },
-  kicker: {
-    fontFamily: Fonts?.mono,
-    fontSize: 11,
-    letterSpacing: 1.5,
-    textTransform: 'uppercase',
-    color: colors.textSecondary,
-    fontWeight: '600',
-  },
-  headline: {
-    fontFamily: Fonts?.serif,
-    fontSize: 28,
-    fontWeight: '500',
-    color: colors.textPrimary,
-  },
-  headlineEm: {
-    fontStyle: 'italic',
-    color: colors.accent,
-  },
   center: {
     flex: 1,
     justifyContent: 'center',
@@ -331,6 +456,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     gap: 12,
   },
   description: {
+    fontFamily: Fonts.sans,
     fontSize: 14,
     color: colors.textSecondary,
   },
@@ -342,11 +468,12 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   retryButtonText: {
     fontSize: 14,
-    fontWeight: '600',
+    fontFamily: Fonts.sansSemiBold,
     color: '#fff',
   },
   errorBanner: {
     textAlign: 'center',
+    fontFamily: Fonts.sans,
     fontSize: 12,
     color: colors.error,
     paddingVertical: 4,
@@ -361,6 +488,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     flexWrap: 'wrap',
     gap: 10,
   },
+  statCardWide: { flexBasis: '22%' },
   statCard: {
     flexGrow: 1,
     flexBasis: '45%',
@@ -374,37 +502,63 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   statValue: {
     fontSize: 22,
-    fontWeight: '700',
+    fontFamily: Fonts.sansBold,
     color: colors.textPrimary,
   },
   statLabel: {
-    fontSize: 11,
+    fontFamily: Fonts.sans,
+    fontSize: 12,
     color: colors.textSecondary,
     textAlign: 'center',
+  },
+  reportRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    minHeight: 64,
+    backgroundColor: colors.primaryLight,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: colors.border,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+  },
+  reportText: {
+    flex: 1,
+    gap: 2,
+    alignItems: 'flex-start',
+  },
+  reportTitle: {
+    fontFamily: Fonts.sansSemiBold,
+    fontSize: 15,
+    color: colors.textPrimary,
   },
   section: {
     gap: 10,
   },
+  // Same wrapping rule as home's sectionHeader.
   sectionHead: {
     flexDirection: 'row',
-    alignItems: 'center',
+    flexWrap: 'wrap',
+    alignItems: 'baseline',
     justifyContent: 'space-between',
+    columnGap: 12,
+    rowGap: 2,
   },
   // Matches web's .section-title h2.
   sectionTitle: {
     fontFamily: Fonts?.serif,
     fontSize: 18,
-    fontWeight: '500',
     color: colors.textPrimary,
   },
   sectionLink: {
     fontSize: 13,
-    fontWeight: '600',
-    color: colors.accent,
+    fontFamily: Fonts.sansSemiBold,
+    color: colors.accentText,
   },
   sectionSub: {
-    fontSize: 11,
-    fontWeight: '600',
+    fontSize: 12,
+    fontFamily: Fonts.sansSemiBold,
     color: colors.textSecondary,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
@@ -419,6 +573,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     gap: 6,
   },
   emptyCardText: {
+    fontFamily: Fonts.sans,
     fontSize: 13,
     color: colors.textSecondary,
     textAlign: 'center',
@@ -433,10 +588,11 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   listCardTitle: {
     fontSize: 14,
-    fontWeight: '600',
+    fontFamily: Fonts.sansSemiBold,
     color: colors.textPrimary,
   },
   listCardMeta: {
+    fontFamily: Fonts.sans,
     fontSize: 13,
     color: colors.textSecondary,
   },
@@ -463,7 +619,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   actionButtonText: {
     fontSize: 12,
-    fontWeight: '600',
+    fontFamily: Fonts.sansSemiBold,
     color: colors.textPrimary,
   },
   wantedHead: {
@@ -472,12 +628,70 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     justifyContent: 'space-between',
   },
   wantedDate: {
-    fontSize: 11,
+    fontFamily: Fonts.sans,
+    fontSize: 12,
     color: colors.textSecondary,
   },
   wantedMetaRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 10,
+  },
+  // Today's agenda: the time leads, like a calendar's day view.
+  agendaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 14,
+  },
+  agendaTime: {
+    fontFamily: Fonts?.mono,
+    fontSize: 15,
+    color: colors.accentText,
+    minWidth: 48,
+  },
+  agendaBody: {
+    flex: 1,
+    gap: 2,
+  },
+  // Auto-matching under each buyer request.
+  matchRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: 6,
+    paddingTop: 8,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: colors.border,
+  },
+  matchText: {
+    flex: 1,
+    fontSize: 13,
+    fontFamily: Fonts.sansSemiBold,
+    color: colors.accentText,
+  },
+  matchTextNone: {
+    fontFamily: Fonts.sans,
+    color: colors.textSecondary,
+  },
+  matchItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 10,
+    minHeight: 40,
+    paddingHorizontal: 10,
+    borderRadius: 10,
+    backgroundColor: colors.glass,
+  },
+  matchItemTitle: {
+    flex: 1,
+    fontFamily: Fonts.sans,
+    fontSize: 13,
+    color: colors.textPrimary,
+  },
+  matchItemPrice: {
+    fontSize: 13,
+    fontFamily: Fonts.sansSemiBold,
+    color: colors.accentText,
   },
 });

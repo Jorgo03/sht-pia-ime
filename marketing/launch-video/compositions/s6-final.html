@@ -1,0 +1,62 @@
+<!-- Scene 6 — final brand reveal (21–25 s): back to the dark, the logo, the line, the call. -->
+<template>
+  <html data-composition-variables='[
+    {"id":"line1","type":"string","label":"Line 1","default":"SHTËPIA JOTE."},
+    {"id":"line2","type":"string","label":"Line 2, orange","default":"ZGJEDHJA JOTE."},
+    {"id":"cta","type":"string","label":"Call to action","default":"Zbulo Shtëpia.ime."}
+  ]'>
+  <div id="s6-final" data-composition-id="s6-final" data-width="1080" data-height="1920" class="scene">
+    <style>
+      #s6-final .s6-dark { position: absolute; inset: 0; background: var(--black); }
+      #s6-final .s6-logo { position: absolute; left: 50%; top: 520px; width: 560px; margin-left: -280px; }
+      #s6-final .s6-logo img { display: block; width: 100%; }
+      #s6-final .s6-line {
+        position: absolute; left: 0; right: 0; text-align: center;
+        font-family: var(--sans); font-weight: 800; font-size: 82px; letter-spacing: 0.05em; color: var(--white);
+      }
+      #s6-final .s6-line2 { color: var(--orange); }
+      #s6-final .s6-rule { position: absolute; left: 50%; top: 1352px; width: 120px; height: 3px; margin-left: -60px; background: rgba(255,255,255,0.35); }
+      #s6-final .s6-cta {
+        position: absolute; left: 0; right: 0; top: 1410px; text-align: center;
+        font-family: var(--serif); font-style: italic; font-weight: 500; font-size: 64px; color: rgba(255,255,255,0.88);
+      }
+    </style>
+    <div class="s6-dark"></div>
+    <div class="glow s6-glow" style="top: 760px"></div>
+    <div class="s6-logo"><img src="assets/brand/lockup-stacked-dark.svg" alt="Shtëpia.ime" /></div>
+    <div class="s6-line s6-line1" style="top: 1080px"></div>
+    <div class="s6-line s6-line2" style="top: 1190px"></div>
+    <div class="s6-rule"></div>
+    <div class="s6-cta"></div>
+    <script>
+      (() => {
+        const root = document.getElementById('s6-final');
+        const q = (s) => root.querySelector(s);
+        const { line1, line2, cta } = film.vars({"line1": "SHTËPIA JOTE.", "line2": "ZGJEDHJA JOTE.", "cta": "Zbulo Shtëpia.ime."});
+        q('.s6-line1').textContent = line1;
+        q('.s6-line2').textContent = line2;
+        q('.s6-cta').textContent = cta;
+        const tl = gsap.timeline({ paused: true });
+
+        // Night falls back over the daylight of scene 5.
+        tl.fromTo(q('.s6-dark'), { opacity: 0 }, { opacity: 1, duration: 0.55, ease: 'power2.inOut' }, 0);
+        tl.fromTo(q('.s6-glow'), { opacity: 0, scale: 0.4 }, { opacity: 0.9, scale: 1, duration: 2, ease: 'power2.out' }, 0.3);
+        tl.fromTo(q('.s6-logo'), { opacity: 0, scale: 0.9, filter: 'blur(20px)' },
+          { opacity: 1, scale: 1, filter: 'blur(0px)', duration: 1.2, ease: 'expo.out' }, 0.5);
+        // The two lines open from their centre, settling in from wide.
+        [['.s6-line1', 1.2], ['.s6-line2', 1.5]].forEach(([sel, at]) => {
+          tl.fromTo(q(sel), { opacity: 0, scaleX: 1.22, filter: 'blur(10px)' },
+            { opacity: 1, scaleX: 1, filter: 'blur(0px)', duration: 1.1, ease: 'expo.out' }, at);
+        });
+        tl.fromTo(q('.s6-rule'), { scaleX: 0 }, { scaleX: 1, duration: 0.7, ease: 'power3.out' }, 2.2);
+        tl.fromTo(q('.s6-cta'), { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.9, ease: 'expo.out' }, 2.45);
+        // Hold, with the light breathing once.
+        tl.to(q('.s6-glow'), { opacity: 0.65, scale: 1.08, duration: 1.4, ease: 'sine.inOut' }, 2.9);
+
+        window.__timelines = window.__timelines || {};
+        window.__timelines['s6-final'] = tl;
+      })();
+    </script>
+  </div>
+  </html>
+</template>

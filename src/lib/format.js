@@ -31,15 +31,22 @@ export function formatPrice(n, lang = 'sq', currency = 'EUR') {
   }).format(num)
 }
 
-// Compact price for a map marker: 200000 -> "€200K", 1250000 -> "€1.3M".
-export function formatCompactPrice(n) {
+// Compact price for a map marker, in the listing's own currency:
+// 200000 -> "€200K", 1250000 -> "€1.3M", 15000000 ALL -> "ALL 15M". Same
+// rule as the phone app's formatBubblePrice (lib/cluster.ts). Every marker
+// used to say €, so a lek price read about 100 times too high.
+export function formatCompactPrice(n, currency = 'EUR') {
   const num = Number(n) || 0
-  if (num >= 1_000_000) {
-    const millions = num / 1_000_000
-    return `€${millions % 1 === 0 ? millions : millions.toFixed(1)}M`
+  const code = (currency || 'EUR').toUpperCase()
+  const tag = (amount) => (code === 'EUR' ? `€${amount}` : code === 'USD' ? `$${amount}` : `${code} ${amount}`)
+  // Rounded before choosing the unit, so 999,600 is "1M", not "1000K".
+  const thousands = Math.round(num / 1_000)
+  if (thousands >= 1_000) {
+    const millions = Math.round(num / 100_000) / 10
+    return tag(`${millions % 1 === 0 ? millions : millions.toFixed(1)}M`)
   }
-  if (num >= 1_000) return `€${Math.round(num / 1_000)}K`
-  return `€${num}`
+  if (num >= 1_000) return tag(`${thousands}K`)
+  return tag(String(num))
 }
 
 // i18n key for a listing-type badge / price suffix — the only place that
@@ -95,15 +102,31 @@ export function slugify(s) {
     .replace(/(^-|-$)/g, '')
 }
 
-export function whatsappUrl(phone, message) {
+/**
+ * A phone number as international digits only — the country code and no '+',
+ * '00' or leading 0 — which is what both wa.me and a `tel:+` link need.
+ */
+export function internationalPhone(phone) {
   let clean = phone?.replace(/[^0-9]/g, '') || ''
   // wa.me requires full international format with no leading 0. Agents
   // enter local Albanian numbers (e.g. "069 602 0791"), so assume Albania's
   // country code (355) whenever one isn't already present.
-  if (clean.startsWith('0')) {
-    clean = `355${clean.slice(1)}`
-  } else if (!clean.startsWith('355')) {
-    clean = `355${clean}`
+  // A number already written internationally ("+39 …", "0039 …") keeps its
+  // own country code: diaspora owners list Italian and German phones.
+  const international = /^\s*\+\s*[1-9]/.test(phone || '')
+  if (clean.startsWith('00')) {
+    clean = clean.slice(2)
+  } else if (!international) {
+    if (clean.startsWith('0')) clean = `355${clean.slice(1)}`
+    else if (!clean.startsWith('355')) clean = `355${clean}`
   }
-  return `https://wa.me/${clean}?text=${encodeURIComponent(message)}`
+  return clean
+}
+
+export function telUrl(phone) {
+  return `tel:+${internationalPhone(phone)}`
+}
+
+export function whatsappUrl(phone, message) {
+  return `https://wa.me/${internationalPhone(phone)}?text=${encodeURIComponent(message)}`
 }

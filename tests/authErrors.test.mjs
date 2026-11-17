@@ -2,7 +2,7 @@
 // Supabase-error-to-user-facing-message mapper. Run with: npm test
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { EMAIL_RE, friendlyError } from '../src/lib/authErrors.js'
+import { EMAIL_RE, friendlyError, retryAfterSeconds } from '../src/lib/authErrors.js'
 
 // A stand-in for react-i18next's t() — returns the key itself, so
 // assertions can check which key was chosen without needing real
@@ -139,4 +139,40 @@ test('the real Supabase texts for a bad address and a weak password are mapped',
     friendlyError({ message: 'Password should be at least 8 characters.' }, t),
     'errors.passwordMin',
   )
+})
+
+test('retryAfterSeconds reads Supabase\'s per-address wait, and nothing else', () => {
+  assert.equal(retryAfterSeconds({ message: 'For security purposes, you can only request this after 42 seconds.' }), 42)
+  assert.equal(retryAfterSeconds({ message: 'For security purposes, you can only request this after 1 second.' }), 1)
+  assert.equal(retryAfterSeconds({ message: 'email rate limit exceeded' }), null)
+  assert.equal(retryAfterSeconds({ message: 'Token has expired or is invalid' }), null)
+  assert.equal(retryAfterSeconds(null), null)
+  assert.equal(retryAfterSeconds({ message: 'you can only request this after 99999 seconds' }), null)
+})
+
+// ---------- error codes (auth-js 2.x), checked before the text ----------
+
+test('Supabase error codes pick the message, whatever the English text says', () => {
+  assert.equal(friendlyError({ code: 'invalid_credentials', message: 'x' }, t), 'errors.invalidCredentials')
+  assert.equal(friendlyError({ code: 'same_password', message: 'x' }, t), 'errors.passwordSame')
+  assert.equal(friendlyError({ code: 'session_expired', message: 'x' }, t), 'errors.sessionExpired')
+  assert.equal(friendlyError({ code: 'reauthentication_needed', message: 'x' }, t), 'errors.reauthNeeded')
+  assert.equal(friendlyError({ code: 'email_address_not_authorized', message: 'x' }, t), 'errors.emailSendFailed')
+  assert.equal(friendlyError({ code: 'flow_state_expired', message: 'x' }, t), 'errors.linkExpired')
+})
+
+test('a weak password says why: too short, too simple, or seen in a breach', () => {
+  assert.equal(friendlyError({ code: 'weak_password', message: 'x', reasons: ['length'] }, t), 'errors.passwordMin')
+  assert.equal(friendlyError({ code: 'weak_password', message: 'x', reasons: ['characters'] }, t), 'errors.passwordWeak')
+  assert.equal(friendlyError({ name: 'AuthWeakPasswordError', message: 'x', reasons: ['pwned'] }, t), 'errors.passwordPwned')
+})
+
+test('no connection says so instead of "something went wrong"', () => {
+  assert.equal(friendlyError({ name: 'AuthRetryableFetchError', message: 'Failed to fetch' }, t), 'errors.network')
+  assert.equal(friendlyError({ name: 'AuthSessionMissingError', message: 'Auth session missing!' }, t), 'errors.sessionExpired')
+})
+
+test('the SMTP refusal (code unexpected_failure) still maps on its text', () => {
+  // Live 2026-10-26: POST /recover → 500 {error_code: unexpected_failure, msg: "Error sending recovery email"}.
+  assert.equal(friendlyError({ code: 'unexpected_failure', message: 'Error sending recovery email' }, t), 'errors.emailSendFailed')
 })

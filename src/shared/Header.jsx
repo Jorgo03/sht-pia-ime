@@ -24,6 +24,7 @@ const LANGUAGES = [
 export default function Header() {
   const { t, i18n } = useTranslation()
   const { theme, toggle } = useTheme()
+  const [themeSwaps, setThemeSwaps] = useState(0)
   const { user, profile, signOut, refreshProfile } = useAuth()
   const navigate = useNavigate()
   const [langOpen, setLangOpen] = useState(false)
@@ -54,8 +55,8 @@ export default function Header() {
   }, [])
 
   const changeLanguage = async (code) => {
+    // Also updates <html lang> (src/i18n/index.js listens for the change).
     await i18n.changeLanguage(code)
-    document.documentElement.lang = code
     localStorage.setItem('fho_lang', code)
     setLangOpen(false)
     if (user) {
@@ -75,7 +76,7 @@ export default function Header() {
       </div>
       <div className="header-actions">
         <div className="lang-switcher" ref={langRef}>
-          <button className="lang-btn" onClick={() => setLangOpen(!langOpen)}>
+          <button className="lang-btn" onClick={() => setLangOpen(!langOpen)} aria-label={currentLang.name} aria-haspopup="true" aria-expanded={langOpen}>
             <span className="lang-flag" aria-hidden="true">{currentLang.flag}</span>
             <span className="lang-label">{currentLang.name}</span>
             <ChevronDown size={14} className={`lang-chevron ${langOpen ? 'open' : ''}`} />
@@ -134,8 +135,17 @@ export default function Header() {
             )}
           </div>
         )}
-        <button className="theme-btn" onClick={toggle} aria-label={t('common.toggleTheme')}>
-          {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+        <button
+          className={`theme-btn ${themeSwaps ? 'is-swapping' : ''}`}
+          onClick={() => { setThemeSwaps(n => n + 1); toggle() }}
+          aria-label={t('common.toggleTheme')}
+        >
+          {/* Re-keyed on every tap so the swap animation replays; not keyed on
+              first render, so the icon doesn't spin on page load. */}
+          <span key={themeSwaps} className="theme-btn__icon" aria-hidden="true">
+            {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+          </span>
+          {themeSwaps > 0 && <span key={`ripple-${themeSwaps}`} className="theme-btn__ripple" aria-hidden="true" />}
         </button>
         <div className="account-switcher" ref={accountRef}>
           {user ? (
@@ -164,7 +174,7 @@ export default function Header() {
               )}
             </>
           ) : (
-            <button className="account-signin-btn" onClick={() => navigate('/profile')}><User size={18} /></button>
+            <button className="account-signin-btn" onClick={() => navigate('/profile')} aria-label={t('common.signIn')}><User size={18} aria-hidden="true" /></button>
           )}
         </div>
       </div>

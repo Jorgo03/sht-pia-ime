@@ -1,0 +1,5634 @@
+{
+ "approved": "2026-11-14",
+ "by": "owner, Checkpoint 1: \"Approve all\"",
+ "counts": {
+  "keep": 205,
+  "rename": 15,
+  "move": 47,
+  "remove": 56
+ },
+ "decisions": [
+  {
+   "city": "Tiranë",
+   "zone": "Blloku",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:5",
+   "evidence": "quarter \"Blloku\" in Tiranë, Bashkia Tiranë (OSM node/6298022013, 41.3213, 19.8161)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Blloku",
+     "bashki": "Tiranë",
+     "osm": "node/6298022013",
+     "lat": 41.3213333,
+     "lon": 19.8160663,
+     "kind": "quarter",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Tiranë",
+   "zone": "Liqeni i Thatë",
+   "status": "unverified",
+   "where": "src/features/properties/data/locations.js:5",
+   "evidence": "OSM nominatim:Liqeni i Thatë, Garunjas (Sauk), Mjull-Bathore, Farkë, Bashkia Tiranë, Qarku i Tiranës, 1045, Shqipëria: Liqeni i Thatë, Garunjas (Sauk), Mjull-Bathore, Farkë, Bashkia Tiranë, Qarku i Tiranës, 1045, Shqipëria",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Liqeni i Thatë",
+     "bashki": "Tiranë",
+     "osm": "nominatim:Liqeni i Thatë, Garunjas (Sauk), Mjull-Bathore, Farkë, Bashkia Tiranë, Qarku i Tiranës, 1045, Shqipëria",
+     "lat": 41.3031658,
+     "lon": 19.8154204,
+     "kind": "lake",
+     "category": "water",
+     "as": "Liqeni i Thatë"
+    }
+   ],
+   "landmark": true
+  },
+  {
+   "city": "Tiranë",
+   "zone": "Myslym Shyri",
+   "status": "unverified",
+   "where": "src/features/properties/data/locations.js:5",
+   "evidence": "OSM way/173691260: Rruga Myslym Shyri, 21 Dhjetori, Njësia Bashkiake Nr. 7, Tiranë, Bashkia Tiranë, Qarku i Tiranës, 1019, Shqipëria",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Rruga Myslym Shyri",
+     "bashki": "Tiranë",
+     "osm": "way/173691260",
+     "lat": 41.3244643,
+     "lon": 19.8097419,
+     "kind": "tertiary",
+     "category": "highway",
+     "as": "Myslym Shyri"
+    }
+   ],
+   "landmark": true
+  },
+  {
+   "city": "Tiranë",
+   "zone": "Selvia",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:5",
+   "evidence": "quarter \"Selvia\" in Tiranë, Bashkia Tiranë (OSM node/6313760913, 41.3333, 19.8233)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Selvia",
+     "bashki": "Tiranë",
+     "osm": "node/6313760913",
+     "lat": 41.3332615,
+     "lon": 19.8232656,
+     "kind": "quarter",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Tiranë",
+   "zone": "Ali Demi",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:5",
+   "evidence": "quarter \"Ali Demi\" in Tiranë, Bashkia Tiranë (OSM node/6298022012, 41.3277, 19.8393)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Ali Demi",
+     "bashki": "Tiranë",
+     "osm": "node/6298022012",
+     "lat": 41.327689,
+     "lon": 19.8393238,
+     "kind": "quarter",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Tiranë",
+   "zone": "Komuna e Parisit",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:6",
+   "evidence": "quarter \"Komuna e Parisit\" in Tiranë, Bashkia Tiranë (OSM node/6298022014, 41.3156, 19.8048)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Komuna e Parisit",
+     "bashki": "Tiranë",
+     "osm": "node/6298022014",
+     "lat": 41.3156139,
+     "lon": 19.8048399,
+     "kind": "quarter",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Tiranë",
+   "zone": "Sauk",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:6",
+   "evidence": "quarter \"Sauk\" in Tiranë, Bashkia Tiranë (OSM node/728421072, 41.3004, 19.8321)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Sauk",
+     "bashki": "Tiranë",
+     "osm": "node/728421072",
+     "lat": 41.3004474,
+     "lon": 19.8321262,
+     "kind": "quarter",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Tiranë",
+   "zone": "Lunder",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:6",
+   "evidence": "village \"Lundër\" in Farkë, Bashkia Tiranë (OSM node/728428731, 41.2885, 19.8672)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Lundër",
+     "bashki": "Tiranë",
+     "osm": "node/728428731",
+     "lat": 41.2884684,
+     "lon": 19.8671977,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Tiranë",
+   "zone": "21 Dhjetori",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:6",
+   "evidence": "quarter \"21 Dhjetori\" in Tiranë, Bashkia Tiranë (OSM node/6298022016, 41.3258, 19.8034)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "21 Dhjetori",
+     "bashki": "Tiranë",
+     "osm": "node/6298022016",
+     "lat": 41.3258217,
+     "lon": 19.8034331,
+     "kind": "quarter",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Tiranë",
+   "zone": "Yzberisht",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:6",
+   "evidence": "quarter \"Yzberisht\" in Tiranë, Bashkia Tiranë (OSM node/728420226, 41.3233, 19.7737)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Yzberisht",
+     "bashki": "Tiranë",
+     "osm": "node/728420226",
+     "lat": 41.3233443,
+     "lon": 19.7737453,
+     "kind": "quarter",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Tiranë",
+   "zone": "Rruga e Kavajës",
+   "status": "unverified",
+   "where": "src/features/properties/data/locations.js:7",
+   "evidence": "OSM nominatim:Rruga e Kavajës, Kompleksi Delijorgji, 21 Dhjetori, Njësia Bashkiake Nr. 7, Tiranë, Bashkia Tiranë, Qarku i Tiranës, 1023, Shqipëria: Rruga e Kavajës, Kompleksi Delijorgji, 21 Dhjetori, Njësia Bashkiake Nr. 7, Tiranë, Bashkia Tiranë, Qarku i Tiranës, 1023, Shqipëria",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Rruga e Kavajës",
+     "bashki": "Tiranë",
+     "osm": "nominatim:Rruga e Kavajës, Kompleksi Delijorgji, 21 Dhjetori, Njësia Bashkiake Nr. 7, Tiranë, Bashkia Tiranë, Qarku i Tiranës, 1023, Shqipëria",
+     "lat": 41.3245844,
+     "lon": 19.799465,
+     "kind": "primary",
+     "category": "highway",
+     "as": "Rruga e Kavajës"
+    }
+   ],
+   "landmark": true
+  },
+  {
+   "city": "Tiranë",
+   "zone": "Pazari i Ri",
+   "status": "unverified",
+   "where": "src/features/properties/data/locations.js:7",
+   "evidence": "OSM nominatim:Pazari i Ri, Rruga Luigj Gurakuqi, Njësia Bashkiake Nr. 2, Tiranë, Bashkia Tiranë, Qarku i Tiranës, 1017, Shqipëria: Pazari i Ri, Rruga Luigj Gurakuqi, Njësia Bashkiake Nr. 2, Tiranë, Bashkia Tiranë, Qarku i Tiranës, 1017, Shqipëria",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Pazari i Ri",
+     "bashki": "Tiranë",
+     "osm": "nominatim:Pazari i Ri, Rruga Luigj Gurakuqi, Njësia Bashkiake Nr. 2, Tiranë, Bashkia Tiranë, Qarku i Tiranës, 1017, Shqipëria",
+     "lat": 41.3302464,
+     "lon": 19.8243503,
+     "kind": "amenity",
+     "category": "amenity",
+     "as": "Pazari i Ri"
+    }
+   ],
+   "landmark": true
+  },
+  {
+   "city": "Tiranë",
+   "zone": "Don Bosko",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:7",
+   "evidence": "quarter \"Don Bosko\" in Tiranë, Bashkia Tiranë (OSM node/6298022009, 41.3408, 19.8012)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Don Bosko",
+     "bashki": "Tiranë",
+     "osm": "node/6298022009",
+     "lat": 41.3408491,
+     "lon": 19.8012378,
+     "kind": "quarter",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Tiranë",
+   "zone": "Tirana e Re",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:7",
+   "evidence": "quarter \"Tirana e Re\" in Tiranë, Bashkia Tiranë (OSM node/6313760915, 41.3174, 19.8120)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Tirana e Re",
+     "bashki": "Tiranë",
+     "osm": "node/6313760915",
+     "lat": 41.317413,
+     "lon": 19.8120048,
+     "kind": "quarter",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Tiranë",
+   "zone": "Kombinat",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:7",
+   "evidence": "quarter \"Kombinat\" in Tiranë, Bashkia Tiranë (OSM node/6298022017, 41.3119, 19.7627)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Kombinat",
+     "bashki": "Tiranë",
+     "osm": "node/6298022017",
+     "lat": 41.3119059,
+     "lon": 19.762674,
+     "kind": "quarter",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Tiranë",
+   "zone": "Laprakë",
+   "status": "spelling",
+   "where": "src/features/properties/data/locations.js:8",
+   "evidence": "quarter \"Lapraka\" in Bashkia Tiranë (OSM node/4596338866, via Nominatim: Lapraka, Njësia Bashkiake Nr. 11, Tiranë, Bashkia Tiranë, Qarku i Tiranës, 1024, Shqipëria)",
+   "action": "rename",
+   "to": [
+    {
+     "name": "Lapraka",
+     "bashki": "Tiranë",
+     "osm": "node/4596338866",
+     "lat": 41.343977,
+     "lon": 19.7891904,
+     "kind": "quarter",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Tiranë",
+   "zone": "Astir",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:8",
+   "evidence": "quarter \"Astir\" in Kashar, Bashkia Tiranë (OSM node/6313760897, 41.3292, 19.7832)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Astir",
+     "bashki": "Tiranë",
+     "osm": "node/6313760897",
+     "lat": 41.3291659,
+     "lon": 19.7831572,
+     "kind": "quarter",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Tiranë",
+   "zone": "Fresk",
+   "status": "spelling",
+   "where": "src/features/properties/data/locations.js:8",
+   "evidence": "quarter \"Fresku\" in Bashkia Tiranë (OSM node/6313760895)",
+   "action": "rename",
+   "to": [
+    {
+     "name": "Fresku",
+     "bashki": "Tiranë",
+     "osm": "node/6313760895",
+     "lat": 41.3452701,
+     "lon": 19.8561517,
+     "kind": "quarter",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Tiranë",
+   "zone": "Kinostudio",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:8",
+   "evidence": "quarter \"Kinostudio\" in Tiranë, Bashkia Tiranë (OSM node/6298022010, 41.3460, 19.8482)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Kinostudio",
+     "bashki": "Tiranë",
+     "osm": "node/6298022010",
+     "lat": 41.3459521,
+     "lon": 19.8481646,
+     "kind": "quarter",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Tiranë",
+   "zone": "Medreseja",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:8",
+   "evidence": "quarter \"Medreseja\" in Tiranë, Bashkia Tiranë (OSM node/6313760912, 41.3380, 19.8263)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Medreseja",
+     "bashki": "Tiranë",
+     "osm": "node/6313760912",
+     "lat": 41.3379612,
+     "lon": 19.8263032,
+     "kind": "quarter",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Tiranë",
+   "zone": "Porcelan",
+   "status": "spelling",
+   "where": "src/features/properties/data/locations.js:9",
+   "evidence": "quarter \"Porcelani\" in Bashkia Tiranë (OSM node/6313760891, via Nominatim: Porcelani, Njësia Bashkiake Nr. 4, Tiranë, Bashkia Tiranë, Qarku i Tiranës, 1007, Shqipëria)",
+   "action": "rename",
+   "to": [
+    {
+     "name": "Porcelani",
+     "bashki": "Tiranë",
+     "osm": "node/6313760891",
+     "lat": 41.3447903,
+     "lon": 19.8452211,
+     "kind": "quarter",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Tiranë",
+   "zone": "Shkozë",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:9",
+   "evidence": "quarter \"Shkozë\" in Tiranë, Bashkia Tiranë (OSM node/4596685807, 41.3328, 19.8569)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Shkozë",
+     "bashki": "Tiranë",
+     "osm": "node/4596685807",
+     "lat": 41.33276,
+     "lon": 19.8569417,
+     "kind": "quarter",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Tiranë",
+   "zone": "Bathore",
+   "status": "hierarchy",
+   "where": "src/features/properties/data/locations.js:9",
+   "evidence": "area (OSM admin level 9) \"Bathore\" in Bashkia Kamëz (OSM relation/19622663)",
+   "action": "move",
+   "to": [
+    {
+     "name": "Bathore",
+     "bashki": "Kamëz",
+     "osm": "relation/19622663",
+     "lat": 41.3835455,
+     "lon": 19.7604138,
+     "kind": "area (OSM admin level 9)",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Tiranë",
+   "zone": "Kashar",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:9",
+   "evidence": "village \"Kashar\" in Kashar, Bashkia Tiranë (OSM node/728428543, 41.3520, 19.7192)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Kashar",
+     "bashki": "Tiranë",
+     "osm": "node/728428543",
+     "lat": 41.3520234,
+     "lon": 19.7191727,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Tiranë",
+   "zone": "Farkë",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:9",
+   "evidence": "njësi administrative \"Farkë\" in Farkë, Bashkia Tiranë (OSM relation/1250112, 41.2910, 19.8492)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Farkë",
+     "bashki": "Tiranë",
+     "osm": "relation/1250112",
+     "lat": 41.29099366,
+     "lon": 19.849213628268338,
+     "kind": "njësi administrative",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Tiranë",
+   "zone": "Shëngjergj",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:10",
+   "evidence": "village \"Shëngjergj\" in Shëngjergj, Bashkia Tiranë (OSM node/728427372, 41.3325, 20.1079)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Shëngjergj",
+     "bashki": "Tiranë",
+     "osm": "node/728427372",
+     "lat": 41.3324813,
+     "lon": 20.1078951,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Tiranë",
+   "zone": "Petrelë",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:10",
+   "evidence": "village \"Petrelë\" in Petrelë, Bashkia Tiranë (OSM node/2538483604, 41.2543, 19.8565)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Petrelë",
+     "bashki": "Tiranë",
+     "osm": "node/2538483604",
+     "lat": 41.2542744,
+     "lon": 19.856542,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Tiranë",
+   "zone": "Vaqarr",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:10",
+   "evidence": "village \"Vaqarr\" in Vaqarr, Bashkia Tiranë (OSM node/728424771, 41.2996, 19.7416)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Vaqarr",
+     "bashki": "Tiranë",
+     "osm": "node/728424771",
+     "lat": 41.2995708,
+     "lon": 19.7415883,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Tiranë",
+   "zone": "Zall-Herr",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:10",
+   "evidence": "village \"Zall-Herr\" in Zall-Herr, Bashkia Tiranë (OSM node/728424808, 41.3893, 19.8260)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Zall-Herr",
+     "bashki": "Tiranë",
+     "osm": "node/728424808",
+     "lat": 41.3892869,
+     "lon": 19.8259662,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Tiranë",
+   "zone": "Pezë",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:10",
+   "evidence": "village \"Pezë e Madhe\" in Pezë, Bashkia Tiranë (OSM node/728420349, 41.2179, 19.6934)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Pezë e Madhe",
+     "bashki": "Tiranë",
+     "osm": "node/728420349",
+     "lat": 41.2178664,
+     "lon": 19.6934416,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Tiranë",
+   "zone": "Kodër-Kamëz",
+   "status": "unverified",
+   "where": "src/features/properties/data/locations.js:11",
+   "evidence": "OSM nominatim:Kodër Kamëz, Rruga Kastriotet, Njësia Bashkiake Nr. 11, Tiranë, Bashkia Tiranë, Qarku i Tiranës, 1029, Shqipëria: Kodër Kamëz, Rruga Kastriotet, Njësia Bashkiake Nr. 11, Tiranë, Bashkia Tiranë, Qarku i Tiranës, 1029, Shqipëria",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Kodër Kamëz",
+     "bashki": "Tiranë",
+     "osm": "nominatim:Kodër Kamëz, Rruga Kastriotet, Njësia Bashkiake Nr. 11, Tiranë, Bashkia Tiranë, Qarku i Tiranës, 1029, Shqipëria",
+     "lat": 41.3578316,
+     "lon": 19.773826,
+     "kind": "highway",
+     "category": "highway",
+     "as": "Kodër-Kamëz"
+    }
+   ],
+   "landmark": true
+  },
+  {
+   "city": "Tiranë",
+   "zone": "Paskuqan",
+   "status": "hierarchy",
+   "where": "src/features/properties/data/locations.js:11",
+   "evidence": "village \"Paskuqan\" in Bashkia Kamëz (OSM node/728424519)",
+   "action": "move",
+   "to": [
+    {
+     "name": "Paskuqan",
+     "bashki": "Kamëz",
+     "osm": "node/728424519",
+     "lat": 41.3549573,
+     "lon": 19.80515,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Tiranë",
+   "zone": "Babrru",
+   "status": "hierarchy",
+   "where": "src/features/properties/data/locations.js:11",
+   "evidence": "area named in OSM place \"Maçaj (Babrru)\" \"Babrru\" in Bashkia Kamëz (OSM node/4596685817)",
+   "action": "move",
+   "to": [
+    {
+     "name": "Babrru",
+     "bashki": "Kamëz",
+     "osm": "node/4596685817",
+     "lat": 41.3658829,
+     "lon": 19.83868,
+     "kind": "area named in OSM place \"Maçaj (Babrru)\"",
+     "category": "place",
+     "as": "Babrru"
+    }
+   ]
+  },
+  {
+   "city": "Tiranë",
+   "zone": "Vorë",
+   "status": "hierarchy",
+   "where": "src/features/properties/data/locations.js:11",
+   "evidence": "city_district \"Vorë\" in Bashkia Vorë (OSM nominatim:Vorë, Bashkia Vorë, Qarku i Tiranës, 1032, Shqipëria)",
+   "action": "move",
+   "to": [
+    {
+     "name": "Vorë",
+     "bashki": "Vorë",
+     "osm": "nominatim:Vorë, Bashkia Vorë, Qarku i Tiranës, 1032, Shqipëria",
+     "lat": 41.3752459,
+     "lon": 19.6509302,
+     "kind": "city_district",
+     "category": "boundary"
+    }
+   ]
+  },
+  {
+   "city": "Tiranë",
+   "zone": "Maminas",
+   "status": "hierarchy",
+   "where": "src/features/properties/data/locations.js:11",
+   "evidence": "village \"Maminas\" in Bashkia Shijak (OSM node/728429031)",
+   "action": "move",
+   "to": [
+    {
+     "name": "Maminas",
+     "bashki": "Shijak",
+     "osm": "node/728429031",
+     "lat": 41.3778218,
+     "lon": 19.6073814,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Durrës",
+   "zone": "Plazh",
+   "status": "unverified",
+   "where": "src/features/properties/data/locations.js:17",
+   "evidence": "amenity/amenity \"Xhamia Islame,Plazh\" (OSM nominatim:Xhamia Islame,Plazh, Rruga Jusuf Myzyri, Durrës, Bashkia Durrës, Qarku i Durrësit, 2001, Shqipëria); railway/railway \"Durrës Plazh\" (OSM nominatim:Durrës Plazh, Rruga Turgut Ozal, Durrës, Bashkia Durrës, Qarku i Durrësit, 2001, Shqipëria); amenity/amenity \"Zyra Postare Plazh\" (OSM nominatim:Zyra Postare Plazh, 281, Rruga Pavarësia, Durrës, Bashkia Durrës, Qarku i Durrësit, 2008, Shqipëria)",
+   "action": "keep",
+   "note": "kept by the owner, 2026-11-16 (DECISIONS.md W8): a real-estate area name used in Durrës, located by the \"Durrës Plazh\" railway halt (OSM node/11001912339); not an official lagje",
+   "landmark": true,
+   "to": [
+    {
+     "name": "Durrës Plazh",
+     "bashki": "Durrës",
+     "osm": "node/11001912339",
+     "lat": 41.3094834,
+     "lon": 19.4923139,
+     "kind": "halt",
+     "category": "railway",
+     "as": "Plazh"
+    }
+   ]
+  },
+  {
+   "city": "Durrës",
+   "zone": "Shkëmbi i Kavajës",
+   "status": "unverified",
+   "where": "src/features/properties/data/locations.js:17",
+   "evidence": "OSM nominatim:Shkembi i Kavajes, Bashkia Durrës, Qarku i Durrësit, 2021, Shqipëria: Shkembi i Kavajes, Bashkia Durrës, Qarku i Durrësit, 2021, Shqipëria",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Shkembi i Kavajes",
+     "bashki": "Durrës",
+     "osm": "nominatim:Shkembi i Kavajes, Bashkia Durrës, Qarku i Durrësit, 2021, Shqipëria",
+     "lat": 41.2805805,
+     "lon": 19.5159754,
+     "kind": "peak",
+     "category": "natural",
+     "as": "Shkëmbi i Kavajës"
+    }
+   ],
+   "landmark": true
+  },
+  {
+   "city": "Durrës",
+   "zone": "Kënetë",
+   "status": "hierarchy",
+   "where": "src/features/properties/data/locations.js:17",
+   "evidence": "village \"Kënetë\" in Bashkia Shijak (OSM node/728428832)",
+   "action": "move",
+   "to": [
+    {
+     "name": "Kënetë",
+     "bashki": "Shijak",
+     "osm": "node/728428832",
+     "lat": 41.3252894,
+     "lon": 19.6206107,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Durrës",
+   "zone": "Spitallë",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:17",
+   "evidence": "village \"Spitallë\" in Durrës, Bashkia Durrës (OSM node/5540618719, 41.3408, 19.4435)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Spitallë",
+     "bashki": "Durrës",
+     "osm": "node/5540618719",
+     "lat": 41.3407845,
+     "lon": 19.4434979,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Durrës",
+   "zone": "Arapaj",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:17",
+   "evidence": "suburb \"Arapaj\" in Rrashbull, Bashkia Durrës (OSM node/728419423, 41.3023, 19.5097)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Arapaj",
+     "bashki": "Durrës",
+     "osm": "node/728419423",
+     "lat": 41.3023312,
+     "lon": 19.5096812,
+     "kind": "suburb",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Durrës",
+   "zone": "Currila",
+   "status": "unverified",
+   "where": "src/features/properties/data/locations.js:18",
+   "evidence": "highway/highway \"Kodër Currila\" (OSM nominatim:Kodër Currila, Rruga e Currilave, Durrës, Bashkia Durrës, Qarku i Durrësit, 2001, Shqipëria); highway/highway \"Kodër Currila\" (OSM node/12572443763)",
+   "action": "keep",
+   "note": "kept by the owner, 2026-11-16 (DECISIONS.md W8): a real-estate area name used in Durrës, located by the \"Kodër Currila\" stop on Rruga e Currilave (OSM node/12572443763); not an official lagje",
+   "landmark": true,
+   "to": [
+    {
+     "name": "Kodër Currila",
+     "bashki": "Durrës",
+     "osm": "node/12572443763",
+     "lat": 41.3201878,
+     "lon": 19.4317326,
+     "kind": "bus_stop",
+     "category": "highway",
+     "as": "Currila"
+    }
+   ]
+  },
+  {
+   "city": "Durrës",
+   "zone": "Plepa",
+   "status": "unverified",
+   "where": "src/features/properties/data/locations.js:18",
+   "evidence": "OSM nominatim:Plepa, Rruga Pavarësia, Durrës, Bashkia Durrës, Qarku i Durrësit, 2001, Shqipëria: Plepa, Rruga Pavarësia, Durrës, Bashkia Durrës, Qarku i Durrësit, 2001, Shqipëria",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Plepa",
+     "bashki": "Durrës",
+     "osm": "nominatim:Plepa, Rruga Pavarësia, Durrës, Bashkia Durrës, Qarku i Durrësit, 2001, Shqipëria",
+     "lat": 41.2924146,
+     "lon": 19.507927,
+     "kind": "highway",
+     "category": "highway",
+     "as": "Plepa"
+    }
+   ],
+   "landmark": true
+  },
+  {
+   "city": "Durrës",
+   "zone": "Shkallnur",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:18",
+   "evidence": "village \"Shkallnur\" in Rrashbull, Bashkia Durrës (OSM node/728425535, 41.2893, 19.5174)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Shkallnur",
+     "bashki": "Durrës",
+     "osm": "node/728425535",
+     "lat": 41.2892573,
+     "lon": 19.5174258,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Durrës",
+   "zone": "Romanat",
+   "status": "spelling",
+   "where": "src/features/properties/data/locations.js:18",
+   "evidence": "Closest name in Bashkia Durrës: OSM node/728418749, 1 letter(s) different. No place spelled \"Romanat\" in OpenStreetMap",
+   "action": "rename",
+   "to": [
+    {
+     "name": "Rromanat",
+     "bashki": "Durrës",
+     "osm": "node/728418749",
+     "lat": 41.2855455,
+     "lon": 19.5977044,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Durrës",
+   "zone": "Fllakë",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:18",
+   "evidence": "village \"Fllakë\" in Katund i Ri, Bashkia Durrës (OSM node/728425692, 41.3738, 19.4956)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Fllakë",
+     "bashki": "Durrës",
+     "osm": "node/728425692",
+     "lat": 41.3737624,
+     "lon": 19.4955861,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Durrës",
+   "zone": "Bisht-Kamëz",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:19",
+   "evidence": "village \"Bisht Kamëz\" in Katund i Ri, Bashkia Durrës (OSM node/4187840090, 41.3911, 19.4778)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Bisht Kamëz",
+     "bashki": "Durrës",
+     "osm": "node/4187840090",
+     "lat": 41.3911427,
+     "lon": 19.4777972,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Durrës",
+   "zone": "Rrashbull",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:19",
+   "evidence": "village \"Rrashbull\" in Rrashbull, Bashkia Durrës (OSM node/728422468, 41.3224, 19.5107)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Rrashbull",
+     "bashki": "Durrës",
+     "osm": "node/728422468",
+     "lat": 41.3223741,
+     "lon": 19.5106972,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Durrës",
+   "zone": "Porto Romano",
+   "status": "unverified",
+   "where": "src/features/properties/data/locations.js:19",
+   "evidence": "OSM nominatim:Porto Romano, Katundi i Ri, Bashkia Durrës, Qarku i Durrësit, 2017, Shqipëria: Porto Romano, Katundi i Ri, Bashkia Durrës, Qarku i Durrësit, 2017, Shqipëria",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Porto Romano",
+     "bashki": "Durrës",
+     "osm": "nominatim:Porto Romano, Katundi i Ri, Bashkia Durrës, Qarku i Durrësit, 2017, Shqipëria",
+     "lat": 41.3828342,
+     "lon": 19.4275183,
+     "kind": "industrial",
+     "category": "landuse",
+     "as": "Porto Romano"
+    }
+   ],
+   "landmark": true
+  },
+  {
+   "city": "Durrës",
+   "zone": "Mali i Robit",
+   "status": "hierarchy",
+   "where": "src/features/properties/data/locations.js:19",
+   "evidence": "quarter \"Mali i Robit\" in Bashkia Kavajë (OSM node/9066689457)",
+   "action": "move",
+   "to": [
+    {
+     "name": "Mali i Robit",
+     "bashki": "Kavajë",
+     "osm": "node/9066689457",
+     "lat": 41.2362684,
+     "lon": 19.5175605,
+     "kind": "quarter",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Durrës",
+   "zone": "Qerret",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:20",
+   "evidence": "village \"Qerret\" in Katund i Ri, Bashkia Durrës (OSM node/4187840092, 41.3923, 19.4917)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Qerret",
+     "bashki": "Durrës",
+     "osm": "node/4187840092",
+     "lat": 41.3923154,
+     "lon": 19.4917403,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Durrës",
+   "zone": "Golem",
+   "status": "hierarchy",
+   "where": "src/features/properties/data/locations.js:20",
+   "evidence": "village \"Golem\" in Bashkia Kavajë (OSM node/728421409)",
+   "action": "move",
+   "to": [
+    {
+     "name": "Golem",
+     "bashki": "Kavajë",
+     "osm": "node/728421409",
+     "lat": 41.2434439,
+     "lon": 19.5223942,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Durrës",
+   "zone": "Iliria",
+   "status": "unverified",
+   "where": "src/features/properties/data/locations.js:20",
+   "evidence": "OSM nominatim:Iliria, Rruga Pavarësia, Durrës, Bashkia Durrës, Qarku i Durrësit, 2001, Shqipëria: Iliria, Rruga Pavarësia, Durrës, Bashkia Durrës, Qarku i Durrësit, 2001, Shqipëria",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Iliria",
+     "bashki": "Durrës",
+     "osm": "nominatim:Iliria, Rruga Pavarësia, Durrës, Bashkia Durrës, Qarku i Durrësit, 2001, Shqipëria",
+     "lat": 41.3020638,
+     "lon": 19.4978454,
+     "kind": "amenity",
+     "category": "amenity",
+     "as": "Iliria"
+    }
+   ],
+   "landmark": true
+  },
+  {
+   "city": "Durrës",
+   "zone": "Përmet i Durrësit",
+   "status": "missing",
+   "where": "src/features/properties/data/locations.js:20",
+   "evidence": "No trace in any source checked: the 373 units of Law 115/2014, 4,560 named places in OpenStreetMap, and Nominatim searches with and without diacritics, in definite and genitive form, as \"Lagjja …\" and with the city name",
+   "action": "remove"
+  },
+  {
+   "city": "Vlorë",
+   "zone": "Lungomare",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:26",
+   "evidence": "suburb \"Lungomare\" in Vlorë, Bashkia Vlorë (OSM node/10963597117, 40.4420, 19.4959)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Lungomare",
+     "bashki": "Vlorë",
+     "osm": "node/10963597117",
+     "lat": 40.442011,
+     "lon": 19.4959128,
+     "kind": "suburb",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Vlorë",
+   "zone": "Uji i Ftohtë",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:26",
+   "evidence": "hamlet \"Uji i Ftohtë (Vlorë)\" in Vlorë, Bashkia Vlorë (OSM node/5174261888, 40.4207, 19.4926)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Uji i Ftohtë (Vlorë)",
+     "bashki": "Vlorë",
+     "osm": "node/5174261888",
+     "lat": 40.4207265,
+     "lon": 19.492576,
+     "kind": "hamlet",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Vlorë",
+   "zone": "Skelë",
+   "status": "missing",
+   "where": "src/features/properties/data/locations.js:26",
+   "evidence": "No trace in any source checked: the 373 units of Law 115/2014, 4,560 named places in OpenStreetMap, and Nominatim searches with and without diacritics, in definite and genitive form, as \"Lagjja …\" and with the city name",
+   "action": "remove"
+  },
+  {
+   "city": "Vlorë",
+   "zone": "Radhimë",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:26",
+   "evidence": "village \"Radhimë\" in Orikum, Bashkia Vlorë (OSM node/713605361, 40.3699, 19.4950)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Radhimë",
+     "bashki": "Vlorë",
+     "osm": "node/713605361",
+     "lat": 40.3699401,
+     "lon": 19.4950193,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Vlorë",
+   "zone": "Orikum",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:26",
+   "evidence": "town \"Orikum\" in Orikum, Bashkia Vlorë (OSM node/713605590, 40.3268, 19.4749)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Orikum",
+     "bashki": "Vlorë",
+     "osm": "node/713605590",
+     "lat": 40.3268432,
+     "lon": 19.4748818,
+     "kind": "town",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Vlorë",
+   "zone": "Zvërnec",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:27",
+   "evidence": "village \"Zvërnec\" in Qendër Vlorë, Bashkia Vlorë (OSM node/728425036, 40.5149, 19.4188)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Zvërnec",
+     "bashki": "Vlorë",
+     "osm": "node/728425036",
+     "lat": 40.5148611,
+     "lon": 19.4187572,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Vlorë",
+   "zone": "Kanina",
+   "status": "spelling",
+   "where": "src/features/properties/data/locations.js:27",
+   "evidence": "village \"Kaninë\" in Bashkia Vlorë (OSM nominatim:Kaninë, Qendër Vlorë, Bashkia Vlorë, Qarku i Vlorës, 9400, Shqipëria, via Nominatim: Kaninë, Qendër Vlorë, Bashkia Vlorë, Qarku i Vlorës, 9400, Shqipëria)",
+   "action": "rename",
+   "to": [
+    {
+     "name": "Kaninë",
+     "bashki": "Vlorë",
+     "osm": "nominatim:Kaninë, Qendër Vlorë, Bashkia Vlorë, Qarku i Vlorës, 9400, Shqipëria",
+     "lat": 40.4379849,
+     "lon": 19.5210825,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Vlorë",
+   "zone": "Tragjas",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:27",
+   "evidence": "village \"Tragjas\" in Orikum, Bashkia Vlorë (OSM node/713605152, 40.3277, 19.5100)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Tragjas",
+     "bashki": "Vlorë",
+     "osm": "node/713605152",
+     "lat": 40.327654,
+     "lon": 19.5099606,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Vlorë",
+   "zone": "Novosejë",
+   "status": "spelling",
+   "where": "src/features/properties/data/locations.js:27",
+   "evidence": "Closest name in Bashkia Vlorë: OSM node/728417568, 1 letter(s) different. No place spelled \"Novosejë\" in OpenStreetMap",
+   "action": "rename",
+   "to": [
+    {
+     "name": "Novoselë",
+     "bashki": "Vlorë",
+     "osm": "node/728417568",
+     "lat": 40.6241635,
+     "lon": 19.467975,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Vlorë",
+   "zone": "Vlorë Qendër",
+   "status": "spelling",
+   "where": "src/features/properties/data/locations.js:27",
+   "evidence": "njësi administrative \"Qendër Vlorë\" in Bashkia Vlorë (OSM relation/1255522)",
+   "action": "rename",
+   "to": [
+    {
+     "name": "Qendër Vlorë",
+     "bashki": "Vlorë",
+     "osm": "relation/1255522",
+     "lat": 40.51278321,
+     "lon": 19.453204331034264,
+     "kind": "njësi administrative",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Vlorë",
+   "zone": "Shushicë",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:28",
+   "evidence": "village \"Shushicë\" in Shushicë, Bashkia Vlorë (OSM node/1917298199, 40.5379, 19.5342)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Shushicë",
+     "bashki": "Vlorë",
+     "osm": "node/1917298199",
+     "lat": 40.5379256,
+     "lon": 19.5341914,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Vlorë",
+   "zone": "Dukat",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:28",
+   "evidence": "village \"Dukat\" in Orikum, Bashkia Vlorë (OSM node/5190702304, 40.2512, 19.5650)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Dukat",
+     "bashki": "Vlorë",
+     "osm": "node/5190702304",
+     "lat": 40.2512302,
+     "lon": 19.5649741,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Vlorë",
+   "zone": "Palasë",
+   "status": "hierarchy",
+   "where": "src/features/properties/data/locations.js:28",
+   "evidence": "village \"Palasë\" in Bashkia Himarë (OSM node/713605010)",
+   "action": "move",
+   "to": [
+    {
+     "name": "Palasë",
+     "bashki": "Himarë",
+     "osm": "node/713605010",
+     "lat": 40.166793,
+     "lon": 19.6239829,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Vlorë",
+   "zone": "Dhërmi",
+   "status": "hierarchy",
+   "where": "src/features/properties/data/locations.js:28",
+   "evidence": "village \"Dhërmi\" in Bashkia Himarë (OSM node/713605581)",
+   "action": "move",
+   "to": [
+    {
+     "name": "Dhërmi",
+     "bashki": "Himarë",
+     "osm": "node/713605581",
+     "lat": 40.151199,
+     "lon": 19.6414118,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Vlorë",
+   "zone": "Jalë",
+   "status": "unverified",
+   "where": "src/features/properties/data/locations.js:28",
+   "evidence": "place/village \"Jalë\" (OSM nominatim:Jalë, Himarë, Bashkia Himarë, Qarku i Vlorës, 9425, Shqipëria); tourism/tourism \"Jalë\" (OSM nominatim:Jalë, Rruga Jali, Jalë, Himarë, Bashkia Himarë, Qarku i Vlorës, 9425, Shqipëria); highway/road \"Livadhi - Jale\" (OSM nominatim:Livadhi - Jale, Spile, Himarë, Bashkia Himarë, Qarku i Vlorës, 9425, Shqipëria)",
+   "action": "remove",
+   "note": "no source for it as a place"
+  },
+  {
+   "city": "Shkodër",
+   "zone": "Qendër",
+   "status": "unverified",
+   "where": "src/features/properties/data/locations.js:34",
+   "evidence": "No place named Qendër in Bashkia Shkodër (OSM); the law has no unit Qendër here",
+   "action": "remove",
+   "note": "replaced by the official units of the municipality"
+  },
+  {
+   "city": "Shkodër",
+   "zone": "Rus",
+   "status": "unverified",
+   "where": "src/features/properties/data/locations.js:34",
+   "evidence": "place/square \"Sheshi Rus i Madh\" (OSM nominatim:Sheshi Rus i Madh, Lagjja 2, Shkodër, Bashkia Shkodër, Qarku i Shkodrës, 4001, Shqipëria); place/square \"Sheshi Rus i Vogël\" (OSM nominatim:Sheshi Rus i Vogël, Tom Kola, Lagjja 3, Shkodër, Bashkia Shkodër, Qarku i Shkodrës, 4001, Shqipëria); highway/primary \"Rruga Rus i Madh\" (OSM nominatim:Rruga Rus i Madh, Lagjja 2, Shkodër, Bashkia Shkodër, Qarku i Shkodrës, 4001, Shqipëria)",
+   "action": "remove",
+   "note": "no source for it as a place"
+  },
+  {
+   "city": "Shkodër",
+   "zone": "Perash",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:34",
+   "evidence": "quarter \"Perash\" in Shkodër, Bashkia Shkodër (OSM node/5949413891, 42.0597, 19.5091)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Perash",
+     "bashki": "Shkodër",
+     "osm": "node/5949413891",
+     "lat": 42.059678,
+     "lon": 19.5090743,
+     "kind": "quarter",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Shkodër",
+   "zone": "Dobraç",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:34",
+   "evidence": "village \"Dobraç\" in Rrethinat, Bashkia Shkodër (OSM node/728421463, 42.0837, 19.5145)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Dobraç",
+     "bashki": "Shkodër",
+     "osm": "node/728421463",
+     "lat": 42.0837192,
+     "lon": 19.5145049,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Shkodër",
+   "zone": "Shirokë",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:34",
+   "evidence": "village \"Shirokë\" in Shkodër, Bashkia Shkodër (OSM node/728422639, 42.0590, 19.4575)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Shirokë",
+     "bashki": "Shkodër",
+     "osm": "node/728422639",
+     "lat": 42.0590016,
+     "lon": 19.4575375,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Shkodër",
+   "zone": "Zogaj",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:35",
+   "evidence": "village \"Zogaj\" in Shkodër, Bashkia Shkodër (OSM node/5600272879, 42.0710, 19.4001)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Zogaj",
+     "bashki": "Shkodër",
+     "osm": "node/5600272879",
+     "lat": 42.0710018,
+     "lon": 19.4000594,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Shkodër",
+   "zone": "Koplik",
+   "status": "hierarchy",
+   "where": "src/features/properties/data/locations.js:35",
+   "evidence": "town \"Koplik\" in Bashkia Malësi e Madhe (OSM node/5386224053)",
+   "action": "move",
+   "to": [
+    {
+     "name": "Koplik",
+     "bashki": "Malësi e Madhe",
+     "osm": "node/5386224053",
+     "lat": 42.2112922,
+     "lon": 19.437214,
+     "kind": "town",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Shkodër",
+   "zone": "Boga",
+   "status": "hierarchy",
+   "where": "src/features/properties/data/locations.js:35",
+   "evidence": "village \"Bogë\" in Bashkia Malësi e Madhe (OSM node/728423556)",
+   "action": "move",
+   "to": [
+    {
+     "name": "Bogë",
+     "bashki": "Malësi e Madhe",
+     "osm": "node/728423556",
+     "lat": 42.3971031,
+     "lon": 19.6437317,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Shkodër",
+   "zone": "Theth",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:35",
+   "evidence": "village \"Theth\" in Shalë, Bashkia Shkodër (OSM node/728416858, 42.3947, 19.7751)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Theth",
+     "bashki": "Shkodër",
+     "osm": "node/728416858",
+     "lat": 42.3946562,
+     "lon": 19.7750573,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Shkodër",
+   "zone": "Razëm",
+   "status": "hierarchy",
+   "where": "src/features/properties/data/locations.js:35",
+   "evidence": "hamlet \"Razëm (Vrith)\" in Bashkia Malësi e Madhe (OSM node/4734080872)",
+   "action": "move",
+   "to": [
+    {
+     "name": "Razëm (Vrith)",
+     "bashki": "Malësi e Madhe",
+     "osm": "node/4734080872",
+     "lat": 42.3451689,
+     "lon": 19.5512781,
+     "kind": "hamlet",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Shkodër",
+   "zone": "Bahçallek",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:36",
+   "evidence": "neighbourhood \"Bahçallek\" in Shkodër, Bashkia Shkodër (OSM node/3706679574, 42.0396, 19.4956)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Bahçallek",
+     "bashki": "Shkodër",
+     "osm": "node/3706679574",
+     "lat": 42.0395647,
+     "lon": 19.4956485,
+     "kind": "neighbourhood",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Shkodër",
+   "zone": "Rrethi i Ri",
+   "status": "missing",
+   "where": "src/features/properties/data/locations.js:36",
+   "evidence": "No trace in any source checked: the 373 units of Law 115/2014, 4,560 named places in OpenStreetMap, and Nominatim searches with and without diacritics, in definite and genitive form, as \"Lagjja …\" and with the city name",
+   "action": "remove"
+  },
+  {
+   "city": "Shkodër",
+   "zone": "Parrucë",
+   "status": "unverified",
+   "where": "src/features/properties/data/locations.js:36",
+   "evidence": "place/square \"Sheshi Parrucë\" (OSM nominatim:Sheshi Parrucë, Qemal Stafa, Lagjja 4, Shkodër, Bashkia Shkodër, Qarku i Shkodrës, 4001, Shqipëria); place/square \"Sheshi Parrucë\" (OSM node/3705066486); amenity/amenity \"Xhamia Parrucës\" (OSM way/198479514)",
+   "action": "remove",
+   "note": "no source for it as a place"
+  },
+  {
+   "city": "Shkodër",
+   "zone": "Gjuhadol",
+   "status": "unverified",
+   "where": "src/features/properties/data/locations.js:36",
+   "evidence": "OSM nominatim:Rruga Gjuhadol, Lagjja 3, Shkodër, Bashkia Shkodër, Qarku i Shkodrës, 4001, Shqipëria: Rruga Gjuhadol, Lagjja 3, Shkodër, Bashkia Shkodër, Qarku i Shkodrës, 4001, Shqipëria",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Rruga Gjuhadol",
+     "bashki": "Shkodër",
+     "osm": "nominatim:Rruga Gjuhadol, Lagjja 3, Shkodër, Bashkia Shkodër, Qarku i Shkodrës, 4001, Shqipëria",
+     "lat": 42.0659603,
+     "lon": 19.5185213,
+     "kind": "residential",
+     "category": "highway",
+     "as": "Gjuhadol"
+    }
+   ],
+   "landmark": true
+  },
+  {
+   "city": "Shkodër",
+   "zone": "Serreq",
+   "status": "spelling",
+   "where": "src/features/properties/data/locations.js:36",
+   "evidence": "Closest name in Bashkia Shkodër: OSM node/4000443721, 1 letter(s) different. No place spelled \"Serreq\" in OpenStreetMap",
+   "action": "rename",
+   "to": [
+    {
+     "name": "Sarreq",
+     "bashki": "Shkodër",
+     "osm": "node/4000443721",
+     "lat": 42.0650075,
+     "lon": 19.5183833,
+     "kind": "neighbourhood",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Elbasan",
+   "zone": "Qendër",
+   "status": "unverified",
+   "where": "src/features/properties/data/locations.js:42",
+   "evidence": "No place named Qendër in Bashkia Elbasan (OSM); the law has no unit Qendër here",
+   "action": "remove",
+   "note": "replaced by the official units of the municipality"
+  },
+  {
+   "city": "Elbasan",
+   "zone": "Partizani",
+   "status": "unverified",
+   "where": "src/features/properties/data/locations.js:42",
+   "evidence": "boundary/quarter \"Partizani\" (OSM nominatim:Partizani, Lagjja 2, Shkodër, Bashkia Shkodër, Qarku i Shkodrës, Shqipëria); highway/residential \"Partizani\" (OSM nominatim:Partizani, Vranisht, Horë-Vranisht, Bashkia Himarë, Qarku i Vlorës, 9413, Shqipëria); historic/historic \"Partizani\" (OSM nominatim:Partizani, Rruga Ali Demi, Vlorë, Bashkia Vlorë, Qarku i Vlorës, 9401, Shqipëria)",
+   "action": "remove",
+   "note": "no source for it as a place"
+  },
+  {
+   "city": "Elbasan",
+   "zone": "5 Maji",
+   "status": "unverified",
+   "where": "src/features/properties/data/locations.js:42",
+   "evidence": "highway/residential \"Rruga 5 Maji\" (OSM nominatim:Rruga 5 Maji, Malasej, Gostimë, Bashkia Cërrik, Qarku i Elbasanit, 3018, Shqipëria); highway/residential \"Rruga 5 Maji\" (OSM way/161785565)",
+   "action": "remove",
+   "note": "no source for it as a place"
+  },
+  {
+   "city": "Elbasan",
+   "zone": "11 Nëntori",
+   "status": "unverified",
+   "where": "src/features/properties/data/locations.js:42",
+   "evidence": "OSM nominatim:Rruga 11 Nëntori, Kusarth, Elbasan, Bashkia Elbasan, Qarku i Elbasanit, 3006, Shqipëria: Rruga 11 Nëntori, Kusarth, Elbasan, Bashkia Elbasan, Qarku i Elbasanit, 3006, Shqipëria",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Rruga 11 Nëntori",
+     "bashki": "Elbasan",
+     "osm": "nominatim:Rruga 11 Nëntori, Kusarth, Elbasan, Bashkia Elbasan, Qarku i Elbasanit, 3006, Shqipëria",
+     "lat": 41.1069992,
+     "lon": 20.0664705,
+     "kind": "primary",
+     "category": "highway",
+     "as": "11 Nëntori"
+    }
+   ],
+   "landmark": true
+  },
+  {
+   "city": "Elbasan",
+   "zone": "Kala",
+   "status": "unverified",
+   "where": "src/features/properties/data/locations.js:42",
+   "evidence": "amenity/amenity \"Taverna Kala\" (OSM nominatim:Taverna Kala, Rruga Avni Rustemi, Scampa, Elbasan, Bashkia Elbasan, Qarku i Elbasanit, 3001, Shqipëria); amenity/amenity \"Taverna Kala\" (OSM node/12585542020)",
+   "action": "remove",
+   "note": "no source for it as a place"
+  },
+  {
+   "city": "Elbasan",
+   "zone": "Zaranikë",
+   "status": "unverified",
+   "where": "src/features/properties/data/locations.js:43",
+   "evidence": "OSM way/150002338: Zaranika, Kusarth, Elbasan, Bashkia Elbasan, Qarku i Elbasanit, Shqipëria",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Zaranika",
+     "bashki": "Elbasan",
+     "osm": "way/150002338",
+     "lat": 41.1106819,
+     "lon": 20.0644934,
+     "kind": "river",
+     "category": "waterway",
+     "as": "Zaranikë"
+    }
+   ],
+   "landmark": true
+  },
+  {
+   "city": "Elbasan",
+   "zone": "Bradashesh",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:43",
+   "evidence": "village \"Bradashesh\" in Bradashesh, Bashkia Elbasan (OSM node/728418960, 41.1039, 20.0215)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Bradashesh",
+     "bashki": "Elbasan",
+     "osm": "node/728418960",
+     "lat": 41.1038965,
+     "lon": 20.0214812,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Elbasan",
+   "zone": "Shirgjan",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:43",
+   "evidence": "village \"Shirgjan\" in Shirgjan, Bashkia Elbasan (OSM node/728422801, 41.0527, 20.0525)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Shirgjan",
+     "bashki": "Elbasan",
+     "osm": "node/728422801",
+     "lat": 41.0526616,
+     "lon": 20.0524727,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Elbasan",
+   "zone": "Labinot-Fushë",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:43",
+   "evidence": "village \"Labinot Fushë\" in Labinot-Fushë, Bashkia Elbasan (OSM node/728420335, 41.1480, 20.1618)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Labinot Fushë",
+     "bashki": "Elbasan",
+     "osm": "node/728420335",
+     "lat": 41.1479733,
+     "lon": 20.1618355,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Elbasan",
+   "zone": "Labinot-Mal",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:43",
+   "evidence": "village \"Labinot Mal\" in Labinot-Mal, Bashkia Elbasan (OSM node/728423059, 41.1998, 20.1512)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Labinot Mal",
+     "bashki": "Elbasan",
+     "osm": "node/728423059",
+     "lat": 41.1998032,
+     "lon": 20.1511858,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Elbasan",
+   "zone": "Paper",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:44",
+   "evidence": "village \"Papër\" in Papër, Bashkia Elbasan (OSM node/728420659, 41.0530, 19.9566)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Papër",
+     "bashki": "Elbasan",
+     "osm": "node/728420659",
+     "lat": 41.053038,
+     "lon": 19.9565889,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Elbasan",
+   "zone": "Gracën",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:44",
+   "evidence": "village \"Gracen\" in Gracen, Bashkia Elbasan (OSM node/728420183, 41.1527, 19.9667)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Gracen",
+     "bashki": "Elbasan",
+     "osm": "node/728420183",
+     "lat": 41.1526634,
+     "lon": 19.9667291,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Elbasan",
+   "zone": "Tregan",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:44",
+   "evidence": "village \"Tregan\" in Tregan, Bashkia Elbasan (OSM node/728429051, 41.0241, 20.0808)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Tregan",
+     "bashki": "Elbasan",
+     "osm": "node/728429051",
+     "lat": 41.0240788,
+     "lon": 20.0807914,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Elbasan",
+   "zone": "Shushicë",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:44",
+   "evidence": "village \"Shushicë\" in Shushicë, Bashkia Elbasan (OSM node/728426062, 41.1008, 20.1389)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Shushicë",
+     "bashki": "Elbasan",
+     "osm": "node/728426062",
+     "lat": 41.1008191,
+     "lon": 20.1388668,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Fier",
+   "zone": "Qendër",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:50",
+   "evidence": "Law 115/2014 unit list; OSM relation/1251497",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Qendër",
+     "bashki": "Fier",
+     "osm": "relation/1251497",
+     "kind": "njësi administrative"
+    }
+   ]
+  },
+  {
+   "city": "Fier",
+   "zone": "Apolloni",
+   "status": "spelling",
+   "where": "src/features/properties/data/locations.js:50",
+   "evidence": "neighbourhood \"Apollonia\" in Bashkia Fier (OSM node/8926835613)",
+   "action": "rename",
+   "to": [
+    {
+     "name": "Apollonia",
+     "bashki": "Fier",
+     "osm": "node/8926835613",
+     "lat": 40.7277954,
+     "lon": 19.5554495,
+     "kind": "neighbourhood",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Fier",
+   "zone": "Liri",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:50",
+   "evidence": "neighbourhood \"Liri\" in Fier, Bashkia Fier (OSM node/8926835611, 40.7310, 19.5692)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Liri",
+     "bashki": "Fier",
+     "osm": "node/8926835611",
+     "lat": 40.7309988,
+     "lon": 19.5692253,
+     "kind": "neighbourhood",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Fier",
+   "zone": "Sheq i Madh",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:50",
+   "evidence": "village \"Sheq i Madh\" in Qendër, Bashkia Fier (OSM node/728422709, 40.7346, 19.5789)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Sheq i Madh",
+     "bashki": "Fier",
+     "osm": "node/728422709",
+     "lat": 40.7346488,
+     "lon": 19.5788803,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Fier",
+   "zone": "Sheq i Vogël",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:50",
+   "evidence": "village \"Sheq i Vogël\" in Fier, Bashkia Fier (OSM node/2974009868, 40.7247, 19.5698)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Sheq i Vogël",
+     "bashki": "Fier",
+     "osm": "node/2974009868",
+     "lat": 40.7247342,
+     "lon": 19.5697752,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Fier",
+   "zone": "Levan",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:51",
+   "evidence": "village \"Levan\" in Levan, Bashkia Fier (OSM node/2852379211, 40.6759, 19.4894)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Levan",
+     "bashki": "Fier",
+     "osm": "node/2852379211",
+     "lat": 40.6758517,
+     "lon": 19.489382,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Fier",
+   "zone": "Cakran",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:51",
+   "evidence": "village \"Cakran\" in Cakran, Bashkia Fier (OSM node/728423901, 40.6000, 19.6199)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Cakran",
+     "bashki": "Fier",
+     "osm": "node/728423901",
+     "lat": 40.6000415,
+     "lon": 19.619923,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Fier",
+   "zone": "Dërmenas",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:51",
+   "evidence": "village \"Dërmenas\" in Dërmenas, Bashkia Fier (OSM node/728416689, 40.7454, 19.4942)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Dërmenas",
+     "bashki": "Fier",
+     "osm": "node/728416689",
+     "lat": 40.7454366,
+     "lon": 19.4942104,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Fier",
+   "zone": "Topojë",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:51",
+   "evidence": "village \"Topojë\" in Topojë, Bashkia Fier (OSM node/728429168, 40.7642, 19.4346)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Topojë",
+     "bashki": "Fier",
+     "osm": "node/728429168",
+     "lat": 40.7641702,
+     "lon": 19.4346292,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Fier",
+   "zone": "Mbrostar",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:51",
+   "evidence": "village \"Mbrostar\" in Mbrostar Ura, Bashkia Fier (OSM node/728427287, 40.7529, 19.5842)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Mbrostar",
+     "bashki": "Fier",
+     "osm": "node/728427287",
+     "lat": 40.7529385,
+     "lon": 19.5842305,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Fier",
+   "zone": "Portëz",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:52",
+   "evidence": "village \"Portëz\" in Portëz, Bashkia Fier (OSM node/2514259519, 40.6997, 19.5781)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Portëz",
+     "bashki": "Fier",
+     "osm": "node/2514259519",
+     "lat": 40.6996714,
+     "lon": 19.5780721,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Fier",
+   "zone": "Frakull",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:52",
+   "evidence": "njësi administrative \"Frakull\" in Frakull, Bashkia Fier (OSM relation/1251510, 40.6406, 19.5193)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Frakull",
+     "bashki": "Fier",
+     "osm": "relation/1251510",
+     "lat": 40.64061464,
+     "lon": 19.519271489538962,
+     "kind": "njësi administrative",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Fier",
+   "zone": "Libofshë",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:52",
+   "evidence": "village \"Libofshë\" in Libofshë, Bashkia Fier (OSM node/728418141, 40.8333, 19.5543)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Libofshë",
+     "bashki": "Fier",
+     "osm": "node/728418141",
+     "lat": 40.8333293,
+     "lon": 19.554253,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Fier",
+   "zone": "Hysgjokaj",
+   "status": "hierarchy",
+   "where": "src/features/properties/data/locations.js:52",
+   "evidence": "city \"Hysgjokaj\" in Bashkia Lushnjë (OSM nominatim:Hysgjokaj, Bashkia Lushnjë, Qarku i Fierit, 9006, Shqipëria)",
+   "action": "move",
+   "to": [
+    {
+     "name": "Hysgjokaj",
+     "bashki": "Lushnjë",
+     "osm": "nominatim:Hysgjokaj, Bashkia Lushnjë, Qarku i Fierit, 9006, Shqipëria",
+     "lat": 40.9763606,
+     "lon": 19.7859778,
+     "kind": "city",
+     "category": "boundary"
+    }
+   ]
+  },
+  {
+   "city": "Korçë",
+   "zone": "Qendër",
+   "status": "unverified",
+   "where": "src/features/properties/data/locations.js:58",
+   "evidence": "No place named Qendër in Bashkia Korçë (OSM); the law has no unit Qendër here",
+   "action": "remove",
+   "note": "replaced by the official units of the municipality"
+  },
+  {
+   "city": "Korçë",
+   "zone": "Pazari i Ri",
+   "status": "unverified",
+   "where": "src/features/properties/data/locations.js:58",
+   "evidence": "amenity/amenity \"Pazari i Ri\" (OSM nominatim:Pazari i Ri, Rruga Luigj Gurakuqi, Njësia Bashkiake Nr. 2, Tiranë, Bashkia Tiranë, Qarku i Tiranës, 1017, Shqipëria); amenity/amenity \"Pazari i Ri\" (OSM nominatim:Pazari i Ri, 4, Rruga Shenasi Dishnica, Njësia Bashkiake Nr. 2, Tiranë, Bashkia Tiranë, Qarku i Tiranës, 1017, Shqipëria); amenity/amenity \"Pazari I Ri\" (OSM nominatim:Pazari I Ri, 4, Rruga Shenasi Dishnica, Njësia Bashkiake Nr. 2, Tiranë, Bashkia Tiranë, Qarku i Tiranës, 1017, Shqipëria)",
+   "action": "remove",
+   "note": "no source for it as a place"
+  },
+  {
+   "city": "Korçë",
+   "zone": "Pazari i Vjetër",
+   "status": "unverified",
+   "where": "src/features/properties/data/locations.js:58",
+   "evidence": "OSM nominatim:Pazari i Vjetër, Rrugica Koli Karapanxha, Pazari i Korçës, Korçë, Bashkia Korçë, Qarku i Korçës, 7001, Shqipëria: Pazari i Vjetër, Rrugica Koli Karapanxha, Pazari i Korçës, Korçë, Bashkia Korçë, Qarku i Korçës, 7001, Shqipëria",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Pazari i Vjetër",
+     "bashki": "Korçë",
+     "osm": "nominatim:Pazari i Vjetër, Rrugica Koli Karapanxha, Pazari i Korçës, Korçë, Bashkia Korçë, Qarku i Korçës, 7001, Shqipëria",
+     "lat": 40.6177468,
+     "lon": 20.774764,
+     "kind": "amenity",
+     "category": "amenity",
+     "as": "Pazari i Vjetër"
+    }
+   ],
+   "landmark": true
+  },
+  {
+   "city": "Korçë",
+   "zone": "Bulevardi Fan Noli",
+   "status": "unverified",
+   "where": "src/features/properties/data/locations.js:58",
+   "evidence": "OSM nominatim:Bulevardi Fan Noli, Korçë, Bashkia Korçë, Qarku i Korçës, 7001, Shqipëria: Bulevardi Fan Noli, Korçë, Bashkia Korçë, Qarku i Korçës, 7001, Shqipëria",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Bulevardi Fan Noli",
+     "bashki": "Korçë",
+     "osm": "nominatim:Bulevardi Fan Noli, Korçë, Bashkia Korçë, Qarku i Korçës, 7001, Shqipëria",
+     "lat": 40.6139347,
+     "lon": 20.7808253,
+     "kind": "secondary",
+     "category": "highway",
+     "as": "Bulevardi Fan Noli"
+    }
+   ],
+   "landmark": true
+  },
+  {
+   "city": "Korçë",
+   "zone": "Bulevardi Republika",
+   "status": "unverified",
+   "where": "src/features/properties/data/locations.js:59",
+   "evidence": "OSM nominatim:Bulevardi Republika, Korçë, Bashkia Korçë, Qarku i Korçës, 7001, Shqipëria: Bulevardi Republika, Korçë, Bashkia Korçë, Qarku i Korçës, 7001, Shqipëria",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Bulevardi Republika",
+     "bashki": "Korçë",
+     "osm": "nominatim:Bulevardi Republika, Korçë, Bashkia Korçë, Qarku i Korçës, 7001, Shqipëria",
+     "lat": 40.6164344,
+     "lon": 20.7806629,
+     "kind": "tertiary",
+     "category": "highway",
+     "as": "Bulevardi Republika"
+    }
+   ],
+   "landmark": true
+  },
+  {
+   "city": "Korçë",
+   "zone": "10 Korriku",
+   "status": "unverified",
+   "where": "src/features/properties/data/locations.js:59",
+   "evidence": "OSM nominatim:Rruga 10 Korriku, Korçë, Bashkia Korçë, Qarku i Korçës, 7001, Shqipëria: Rruga 10 Korriku, Korçë, Bashkia Korçë, Qarku i Korçës, 7001, Shqipëria",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Rruga 10 Korriku",
+     "bashki": "Korçë",
+     "osm": "nominatim:Rruga 10 Korriku, Korçë, Bashkia Korçë, Qarku i Korçës, 7001, Shqipëria",
+     "lat": 40.6105834,
+     "lon": 20.7806241,
+     "kind": "residential",
+     "category": "highway",
+     "as": "10 Korriku"
+    }
+   ],
+   "landmark": true
+  },
+  {
+   "city": "Korçë",
+   "zone": "Liqeni i Korçës",
+   "status": "missing",
+   "where": "src/features/properties/data/locations.js:59",
+   "evidence": "No trace in any source checked: the 373 units of Law 115/2014, 4,560 named places in OpenStreetMap, and Nominatim searches with and without diacritics, in definite and genitive form, as \"Lagjja …\" and with the city name",
+   "action": "remove"
+  },
+  {
+   "city": "Korçë",
+   "zone": "Voskopojë",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:59",
+   "evidence": "village \"Voskopojë\" in Voskopojë, Bashkia Korçë (OSM node/5271846848, 40.6332, 20.5906)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Voskopojë",
+     "bashki": "Korçë",
+     "osm": "node/5271846848",
+     "lat": 40.6332013,
+     "lon": 20.5906137,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Korçë",
+   "zone": "Dardha",
+   "status": "spelling",
+   "where": "src/features/properties/data/locations.js:60",
+   "evidence": "village \"Dardhë\" in Bashkia Korçë (OSM node/712337459)",
+   "action": "rename",
+   "to": [
+    {
+     "name": "Dardhë",
+     "bashki": "Korçë",
+     "osm": "node/712337459",
+     "lat": 40.5187822,
+     "lon": 20.8273678,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Korçë",
+   "zone": "Boboshticë",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:60",
+   "evidence": "village \"Boboshticë\" in Drenovë, Bashkia Korçë (OSM node/5279827286, 40.5534, 20.7648)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Boboshticë",
+     "bashki": "Korçë",
+     "osm": "node/5279827286",
+     "lat": 40.553401,
+     "lon": 20.7648106,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Korçë",
+   "zone": "Drenovë",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:60",
+   "evidence": "village \"Drenovë\" in Drenovë, Bashkia Korçë (OSM node/712337686, 40.5835, 20.7909)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Drenovë",
+     "bashki": "Korçë",
+     "osm": "node/712337686",
+     "lat": 40.5834892,
+     "lon": 20.7909202,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Korçë",
+   "zone": "Mborje",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:60",
+   "evidence": "village \"Mborje\" in Drenovë, Bashkia Korçë (OSM node/712337586, 40.6061, 20.8011)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Mborje",
+     "bashki": "Korçë",
+     "osm": "node/712337586",
+     "lat": 40.6061265,
+     "lon": 20.8011201,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Korçë",
+   "zone": "Pojan",
+   "status": "hierarchy",
+   "where": "src/features/properties/data/locations.js:60",
+   "evidence": "njësi administrative \"Pojan\" in Bashkia Maliq (OSM relation/1252592)",
+   "action": "move",
+   "to": [
+    {
+     "name": "Pojan",
+     "bashki": "Maliq",
+     "osm": "relation/1252592",
+     "lat": 40.71340912,
+     "lon": 20.841724606198536,
+     "kind": "njësi administrative",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Berat",
+   "zone": "Mangalem",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:66",
+   "evidence": "neighbourhood \"Mangalem\" in Berat, Bashkia Berat (OSM node/9531940558, 40.7054, 19.9499)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Mangalem",
+     "bashki": "Berat",
+     "osm": "node/9531940558",
+     "lat": 40.705387,
+     "lon": 19.949939,
+     "kind": "neighbourhood",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Berat",
+   "zone": "Goricë",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:66",
+   "evidence": "neighbourhood \"Goricë\" in Berat, Bashkia Berat (OSM node/9531978073, 40.7026, 19.9467)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Goricë",
+     "bashki": "Berat",
+     "osm": "node/9531978073",
+     "lat": 40.7025662,
+     "lon": 19.9467161,
+     "kind": "neighbourhood",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Berat",
+   "zone": "Kala",
+   "status": "unverified",
+   "where": "src/features/properties/data/locations.js:66",
+   "evidence": "highway/road \"Rruga Lagje Kala\" (OSM nominatim:Rruga Lagje Kala, Kalaja e Beratit, Berat, Bashkia Berat, Qarku i Beratit, 5001, Shqipëria); highway/road \"Rruga Lagje Kala\" (OSM way/229018077)",
+   "action": "remove",
+   "note": "no source for it as a place"
+  },
+  {
+   "city": "Berat",
+   "zone": "Qendër",
+   "status": "unverified",
+   "where": "src/features/properties/data/locations.js:66",
+   "evidence": "No place named Qendër in Bashkia Berat (OSM); the law has no unit Qendër here",
+   "action": "remove",
+   "note": "replaced by the official units of the municipality"
+  },
+  {
+   "city": "Berat",
+   "zone": "Uznove",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:66",
+   "evidence": "village \"Uznovë\" in Berat, Bashkia Berat (OSM node/728419025, 40.6957, 19.9788)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Uznovë",
+     "bashki": "Berat",
+     "osm": "node/728419025",
+     "lat": 40.6957461,
+     "lon": 19.9788398,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Berat",
+   "zone": "Dorez",
+   "status": "hierarchy",
+   "where": "src/features/properties/data/locations.js:67",
+   "evidence": "village \"Dorëz\" in Bashkia Tepelenë (OSM node/713605356)",
+   "action": "move",
+   "to": [
+    {
+     "name": "Dorëz",
+     "bashki": "Tepelenë",
+     "osm": "node/713605356",
+     "lat": 40.3823617,
+     "lon": 19.8287634,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Berat",
+   "zone": "Roshnik",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:67",
+   "evidence": "village \"Roshnik\" in Roshnik, Bashkia Berat (OSM node/728425130, 40.7311, 20.0414)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Roshnik",
+     "bashki": "Berat",
+     "osm": "node/728425130",
+     "lat": 40.7311372,
+     "lon": 20.0413734,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Berat",
+   "zone": "Sinjë",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:67",
+   "evidence": "village \"Sinjë\" in Sinjë, Bashkia Berat (OSM node/728418259, 40.6484, 19.8683)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Sinjë",
+     "bashki": "Berat",
+     "osm": "node/728418259",
+     "lat": 40.648359,
+     "lon": 19.8682853,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Berat",
+   "zone": "Otllak",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:67",
+   "evidence": "village \"Otllak\" in Otllak, Bashkia Berat (OSM node/728419545, 40.7440, 19.9349)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Otllak",
+     "bashki": "Berat",
+     "osm": "node/728419545",
+     "lat": 40.7440491,
+     "lon": 19.9348885,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Berat",
+   "zone": "Velabisht",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:67",
+   "evidence": "village \"Velabisht\" in Velabisht, Bashkia Berat (OSM node/728428016, 40.7015, 19.9344)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Velabisht",
+     "bashki": "Berat",
+     "osm": "node/728428016",
+     "lat": 40.7015325,
+     "lon": 19.9343516,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Berat",
+   "zone": "Ura Vajgurore",
+   "status": "hierarchy",
+   "where": "src/features/properties/data/locations.js:68",
+   "evidence": "city_district \"Ura Vajgurore\" in Bashkia Dimal (OSM nominatim:Ura Vajgurore, Bashkia Dimal, Qarku i Beratit, 5007, Shqipëria)",
+   "action": "move",
+   "to": [
+    {
+     "name": "Ura Vajgurore",
+     "bashki": "Dimal",
+     "osm": "nominatim:Ura Vajgurore, Bashkia Dimal, Qarku i Beratit, 5007, Shqipëria",
+     "lat": 40.7391336,
+     "lon": 19.8422361,
+     "kind": "city_district",
+     "category": "boundary"
+    }
+   ]
+  },
+  {
+   "city": "Berat",
+   "zone": "Poshnjë",
+   "status": "hierarchy",
+   "where": "src/features/properties/data/locations.js:68",
+   "evidence": "village \"Poshnjë\" in Bashkia Dimal (OSM node/728428199)",
+   "action": "move",
+   "to": [
+    {
+     "name": "Poshnjë",
+     "bashki": "Dimal",
+     "osm": "node/728428199",
+     "lat": 40.7829351,
+     "lon": 19.8443153,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Berat",
+   "zone": "Kutalli",
+   "status": "hierarchy",
+   "where": "src/features/properties/data/locations.js:68",
+   "evidence": "village \"Kutalli\" in Bashkia Dimal (OSM node/4073879322)",
+   "action": "move",
+   "to": [
+    {
+     "name": "Kutalli",
+     "bashki": "Dimal",
+     "osm": "node/4073879322",
+     "lat": 40.7851671,
+     "lon": 19.7922362,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Lushnjë",
+   "zone": "Qendër",
+   "status": "unverified",
+   "where": "src/features/properties/data/locations.js:74",
+   "evidence": "No place named Qendër in Bashkia Lushnjë (OSM); the law has no unit Qendër here",
+   "action": "remove",
+   "note": "replaced by the official units of the municipality"
+  },
+  {
+   "city": "Lushnjë",
+   "zone": "Divjakë",
+   "status": "hierarchy",
+   "where": "src/features/properties/data/locations.js:74",
+   "evidence": "njësi administrative \"Divjakë\" in Bashkia Divjakë (OSM relation/1251476)",
+   "action": "move",
+   "to": [
+    {
+     "name": "Divjakë",
+     "bashki": "Divjakë",
+     "osm": "relation/1251476",
+     "lat": 40.9853648,
+     "lon": 19.534652801549296,
+     "kind": "njësi administrative",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Lushnjë",
+   "zone": "Fier-Shegan",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:74",
+   "evidence": "village \"Fier Shegan\" in Fier-Shegan, Bashkia Lushnjë (OSM node/2359229035, 40.8690, 19.7844)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Fier Shegan",
+     "bashki": "Lushnjë",
+     "osm": "node/2359229035",
+     "lat": 40.8690086,
+     "lon": 19.784368,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Lushnjë",
+   "zone": "Karbunarë",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:74",
+   "evidence": "njësi administrative \"Karbunarë\" in Karbunarë, Bashkia Lushnjë (OSM relation/1251503, 40.9259, 19.7683)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Karbunarë",
+     "bashki": "Lushnjë",
+     "osm": "relation/1251503",
+     "lat": 40.92589585,
+     "lon": 19.76825829296738,
+     "kind": "njësi administrative",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Lushnjë",
+   "zone": "Golem",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:74",
+   "evidence": "village \"Golem\" in Golem, Bashkia Lushnjë (OSM node/728425135, 40.9674, 19.6817)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Golem",
+     "bashki": "Lushnjë",
+     "osm": "node/728425135",
+     "lat": 40.9673917,
+     "lon": 19.6817049,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Lushnjë",
+   "zone": "Kolonjë",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:75",
+   "evidence": "village \"Kolonjë\" in Kolonjë, Bashkia Lushnjë (OSM node/728419499, 40.8255, 19.6049)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Kolonjë",
+     "bashki": "Lushnjë",
+     "osm": "node/728419499",
+     "lat": 40.8254518,
+     "lon": 19.6048673,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Lushnjë",
+   "zone": "Ballagat",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:75",
+   "evidence": "village \"Ballagat\" in Ballagat, Bashkia Lushnjë (OSM node/728420233, 40.9968, 19.7756)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Ballagat",
+     "bashki": "Lushnjë",
+     "osm": "node/728420233",
+     "lat": 40.9968041,
+     "lon": 19.7756136,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Lushnjë",
+   "zone": "Bubullimë",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:75",
+   "evidence": "village \"Bubullimë\" in Bubullimë, Bashkia Lushnjë (OSM node/728423318, 40.8135, 19.6485)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Bubullimë",
+     "bashki": "Lushnjë",
+     "osm": "node/728423318",
+     "lat": 40.8135377,
+     "lon": 19.6484904,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Lushnjë",
+   "zone": "Greth",
+   "status": "unverified",
+   "where": "src/features/properties/data/locations.js:75",
+   "evidence": "place/village \"Rreth-Greth\" (OSM nominatim:Rreth-Greth, Kryevidh, Bashkia Rrogozhinë, Qarku i Tiranës, 2510, Shqipëria); highway/residential \"Rreth-greth\" (OSM nominatim:Rreth-greth, Vilë-Ballaj, Gosë, Bashkia Rrogozhinë, Qarku i Tiranës, 2508, Shqipëria)",
+   "action": "remove",
+   "note": "no source for it as a place"
+  },
+  {
+   "city": "Lushnjë",
+   "zone": "Hysgjokaj",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:75",
+   "evidence": "village \"Hysgjokaj\" in Hysgjokaj, Bashkia Lushnjë (OSM node/728428202, 40.9747, 19.7904)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Hysgjokaj",
+     "bashki": "Lushnjë",
+     "osm": "node/728428202",
+     "lat": 40.9746524,
+     "lon": 19.790414,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Pogradec",
+   "zone": "Qendër",
+   "status": "unverified",
+   "where": "src/features/properties/data/locations.js:81",
+   "evidence": "No place named Qendër in Bashkia Pogradec (OSM); the law has no unit Qendër here",
+   "action": "remove",
+   "note": "replaced by the official units of the municipality"
+  },
+  {
+   "city": "Pogradec",
+   "zone": "Liqeni",
+   "status": "unverified",
+   "where": "src/features/properties/data/locations.js:81",
+   "evidence": "water/lake \"Liqeni Lukovës\" (OSM nominatim:Liqeni Lukovës, Velçan, Bashkia Pogradec, Qarku i Korçës, 7310, Shqipëria); shop/shop \"Big Market Liqeni\" (OSM nominatim:Big Market Liqeni, Dëshmorët e Pojskës, Pogradec, Bashkia Pogradec, Qarku i Korçës, 7301, Shqipëria); water/lake \"Liqeni Lukovës\" (OSM way/284040315)",
+   "action": "remove",
+   "note": "no source for it as a place"
+  },
+  {
+   "city": "Pogradec",
+   "zone": "Tushemisht",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:81",
+   "evidence": "village \"Tushemisht\" in Buçimas, Bashkia Pogradec (OSM node/3053090986, 40.9010, 20.7202)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Tushemisht",
+     "bashki": "Pogradec",
+     "osm": "node/3053090986",
+     "lat": 40.9010373,
+     "lon": 20.720156,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Pogradec",
+   "zone": "Drilon",
+   "status": "unverified",
+   "where": "src/features/properties/data/locations.js:81",
+   "evidence": "OSM node/9200215817: Driloni, Dëshmorët e Pojskës, Tushemisht, Buçimas, Bashkia Pogradec, Qarku i Korçës, 7304, Shqipëria",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Driloni",
+     "bashki": "Pogradec",
+     "osm": "node/9200215817",
+     "lat": 40.9010351,
+     "lon": 20.7117847,
+     "kind": "tourism",
+     "category": "tourism",
+     "as": "Drilon"
+    }
+   ],
+   "landmark": true
+  },
+  {
+   "city": "Pogradec",
+   "zone": "Lin",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:81",
+   "evidence": "village \"Lin\" in Udenisht, Bashkia Pogradec (OSM node/712337202, 41.0664, 20.6395)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Lin",
+     "bashki": "Pogradec",
+     "osm": "node/712337202",
+     "lat": 41.0663515,
+     "lon": 20.6395205,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Pogradec",
+   "zone": "Çërravë",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:82",
+   "evidence": "village \"Çerravë\" in Çërravë, Bashkia Pogradec (OSM node/712337594, 40.8521, 20.7265)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Çerravë",
+     "bashki": "Pogradec",
+     "osm": "node/712337594",
+     "lat": 40.8521316,
+     "lon": 20.7264853,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Pogradec",
+   "zone": "Buçimas",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:82",
+   "evidence": "village \"Buçimas\" in Buçimas, Bashkia Pogradec (OSM node/712337098, 40.8916, 20.6838)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Buçimas",
+     "bashki": "Pogradec",
+     "osm": "node/712337098",
+     "lat": 40.8915517,
+     "lon": 20.6837574,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Pogradec",
+   "zone": "Hudënisht",
+   "status": "spelling",
+   "where": "src/features/properties/data/locations.js:82",
+   "evidence": "Closest name in Bashkia Pogradec: OSM node/712337415, 1 letter(s) different. No place spelled \"Hudënisht\" in OpenStreetMap",
+   "action": "rename",
+   "to": [
+    {
+     "name": "Udenisht",
+     "bashki": "Pogradec",
+     "osm": "node/712337415",
+     "lat": 40.9632082,
+     "lon": 20.6404654,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Pogradec",
+   "zone": "Guri i Kuq",
+   "status": "unverified",
+   "where": "src/features/properties/data/locations.js:82",
+   "evidence": "natural/peak \"Maja Guri i Kuq\" (OSM nominatim:Maja Guri i Kuq, Qendër Leskovik, Bashkia Kolonjë, Qarku i Korçës, 7404, Shqipëria)",
+   "action": "remove",
+   "note": "no source for it as a place"
+  },
+  {
+   "city": "Pogradec",
+   "zone": "Verdovë",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:82",
+   "evidence": "village \"Vërdovë\" in Buçimas, Bashkia Pogradec (OSM node/712337852, 40.8908, 20.6573)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Vërdovë",
+     "bashki": "Pogradec",
+     "osm": "node/712337852",
+     "lat": 40.8907606,
+     "lon": 20.6572833,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Kavajë",
+   "zone": "Qendër",
+   "status": "unverified",
+   "where": "src/features/properties/data/locations.js:88",
+   "evidence": "No place named Qendër in Bashkia Kavajë (OSM); the law has no unit Qendër here",
+   "action": "remove",
+   "note": "replaced by the official units of the municipality"
+  },
+  {
+   "city": "Kavajë",
+   "zone": "Golem",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:88",
+   "evidence": "village \"Golem\" in Golem, Bashkia Kavajë (OSM node/728421409, 41.2434, 19.5224)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Golem",
+     "bashki": "Kavajë",
+     "osm": "node/728421409",
+     "lat": 41.2434439,
+     "lon": 19.5223942,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Kavajë",
+   "zone": "Qerret",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:88",
+   "evidence": "village \"Qerret\" in Golem, Bashkia Kavajë (OSM node/728418495, 41.2166, 19.5277)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Qerret",
+     "bashki": "Kavajë",
+     "osm": "node/728418495",
+     "lat": 41.2166061,
+     "lon": 19.5276902,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Kavajë",
+   "zone": "Mali i Robit",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:88",
+   "evidence": "quarter \"Mali i Robit\" in Golem, Bashkia Kavajë (OSM node/9066689457, 41.2363, 19.5176)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Mali i Robit",
+     "bashki": "Kavajë",
+     "osm": "node/9066689457",
+     "lat": 41.2362684,
+     "lon": 19.5175605,
+     "kind": "quarter",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Kavajë",
+   "zone": "Spille",
+   "status": "hierarchy",
+   "where": "src/features/properties/data/locations.js:88",
+   "evidence": "village \"Spille\" in Bashkia Rrogozhinë (OSM node/2822286660)",
+   "action": "move",
+   "to": [
+    {
+     "name": "Spille",
+     "bashki": "Rrogozhinë",
+     "osm": "node/2822286660",
+     "lat": 41.0953179,
+     "lon": 19.4680787,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Kavajë",
+   "zone": "Helmës",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:89",
+   "evidence": "village \"Helmes\" in Helmas, Bashkia Kavajë (OSM node/728423757, 41.2030, 19.6168)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Helmes",
+     "bashki": "Kavajë",
+     "osm": "node/728423757",
+     "lat": 41.2029849,
+     "lon": 19.6168098,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Kavajë",
+   "zone": "Luz i Vogël",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:89",
+   "evidence": "village \"Luz i Vogël\" in Luz i Vogël, Bashkia Kavajë (OSM node/728421688, 41.1274, 19.5736)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Luz i Vogël",
+     "bashki": "Kavajë",
+     "osm": "node/728421688",
+     "lat": 41.1273876,
+     "lon": 19.5736017,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Kavajë",
+   "zone": "Synej",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:89",
+   "evidence": "village \"Synej\" in Synej, Bashkia Kavajë (OSM node/728416973, 41.1748, 19.5461)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Synej",
+     "bashki": "Kavajë",
+     "osm": "node/728416973",
+     "lat": 41.1748033,
+     "lon": 19.5461306,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Kavajë",
+   "zone": "Rrogozhinë",
+   "status": "hierarchy",
+   "where": "src/features/properties/data/locations.js:89",
+   "evidence": "njësi administrative \"Rrogozhinë\" in Bashkia Rrogozhinë (OSM relation/1250110)",
+   "action": "move",
+   "to": [
+    {
+     "name": "Rrogozhinë",
+     "bashki": "Rrogozhinë",
+     "osm": "relation/1250110",
+     "lat": 41.08294212,
+     "lon": 19.660884391309423,
+     "kind": "njësi administrative",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Lezhë",
+   "zone": "Qendër",
+   "status": "unverified",
+   "where": "src/features/properties/data/locations.js:95",
+   "evidence": "No place named Qendër in Bashkia Lezhë (OSM); the law has no unit Qendër here",
+   "action": "remove",
+   "note": "replaced by the official units of the municipality"
+  },
+  {
+   "city": "Lezhë",
+   "zone": "Kala",
+   "status": "unverified",
+   "where": "src/features/properties/data/locations.js:95",
+   "evidence": "natural/peak \"Maja Kala\" (OSM nominatim:Maja Kala, Klos, Bashkia Cërrik, Qarku i Elbasanit, 3020, Shqipëria); amenity/amenity \"Taverna Kala\" (OSM nominatim:Taverna Kala, Rruga Avni Rustemi, Scampa, Elbasan, Bashkia Elbasan, Qarku i Elbasanit, 3001, Shqipëria); highway/road \"Rruga Lagje Kala\" (OSM nominatim:Rruga Lagje Kala, Kalaja e Beratit, Berat, Bashkia Berat, Qarku i Beratit, 5001, Shqipëria)",
+   "action": "remove",
+   "note": "no source for it as a place"
+  },
+  {
+   "city": "Lezhë",
+   "zone": "Shëngjin",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:95",
+   "evidence": "town \"Shëngjin\" in Shëngjin, Bashkia Lezhë (OSM node/441527308, 41.8098, 19.5990)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Shëngjin",
+     "bashki": "Lezhë",
+     "osm": "node/441527308",
+     "lat": 41.8097827,
+     "lon": 19.5989755,
+     "kind": "town",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Lezhë",
+   "zone": "Ishull-Lezhë",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:95",
+   "evidence": "village \"Ishull Lezhë\" in Shëngjin, Bashkia Lezhë (OSM node/728419751, 41.7649, 19.6406)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Ishull Lezhë",
+     "bashki": "Lezhë",
+     "osm": "node/728419751",
+     "lat": 41.7648685,
+     "lon": 19.6405816,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Lezhë",
+   "zone": "Balldren",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:95",
+   "evidence": "village \"Balldren\" in Balldren, Bashkia Lezhë (OSM node/728427720, 41.8212, 19.6378)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Balldren",
+     "bashki": "Lezhë",
+     "osm": "node/728427720",
+     "lat": 41.8211888,
+     "lon": 19.6377892,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Lezhë",
+   "zone": "Blinisht",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:96",
+   "evidence": "village \"Blinisht\" in Blinisht, Bashkia Lezhë (OSM node/728421982, 41.8821, 19.6367)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Blinisht",
+     "bashki": "Lezhë",
+     "osm": "node/728421982",
+     "lat": 41.882065,
+     "lon": 19.6366548,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Lezhë",
+   "zone": "Kallmet",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:96",
+   "evidence": "njësi administrative \"Kallmet\" in Kallmet, Bashkia Lezhë (OSM relation/1248932, 41.8459, 19.6797)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Kallmet",
+     "bashki": "Lezhë",
+     "osm": "relation/1248932",
+     "lat": 41.84594607,
+     "lon": 19.67968190134343,
+     "kind": "njësi administrative",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Lezhë",
+   "zone": "Kolsh",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:96",
+   "evidence": "village \"Kolç\" in Kolsh, Bashkia Lezhë (OSM node/728427347, 41.7903, 19.6814)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Kolç",
+     "bashki": "Lezhë",
+     "osm": "node/728427347",
+     "lat": 41.7903239,
+     "lon": 19.6814491,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Lezhë",
+   "zone": "Zejmen",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:96",
+   "evidence": "village \"Zejmen\" in Zejmen, Bashkia Lezhë (OSM node/728423433, 41.7075, 19.6896)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Zejmen",
+     "bashki": "Lezhë",
+     "osm": "node/728423433",
+     "lat": 41.7075387,
+     "lon": 19.6895601,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Lezhë",
+   "zone": "Ungrej",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:96",
+   "evidence": "village \"Ungrej\" in Ungrej, Bashkia Lezhë (OSM node/728420167, 41.8728, 19.7915)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Ungrej",
+     "bashki": "Lezhë",
+     "osm": "node/728420167",
+     "lat": 41.8728191,
+     "lon": 19.7914912,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Gjirokastër",
+   "zone": "Kala",
+   "status": "unverified",
+   "where": "src/features/properties/data/locations.js:102",
+   "evidence": "natural/peak \"Maja Kala\" (OSM nominatim:Maja Kala, Klos, Bashkia Cërrik, Qarku i Elbasanit, 3020, Shqipëria); amenity/amenity \"Taverna Kala\" (OSM nominatim:Taverna Kala, Rruga Avni Rustemi, Scampa, Elbasan, Bashkia Elbasan, Qarku i Elbasanit, 3001, Shqipëria); highway/road \"Rruga Lagje Kala\" (OSM nominatim:Rruga Lagje Kala, Kalaja e Beratit, Berat, Bashkia Berat, Qarku i Beratit, 5001, Shqipëria)",
+   "action": "remove",
+   "note": "no source for it as a place"
+  },
+  {
+   "city": "Gjirokastër",
+   "zone": "Qendër",
+   "status": "unverified",
+   "where": "src/features/properties/data/locations.js:102",
+   "evidence": "No place named Qendër in Bashkia Gjirokastër (OSM); the law has no unit Qendër here",
+   "action": "remove",
+   "note": "replaced by the official units of the municipality"
+  },
+  {
+   "city": "Gjirokastër",
+   "zone": "Pazari i Vjetër",
+   "status": "unverified",
+   "where": "src/features/properties/data/locations.js:102",
+   "evidence": "OSM nominatim:Rruga Pazari i Vjetër, Gjirokastër, Bashkia Gjirokastër, Qarku i Gjirokastrës, 6001, Shqipëria: Rruga Pazari i Vjetër, Gjirokastër, Bashkia Gjirokastër, Qarku i Gjirokastrës, 6001, Shqipëria",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Rruga Pazari i Vjetër",
+     "bashki": "Gjirokastër",
+     "osm": "nominatim:Rruga Pazari i Vjetër, Gjirokastër, Bashkia Gjirokastër, Qarku i Gjirokastrës, 6001, Shqipëria",
+     "lat": 40.0753892,
+     "lon": 20.1430949,
+     "kind": "residential",
+     "category": "highway",
+     "as": "Pazari i Vjetër"
+    }
+   ],
+   "landmark": true
+  },
+  {
+   "city": "Gjirokastër",
+   "zone": "Dunavat",
+   "status": "missing",
+   "where": "src/features/properties/data/locations.js:102",
+   "evidence": "No trace in any source checked: the 373 units of Law 115/2014, 4,560 named places in OpenStreetMap, and Nominatim searches with and without diacritics, in definite and genitive form, as \"Lagjja …\" and with the city name",
+   "action": "remove"
+  },
+  {
+   "city": "Gjirokastër",
+   "zone": "Antigonë",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:102",
+   "evidence": "njësi administrative \"Antigonë\" in Antigonë, Bashkia Gjirokastër (OSM relation/1253909, 40.0839, 20.1971)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Antigonë",
+     "bashki": "Gjirokastër",
+     "osm": "relation/1253909",
+     "lat": 40.08388714,
+     "lon": 20.197113425108455,
+     "kind": "njësi administrative",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Gjirokastër",
+   "zone": "Lazarat",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:103",
+   "evidence": "village \"Lazarat\" in Lazarat, Bashkia Gjirokastër (OSM node/728418835, 40.0487, 20.1506)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Lazarat",
+     "bashki": "Gjirokastër",
+     "osm": "node/728418835",
+     "lat": 40.0486634,
+     "lon": 20.1506355,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Gjirokastër",
+   "zone": "Lunxhëri",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:103",
+   "evidence": "njësi administrative \"Lunxhëri\" in Lunxhëri, Bashkia Gjirokastër (OSM relation/1253927, 40.1420, 20.1735)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Lunxhëri",
+     "bashki": "Gjirokastër",
+     "osm": "relation/1253927",
+     "lat": 40.14204046,
+     "lon": 20.173541577035607,
+     "kind": "njësi administrative",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Gjirokastër",
+   "zone": "Dropull",
+   "status": "hierarchy",
+   "where": "src/features/properties/data/locations.js:103",
+   "evidence": "njësi administrative \"Dropull i Poshtëm\" in Bashkia Dropull (OSM relation/1253924)",
+   "action": "move",
+   "to": [
+    {
+     "name": "Dropull i Poshtëm",
+     "bashki": "Dropull",
+     "osm": "relation/1253924",
+     "lat": 39.97363716,
+     "lon": 20.23562491546132,
+     "kind": "njësi administrative",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Gjirokastër",
+   "zone": "Cepo",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:103",
+   "evidence": "njësi administrative \"Cepo\" in Cepo, Bashkia Gjirokastër (OSM relation/1253903, 40.1147, 20.0265)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Cepo",
+     "bashki": "Gjirokastër",
+     "osm": "relation/1253903",
+     "lat": 40.11470145,
+     "lon": 20.026488604816542,
+     "kind": "njësi administrative",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Gjirokastër",
+   "zone": "Labovë",
+   "status": "spelling",
+   "where": "src/features/properties/data/locations.js:103",
+   "evidence": "village \"Labovë e Madhe\" in Bashkia Gjirokastër (OSM node/728418348); village \"Labovë e Vogël\" in Bashkia Gjirokastër (OSM node/728418049)",
+   "action": "rename",
+   "to": [
+    {
+     "name": "Labovë e Madhe",
+     "bashki": "Gjirokastër",
+     "osm": "node/728418348",
+     "lat": 40.2073931,
+     "lon": 20.1368326,
+     "kind": "village",
+     "category": "place"
+    },
+    {
+     "name": "Labovë e Vogël",
+     "bashki": "Gjirokastër",
+     "osm": "node/728418049",
+     "lat": 40.1967212,
+     "lon": 20.1383312,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Gjirokastër",
+   "zone": "Hormovë",
+   "status": "hierarchy",
+   "where": "src/features/properties/data/locations.js:104",
+   "evidence": "village \"Hormovë\" in Bashkia Tepelenë (OSM node/728418565)",
+   "action": "move",
+   "to": [
+    {
+     "name": "Hormovë",
+     "bashki": "Tepelenë",
+     "osm": "node/728418565",
+     "lat": 40.2382185,
+     "lon": 20.1007506,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Gjirokastër",
+   "zone": "Kakavijë",
+   "status": "hierarchy",
+   "where": "src/features/properties/data/locations.js:104",
+   "evidence": "village \"Kakavijë\" in Bashkia Dropull (OSM node/728421251)",
+   "action": "move",
+   "to": [
+    {
+     "name": "Kakavijë",
+     "bashki": "Dropull",
+     "osm": "node/728421251",
+     "lat": 39.9084407,
+     "lon": 20.358378,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Gjirokastër",
+   "zone": "Mashkullorë",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:104",
+   "evidence": "village \"Mashkullorë\" in Cepo, Bashkia Gjirokastër (OSM node/728425618, 40.1179, 20.0881)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Mashkullorë",
+     "bashki": "Gjirokastër",
+     "osm": "node/728425618",
+     "lat": 40.1179099,
+     "lon": 20.088061,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Sarandë",
+   "zone": "Qendër",
+   "status": "unverified",
+   "where": "src/features/properties/data/locations.js:110",
+   "evidence": "No place named Qendër in Bashkia Sarandë (OSM); the law has no unit Qendër here",
+   "action": "remove",
+   "note": "replaced by the official units of the municipality"
+  },
+  {
+   "city": "Sarandë",
+   "zone": "Lungomare",
+   "status": "unverified",
+   "where": "src/features/properties/data/locations.js:110",
+   "evidence": "place/suburb \"Lungomare\" (OSM nominatim:Lungomare, Vlorë, Bashkia Vlorë, Qarku i Vlorës, 9400, Shqipëria); highway/pedestrian \"Lungomare\" (OSM nominatim:Lungomare, Vlorë, Bashkia Vlorë, Qarku i Vlorës, 9401, Shqipëria)",
+   "action": "remove",
+   "note": "no source for it as a place"
+  },
+  {
+   "city": "Sarandë",
+   "zone": "Mango",
+   "status": "unverified",
+   "where": "src/features/properties/data/locations.js:110",
+   "evidence": "natural/beach \"Plazhi Mango\" (OSM nominatim:Plazhi Mango, Çukë, Sarandë, Bashkia Sarandë, Qarku i Vlorës, 9701, Shqipëria); natural/beach \"Plazhi Mango\" (OSM way/285639634); Overpass: natural=beach \"Plazhi Mango\" (OSM way/285639634)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Plazhi Mango",
+     "bashki": "Sarandë",
+     "osm": "way/285639634",
+     "lat": 39.8527,
+     "lon": 20.0205,
+     "kind": "beach",
+     "category": "natural",
+     "as": "Mango"
+    }
+   ],
+   "landmark": true
+  },
+  {
+   "city": "Sarandë",
+   "zone": "Ksamil",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:110",
+   "evidence": "village \"Ksamil\" in Ksamil, Bashkia Sarandë (OSM node/713605214, 39.7701, 20.0038)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Ksamil",
+     "bashki": "Sarandë",
+     "osm": "node/713605214",
+     "lat": 39.7701379,
+     "lon": 20.0037922,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Sarandë",
+   "zone": "Butrint",
+   "status": "unverified",
+   "where": "src/features/properties/data/locations.js:110",
+   "evidence": "OSM way/1085039416: Butrinti, Rruga Butrinti, Gjashtë, Sarandë, Bashkia Sarandë, Qarku i Vlorës, 9701, Shqipëria",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Butrinti",
+     "bashki": "Sarandë",
+     "osm": "way/1085039416",
+     "lat": 39.8711871,
+     "lon": 20.0147583,
+     "kind": "tourism",
+     "category": "tourism",
+     "as": "Butrint"
+    }
+   ],
+   "landmark": true
+  },
+  {
+   "city": "Sarandë",
+   "zone": "Çukë",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:111",
+   "evidence": "village \"Çukë\" in Sarandë, Bashkia Sarandë (OSM node/728428633, 39.8458, 20.0355)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Çukë",
+     "bashki": "Sarandë",
+     "osm": "node/728428633",
+     "lat": 39.8457914,
+     "lon": 20.035488,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Sarandë",
+   "zone": "Lukovë",
+   "status": "hierarchy",
+   "where": "src/features/properties/data/locations.js:111",
+   "evidence": "village \"Lukovë\" in Bashkia Himarë (OSM node/713605611)",
+   "action": "move",
+   "to": [
+    {
+     "name": "Lukovë",
+     "bashki": "Himarë",
+     "osm": "node/713605611",
+     "lat": 39.9927221,
+     "lon": 19.9135183,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Sarandë",
+   "zone": "Kakome",
+   "status": "unverified",
+   "where": "src/features/properties/data/locations.js:111",
+   "evidence": "tourism/tourism \"Manastiri i Shën Mërisë (Kakome)\" (OSM nominatim:Manastiri i Shën Mërisë (Kakome), SH8, Qopek (Nivicë-Bubar), Shën Vasil, Lukovë, Bashkia Himarë, Qarku i Vlorës, 9713, Shqipëria); natural/beach \"Plazhi i Kakomesë\" (OSM nominatim:Plazhi i Kakomesë, Lukovë, Bashkia Himarë, Qarku i Vlorës, 9713, Shqipëria); tourism/tourism \"Manastiri i Shën Mërisë (Kakome)\" (OSM way/533163311)",
+   "action": "remove",
+   "note": "no source for it as a place"
+  },
+  {
+   "city": "Sarandë",
+   "zone": "Himara Jugor",
+   "status": "missing",
+   "where": "src/features/properties/data/locations.js:111",
+   "evidence": "No trace in any source checked: the 373 units of Law 115/2014, 4,560 named places in OpenStreetMap, and Nominatim searches with and without diacritics, in definite and genitive form, as \"Lagjja …\" and with the city name",
+   "action": "remove"
+  },
+  {
+   "city": "Sarandë",
+   "zone": "Konispol",
+   "status": "hierarchy",
+   "where": "src/features/properties/data/locations.js:111",
+   "evidence": "njësi administrative \"Konispol\" in Bashkia Konispol (OSM relation/1255548)",
+   "action": "move",
+   "to": [
+    {
+     "name": "Konispol",
+     "bashki": "Konispol",
+     "osm": "relation/1255548",
+     "lat": 39.67697158,
+     "lon": 20.14594729838318,
+     "kind": "njësi administrative",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Kukës",
+   "zone": "Qendër",
+   "status": "unverified",
+   "where": "src/features/properties/data/locations.js:117",
+   "evidence": "No place named Qendër in Bashkia Kukës (OSM); the law has no unit Qendër here",
+   "action": "remove",
+   "note": "replaced by the official units of the municipality"
+  },
+  {
+   "city": "Kukës",
+   "zone": "Kukës i Ri",
+   "status": "missing",
+   "where": "src/features/properties/data/locations.js:117",
+   "evidence": "No trace in any source checked: the 373 units of Law 115/2014, 4,560 named places in OpenStreetMap, and Nominatim searches with and without diacritics, in definite and genitive form, as \"Lagjja …\" and with the city name",
+   "action": "remove"
+  },
+  {
+   "city": "Kukës",
+   "zone": "Kukës i Vjetër",
+   "status": "missing",
+   "where": "src/features/properties/data/locations.js:117",
+   "evidence": "No trace in any source checked: the 373 units of Law 115/2014, 4,560 named places in OpenStreetMap, and Nominatim searches with and without diacritics, in definite and genitive form, as \"Lagjja …\" and with the city name",
+   "action": "remove"
+  },
+  {
+   "city": "Kukës",
+   "zone": "Kolsh",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:117",
+   "evidence": "village \"Kolsh\" in Kolsh, Bashkia Kukës (OSM node/728423747, 42.0780, 20.3414)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Kolsh",
+     "bashki": "Kukës",
+     "osm": "node/728423747",
+     "lat": 42.0780138,
+     "lon": 20.3414408,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Kukës",
+   "zone": "Shtiqën",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:117",
+   "evidence": "village \"Shtiqën\" in Shtiqën, Bashkia Kukës (OSM node/728426119, 42.0409, 20.4307)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Shtiqën",
+     "bashki": "Kukës",
+     "osm": "node/728426119",
+     "lat": 42.040905,
+     "lon": 20.430684,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Kukës",
+   "zone": "Bicaj",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:118",
+   "evidence": "village \"Bicaj\" in Bicaj, Bashkia Kukës (OSM node/728423578, 41.9934, 20.4106)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Bicaj",
+     "bashki": "Kukës",
+     "osm": "node/728423578",
+     "lat": 41.9933984,
+     "lon": 20.4105507,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Kukës",
+   "zone": "Shishtavec",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:118",
+   "evidence": "village \"Shishtavec\" in Shishtavec, Bashkia Kukës (OSM node/728423422, 41.9796, 20.6060)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Shishtavec",
+     "bashki": "Kukës",
+     "osm": "node/728423422",
+     "lat": 41.9796374,
+     "lon": 20.6059536,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Kukës",
+   "zone": "Surroj",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:118",
+   "evidence": "village \"Surroj\" in Surroj, Bashkia Kukës (OSM node/728418068, 41.9879, 20.3392)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Surroj",
+     "bashki": "Kukës",
+     "osm": "node/728418068",
+     "lat": 41.9878683,
+     "lon": 20.3392426,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Kukës",
+   "zone": "Zapod",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:118",
+   "evidence": "village \"Zapod\" in Zapod, Bashkia Kukës (OSM node/728421713, 42.0509, 20.5515)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Zapod",
+     "bashki": "Kukës",
+     "osm": "node/728421713",
+     "lat": 42.05087,
+     "lon": 20.5514901,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Kukës",
+   "zone": "Tërthorë",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:118",
+   "evidence": "njësi administrative \"Tërthore\" in Tërthore, Bashkia Kukës (OSM relation/1248544, 42.0944, 20.4934)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Tërthore",
+     "bashki": "Kukës",
+     "osm": "relation/1248544",
+     "lat": 42.09436069,
+     "lon": 20.49335050618252,
+     "kind": "njësi administrative",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Peshkopi",
+   "zone": "Qendër",
+   "status": "unverified",
+   "where": "src/features/properties/data/locations.js:124",
+   "evidence": "No place named Qendër in Bashkia Dibër (OSM); the law has no unit Qendër here",
+   "action": "remove",
+   "note": "replaced by the official units of the municipality"
+  },
+  {
+   "city": "Peshkopi",
+   "zone": "Maqellarë",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:124",
+   "evidence": "village \"Maqellarë\" in Maqellarë, Bashkia Dibër (OSM node/728425857, 41.5890, 20.4864)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Maqellarë",
+     "bashki": "Dibër",
+     "osm": "node/728425857",
+     "lat": 41.5889687,
+     "lon": 20.4863759,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Peshkopi",
+   "zone": "Melan",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:124",
+   "evidence": "village \"Melan\" in Melan, Bashkia Dibër (OSM node/728423586, 41.6549, 20.4646)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Melan",
+     "bashki": "Dibër",
+     "osm": "node/728423586",
+     "lat": 41.6549196,
+     "lon": 20.4645851,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Peshkopi",
+   "zone": "Tomin",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:124",
+   "evidence": "village \"Tomin\" in Tomin, Bashkia Dibër (OSM node/728424733, 41.6906, 20.4210)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Tomin",
+     "bashki": "Dibër",
+     "osm": "node/728424733",
+     "lat": 41.6906338,
+     "lon": 20.4210429,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Peshkopi",
+   "zone": "Luzni",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:124",
+   "evidence": "village \"Bllatë e Sipërme\" in Maqellarë, Bashkia Dibër (OSM node/728422073, 41.5636, 20.4895)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Bllatë e Sipërme",
+     "bashki": "Dibër",
+     "osm": "node/728422073",
+     "lat": 41.5636281,
+     "lon": 20.489507,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Peshkopi",
+   "zone": "Selishtë",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:125",
+   "evidence": "village \"Selishtë\" in Selishtë, Bashkia Dibër (OSM node/728421098, 41.6273, 20.2736)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Selishtë",
+     "bashki": "Dibër",
+     "osm": "node/728421098",
+     "lat": 41.6273457,
+     "lon": 20.2735541,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Peshkopi",
+   "zone": "Kastriot",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:125",
+   "evidence": "village \"Kastriot\" in Kastriot, Bashkia Dibër (OSM node/11969158276, 41.7297, 20.3768)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Kastriot",
+     "bashki": "Dibër",
+     "osm": "node/11969158276",
+     "lat": 41.7297366,
+     "lon": 20.3767975,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Peshkopi",
+   "zone": "Sllovë",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:125",
+   "evidence": "village \"Sllovë\" in Sllovë, Bashkia Dibër (OSM node/728418956, 41.8030, 20.4107)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Sllovë",
+     "bashki": "Dibër",
+     "osm": "node/728418956",
+     "lat": 41.8029517,
+     "lon": 20.4106784,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Peshkopi",
+   "zone": "Radomirë",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:125",
+   "evidence": "village \"Radomirë\" in Kala e Dodës, Bashkia Dibër (OSM node/728423093, 41.8157, 20.4850)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Radomirë",
+     "bashki": "Dibër",
+     "osm": "node/728423093",
+     "lat": 41.8156832,
+     "lon": 20.4850426,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Krujë",
+   "zone": "Qendër",
+   "status": "unverified",
+   "where": "src/features/properties/data/locations.js:131",
+   "evidence": "No place named Qendër in Bashkia Krujë (OSM); the law has no unit Qendër here",
+   "action": "remove",
+   "note": "replaced by the official units of the municipality"
+  },
+  {
+   "city": "Krujë",
+   "zone": "Kala",
+   "status": "unverified",
+   "where": "src/features/properties/data/locations.js:131",
+   "evidence": "building/building \"Hamami i Vjetër në Kala\" (OSM nominatim:Hamami i Vjetër në Kala, Stonebridge, Krujë, Bashkia Krujë, Qarku i Durrësit, 1501, Shqipëria); amenity/amenity \"Parking Kala\" (OSM nominatim:Parking Kala, Kalasë, Krujë, Bashkia Krujë, Qarku i Durrësit, 1501, Shqipëria); building/building \"Hamami i Vjetër në Kala\" (OSM way/226764478)",
+   "action": "remove",
+   "note": "no source for it as a place"
+  },
+  {
+   "city": "Krujë",
+   "zone": "Pazari i Vjetër",
+   "status": "unverified",
+   "where": "src/features/properties/data/locations.js:131",
+   "evidence": "amenity/amenity \"Pazari i Vjetër\" (OSM nominatim:Pazari i Vjetër, Rrugica Koli Karapanxha, Pazari i Korçës, Korçë, Bashkia Korçë, Qarku i Korçës, 7001, Shqipëria); highway/residential \"Rruga Pazari i Vjetër\" (OSM nominatim:Rruga Pazari i Vjetër, Gjirokastër, Bashkia Gjirokastër, Qarku i Gjirokastrës, 6001, Shqipëria); amenity/amenity \"Pazari i Vjetër\" (OSM node/9825988499)",
+   "action": "remove",
+   "note": "no source for it as a place"
+  },
+  {
+   "city": "Krujë",
+   "zone": "Fushë-Krujë",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:131",
+   "evidence": "town \"Fushë-Krujë\" in Fushë-Krujë, Bashkia Krujë (OSM node/728424152, 41.4791, 19.7206)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Fushë-Krujë",
+     "bashki": "Krujë",
+     "osm": "node/728424152",
+     "lat": 41.4791135,
+     "lon": 19.7205635,
+     "kind": "town",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Krujë",
+   "zone": "Nikël",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:131",
+   "evidence": "village \"Nikël\" in Nikël, Bashkia Krujë (OSM node/728428509, 41.4372, 19.7414)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Nikël",
+     "bashki": "Krujë",
+     "osm": "node/728428509",
+     "lat": 41.4372243,
+     "lon": 19.7413751,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Krujë",
+   "zone": "Bubq",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:132",
+   "evidence": "village \"Bubq\" in Bubq, Bashkia Krujë (OSM node/728426250, 41.4714, 19.6546)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Bubq",
+     "bashki": "Krujë",
+     "osm": "node/728426250",
+     "lat": 41.4713963,
+     "lon": 19.6545539,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Krujë",
+   "zone": "Cudhi",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:132",
+   "evidence": "njësi administrative \"Cudhi\" in Cudhi, Bashkia Krujë (OSM relation/1249887, 41.5258, 19.8516)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Cudhi",
+     "bashki": "Krujë",
+     "osm": "relation/1249887",
+     "lat": 41.52578805,
+     "lon": 19.85157704333234,
+     "kind": "njësi administrative",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Krujë",
+   "zone": "Sarisalltik",
+   "status": "unverified",
+   "where": "src/features/properties/data/locations.js:132",
+   "evidence": "tourism/tourism \"Sarisalltik Baba\" (OSM nominatim:Sarisalltik Baba, Rruga Malit, Krujë, Bashkia Krujë, Qarku i Durrësit, 1501, Shqipëria); tourism/tourism \"Sarisalltik Baba\" (OSM node/12806356232)",
+   "action": "remove",
+   "note": "no source for it as a place"
+  },
+  {
+   "city": "Krujë",
+   "zone": "Zgërdhesh",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:132",
+   "evidence": "village \"Zgërdhesh\" in Fushë-Krujë, Bashkia Krujë (OSM node/728423054, 41.4758, 19.7635)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Zgërdhesh",
+     "bashki": "Krujë",
+     "osm": "node/728423054",
+     "lat": 41.475806,
+     "lon": 19.7634937,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Laç",
+   "zone": "Qendër",
+   "status": "unverified",
+   "where": "src/features/properties/data/locations.js:138",
+   "evidence": "No place named Qendër in Bashkia Kurbin (OSM); the law has no unit Qendër here",
+   "action": "remove",
+   "note": "replaced by the official units of the municipality"
+  },
+  {
+   "city": "Laç",
+   "zone": "Mamurras",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:138",
+   "evidence": "town \"Mamurras\" in Mamurras, Bashkia Kurbin (OSM node/728425851, 41.5782, 19.6926)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Mamurras",
+     "bashki": "Kurbin",
+     "osm": "node/728425851",
+     "lat": 41.5782039,
+     "lon": 19.692562,
+     "kind": "town",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Laç",
+   "zone": "Milot",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:138",
+   "evidence": "town \"Milot\" in Milot, Bashkia Kurbin (OSM node/728427837, 41.6839, 19.7160)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Milot",
+     "bashki": "Kurbin",
+     "osm": "node/728427837",
+     "lat": 41.683873,
+     "lon": 19.7160484,
+     "kind": "town",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Laç",
+   "zone": "Fushë-Kuqe",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:138",
+   "evidence": "village \"Fushë Kuqe\" in Fushë Kuqe, Bashkia Kurbin (OSM node/728429087, 41.6522, 19.6223)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Fushë Kuqe",
+     "bashki": "Kurbin",
+     "osm": "node/728429087",
+     "lat": 41.6522473,
+     "lon": 19.6222612,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Laç",
+   "zone": "Sanxhak",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:138",
+   "evidence": "village \"Sanxhak\" in Laç, Bashkia Kurbin (OSM node/13742139911, 41.6205, 19.7126)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Sanxhak",
+     "bashki": "Kurbin",
+     "osm": "node/13742139911",
+     "lat": 41.6205329,
+     "lon": 19.7125823,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Laç",
+   "zone": "Kakarriq",
+   "status": "unverified",
+   "where": "src/features/properties/data/locations.js:139",
+   "evidence": "highway/secondary \"Balldren Kakarriq Gjader\" (OSM nominatim:Balldren Kakarriq Gjader, Sirmak, Balldren, Bashkia Lezhë, Qarku i Lezhës, 4504, Shqipëria); highway/residential \"Rruga Zef Kakarriqi\" (OSM way/333880586); highway/residential \"Rruga Zef Kakarriqi\" (OSM way/618632104)",
+   "action": "remove",
+   "note": "no source for it as a place"
+  },
+  {
+   "city": "Laç",
+   "zone": "Troshan",
+   "status": "hierarchy",
+   "where": "src/features/properties/data/locations.js:139",
+   "evidence": "village \"Troshan\" in Bashkia Lezhë (OSM node/728422939)",
+   "action": "move",
+   "to": [
+    {
+     "name": "Troshan",
+     "bashki": "Lezhë",
+     "osm": "node/728422939",
+     "lat": 41.876659,
+     "lon": 19.6764521,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Laç",
+   "zone": "Delbnisht",
+   "status": "spelling",
+   "where": "src/features/properties/data/locations.js:139",
+   "evidence": "Closest name in Bashkia Kurbin: OSM node/728424559, 1 letter(s) different. No place spelled \"Delbnisht\" in OpenStreetMap",
+   "action": "rename",
+   "to": [
+    {
+     "name": "Delbinisht",
+     "bashki": "Kurbin",
+     "osm": "node/728424559",
+     "lat": 41.6484941,
+     "lon": 19.7377518,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Burrel",
+   "zone": "Qendër",
+   "status": "unverified",
+   "where": "src/features/properties/data/locations.js:145",
+   "evidence": "No place named Qendër in Bashkia Mat (OSM); the law has no unit Qendër here",
+   "action": "remove",
+   "note": "replaced by the official units of the municipality"
+  },
+  {
+   "city": "Burrel",
+   "zone": "Suç",
+   "status": "hierarchy",
+   "where": "src/features/properties/data/locations.js:145",
+   "evidence": "village \"Suç\" in Bashkia Klos (OSM node/728417532)",
+   "action": "move",
+   "to": [
+    {
+     "name": "Suç",
+     "bashki": "Klos",
+     "osm": "node/728417532",
+     "lat": 41.5751431,
+     "lon": 20.0504498,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Burrel",
+   "zone": "Baz",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:145",
+   "evidence": "village \"Baz\" in Baz, Bashkia Mat (OSM node/728426210, 41.6318, 19.9308)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Baz",
+     "bashki": "Mat",
+     "osm": "node/728426210",
+     "lat": 41.6317778,
+     "lon": 19.9307855,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Burrel",
+   "zone": "Macukull",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:145",
+   "evidence": "village \"Macukull\" in Macukull, Bashkia Mat (OSM node/728428218, 41.6932, 20.1090)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Macukull",
+     "bashki": "Mat",
+     "osm": "node/728428218",
+     "lat": 41.6932494,
+     "lon": 20.1089763,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Burrel",
+   "zone": "Ulëz",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:145",
+   "evidence": "village \"Ulëz\" in Ulëz, Bashkia Mat (OSM node/728426483, 41.6822, 19.8919)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Ulëz",
+     "bashki": "Mat",
+     "osm": "node/728426483",
+     "lat": 41.6821908,
+     "lon": 19.8918946,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Burrel",
+   "zone": "Klos",
+   "status": "hierarchy",
+   "where": "src/features/properties/data/locations.js:146",
+   "evidence": "town \"Klos\" in Bashkia Klos (OSM node/728417102); same name also in Bashkia Mirditë",
+   "action": "move",
+   "to": [
+    {
+     "name": "Klos",
+     "bashki": "Klos",
+     "osm": "node/728417102",
+     "lat": 41.5072297,
+     "lon": 20.0850706,
+     "kind": "town",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Burrel",
+   "zone": "Martanesh",
+   "status": "hierarchy",
+   "where": "src/features/properties/data/locations.js:146",
+   "evidence": "village \"Martanesh\" in Bashkia Bulqizë (OSM nominatim:Martanesh, Bashkia Bulqizë, Qarku i Dibrës, 8403, Shqipëria)",
+   "action": "move",
+   "to": [
+    {
+     "name": "Martanesh",
+     "bashki": "Bulqizë",
+     "osm": "nominatim:Martanesh, Bashkia Bulqizë, Qarku i Dibrës, 8403, Shqipëria",
+     "lat": 41.4232172,
+     "lon": 20.2034934,
+     "kind": "village",
+     "category": "boundary"
+    }
+   ]
+  },
+  {
+   "city": "Burrel",
+   "zone": "Zerqan",
+   "status": "hierarchy",
+   "where": "src/features/properties/data/locations.js:146",
+   "evidence": "village \"Zerqan\" in Bashkia Bulqizë (OSM node/728418136)",
+   "action": "move",
+   "to": [
+    {
+     "name": "Zerqan",
+     "bashki": "Bulqizë",
+     "osm": "node/728418136",
+     "lat": 41.5032582,
+     "lon": 20.3556273,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Bulqizë",
+   "zone": "Qendër",
+   "status": "unverified",
+   "where": "src/features/properties/data/locations.js:152",
+   "evidence": "No place named Qendër in Bashkia Bulqizë (OSM); the law has no unit Qendër here",
+   "action": "remove",
+   "note": "replaced by the official units of the municipality"
+  },
+  {
+   "city": "Bulqizë",
+   "zone": "Shupenzë",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:152",
+   "evidence": "village \"Boçovë\" in Shupenzë, Bashkia Bulqizë (OSM node/728421242, 41.5416, 20.4231)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Boçovë",
+     "bashki": "Bulqizë",
+     "osm": "node/728421242",
+     "lat": 41.5415987,
+     "lon": 20.4230557,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Bulqizë",
+   "zone": "Homesh",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:152",
+   "evidence": "village \"Homesh\" in Shupenzë, Bashkia Bulqizë (OSM node/728425459, 41.5522, 20.4280)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Homesh",
+     "bashki": "Bulqizë",
+     "osm": "node/728425459",
+     "lat": 41.5521859,
+     "lon": 20.4279527,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Bulqizë",
+   "zone": "Ostren",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:152",
+   "evidence": "njësi administrative \"Ostren\" in Ostren, Bashkia Bulqizë (OSM relation/1249535, 41.4053, 20.4006)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Ostren",
+     "bashki": "Bulqizë",
+     "osm": "relation/1249535",
+     "lat": 41.40527457,
+     "lon": 20.400579898258385,
+     "kind": "njësi administrative",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Bulqizë",
+   "zone": "Martanesh",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:153",
+   "evidence": "njësi administrative \"Martanesh\" in Martanesh, Bashkia Bulqizë (OSM relation/1249538, 41.4137, 20.2137)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Martanesh",
+     "bashki": "Bulqizë",
+     "osm": "relation/1249538",
+     "lat": 41.4136788,
+     "lon": 20.213672034720602,
+     "kind": "njësi administrative",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Bulqizë",
+   "zone": "Zerqan",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:153",
+   "evidence": "village \"Zerqan\" in Zerqan, Bashkia Bulqizë (OSM node/728418136, 41.5033, 20.3556)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Zerqan",
+     "bashki": "Bulqizë",
+     "osm": "node/728418136",
+     "lat": 41.5032582,
+     "lon": 20.3556273,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Bulqizë",
+   "zone": "Fushë-Bulqizë",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:153",
+   "evidence": "village \"Fushë Bulqizë\" in Fushë-Bulqizë, Bashkia Bulqizë (OSM node/728425760, 41.5220, 20.2819)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Fushë Bulqizë",
+     "bashki": "Bulqizë",
+     "osm": "node/728425760",
+     "lat": 41.5220116,
+     "lon": 20.2819272,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Gramsh",
+   "zone": "Qendër",
+   "status": "unverified",
+   "where": "src/features/properties/data/locations.js:159",
+   "evidence": "No place named Qendër in Bashkia Gramsh (OSM); the law has no unit Qendër here",
+   "action": "remove",
+   "note": "replaced by the official units of the municipality"
+  },
+  {
+   "city": "Gramsh",
+   "zone": "Kodovjat",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:159",
+   "evidence": "village \"Kodovjat\" in Kodovjat, Bashkia Gramsh (OSM node/728418739, 40.8056, 20.2509)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Kodovjat",
+     "bashki": "Gramsh",
+     "osm": "node/728418739",
+     "lat": 40.8056371,
+     "lon": 20.2509188,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Gramsh",
+   "zone": "Poroçan",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:159",
+   "evidence": "village \"Poroçan\" in Poroçan, Bashkia Gramsh (OSM node/728424752, 40.9361, 20.2903)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Poroçan",
+     "bashki": "Gramsh",
+     "osm": "node/728424752",
+     "lat": 40.9360561,
+     "lon": 20.2902543,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Gramsh",
+   "zone": "Skënderbegas",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:159",
+   "evidence": "village \"Skëndërbegas\" in Skënderbegas, Bashkia Gramsh (OSM node/728420020, 40.7772, 20.2393)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Skëndërbegas",
+     "bashki": "Gramsh",
+     "osm": "node/728420020",
+     "lat": 40.7772493,
+     "lon": 20.2393121,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Gramsh",
+   "zone": "Kushovë",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:160",
+   "evidence": "village \"Kushovë\" in Kushovë, Bashkia Gramsh (OSM node/728419268, 40.7882, 20.1881)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Kushovë",
+     "bashki": "Gramsh",
+     "osm": "node/728419268",
+     "lat": 40.7881926,
+     "lon": 20.1880618,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Gramsh",
+   "zone": "Lënie",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:160",
+   "evidence": "village \"Lenie\" in Lenie, Bashkia Gramsh (OSM node/728421479, 40.7652, 20.3896)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Lenie",
+     "bashki": "Gramsh",
+     "osm": "node/728421479",
+     "lat": 40.7652176,
+     "lon": 20.3896364,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Gramsh",
+   "zone": "Sult",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:160",
+   "evidence": "village \"Sult\" in Sult, Bashkia Gramsh (OSM node/728426578, 40.8830, 20.1023)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Sult",
+     "bashki": "Gramsh",
+     "osm": "node/728426578",
+     "lat": 40.883013,
+     "lon": 20.1023279,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Librazhd",
+   "zone": "Qendër",
+   "status": "unverified",
+   "where": "src/features/properties/data/locations.js:166",
+   "evidence": "No place named Qendër in Bashkia Librazhd (OSM); the law has no unit Qendër here",
+   "action": "remove",
+   "note": "replaced by the official units of the municipality"
+  },
+  {
+   "city": "Librazhd",
+   "zone": "Steblevë",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:166",
+   "evidence": "village \"Steblevë\" in Stëblevë, Bashkia Librazhd (OSM node/728425244, 41.3366, 20.4717)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Steblevë",
+     "bashki": "Librazhd",
+     "osm": "node/728425244",
+     "lat": 41.336638,
+     "lon": 20.4716974,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Librazhd",
+   "zone": "Hotolisht",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:166",
+   "evidence": "village \"Hotolisht\" in Hotolisht, Bashkia Librazhd (OSM node/728422123, 41.1548, 20.3954)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Hotolisht",
+     "bashki": "Librazhd",
+     "osm": "node/728422123",
+     "lat": 41.1547579,
+     "lon": 20.3953929,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Librazhd",
+   "zone": "Lunik",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:166",
+   "evidence": "village \"Lunik\" in Lunik, Bashkia Librazhd (OSM node/728428719, 41.2852, 20.3233)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Lunik",
+     "bashki": "Librazhd",
+     "osm": "node/728428719",
+     "lat": 41.2852416,
+     "lon": 20.3232915,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Librazhd",
+   "zone": "Orenjë",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:167",
+   "evidence": "village \"Orenjë\" in Orenjë, Bashkia Librazhd (OSM node/728425862, 41.2843, 20.2093)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Orenjë",
+     "bashki": "Librazhd",
+     "osm": "node/728425862",
+     "lat": 41.2843288,
+     "lon": 20.2093087,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Librazhd",
+   "zone": "Qukës",
+   "status": "hierarchy",
+   "where": "src/features/properties/data/locations.js:167",
+   "evidence": "njësi administrative \"Qukës\" in Bashkia Prrenjas (OSM relation/1250563)",
+   "action": "move",
+   "to": [
+    {
+     "name": "Qukës",
+     "bashki": "Prrenjas",
+     "osm": "relation/1250563",
+     "lat": 41.07458752,
+     "lon": 20.463732300050467,
+     "kind": "njësi administrative",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Librazhd",
+   "zone": "Prrenjas",
+   "status": "hierarchy",
+   "where": "src/features/properties/data/locations.js:167",
+   "evidence": "njësi administrative \"Prrenjas\" in Bashkia Prrenjas (OSM relation/1250585)",
+   "action": "move",
+   "to": [
+    {
+     "name": "Prrenjas",
+     "bashki": "Prrenjas",
+     "osm": "relation/1250585",
+     "lat": 41.054932140000005,
+     "lon": 20.5261030894808,
+     "kind": "njësi administrative",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Tepelenë",
+   "zone": "Qendër",
+   "status": "unverified",
+   "where": "src/features/properties/data/locations.js:173",
+   "evidence": "No place named Qendër in Bashkia Tepelenë (OSM); the law has no unit Qendër here",
+   "action": "remove",
+   "note": "replaced by the official units of the municipality"
+  },
+  {
+   "city": "Tepelenë",
+   "zone": "Memaliaj",
+   "status": "hierarchy",
+   "where": "src/features/properties/data/locations.js:173",
+   "evidence": "town \"Memaliaj\" in Bashkia Memaliaj (OSM node/713605057)",
+   "action": "move",
+   "to": [
+    {
+     "name": "Memaliaj",
+     "bashki": "Memaliaj",
+     "osm": "node/713605057",
+     "lat": 40.3516573,
+     "lon": 19.9833859,
+     "kind": "town",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Tepelenë",
+   "zone": "Këlcyrë",
+   "status": "hierarchy",
+   "where": "src/features/properties/data/locations.js:173",
+   "evidence": "njësi administrative \"Këlcyrë\" in Bashkia Këlcyrë (OSM relation/1253928)",
+   "action": "move",
+   "to": [
+    {
+     "name": "Këlcyrë",
+     "bashki": "Këlcyrë",
+     "osm": "relation/1253928",
+     "lat": 40.25240442,
+     "lon": 20.172868662451457,
+     "kind": "njësi administrative",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Tepelenë",
+   "zone": "Luftinjë",
+   "status": "hierarchy",
+   "where": "src/features/properties/data/locations.js:173",
+   "evidence": "njësi administrative \"Luftinjë\" in Bashkia Memaliaj (OSM relation/1253917); same name also in Bashkia Berat",
+   "action": "move",
+   "to": [
+    {
+     "name": "Luftinjë",
+     "bashki": "Memaliaj",
+     "osm": "relation/1253917",
+     "lat": 40.40142699,
+     "lon": 19.998476080203048,
+     "kind": "njësi administrative",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Tepelenë",
+   "zone": "Lopës",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:174",
+   "evidence": "njësi administrative \"Lopës\" in Lopës, Bashkia Tepelenë (OSM relation/1253923, 40.3625, 19.8572)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Lopës",
+     "bashki": "Tepelenë",
+     "osm": "relation/1253923",
+     "lat": 40.36250615,
+     "lon": 19.85722214239412,
+     "kind": "njësi administrative",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Tepelenë",
+   "zone": "Bënçë",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:174",
+   "evidence": "village \"Bënçë\" in Qendër Tepelenë, Bashkia Tepelenë (OSM node/728418014, 40.2553, 20.0056)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Bënçë",
+     "bashki": "Tepelenë",
+     "osm": "node/728418014",
+     "lat": 40.2552635,
+     "lon": 20.0055563,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Tepelenë",
+   "zone": "Krahës",
+   "status": "hierarchy",
+   "where": "src/features/properties/data/locations.js:174",
+   "evidence": "village \"Krahës\" in Bashkia Memaliaj (OSM node/728428839)",
+   "action": "move",
+   "to": [
+    {
+     "name": "Krahës",
+     "bashki": "Memaliaj",
+     "osm": "node/728428839",
+     "lat": 40.43207,
+     "lon": 19.8505404,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Përmet",
+   "zone": "Qendër",
+   "status": "unverified",
+   "where": "src/features/properties/data/locations.js:180",
+   "evidence": "No place named Qendër in Bashkia Përmet (OSM); the law has no unit Qendër here",
+   "action": "remove",
+   "note": "replaced by the official units of the municipality"
+  },
+  {
+   "city": "Përmet",
+   "zone": "Këlcyrë",
+   "status": "hierarchy",
+   "where": "src/features/properties/data/locations.js:180",
+   "evidence": "njësi administrative \"Këlcyrë\" in Bashkia Këlcyrë (OSM relation/1253928)",
+   "action": "move",
+   "to": [
+    {
+     "name": "Këlcyrë",
+     "bashki": "Këlcyrë",
+     "osm": "relation/1253928",
+     "lat": 40.25240442,
+     "lon": 20.172868662451457,
+     "kind": "njësi administrative",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Përmet",
+   "zone": "Petran",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:180",
+   "evidence": "village \"Petran\" in Petran, Bashkia Përmet (OSM node/728417742, 40.2081, 20.4184)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Petran",
+     "bashki": "Përmet",
+     "osm": "node/728417742",
+     "lat": 40.2080905,
+     "lon": 20.418365,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Përmet",
+   "zone": "Çarçovë",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:180",
+   "evidence": "village \"Çarçovë\" in Çarçovë, Bashkia Përmet (OSM node/728426942, 40.1183, 20.5435)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Çarçovë",
+     "bashki": "Përmet",
+     "osm": "node/728426942",
+     "lat": 40.1183018,
+     "lon": 20.5435007,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Përmet",
+   "zone": "Ballaban",
+   "status": "hierarchy",
+   "where": "src/features/properties/data/locations.js:181",
+   "evidence": "njësi administrative \"Ballaban\" in Bashkia Këlcyrë (OSM relation/1253918)",
+   "action": "move",
+   "to": [
+    {
+     "name": "Ballaban",
+     "bashki": "Këlcyrë",
+     "osm": "relation/1253918",
+     "lat": 40.41210539,
+     "lon": 20.136868799418146,
+     "kind": "njësi administrative",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Përmet",
+   "zone": "Piskovë",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:181",
+   "evidence": "village \"Piskovë\" in Qendër Piskovë, Bashkia Përmet (OSM node/728418532, 40.2796, 20.2737)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Piskovë",
+     "bashki": "Përmet",
+     "osm": "node/728418532",
+     "lat": 40.2795649,
+     "lon": 20.273695,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Përmet",
+   "zone": "Frashër",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:181",
+   "evidence": "village \"Frashër\" in Frashër, Bashkia Përmet (OSM node/728418233, 40.3661, 20.4282)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Frashër",
+     "bashki": "Përmet",
+     "osm": "node/728418233",
+     "lat": 40.3661283,
+     "lon": 20.4281963,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Ersekë",
+   "zone": "Qendër",
+   "status": "unverified",
+   "where": "src/features/properties/data/locations.js:187",
+   "evidence": "No place named Qendër in Bashkia Kolonjë (OSM); the law has no unit Qendër here",
+   "action": "remove",
+   "note": "replaced by the official units of the municipality"
+  },
+  {
+   "city": "Ersekë",
+   "zone": "Leskovik",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:187",
+   "evidence": "town \"Leskovik\" in Leskovik, Bashkia Kolonjë (OSM node/728422173, 40.1524, 20.5990)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Leskovik",
+     "bashki": "Kolonjë",
+     "osm": "node/728422173",
+     "lat": 40.1524216,
+     "lon": 20.5990179,
+     "kind": "town",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Ersekë",
+   "zone": "Barmash",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:187",
+   "evidence": "village \"Barmash\" in Barmash, Bashkia Kolonjë (OSM node/728427502, 40.2778, 20.6194)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Barmash",
+     "bashki": "Kolonjë",
+     "osm": "node/728427502",
+     "lat": 40.2778166,
+     "lon": 20.6194257,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Ersekë",
+   "zone": "Mollas",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:187",
+   "evidence": "village \"Mollas\" in Mollas, Bashkia Kolonjë (OSM node/712337629, 40.4258, 20.6762)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Mollas",
+     "bashki": "Kolonjë",
+     "osm": "node/712337629",
+     "lat": 40.425825,
+     "lon": 20.6762377,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Ersekë",
+   "zone": "Novoselë",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:188",
+   "evidence": "village \"Novoselë\" in Novoselë, Bashkia Kolonjë (OSM node/728418413, 40.3330, 20.5902)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Novoselë",
+     "bashki": "Kolonjë",
+     "osm": "node/728418413",
+     "lat": 40.3329921,
+     "lon": 20.5902153,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Ersekë",
+   "zone": "Çlirim",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:188",
+   "evidence": "village \"Çlirim\" in Çlirim, Bashkia Kolonjë (OSM node/712337084, 40.4167, 20.5525)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Çlirim",
+     "bashki": "Kolonjë",
+     "osm": "node/712337084",
+     "lat": 40.4166681,
+     "lon": 20.5525025,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Ersekë",
+   "zone": "Rehova",
+   "status": "spelling",
+   "where": "src/features/properties/data/locations.js:188",
+   "evidence": "village \"Rehovë\" in Bashkia Kolonjë (OSM node/728423727)",
+   "action": "rename",
+   "to": [
+    {
+     "name": "Rehovë",
+     "bashki": "Kolonjë",
+     "osm": "node/728423727",
+     "lat": 40.3328769,
+     "lon": 20.7074042,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Kuçovë",
+   "zone": "Qendër",
+   "status": "unverified",
+   "where": "src/features/properties/data/locations.js:194",
+   "evidence": "No place named Qendër in Bashkia Kuçovë (OSM); the law has no unit Qendër here",
+   "action": "remove",
+   "note": "replaced by the official units of the municipality"
+  },
+  {
+   "city": "Kuçovë",
+   "zone": "Perondi",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:194",
+   "evidence": "village \"Perondi\" in Perondi, Bashkia Kuçovë (OSM node/728416730, 40.7791, 19.9222)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Perondi",
+     "bashki": "Kuçovë",
+     "osm": "node/728416730",
+     "lat": 40.7791212,
+     "lon": 19.9222363,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Kuçovë",
+   "zone": "Kozarë",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:194",
+   "evidence": "village \"Kozarë\" in Kozare, Bashkia Kuçovë (OSM node/9833430572, 40.8337, 19.9024)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Kozarë",
+     "bashki": "Kuçovë",
+     "osm": "node/9833430572",
+     "lat": 40.8336621,
+     "lon": 19.9024089,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Kuçovë",
+   "zone": "Lumas",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:194",
+   "evidence": "village \"Lumas\" in Lumas, Bashkia Kuçovë (OSM node/728423284, 40.8172, 19.9994)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Lumas",
+     "bashki": "Kuçovë",
+     "osm": "node/728423284",
+     "lat": 40.8172241,
+     "lon": 19.9994237,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Kuçovë",
+   "zone": "Visokë",
+   "status": "hierarchy",
+   "where": "src/features/properties/data/locations.js:195",
+   "evidence": "village \"Visok\" in Bashkia Mallakastër (OSM node/728425722)",
+   "action": "move",
+   "to": [
+    {
+     "name": "Visok",
+     "bashki": "Mallakastër",
+     "osm": "node/728425722",
+     "lat": 40.6437513,
+     "lon": 19.6898174,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Kuçovë",
+   "zone": "Hajdaraj",
+   "status": "hierarchy",
+   "where": "src/features/properties/data/locations.js:195",
+   "evidence": "village \"Hajdaraj\" in Bashkia Lushnjë (OSM node/728428580)",
+   "action": "move",
+   "to": [
+    {
+     "name": "Hajdaraj",
+     "bashki": "Lushnjë",
+     "osm": "node/728428580",
+     "lat": 40.9589859,
+     "lon": 19.7222141,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Çorovodë",
+   "zone": "Qendër",
+   "status": "unverified",
+   "where": "src/features/properties/data/locations.js:201",
+   "evidence": "No place named Qendër in Bashkia Skrapar (OSM); the law has no unit Qendër here",
+   "action": "remove",
+   "note": "replaced by the official units of the municipality"
+  },
+  {
+   "city": "Çorovodë",
+   "zone": "Polican",
+   "status": "hierarchy",
+   "where": "src/features/properties/data/locations.js:201",
+   "evidence": "town \"Poliçan\" in Bashkia Poliçan (OSM node/728421560)",
+   "action": "move",
+   "to": [
+    {
+     "name": "Poliçan",
+     "bashki": "Poliçan",
+     "osm": "node/728421560",
+     "lat": 40.6122122,
+     "lon": 20.0989769,
+     "kind": "town",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Çorovodë",
+   "zone": "Bogovë",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:201",
+   "evidence": "village \"Bogovë\" in Bogovë, Bashkia Skrapar (OSM node/728419996, 40.5708, 20.1465)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Bogovë",
+     "bashki": "Skrapar",
+     "osm": "node/728419996",
+     "lat": 40.5707974,
+     "lon": 20.1465409,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Çorovodë",
+   "zone": "Leshnjë",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:201",
+   "evidence": "village \"Leshnjë\" in Leshnjë, Bashkia Skrapar (OSM node/728422505, 40.5406, 20.3177)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Leshnjë",
+     "bashki": "Skrapar",
+     "osm": "node/728422505",
+     "lat": 40.5406241,
+     "lon": 20.3177224,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Çorovodë",
+   "zone": "Çepan",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:202",
+   "evidence": "village \"Çepan\" in Çepan, Bashkia Skrapar (OSM node/728422684, 40.4220, 20.2626)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Çepan",
+     "bashki": "Skrapar",
+     "osm": "node/728422684",
+     "lat": 40.4220452,
+     "lon": 20.2625737,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Çorovodë",
+   "zone": "Zhepë",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:202",
+   "evidence": "village \"Zhepë\" in Zhepë, Bashkia Skrapar (OSM node/728427286, 40.6777, 20.2881)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Zhepë",
+     "bashki": "Skrapar",
+     "osm": "node/728427286",
+     "lat": 40.6777302,
+     "lon": 20.2880788,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Çorovodë",
+   "zone": "Tomorr",
+   "status": "hierarchy",
+   "where": "src/features/properties/data/locations.js:202",
+   "evidence": "hamlet \"Tomorr i Vogël (Tomorr)\" in Bashkia Poliçan (OSM node/5314535337); same name also in Bashkia Berat",
+   "action": "move",
+   "to": [
+    {
+     "name": "Tomorr i Vogël (Tomorr)",
+     "bashki": "Poliçan",
+     "osm": "node/5314535337",
+     "lat": 40.6830324,
+     "lon": 20.100862,
+     "kind": "hamlet",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Peqin",
+   "zone": "Qendër",
+   "status": "unverified",
+   "where": "src/features/properties/data/locations.js:208",
+   "evidence": "No place named Qendër in Bashkia Peqin (OSM); the law has no unit Qendër here",
+   "action": "remove",
+   "note": "replaced by the official units of the municipality"
+  },
+  {
+   "city": "Peqin",
+   "zone": "Pajovë",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:208",
+   "evidence": "village \"Pajove\" in Pajovë, Bashkia Peqin (OSM node/7070452081, 41.0549, 19.8377)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Pajove",
+     "bashki": "Peqin",
+     "osm": "node/7070452081",
+     "lat": 41.0548543,
+     "lon": 19.8376574,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Peqin",
+   "zone": "Gjocaj",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:208",
+   "evidence": "village \"Gjocaj\" in Gjoçaj, Bashkia Peqin (OSM node/728425022, 41.0245, 19.7254)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Gjocaj",
+     "bashki": "Peqin",
+     "osm": "node/728425022",
+     "lat": 41.024523,
+     "lon": 19.7253789,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Peqin",
+   "zone": "Karinë",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:208",
+   "evidence": "village \"Karinë\" in Karinë, Bashkia Peqin (OSM node/728427936, 41.0630, 19.7165)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Karinë",
+     "bashki": "Peqin",
+     "osm": "node/728427936",
+     "lat": 41.0630445,
+     "lon": 19.7164676,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Peqin",
+   "zone": "Shezë",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:208",
+   "evidence": "village \"Shezë\" in Shezë, Bashkia Peqin (OSM node/13299618366, 41.0257, 19.8174)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Shezë",
+     "bashki": "Peqin",
+     "osm": "node/13299618366",
+     "lat": 41.0256514,
+     "lon": 19.8173878,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Himarë",
+   "zone": "Qendër",
+   "status": "unverified",
+   "where": "src/features/properties/data/locations.js:214",
+   "evidence": "No place named Qendër in Bashkia Himarë (OSM); the law has no unit Qendër here",
+   "action": "remove",
+   "note": "replaced by the official units of the municipality"
+  },
+  {
+   "city": "Himarë",
+   "zone": "Dhërmi",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:214",
+   "evidence": "village \"Dhërmi\" in Himarë, Bashkia Himarë (OSM node/713605581, 40.1512, 19.6414)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Dhërmi",
+     "bashki": "Himarë",
+     "osm": "node/713605581",
+     "lat": 40.151199,
+     "lon": 19.6414118,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Himarë",
+   "zone": "Jalë",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:214",
+   "evidence": "village \"Jalë\" in Himarë, Bashkia Himarë (OSM node/4384535459, 40.1195, 19.7026)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Jalë",
+     "bashki": "Himarë",
+     "osm": "node/4384535459",
+     "lat": 40.1195096,
+     "lon": 19.7026135,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Himarë",
+   "zone": "Livadhi",
+   "status": "unverified",
+   "where": "src/features/properties/data/locations.js:214",
+   "evidence": "highway/road \"Livadhi - Jale\" (OSM nominatim:Livadhi - Jale, Spile, Himarë, Bashkia Himarë, Qarku i Vlorës, 9425, Shqipëria); shop/shop \"BakeHouse Livadhi\" (OSM nominatim:BakeHouse Livadhi, Rruga Shen Varvara (Aj Varvara), Spile, Himarë, Bashkia Himarë, Qarku i Vlorës, 9425, Shqipëria); highway/road \"Livadhi - Jale\" (OSM way/713101067)",
+   "action": "remove",
+   "note": "no source for it as a place"
+  },
+  {
+   "city": "Himarë",
+   "zone": "Palasë",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:214",
+   "evidence": "village \"Palasë\" in Himarë, Bashkia Himarë (OSM node/713605010, 40.1668, 19.6240)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Palasë",
+     "bashki": "Himarë",
+     "osm": "node/713605010",
+     "lat": 40.166793,
+     "lon": 19.6239829,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Himarë",
+   "zone": "Llamani",
+   "status": "unverified",
+   "where": "src/features/properties/data/locations.js:215",
+   "evidence": "natural/beach \"Plazhi i Llamanit\" (OSM way/362378261)",
+   "action": "remove",
+   "note": "no source for it as a place"
+  },
+  {
+   "city": "Himarë",
+   "zone": "Vuno",
+   "status": "spelling",
+   "where": "src/features/properties/data/locations.js:215",
+   "evidence": "village \"Vunoi\" in Bashkia Himarë (OSM node/713605759, via Nominatim: Vunoi, Himarë, Bashkia Himarë, Qarku i Vlorës, 9425, Shqipëria)",
+   "action": "rename",
+   "to": [
+    {
+     "name": "Vunoi",
+     "bashki": "Himarë",
+     "osm": "node/713605759",
+     "lat": 40.140635,
+     "lon": 19.694886,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Himarë",
+   "zone": "Ilias",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:215",
+   "evidence": "village \"Ilias\" in Himarë, Bashkia Himarë (OSM node/713605147, 40.1427, 19.6711)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Ilias",
+     "bashki": "Himarë",
+     "osm": "node/713605147",
+     "lat": 40.1426557,
+     "lon": 19.671131,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Himarë",
+   "zone": "Qeparo",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:215",
+   "evidence": "village \"Qeparo\" in Himarë, Bashkia Himarë (OSM node/713605487, 40.0550, 19.8304)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Qeparo",
+     "bashki": "Himarë",
+     "osm": "node/713605487",
+     "lat": 40.0549728,
+     "lon": 19.8303928,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Himarë",
+   "zone": "Borsh",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:215",
+   "evidence": "village \"Borsh\" in Lukovë, Bashkia Himarë (OSM node/713605633, 40.0614, 19.8577)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Borsh",
+     "bashki": "Himarë",
+     "osm": "node/713605633",
+     "lat": 40.0614485,
+     "lon": 19.8576784,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Pukë",
+   "zone": "Qendër",
+   "status": "unverified",
+   "where": "src/features/properties/data/locations.js:221",
+   "evidence": "No place named Qendër in Bashkia Pukë (OSM); the law has no unit Qendër here",
+   "action": "remove",
+   "note": "replaced by the official units of the municipality"
+  },
+  {
+   "city": "Pukë",
+   "zone": "Fushë-Arrëz",
+   "status": "hierarchy",
+   "where": "src/features/properties/data/locations.js:221",
+   "evidence": "njësi administrative \"Fushë-Arrëz\" in Bashkia Fushë-Arrëz (OSM relation/1248265)",
+   "action": "move",
+   "to": [
+    {
+     "name": "Fushë-Arrëz",
+     "bashki": "Fushë-Arrëz",
+     "osm": "relation/1248265",
+     "lat": 42.101134779999995,
+     "lon": 19.998530335673962,
+     "kind": "njësi administrative",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Pukë",
+   "zone": "Qelëz",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:221",
+   "evidence": "njësi administrative \"Qelëz\" in Qelëz, Bashkia Pukë (OSM relation/1248298, 42.1091, 19.9167)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Qelëz",
+     "bashki": "Pukë",
+     "osm": "relation/1248298",
+     "lat": 42.10914354,
+     "lon": 19.916721516268407,
+     "kind": "njësi administrative",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Pukë",
+   "zone": "Iballë",
+   "status": "hierarchy",
+   "where": "src/features/properties/data/locations.js:221",
+   "evidence": "njësi administrative \"Iballë\" in Bashkia Fushë-Arrëz (OSM relation/1248291)",
+   "action": "move",
+   "to": [
+    {
+     "name": "Iballë",
+     "bashki": "Fushë-Arrëz",
+     "osm": "relation/1248291",
+     "lat": 42.16630172,
+     "lon": 19.969036929586473,
+     "kind": "njësi administrative",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Pukë",
+   "zone": "Gjegjan",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:221",
+   "evidence": "village \"Gjegjan\" in Gjegjan, Bashkia Pukë (OSM node/728423575, 41.9327, 20.0106)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Gjegjan",
+     "bashki": "Pukë",
+     "osm": "node/728423575",
+     "lat": 41.9326835,
+     "lon": 20.0106318,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Rrogozhinë",
+   "zone": "Qendër",
+   "status": "unverified",
+   "where": "src/features/properties/data/locations.js:227",
+   "evidence": "No place named Qendër in Bashkia Rrogozhinë (OSM); the law has no unit Qendër here",
+   "action": "remove",
+   "note": "replaced by the official units of the municipality"
+  },
+  {
+   "city": "Rrogozhinë",
+   "zone": "Kryevidh",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:227",
+   "evidence": "village \"Kryevidh\" in Kryevidh, Bashkia Rrogozhinë (OSM node/728419075, 41.0908, 19.5326)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Kryevidh",
+     "bashki": "Rrogozhinë",
+     "osm": "node/728419075",
+     "lat": 41.0907515,
+     "lon": 19.5326194,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Rrogozhinë",
+   "zone": "Sinaballaj",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:227",
+   "evidence": "village \"Sinaballaj\" in Sinaballaj, Bashkia Rrogozhinë (OSM node/728424724, 41.0703, 19.6993)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Sinaballaj",
+     "bashki": "Rrogozhinë",
+     "osm": "node/728424724",
+     "lat": 41.070294,
+     "lon": 19.6992606,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Rrogozhinë",
+   "zone": "Shezë",
+   "status": "hierarchy",
+   "where": "src/features/properties/data/locations.js:227",
+   "evidence": "village \"Shezë e Vogël\" in Bashkia Peqin (OSM node/728427581)",
+   "action": "move",
+   "to": [
+    {
+     "name": "Shezë e Vogël",
+     "bashki": "Peqin",
+     "osm": "node/728427581",
+     "lat": 41.0235486,
+     "lon": 19.7985971,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  },
+  {
+   "city": "Rrogozhinë",
+   "zone": "Lekaj",
+   "status": "valid",
+   "where": "src/features/properties/data/locations.js:227",
+   "evidence": "village \"Lekaj\" in Lekaj, Bashkia Rrogozhinë (OSM node/728425874, 41.1152, 19.6118)",
+   "action": "keep",
+   "to": [
+    {
+     "name": "Lekaj",
+     "bashki": "Rrogozhinë",
+     "osm": "node/728425874",
+     "lat": 41.1152488,
+     "lon": 19.6117968,
+     "kind": "village",
+     "category": "place"
+    }
+   ]
+  }
+ ]
+}

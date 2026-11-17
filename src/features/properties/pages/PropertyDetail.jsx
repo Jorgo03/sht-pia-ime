@@ -1,10 +1,12 @@
 import { useEffect, useState, lazy, Suspense } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { ChevronLeft, Heart, Share2, MapPin, Phone, MessageCircle, ExternalLink, ChevronRight as ChevRight, Globe, ArrowRight } from 'lucide-react'
+import { formatRef } from '../lib/searchFilters'
+import { ChevronLeft, Heart, Share2, MapPin, ExternalLink, ChevronRight as ChevRight, Globe, ArrowRight, Phone, Flag } from 'lucide-react'
 import { useProperty, useProperties } from '../hooks/useProperties'
+import { fetchPublisher, publisherView } from '../lib/publisher'
 import { useTranslatedProperty } from '../hooks/useTranslatedProperty'
-import { formatPrice, imageFor, listingBadgeKey, priceSuffixKey } from '../../../lib/format'
+import { formatPrice, imageFor, listingBadgeKey, priceSuffixKey, telUrl, whatsappUrl } from '../../../lib/format'
 import { useFavorites } from '../../favorites/FavoritesContext'
 import { useAuth } from '../../auth/AuthContext'
 import { supabase } from '../../../lib/supabase'
@@ -14,6 +16,7 @@ import PropertyCard from '../components/PropertyCard'
 import ImageLightbox from '../components/ImageLightbox'
 import ListingAssistant from '../components/ListingAssistant'
 import ViewingRequestSheet from '../../viewings/components/ViewingRequestSheet'
+import ReportSheet from '../../safety/components/ReportSheet'
 import { isEnabled } from '../../../lib/flags'
 import { useSwipe } from '../../../hooks/useSwipe'
 import '../../../styles/property-detail.css'
@@ -25,6 +28,18 @@ export default function PropertyDetail() {
   const navigate = useNavigate()
   const { t, i18n } = useTranslation()
   const { property, loading, error } = useProperty(id)
+  const [publisherAnswer, setPublisherAnswer] = useState({ id: null, row: null })
+  const publisherRow = publisherAnswer.id === id ? publisherAnswer.row : null
+  // Who published this listing (lib/publisher.js). A failed lookup leaves
+  // what the listing already carries.
+  useEffect(() => {
+    if (!id) return undefined
+    let active = true
+    fetchPublisher(supabase, id)
+      .then((row) => { if (active) setPublisherAnswer({ id, row }) })
+      .catch(() => {})
+    return () => { active = false }
+  }, [id])
   const { user } = useAuth()
   const { isFavorite, toggle } = useFavorites()
   const [imgIdx, setImgIdx] = useState(0)
@@ -32,8 +47,10 @@ export default function PropertyDetail() {
   const [loginToast, setLoginToast] = useState(false)
   const [chatError, setChatError] = useState(false)
   const [viewingSheet, setViewingSheet] = useState(false)
+  const [reportSheet, setReportSheet] = useState(false)
   const [viewingToast, setViewingToast] = useState(false)
   const [brokenImages, setBrokenImages] = useState(new Set())
+  const [shareToast, setShareToast] = useState(false)
   const { title, description, translating, isTranslated } = useTranslatedProperty(property, i18n.language)
   const { properties: similar } = useProperties({ filter: property?.property_type || 'all', city: property?.city || null, limit: 8 })
   const similarProperties = similar.filter(p => p.id !== id).slice(0, 4)
@@ -55,7 +72,18 @@ export default function PropertyDetail() {
   if (loading) return <div className="page">{t('common.loading')}</div>
   // A localized message, never the driver's own text — see useProperty().
   if (error) return <div className="page" style={{ color: '#c0392b' }}>{t('errors.generic')}</div>
-  if (!property) return <div className="page">{t('search.empty')}</div>
+  // A deleted, sold-and-removed or mistyped listing: say so and offer a way on,
+  // rather than a bare line of text with nowhere to go.
+  if (!property) return (
+    <div className="page mx-auto flex max-w-[420px] flex-col items-center px-5 pt-20 text-center">
+      <h1 className="font-fho-serif text-2xl font-medium text-fho-text">{t('detail.unavailable')}</h1>
+      <p className="mt-2 text-[15px] text-fho-text-muted">{t('detail.unavailableHint')}</p>
+      <div className="mt-6 flex gap-3">
+        <button className="pill-btn" onClick={() => navigate('/search')}>{t('common.search')}</button>
+        <button className="pill-btn" onClick={() => navigate('/')}>{t('common.home')}</button>
+      </div>
+    </div>
+  )
 
   const saved = isFavorite(property.id)
   const hasMultiple = images.length > 1
@@ -64,10 +92,13 @@ export default function PropertyDetail() {
   const suffixKey = priceSuffixKey(property.listing_type)
   const suffix = suffixKey ? t(suffixKey) : ''
   const badge = t(listingBadgeKey(property.listing_type))
-  const phone = property.contact_phone?.replace(/\s/g, '') || property.agent?.phone?.replace(/\s/g, '') || null
-  const waMsg = encodeURIComponent(t('property.whatsappMessage', { title }))
+  const publisher = publisherView(publisherRow, property)
+  const publisherName = publisher.name ?? t(publisher.kind === 'agent' ? 'auth.agent' : 'detail.owner')
+  // The number shown in "Published by", so the card, Call and WhatsApp agree.
+  const phone = publisher.phone?.replace(/\s/g, '') || null
   const features = property.features || []
-  const pricePerSqm = property.sqft > 0 ? Math.round(property.price / property.sqft) : null
+  // Sales only: a monthly or daily rent per m² is not a figure anyone compares.
+  const pricePerSqm = !suffixKey && property.sqft > 0 ? Math.round(property.price / property.sqft) : null
   const propertyTypeLabel = property.property_type ? t(`search.${property.property_type}`) : ''
 
   const startChat = async () => {
@@ -101,8 +132,12 @@ export default function PropertyDetail() {
 
   const handleShare = async () => {
     const url = window.location.href
-    if (navigator.share) navigator.share({ title, url }).catch(() => {})
-    else await navigator.clipboard.writeText(url)
+    if (navigator.share) { navigator.share({ title, url }).catch(() => {}); return }
+    try {
+      await navigator.clipboard.writeText(url)
+      setShareToast(true)
+      setTimeout(() => setShareToast(false), 2500)
+    } catch { /* clipboard blocked (insecure context, permission) — nothing to confirm */ }
   }
 
   const handleFavorite = (e) => {
@@ -162,7 +197,12 @@ export default function PropertyDetail() {
       <section className="detail-title">
         <div className="screen-kicker"><span className="screen-kicker__dash" />{badge}{propertyTypeLabel ? ` · ${propertyTypeLabel}` : ''}</div>
         <h1 className="screen-headline">{title}</h1>
-        <div className="muted-row"><MapPin size={14} /> {property.address}, {property.city}</div>
+        <div className="muted-row"><MapPin size={14} /> {[property.address, property.zone, property.city].filter(Boolean).join(', ')}</div>
+        {property.ref_code && (
+          <div className="mt-1 font-mono text-[12px] tracking-wide text-fho-text-muted">
+            {t('detail.reference')} <span className="select-all">{formatRef(property.ref_code)}</span>
+          </div>
+        )}
         <div className="detail-price">
           <span className="detail-price__main">{price}{suffix}</span>
           {pricePerSqm && <span className="detail-price__per">≈ {formatPrice(pricePerSqm, i18n.language, property.currency)}{t('detail.perSqm')}</span>}
@@ -202,22 +242,52 @@ export default function PropertyDetail() {
         </section>
       )}
 
-      {/* Agent */}
-      {property.agent && (
-        <section className="agent-strip" onClick={() => navigate(`/agent/${property.agent.id}`)}>
-          <div className="agent-initial">{property.agent.full_name?.[0] || 'A'}</div>
-          <div style={{ flex: 1 }}>
-            <div className="agent-name">{property.agent.full_name}</div>
-            <div className="agent-agency">{property.agent.agency_name}</div>
-          </div>
-          <button className="pill-btn" onClick={e => { e.stopPropagation(); startChat() }}>
-            {t('detail.chatInApp')}
-          </button>
-          {phone && (
-            <button className="pill-btn" onClick={e => { e.stopPropagation(); logActivity(property.id, 'message'); window.open(`https://wa.me/${phone}?text=${waMsg}`, '_blank') }}>
-              {t('detail.message')}
+      {/* Contact — the agent, or the owner on a listing posted without one.
+          Owner listings used to render nothing here, leaving no way to reach
+          them. The strip itself isn't clickable: only the agent's name links
+          to the profile, so no button sits inside another interactive element. */}
+      {(property.agent || publisher.name || phone) && (
+        <section className="agent-strip">
+          {property.agent ? (
+            <button type="button" className="agent-strip__who" onClick={() => navigate(`/agent/${property.agent.id}`)}>
+              <span className="agent-initial">{publisherName[0]}</span>
+              <span style={{ flex: 1, minWidth: 0 }}>
+                <span className="agent-published-by">{t('detail.publishedBy')}</span>
+                <span className="agent-name">{publisherName}</span>
+                {publisher.office && <span className="agent-agency">{publisher.office}</span>}
+              </span>
             </button>
+          ) : (
+            <div className="agent-strip__who">
+              <span className="agent-initial">{publisherName[0]}</span>
+              <span style={{ flex: 1, minWidth: 0 }}>
+                <span className="agent-published-by">{t('detail.publishedBy')}</span>
+                <span className="agent-name">{publisherName}</span>
+              </span>
+            </div>
           )}
+          <div className="agent-strip__actions">
+            <button className="pill-btn" onClick={startChat}>
+              {t('detail.chatInApp')}
+            </button>
+            {phone && (
+              <a className="pill-btn" href={telUrl(phone)} aria-label={t('property.call')} onClick={() => logActivity(property.id, 'call')}>
+                <Phone size={14} aria-hidden="true" />
+                <span style={{ marginLeft: 6 }}>{publisher.phone}</span>
+              </a>
+            )}
+            {phone && (
+              <a
+                className="pill-btn"
+                href={whatsappUrl(phone, t('property.whatsappMessage', { title }))}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => logActivity(property.id, 'message')}
+              >
+                {t('detail.message')}
+              </a>
+            )}
+          </div>
         </section>
       )}
 
@@ -242,6 +312,25 @@ export default function PropertyDetail() {
           </div>
         </section>
       )}
+
+      {/* Report: required by the App Store and Google Play for user posts.
+          Not offered on your own listing. */}
+      {user?.id !== property.owner_id && user?.id !== property.agent_id && (
+        <section className="detail-section">
+          <button
+            type="button"
+            className="inline-flex min-h-11 items-center gap-2 bg-transparent p-0 text-[13px] text-fho-text-muted underline underline-offset-2"
+            onClick={() => {
+              if (!user) { setLoginToast(true); setTimeout(() => setLoginToast(false), 2500); return }
+              setReportSheet(true)
+            }}
+          >
+            <Flag size={14} aria-hidden="true" /> {t('safety.reportListing')}
+          </button>
+        </section>
+      )}
+
+      {reportSheet && <ReportSheet propertyId={property.id} onClose={() => setReportSheet(false)} />}
 
       {/* Sticky CTA — in-app viewing request (owner sees no CTA on own listing) */}
       {user?.id !== property.owner_id && user?.id !== property.agent_id && (
@@ -272,6 +361,10 @@ export default function PropertyDetail() {
 
       {viewingToast && (
         <div className="addsheet-toast" role="status" onClick={() => setViewingToast(false)}>{t('viewings.requestSuccess')}</div>
+      )}
+
+      {shareToast && (
+        <div className="addsheet-toast" role="status" onClick={() => setShareToast(false)}>{t('detail.linkCopied')}</div>
       )}
 
       {loginToast && (

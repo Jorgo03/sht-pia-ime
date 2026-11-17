@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Navigation } from 'lucide-react'
 import { getMarkerIcon, getPriceMarkerIcon, getCountMarkerIcon, MARKER_COLORS } from './MapMarker'
-import { formatPrice, gradientFor } from '../../../lib/format'
+import { formatPrice, getLocalizedText, gradientFor, listingBadgeKey, priceSuffixKey } from '../../../lib/format'
 import { pointInGeometry, geometryCentroid, geometryBounds, unionBounds } from '../../../lib/geo'
 import albaniaCounties from '../../../data/albania-counties.json'
 import 'react-leaflet-cluster/dist/assets/MarkerCluster.css'
@@ -67,9 +67,14 @@ function LocateButton() {
 
 function PropertyPopup({ property }) {
   const navigate = useNavigate()
-  const { i18n } = useTranslation()
-  const price = formatPrice(property.price, i18n.language)
-  const suffix = property.listing_type === 'rent' ? '/mo' : ''
+  const { t, i18n } = useTranslation()
+  // The listing's own currency and translated labels: the popup used to
+  // show € for every listing, an English "/mo", and the raw column values
+  // ("apartment · sale").
+  const price = formatPrice(property.price, i18n.language, property.currency)
+  const suffixKey = priceSuffixKey(property.listing_type)
+  const suffix = suffixKey ? t(suffixKey) : ''
+  const title = getLocalizedText(property.title_i18n, i18n.language) || property.title
   const hasImage = property.image_urls?.[0]
 
   return (
@@ -79,10 +84,10 @@ function PropertyPopup({ property }) {
       ) : (
         <div className="map-popup-gradient" style={{ background: gradientFor(property.id) }} />
       )}
-      <div className="map-popup-title">{property.title}</div>
+      <div className="map-popup-title">{title}</div>
       <div className="map-popup-price">{price}{suffix}</div>
       <div className="map-popup-type">
-        {property.property_type} &middot; {property.listing_type}
+        {t(`search.${property.property_type}`, property.property_type)} &middot; {t(listingBadgeKey(property.listing_type))}
       </div>
       <button className="map-popup-btn" onClick={() => navigate(`/property/${property.id}`)}>
         View Details
@@ -103,7 +108,7 @@ function PropertyMarkers({ properties }) {
         <Marker
           key={property.id}
           position={[property.latitude, property.longitude]}
-          icon={getPriceMarkerIcon(property.listing_type, property.price)}
+          icon={getPriceMarkerIcon(property.listing_type, property.price, property.currency)}
         >
           <Popup>
             <PropertyPopup property={property} />
@@ -161,6 +166,7 @@ function CountyRegionLayer({ properties }) {
 }
 
 export default function PropertyMap({ properties, lat, lng }) {
+  const { t } = useTranslation()
   const mapRef = useRef(null)
 
   const isSinglePin = lat != null && lng != null
@@ -194,10 +200,12 @@ export default function PropertyMap({ properties, lat, lng }) {
       </div>
       {!isSinglePin && (
         <div className="map-legend">
-          {Object.entries(MARKER_COLORS).map(([type, color]) => (
+          {/* Only the colours a marker can have (by listing type), translated;
+              this used to list every colour, in English. */}
+          {['sale', 'rent'].map((type) => (
             <div key={type} className="legend-item">
-              <span className="legend-dot" style={{ background: color }} />
-              {type.charAt(0).toUpperCase() + type.slice(1)}
+              <span className="legend-dot" style={{ background: MARKER_COLORS[type] }} />
+              {t(`listing.type.${type}`)}
             </div>
           ))}
         </div>

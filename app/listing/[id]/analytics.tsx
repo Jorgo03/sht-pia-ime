@@ -1,3 +1,5 @@
+import { useAuth } from '@/contexts/auth-context';
+import { SignInPrompt } from '@/components/ui/sign-in-prompt';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useMemo, useState } from 'react';
@@ -7,10 +9,11 @@ import { useTranslation } from 'react-i18next';
 
 import { AppHeader } from '@/components/ui/app-header';
 import { GradientBackground } from '@/components/ui/gradient-background';
-import { type AtticoPalette } from '@/constants/theme';
+import { type AtticoPalette, Fonts } from '@/constants/theme';
 import { useTheme } from '@/contexts/theme-context';
 import { supabase } from '@/lib/supabase';
 import { formatDate } from '@/lib/format';
+import { useReadableColumn } from '@/hooks/use-responsive';
 
 type ActivityType = 'view' | 'call' | 'message' | 'meeting' | 'favourite';
 
@@ -49,11 +52,14 @@ const BAR_GAP = 4;
 const CHART_HEIGHT = 140;
 
 export default function PropertyAnalyticsScreen() {
+  const { user, loading: authLoading } = useAuth();
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const { t, i18n } = useTranslation();
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
+  // A centred column on an unfolded Fold or a spanned Duo (hooks/use-responsive).
+  const readable = useReadableColumn();
 
   const [activity, setActivity] = useState<PropertyActivity[]>([]);
   const [loading, setLoading] = useState(true);
@@ -120,10 +126,12 @@ export default function PropertyAnalyticsScreen() {
   const maxCount = Math.max(1, ...dailySeries.map((d) => d.count));
   const recent = activity.slice(0, 50);
 
+  // Signed out: ask to sign in, not an empty "nothing yet" screen (website audit).
+  if (!user) return authLoading ? null : <SignInPrompt />;
   return (
     <GradientBackground>
-      <SafeAreaView style={styles.container} edges={['top']}>
-        <AppHeader onBack={() => router.back()} title={t('dashboard.title')} />
+      <SafeAreaView style={[styles.container, readable]} edges={['top']}>
+        <AppHeader onBack={() => router.back()} title={t('dashboard.title')} titleIsHeading />
 
         {loading ? (
           <View style={styles.center}>
@@ -151,6 +159,7 @@ export default function PropertyAnalyticsScreen() {
                   const active = metric === type;
                   return (
                     <TouchableOpacity
+                      accessibilityRole="button"
                       key={type}
                       onPress={() => setMetric(type)}
                       activeOpacity={0.7}
@@ -232,11 +241,14 @@ const createStyles = (colors: AtticoPalette) =>
       gap: 8,
     },
     description: {
+      fontFamily: Fonts.sans,
       fontSize: 14,
       color: colors.textSecondary,
     },
     scrollContent: {
       paddingHorizontal: 20,
+      // Clear of the header's bottom line, like every other pushed screen.
+      paddingTop: 16,
       paddingBottom: 40,
       gap: 20,
     },
@@ -258,11 +270,12 @@ const createStyles = (colors: AtticoPalette) =>
     },
     statValue: {
       fontSize: 20,
-      fontWeight: '700',
+      fontFamily: Fonts.sansBold,
       color: colors.textPrimary,
     },
     statLabel: {
-      fontSize: 10,
+      fontFamily: Fonts.sans,
+      fontSize: 12,
       color: colors.textSecondary,
       textAlign: 'center',
     },
@@ -286,8 +299,8 @@ const createStyles = (colors: AtticoPalette) =>
       borderWidth: 1,
     },
     metricPillText: {
-      fontSize: 11,
-      fontWeight: '600',
+      fontSize: 12,
+      fontFamily: Fonts.sansSemiBold,
     },
     chartScroll: {
       marginTop: 4,
@@ -309,7 +322,8 @@ const createStyles = (colors: AtticoPalette) =>
       borderRadius: 3,
     },
     chartHint: {
-      fontSize: 11,
+      fontFamily: Fonts.sans,
+      fontSize: 12,
       color: colors.textSecondary,
       textAlign: 'right',
     },
@@ -322,7 +336,7 @@ const createStyles = (colors: AtticoPalette) =>
     },
     listCardHeader: {
       fontSize: 14,
-      fontWeight: '700',
+      fontFamily: Fonts.sansBold,
       color: colors.textPrimary,
       padding: 14,
       borderBottomWidth: 1,
@@ -333,6 +347,7 @@ const createStyles = (colors: AtticoPalette) =>
       alignItems: 'center',
     },
     emptyText: {
+      fontFamily: Fonts.sans,
       fontSize: 13,
       color: colors.textSecondary,
     },
@@ -347,11 +362,13 @@ const createStyles = (colors: AtticoPalette) =>
     },
     activityType: {
       flex: 1,
+      fontFamily: Fonts.sans,
       fontSize: 13,
       color: colors.textPrimary,
     },
     activityDate: {
-      fontSize: 11,
+      fontFamily: Fonts.sans,
+      fontSize: 12,
       color: colors.textSecondary,
     },
   });

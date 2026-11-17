@@ -1,13 +1,4 @@
-const GRADIENTS = [
-  'linear-gradient(135deg, #a08868 0%, #7a5d3f 50%, #4a3520 100%)',
-  'linear-gradient(135deg, #9eb09a, #5f7158)',
-  'linear-gradient(135deg, #c2a895, #8a6f5a)',
-  'linear-gradient(135deg, #8b9d83, #5d6b56)',
-  'linear-gradient(135deg, #b8a89d, #8a7868)',
-  'linear-gradient(135deg, #6b7d8a, #485966)',
-  'linear-gradient(135deg, #a99580, #756352)',
-  'linear-gradient(135deg, #8a9b8e, #5c6b5e)',
-];
+import { t as translate } from 'i18next';
 
 const FALLBACK_COLORS: [string, string][] = [
   ['#a08868', '#4a3520'],
@@ -87,7 +78,20 @@ export function formatDate(dateStr: string | null | undefined, lang: string = 's
 export function formatRelativeTime(iso: string | null | undefined, locale: string = 'sq'): string {
   if (!iso) return '';
   const diff = (Date.now() - new Date(iso).getTime()) / 1000;
-  const rtf = new Intl.RelativeTimeFormat(locale, { numeric: 'auto' });
+  // Hermes, the phones' JavaScript engine, has no Intl.RelativeTimeFormat:
+  // calling it crashed the Messages screen on a real device. Browsers have
+  // it, so the web keeps the exact wording; phones use the app's own
+  // translations (time.*), worded so the number needs no plural form.
+  const Rtf = (Intl as { RelativeTimeFormat?: typeof Intl.RelativeTimeFormat }).RelativeTimeFormat;
+  if (typeof Rtf !== 'function') {
+    const say = (key: string, n?: number) => translate(key, { n, lng: locale });
+    if (diff < 60) return say('time.justNow');
+    if (diff < 3600) return say('time.minutesAgo', Math.floor(diff / 60));
+    if (diff < 86400) return say('time.hoursAgo', Math.floor(diff / 3600));
+    if (diff < 604800) return say('time.daysAgo', Math.floor(diff / 86400));
+    return formatDate(iso);
+  }
+  const rtf = new Rtf(locale, { numeric: 'auto' });
   if (diff < 60) return rtf.format(-Math.floor(diff), 'second');
   if (diff < 3600) return rtf.format(-Math.floor(diff / 60), 'minute');
   if (diff < 86400) return rtf.format(-Math.floor(diff / 3600), 'hour');
@@ -97,17 +101,33 @@ export function formatRelativeTime(iso: string | null | undefined, locale: strin
   return formatDate(iso);
 }
 
-export function whatsappUrl(phone: string | undefined, message: string): string {
+/**
+ * A phone number as international digits only — the country code and no '+',
+ * '00' or leading 0 — which is what both wa.me and a `tel:+` link need.
+ */
+export function internationalPhone(phone: string | null | undefined): string {
   let clean = phone?.replace(/[^0-9]/g, '') || '';
   // wa.me requires full international format with no leading 0. Agents
   // enter local Albanian numbers (e.g. "069 602 0791"), so assume Albania's
   // country code (355) whenever one isn't already present — without this,
   // WhatsApp's Universal Link handler silently rejects the malformed number
   // and Linking.openURL fails with "Unable to open URL".
-  if (clean.startsWith('0')) {
-    clean = `355${clean.slice(1)}`;
-  } else if (!clean.startsWith('355')) {
-    clean = `355${clean}`;
+  // A number already written internationally ("+39 …", "0039 …") keeps its
+  // own country code: diaspora owners list Italian and German phones.
+  const international = /^\s*\+\s*[1-9]/.test(phone || '');
+  if (clean.startsWith('00')) {
+    clean = clean.slice(2);
+  } else if (!international) {
+    if (clean.startsWith('0')) clean = `355${clean.slice(1)}`;
+    else if (!clean.startsWith('355')) clean = `355${clean}`;
   }
-  return `https://wa.me/${clean}?text=${encodeURIComponent(message)}`;
+  return clean;
+}
+
+export function telUrl(phone: string | null | undefined): string {
+  return `tel:+${internationalPhone(phone)}`;
+}
+
+export function whatsappUrl(phone: string | null | undefined, message: string): string {
+  return `https://wa.me/${internationalPhone(phone)}?text=${encodeURIComponent(message)}`;
 }

@@ -1,0 +1,30 @@
+{
+  "contract": "AUDIT.md Pass 29. Surface: the Expo app (phone, tablet, unfolded foldable) and its web build. Job: find and choose a home. Primary action: open a listing and contact the seller. Hierarchy on a card: photo, sale/rent, price, type and place, rooms and size. Approved and unchanged: logo, sign-in screen. Data: fictional demo listings (marketing/launch-video/capture/demo-listings.mjs) answered in the browser; production never reached.",
+  "targetViewports": ["280x653", "320x568", "390x844", "673x841", "768x1024", "1194x834"],
+  "accessibility": {
+    "status": "pass",
+    "evidence": "axe-core (wcag2a/aa, 21a/aa, 22aa) on 18 screens at 280/320/390 light, 11 screens dark, 10 screens at 673/768/1194. Fixed: orange text on accentGlow chips (3.7-3.9:1 -> 4.7:1+), unnamed wizard progressbar, 17-21px standalone link targets (now 24px+ via InlineTarget), 19px-tall search input. Remaining axe failures are all white on solid #ff6b00 (2.85:1) and white on #e85d00 (3.5:1): an open owner decision on the brand look, listed as remaining. Reduced motion: Reanimated defaults every animation to ReduceMotion.System and reads prefers-reduced-motion on the web."
+  },
+  "responsive": {
+    "status": "pass",
+    "evidence": "No horizontal scroll and no control off screen at any target, apart from intentional horizontal carousels (home rails, photo pager, lead status chips). Tablet and unfolded widths rendered through a test build with EXPO_PUBLIC_WEB_MAX_WIDTH=1400: Explore 3 columns, listing page two-column in landscape, forms and settings in a readable column. Explore card specs wrap at 280px instead of clipping."
+  },
+  "contentStates": {
+    "loading": { "status": "pass", "evidence": "Skeleton cards on Explore and Home (existing SkeletonCard); listing pages keep layout while the photo loads (expo-image transition). Covered by e2e-expo X33 retry flows." },
+    "empty": { "status": "pass", "evidence": "Agent dashboard with no viewings, buyer requests or leads shows a named empty state with an icon in each section (screenshot tablet-landscape-and-fold-open.jpg, dashboard)." },
+    "error": { "status": "pass", "evidence": "e2e-expo X33: a failed load of /viewings, /my-listings and /saved-searches offers a retry that loads; X46: the assistant says it is down and retry repeats the question." },
+    "partial": { "status": "pass", "evidence": "Explore cards show beds, baths and m2 only when the listing has them; a listing with no specs shows a shorter card, not zeros (property-card.tsx)." },
+    "success": { "status": "pass", "evidence": "Sending the first message on a listing shows the sent confirmation; e2e-expo X49 checks the message write with the suggested text untouched." },
+    "permission": { "status": "pass", "evidence": "Signed out, Chat and Save ask to sign in (e2e F02-N2, F03-N2, X49 signed-in counterpart); the agent dashboard and leads screens render only for a signed-in agent." }
+  },
+  "renderedEvidence": [
+    { "viewport": "390x844", "artifact": "phone-390-light.jpg", "observation": "Home, Explore with the new cards, Filters with tint chips, listing page, signed-in profile. Price, type, place and specs readable; no clipping." },
+    { "viewport": "390x844", "artifact": "phone-390-dark.jpg", "observation": "Dark theme: home, Explore, listing, new-listing wizard, agent dashboard. Only white-on-orange contrast remains." },
+    { "viewport": "390x844", "artifact": "explore-cards-before-after.jpg", "observation": "Explore grid before (90px photo strip, price and city only) and after (4:3 photo, sale/rent tag, type and place, beds/baths/m2)." },
+    { "viewport": "280x653", "artifact": "fold-cover-280.jpg", "observation": "Foldable cover screen: Explore cards wrap their specs; listing, sign-in and wizard fit with no horizontal scroll." },
+    { "viewport": "320x568", "artifact": "phone-390-light.jpg", "observation": "320x568 was audited by the same script (report in the pass): no overflow, same findings as 390. The sheet shown is 390; 320 shares its layout path." },
+    { "viewport": "768x1024", "artifact": "tablet-768.jpg", "observation": "Tablet portrait: Home in a readable column, Explore in 3 columns, listing page single column, profile settings list." },
+    { "viewport": "673x841", "artifact": "tablet-landscape-and-fold-open.jpg", "observation": "Unfolded foldable (bottom right): agent dashboard 2-up stat grid, sections in a readable column." },
+    { "viewport": "1194x834", "artifact": "tablet-landscape-and-fold-open.jpg", "observation": "Tablet landscape: listing page two-column with the agent, message and price in a side column; new-listing wizard centred." }
+  ]
+}

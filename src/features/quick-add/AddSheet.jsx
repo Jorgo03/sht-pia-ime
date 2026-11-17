@@ -5,6 +5,7 @@ import { Home, Search, Heart, Eye, Users, CalendarDays, Building2, X, ArrowLeft,
 import { useAddSheet } from './AddSheetContext'
 import { useAuth } from '../auth/AuthContext'
 import { supabase } from '../../lib/supabase'
+import { countMatches } from '../saved-searches/lib/matches'
 import { parseSearchQuery } from '../../lib/ai'
 import { isEnabled } from '../../lib/flags'
 import './AddSheet.css'
@@ -20,11 +21,15 @@ function SaveSearchForm({ onClose, onSuccess, onError }) {
   const handleSubmit = async () => {
     if (!name.trim() || !user) return
     setLoading(true)
+    const filters = { city: city.trim() || null, listing_type: listingType }
+    // Start from what matches today, so only later listings count as new.
+    const current = await countMatches(supabase, filters)
     const { error } = await supabase.from('saved_searches').insert({
       user_id: user.id,
       name: name.trim(),
-      filters: { city: city.trim() || null, listing_type: listingType },
+      filters,
       alerts_enabled: true,
+      last_match_count: current ?? 0,
     })
     setLoading(false)
     if (!error) onSuccess(t('addSheet.searchSaved'))

@@ -22,7 +22,5 @@ export const PRICE_STEP = 1000
 // be correct would be useless at residential scale.
 export const AREA_MAX = 100000
 
-// TODO: id/referenca filter — not implemented yet. It belongs here as a plain
-// text param, and in the bar between Cmimi max and Sip min.
-// TODO: zona — needs a `zone` column on properties plus capture in NewListing
-// before it can filter anything. Options list already exists in ./locations.js.
+// Zone and reference (F19) live in ../lib/searchFilters.js: zone lists come
+// from ./locations.js per city, references are the listing's SH-XXXXXXXX code.

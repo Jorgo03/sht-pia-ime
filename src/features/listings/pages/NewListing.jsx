@@ -1,15 +1,24 @@
 import { useState, useRef, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet'
-import { ArrowLeft, ArrowRight, Upload, X, Film, Check } from 'lucide-react'
+import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-leaflet'
+import { ArrowLeft, ArrowRight, Upload, X, Film, Check, Move } from 'lucide-react'
 import { useAuth } from '../../auth/AuthContext'
 import { supabase } from '../../../lib/supabase'
 import { isEnabled } from '../../../lib/flags'
 import { getMarkerIcon } from '../../properties/components/MapMarker'
+import { RoadField } from '../components/RoadField'
 import { TranslationBar } from '../components/TranslationBar'
 import { useListingTranslation } from '../hooks/useListingTranslation'
 import { translatePropertyContent } from '../../../lib/translate'
+import { geocodeCity } from '../../../lib/roadSearch'
+import { formToColumns, propertyToForm, removedMediaPaths } from '../lib/listingForm'
+import { zonesFor } from '../../properties/lib/searchFilters'
+import LOCATIONS from '../../properties/data/locations'
+import { checkPin, cityLabel, findCity } from '../../properties/lib/places'
+import { FORM_LIMITS, isValidEmail } from '../../../lib/formLimits'
+import { isValidPhone } from '../../auth/lib/profileForm'
+import { uploadPath } from '../../../lib/uploadNames'
 import '../../../styles/map.css'
 import '../../../styles/new-listing.css'
 
@@ -20,6 +29,36 @@ function MapClickPicker({ onPick }) {
   useMapEvents({
     click(e) { onPick(e.latlng) },
   })
+  return null
+}
+
+/** Roughly a few blocks across — close enough to pick out a building, wide
+ *  enough that a road's midpoint still shows the street it belongs to. */
+const STREET_ZOOM = 17
+
+/**
+ * Flies the camera to a chosen road or city centre.
+ *
+ * Deliberately does not touch the marker. Framing the map and claiming the
+ * property's position are different things: a road's coordinate is the
+ * midpoint of a line that can run for a kilometre, and a city centre is not a
+ * building at all. If this dropped a pin, an agent who never touched the map
+ * would publish that approximation as their address.
+ *
+ * Keyed on the coordinates rather than on object identity, so a parent
+ * re-render that rebuilds an equal object does not yank the camera back while
+ * the agent is panning to fine-tune the marker.
+ */
+function MapFocus({ focus }) {
+  const map = useMap()
+  const lat = focus?.latitude
+  const lng = focus?.longitude
+
+  useEffect(() => {
+    if (lat == null || lng == null) return
+    map.flyTo([lat, lng], STREET_ZOOM, { duration: 0.65 })
+  }, [map, lat, lng])
+
   return null
 }
 
@@ -48,8 +87,11 @@ const PROPERTY_TYPES = ['apartment', 'villa', 'house', 'land', 'commercial', 'of
 // daily_rent removed from creation (owner decision 2026-07-14); display
 // helpers in lib/format keep supporting it in case legacy rows ever exist.
 const LISTING_TYPES = ['sale', 'rent']
-const CITIES = ['Tiranë', 'Durrës', 'Vlorë', 'Shkodër', 'Elbasan', 'Korçë', 'Fier', 'Berat', 'Lushnjë', 'Pogradec', 'Kavajë', 'Gjirokastër', 'Sarandë']
-const FEATURES_LIST = ['balcony', 'parking', 'elevator', 'garden', 'pool', 'furnished', 'airConditioning', 'heating', 'security', 'storage']
+// Every city both apps offer (data/locations.js, the locations audit), not a
+// hand-kept list: this one had 13 of them while the phone app had 31.
+const CITIES = LOCATIONS.map((l) => l.city)
+// 'heating' is no longer offered; existing listings with it still display it.
+const FEATURES_LIST = ['balcony', 'parking', 'elevator', 'garden', 'pool', 'furnished', 'airConditioning', 'security', 'storage']
 
 // properties.sqft/beds/floor/total_floors/year_built are Postgres `integer`
 // (±2.14B). Without a client-side bound, a fat-fingered value sails through
@@ -63,10 +105,18 @@ const MIN_FLOOR = -10
 const MAX_FLOOR = 200
 const MIN_YEAR = 1800
 const MAX_YEAR = new Date().getFullYear() + 2
+// One photo, not three. A listing with a single good photo is worth
+// publishing; the earlier floor turned agents away at the media step, and a
+// listing that never gets posted helps nobody. Named rather than inlined
+// because the number also appears in the error message, and the two drifting
+// apart is how a form ends up demanding three while saying it needs one.
+// lib/upload.ts holds the Expo twin — keep them in step.
+const MIN_IMAGES = 1
 
 // Storage-side validation: the file picker's accept="image/*" is only a
 // hint — anything can be dropped in. Enforce type + size before upload.
-const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/avif', 'image/gif']
+// The storage bucket's own list (lib/uploadNames.js); AVIF was offered here but refused by the bucket.
+const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
 const MAX_IMAGE_MB = 10
 
 // Video: MP4/MOV only, capped at Supabase's default per-object limit.
@@ -94,6 +144,7 @@ const INITIAL_FORM = {
   // Per-language provenance — see properties.translation_meta.
   translation_meta: {},
   city: 'Tiranë',
+  zone: '',
   address: '',
   latitude: null,
   longitude: null,
@@ -115,35 +166,73 @@ const INITIAL_FORM = {
 // Draft persistence: the wizard survives navigation/refresh via
 // localStorage. Selected photos are File objects and can't be serialized —
 // they're the one thing a returning user re-adds.
+// One draft per account (`fho_listing_draft:<user id>`): on a shared computer
+// the next person must never open the previous agent's listing and contact
+// details. The bare key is the old one-per-browser draft, deleted on sight.
 const DRAFT_KEY = 'fho_listing_draft'
 const DRAFT_TTL_MS = 7 * 24 * 60 * 60 * 1000
+const draftKeyFor = (userId) => `${DRAFT_KEY}:${userId}`
+// Photos are never kept in a draft, so a restored one reopens here at the
+// latest: one left on Publish could otherwise go live with no photos.
+const MEDIA_STEP = 3
 
-function loadDraft() {
+// Nothing typed or chosen yet: not worth saving, or restoring, as a draft.
+const isPristine = (form, step = 0) => step === 0 && JSON.stringify({ ...INITIAL_FORM, ...form }) === JSON.stringify(INITIAL_FORM)
+
+function loadDraft(userId) {
   try {
-    const raw = localStorage.getItem(DRAFT_KEY)
+    localStorage.removeItem(DRAFT_KEY)
+    if (!userId) return null
+    const raw = localStorage.getItem(draftKeyFor(userId))
     if (!raw) return null
     const draft = JSON.parse(raw)
-    if (!draft?.form || Date.now() - (draft.savedAt || 0) > DRAFT_TTL_MS) return null
+    if (!draft?.form || Date.now() - (draft.savedAt || 0) > DRAFT_TTL_MS || isPristine(draft.form, draft.step)) return null
     return draft
   } catch {
     return null
   }
 }
 
+/** The listing to edit, if this user may edit it. */
+async function fetchEditableListing(id, userId) {
+  const { data, error } = await supabase.from('properties').select('*').eq('id', id).maybeSingle()
+  if (error) return { state: 'error' }
+  // RLS already hides other people's drafts; this also covers active listings
+  // someone else owns, which everyone can read but only the owner may edit.
+  if (!data || (data.owner_id !== userId && data.agent_id !== userId)) return { state: 'forbidden' }
+  return { state: 'ready', row: data }
+}
+
 export default function NewListing() {
   const { t } = useTranslation()
-  const { user } = useAuth()
+  const { user, profile } = useAuth()
   const navigate = useNavigate()
   const fileInputRef = useRef(null)
+  // Media the listing had when it was opened for editing; anything missing
+  // after a successful save is deleted from storage.
+  const originalMedia = useRef([])
   const videoInputRef = useRef(null)
 
-  const [draft] = useState(loadDraft)
-  const [step, setStep] = useState(draft?.step ?? 0)
+  // /my-listings/:id/edit opens the same wizard on a saved listing.
+  const { id: editId } = useParams()
+  const isEdit = Boolean(editId)
+  // 'loading' | 'ready' | 'error' | 'forbidden' while editing; always 'ready' when creating.
+  const [editState, setEditState] = useState(isEdit ? 'loading' : 'ready')
+
+  // Editing never reads or overwrites the new-listing draft.
+  const [draft] = useState(() => (isEdit ? null : loadDraft(user?.id)))
+  const [step, setStep] = useState(Math.min(draft?.step ?? 0, MEDIA_STEP))
   const [submitting, setSubmitting] = useState(false)
   const [errors, setErrors] = useState({})
   const [draftRestored, setDraftRestored] = useState(Boolean(draft))
 
   const [form, setForm] = useState(draft?.form ? { ...INITIAL_FORM, ...draft.form } : INITIAL_FORM)
+
+  // Where the map should look: the selected road, or the city centre. Not
+  // persisted with the draft — it is a camera position, not listing data, and
+  // a restored draft should show the pin it saved rather than fly somewhere.
+  const [mapFocus, setMapFocus] = useState(null)
+  const cityLookup = useRef('')
 
   // Owns the language selection for BOTH text fields, plus the per-language
   // cache, staleness against the Albanian source, protection for hand-edited
@@ -164,14 +253,43 @@ export default function NewListing() {
   const [video, setVideo] = useState(null)
 
   // Persist progress on every change; cleared on successful submit/discard.
+  // An untouched form is not a draft: saving one showed "draft restored" over
+  // blank fields on every later visit, even after "start fresh".
+  const draftOwner = user?.id
   useEffect(() => {
+    if (isEdit || !draftOwner) return
     try {
-      localStorage.setItem(DRAFT_KEY, JSON.stringify({ form, step, savedAt: Date.now() }))
+      if (isPristine(form, step)) localStorage.removeItem(draftKeyFor(draftOwner))
+      else localStorage.setItem(draftKeyFor(draftOwner), JSON.stringify({ form, step, savedAt: Date.now() }))
     } catch { /* storage full/blocked — wizard still works, just unsaved */ }
-  }, [form, step])
+  }, [form, step, isEdit, draftOwner])
+
+  // Load the listing being edited. Photos and video already uploaded join the
+  // same lists as new ones, flagged `existing`, so ordering, the cover photo
+  // and removal behave exactly as when creating.
+  const applyLoaded = (result) => {
+    if (result.state !== 'ready') { setEditState(result.state); return }
+    const { row } = result
+    setForm({ ...INITIAL_FORM, ...propertyToForm(row), status: row.status })
+    setImages((row.image_urls ?? []).map(url => ({ url, preview: url, existing: true })))
+    setVideo(row.video_url ? { url: row.video_url, existing: true } : null)
+    originalMedia.current = [...(row.image_urls ?? []), row.video_url].filter(Boolean)
+    setEditState('ready')
+  }
+  const userId = user?.id
+  useEffect(() => {
+    if (!editId || !userId) return
+    let cancelled = false
+    fetchEditableListing(editId, userId).then(result => { if (!cancelled) applyLoaded(result) })
+    return () => { cancelled = true }
+  }, [editId, userId])
+  const retryLoad = () => {
+    setEditState('loading')
+    fetchEditableListing(editId, userId).then(applyLoaded)
+  }
 
   const discardDraft = () => {
-    try { localStorage.removeItem(DRAFT_KEY) } catch { /* ignore */ }
+    try { if (user) localStorage.removeItem(draftKeyFor(user.id)) } catch { /* ignore */ }
     setForm(INITIAL_FORM)
     setStep(0)
     setImages([])
@@ -181,7 +299,27 @@ export default function NewListing() {
 
   const update = (key, value) => {
     setForm(prev => ({ ...prev, [key]: value }))
-    setErrors(prev => ({ ...prev, [key]: undefined }))
+    // Moving the pin answers a pin error.
+    setErrors(prev => ({ ...prev, [key]: undefined, ...(key === 'latitude' || key === 'longitude' ? { pin: undefined } : {}) }))
+  }
+
+  /**
+   * A new city invalidates everything downstream of it.
+   *
+   * Keeping the old road would leave a street that does not exist here, and
+   * keeping the pin would publish a property in the previous city — the kind
+   * of stale coordinate nobody notices until it is on a map.
+   */
+  const selectCity = (city) => {
+    if (city === form.city) return
+    setForm(prev => ({ ...prev, city, zone: '', address: '', latitude: null, longitude: null }))
+    setErrors(prev => ({ ...prev, city: undefined }))
+    setMapFocus(null)
+    // Move the map to the new city so the next pin starts somewhere plausible
+    // rather than wherever it was left. A late answer for a city changed
+    // since (or after a road was picked) must not pull the map back there.
+    cityLookup.current = city
+    geocodeCity({ city }).then(centre => { if (centre && cityLookup.current === city) setMapFocus(centre) })
   }
 
   const toggleFeature = (feat) => {
@@ -214,7 +352,7 @@ export default function NewListing() {
 
   const removeImage = (idx) => {
     setImages(prev => {
-      URL.revokeObjectURL(prev[idx].preview)
+      if (!prev[idx].existing) URL.revokeObjectURL(prev[idx].preview)
       return prev.filter((_, i) => i !== idx)
     })
   }
@@ -245,20 +383,27 @@ export default function NewListing() {
     })
   }
 
-  const validate = () => {
+  const errorsFor = (s) => {
     const errs = {}
-    if (step === 0) {
+    if (s === 0) {
       if (!form.title_i18n.sq?.trim()) errs.title = t('listing.required')
       if (!form.description_i18n.sq?.trim()) errs.description = t('listing.required')
     }
-    if (step === 1) {
+    if (s === 1) {
       if (!form.city) errs.city = t('listing.required')
+      // The database refuses the same pins (supabase/migrations/20261114215248_locations.sql).
+      else if (form.latitude != null && form.longitude != null) {
+        const pin = checkPin(form.city, form.latitude, form.longitude)
+        if (pin === 'outside-albania') errs.pin = t('listing.pinOutsideAlbania')
+        else if (pin === 'outside-city') errs.pin = t('listing.pinOutsideCity', { city: findCity(form.city)?.bashki ?? form.city })
+      }
     }
-    if (step === 2) {
+    if (s === 2) {
       if (!form.price || Number(form.price) <= 0) errs.price = t('listing.required')
       else if (Number(form.price) > MAX_PRICE) errs.price = t('listing.valueOutOfRange', { min: 0, max: MAX_PRICE.toLocaleString() })
 
-      if (!form.sqft || Number(form.sqft) <= 0) errs.sqft = t('listing.required')
+      // At least 1 m² once rounded: the column holds whole square metres.
+      if (!form.sqft || !(Number(form.sqft) >= 1)) errs.sqft = t('listing.required')
       else if (Number(form.sqft) > MAX_SQFT) errs.sqft = t('listing.valueOutOfRange', { min: 1, max: MAX_SQFT.toLocaleString() })
 
       if (outOfRange(form.beds, 0, MAX_BEDS)) errs.beds = t('listing.valueOutOfRange', { min: 0, max: MAX_BEDS })
@@ -267,14 +412,37 @@ export default function NewListing() {
       if (outOfRange(form.total_floors, 1, MAX_FLOOR)) errs.total_floors = t('listing.valueOutOfRange', { min: 1, max: MAX_FLOOR })
       if (outOfRange(form.year_built, MIN_YEAR, MAX_YEAR)) errs.year_built = t('listing.valueOutOfRange', { min: MIN_YEAR, max: MAX_YEAR })
     }
-    if (step === 3) {
-      if (images.length < 3) errs.images = t('listing.minImages')
+    if (s === 3) {
+      if (images.length < MIN_IMAGES) errs.images = t('listing.minImages', { min: MIN_IMAGES })
     }
-    if (step === 4) {
+    if (s === 4) {
+      // The same formats the database checks (properties_contact_*_format).
       if (!form.contact_phone?.trim()) errs.phone = t('listing.required')
+      else if (!isValidPhone(form.contact_phone)) errs.phone = t('profile.edit.phoneInvalid')
+      if (!isValidEmail(form.contact_email)) errs.email = t('errors.invalidEmail')
     }
+    return errs
+  }
+
+  const validate = () => {
+    const errs = errorsFor(step)
     setErrors(errs)
     return Object.keys(errs).length === 0
+  }
+
+  // Publishing checks every step, not only the one on screen, and opens the
+  // first one that is incomplete.
+  const validateAll = () => {
+    for (let s = 0; s < STEPS.length; s++) {
+      const errs = errorsFor(s)
+      if (Object.keys(errs).length > 0) {
+        setStep(s)
+        setErrors(errs)
+        return false
+      }
+    }
+    setErrors({})
+    return true
   }
 
   const next = () => { if (validate()) setStep(s => Math.min(s + 1, STEPS.length - 1)) }
@@ -287,8 +455,10 @@ export default function NewListing() {
     const urls = []
     const paths = []
     for (const img of images) {
-      const ext = img.file.name.split('.').pop()
-      const path = `${user.id}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
+      // Already in storage (editing): keep its place in the order.
+      if (img.existing) { urls.push(img.url); continue }
+      // Named from the checked type, never the person's file name (lib/uploadNames.js).
+      const path = uploadPath(user.id, img.file.type)
       const { error } = await supabase.storage.from('property-images').upload(path, img.file)
       if (error) {
         if (paths.length) await supabase.storage.from('property-images').remove(paths).catch(() => {})
@@ -302,20 +472,30 @@ export default function NewListing() {
   }
 
   const submit = async (asDraft = false) => {
-    if (!asDraft && !validate()) return
+    if (!asDraft && !validateAll()) return
     setSubmitting(true)
 
     let uploadedPaths = []
     try {
+      // Agent or not decides agent_id and owner_type, which the ownership
+      // guard never lets change afterwards, so a failed lookup must stop the
+      // save rather than file an agent's listing as a client's. Before any
+      // upload, so a failure leaves nothing behind.
+      let role = profile?.role ?? null
+      if (!isEdit && !role) {
+        const { data, error: roleError } = await supabase.from('profiles').select('role').eq('id', user.id).single()
+        if (roleError || !data) throw roleError ?? new Error('profile role unavailable')
+        role = data.role
+      }
+
       const { urls: imageUrls, paths } = await uploadImages()
       uploadedPaths = paths
 
       // Video rides the same all-or-nothing rule as the photos: a failed
       // upload aborts the submit and removes everything already uploaded.
-      let videoUrl = null
-      if (video) {
-        const ext = video.file.name.split('.').pop()
-        const path = `${user.id}/video-${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
+      let videoUrl = video?.existing ? video.url : null
+      if (video && !video.existing) {
+        const path = uploadPath(user.id, video.file.type, { prefix: 'video-' })
         const { error: vErr } = await supabase.storage.from('property-images').upload(path, video.file)
         if (vErr) {
           if (uploadedPaths.length) await supabase.storage.from('property-images').remove(uploadedPaths).catch(() => {})
@@ -325,45 +505,39 @@ export default function NewListing() {
         videoUrl = supabase.storage.from('property-images').getPublicUrl(path).data.publicUrl
       }
 
-      const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single()
+      // Fill every language whose tab the agent never opened. Card surfaces
+      // resolve titles synchronously and never fetch, so a listing published
+      // with only a couple of languages shows the fallback one to every
+      // visitor no matter which they pick. The returned maps are used rather
+      // than form state, which has not updated yet at this point.
+      const translated = await translation.translateAll()
+      const columns = { ...formToColumns(form, translated), image_urls: imageUrls, video_url: videoUrl }
 
-      const { error } = await supabase.from('properties').insert({
-        owner_id: user.id,
-        agent_id: profile?.role === 'agent' ? user.id : null,
-        owner_type: profile?.role === 'agent' ? 'agent' : 'client',
-        title: form.title_i18n.sq || '',
-        title_i18n: form.title_i18n,
-        description: form.description_i18n.sq || '',
-        description_i18n: form.description_i18n,
-        // Which languages are machine output and which an agent corrected by
-        // hand, so a later edit does not regenerate over their work.
-        translation_meta: form.translation_meta,
-        listing_type: form.listing_type,
-        property_type: form.property_type,
-        city: form.city,
-        address: form.address,
-        latitude: form.latitude,
-        longitude: form.longitude,
-        price: Number(form.price) || 0,
-        currency: form.currency,
-        sqft: Number(form.sqft) || 0,
-        beds: Number(form.beds) || 0,
-        baths: Number(form.baths) || 0,
-        floor: form.floor ? Number(form.floor) : null,
-        total_floors: form.total_floors ? Number(form.total_floors) : null,
-        year_built: form.year_built ? Number(form.year_built) : null,
-        features: form.features,
-        video_url: videoUrl,
-        image_urls: imageUrls,
-        contact_phone: form.contact_phone,
-        whatsapp_enabled: form.whatsapp_enabled,
-        contact_email: form.contact_email,
-        status: asDraft ? 'draft' : 'active',
-      })
+      let error
+      if (isEdit) {
+        // Ownership and status are never part of an edit: status has its own
+        // actions on My Listings (pause, mark sold/rented).
+        ;({ error } = await supabase.from('properties').update(columns).eq('id', editId))
+      } else {
+        ;({ error } = await supabase.from('properties').insert({
+          ...columns,
+          owner_id: user.id,
+          agent_id: role === 'agent' ? user.id : null,
+          owner_type: role === 'agent' ? 'agent' : 'client',
+          status: asDraft ? 'draft' : 'active',
+        }))
+      }
 
       if (error) throw error
-      try { localStorage.removeItem(DRAFT_KEY) } catch { /* ignore */ }
-      navigate('/my-listings')
+      if (!isEdit) { try { localStorage.removeItem(draftKeyFor(user.id)) } catch { /* ignore */ } }
+      if (isEdit) {
+        // The save went through, so photos/video taken out of the listing are
+        // no longer referenced anywhere: remove them (own folder only).
+        const removed = removedMediaPaths({ before: originalMedia.current, after: [...imageUrls, videoUrl], userId: user.id })
+        if (removed.length) await supabase.storage.from('property-images').remove(removed).catch(() => {})
+      }
+      // Saved either way; My Listings says which languages failed.
+      navigate('/my-listings', translated.failed.length ? { state: { translationFailed: translated.failed } } : undefined)
     } catch (err) {
       // Insert failed after upload succeeded — remove the now-orphaned files.
       if (!err?.uploadFailed && uploadedPaths.length) {
@@ -378,11 +552,29 @@ export default function NewListing() {
   // Route is wrapped in ProtectedRoute; this only covers the sign-out-while-open race.
   if (!user) return null
 
+  if (editState === 'loading') return <div className="page">{t('common.loading')}</div>
+  if (editState === 'error') {
+    return (
+      <div className="page">
+        <p role="alert">{t('errors.generic')}</p>
+        <button className="nl-btn nl-btn-secondary mt-3" onClick={retryLoad}>{t('common.retry')}</button>
+      </div>
+    )
+  }
+  if (editState === 'forbidden') {
+    return (
+      <div className="page">
+        <h1 className="page-title">{t('detail.unavailable')}</h1>
+        <button className="nl-btn nl-btn-secondary mt-3" onClick={() => navigate('/my-listings')}>{t('listing.myListings')}</button>
+      </div>
+    )
+  }
+
   return (
     <div className="page new-listing-page">
       <div className="nl-header">
         <button onClick={() => (step > 0 ? prev() : navigate(-1))} className="nl-back" aria-label={t('common.back')}><ArrowLeft size={18} /></button>
-        <h1 className="page-title" style={{ margin: 0 }}>{t('listing.newListing')}</h1>
+        <h1 className="page-title" style={{ margin: 0 }}>{isEdit ? t('listing.editListing') : t('listing.newListing')}</h1>
       </div>
 
       {draftRestored && (
@@ -459,6 +651,7 @@ export default function NewListing() {
               />
               <input
                 type="text"
+                maxLength={FORM_LIMITS.listingTitle}
                 value={translation.title}
                 onChange={e => {
                   translation.editTitle(e.target.value)
@@ -479,6 +672,7 @@ export default function NewListing() {
               <label>{t('listing.description')}</label>
               <textarea
                 rows={4}
+                maxLength={FORM_LIMITS.listingDescription}
                 value={translation.description}
                 onChange={e => {
                   translation.editDescription(e.target.value)
@@ -499,14 +693,31 @@ export default function NewListing() {
           <>
             <div className="nl-field">
               <label>{t('listing.city')}</label>
-              <select value={form.city} onChange={e => update('city', e.target.value)}>
-                {CITIES.map(c => <option key={c} value={c}>{c}</option>)}
+              <select value={form.city} onChange={e => selectCity(e.target.value)}>
+                {CITIES.map(c => <option key={c} value={c}>{cityLabel(c)}</option>)}
               </select>
               {errors.city && <span className="nl-error">{errors.city}</span>}
             </div>
+            {zonesFor(form.city).length > 0 && (
+              <div className="nl-field">
+                <label htmlFor="nl-zone">{t('listing.zone')}</label>
+                <select id="nl-zone" value={form.zone} onChange={e => update('zone', e.target.value)}>
+                  <option value="">{t('listing.zoneNone')}</option>
+                  {zonesFor(form.city).map(z => <option key={z} value={z}>{z}</option>)}
+                </select>
+              </div>
+            )}
             <div className="nl-field">
               <label>{t('listing.address')}</label>
-              <input type="text" value={form.address} onChange={e => update('address', e.target.value)} placeholder={t('listing.addressPlaceholder')} />
+              <RoadField
+                city={form.city}
+                value={form.address}
+                placeholder={t('listing.addressPlaceholder')}
+                onChange={val => update('address', val.slice(0, FORM_LIMITS.listingAddress))}
+                // Picking a road frames the map; it never sets the property's
+                // position. That still comes from the marker.
+                onSelectRoad={road => { cityLookup.current = ''; setMapFocus({ latitude: road.latitude, longitude: road.longitude }) }}
+              />
             </div>
             <div className="nl-field">
               <label>{t('listing.pinLocation')}</label>
@@ -521,6 +732,7 @@ export default function NewListing() {
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                   />
+                  <MapFocus focus={mapFocus} />
                   <MapClickPicker onPick={({ lat, lng }) => {
                     update('latitude', Number(lat.toFixed(6)))
                     update('longitude', Number(lng.toFixed(6)))
@@ -540,12 +752,32 @@ export default function NewListing() {
                     />
                   )}
                 </MapContainer>
+
+                {/* The drag affordance. A pin that happens to be draggable
+                    looks exactly like one that is not, and an agent who never
+                    discovers it publishes wherever the first click landed. */}
+                {form.latitude != null && form.longitude != null && (
+                  <div className="pointer-events-none absolute bottom-2 left-2 z-[500] flex items-center gap-1.5 rounded-fho-pill border border-fho-border bg-fho-surface px-2.5 py-1.5 text-[11px] font-semibold text-fho-text">
+                    <Move size={12} aria-hidden="true" className="text-fho-orange-2" />
+                    {t('listing.dragMarker')}
+                  </div>
+                )}
               </div>
-              <span style={{ fontSize: 12, color: 'var(--fho-text-muted)' }}>
+
+              {errors.pin && <span className="nl-error" role="alert">{errors.pin}</span>}
+              <span className="mt-2 block text-xs leading-relaxed text-fho-text-muted">
                 {form.latitude != null && form.longitude != null
-                  ? `${form.latitude}, ${form.longitude}`
-                  : t('listing.mapHint')}
+                  ? t('listing.pinAdjustHint')
+                  : t('listing.pinOrderHint')}
               </span>
+              {/* Coordinate readout only — with no pin there is nothing to
+                  read out, and the instruction above has already said what to
+                  do. Two lines of advice read as one confused one. */}
+              {form.latitude != null && form.longitude != null && (
+                <span className="mt-1 block font-fho-mono text-xs text-fho-text-muted">
+                  {form.latitude}, {form.longitude}
+                </span>
+              )}
             </div>
           </>
         )}
@@ -621,7 +853,7 @@ export default function NewListing() {
               <div className="nl-upload-zone" onClick={() => fileInputRef.current?.click()}>
                 <Upload size={24} />
                 <div>{t('listing.dropImages')}</div>
-                <div style={{ fontSize: 11, color: 'var(--fho-text-muted)' }}>{t('listing.minImages')}</div>
+                <div style={{ fontSize: 11, color: 'var(--fho-text-muted)' }}>{t('listing.minImages', { min: MIN_IMAGES })}</div>
               </div>
               <input ref={fileInputRef} type="file" accept="image/*" multiple hidden onChange={handleImages} />
               {errors.images && <span className="nl-error">{errors.images}</span>}
@@ -632,7 +864,7 @@ export default function NewListing() {
                   <div key={i} className="nl-image-thumb">
                     <img src={img.preview} alt="" />
                     {i === 0 && <span className="nl-cover-badge">{t('listing.cover')}</span>}
-                    <button className="nl-image-remove" onClick={() => removeImage(i)} aria-label={t('common.close')}><X size={12} /></button>
+                    <button className="nl-image-remove" onClick={() => removeImage(i)} aria-label={t('listing.removePhoto')}><X size={12} /></button>
                   </div>
                 ))}
               </div>
@@ -643,10 +875,10 @@ export default function NewListing() {
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 14px', border: '1px solid var(--fho-border)', borderRadius: 'var(--r-md)', background: 'var(--fho-surface-2)' }}>
                   <Film size={18} style={{ color: 'var(--fho-orange-1)', flexShrink: 0 }} />
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--fho-text)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{video.file.name}</div>
-                    <div style={{ fontSize: 11, color: 'var(--fho-text-muted)' }}>{(video.file.size / (1024 * 1024)).toFixed(1)} MB</div>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--fho-text)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{video.existing ? t('listing.currentVideo') : video.file.name}</div>
+                    {!video.existing && <div style={{ fontSize: 11, color: 'var(--fho-text-muted)' }}>{t('listing.fileSizeMb', { size: (video.file.size / (1024 * 1024)).toFixed(1) })}</div>}
                   </div>
-                  <button className="nl-image-remove" style={{ position: 'static' }} onClick={removeVideo} aria-label={t('common.close')}><X size={12} /></button>
+                  <button className="nl-image-remove" style={{ position: 'static' }} onClick={removeVideo} aria-label={t('listing.removeVideo')}><X size={12} /></button>
                 </div>
               ) : (
                 <div
@@ -670,7 +902,7 @@ export default function NewListing() {
           <>
             <div className="nl-field">
               <label>{t('listing.phone')}</label>
-              <input type="tel" value={form.contact_phone} onChange={e => update('contact_phone', e.target.value)} placeholder="+355 69..." />
+              <input type="tel" value={form.contact_phone} onChange={e => { update('contact_phone', e.target.value); if (errors.phone) setErrors(prev => ({ ...prev, phone: undefined })) }} placeholder="+355 69..." />
               {errors.phone && <span className="nl-error">{errors.phone}</span>}
             </div>
             <div className="nl-field">
@@ -681,7 +913,8 @@ export default function NewListing() {
             </div>
             <div className="nl-field">
               <label>{t('listing.email')}</label>
-              <input type="email" value={form.contact_email} onChange={e => update('contact_email', e.target.value)} placeholder="john.doe@gmail.com" />
+              <input type="email" maxLength={FORM_LIMITS.email} value={form.contact_email} onChange={e => { update('contact_email', e.target.value); if (errors.email) setErrors(prev => ({ ...prev, email: undefined })) }} placeholder="john.doe@gmail.com" />
+              {errors.email && <span className="nl-error">{errors.email}</span>}
             </div>
             {errors.submit && <div className="nl-error" style={{ marginBottom: 12 }}>{errors.submit}</div>}
           </>
@@ -726,11 +959,11 @@ export default function NewListing() {
         // deserves a clearer, paired Save Draft / Publish affordance rather
         // than a small anonymous corner button.
         <div className="nl-actions">
-          <button className="nl-btn nl-btn-secondary" onClick={prev}><ArrowLeft size={16} /> {t('listing.back')}</button>
+          <button className="nl-btn nl-btn-secondary" onClick={prev} aria-label={t('listing.back')}><ArrowLeft size={16} /> <span className="nl-btn-label">{t('listing.back')}</span></button>
           <div style={{ flex: 1 }} />
-          <button className="nl-btn nl-btn-secondary" onClick={() => submit(true)} disabled={submitting}>{t('listing.saveDraft')}</button>
+          {!isEdit && <button className="nl-btn nl-btn-secondary" onClick={() => submit(true)} disabled={submitting}>{t('listing.saveDraft')}</button>}
           <button className="nl-btn nl-btn-primary" onClick={() => submit(false)} disabled={submitting}>
-            {submitting ? t('common.loading') : t('listing.publish')}
+            {submitting ? t('common.loading') : isEdit ? t('listing.saveChanges') : t('listing.publish')}
           </button>
         </div>
       )}

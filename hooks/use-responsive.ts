@@ -1,4 +1,5 @@
-import { useWindowDimensions } from 'react-native';
+import { READABLE_MAX_WIDTH } from '@/constants/web-frame';
+import { useAppDimensions } from '@/hooks/use-app-dimensions';
 
 /**
  * A phone in landscape can be WIDER than a small tablet in portrait (e.g. an
@@ -37,12 +38,27 @@ export interface Responsive {
  * Single source of truth for size-based layout decisions, backed by RN's
  * built-in useWindowDimensions() — already reactive to rotation/resize, so
  * no manual resize-listener or forceUpdate is needed anywhere that uses this.
+ * On the web the width is the phone-width column (useAppDimensions), so the
+ * website always gets the phone layout.
  */
 export function useResponsive(): Responsive {
-  const { width, height } = useWindowDimensions();
+  const { width, height } = useAppDimensions();
   const isLandscape = width > height;
   const isTablet = Math.min(width, height) >= TABLET_MIN_SHORT_DIMENSION;
   const columns = computeColumns(width, isLandscape);
 
   return { width, height, isTablet, isLandscape, columns };
+}
+
+/**
+ * Side padding that centres a screen's content in a READABLE_MAX_WIDTH
+ * column (constants/web-frame.ts) on an unfolded Fold or a spanned Duo,
+ * for the screen's outer container (its background stays full
+ * width). Null at phone widths and on the web, which is already a phone
+ * column, so nothing changes there.
+ */
+export function useReadableColumn(): { paddingHorizontal: number } | null {
+  const { width } = useAppDimensions();
+  const side = Math.floor((width - READABLE_MAX_WIDTH) / 2);
+  return side > 0 ? { paddingHorizontal: side } : null;
 }

@@ -1,10 +1,11 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Crypto from 'expo-crypto';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useQueryClient } from '@tanstack/react-query';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useRouter } from 'expo-router';
-import { useEffect, useMemo, useState } from 'react';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   ActivityIndicator,
@@ -20,9 +21,10 @@ import {
   type StyleProp,
   type ViewStyle,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { LocationPicker } from '@/components/listing/location-picker';
+import { RoadField } from '@/components/listing/road-field';
 import { TranslationBar } from '@/components/listing/translation-bar';
 import { GhostBtn, PrimaryCTA } from '@/components/ui/buttons';
 import { Chip, SectionLabel } from '@/components/ui/chip';
@@ -30,13 +32,21 @@ import { Field } from '@/components/ui/field';
 import { GradientBackground } from '@/components/ui/gradient-background';
 import { RiseIn } from '@/components/ui/motion';
 import { SelectField } from '@/components/ui/select-field';
+import { KeyboardDoneBar } from '@/components/ui/keyboard-done-bar';
+import { SignInPrompt } from '@/components/ui/sign-in-prompt';
 import { Fonts, Radii, Spacing, type AtticoPalette } from '@/constants/theme';
 import { useAuth } from '@/contexts/auth-context';
 import { useTheme } from '@/contexts/theme-context';
+import { debugWarn } from '@/lib/debug';
 import { supabase } from '@/lib/supabase';
+import { isDuplicateKey } from '@/src/features/listings/lib/mediaUpload';
 import { translatePropertyContent, type I18nMap } from '@/lib/translate';
+import { geocodeCity, type RoadSuggestion } from '@/src/lib/roadSearch';
 import { useListingTranslation } from '@/src/features/listings/hooks/useListingTranslation';
+import { formToColumns, normalizeAmount, propertyToForm, removedMediaPaths } from '@/src/features/listings/lib/listingForm';
 import type { TranslationMeta } from '@/src/lib/translationCore';
+import { FORM_LIMITS, isValidEmail } from '@/src/lib/formLimits';
+import { isValidPhone } from '@/src/features/auth/lib/profileForm';
 import {
   MAX_IMAGES,
   MAX_VIDEO_MB,
@@ -50,6 +60,10 @@ import {
   type PickedVideo,
 } from '@/lib/upload';
 import LOCATIONS from '@/src/features/properties/data/locations';
+import { AMENITIES } from '@/src/features/properties/lib/amenities';
+import { zonesFor } from '@/src/features/properties/lib/searchFilters';
+import { checkPin, cityLabel, findCity, orderCities } from '@/src/features/properties/lib/places';
+import { useReadableColumn, useResponsive } from '@/hooks/use-responsive';
 
 /**
  * Multi-step listing wizard — the native counterpart to web's
@@ -57,8 +71,8 @@ import LOCATIONS from '@/src/features/properties/data/locations';
  *
  * Same five steps, same per-step validation, same insert payload and same
  * draft-restore behaviour, so a listing is identical whichever app created it.
- * `listing/create.tsx` remains the single-scroll form and is untouched; this
- * route is additive until the wizard is confirmed against real submissions.
+ * It is the only listing form: the old single-scroll `listing/create.tsx` now
+ * redirects here.
  *
  * Two deliberate divergences from the design handoff's §13 sketch:
  *  - Five steps, not four. Web already ships basics/location/details/media/
@@ -102,20 +116,14 @@ const PROPERTY_TYPES: PropertyType[] = [
 
 const CURRENCIES: Currency[] = ['EUR', 'ALL', 'USD'];
 
-const CITIES: string[] = (LOCATIONS as { city: string }[]).map((l) => l.city);
+const CITIES: string[] = orderCities((LOCATIONS as { city: string }[]).map((l) => l.city));
+/** Every city, by its picker label, findable by any of its names. */
+const CITY_OPTIONS = CITIES.map((c) => ({ value: c, label: cityLabel(c), keys: findCity(c)?.keys ?? [] }));
+/** A city's zones, findable by their aliases and old spellings. */
+const zoneOptions = (city: string) =>
+  (findCity(city)?.zones ?? []).map((z) => ({ value: z.name, label: z.name, keys: z.keys }));
 
-const FEATURES_LIST = [
-  'balcony',
-  'parking',
-  'elevator',
-  'garden',
-  'pool',
-  'furnished',
-  'airConditioning',
-  'heating',
-  'security',
-  'storage',
-] as const;
+const FEATURES_LIST = AMENITIES;
 
 // Same client-side caps as web — properties.sqft/beds/floor/total_floors/
 // year_built are Postgres `integer`, so a fat-fingered value is caught on the
@@ -129,7 +137,41 @@ const MAX_FLOOR = 200;
 const MIN_YEAR = 1800;
 const MAX_YEAR = new Date().getFullYear() + 2;
 
+/**
+ * One draft per account, `fho_listing_draft_v1:<user id>`: on a shared phone
+ * the next person must never open the previous agent's listing and contact
+ * details. The bare key is the old one-per-device draft, deleted on sight.
+ */
 const DRAFT_KEY = 'fho_listing_draft_v1';
+const draftKeyFor = (userId: string) => `${DRAFT_KEY}:${userId}`;
+/** The website's draft lifetime (NewListing.jsx). */
+const DRAFT_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+/** Photos are never kept in a draft, so a restored one reopens here at the latest. */
+const MEDIA_STEP = STEPS.indexOf('media');
+
+/**
+ * Photos and video in the wizard. When editing, the ones already in storage
+ * join the same lists flagged `existing` (their `uri` is the public URL), so
+ * ordering, the cover photo and removal work exactly as when creating.
+ */
+type WizardImage = PickedImage & { existing?: boolean };
+type WizardVideo = PickedVideo & { existing?: boolean };
+
+type EditState = 'loading' | 'ready' | 'error' | 'forbidden';
+
+type LoadedListing =
+  | { state: 'ready'; row: Record<string, any> }
+  | { state: 'error' | 'forbidden' };
+
+/** The listing to edit, if this user may edit it. */
+async function fetchEditableListing(id: string, userId: string): Promise<LoadedListing> {
+  const { data, error } = await supabase.from('properties').select('*').eq('id', id).maybeSingle();
+  if (error) return { state: 'error' };
+  // RLS already hides other people's drafts; this also covers active listings
+  // someone else owns, which everyone can read but only the owner may edit.
+  if (!data || (data.owner_id !== userId && data.agent_id !== userId)) return { state: 'forbidden' };
+  return { state: 'ready', row: data };
+}
 
 function outOfRange(raw: string, min: number, max: number): boolean {
   if (!raw) return false;
@@ -141,6 +183,8 @@ interface FormErrors {
   title?: string;
   description?: string;
   city?: string;
+  /** The map pin is outside Albania or outside the city's municipality. */
+  pin?: string;
   price?: string;
   sqft?: string;
   beds?: string;
@@ -151,6 +195,7 @@ interface FormErrors {
   images?: string;
   video?: string;
   phone?: string;
+  email?: string;
   submit?: string;
 }
 
@@ -167,6 +212,8 @@ interface ListingForm {
   translation_meta: TranslationMeta;
   address: string;
   city: string;
+  /** Neighbourhood from the city's zone list; '' when not chosen. */
+  zone: string;
   /** Null until the agent taps the map; such rows are excluded from the map tab. */
   latitude: number | null;
   longitude: number | null;
@@ -192,6 +239,7 @@ const INITIAL_FORM: ListingForm = {
   translation_meta: {},
   address: '',
   city: '',
+  zone: '',
   latitude: null,
   longitude: null,
   price: '',
@@ -208,36 +256,135 @@ const INITIAL_FORM: ListingForm = {
   contact_email: '',
 };
 
+/** Nothing typed or chosen yet: not worth saving, or restoring, as a draft. */
+function isPristine(form: Partial<ListingForm>, step = 0): boolean {
+  return step === 0 && JSON.stringify({ ...INITIAL_FORM, ...form }) === JSON.stringify(INITIAL_FORM);
+}
+
+/** /listing/new: a blank wizard, with draft restore. */
 export default function NewListingWizard() {
+  return <AccountWizard />;
+}
+
+/** /listing/[id]/edit: the same wizard opened on a saved listing. */
+export function EditListingWizard() {
+  const { id } = useLocalSearchParams<{ id: string }>();
+  return <AccountWizard editId={id} />;
+}
+
+/**
+ * The wizard needs an account. Signed out it now asks for one; it used to let
+ * a guest fill in all five steps and then fail with "Authentication failed",
+ * and the edit route waited forever. Keyed by the account, so someone else
+ * signing in gets a fresh wizard, never the previous person's form.
+ */
+function AccountWizard({ editId }: { editId?: string }) {
+  const { user, loading } = useAuth();
+  if (!user) return loading ? null : <SignInPrompt />;
+  return <ListingWizard key={user.id} editId={editId} />;
+}
+
+function ListingWizard({ editId }: { editId?: string }) {
+  const isEdit = Boolean(editId);
   const router = useRouter();
   const { t } = useTranslation();
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
+  // A centred column on an unfolded Fold or a spanned Duo (hooks/use-responsive).
+  const readable = useReadableColumn();
+  // The kicker above already reads "BASICS 1/5", so the current step's label
+  // is the first thing to go on a Galaxy Fold cover screen (280 wide).
+  const showStepLabel = useResponsive().width >= 340;
+  // The SafeAreaView only pads the top, so the footer clears the home
+  // indicator / Android edge-to-edge nav bar itself.
+  const insets = useSafeAreaInsets();
   const queryClient = useQueryClient();
 
   const [step, setStep] = useState(0);
   const [form, setForm] = useState<ListingForm>(INITIAL_FORM);
-  const [images, setImages] = useState<PickedImage[]>([]);
-  const [video, setVideo] = useState<PickedVideo | null>(null);
+  const [images, setImages] = useState<WizardImage[]>([]);
+  const [video, setVideo] = useState<WizardVideo | null>(null);
+  const [editState, setEditState] = useState<EditState>(isEdit ? 'loading' : 'ready');
   const [errors, setErrors] = useState<FormErrors>({});
   const [submitting, setSubmitting] = useState(false);
   const [uploadProgress, setUploadProgress] = useState<{ done: number; total: number } | null>(null);
   const [draftRestored, setDraftRestored] = useState(false);
   // First paint waits on the draft read so a restore can never land on top of
   // something the agent already typed. It's one AsyncStorage get.
-  const [hydrated, setHydrated] = useState(false);
+  // Editing has no draft to read, so it is hydrated from the start.
+  const [hydrated, setHydrated] = useState(isEdit);
+
+  // Load the listing being edited. Editing never reads or writes the
+  // new-listing draft, so an unfinished draft survives an edit untouched.
+  // Media the listing had when it was opened for editing; anything missing
+  // after a successful save is deleted from storage.
+  const originalMedia = useRef<string[]>([]);
+  // One save at a time, set before the button re-renders as busy.
+  const saving = useRef(false);
+  // A new listing's id, made here and kept across retries: if a save's reply
+  // is lost after the row was written, the retry finds that row (duplicate
+  // key) and updates it instead of creating a second listing.
+  const newListingId = useRef<string | null>(null);
+
+  const applyLoaded = useCallback((result: LoadedListing) => {
+    if (result.state !== 'ready') {
+      setEditState(result.state);
+      return;
+    }
+    const { row } = result;
+    setForm({ ...INITIAL_FORM, ...(propertyToForm(row) as Partial<ListingForm>) });
+    setImages(
+      ((row.image_urls ?? []) as string[]).map((url) => ({
+        uri: url,
+        fileName: url.split('/').pop() ?? 'photo.jpg',
+        mimeType: 'image/jpeg',
+        existing: true,
+      })),
+    );
+    setVideo(
+      row.video_url
+        ? { uri: row.video_url, fileName: '', mimeType: 'video/mp4', size: 0, existing: true }
+        : null,
+    );
+    originalMedia.current = [...((row.image_urls ?? []) as string[]), row.video_url].filter(Boolean);
+    setEditState('ready');
+  }, []);
+
+  const userId = user?.id;
+  useEffect(() => {
+    if (!editId || !userId) return;
+    let cancelled = false;
+    void fetchEditableListing(editId, userId).then((result) => {
+      if (!cancelled) applyLoaded(result);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [editId, userId, applyLoaded]);
+
+  const retryLoad = () => {
+    if (!editId || !userId) return;
+    setEditState('loading');
+    void fetchEditableListing(editId, userId).then(applyLoaded);
+  };
 
   useEffect(() => {
+    if (isEdit) return;
     let cancelled = false;
     (async () => {
       try {
-        const raw = await AsyncStorage.getItem(DRAFT_KEY);
+        // Drafts used to be one per device, so an old one could be anyone's.
+        await AsyncStorage.removeItem(DRAFT_KEY).catch(() => {});
+        const raw = userId ? await AsyncStorage.getItem(draftKeyFor(userId)) : null;
         if (!cancelled && raw) {
-          const draft = JSON.parse(raw) as { form?: Partial<ListingForm>; step?: number };
-          if (draft?.form) {
+          const draft = JSON.parse(raw) as { form?: Partial<ListingForm>; step?: number; savedAt?: number };
+          const fresh = typeof draft?.savedAt === 'number' && Date.now() - draft.savedAt < DRAFT_TTL_MS;
+          if (draft?.form && fresh && !isPristine(draft.form, draft.step)) {
             setForm({ ...INITIAL_FORM, ...draft.form });
-            setStep(Math.min(Math.max(draft.step ?? 0, 0), STEPS.length - 1));
+            // Not past Media: a draft left on Publish has no photos any more,
+            // and reopening there let it go live with none.
+            setStep(Math.min(Math.max(draft.step ?? 0, 0), MEDIA_STEP));
             setDraftRestored(true);
           }
         }
@@ -250,22 +397,26 @@ export default function NewListingWizard() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [isEdit, userId]);
 
   // Persist progress on every change. Photos and video hold local file URIs
   // that don't survive a restart, so — exactly like web — only the form and
   // the step are saved and media is re-added after a restore.
   useEffect(() => {
-    if (!hydrated) return;
-    AsyncStorage.setItem(DRAFT_KEY, JSON.stringify({ form, step, savedAt: Date.now() })).catch(
-      () => {
-        /* storage full/blocked — the wizard still works, just unsaved */
-      },
-    );
-  }, [form, step, hydrated]);
+    if (!hydrated || isEdit || !userId) return;
+    const key = draftKeyFor(userId);
+    // An untouched form is not a draft: saving one showed "draft restored"
+    // over blank fields on every later visit, even after "start fresh".
+    const write = isPristine(form, step)
+      ? AsyncStorage.removeItem(key)
+      : AsyncStorage.setItem(key, JSON.stringify({ form, step, savedAt: Date.now() }));
+    write.catch(() => {
+      /* storage full/blocked — the wizard still works, just unsaved */
+    });
+  }, [form, step, hydrated, isEdit, userId]);
 
   const discardDraft = () => {
-    AsyncStorage.removeItem(DRAFT_KEY).catch(() => {});
+    if (userId) AsyncStorage.removeItem(draftKeyFor(userId)).catch(() => {});
     setForm(INITIAL_FORM);
     setStep(0);
     setImages([]);
@@ -276,6 +427,17 @@ export default function NewListingWizard() {
 
   const update = <K extends keyof ListingForm>(key: K, value: ListingForm[K]) =>
     setForm((prev) => ({ ...prev, [key]: value }));
+
+  /**
+   * Where the map should look: the selected road, or the city centre.
+   *
+   * Kept out of `form` on purpose — it is view state, never persisted, and
+   * must not be mistaken for the property's coordinates.
+   */
+  const [mapFocus, setMapFocus] = useState<{ latitude: number; longitude: number } | null>(null);
+  // The city whose centre the map is waiting for, so a slow answer for a city
+  // since changed (or a road picked meanwhile) cannot pull the map back there.
+  const cityLookup = useRef('');
 
   // Owns the language selection for BOTH text fields, plus everything that
   // makes selecting one safe: the per-language cache, staleness against the
@@ -299,23 +461,31 @@ export default function NewListingWizard() {
     }));
 
   // Per-step gate, field-for-field the same as web's validate().
-  const validate = (): boolean => {
+  const errorsFor = (s: number): FormErrors => {
     const errs: FormErrors = {};
 
-    if (step === 0) {
+    if (s === 0) {
       if (!form.title_i18n.sq?.trim()) errs.title = t('listing.required');
       if (!form.description_i18n.sq?.trim()) errs.description = t('listing.required');
     }
-    if (step === 1) {
+    if (s === 1) {
       if (!form.city) errs.city = t('listing.required');
+      // The database refuses the same pins (public.locations, migration
+      // supabase/migrations/20261114215248_locations.sql); saying so here is kinder.
+      else if (form.latitude != null && form.longitude != null) {
+        const pin = checkPin(form.city, form.latitude, form.longitude);
+        if (pin === 'outside-albania') errs.pin = t('listing.pinOutsideAlbania');
+        else if (pin === 'outside-city') errs.pin = t('listing.pinOutsideCity', { city: findCity(form.city)?.bashki ?? form.city });
+      }
     }
-    if (step === 2) {
+    if (s === 2) {
       if (!form.price || Number(form.price) <= 0) errs.price = t('listing.required');
       else if (Number(form.price) > MAX_PRICE) {
         errs.price = t('listing.valueOutOfRange', { min: 0, max: MAX_PRICE.toLocaleString() });
       }
 
-      if (!form.sqft || Number(form.sqft) <= 0) errs.sqft = t('listing.required');
+      // At least 1 m² once rounded: the column holds whole square metres.
+      if (!form.sqft || !(Number(form.sqft) >= 1)) errs.sqft = t('listing.required');
       else if (Number(form.sqft) > MAX_SQFT) {
         errs.sqft = t('listing.valueOutOfRange', { min: 1, max: MAX_SQFT.toLocaleString() });
       }
@@ -336,15 +506,38 @@ export default function NewListingWizard() {
         errs.year_built = t('listing.valueOutOfRange', { min: MIN_YEAR, max: MAX_YEAR });
       }
     }
-    if (step === 3) {
-      if (images.length < MIN_IMAGES) errs.images = t('listing.minImages');
+    if (s === 3) {
+      if (images.length < MIN_IMAGES) errs.images = t('listing.minImages', { min: MIN_IMAGES });
     }
-    if (step === 4) {
+    if (s === 4) {
+      // The same formats the database checks (properties_contact_*_format).
       if (!form.contact_phone?.trim()) errs.phone = t('listing.required');
+      else if (!isValidPhone(form.contact_phone)) errs.phone = t('profile.edit.phoneInvalid');
+      if (!isValidEmail(form.contact_email)) errs.email = t('errors.invalidEmail');
     }
 
+    return errs;
+  };
+
+  const validate = (): boolean => {
+    const errs = errorsFor(step);
     setErrors(errs);
     return Object.keys(errs).length === 0;
+  };
+
+  /** Publishing checks every step, not only the one on screen, and opens the
+   *  first one that is incomplete. */
+  const validateAll = (): boolean => {
+    for (let s = 0; s < STEPS.length; s++) {
+      const errs = errorsFor(s);
+      if (Object.keys(errs).length > 0) {
+        setStep(s);
+        setErrors(errs);
+        return false;
+      }
+    }
+    setErrors({});
+    return true;
   };
 
   const next = () => {
@@ -382,32 +575,50 @@ export default function NewListingWizard() {
   };
 
   const submit = async (status: Status) => {
-    // A draft can be finished later, so it skips the remaining step gates —
-    // same short-circuit as web's submit(asDraft).
-    if (status === 'active' && !validate()) return;
+    // A draft can be finished later, so it skips the step gates — same
+    // short-circuit as web's submit(asDraft). Publishing checks them all.
+    if (status === 'active' && !validateAll()) return;
     if (!user) {
       Alert.alert(t('common.error'), t('errors.authFailed'));
       return;
     }
 
+    if (saving.current) return;
+    saving.current = true;
     setSubmitting(true);
     setErrors((prev) => ({ ...prev, submit: undefined }));
     let uploadedPaths: string[] = [];
 
     try {
-      let imageUrls: string[] = [];
-      if (images.length > 0) {
-        setUploadProgress({ done: 0, total: images.length });
-        const { urls, paths } = await uploadPropertyImages(images, user.id, (done, total) =>
-          setUploadProgress({ done, total }),
-        );
-        imageUrls = urls;
-        uploadedPaths = paths;
+      // Agent or not decides agent_id and owner_type, which the ownership
+      // guard never lets change afterwards, so a failed lookup must stop the
+      // save rather than file an agent's listing as a client's. It runs
+      // before any upload, so a failure leaves nothing behind.
+      let role = profile?.role ?? null;
+      if (!isEdit && !role) {
+        const { data, error: roleError } = await supabase.from('profiles').select('role').eq('id', user.id).single();
+        if (roleError || !data) throw roleError ?? new Error('profile role unavailable');
+        role = data.role;
       }
 
+      // Only photos added in this session are uploaded; ones already in
+      // storage (editing) keep their URL and their place in the order.
+      const fresh = images.filter((img) => !img.existing);
+      let freshUrls: string[] = [];
+      if (fresh.length > 0) {
+        setUploadProgress({ done: 0, total: fresh.length });
+        const { urls, paths } = await uploadPropertyImages(fresh, user.id, (done, total) =>
+          setUploadProgress({ done, total }),
+        );
+        freshUrls = urls;
+        uploadedPaths = paths;
+      }
+      let nextFresh = 0;
+      const imageUrls = images.map((img) => (img.existing ? img.uri : freshUrls[nextFresh++]));
+
       // Video rides the same all-or-nothing rule as the photos.
-      let videoUrl: string | null = null;
-      if (video) {
+      let videoUrl: string | null = video?.existing ? video.uri : null;
+      if (video && !video.existing) {
         try {
           const uploaded = await uploadPropertyVideo(video, user.id);
           videoUrl = uploaded.url;
@@ -419,75 +630,107 @@ export default function NewListingWizard() {
       }
       setUploadProgress(null);
 
-      // Only an agent's own listing carries an agent_id — a client-posted one
-      // must not claim agent attribution (same rule as web).
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', user.id)
-        .single();
-      const isAgent = profile?.role === 'agent';
+      // Fill every language the agent did not open a tab for. Without this a
+      // listing reaches the site with only the languages they happened to
+      // click, and card surfaces — which resolve titles synchronously and
+      // never fetch — show the fallback language to every visitor regardless
+      // of what they select. Returns the maps it produced, because setForm has
+      // not landed by the time this save runs.
+      const translated = await translation.translateAll();
 
-      const { error } = await supabase.from('properties').insert({
-        // RLS requires owner_id = auth.uid() on insert.
-        owner_id: user.id,
-        agent_id: isAgent ? user.id : null,
-        owner_type: isAgent ? 'agent' : 'client',
-        title: form.title_i18n.sq || '',
-        title_i18n: form.title_i18n,
-        description: form.description_i18n.sq || '',
-        description_i18n: form.description_i18n,
-        // This form authors in Albanian and translates outward from it.
-        source_language: 'sq',
-        // Carries which languages are machine-translated and which an agent
-        // edited, so reopening the listing later does not re-translate over
-        // their corrections or re-bill for work already done.
-        translation_meta: form.translation_meta,
-        listing_type: form.listing_type,
-        property_type: form.property_type,
-        city: form.city || null,
-        address: form.address,
-        latitude: form.latitude,
-        longitude: form.longitude,
-        price: Number(form.price) || 0,
-        currency: form.currency,
-        sqft: Number(form.sqft) || 0,
-        beds: Number(form.beds) || 0,
-        baths: Number(form.baths) || 0,
-        floor: form.floor ? Number(form.floor) : null,
-        total_floors: form.total_floors ? Number(form.total_floors) : null,
-        year_built: form.year_built ? Number(form.year_built) : null,
-        features: form.features,
-        video_url: videoUrl,
+      // Same columns as web, from the shared helper, for insert and update.
+      const columns = {
+        ...formToColumns(form, translated),
         image_urls: imageUrls,
-        contact_phone: form.contact_phone || null,
-        whatsapp_enabled: form.whatsapp_enabled,
-        contact_email: form.contact_email || null,
-        status,
-      });
+        video_url: videoUrl,
+      };
 
-      // Insert failed after upload succeeded — don't leave orphaned files.
+      let error;
+      if (isEdit) {
+        // Ownership and status are never part of an edit: status has its own
+        // actions on My Listings (pause, mark sold/rented).
+        ({ error } = await supabase.from('properties').update(columns).eq('id', editId!));
+      } else {
+        // Only an agent's own listing carries an agent_id — a client-posted
+        // one must not claim agent attribution (same rule as web).
+        const isAgent = role === 'agent';
+        newListingId.current ??= Crypto.randomUUID();
+        const id = newListingId.current;
+        ({ error } = await supabase.from('properties').insert({
+          ...columns,
+          id,
+          // RLS requires owner_id = auth.uid() on insert.
+          owner_id: user.id,
+          agent_id: isAgent ? user.id : null,
+          owner_type: isAgent ? 'agent' : 'client',
+          status,
+        }));
+        if (isDuplicateKey(error)) {
+          // An earlier attempt landed: bring that row up to date (RLS: own
+          // rows only) and drop the photos only it referenced.
+          const { data: earlier } = await supabase.from('properties').select('image_urls, video_url').eq('id', id).maybeSingle();
+          ({ error } = await supabase.from('properties').update({ ...columns, status }).eq('id', id));
+          if (!error && earlier) {
+            await removeUploadedImages(
+              removedMediaPaths({
+                before: [...(earlier.image_urls ?? []), earlier.video_url],
+                after: [...imageUrls, videoUrl],
+                userId: user.id,
+              }),
+            );
+          }
+        }
+      }
+
       if (error) {
-        await removeUploadedImages(uploadedPaths);
+        // The database refused the row (a Postgres/PostgREST code): nothing
+        // references the new files, so remove them. With no code the reply
+        // was lost on the network and the row may exist; keep the files
+        // rather than risk a saved listing whose photos are gone. The retry
+        // reuses the same id, finds that row and cleans up what it replaces.
+        if (error.code) await removeUploadedImages(uploadedPaths);
         throw error;
       }
 
-      await AsyncStorage.removeItem(DRAFT_KEY).catch(() => {});
+      if (!isEdit) await AsyncStorage.removeItem(draftKeyFor(user.id)).catch(() => {});
+      if (isEdit) {
+        // The save went through, so photos/video taken out of the listing are
+        // no longer referenced anywhere: remove them (own folder only).
+        await removeUploadedImages(
+          removedMediaPaths({ before: originalMedia.current, after: [...imageUrls, videoUrl], userId: user.id }),
+        );
+      }
       // The new listing must appear in Explore/Home/Map immediately, not once
       // their cache's staleTime quietly expires.
       queryClient.invalidateQueries({ queryKey: ['properties'] });
+      // Saved either way; say which languages the engine could not produce,
+      // so the agent knows to open those tabs again.
+      if (translated.failed.length) {
+        Alert.alert(
+          t('ai.translationPartialTitle'),
+          t('ai.translationPartial', { langs: translated.failed.map((l) => l.toUpperCase()).join(', ') }),
+        );
+      }
       router.replace('/my-listings');
     } catch (err: any) {
       setUploadProgress(null);
-      // A raw Postgres "out of range" isn't something an agent can act on.
+      debugWarn('listing save', err?.cause ?? err);
+      // Never the raw error (a native stack trace or Postgres text). The form
+      // and the picked photos stay as they are, so the agent can retry.
       const outOfRangeErr = err?.code === '22003' || /out of range/i.test(err?.message ?? '');
-      const message = err?.uploadFailed
-        ? t('errors.imageUploadFailed')
-        : outOfRangeErr
-          ? t('errors.valueOutOfRange')
-          : (err?.message ?? t('errors.submitFailed'));
+      const message =
+        err?.videoTooLarge
+          ? t('errors.videoTooLarge', { max: MAX_VIDEO_MB })
+          : err?.stage === 'prepare'
+          ? t('errors.photoPrepareFailed')
+          : err?.stage === 'read' || err?.uploadFailed
+            ? t('errors.imageUploadFailed')
+            : outOfRangeErr
+              ? t('errors.valueOutOfRange')
+              : t('errors.listingSaveFailed');
       setErrors((prev) => ({ ...prev, submit: message }));
     } finally {
+      saving.current = false;
       setSubmitting(false);
     }
   };
@@ -514,7 +757,7 @@ export default function NewListingWizard() {
                       colors={[colors.accent, colors.accentEnd]}
                       start={{ x: 0, y: 0 }}
                       end={{ x: 1, y: 1 }}
-                      style={StyleSheet.absoluteFillObject}
+                      style={StyleSheet.absoluteFill}
                     />
                   )}
                   <Text style={[styles.radioText, active && styles.radioTextActive]}>
@@ -529,6 +772,7 @@ export default function NewListingWizard() {
 
       <Labeled styles={styles} label={t('search.propertyType')}>
         <SelectField
+          variant="form"
           value={form.property_type}
           options={PROPERTY_TYPES.map((pt) => ({ value: pt, label: t(`search.${pt}`) }))}
           placeholder={t('search.propertyType')}
@@ -571,6 +815,7 @@ export default function NewListingWizard() {
           }
           placeholderTextColor={colors.textSecondary}
           value={translation.title}
+          maxLength={FORM_LIMITS.listingTitle}
           onChangeText={(val) => {
             translation.editTitle(val);
             clearError('title');
@@ -591,6 +836,7 @@ export default function NewListingWizard() {
           }
           placeholderTextColor={colors.textSecondary}
           value={translation.description}
+          maxLength={FORM_LIMITS.listingDescription}
           onChangeText={(val) => {
             translation.editDescription(val);
             clearError('description');
@@ -607,23 +853,67 @@ export default function NewListingWizard() {
     <>
       <Labeled styles={styles} label={t('listing.city')} error={errors.city}>
         <SelectField
+          variant="form"
           value={form.city}
-          options={CITIES.map((c) => ({ value: c, label: c }))}
+          options={CITY_OPTIONS}
+          searchable
           placeholder={t('listing.city')}
           icon="location-city"
           onChange={(v) => {
-            update('city', v);
+            if (v === form.city) return;
+            // A new city invalidates everything downstream of it. Leaving the
+            // old road would keep a street that does not exist here, and
+            // leaving the pin would publish a property in the previous city —
+            // the kind of stale coordinate nobody notices until it is on a map.
+            setForm((prev) => ({
+              ...prev,
+              city: v,
+              zone: '',
+              address: '',
+              latitude: null,
+              longitude: null,
+            }));
             clearError('city');
+            setMapFocus(null);
+            // Move the map to the new city so the next pin starts from
+            // somewhere plausible rather than from wherever it was left.
+            cityLookup.current = v;
+            void geocodeCity({ city: v }).then((centre) => {
+              if (centre && cityLookup.current === v) setMapFocus(centre);
+            });
           }}
         />
       </Labeled>
 
+      {zonesFor(form.city).length > 0 ? (
+        <Labeled styles={styles} label={t('listing.zone')}>
+          <SelectField
+            variant="form"
+            value={form.zone}
+            options={[
+              { value: '', label: t('listing.zoneNone') },
+              ...zoneOptions(form.city),
+            ]}
+            searchable
+            placeholder={t('listing.zoneNone')}
+            icon="place"
+            onChange={(v) => update('zone', v)}
+          />
+        </Labeled>
+      ) : null}
+
       <Labeled styles={styles} label={t('listing.address')}>
-        <Field
-          icon="place"
-          placeholder={t('listing.addressPlaceholder')}
+        <RoadField
+          city={form.city}
           value={form.address}
-          onChangeText={(val) => update('address', val)}
+          placeholder={t('listing.addressPlaceholder')}
+          onChangeText={(val) => update('address', val.slice(0, FORM_LIMITS.listingAddress))}
+          // Picking a road frames the map; it never sets the property's
+          // position. That still comes from the marker.
+          onSelectRoad={(road: RoadSuggestion) => {
+            cityLookup.current = '';
+            setMapFocus({ latitude: road.latitude, longitude: road.longitude });
+          }}
         />
       </Labeled>
 
@@ -634,13 +924,15 @@ export default function NewListingWizard() {
         <LocationPicker
           latitude={form.latitude}
           longitude={form.longitude}
-          onChange={(lat, lng) => setForm((prev) => ({ ...prev, latitude: lat, longitude: lng }))}
+          focus={mapFocus}
+          onChange={(lat, lng) => {
+            setForm((prev) => ({ ...prev, latitude: lat, longitude: lng }));
+            clearError('pin');
+          }}
         />
-        <Text style={styles.hint}>
-          {form.latitude != null && form.longitude != null
-            ? `${form.latitude}, ${form.longitude}`
-            : t('listing.mapHint')}
-        </Text>
+        {errors.pin ? (
+          <Text style={styles.errorText} accessibilityLiveRegion="polite">{errors.pin}</Text>
+        ) : null}
       </View>
     </>
   );
@@ -648,24 +940,29 @@ export default function NewListingWizard() {
   const renderDetails = () => (
     <>
       <View style={styles.row}>
-        <Labeled styles={styles} label={t('listing.price')} error={errors.price} style={styles.flex2}>
+        <Labeled styles={styles} label={t('listing.price')} error={errors.price} style={styles.flex1}>
+          {/* A currency-neutral banknote: the currency is the select beside it,
+              and a fixed € next to "ALL" said the wrong thing. */}
           <Field
-            icon="euro"
+            icon="payments"
             placeholder="0"
-            keyboardType="numeric"
+            keyboardType="decimal-pad"
+            accessibilityLabel={t('listing.price')}
             value={form.price}
             onChangeText={(val) => {
-              update('price', val);
+              update('price', normalizeAmount(val));
               clearError('price');
             }}
           />
         </Labeled>
-        <Labeled styles={styles} label={t('listing.currency')} style={styles.flex1}>
+        <Labeled styles={styles} label={t('listing.currency')} style={styles.currencyColumn}>
           <SelectField
+            variant="form"
             value={form.currency}
             options={CURRENCIES.map((c) => ({ value: c, label: c }))}
             placeholder={t('listing.currency')}
-            icon="payments"
+            icon={null}
+            accessibilityLabel={t('listing.currency')}
             onChange={(v) => update('currency', v as Currency)}
           />
         </Labeled>
@@ -675,10 +972,12 @@ export default function NewListingWizard() {
         <Field
           icon="straighten"
           placeholder="0"
-          keyboardType="numeric"
+          // Read like the price: "85,5" and "85.5" are both 85.5, "5,000" is
+          // 5000. Number("85,5") was NaN and saved as 0 m².
+          keyboardType="decimal-pad"
           value={form.sqft}
           onChangeText={(val) => {
-            update('sqft', val);
+            update('sqft', normalizeAmount(val));
             clearError('sqft');
           }}
         />
@@ -689,10 +988,11 @@ export default function NewListingWizard() {
           <Field
             icon="king-bed"
             placeholder="0"
-            keyboardType="numeric"
+            // Whole rooms only: the column is an integer.
+            keyboardType="number-pad"
             value={form.beds}
             onChangeText={(val) => {
-              update('beds', val);
+              update('beds', val.replace(/[^0-9]/g, ''));
               clearError('beds');
             }}
           />
@@ -701,10 +1001,11 @@ export default function NewListingWizard() {
           <Field
             icon="bathtub"
             placeholder="0"
-            keyboardType="numeric"
+            // Whole bathrooms only (owner, real-device test 2026-11-06).
+            keyboardType="number-pad"
             value={form.baths}
             onChangeText={(val) => {
-              update('baths', val);
+              update('baths', val.replace(/[^0-9]/g, ''));
               clearError('baths');
             }}
           />
@@ -716,10 +1017,13 @@ export default function NewListingWizard() {
           <Field
             icon="stairs"
             placeholder="0"
-            keyboardType="numeric"
+            // Whole numbers on the number pad, like rooms and total floors
+            // (owner, real-device test 2026-11-06). The pad has no minus, so a
+            // basement cannot be typed here; the ground floor is 0.
+            keyboardType="number-pad"
             value={form.floor}
             onChangeText={(val) => {
-              update('floor', val);
+              update('floor', val.replace(/[^0-9]/g, ''));
               clearError('floor');
             }}
           />
@@ -728,10 +1032,10 @@ export default function NewListingWizard() {
           <Field
             icon="layers"
             placeholder="0"
-            keyboardType="numeric"
+            keyboardType="number-pad"
             value={form.total_floors}
             onChangeText={(val) => {
-              update('total_floors', val);
+              update('total_floors', val.replace(/[^0-9]/g, ''));
               clearError('total_floors');
             }}
           />
@@ -742,10 +1046,10 @@ export default function NewListingWizard() {
         <Field
           icon="event"
           placeholder="2024"
-          keyboardType="numeric"
+          keyboardType="number-pad"
           value={form.year_built}
           onChangeText={(val) => {
-            update('year_built', val);
+            update('year_built', val.replace(/[^0-9]/g, ''));
             clearError('year_built');
           }}
         />
@@ -777,13 +1081,13 @@ export default function NewListingWizard() {
         <View style={styles.photoGrid}>
           {images.map((img, index) => (
             <View key={img.uri} style={styles.photoThumb}>
-              <Image source={{ uri: img.uri }} style={styles.photoThumbImage} contentFit="cover" />
+              <Image accessibilityLabel={t('listing.images')} source={{ uri: img.uri }} style={styles.photoThumbImage} contentFit="cover" />
               <Pressable
                 style={styles.photoRemove}
                 onPress={() => setImages((prev) => prev.filter((_, i) => i !== index))}
                 hitSlop={8}
                 accessibilityRole="button"
-                accessibilityLabel={t('common.close')}>
+                accessibilityLabel={t('listing.removePhoto')}>
                 <MaterialIcons name="close" size={13} color="#fff" />
               </Pressable>
               {index === 0 && (
@@ -803,7 +1107,7 @@ export default function NewListingWizard() {
             </Pressable>
           )}
         </View>
-        <Text style={styles.hint}>{t('listing.minImages')}</Text>
+        <Text style={styles.hint}>{t('listing.minImages', { min: MIN_IMAGES })}</Text>
         {errors.images ? <Text style={styles.errorText}>{errors.images}</Text> : null}
       </View>
 
@@ -814,15 +1118,17 @@ export default function NewListingWizard() {
             <MaterialIcons name="movie" size={18} color={colors.accent} />
             <View style={styles.videoMeta}>
               <Text style={styles.videoName} numberOfLines={1}>
-                {video.fileName}
+                {video.existing ? t('listing.currentVideo') : video.fileName}
               </Text>
-              <Text style={styles.hint}>{(video.size / (1024 * 1024)).toFixed(1)} MB</Text>
+              {!video.existing && (
+                <Text style={styles.hint}>{t('listing.fileSizeMb', { size: (video.size / (1024 * 1024)).toFixed(1) })}</Text>
+              )}
             </View>
             <Pressable
               onPress={() => setVideo(null)}
               hitSlop={8}
               accessibilityRole="button"
-              accessibilityLabel={t('common.close')}>
+              accessibilityLabel={t('listing.removeVideo')}>
               <MaterialIcons name="close" size={16} color={colors.textSecondary} />
             </Pressable>
           </View>
@@ -883,15 +1189,19 @@ export default function NewListingWizard() {
         <Text style={styles.checkLabel}>WhatsApp</Text>
       </Pressable>
 
-      <Labeled styles={styles} label={t('listing.email')}>
+      <Labeled styles={styles} label={t('listing.email')} error={errors.email}>
         <Field
           icon="mail"
           placeholder="john.doe@gmail.com"
           keyboardType="email-address"
           autoCapitalize="none"
           textContentType="emailAddress"
+          maxLength={FORM_LIMITS.email}
           value={form.contact_email}
-          onChangeText={(val) => update('contact_email', val)}
+          onChangeText={(val) => {
+            update('contact_email', val);
+            clearError('email');
+          }}
         />
       </Labeled>
 
@@ -937,7 +1247,7 @@ export default function NewListingWizard() {
   const stepBody = [renderBasics, renderLocation, renderDetails, renderMedia, renderPublish][step];
   const isLast = step === STEPS.length - 1;
 
-  if (!hydrated) {
+  if (!hydrated || editState === 'loading') {
     return (
       <GradientBackground>
         <SafeAreaView style={styles.centered}>
@@ -947,9 +1257,30 @@ export default function NewListingWizard() {
     );
   }
 
+  if (editState === 'error' || editState === 'forbidden') {
+    return (
+      <GradientBackground>
+        <SafeAreaView style={[styles.centered, styles.editMessage]}>
+          <Text style={styles.editMessageText}>
+            {editState === 'error' ? t('errors.generic') : t('detail.unavailable')}
+          </Text>
+          {editState === 'error' ? (
+            <PrimaryCTA label={t('common.retry')} icon="refresh" onPress={retryLoad} />
+          ) : (
+            <GhostBtn
+              label={t('listing.myListings')}
+              icon="arrow-back"
+              onPress={() => router.replace('/my-listings')}
+            />
+          )}
+        </SafeAreaView>
+      </GradientBackground>
+    );
+  }
+
   return (
     <GradientBackground>
-      <SafeAreaView style={styles.container} edges={['top']}>
+      <SafeAreaView style={[styles.container, readable]} edges={['top']}>
         {/* Header — mono step counter left, serif step name right (web's
             .nl-step-counter / .nl-step-name). */}
         <View style={styles.header}>
@@ -963,15 +1294,20 @@ export default function NewListingWizard() {
           <Text style={styles.stepCounter}>
             {`${t('listing.step.' + STEPS[step])} ${step + 1}/${STEPS.length}`.toUpperCase()}
           </Text>
-          <Text style={styles.stepName} numberOfLines={1}>
-            {t('listing.newListing')}
+          <Text style={styles.stepName} numberOfLines={1} accessibilityRole="header">
+            {isEdit ? t('listing.editListing') : t('listing.newListing')}
           </Text>
         </View>
 
         {/* Stepper — completed steps get a check in a gradient dot, the current
             one a scaled gradient dot with a tint ring, and each connector
             fills as it's passed. */}
-        <View style={styles.stepper} accessibilityRole="progressbar">
+        <View
+          style={styles.stepper}
+          accessibilityRole="progressbar"
+          // A progress bar needs a name and a value for screen readers.
+          accessibilityLabel={`${t('listing.step.' + STEPS[step])} ${step + 1}/${STEPS.length}`}
+          accessibilityValue={{ min: 1, max: STEPS.length, now: step + 1 }}>
           {STEPS.map((s, i) => {
             const completed = i < step;
             const current = i === step;
@@ -996,7 +1332,7 @@ export default function NewListingWizard() {
                           colors={[colors.accent, colors.accentEnd]}
                           start={{ x: 0, y: 0 }}
                           end={{ x: 1, y: 1 }}
-                          style={[StyleSheet.absoluteFillObject, styles.stepDotFill]}
+                          style={[StyleSheet.absoluteFill, styles.stepDotFill]}
                         />
                       )}
                       {completed ? (
@@ -1008,7 +1344,7 @@ export default function NewListingWizard() {
                       )}
                     </View>
                   </View>
-                  {current && <Text style={styles.stepLabel}>{t(`listing.step.${s}`)}</Text>}
+                  {current && showStepLabel && <Text style={styles.stepLabel}>{t(`listing.step.${s}`)}</Text>}
                 </Pressable>
                 {i < STEPS.length - 1 && (
                   <View style={styles.stepLine}>
@@ -1017,7 +1353,7 @@ export default function NewListingWizard() {
                         colors={[colors.accent, colors.accentEnd]}
                         start={{ x: 0, y: 0 }}
                         end={{ x: 1, y: 0 }}
-                        style={StyleSheet.absoluteFillObject}
+                        style={StyleSheet.absoluteFill}
                       />
                     )}
                   </View>
@@ -1043,15 +1379,22 @@ export default function NewListingWizard() {
           <ScrollView
             contentContainerStyle={styles.scrollContent}
             showsVerticalScrollIndicator={false}
+            // Dragging the form down closes the keyboard, on both platforms.
+            keyboardDismissMode={Platform.OS === 'ios' ? 'interactive' : 'on-drag'}
             keyboardShouldPersistTaps="handled">
             {/* Keyed on the step so each one animates in rather than swapping
                 content underneath a static frame. */}
-            <RiseIn key={step}>{stepBody()}</RiseIn>
+            <RiseIn key={step} style={styles.stepBody}>{stepBody()}</RiseIn>
           </ScrollView>
+          <KeyboardDoneBar />
         </KeyboardAvoidingView>
 
-        <View style={styles.footer}>
-          {isLast && (
+        <View
+          style={[
+            styles.footer,
+            { paddingBottom: Math.max(insets.bottom, Platform.OS === 'ios' ? 20 : 14) },
+          ]}>
+          {isLast && !isEdit && (
             <Pressable
               onPress={() => submit('draft')}
               disabled={submitting}
@@ -1071,7 +1414,9 @@ export default function NewListingWizard() {
                 submitting
                   ? t('common.loading')
                   : isLast
-                    ? t('listing.publish')
+                    ? isEdit
+                      ? t('listing.saveChanges')
+                      : t('listing.publish')
                     : t('listing.next')
               }
               icon={isLast ? 'check' : 'arrow-forward'}
@@ -1137,8 +1482,18 @@ const createStyles = (colors: AtticoPalette) =>
   StyleSheet.create({
     container: { flex: 1 },
     centered: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+    editMessage: { gap: Spacing.lg, paddingHorizontal: Spacing.xl },
+    editMessageText: {
+      fontFamily: Fonts.sansSemiBold,
+      fontSize: 16,
+      color: colors.textPrimary,
+      textAlign: 'center',
+    },
     flex1: { flex: 1 },
     flex2: { flex: 2 },
+    // Fits "EUR"/"ALL"/"USD" + caret in Control's box (16 + ~34 + 10 + 20 + 16
+    // + borders = ~98) with room for larger text; the amount takes the rest.
+    currencyColumn: { width: 112 },
 
     header: {
       flexDirection: 'row',
@@ -1157,7 +1512,7 @@ const createStyles = (colors: AtticoPalette) =>
     },
     stepCounter: {
       fontFamily: Fonts?.mono,
-      fontSize: 11,
+      fontSize: 12,
       letterSpacing: 1.1,
       color: colors.textSecondary,
     },
@@ -1175,7 +1530,7 @@ const createStyles = (colors: AtticoPalette) =>
       paddingHorizontal: Spacing.md,
       paddingBottom: Spacing.sm,
     },
-    stepItem: { flexDirection: 'row', alignItems: 'center' },
+    stepItem: { flexDirection: 'row', alignItems: 'center', flexShrink: 1 },
     stepPress: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 4 },
     stepDot: {
       width: 26,
@@ -1207,6 +1562,9 @@ const createStyles = (colors: AtticoPalette) =>
     },
     stepLine: {
       width: 18,
+      // Gives way first on a narrow screen, so the fifth dot stays on it.
+      flexShrink: 1,
+      minWidth: 6,
       height: 2,
       marginHorizontal: 2,
       backgroundColor: colors.border,
@@ -1230,7 +1588,7 @@ const createStyles = (colors: AtticoPalette) =>
     draftAction: {
       fontFamily: Fonts?.sansSemiBold,
       fontSize: 12,
-      color: colors.accentEnd,
+      color: colors.accentText,
     },
 
     scrollContent: {
@@ -1239,6 +1597,10 @@ const createStyles = (colors: AtticoPalette) =>
       gap: Spacing.md,
     },
 
+    // Space between fields. It has to live here: the scroll view's own gap
+    // only separates its direct children, and the whole step is one RiseIn,
+    // so without this every label sat flush against the box above it.
+    stepBody: { gap: Spacing.lg },
     fieldBlock: { gap: 8 },
     row: { flexDirection: 'row', gap: 12 },
     fieldLabel: {
@@ -1263,19 +1625,6 @@ const createStyles = (colors: AtticoPalette) =>
     radioActive: { borderColor: 'transparent' },
     radioText: { fontFamily: Fonts?.sansSemiBold, fontSize: 13, color: colors.textPrimary },
     radioTextActive: { color: '#fff' },
-
-    langTabs: { flexDirection: 'row', flexWrap: 'wrap', gap: 4 },
-    langTab: {
-      paddingHorizontal: 10,
-      paddingVertical: 4,
-      borderRadius: Radii.sm,
-      borderWidth: 1,
-      borderColor: colors.border,
-    },
-    langTabActive: { backgroundColor: colors.accentEnd, borderColor: 'transparent' },
-    langTabFilled: { borderColor: colors.accentLight },
-    langTabText: { fontFamily: Fonts?.mono, fontSize: 11, color: colors.textSecondary },
-    langTabTextActive: { color: '#fff' },
 
     input: {
       backgroundColor: colors.surface2,
@@ -1325,7 +1674,7 @@ const createStyles = (colors: AtticoPalette) =>
     },
     coverBadgeText: {
       fontFamily: Fonts?.mono,
-      fontSize: 9,
+      fontSize: 12,
       color: '#fff',
       letterSpacing: 0.4,
     },
@@ -1388,7 +1737,7 @@ const createStyles = (colors: AtticoPalette) =>
     summaryRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
     summaryLabel: {
       fontFamily: Fonts?.mono,
-      fontSize: 10,
+      fontSize: 12,
       letterSpacing: 1,
       color: colors.textSecondary,
       width: 92,
@@ -1405,7 +1754,6 @@ const createStyles = (colors: AtticoPalette) =>
       gap: 10,
       paddingHorizontal: Spacing.md,
       paddingTop: 10,
-      paddingBottom: Platform.OS === 'ios' ? 20 : 14,
       borderTopWidth: 1,
       borderTopColor: colors.border,
       backgroundColor: colors.primary,

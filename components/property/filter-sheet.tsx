@@ -13,7 +13,7 @@ import {
   useWindowDimensions,
   View,
 } from 'react-native';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import { GestureDetector, usePanGesture } from 'react-native-gesture-handler';
 import Animated, {
   runOnJS,
   useAnimatedStyle,
@@ -26,12 +26,17 @@ import { useTranslation } from 'react-i18next';
 import { SelectField } from '@/components/ui/select-field';
 import { type AtticoPalette, Fonts } from '@/constants/theme';
 import { useFilters } from '@/contexts/filters-context';
+import { KeyboardDoneBar } from '@/components/ui/keyboard-done-bar';
 import { useTheme } from '@/contexts/theme-context';
 import { Property, PropertySort } from '@/data/types';
 import { usePropertiesCountQuery } from '@/hooks/use-property-queries';
 // Shared with the web app rather than duplicated — the same convention i18n
 // already uses to pull locales out of src/.
 import LOCATIONS from '@/src/features/properties/data/locations';
+import { AMENITIES, toggleAmenity } from '@/src/features/properties/lib/amenities';
+import { normalizeRef } from '@/src/features/properties/lib/searchFilters';
+import { cityLabel, findCity, orderCities } from '@/src/features/properties/lib/places';
+import { sheetColumn } from '@/constants/web-frame';
 
 type PropertyType = NonNullable<Property['property_type']>;
 type ListingType = NonNullable<Property['listing_type']>;
@@ -47,7 +52,7 @@ const LISTING_TYPES: ListingType[] = ['sale', 'rent'];
 const COUNT_OPTIONS = [1, 2, 3, 4];
 const SORTS: PropertySort[] = ['newest', 'price_asc', 'price_desc'];
 
-const CITIES: string[] = (LOCATIONS as { city: string }[]).map((l) => l.city);
+const CITIES: string[] = orderCities((LOCATIONS as { city: string }[]).map((l) => l.city));
 
 /** Numeric text -> filter value. Empty string clears the facet. */
 function toNumber(text: string): number | null {
@@ -71,7 +76,11 @@ function Chip({
   const styles = useMemo(() => createStyles(colors), [colors]);
   return (
     <Pressable
+      accessibilityRole="button"
+      accessibilityState={{ selected: active }}
       onPress={onPress}
+      // 36px tall drawn; 44px to the finger (the 8px row gap leaves room).
+      hitSlop={4}
       style={[styles.chip, active && styles.chipActive]}>
       <Text style={[styles.chipText, active && styles.chipTextActive]}>
         {label}
@@ -100,6 +109,10 @@ function Segment({
         const isActive = active === opt.value;
         return (
           <Pressable
+            accessibilityRole="button"
+            // The active option is only drawn as a gradient; say it too, as
+            // the Chip beside it does.
+            accessibilityState={{ selected: isActive }}
             key={opt.value}
             onPress={() => onChange(opt.value)}
             style={styles.segment}>
@@ -110,7 +123,7 @@ function Segment({
                 colors={[colors.accent, colors.accentEnd]}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
-                style={StyleSheet.absoluteFillObject}
+                style={StyleSheet.absoluteFill}
               />
             )}
             <Text style={[styles.segmentText, isActive && styles.segmentTextActive]}>
@@ -148,8 +161,7 @@ export function FilterSheet({
   onClose: () => void;
 }) {
   const { t } = useTranslation();
-  const { filters, queryFilters, setFilter, reset, priceInvalid, areaInvalid } =
-    useFilters();
+  const { queryFilters, reset } = useFilters();
   const { colors } = useTheme();
   const { height: windowHeight } = useWindowDimensions();
   // A definite pixel height, not `maxHeight: '88%'` — on native Yoga (unlike
@@ -167,7 +179,7 @@ export function FilterSheet({
   // and only while the sheet is open. Shares a cache entry with Explore's
   // own count for the same filters — reopening the sheet right after
   // Explore loaded shows the number instantly, no network round-trip.
-  const { data: count } = usePropertiesCountQuery(queryFilters, visible);
+  const { data: count, isError: countFailed } = usePropertiesCountQuery(queryFilters, visible);
 
   // Drag-to-dismiss, driven by react-native-gesture-handler + reanimated
   // (both already app dependencies, so no new one added). The pan is
@@ -184,19 +196,24 @@ export function FilterSheet({
 
   const closeSheet = () => onClose();
 
-  const panGesture = Gesture.Pan()
-    .onUpdate((e) => {
+  const panGesture = usePanGesture({
+    onUpdate: (e) => {
+      // eslint-disable-next-line react-hooks/immutability -- Reanimated SharedValue: assigning .value IS its API, and it is a worklet value, not React state. The compiler rule does not model SharedValue.
       translateY.value = Math.max(0, e.translationY);
-    })
-    .onEnd((e) => {
+    },
+    onDeactivate: (e) => {
       if (translateY.value > 120 || e.velocityY > 800) {
-        translateY.value = withTiming(800, { duration: 200 }, () => {
+        // The sheet's own height, as BottomSheet does: a fixed 800 stopped
+        // ~100px short of off-screen on a 768x1024 tablet (sheet 901).
+        // eslint-disable-next-line react-hooks/immutability -- Reanimated SharedValue: assigning .value IS its API, and it is a worklet value, not React state. The compiler rule does not model SharedValue.
+        translateY.value = withTiming(sheetHeight, { duration: 200 }, () => {
           runOnJS(closeSheet)();
         });
       } else {
         translateY.value = withSpring(0, { damping: 22, stiffness: 300 });
       }
-    });
+    },
+  });
 
   const sheetAnimatedStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: translateY.value }],
@@ -209,14 +226,14 @@ export function FilterSheet({
       animationType="slide"
       onRequestClose={onClose}>
       <View style={styles.backdrop}>
-        <Pressable style={StyleSheet.absoluteFill} onPress={onClose} />
-        <Animated.View style={[styles.container, sheetAnimatedStyle]}>
+        <Pressable accessibilityRole="button" accessibilityLabel={t('common.close')} style={StyleSheet.absoluteFill} onPress={onClose} />
+        <Animated.View style={[styles.container, sheetColumn, sheetAnimatedStyle]}>
         <GestureDetector gesture={panGesture}>
           <View>
             <View style={styles.grip} />
             <View style={styles.header}>
               <Text style={styles.title}>{t('search.filtersTitle')}</Text>
-              <Pressable onPress={reset} hitSlop={12}>
+              <Pressable accessibilityRole="button" onPress={reset} hitSlop={12}>
                 <Text style={styles.resetText}>{t('search.reset')}</Text>
               </Pressable>
             </View>
@@ -234,6 +251,46 @@ export function FilterSheet({
         <ScrollView
           contentContainerStyle={styles.scroll}
           keyboardShouldPersistTaps="handled">
+          <FilterFields styles={styles} />
+        </ScrollView>
+
+        <Pressable accessibilityRole="button" style={styles.cta} onPress={onClose}>
+          <LinearGradient
+            colors={[colors.accent, colors.accentEnd]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.ctaGradient}
+          />
+          <Text style={styles.ctaText}>
+            {/* A failed count is not "loading" forever: the button still applies the filters. */}
+            {count != null
+              ? t('search.showHomes', { count })
+              : countFailed
+                ? t('search.showHomesAny')
+                : t('common.loading')}
+          </Text>
+        </Pressable>
+          <KeyboardDoneBar />
+        </KeyboardAvoidingView>
+        </Animated.View>
+      </View>
+    </Modal>
+  );
+}
+
+
+type FilterStyles = ReturnType<typeof createStyles>;
+
+/**
+ * The filter fields themselves, shared by the phone's bottom sheet and the
+ * website's desktop sidebar (FilterSidebar), so the two never drift apart.
+ */
+function FilterFields({ styles }: { styles: FilterStyles }) {
+  const { t } = useTranslation();
+  const { filters, setFilter, priceInvalid, areaInvalid } = useFilters();
+  const { colors } = useTheme();
+  return (
+    <>
           {/* Order matches web's Search.jsx filter sheet exactly: City,
               Listing Type, Price, Surface, Bedrooms, Bathrooms, Sort,
               Property Type. */}
@@ -247,10 +304,51 @@ export function FilterSheet({
               accessibilityLabel={t('search.city')}
               options={[
                 { value: '', label: t('search.anyCity') },
-                ...CITIES.map((city) => ({ value: city, label: city })),
+                ...CITIES.map((city) => ({ value: city, label: cityLabel(city), keys: findCity(city)?.keys ?? [] })),
               ]}
-              onChange={(v) => setFilter('city', v || null)}
+              searchable
+              onChange={(v) => {
+                setFilter('city', v || null);
+                // A zone only means something inside its own city.
+                setFilter('zone', null);
+              }}
             />
+            {(findCity(filters.city)?.zones.length ?? 0) > 0 ? (
+              <View style={styles.zoneField}>
+                <SelectField
+                  value={filters.zone ?? ''}
+                  placeholder={t('search.anyZone')}
+                  accessibilityLabel={t('search.zone')}
+                  options={[
+                    { value: '', label: t('search.anyZone') },
+                    ...(findCity(filters.city)?.zones ?? []).map((z) => ({ value: z.name, label: z.name, keys: z.keys })),
+                  ]}
+                  searchable
+                  onChange={(v) => setFilter('zone', v || null)}
+                />
+              </View>
+            ) : null}
+          </Section>
+
+          <Section label={t('search.reference')}>
+            <View style={[styles.inputField, styles.refField]}>
+              <MaterialIcons name="tag" size={14} color={colors.textSecondary} />
+              <TextInput
+                style={styles.input}
+                autoCapitalize="characters"
+                autoCorrect={false}
+                placeholder="SH-1A2B3C4D"
+                placeholderTextColor={colors.textSecondary}
+                value={filters.refCode ?? ''}
+                onChangeText={(v) => setFilter('refCode', v || null)}
+                accessibilityLabel={t('search.reference')}
+              />
+            </View>
+            {filters.refCode && !normalizeRef(filters.refCode) ? (
+              <Text style={styles.zoneWarning} accessibilityLiveRegion="polite">
+                {t('search.referenceInvalid')}
+              </Text>
+            ) : null}
           </Section>
 
           <Section label={t('search.listingType')}>
@@ -271,7 +369,9 @@ export function FilterSheet({
                 <TextInput
                   style={styles.input}
                   keyboardType="number-pad"
-                  placeholder={t('search.minPrice')}
+                  // The section label names the field; the full name is for screen readers.
+                  placeholder={t('search.rangeMin')}
+                  accessibilityLabel={t('search.minPrice')}
                   placeholderTextColor={colors.textSecondary}
                   value={filters.minPrice?.toString() ?? ''}
                   onChangeText={(v) => setFilter('minPrice', toNumber(v))}
@@ -283,7 +383,9 @@ export function FilterSheet({
                 <TextInput
                   style={styles.input}
                   keyboardType="number-pad"
-                  placeholder={t('search.maxPrice')}
+                  // The section label names the field; the full name is for screen readers.
+                  placeholder={t('search.rangeMax')}
+                  accessibilityLabel={t('search.maxPrice')}
                   placeholderTextColor={colors.textSecondary}
                   value={filters.maxPrice?.toString() ?? ''}
                   onChangeText={(v) => setFilter('maxPrice', toNumber(v))}
@@ -302,7 +404,9 @@ export function FilterSheet({
                 <TextInput
                   style={styles.input}
                   keyboardType="number-pad"
-                  placeholder={t('search.minArea')}
+                  // The section label names the field; the full name is for screen readers.
+                  placeholder={t('search.rangeMin')}
+                  accessibilityLabel={t('search.minArea')}
                   placeholderTextColor={colors.textSecondary}
                   value={filters.minArea?.toString() ?? ''}
                   onChangeText={(v) => setFilter('minArea', toNumber(v))}
@@ -315,7 +419,9 @@ export function FilterSheet({
                 <TextInput
                   style={styles.input}
                   keyboardType="number-pad"
-                  placeholder={t('search.maxArea')}
+                  // The section label names the field; the full name is for screen readers.
+                  placeholder={t('search.rangeMax')}
+                  accessibilityLabel={t('search.maxArea')}
                   placeholderTextColor={colors.textSecondary}
                   value={filters.maxArea?.toString() ?? ''}
                   onChangeText={(v) => setFilter('maxArea', toNumber(v))}
@@ -389,29 +495,59 @@ export function FilterSheet({
               ))}
             </View>
           </Section>
-        </ScrollView>
 
-        <Pressable style={styles.cta} onPress={onClose}>
-          <LinearGradient
-            colors={[colors.accent, colors.accentEnd]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.ctaGradient}
-          />
-          <Text style={styles.ctaText}>
-            {count == null
-              ? t('common.loading')
-              : t('search.showHomes', { count })}
-          </Text>
+          <Section label={t('listing.features')}>
+            <View style={styles.row}>
+              {AMENITIES.map((amenity) => (
+                <Chip
+                  key={amenity}
+                  label={t(`listing.feature.${amenity}`, amenity)}
+                  active={filters.features?.includes(amenity) ?? false}
+                  onPress={() => setFilter('features', toggleAmenity(filters.features, amenity), { immediate: true })}
+                />
+              ))}
+            </View>
+          </Section>
+    </>
+  );
+}
+
+/**
+ * Desktop website: the same filters as a column beside the results, applied
+ * as they change (the list re-queries from the debounced filters), so there
+ * is no "show homes" button to press.
+ */
+export function FilterSidebar() {
+  const { t } = useTranslation();
+  const { reset } = useFilters();
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors, 0), [colors]);
+  return (
+    <View style={styles.sidebar} accessibilityRole="search" accessibilityLabel={t('search.filtersTitle')}>
+      <View style={styles.header}>
+        <Text style={styles.title}>{t('search.filtersTitle')}</Text>
+        <Pressable accessibilityRole="button" onPress={reset} hitSlop={12}>
+          <Text style={styles.resetText}>{t('search.reset')}</Text>
         </Pressable>
-        </KeyboardAvoidingView>
-        </Animated.View>
       </View>
-    </Modal>
+      <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
+        <FilterFields styles={styles} />
+      </ScrollView>
+    </View>
   );
 }
 
 const createStyles = (colors: AtticoPalette, sheetHeight: number = 0) => StyleSheet.create({
+  sidebar: {
+    flex: 1,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: colors.border,
+    // The theme's card colour: `surface` is white in both palettes, which
+    // left a white panel with light text on the dark website.
+    backgroundColor: colors.primaryLight,
+    overflow: 'hidden',
+  },
   backdrop: {
     flex: 1,
     justifyContent: 'flex-end',
@@ -425,6 +561,11 @@ const createStyles = (colors: AtticoPalette, sheetHeight: number = 0) => StyleSh
     // of the screen" read as the web sheet's max-height, and gives the drag
     // gesture room to move before it must dismiss.
     height: sheetHeight,
+    // Android resizes the Modal above the keyboard but the window height
+    // (and so sheetHeight) stays put: the backdrop shrank and pushed the grip,
+    // title and Reset off the top while typing a price. Clamped to the
+    // backdrop, the height stays definite and shrinks with it.
+    maxHeight: '100%',
     // Matches web's .filter-sheet: border-radius: var(--r-2xl) (28px).
     borderTopLeftRadius: 28,
     borderTopRightRadius: 28,
@@ -455,14 +596,13 @@ const createStyles = (colors: AtticoPalette, sheetHeight: number = 0) => StyleSh
   title: {
     fontFamily: Fonts?.serif,
     fontSize: 22,
-    fontWeight: '500',
     color: colors.textPrimary,
   },
   // Matches web's reset link: 13px, regular weight, no bold override.
   resetText: {
     fontFamily: Fonts?.sans,
     fontSize: 13,
-    color: colors.accent,
+    color: colors.accentText,
   },
   scroll: {
     paddingHorizontal: 20,
@@ -479,7 +619,7 @@ const createStyles = (colors: AtticoPalette, sheetHeight: number = 0) => StyleSh
   // Mono's own regular weight), not a bolded override.
   sectionLabel: {
     fontFamily: Fonts?.mono,
-    fontSize: 11,
+    fontSize: 12,
     letterSpacing: 1,
     color: colors.textSecondary,
     marginBottom: 10,
@@ -496,8 +636,11 @@ const createStyles = (colors: AtticoPalette, sheetHeight: number = 0) => StyleSh
   },
   // Matches web's .bed-chip — a light accent tint when active, not a solid
   // fill (Segment, below, is the one that fills solid). padding: 9px 18px.
+  // 12px sides (web's .bed-chip uses 18): "Çdo numër" + 1, 2, 3, 4+ then
+  // fit one 280px row on a 320px phone (measured: 14px still wrapped 4+ by
+  // ~2px) instead of leaving 4+ alone on a second line.
   chip: {
-    paddingHorizontal: 18,
+    paddingHorizontal: 12,
     paddingVertical: 9,
     borderRadius: 999,
     borderWidth: 1,
@@ -505,7 +648,7 @@ const createStyles = (colors: AtticoPalette, sheetHeight: number = 0) => StyleSh
     backgroundColor: colors.glass,
   },
   chipActive: {
-    backgroundColor: colors.accentGlow,
+    backgroundColor: colors.accentTint,
     borderColor: colors.accent,
   },
   chipText: {
@@ -514,7 +657,7 @@ const createStyles = (colors: AtticoPalette, sheetHeight: number = 0) => StyleSh
     color: colors.textPrimary,
   },
   chipTextActive: {
-    color: colors.accent,
+    color: colors.accentText,
   },
   // Matches web's .segment-control / .segment.
   segmentControl: {
@@ -563,6 +706,9 @@ const createStyles = (colors: AtticoPalette, sheetHeight: number = 0) => StyleSh
   },
   input: {
     flex: 1,
+    // Lets the field shrink below the input's intrinsic width, so the "m²"
+    // suffix stays inside the pill instead of being pushed over the text.
+    minWidth: 0,
     fontFamily: Fonts?.sans,
     paddingVertical: 12,
     color: colors.textPrimary,
@@ -572,6 +718,17 @@ const createStyles = (colors: AtticoPalette, sheetHeight: number = 0) => StyleSh
     fontFamily: Fonts?.sans,
     fontSize: 12,
     color: colors.textSecondary,
+  },
+  zoneField: { marginTop: 8 },
+  // inputField grows to fill a row; on its own in a section it must not.
+  // Spelled out: `flex: 0` collapsed the field to its border on the web
+  // (react-native-web reads it as a zero flex-basis), hiding the input.
+  refField: { flexGrow: 0, flexShrink: 0, flexBasis: 'auto' },
+  zoneWarning: {
+    fontFamily: Fonts?.sans,
+    fontSize: 12,
+    color: colors.error,
+    marginTop: 6,
   },
   dash: {
     fontFamily: Fonts?.sans,
@@ -601,7 +758,7 @@ const createStyles = (colors: AtticoPalette, sheetHeight: number = 0) => StyleSh
     elevation: 6,
   },
   ctaGradient: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
   },
   ctaText: {
     fontFamily: Fonts?.sansBold,

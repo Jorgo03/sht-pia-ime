@@ -1,0 +1,89 @@
+// New matches for a saved search, shared by the website and the phone app.
+//
+// There is no email or push sender yet, so "alerts" are shown in the app: the
+// number of active listings that match a saved search now, compared with the
+// number recorded the last time the person looked (`last_match_count`). It is a
+// count difference, so it is worded as "more than last time", never as a list
+// of specific new listings.
+//
+// The filter rules mirror the Search page (useProperties.applyFilters) for the
+// keys a saved search can hold: city, zone (only with its city), listing_type,
+// type, minPrice, maxPrice (euros, across listing currencies), beds, baths,
+// minArea, maxArea and features (all of them).
+
+import { applyPriceRange } from '../../properties/lib/priceRange.js'
+import { applyFreeText, validZone } from '../../properties/lib/searchFilters.js'
+
+const toNumber = (value) => {
+  if (value === null || value === undefined || value === '') return null
+  const n = Number(value)
+  return Number.isFinite(n) ? n : null
+}
+
+/** Apply a saved search's filters to a Supabase query on `properties`. */
+export function applySavedFilters(query, filters) {
+  const f = filters ?? {}
+  query = applyFreeText(query, f.city)
+  const zone = validZone(f.city, f.zone)
+  if (zone) query = query.eq('zone', zone)
+  if (f.listing_type) query = query.eq('listing_type', f.listing_type)
+  if (f.type && f.type !== 'all') query = query.eq('property_type', f.type)
+  query = applyPriceRange(query, { minPrice: f.minPrice, maxPrice: f.maxPrice })
+  const beds = toNumber(f.beds)
+  if (beds !== null) query = query.gte('beds', beds)
+  const baths = toNumber(f.baths)
+  if (baths !== null) query = query.gte('baths', baths)
+  const minArea = toNumber(f.minArea)
+  if (minArea !== null) query = query.gte('sqft', minArea)
+  const maxArea = toNumber(f.maxArea)
+  if (maxArea !== null) query = query.lte('sqft', maxArea)
+  if (Array.isArray(f.features) && f.features.length) query = query.contains('features', f.features)
+  return query
+}
+
+/** How many active listings match now, or null if the count failed. */
+export async function countMatches(client, filters) {
+  try {
+    const query = applySavedFilters(
+      client.from('properties').select('id', { count: 'exact', head: true }).eq('status', 'active'),
+      filters,
+    )
+    const { count, error } = await query
+    return error ? null : (count ?? 0)
+  } catch {
+    return null
+  }
+}
+
+/** How many more matches than last time (never negative; 0 when unknown). */
+export function newMatchCount(current, lastSeen) {
+  if (current === null || current === undefined) return 0
+  return Math.max(0, current - (lastSeen ?? 0))
+}
+
+/** Record that the person has now seen `current` matches. */
+export async function markSeen(client, id, current) {
+  if (current === null || current === undefined) return false
+  try {
+    const { error } = await client.from('saved_searches').update({ last_match_count: current }).eq('id', id)
+    return !error
+  } catch {
+    return false
+  }
+}
+
+/**
+ * Turn email alerts for one saved search on or off (docs/LAUNCH_TASKS.md F13).
+ * The apps only offer this when sending is configured (VITE_EMAIL_ALERTS /
+ * EXPO_PUBLIC_EMAIL_ALERTS = 'true'), so nobody opts into emails that never
+ * come. Turning it on starts the window now: no backlog of old listings.
+ */
+export async function setEmailAlerts(client, id, on) {
+  const patch = on ? { email_alerts: true, last_alerted_at: new Date().toISOString() } : { email_alerts: false }
+  try {
+    const { error } = await client.from('saved_searches').update(patch).eq('id', id)
+    return !error
+  } catch {
+    return false
+  }
+}

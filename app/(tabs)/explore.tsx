@@ -13,31 +13,55 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { useRouter, type Href } from 'expo-router';
 
 import { useTabBarClearance } from '@/components/liquid-tab-bar';
 import { AppHeader } from '@/components/ui/app-header';
 import { MapScreenContent } from '@/components/map/map-screen-content';
 import { FilterSheet } from '@/components/property/filter-sheet';
+import { FilterPanel, ResultsBar } from '@/components/web/filter-panel';
 import { PropertyCard } from '@/components/property/property-card';
 import { FilterTabs } from '@/components/ui/filter-tabs';
 import { GradientBackground } from '@/components/ui/gradient-background';
 import { RiseIn } from '@/components/ui/motion';
 import { type AtticoPalette, Fonts } from '@/constants/theme';
+import { SaveSearchButton } from '@/components/property/save-search-button';
 import { useFilters } from '@/contexts/filters-context';
+import { KeyboardDoneBar } from '@/components/ui/keyboard-done-bar';
+import { useIsDesktopWeb } from '@/hooks/use-app-dimensions';
 import { useTheme } from '@/contexts/theme-context';
 import { Property } from '@/data/types';
-import { useInfinitePropertiesQuery, usePropertiesCountQuery } from '@/hooks/use-property-queries';
-import { useResponsive } from '@/hooks/use-responsive';
+import { useInfinitePropertiesQuery, usePrefetchListingTabs, usePropertiesCountQuery } from '@/hooks/use-property-queries';
+import { useReadableColumn, useResponsive } from '@/hooks/use-responsive';
+import { AI_CHAT_ENABLED } from '@/constants/features';
+import { IS_WEB } from '@/constants/web-frame';
 
 export default function ExploreScreen() {
   const { t } = useTranslation();
+  const router = useRouter();
   const { filters, queryFilters, setFilter, reset, activeCount } = useFilters();
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
   // The nav pill floats above content rather than pushing it up, so the list
   // has to reserve its full footprint or the last row sits under it.
   const tabBarClearance = useTabBarClearance();
-  const { columns } = useResponsive();
+  const { columns: deviceColumns, height: screenHeight, width: layoutWidth } = useResponsive();
+  // Desktop website: filters sit in a sidebar beside the results, and the
+  // grid gets one column per ~300px of what is left.
+  const desktop = useIsDesktopWeb();
+  // The website from tablet width up: the filters as one wide panel above
+  // the results (FilterPanel), and up to four cards a row, as on a listings
+  // portal (owner's reference, 2026-11-17). Phones keep the sheet.
+  const panel = IS_WEB && layoutWidth >= 768;
+  const columns = panel ? Math.min(4, Math.max(2, Math.floor((layoutWidth - 40) / 290))) : deviceColumns;
+  const listRef = useRef<FlatList<Property>>(null);
+  // A centred column for the title/search/tabs on an unfolded Fold or a
+  // spanned Duo; the grid below keeps the full width for its columns.
+  // On the website the grid already spans the page, so the title and search
+  // line up with it (left edge, capped width) instead of floating centred
+  // above it — the centred column looked detached at tablet and desktop.
+  const readableColumn = useReadableColumn();
+  const readable = IS_WEB && layoutWidth >= 768 ? styles.webChrome : readableColumn;
 
   // Local echo of filters.city so the field feels instant; the shared
   // filters-context already debounces the actual query (same 350ms web
@@ -61,11 +85,21 @@ export default function ExploreScreen() {
     data,
     isLoading: loading,
     isFetchingNextPage: loadingMore,
+    isError,
+    isFetchNextPageError,
+    refetch,
     hasNextPage,
     fetchNextPage,
   } = useInfinitePropertiesQuery(queryFilters);
-  const properties = useMemo(() => data?.pages.flat() ?? [], [data]);
+  // De-duplicated: a listing published while the visitor scrolls shifts the
+  // offsets by one, and the last card of a page came back on the next.
+  const properties = useMemo(() => {
+    const seen = new Set<string>();
+    return (data?.pages.flat() ?? []).filter((p) => !seen.has(p.id) && Boolean(seen.add(p.id)));
+  }, [data]);
   const { data: total = 0 } = usePropertiesCountQuery(queryFilters);
+  // The other tabs are ready before they are tapped.
+  usePrefetchListingTabs(queryFilters, viewMode === 'list');
 
   // Quick All/Sale/Rent tabs stay in sync with the sheet by reading the same
   // shared filter state rather than keeping their own copy.
@@ -73,8 +107,9 @@ export default function ExploreScreen() {
     () => [t('common.all'), t('search.sale'), t('search.rent')],
     [t],
   );
-  const activeTab = queryFilters.listingType
-    ? queryFilters.listingType === 'sale'
+  // The live value, not the debounced one: the tap lights up at once.
+  const activeTab = filters.listingType
+    ? filters.listingType === 'sale'
       ? listingTabs[1]
       : listingTabs[2]
     : listingTabs[0];
@@ -82,7 +117,7 @@ export default function ExploreScreen() {
   const handleTabChange = useCallback(
     (tab: string) => {
       const index = listingTabs.indexOf(tab);
-      setFilter('listingType', index === 1 ? 'sale' : index === 2 ? 'rent' : null);
+      setFilter('listingType', index === 1 ? 'sale' : index === 2 ? 'rent' : null, { immediate: true });
     },
     [listingTabs, setFilter],
   );
@@ -93,6 +128,13 @@ export default function ExploreScreen() {
   useEffect(() => {
     const id = setTimeout(() => {
       const next = searchText.trim() || null;
+      // Unchanged: writing it anyway turned a missing city into `city: null`,
+      // a new cache key, so the list loaded twice on opening and missed the
+      // prefetched All/Sale/Rent pages.
+      if (next === lastPushedCity.current) return;
+      // A zone belongs to its city (the sheet clears it the same way); kept,
+      // it was silently ignored by the query yet still counted as a filter.
+      setFilter('zone', null);
       lastPushedCity.current = next;
       setFilter('city', next);
     }, 350);
@@ -109,10 +151,12 @@ export default function ExploreScreen() {
     }
   }, [filters.city]);
 
+  // After a failed page, only the footer's Retry asks again, so scrolling
+  // does not repeat a request that keeps failing.
   const loadMore = useCallback(() => {
-    if (loading || loadingMore || !hasNextPage) return;
+    if (loading || loadingMore || !hasNextPage || isFetchNextPageError) return;
     fetchNextPage();
-  }, [loading, loadingMore, hasNextPage, fetchNextPage]);
+  }, [loading, loadingMore, hasNextPage, isFetchNextPageError, fetchNextPage]);
 
   // PropertyCard's outer wrapper is `flex: 1` so it fills its grid column,
   // but RiseIn sits between it and the row and defaults to content sizing —
@@ -137,11 +181,154 @@ export default function ExploreScreen() {
   // polish.css's `.property-grid > *` nth-child delays.
   const renderItem = useCallback(
     ({ item, index }: { item: Property; index: number }) => (
-      <RiseIn index={index} style={gridItemStyle}>
-        <PropertyCard property={item} />
+      <RiseIn index={index} style={gridItemStyle} quick>
+        <PropertyCard property={item} rich={panel} />
       </RiseIn>
     ),
-    [gridItemStyle],
+    [gridItemStyle, panel],
+  );
+
+  // On a short screen (360x380 Flip cover) the pinned title, search and tabs
+  // left a ~50px sliver of list; in list mode they become the list's header
+  // and scroll away. The list then also carries the loading and error states,
+  // so the search field is not remounted (dropping the keyboard) when typing
+  // starts a new query. The map does not scroll, so it keeps them pinned.
+  // Native only, as on Home: the pre-rendered web page has no height to match.
+  const chromeInList = !IS_WEB && screenHeight < 520 && viewMode === 'list';
+  const failedEmpty = isError && properties.length === 0;
+
+  const chrome = (
+    <View style={readable}>
+      <View style={styles.header}>
+        <View style={styles.titleRow}>
+          {/* Web's `.screen-headline`: "Explore <em>everything</em>." —
+              serif with the emphasis in orange italic. Mobile was rendering
+              a bold sans `search.title` and leaving headline/headlineEm
+              unused, so the two screens didn't read as the same app. */}
+          <Text style={styles.title} accessibilityRole="header">
+            {t('search.headline')}{' '}
+            <Text style={styles.titleEm}>{t('search.headlineEm')}</Text>.
+          </Text>
+          <View style={styles.titleActions}>
+            {/* Matches web's Search.jsx .view-toggle — map is a view mode
+                of this same screen, not a separate tab. */}
+            <View style={styles.viewToggle}>
+              <Pressable
+                accessibilityRole="button"
+                style={[styles.viewToggleButton, viewMode === 'list' && styles.viewToggleButtonActive]}
+                onPress={() => setViewMode('list')}
+                accessibilityLabel={t('search.listView')}>
+                <MaterialIcons
+                  name="grid-view"
+                  size={15}
+                  color={viewMode === 'list' ? colors.textPrimary : colors.textSecondary}
+                />
+              </Pressable>
+              <Pressable
+                accessibilityRole="button"
+                style={[styles.viewToggleButton, viewMode === 'map' && styles.viewToggleButtonActive]}
+                onPress={() => setViewMode('map')}
+                accessibilityLabel={t('search.mapView')}>
+                <MaterialIcons
+                  name="map"
+                  size={15}
+                  color={viewMode === 'map' ? colors.textPrimary : colors.textSecondary}
+                />
+              </Pressable>
+            </View>
+            {!desktop && <Pressable
+              accessibilityRole="button"
+              style={styles.filterButton}
+              onPress={() => setSheetOpen(true)}
+              accessibilityLabel={t('search.filtersTitle')}>
+              <MaterialIcons
+                name="tune"
+                size={22}
+                color={colors.textPrimary}
+              />
+              {activeCount > 0 && (
+                <View style={styles.badge}>
+                  <Text style={styles.badgeText}>{activeCount}</Text>
+                </View>
+              )}
+            </Pressable>}
+          </View>
+        </View>
+      </View>
+
+      <View style={styles.searchField}>
+        <MaterialIcons name="search" size={18} color={colors.textSecondary} />
+        <TextInput
+          style={styles.searchInput}
+          value={searchText}
+          onChangeText={setSearchText}
+          placeholder={t('search.placeholder')}
+          accessibilityLabel={t('search.placeholder')}
+          placeholderTextColor={colors.textSecondary}
+          returnKeyType="search"
+        />
+        {searchText.length > 0 && (
+          <Pressable accessibilityRole="button" accessibilityLabel={t('search.reset')} onPress={() => setSearchText('')} hitSlop={8}>
+            <MaterialIcons name="close" size={16} color={colors.textSecondary} />
+          </Pressable>
+        )}
+        {/* Describing the home in words is the assistant's job: it sits at
+            the end of the search field, which fits any width (a third round
+            button beside the title ran off a Fold's 280px cover screen). */}
+        {AI_CHAT_ENABLED && (
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={t('aiAssistant.title')}
+            onPress={() => router.push('/assistant' as Href)}
+            hitSlop={10}
+            style={styles.assistantButton}>
+            <MaterialIcons name="auto-awesome" size={18} color={colors.accent} />
+          </Pressable>
+        )}
+      </View>
+
+      <FilterTabs
+        tabs={listingTabs}
+        activeTab={activeTab}
+        onTabChange={handleTabChange}
+      />
+    </View>
+  );
+
+  const filterPanel = (
+    <FilterPanel
+      search={searchText}
+      onSearch={setSearchText}
+      viewMode={viewMode}
+      onViewMode={setViewMode}
+      onShowResults={() => {
+        setViewMode('list');
+        listRef.current?.scrollToOffset({ offset: 380, animated: true });
+      }}
+    />
+  );
+
+  const loader = (
+    <View style={styles.loader}>
+      <ActivityIndicator size="large" color={colors.accent} />
+    </View>
+  );
+
+  /* Must come before the list: a failed query also yields zero rows, so
+     without this the ListEmptyComponent told the visitor their filters
+     matched nothing ("Try adjusting your search filters") when the
+     fetch had actually failed. Mirrors the web Search fix. Only when
+     nothing loaded: one failed extra page used to replace a list
+     already on screen; that case gets the footer's Retry instead. */
+  const failedView = (
+    <View style={styles.empty}>
+      <MaterialIcons name="error-outline" size={40} color={colors.textSecondary} />
+      <Text style={styles.emptyTitle}>{t('errors.generic')}</Text>
+      <Pressable accessibilityRole="button" style={styles.emptyResetButton} onPress={() => refetch()}>
+        <MaterialIcons name="restart-alt" size={14} color={colors.accent} />
+        <Text style={styles.emptyResetText}>{t('common.retry')}</Text>
+      </Pressable>
+    </View>
   );
 
   return (
@@ -150,98 +337,26 @@ export default function ExploreScreen() {
         {/* Replaces the plain `common.appName` text this screen used to show
             — web renders the full `.app-header` here like everywhere else. */}
         <AppHeader />
-        <View style={styles.header}>
-          <View style={styles.titleRow}>
-            {/* Web's `.screen-headline`: "Explore <em>everything</em>." —
-                serif with the emphasis in orange italic. Mobile was rendering
-                a bold sans `search.title` and leaving headline/headlineEm
-                unused, so the two screens didn't read as the same app. */}
-            <Text style={styles.title}>
-              {t('search.headline')}{' '}
-              <Text style={styles.titleEm}>{t('search.headlineEm')}</Text>.
-            </Text>
-            <View style={styles.titleActions}>
-              {/* Matches web's Search.jsx .view-toggle — map is a view mode
-                  of this same screen, not a separate tab. */}
-              <View style={styles.viewToggle}>
-                <Pressable
-                  style={[styles.viewToggleButton, viewMode === 'list' && styles.viewToggleButtonActive]}
-                  onPress={() => setViewMode('list')}
-                  accessibilityLabel={t('search.listView')}>
-                  <MaterialIcons
-                    name="grid-view"
-                    size={15}
-                    color={viewMode === 'list' ? colors.textPrimary : colors.textSecondary}
-                  />
-                </Pressable>
-                <Pressable
-                  style={[styles.viewToggleButton, viewMode === 'map' && styles.viewToggleButtonActive]}
-                  onPress={() => setViewMode('map')}
-                  accessibilityLabel={t('search.mapView')}>
-                  <MaterialIcons
-                    name="map"
-                    size={15}
-                    color={viewMode === 'map' ? colors.textPrimary : colors.textSecondary}
-                  />
-                </Pressable>
-              </View>
-              <Pressable
-                style={styles.filterButton}
-                onPress={() => setSheetOpen(true)}
-                accessibilityLabel={t('search.filtersTitle')}>
-                <MaterialIcons
-                  name="tune"
-                  size={22}
-                  color={colors.textPrimary}
-                />
-                {activeCount > 0 && (
-                  <View style={styles.badge}>
-                    <Text style={styles.badgeText}>{activeCount}</Text>
-                  </View>
-                )}
-              </Pressable>
-            </View>
-          </View>
-        </View>
+        {!chromeInList && !panel && chrome}
 
-        <View style={styles.searchField}>
-          <MaterialIcons name="search" size={18} color={colors.textSecondary} />
-          <TextInput
-            style={styles.searchInput}
-            value={searchText}
-            onChangeText={setSearchText}
-            placeholder={t('search.placeholder')}
-            placeholderTextColor={colors.textSecondary}
-            returnKeyType="search"
-          />
-          {searchText.length > 0 && (
-            <Pressable onPress={() => setSearchText('')} hitSlop={8}>
-              <MaterialIcons name="close" size={16} color={colors.textSecondary} />
-            </Pressable>
-          )}
-        </View>
-
-        <FilterTabs
-          tabs={listingTabs}
-          activeTab={activeTab}
-          onTabChange={handleTabChange}
-        />
-
+        <View style={styles.flex}>
+        <View style={styles.flex}>
         {viewMode === 'map' ? (
           <View style={styles.mapWrap}>
+            {panel ? <View style={styles.panelWrap}>{filterPanel}</View> : null}
             <MapScreenContent />
           </View>
-        ) : loading ? (
-          <View style={styles.loader}>
-            <ActivityIndicator size="large" color={colors.accent} />
-          </View>
+        ) : loading && !chromeInList ? (
+          loader
+        ) : failedEmpty && !chromeInList ? (
+          failedView
         ) : (
           <FlatList
             // FlatList can't change numColumns on a live instance — keying by
             // the column count forces a clean remount on rotation/tablet
             // resize instead of silently misrendering rows.
             key={`cols-${columns}`}
-            data={properties}
+            data={loading || failedEmpty ? [] : properties}
             renderItem={renderItem}
             keyExtractor={(item) => item.id}
             numColumns={columns}
@@ -255,43 +370,60 @@ export default function ExploreScreen() {
             removeClippedSubviews
             onEndReached={loadMore}
             onEndReachedThreshold={0.5}
+            ref={listRef}
             ListHeaderComponent={
-              // Web's `.result-count`: bold total + "homes in view" on the
-              // left, a mono-caps eyebrow naming the current sort on the
-              // right. Mobile only had the bare count.
-              <View style={styles.countRow}>
-                <Text style={styles.count}>
-                  <Text style={styles.countStrong}>{total}</Text>{' '}
-                  {/* count drives i18next's plural choice even though the
-                      string itself doesn't interpolate it — the number stays
-                      a separate bold <Text>. */}
-                  {t('search.homesInView', { count: total })}
-                </Text>
-                {/* Web switches this to "Map view" when the map is showing,
-                    but this header only renders inside the list branch, so
-                    the sort label is the only reachable case here. */}
-                <Text style={styles.countEyebrow}>
-                  {t('search.sortedByRelevance').toUpperCase()}
-                </Text>
-              </View>
+              <>
+                {panel ? filterPanel : null}
+                {panel && !loading && !failedEmpty ? <ResultsBar shown={properties.length} total={total} tabs={<FilterTabs tabs={listingTabs} activeTab={activeTab} onTabChange={handleTabChange} />} /> : null}
+                {/* Short screens only (chromeInList above). The list pads its
+                    sides by 14 and the chrome brings its own 20, so it steps
+                    back out to the screen edge. */}
+                {chromeInList && <View style={styles.listChrome}>{chrome}</View>}
+                {/* Web's `.result-count`: bold total + "homes in view" on the
+                    left, a mono-caps eyebrow naming the current sort on the
+                    right. Mobile only had the bare count. */}
+                {!panel && !loading && !failedEmpty && (
+                  <View style={styles.countRow}>
+                    <Text style={styles.count}>
+                      <Text style={styles.countStrong}>{total}</Text>{' '}
+                      {/* count drives i18next's plural choice even though the
+                          string itself doesn't interpolate it — the number stays
+                          a separate bold <Text>. */}
+                      {t('search.homesInView', { count: total })}
+                    </Text>
+                    {/* Web switches this to "Map view" when the map is showing,
+                        but this header only renders inside the list branch, so
+                        the sort label is the only reachable case here. */}
+                    <Text style={styles.countEyebrow}>
+                      {/* The sort actually applied: it always said "relevance",
+                          which this app has no ranking for. */}
+                      {t(`search.sort.${queryFilters.sort ?? 'newest'}`).toUpperCase()}
+                    </Text>
+                  </View>
+                )}
+                {!loading && !failedEmpty && <SaveSearchButton filters={queryFilters} />}
+              </>
             }
             ListEmptyComponent={
-              <View style={styles.empty}>
-                <MaterialIcons name="search-off" size={40} color={colors.textSecondary} />
-                <Text style={styles.emptyTitle}>{t('search.empty')}</Text>
-                <Text style={styles.emptyHint}>{t('search.emptyHint')}</Text>
-                {activeCount > 0 && (
-                  <Pressable
-                    style={styles.emptyResetButton}
-                    onPress={() => {
-                      reset();
-                      setSearchText('');
-                    }}>
-                    <MaterialIcons name="restart-alt" size={14} color={colors.accent} />
-                    <Text style={styles.emptyResetText}>{t('search.reset')}</Text>
-                  </Pressable>
-                )}
-              </View>
+              loading ? loader : failedEmpty ? failedView : (
+                <View style={styles.empty}>
+                  <MaterialIcons name="search-off" size={40} color={colors.textSecondary} />
+                  <Text style={styles.emptyTitle}>{t('search.empty')}</Text>
+                  <Text style={styles.emptyHint}>{t('search.emptyHint')}</Text>
+                  {activeCount > 0 && (
+                    <Pressable
+                      accessibilityRole="button"
+                      style={styles.emptyResetButton}
+                      onPress={() => {
+                        reset();
+                        setSearchText('');
+                      }}>
+                      <MaterialIcons name="restart-alt" size={14} color={colors.accent} />
+                      <Text style={styles.emptyResetText}>{t('search.reset')}</Text>
+                    </Pressable>
+                  )}
+                </View>
+              )
             }
             ListFooterComponent={
               loadingMore ? (
@@ -299,21 +431,36 @@ export default function ExploreScreen() {
                   style={styles.footer}
                   color={colors.accent}
                 />
-              ) : null
+              ) : isFetchNextPageError ? (
+                <View style={[styles.footer, styles.footerRetry]}>
+                  <Text style={styles.emptyHint}>{t('errors.generic')}</Text>
+                  <Pressable accessibilityRole="button" style={styles.emptyResetButton} onPress={() => fetchNextPage()}>
+                    <MaterialIcons name="restart-alt" size={14} color={colors.accent} />
+                    <Text style={styles.emptyResetText}>{t('common.retry')}</Text>
+                  </Pressable>
+                </View>
+              ) : undefined
             }
           />
         )}
+        </View>
+        </View>
 
         <FilterSheet
           visible={sheetOpen}
           onClose={() => setSheetOpen(false)}
         />
+        <KeyboardDoneBar />
       </SafeAreaView>
     </GradientBackground>
   );
 }
 
+
 const createStyles = (colors: AtticoPalette) => StyleSheet.create({
+  flex: { flex: 1 },
+  webChrome: { width: '100%', maxWidth: 820 },
+  panelWrap: { paddingHorizontal: 20, paddingBottom: 16 },
   container: {
     flex: 1,
   },
@@ -324,8 +471,8 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   brand: {
     fontSize: 14,
-    fontWeight: '600',
-    color: colors.accent,
+    fontFamily: Fonts.sansSemiBold,
+    color: colors.accentText,
     letterSpacing: 1,
     marginBottom: 12,
   },
@@ -347,7 +494,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   // the italic comes from the italic family, not a fontStyle override.
   titleEm: {
     fontFamily: Fonts?.serifItalic,
-    color: colors.accent,
+    color: colors.accentText,
   },
   titleActions: {
     flexDirection: 'row',
@@ -398,8 +545,8 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     alignItems: 'center',
   },
   badgeText: {
-    fontSize: 11,
-    fontWeight: '700',
+    fontSize: 12,
+    fontFamily: Fonts.sansBold,
     color: colors.textPrimary,
   },
   searchField: {
@@ -409,14 +556,31 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     marginHorizontal: 20,
     marginBottom: 14,
     paddingHorizontal: 14,
-    paddingVertical: 12,
+    // The input fills the field's height instead of 12px of padding, so a
+    // tap anywhere on the pill lands in it (it was a 19px strip). Same
+    // 58px outer height as before.
+    minHeight: 58,
     backgroundColor: colors.glass,
     borderWidth: 1,
     borderColor: colors.border,
     borderRadius: 14,
   },
+  assistantButton: {
+    width: 32,
+    height: 32,
+    marginVertical: -6,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.accentTint,
+  },
   searchInput: {
     flex: 1,
+    // A web <input> keeps its default width otherwise and pushes the
+    // assistant button off a 280px screen.
+    minWidth: 0,
+    alignSelf: 'stretch',
+    fontFamily: Fonts.sans,
     fontSize: 14,
     color: colors.textPrimary,
     padding: 0,
@@ -425,19 +589,24 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     paddingHorizontal: 14,
     paddingBottom: 24,
   },
+  listChrome: {
+    marginHorizontal: -14,
+  },
   row: {
     gap: 0,
   },
+  // Wraps as a whole rather than squeezing both texts (see home's sectionHeader).
   countRow: {
     flexDirection: 'row',
-    alignItems: 'center',
+    flexWrap: 'wrap',
+    alignItems: 'baseline',
     justifyContent: 'space-between',
-    gap: 10,
+    columnGap: 10,
+    rowGap: 2,
     paddingHorizontal: 6,
     paddingBottom: 12,
   },
   count: {
-    flexShrink: 1,
     fontFamily: Fonts?.sans,
     fontSize: 13,
     color: colors.textSecondary,
@@ -449,7 +618,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   // Web's .mono-eyebrow: mono, 11px, 0.1em, uppercase, muted.
   countEyebrow: {
     fontFamily: Fonts?.mono,
-    fontSize: 11,
+    fontSize: 12,
     letterSpacing: 1.1,
     color: colors.textSecondary,
   },
@@ -460,6 +629,10 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   footer: {
     paddingVertical: 20,
   },
+  footerRetry: {
+    alignItems: 'center',
+    gap: 4,
+  },
   empty: {
     paddingTop: 60,
     alignItems: 'center',
@@ -467,10 +640,11 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   emptyTitle: {
     fontSize: 16,
-    fontWeight: '600',
+    fontFamily: Fonts.sansSemiBold,
     color: colors.textPrimary,
   },
   emptyHint: {
+    fontFamily: Fonts.sans,
     fontSize: 13,
     color: colors.textSecondary,
   },
@@ -487,7 +661,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   emptyResetText: {
     fontSize: 13,
-    fontWeight: '600',
-    color: colors.accent,
+    fontFamily: Fonts.sansSemiBold,
+    color: colors.accentText,
   },
 });

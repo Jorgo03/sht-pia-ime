@@ -1,0 +1,42 @@
+<!-- Scene 1 — the hook (0–3 s): orange light out of black, the logo, the question. -->
+<template>
+  <html data-composition-variables='[
+    {"id":"lead","type":"string","label":"Caption","default":"Po kërkon"},
+    {"id":"accent","type":"string","label":"Caption, orange","default":"shtëpinë tënde?"}
+  ]'>
+  <div id="s1-hook" data-composition-id="s1-hook" data-width="1080" data-height="1920" class="scene" style="background: var(--black)">
+    <style>
+      #s1-hook .s1-logo { position: absolute; left: 50%; top: 560px; width: 620px; margin-left: -310px; }
+      #s1-hook .s1-logo img { display: block; width: 100%; }
+      #s1-hook .caption { top: 1150px; font-size: 92px; }
+    </style>
+    <div class="glow s1-glow" style="top: 760px"></div>
+    <div class="s1-logo"><img src="assets/brand/lockup-stacked-dark.svg" alt="Shtëpia.ime" /></div>
+    <h1 class="caption s1-caption"></h1>
+    <script>
+      (() => {
+        const root = document.getElementById('s1-hook');
+        const { lead, accent } = film.vars({"lead": "Po kërkon", "accent": "shtëpinë tënde?"});
+        const words = film.caption(root.querySelector('.s1-caption'), lead, accent);
+        const logo = root.querySelector('.s1-logo');
+        const tl = gsap.timeline({ paused: true });
+
+        tl.fromTo('#s1-hook .s1-glow', { opacity: 0, scale: 0.25 }, { opacity: 1, scale: 1, duration: 1.8, ease: 'power2.out' }, 0.1);
+        // The door first, then the name opens up beneath it.
+        tl.fromTo(logo, { opacity: 0, scale: 0.86, filter: 'blur(22px)', clipPath: 'inset(0% 0% 40% 0%)' },
+          { opacity: 1, scale: 1, filter: 'blur(0px)', duration: 1.1, ease: 'expo.out' }, 0.35);
+        tl.to(logo, { clipPath: 'inset(0% 0% 0% 0%)', duration: 0.8, ease: 'power3.inOut' }, 1.0);
+        film.wordsIn(tl, words, 1.55);
+
+        // Out: everything lifts and softens.
+        tl.to(logo, { scale: 1.06, opacity: 0, filter: 'blur(12px)', duration: 0.5, ease: 'power2.in' }, 2.85);
+        film.wordsOut(tl, words, 2.8);
+        tl.to('#s1-hook .s1-glow', { opacity: 0.25, duration: 0.5 }, 2.85);
+
+        window.__timelines = window.__timelines || {};
+        window.__timelines['s1-hook'] = tl;
+      })();
+    </script>
+  </div>
+  </html>
+</template>

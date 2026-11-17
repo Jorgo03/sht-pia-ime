@@ -16,24 +16,42 @@ import {
   Newsreader_500Medium_Italic,
   Newsreader_600SemiBold,
 } from '@expo-google-fonts/newsreader';
-import { DarkTheme, DefaultTheme, ThemeProvider as NavigationThemeProvider } from '@react-navigation/native';
 import { QueryClientProvider } from '@tanstack/react-query';
-import { Stack } from 'expo-router';
-import { useFonts } from 'expo-font';
+// As of SDK 56, expo-router no longer allows importing @react-navigation/*
+// directly (Metro throws) — it re-exports what's still needed itself.
+import { DarkTheme, DefaultTheme, Stack, ThemeProvider as NavigationThemeProvider, usePathname } from 'expo-router';
+import { loadAsync as loadFontsAsync, useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect } from 'react';
-import { Platform } from 'react-native';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { Platform, StyleSheet, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import 'react-native-reanimated';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import '@/i18n';
+import { applyPreferredLanguage } from '@/i18n';
 
 import { AuthProvider, useAuth } from '@/contexts/auth-context';
+import { CompareProvider } from '@/contexts/compare-context';
+import { CurrencyProvider } from '@/contexts/currency-context';
 import { FavoritesProvider } from '@/contexts/favorites-context';
 import { FiltersProvider } from '@/contexts/filters-context';
 import { ThemeProvider, useTheme } from '@/contexts/theme-context';
 import { queryClient } from '@/lib/query-client';
+// NetInfo drives React Query's online state (AUDIT-009); side effect only.
+import { startWebOnlineState } from '@/lib/online-manager';
+import { OfflineBanner } from '@/components/ui/offline-banner';
+import { installGlobalErrorReporting } from '@/lib/report-error';
+import { configureForegroundNotifications } from '@/lib/push';
+import { LaunchDoorSplash } from '@/components/brand/door-splash';
+import { NotificationBanner } from '@/components/notifications/notification-banner';
+import { PushBridge } from '@/components/push-bridge';
+import { SignedOutStart } from '@/components/auth/signed-out-start';
+import { NotificationsProvider } from '@/contexts/notifications-context';
+import { APP_SCREEN_MAX_WIDTH, IS_WEB, SITE_MAX_WIDTH, isWebsiteRoute } from '@/constants/web-frame';
+import { SiteHeader } from '@/components/web/site-header';
+import { forwardWheel } from '@/lib/web/forward-wheel';
+import { RouteHead } from '@/components/web/page-head';
+import { debugWarn } from '@/lib/debug';
 
 export const unstable_settings = {
   anchor: '(tabs)',
@@ -52,62 +70,166 @@ export { AppErrorBoundary as ErrorBoundary } from '@/components/ui/error-boundar
 // error, so it's the one intentional swallow in this file.
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
+/**
+ * Longest the first screen waits for its fonts. In Expo Go every font is a
+ * separate download from the laptop, through the tunnel when testing away
+ * from home, and a stalled one never settles: with no limit the phone sat on
+ * the blank splash (2026-11-07). Text drawn before a font arrives uses the
+ * system font until the next render; icons load themselves (createIconSet).
+ */
+const FONT_GATE_TIMEOUT_MS = 4000;
+
+/**
+ * Loaded after the first screen, not before it: Ionicons draws only the Apple
+ * and LinkedIn logos on Profile (390 KB), and the sansExtraBold weight is in
+ * constants/theme.ts but no screen uses it yet. Count uses as `Fonts?.x` too
+ * (tests/fontGate.test.mjs does):
+ * missing that form once moved sansMedium (listing cards) and serifItalic
+ * here, and text already drawn kept the system font.
+ */
+const LATER_FONTS = {
+  ...Ionicons.font,
+  Manrope_800ExtraBold,
+};
+
+// Redacted crash reports to client_errors (docs/LAUNCH_TASKS.md F11); a no-op
+// in development.
+installGlobalErrorReporting();
+configureForegroundNotifications();
+
+/**
+ * The website is this app's web build (DECISIONS.md W5): the site header
+ * across the window, and the page in a centred column (constants/web-frame.ts)
+ * whose width depends on the page.
+ * Native builds render the navigator directly.
+ */
+function WebColumn({ children }: { children: ReactNode }) {
+  const { colors } = useTheme();
+  const pathname = usePathname();
+  const pageRef = useRef<unknown>(null);
+  const columnRef = useRef<unknown>(null);
+  // A wheel over the margins beside the column scrolls the page too.
+  useEffect(() => {
+    if (!IS_WEB) return;
+    const page = pageRef.current as unknown as HTMLElement | null;
+    const column = columnRef.current as unknown as HTMLElement | null;
+    if (!page || !column) return;
+    return forwardWheel(page, column);
+  }, []);
+  if (!IS_WEB) return <>{children}</>;
+  // The column's width depends only on the address, never on the window, so
+  // the pre-rendered page and the browser's first draw agree.
+  // Home is full-bleed: its hero runs edge to edge under a floating header,
+  // and each section keeps its own content width (components/web/website-home).
+  const home = pathname === '/';
+  const maxWidth = home ? undefined : isWebsiteRoute(pathname) ? SITE_MAX_WIDTH : APP_SCREEN_MAX_WIDTH;
+  return (
+    <View ref={pageRef as never} style={[styles.webPage, { backgroundColor: colors.primary }]}>
+      <View style={home ? styles.headerFloating : undefined}>
+        <SiteHeader />
+      </View>
+      <View ref={columnRef as never} style={[styles.webColumn, maxWidth ? { maxWidth } : null]}>{children}</View>
+    </View>
+  );
+}
+
 function ThemedNavigation() {
   const { theme } = useTheme();
 
   return (
     <NavigationThemeProvider value={theme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen
-          name="property/[id]"
-          options={{ headerShown: false, presentation: 'card' }}
-        />
-        <Stack.Screen
-          name="listing/create"
-          options={{ headerShown: false, presentation: 'card' }}
-        />
-        <Stack.Screen
-          name="listing/new"
-          options={{ headerShown: false, presentation: 'card' }}
-        />
-        <Stack.Screen
-          name="listing/[id]/analytics"
-          options={{ headerShown: false, presentation: 'card' }}
-        />
-        <Stack.Screen
-          name="favorites/index"
-          options={{ headerShown: false, presentation: 'card' }}
-        />
-        <Stack.Screen
-          name="messages/index"
-          options={{ headerShown: false, presentation: 'card' }}
-        />
-        <Stack.Screen
-          name="messages/[id]"
-          options={{ headerShown: false, presentation: 'card' }}
-        />
-        <Stack.Screen
-          name="viewings/index"
-          options={{ headerShown: false, presentation: 'card' }}
-        />
-        <Stack.Screen
-          name="my-listings/index"
-          options={{ headerShown: false, presentation: 'card' }}
-        />
-        <Stack.Screen
-          name="agent-dashboard/index"
-          options={{ headerShown: false, presentation: 'card' }}
-        />
-        <Stack.Screen
-          name="saved-searches/index"
-          options={{ headerShown: false, presentation: 'card' }}
-        />
-        <Stack.Screen
-          name="agent/[id]"
-          options={{ headerShown: false, presentation: 'card' }}
-        />
-      </Stack>
+      <RouteHead />
+      <WebColumn>
+        {/* Every screen draws its own header (AppHeader), so the system one is
+            off by default: a route missing from this list showed its file
+            path ("messages/[id]", "user/[id]") as a bar on iPhone
+            (2026-11-12). tests/routes.test.mjs keeps the list complete. */}
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen
+            name="property/[id]"
+            options={{ headerShown: false, presentation: 'card' }}
+          />
+          <Stack.Screen
+            name="listing/create"
+            options={{ headerShown: false, presentation: 'card' }}
+          />
+          <Stack.Screen
+            name="listing/new"
+            options={{ headerShown: false, presentation: 'card' }}
+          />
+          <Stack.Screen
+            name="listing/[id]/analytics"
+            options={{ headerShown: false, presentation: 'card' }}
+          />
+          <Stack.Screen
+            name="listing/[id]/edit"
+            options={{ headerShown: false, presentation: 'card' }}
+          />
+          <Stack.Screen
+            name="favorites/index"
+            options={{ headerShown: false, presentation: 'card' }}
+          />
+          <Stack.Screen
+            name="messages/[id]"
+            options={{ headerShown: false, presentation: 'card' }}
+          />
+          <Stack.Screen
+            name="notifications"
+            options={{ headerShown: false, presentation: 'card' }}
+          />
+          <Stack.Screen
+            name="viewings/index"
+            options={{ headerShown: false, presentation: 'card' }}
+          />
+          <Stack.Screen
+            name="my-listings/index"
+            options={{ headerShown: false, presentation: 'card' }}
+          />
+          <Stack.Screen
+            name="agent-dashboard/index"
+            options={{ headerShown: false, presentation: 'card' }}
+          />
+          <Stack.Screen
+            name="leads/index"
+            options={{ headerShown: false, presentation: 'card' }}
+          />
+          <Stack.Screen
+            name="performance/index"
+            options={{ headerShown: false, presentation: 'card' }}
+          />
+          <Stack.Screen
+            name="saved-searches/index"
+            options={{ headerShown: false, presentation: 'card' }}
+          />
+          <Stack.Screen
+            name="agent/[id]"
+            options={{ headerShown: false, presentation: 'card' }}
+          />
+          <Stack.Screen
+            name="user/[id]"
+            options={{ headerShown: false, presentation: 'card' }}
+          />
+          <Stack.Screen name="blocked-users" options={{ headerShown: false, presentation: 'card' }} />
+          <Stack.Screen name="agents/index" options={{ headerShown: false, presentation: 'card' }} />
+          <Stack.Screen name="compare" options={{ headerShown: false, presentation: 'card' }} />
+          <Stack.Screen name="listing/import" options={{ headerShown: false, presentation: 'card' }} />
+          <Stack.Screen name="assistant" options={{ headerShown: false, presentation: 'card' }} />
+          {/* Website pages; pricing, moderation and auth/callback are web
+              only (their native files redirect home). */}
+          <Stack.Screen name="privacy" options={{ headerShown: false }} />
+          <Stack.Screen name="terms" options={{ headerShown: false }} />
+          <Stack.Screen name="cookies" options={{ headerShown: false }} />
+          <Stack.Screen name="guide" options={{ headerShown: false }} />
+          <Stack.Screen name="wanted" options={{ headerShown: false }} />
+          <Stack.Screen name="pricing" options={{ headerShown: false }} />
+          <Stack.Screen name="moderation" options={{ headerShown: false }} />
+          <Stack.Screen name="auth/callback" options={{ headerShown: false }} />
+          <Stack.Screen name="+not-found" options={{ headerShown: false }} />
+        </Stack>
+        {/* Above every screen while the phone is offline (AUDIT-009). */}
+        <OfflineBanner />
+      </WebColumn>
       <StatusBar style={theme === 'dark' ? 'light' : 'dark'} />
     </NavigationThemeProvider>
   );
@@ -123,6 +245,12 @@ function ThemedNavigation() {
  */
 function AppGate({ fontsReady }: { fontsReady: boolean }) {
   const { loading: authLoading } = useAuth();
+  const [fontWaitOver, setFontWaitOver] = useState(false);
+  useEffect(() => {
+    if (Platform.OS === 'web') return;
+    const timer = setTimeout(() => setFontWaitOver(true), FONT_GATE_TIMEOUT_MS);
+    return () => clearTimeout(timer);
+  }, []);
   // Web has no native splash screen (nothing to hold up) and, critically,
   // Expo Router's static export renders this tree in Node to produce each
   // route's static HTML — there `useFonts`/the Supabase session promise
@@ -130,11 +258,20 @@ function AppGate({ fontsReady }: { fontsReady: boolean }) {
   // isn't "still loading," it's permanently `false`, which blanked every
   // exported page. The race this gate exists to prevent is native-only
   // (LAN asset requests, iOS/Android session storage) — skip it on web.
-  const ready = Platform.OS === 'web' || (fontsReady && !authLoading);
+  const ready = Platform.OS === 'web' || ((fontsReady || fontWaitOver) && !authLoading);
 
   useEffect(() => {
-    if (ready) SplashScreen.hideAsync();
+    if (!ready) return;
+    SplashScreen.hideAsync();
+    loadFontsAsync(LATER_FONTS).catch((e) => debugWarn('Later fonts failed to load', e));
   }, [ready]);
+
+  // Web: the page hydrated in Albanian (what was pre-rendered); now switch to
+  // the visitor's own language. No-op on native.
+  useEffect(() => {
+    applyPreferredLanguage();
+    startWebOnlineState();
+  }, []);
 
   if (!ready) {
     // Native splash screen is still visible (prevented above) — this isn't
@@ -143,14 +280,30 @@ function AppGate({ fontsReady }: { fontsReady: boolean }) {
   }
 
   return (
-    <FavoritesProvider>
-      {/* Above the navigator so the list and map tabs share one filter state. */}
-      <FiltersProvider>
-        <ThemeProvider>
-          <ThemedNavigation />
-        </ThemeProvider>
-      </FiltersProvider>
-    </FavoritesProvider>
+    <>
+      <FavoritesProvider>
+        <CompareProvider>
+        {/* Above the navigator so the list and map tabs share one filter state. */}
+        <FiltersProvider>
+          <CurrencyProvider>
+          <ThemeProvider>
+            <NotificationsProvider>
+              <ThemedNavigation />
+              <NotificationBanner />
+              <PushBridge />
+              {/* Phones: signed out, the app opens on sign-in, not Home. */}
+              <SignedOutStart />
+            </NotificationsProvider>
+          </ThemeProvider>
+          </CurrencyProvider>
+        </FiltersProvider>
+        </CompareProvider>
+      </FavoritesProvider>
+      {/* The door opening, over the first screen as the native splash hides
+          (phones only, once per launch). The app is already mounted beneath
+          it, so session restore, routing and deep links carry on as usual. */}
+      <LaunchDoorSplash />
+    </>
   );
 }
 
@@ -170,9 +323,11 @@ export default function RootLayout() {
   // Fonts export) through the same gate, so the design-brief requirement
   // "do not show the UI before required fonts have loaded" is enforced by
   // construction rather than left to chance.
+  //
+  // Every font a screen uses blocks the splash (10 files); the rest follows
+  // in LATER_FONTS, and FONT_GATE_TIMEOUT_MS caps the wait.
   const [fontsLoaded, fontError] = useFonts({
     ...MaterialIcons.font,
-    ...Ionicons.font,
     Newsreader_500Medium,
     Newsreader_500Medium_Italic,
     Newsreader_600SemiBold,
@@ -180,7 +335,6 @@ export default function RootLayout() {
     Manrope_500Medium,
     Manrope_600SemiBold,
     Manrope_700Bold,
-    Manrope_800ExtraBold,
     JetBrainsMono_400Regular,
     JetBrainsMono_500Medium,
   });
@@ -191,7 +345,7 @@ export default function RootLayout() {
       // each icon's own lazy loader (see createIconSet.js) gets a second
       // independent attempt, so a transient failure here degrades to
       // blank icons rather than blocking the whole app.
-      console.error('Font preload failed, icons will lazy-load individually as a fallback:', fontError);
+      debugWarn('Font preload failed, icons load one by one instead', fontError);
     }
   }, [fontError]);
 
@@ -210,3 +364,9 @@ export default function RootLayout() {
     </GestureHandlerRootView>
   );
 }
+
+const styles = StyleSheet.create({
+  webPage: { flex: 1 },
+  headerFloating: { position: 'absolute', top: 0, left: 0, right: 0, zIndex: 20 },
+  webColumn: { flex: 1, width: '100%', alignSelf: 'center', overflow: 'hidden' },
+});

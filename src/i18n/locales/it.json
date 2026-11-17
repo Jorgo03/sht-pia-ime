@@ -2,6 +2,7 @@
   "common": {
     "appName": "Shtëpia.ime",
     "loading": "Caricamento...",
+    "loadMore": "Carica altri",
     "error": "Errore",
     "save": "Salva",
     "cancel": "Annulla",
@@ -25,7 +26,11 @@
     "toggleTheme": "Cambia tema",
     "previous": "Precedente",
     "next": "Avanti",
-    "retry": "Riprova"
+    "retry": "Riprova",
+    "done": "Fine",
+    "language": "Lingua",
+    "closeKeyboard": "Chiude la tastiera",
+    "addShort": "Aggiungi"
   },
   "auth": {
     "roleClient": "Cliente",
@@ -43,8 +48,8 @@
     "forgotPassword": "Password dimenticata?",
     "accessClient": "Accesso acquirenti e affittuari",
     "accessAgent": "Accesso al portale agenti",
-    "forgotShort": "Dimenticata?",
-    "resetSent": "Controlla la tua email per reimpostare la password.",
+    "forgotShort": "Password dimenticata?",
+    "resetSent": "Se esiste un account con questa email, abbiamo inviato un codice per reimpostare la password.",
     "recoveryTitle": "Imposta una nuova password",
     "recoverySubtitle": "Scegli una nuova password per il tuo account.",
     "newPassword": "Nuova password",
@@ -78,7 +83,28 @@
     "heroSignUpPre": "Inizia a",
     "heroSignUpEm": "trovare casa",
     "heroSignUpPost": "oggi.",
-    "resendIn": "Reinvia tra {{s}}s"
+    "resendIn": "Reinvia tra {{s}}s",
+    "showPassword": "Mostra password",
+    "hidePassword": "Nascondi password",
+    "codeDigit": "Cifra {{n}} di 6",
+    "newCodeSent": "È stato inviato un nuovo codice. I codici precedenti non valgono più.",
+    "forgotTitle": "Reimposta la password",
+    "forgotSubtitle": "Inserisci l’email del tuo account. Ti invieremo un codice a 6 cifre.",
+    "resetCodeSent": "Se esiste un account per {{email}}, abbiamo inviato un codice a 6 cifre.",
+    "backToSignIn": "Torna all’accesso",
+    "confirmFirst": "Prima conferma la tua email: inserisci il codice inviato o richiedine uno nuovo.",
+    "signupCodeHint": "Hai già aperto il link nell’email? Allora l’email è confermata: accedi.",
+    "emailCode": "Codice email",
+    "verifyEmailTitle": "Verifica la tua email",
+    "verifyEmailSubtitle": "Ti abbiamo inviato un codice di verifica di 6 cifre al tuo indirizzo email.",
+    "verifyAccount": "Verifica account",
+    "codeExpiresIn": "Il codice scade tra {{time}}",
+    "officeName": "Nome dell'ufficio",
+    "continue": "Continua",
+    "checkInbox": "Controlla la tua email",
+    "usePassword": "Password",
+    "spamHint": "Se non hai ricevuto l’email, controlla la cartella Spam o richiedi un nuovo codice.",
+    "browseWithoutAccount": "Sfoglia senza account"
   },
   "home": {
     "greetingMorning": "Buongiorno",
@@ -92,7 +118,35 @@
     "matched": "Su misura per te",
     "seeAll": "Vedi tutto →",
     "searchPlaceholder": "Città, quartiere, CAP...",
-    "country": "Albania"
+    "country": "Albania",
+    "heroPhrases": [
+      {
+        "lead": "L'immobile giusto",
+        "accent": "inizia qui."
+      },
+      {
+        "lead": "Trova l'immobile",
+        "accent": "adatto a te."
+      },
+      {
+        "lead": "L'investimento giusto,",
+        "accent": "nel posto giusto."
+      },
+      {
+        "lead": "La tua attività merita",
+        "accent": "il posto giusto."
+      },
+      {
+        "lead": "Trasforma l'opportunità",
+        "accent": "in investimento."
+      },
+      {
+        "lead": "Scopri",
+        "accent": "la prossima opportunità."
+      }
+    ],
+    "exploreCities": "Esplora per città",
+    "agencies": "Agenzie e agenti"
   },
   "search": {
     "title": "Cerca immobili",
@@ -159,7 +213,27 @@
     "surface": "Superficie",
     "minArea": "Sup. min",
     "maxArea": "Sup. max",
-    "rangeInvalid": "Il minimo deve essere inferiore al massimo"
+    "rangeInvalid": "Il minimo deve essere inferiore al massimo",
+    "zone": "Quartiere",
+    "reference": "Riferimento",
+    "referenceInvalid": "Un riferimento ha 8 lettere o cifre, es. SH-1A2B3C4D.",
+    "rangeMin": "Min",
+    "rangeMax": "Max",
+    "showHomesAny": "Mostra le case",
+    "saveSearch": "Salva questa ricerca",
+    "searchSaved": "Salvata · Avvisi attivi",
+    "panel": {
+      "title": "Filtra immobili",
+      "clearAll": "Cancella tutti i filtri",
+      "showOnMap": "Mostra sulla mappa",
+      "showList": "Mostra elenco",
+      "otherFilters": "Altri filtri",
+      "moreFilters": "Più filtri",
+      "fewerFilters": "Meno filtri",
+      "refPlaceholder": "ID / Parola chiave",
+      "results": "{{shown}} di {{total}} risultati",
+      "removeFilter": "Rimuovi filtro {{name}}"
+    }
   },
   "favourites": {
     "title": "Preferiti",
@@ -175,14 +249,15 @@
     "headlineEm": "selezione",
     "backToProfile": "← Torna al profilo",
     "kicker": "PREFERITI",
-    "headlinePre": "La tua"
+    "headlinePre": "La tua",
+    "loadFailed": "Non è stato possibile caricare le case salvate."
   },
   "property": {
-    "beds": "camere",
+    "beds": "Camere",
     "bedsCount_one": "camera",
     "bedsCount_many": "camere",
     "bedsCount_other": "camere",
-    "baths": "bagni",
+    "baths": "Bagni",
     "bathsCount_one": "bagno",
     "bathsCount_many": "bagni",
     "bathsCount_other": "bagni",
@@ -198,7 +273,8 @@
     "similar": "Immobili simili",
     "video": "Video tour",
     "perDay": "/giorno",
-    "forDailyRent": "Affitto giornaliero"
+    "forDailyRent": "Affitto giornaliero",
+    "publishedOn": "Pubblicato il {{date}}"
   },
   "detail": {
     "forSale": "In vendita",
@@ -213,7 +289,17 @@
     "area": "Superficie",
     "year": "Anno",
     "chatInApp": "Chatta",
-    "share": "Condividi"
+    "share": "Condividi",
+    "owner": "Proprietario",
+    "linkCopied": "Link copiato",
+    "unavailable": "Questo annuncio non è più disponibile",
+    "unavailableHint": "Potrebbe essere stato venduto, affittato o rimosso dall'agente.",
+    "reference": "Rif.",
+    "publishedBy": "Pubblicato da",
+    "video": "Video",
+    "videoFailed": "Impossibile riprodurre il video.",
+    "priceHistory": "Storico dei prezzi",
+    "priceListed": "Primo prezzo"
   },
   "messages": {
     "subtitle": "Conversazioni con agenti",
@@ -235,7 +321,12 @@
     "inputPlaceholder": "Scrivi un messaggio…",
     "noMessages": "Ancora nessun messaggio — saluta!",
     "loginPrompt": "Accedi per vedere i tuoi messaggi",
-    "sendFailed": "Messaggio non inviato — riprova"
+    "sendFailed": "Messaggio non inviato — riprova",
+    "unavailable": "Questa conversazione non è disponibile",
+    "loadFailed": "Impossibile caricare questa conversazione.",
+    "attachFailed": "Il file non è stato inviato. Riprova.",
+    "openAttachment": "Apri {{name}}",
+    "selectConversation": "Scegli una conversazione dall'elenco."
   },
   "notFound": {
     "title": "Pagina non trovata",
@@ -246,7 +337,24 @@
     "statSaved": "Salvati",
     "statSearches": "Ricerche",
     "statListings": "Annunci",
-    "statViewings": "Visite"
+    "statViewings": "Visite",
+    "edit": {
+      "title": "Modifica profilo",
+      "phone": "Numero di telefono",
+      "phoneHintAgent": "Compare nella tua pagina agente, così possono chiamarti o scriverti su WhatsApp. Ogni annuncio mantiene il proprio numero di contatto. Includi il prefisso internazionale, es. +355.",
+      "phoneHintClient": "Lo vedono solo gli agenti a cui scrivi o con cui prenoti una visita.",
+      "nameRequired": "Inserisci il tuo nome.",
+      "tooLong": "Uno dei campi è troppo lungo.",
+      "phoneInvalid": "Non sembra un numero di telefono. Usa cifre, spazi e un + iniziale.",
+      "failed": "Le modifiche non sono state salvate. Riprova.",
+      "photo": "Foto del profilo",
+      "changePhoto": "Cambia foto",
+      "removePhoto": "Rimuovi foto",
+      "photoType": "Scegli una foto JPEG, PNG o WebP.",
+      "photoSize": "La foto è troppo grande. Scegline una sotto i 15 MB.",
+      "photoFailed": "La foto non è stata salvata. Riprova.",
+      "photoPermission": "Consenti l'accesso alle foto nelle impostazioni del telefono per scegliere una foto."
+    }
   },
   "errors": {
     "generic": "Qualcosa è andato storto. Riprova.",
@@ -270,10 +378,33 @@
     "imageUploadFailed": "Caricamento immagini non riuscito — riprova",
     "updateFailed": "Aggiornamento non riuscito — riprova",
     "oauthFailed": "Accesso con il provider non riuscito — riprova",
-    "invalidCode": "Il codice è errato o scaduto",
+    "invalidCode": "Il codice è errato o non è più valido. Usa l'ultimo codice che ti abbiamo inviato.",
     "videoInvalidType": "Sono consentiti solo video MP4 o MOV",
     "videoTooLarge": "Video troppo grande (max {{max}} MB)",
-    "emailSendFailed": "Non siamo riusciti a inviare l’email di conferma. È un problema di configurazione del server, non del tuo account — contatta l’amministratore."
+    "emailSendFailed": "Non siamo riusciti a inviare il codice di verifica. Riprova tra qualche minuto.",
+    "waitSeconds": "Attendi {{s}} secondi prima di chiedere un nuovo codice.",
+    "photoPrepareFailed": "Non è stato possibile preparare una foto per il caricamento. Riprova o scegli un'altra foto.",
+    "listingSaveFailed": "L'annuncio non è stato salvato. Tutto ciò che hai inserito è ancora qui; riprova.",
+    "network": "Impossibile raggiungere il server. Controlla la connessione e riprova.",
+    "sessionExpired": "La sessione è scaduta. Accedi di nuovo.",
+    "passwordSame": "Scegli una password diversa da quella attuale.",
+    "passwordPwned": "Questa password è comparsa in una violazione di dati. Scegline un’altra.",
+    "passwordWeak": "Questa password è troppo semplice. Combina lettere, numeri e simboli.",
+    "passwordTooLong": "La password è troppo lunga. Usa al massimo 72 caratteri.",
+    "reauthNeeded": "Per sicurezza, conferma prima con un codice ricevuto via email.",
+    "signupDisabled": "Al momento non è possibile creare nuovi account.",
+    "linkExpired": "Questo link è scaduto o è già stato usato. Richiedi un nuovo codice.",
+    "linkInvalid": "Questo link non è valido. Richiedi un nuovo codice.",
+    "linkOtherDevice": "Hai aperto il link in un browser diverso da quello in cui l’hai richiesto. Inserisci invece il codice a 6 cifre dell’email.",
+    "currentPasswordWrong": "La password attuale non è corretta.",
+    "providerUnavailable": "Questo metodo di accesso non è ancora disponibile. Scegline un altro.",
+    "loadFailed": "Impossibile caricare. Controlla la connessione e riprova.",
+    "offline": "Sei offline. I contenuti si caricheranno appena torna la connessione.",
+    "tooManyAttempts": "Troppi tentativi errati. Riprova tra {{seconds}} secondi.",
+    "codeIncorrect": "Codice di verifica errato. Riprova.",
+    "codeExpired": "Il tuo codice di verifica è scaduto. Richiedine uno nuovo.",
+    "codeAttempts": "Troppi tentativi errati. Richiedi un nuovo codice.",
+    "officeRequired": "Inserisci il nome del tuo ufficio."
   },
   "agentDashboard": {
     "title": "Dashboard Agente",
@@ -290,12 +421,27 @@
     "noPendingViewings": "Nessuna richiesta in attesa",
     "wantedFeed": "Acquirenti in cerca",
     "wantedFeedSub": "Richieste aperte",
-    "wantedEmpty": "Nessuna richiesta aperta al momento"
+    "wantedEmpty": "Nessuna richiesta aperta al momento",
+    "today": "Oggi",
+    "todayEmpty": "Nessuna visita oggi.",
+    "matches_one": "{{count}} dei tuoi annunci corrisponde",
+    "matches_other": "{{count}} dei tuoi annunci corrispondono",
+    "matches_many": "{{count}} dei tuoi annunci corrispondono",
+    "noMatches": "Nessuno dei tuoi annunci corrisponde ancora",
+    "showMatches": "Mostra",
+    "hideMatches": "Nascondi"
   },
   "account": {
     "welcomeBack": "Bentornato, {{name}} 👋",
     "myListings": "I miei annunci",
-    "settings": "Impostazioni"
+    "settings": "Impostazioni",
+    "deleteAccount": "Elimina account",
+    "deleteConfirmBody": "Questa operazione elimina definitivamente il tuo profilo, gli annunci, le foto, i preferiti, le ricerche salvate e i messaggi. Non è reversibile.",
+    "deleteConfirmCta": "Elimina definitivamente",
+    "deleteFailed": "Impossibile eliminare l'account. Riprova.",
+    "downloadData": "Scarica i miei dati",
+    "downloadDataBusy": "Preparazione dei dati…",
+    "downloadDataFailed": "Impossibile scaricare i tuoi dati. Riprova."
   },
   "listing": {
     "newListing": "Nuovo annuncio",
@@ -309,7 +455,7 @@
     "activate": "Attiva",
     "delete": "Elimina",
     "required": "Campo obbligatorio",
-    "minImages": "Minimo 3 immagini richieste",
+    "minImages": "Serve almeno {{min}} foto",
     "listingType": "Tipo di annuncio",
     "title": "Titolo",
     "titlePlaceholder": "es. Appartamento 2+1 moderno a Blloku",
@@ -372,9 +518,35 @@
     "draftRestored": "Bozza ripristinata — continua da dove eri. Le foto vanno riaggiunte.",
     "discardDraft": "Ricomincia da capo",
     "pinLocation": "Posiziona il segnaposto",
-    "mapHint": "Tocca la mappa per impostare la posizione",
+    "latitude": "Latitudine",
+    "longitude": "Longitudine",
     "videoUpload": "Video dell’immobile",
-    "dropVideo": "Trascina un video qui o clicca (MP4 o MOV)"
+    "dropVideo": "Trascina un video qui o clicca (MP4 o MOV)",
+    "roadNeedsCity": "Seleziona una città per vedere le sue strade.",
+    "roadNoResults": "Nessuna strada trovata. Puoi scriverla tu.",
+    "dragMarker": "Trascina il segnaposto",
+    "pinOrderHint": "Seleziona prima la strada, poi posiziona il segnaposto sulla mappa.",
+    "pinAdjustHint": "Trascina il segnaposto sulla posizione esatta dell’immobile.",
+    "edit": "Modifica",
+    "editListing": "Modifica annuncio",
+    "saveChanges": "Salva modifiche",
+    "currentVideo": "Video attuale",
+    "markSold": "Segna come venduto",
+    "markRented": "Segna come affittato",
+    "zone": "Quartiere",
+    "zoneNone": "Nessun quartiere",
+    "fileSizeMb": "{{size}} MB",
+    "removePhoto": "Rimuovi foto",
+    "removeVideo": "Rimuovi video",
+    "confirmSoldTitle": "Segnare come venduto?",
+    "confirmRentedTitle": "Segnare come affittato?",
+    "confirmClosedHint": "Fallo solo a trattativa conclusa. Conta nel tuo report; se annullato entro 7 giorni, non conta.",
+    "actionView": "Vedi",
+    "actionStats": "Statistiche",
+    "actionSold": "Venduto",
+    "actionRented": "Affittato",
+    "pinOutsideAlbania": "Il segnaposto è fuori dall’Albania. Mettilo dove si trova l’immobile.",
+    "pinOutsideCity": "Il segnaposto è fuori dal comune di {{city}}. Spostalo o scegli la città giusta."
   },
   "dashboard": {
     "title": "Dashboard immobile",
@@ -389,6 +561,8 @@
   "map": {
     "openInMaps": "Apri in Google Maps",
     "mapView": "Mappa",
+    "webUnavailableTitle": "Vista mappa",
+    "webUnavailableHint": "La mappa interattiva è disponibile nell'app mobile. Sfoglia gli annunci come elenco.",
     "gridView": "Griglia"
   },
   "floorPlan": {
@@ -456,7 +630,10 @@
   },
   "authCallback": {
     "signingIn": "Accesso in corso…",
-    "preparingMatches": "Preparazione dei tuoi abbinamenti…"
+    "preparingMatches": "Preparazione dei tuoi abbinamenti…",
+    "returning": "Ti stiamo riportando all'app…",
+    "openApp": "Apri l'app",
+    "tapHint": "Se non è successo nulla, tocca il pulsante qui sopra."
   },
   "ai": {
     "errorUnavailable": "L'IA non è disponibile al momento — scrivi manualmente.",
@@ -469,7 +646,9 @@
     "regenerateTranslation": "Traduci di nuovo",
     "translationFailed": "Traduzione non riuscita. Riprova.",
     "translationNotConfigured": "La traduzione non è configurata sul server. Contatta l’amministratore.",
-    "translationBasic": "Traduzione di base — controllala prima di pubblicare"
+    "translationBasic": "Traduzione di base — controllala prima di pubblicare",
+    "translationPartialTitle": "Salvato, mancano alcune lingue",
+    "translationPartial": "Il tuo annuncio è stato salvato. La traduzione automatica non ha funzionato per: {{langs}}. Apri l'annuncio e tocca una lingua per riprovare."
   },
   "assistant": {
     "title": "Assistente dell'annuncio",
@@ -479,7 +658,10 @@
     "placeholder": "Fai una domanda…",
     "thinking": "Sto pensando…",
     "unavailable": "Non posso rispondere ora. Contatta il venditore dalla pagina dell'annuncio.",
-    "disclaimer": "Le risposte dell'IA si basano solo sui dati dell'annuncio — verifica i dettagli importanti con il venditore."
+    "disclaimer": "Le risposte dell'IA si basano solo sui dati dell'annuncio — verifica i dettagli importanti con il venditore.",
+    "contactTitle": "Chiedi direttamente al venditore",
+    "notInListing": "L’annuncio non lo dice.",
+    "viewProfile": "Profilo"
   },
   "viewings": {
     "title": "Visite",
@@ -489,9 +671,12 @@
     "requestTitle": "Richiedi una",
     "requestTitleEm": "visita",
     "when": "Quando?",
+    "tiranaTime": "ora di Tirana",
+    "pickInTiranaTime": "Gli orari sono nell'ora di Tirana, dove si trova l'immobile.",
     "request": "Invia richiesta",
     "requestSuccess": "Richiesta inviata — riceverai una notifica alla conferma",
     "requestFailed": "Richiesta non riuscita — riprova",
+    "slotTaken": "Questo orario è già occupato. Scegli un altro orario.",
     "pastDate": "Scegli una data futura",
     "empty": "Nessuna visita ancora",
     "emptyHint": "Richiedine una dalla pagina di un immobile",
@@ -505,8 +690,12 @@
       "requested": "Richiesta",
       "confirmed": "Confermata",
       "declined": "Rifiutata",
-      "cancelled": "Annullata"
-    }
+      "cancelled": "Annullata",
+      "completed": "Completata",
+      "no_show": "Mancata presenza"
+    },
+    "markCompleted": "Effettuata",
+    "markNoShow": "Non presentato"
   },
   "saved": {
     "kicker": "Ricerche e richieste",
@@ -520,8 +709,8 @@
     "emptyWantedHint": "Pubblica cosa cerchi con il pulsante qui sopra",
     "run": "Avvia ricerca",
     "delete": "Elimina",
-    "alertsOn": "Attiva avvisi",
-    "alertsOff": "Disattiva avvisi",
+    "alertsOn": "Mostra nuovi risultati",
+    "alertsOff": "Non mostrare nuovi risultati",
     "markClosed": "Segna come trovata",
     "markOpen": "Riapri",
     "wantedStatus": {
@@ -529,7 +718,14 @@
       "closed": "Chiusa"
     },
     "newSearch": "Nuova ricerca",
-    "newWanted": "Nuova richiesta"
+    "newWanted": "Nuova richiesta",
+    "newMatches": "{{n}} in più dall'ultima volta",
+    "alertsHint": "Ti avviseremo quando ci saranno nuovi immobili corrispondenti. Gli avvisi via email non sono ancora disponibili.",
+    "emailOn": "Inviami via email i nuovi risultati",
+    "emailOff": "Non inviarmi più email",
+    "emailHint": "I nuovi risultati compaiono qui quando apri questa pagina. Attiva l'email per riceverli anche via email; ogni email ha un link per disattivarla.",
+    "confirmDeleteSearch": "Eliminare questa ricerca salvata?",
+    "confirmDeleteWanted": "Eliminare questa richiesta?"
   },
   "bell": {
     "label": "Notifiche",
@@ -539,6 +735,600 @@
   },
   "wanted": {
     "describePlaceholder": "Descrivi cosa cerchi… es. \"bilocale a Tirana fino a 150.000 €\"",
-    "matchesNow": "Annunci corrispondenti ora: {{n}}"
+    "matchesNow": "Annunci corrispondenti ora: {{n}}",
+    "boardPre": "Case",
+    "boardEm": "cercate",
+    "boardIntro": "Non trovi la casa che cerchi? Indica budget, città e stanze. Gli agenti vedono le richieste e ti avvisiamo appena viene pubblicata una casa adatta.",
+    "postCta": "Pubblica cosa cerchi",
+    "agentHint": "Quando pubblichi un annuncio adatto a una richiesta, l'acquirente viene avvisato automaticamente.",
+    "step1": "Indica città, tipo, budget e stanze che ti servono.",
+    "step2": "Gli agenti vedono la richiesta e cercano per te.",
+    "step3": "Ricevi una notifica appena compare una casa adatta.",
+    "homeSub": "Di' cosa cerchi, gli agenti ti trovano",
+    "homeTitle": "Case cercate"
+  },
+  "legal": {
+    "privacyPolicy": "Informativa sulla privacy",
+    "termsOfService": "Termini di servizio",
+    "lastUpdated": "Ultimo aggiornamento: {{date}}",
+    "languageNote": "Questo documento è disponibile in albanese e in inglese. Di seguito la versione inglese; prevale la versione albanese.",
+    "cookiePolicy": "Informativa sui cookie",
+    "buyingGuide": "Acquistare dall'estero",
+    "buyingGuideHint": "Passaggi, documenti e come restare al sicuro"
+  },
+  "safety": {
+    "reportListing": "Segnala questo annuncio",
+    "reportUser": "Segnala questo utente",
+    "blockUser": "Blocca utente",
+    "unblockUser": "Sblocca utente",
+    "menu": "Altre opzioni",
+    "reportTitle": "Qual è il problema?",
+    "reason": {
+      "spam": "Spam",
+      "scam": "Truffa",
+      "wrong_info": "Informazioni errate",
+      "unavailable": "Non più disponibile",
+      "offensive": "Contenuto offensivo",
+      "other": "Altro",
+      "inappropriate": "Comportamento inappropriato",
+      "fake_account": "Account falso",
+      "fraud": "Frode o attività sospetta",
+      "harassment": "Molestie"
+    },
+    "detailsPlaceholder": "C'è altro che dovremmo sapere? (facoltativo)",
+    "send": "Invia segnalazione",
+    "sent": "Grazie. Lo verificheremo.",
+    "already": "Hai già segnalato questo contenuto.",
+    "failed": "Impossibile inviare la segnalazione. Riprova.",
+    "blockConfirm": "Sei sicuro di voler bloccare {{name}}? Non potrete scrivervi finché non lo sblocchi.",
+    "blocked": "Hai bloccato questo utente. Non può inviarti messaggi.",
+    "cannotMessage": "Non puoi inviare messaggi a questo utente.",
+    "blockedBadge": "Bloccato",
+    "signInToReport": "Accedi per segnalare.",
+    "blockedUsers": "Utenti bloccati",
+    "noBlocked": "Non hai bloccato nessuno."
+  },
+  "notifications": {
+    "title": "Notifiche",
+    "off": "Le notifiche sono disattivate su questo telefono.",
+    "turnOn": "Attiva le notifiche",
+    "enabled": "Le notifiche sono attive su questo telefono.",
+    "denied": "Le notifiche sono disattivate nelle impostazioni del telefono.",
+    "openSettings": "Apri impostazioni",
+    "unavailable": "Le notifiche non funzionano ancora in questa versione dell'app.",
+    "messages": "Nuovi messaggi",
+    "viewings": "Richieste e modifiche delle visite",
+    "saveFailed": "La scelta non è stata salvata. Riprova.",
+    "privacy": "Una notifica dice solo chi ti ha scritto o cosa è successo a una visita, mai il testo del messaggio.",
+    "web": "Le notifiche arrivano solo nell'app per telefono.",
+    "registering": "Collegamento di questo telefono alle notifiche…",
+    "registerFailed": "Il permesso è attivo, ma questo telefono non è stato collegato alle notifiche. Riprova.",
+    "settingsHint": "Apri le Impostazioni del telefono, scegli Shtëpia.ime e attiva le Notifiche.",
+    "prefsNote": "Queste scelte sono salvate nel tuo account. Questo telefono non riceverà notifiche finché non le attivi.",
+    "loadFailed": "Impossibile caricare le notifiche.",
+    "saving": "Salvataggio…",
+    "all": "Tutte",
+    "unread": "Non lette",
+    "read": "Lette",
+    "unreadTag": "Non letta",
+    "markRead": "Segna come letta",
+    "markAll": "Segna tutte come lette",
+    "loadMore": "Carica altre",
+    "headlinePre": "Le tue",
+    "headlineEm": "notifiche",
+    "empty": "Ancora nessuna notifica",
+    "emptyHint": "Qui compariranno nuovi messaggi, visite e modifiche ai tuoi immobili.",
+    "emptyUnread": "Niente da leggere",
+    "emptyRead": "Nessuna notifica letta",
+    "inviteTitle": "Non perdere una risposta",
+    "inviteBody": "Attiva le notifiche per sapere subito quando qualcuno ti scrive o una visita cambia. Puoi modificarlo quando vuoi nel Profilo.",
+    "inviteLater": "Non ora",
+    "kinds": {
+      "message": {
+        "title": "Nuovo messaggio",
+        "body": "{{name}} ti ha scritto",
+        "bodyMany": "{{name}} ti ha inviato {{total}} messaggi",
+        "bodyNoName": "Hai un nuovo messaggio"
+      },
+      "inquiry": {
+        "title": "Nuova richiesta immobile",
+        "body": "{{name}} ha chiesto del tuo immobile",
+        "bodyNoName": "Qualcuno ha chiesto del tuo immobile"
+      },
+      "viewing_requested": {
+        "title": "Richiesta di visita",
+        "body": "Qualcuno vuole visitare il tuo immobile"
+      },
+      "viewing_updated": {
+        "title": "Visita aggiornata",
+        "confirmed": "La tua visita è confermata",
+        "declined": "La tua visita è stata rifiutata",
+        "cancelled": "Una visita è stata annullata",
+        "updated": "Una visita è stata aggiornata"
+      },
+      "listing_hidden": {
+        "title": "Annuncio nascosto",
+        "body": "Un tuo annuncio è nascosto durante la revisione"
+      },
+      "listing_restored": {
+        "title": "Annuncio ripristinato",
+        "body": "Il tuo annuncio è di nuovo pubblico"
+      },
+      "welcome": {
+        "title": "Benvenuto",
+        "body": "Il tuo account è pronto. Cerca case o pubblica il tuo annuncio."
+      },
+      "saved_search": {
+        "title": "Nuovi immobili per te",
+        "body": "Un nuovo immobile corrisponde alla tua ricerca",
+        "bodyMany": "{{total}} nuovi immobili corrispondono alla tua ricerca"
+      },
+      "wanted_match": {
+        "title": "Un immobile per la tua richiesta",
+        "body": "Un nuovo annuncio corrisponde alla casa che cerchi"
+      }
+    },
+    "settings": "Impostazioni notifiche"
+  },
+  "pricing": {
+    "title": "Piani e prezzi",
+    "subtitle": "Pubblicare annunci è gratis. Piani e promozioni sono prepagati e non si rinnovano da soli.",
+    "comingSoon": "I prezzi saranno pubblicati presto.",
+    "comingSoonHint": "Fino ad allora, pubblicare annunci resta gratis.",
+    "loadFailed": "Impossibile caricare i prezzi.",
+    "kindPlan": "Piano agenzia",
+    "kindPromotion": "Promozione annuncio",
+    "period": "Durata",
+    "months": "{{n}} mesi",
+    "perMonth": "≈ {{price}} al mese",
+    "listingCap": "Fino a {{n}} annunci attivi",
+    "credits": "{{n}} promozioni al mese incluse",
+    "prepaid": "Pagato una volta, senza rinnovo automatico",
+    "buy": "Acquista",
+    "signInToBuy": "Accedi per acquistare.",
+    "notYet": "Il pagamento online non è ancora disponibile.",
+    "startFailed": "Il pagamento non è partito. Riprova.",
+    "returnedDone": "Grazie. Il piano si attiva appena il fornitore di pagamento conferma il pagamento, di solito in pochi minuti.",
+    "returnedCancelled": "Il pagamento è stato annullato. Non ti è stato addebitato nulla."
+  },
+  "moderation": {
+    "title": "Moderazione",
+    "subtitle": "Segnalazioni degli utenti su annunci e account. Gli annunci nascosti restano offline finché non li ripristini.",
+    "notAllowed": "Questa pagina è riservata ai moderatori.",
+    "queue": {
+      "open": "Aperte",
+      "closed": "Chiuse"
+    },
+    "loadFailed": "Impossibile caricare le segnalazioni.",
+    "empty": "Nessuna segnalazione aperta. Tutto in ordine.",
+    "emptyClosed": "Ancora nessuna segnalazione chiusa.",
+    "listing": "Annuncio",
+    "user": "Utente",
+    "missingTarget": "Non esiste più",
+    "hiddenBadge": "Nascosto per verifica",
+    "hide": "Nascondi annuncio",
+    "restore": "Ripristina annuncio",
+    "markActioned": "Segna come gestita",
+    "dismiss": "Archivia",
+    "note": "Nota (facoltativa)",
+    "actionFailed": "Non ha funzionato. Riprova.",
+    "loadMore": "Carica altro",
+    "reportedOn": "Segnalato il {{date}}",
+    "status": {
+      "actioned": "Gestita",
+      "dismissed": "Archiviata"
+    }
+  },
+  "seo": {
+    "siteTitle": "Shtëpia.ime — Case in vendita e in affitto in Albania",
+    "siteDescription": "Appartamenti, ville e uffici in vendita e in affitto a Tirana, Durazzo e in tutta l'Albania. Contatta direttamente agenti e proprietari."
+  },
+  "security": {
+    "row": "Password e sicurezza",
+    "title": "Cambia password",
+    "currentPassword": "Password attuale",
+    "save": "Salva la nuova password",
+    "success": "La password è stata cambiata.",
+    "othersSignedOut": "Gli altri dispositivi sono stati disconnessi.",
+    "forgotCurrent": "Hai dimenticato la password attuale?",
+    "codeIntro": "Invieremo un codice a 6 cifre a {{email}}. Inseriscilo qui, poi scegli la nuova password.",
+    "providerOnly": "Accedi con {{providers}}, quindi non c’è una password Shtëpia.ime da cambiare. Il tuo account è protetto dal tuo account {{providers}}."
+  },
+  "authConfirm": {
+    "titleEmail": "Conferma la tua email",
+    "titleRecovery": "Reimposta la password",
+    "titleEmailChange": "Conferma la nuova email",
+    "intro": "Per la tua sicurezza, continua con il pulsante qui sotto.",
+    "ctaEmail": "Conferma e accedi",
+    "ctaRecovery": "Continua",
+    "ctaEmailChange": "Conferma nuova email",
+    "emailChanged": "L’indirizzo email è stato aggiornato.",
+    "requestNew": "Richiedi un nuovo codice",
+    "goSignIn": "Vai all’accesso"
+  },
+  "leads": {
+    "kicker": "I tuoi clienti",
+    "headlinePre": "Clienti",
+    "headlineEm": "potenziali",
+    "search": "Cerca per nome, telefono, email…",
+    "add": "Aggiungi cliente",
+    "addTitle": "Nuovo cliente",
+    "editTitle": "Modifica cliente",
+    "all": "Tutti",
+    "status": {
+      "new": "Nuovo",
+      "contacted": "Contattato",
+      "qualified": "Qualificato",
+      "won": "Acquisito",
+      "lost": "Perso"
+    },
+    "name": "Nome",
+    "phone": "Telefono",
+    "email": "Email",
+    "notes": "Note",
+    "notesHint": "es. cerca un bilocale a Tirana, fino a 150.000 €",
+    "statusLabel": "Stato",
+    "call": "Chiama",
+    "whatsapp": "WhatsApp",
+    "sendEmail": "Email",
+    "delete": "Elimina",
+    "deleteTitle": "Eliminare questo cliente?",
+    "deleteBody": "{{name}} verrà eliminato definitivamente.",
+    "empty": "Ancora nessun cliente",
+    "emptyHint": "Aggiungi chiunque ti contatti, così nessuna opportunità va persa.",
+    "noResults": "Nessun cliente corrisponde alla ricerca.",
+    "nameRequired": "Inserisci il nome del cliente.",
+    "tooLong": "Uno dei campi è troppo lungo.",
+    "phoneInvalid": "Non sembra un numero di telefono.",
+    "emailInvalid": "Non sembra un indirizzo email.",
+    "saveFailed": "Salvataggio non riuscito. Riprova.",
+    "deleteFailed": "Eliminazione non riuscita. Riprova.",
+    "greeting": "Ciao {{name}}!",
+    "added": "Aggiunto il {{date}}"
+  },
+  "aiAssistant": {
+    "title": "Assistente AI",
+    "subtitle": "Trova annunci reali, confrontali e scopri come funziona Shtëpia.ime.",
+    "intro": "Ciao! Dimmi cosa cerchi: trovo annunci su Shtëpia.ime, li confronto o ti spiego come funziona l'app.",
+    "placeholder": "Scrivi un messaggio…",
+    "thinking": "Sto cercando…",
+    "newChat": "Nuova chat",
+    "startersTitle": "Prova a chiedere",
+    "starters": {
+      "findApartment": "Trovami un appartamento",
+      "byBudget": "Cerca immobili nel mio budget",
+      "compare": "Confronta alcuni immobili",
+      "howItWorks": "Come funziona Shtëpia.ime?",
+      "publish": "Aiutami a pubblicare un immobile"
+    },
+    "error": {
+      "unavailable": "L'assistente non è disponibile ora. Riprova tra poco.",
+      "rate_limited": "Hai fatto molte domande in quest'ora. Riprova tra poco.",
+      "refused": "Non posso aiutarti con questa richiesta.",
+      "network": "Connessione non riuscita. Controlla internet e riprova."
+    },
+    "notSpecified": "Non specificato",
+    "disclaimer": "L'assistente usa gli annunci di Shtëpia.ime. Verifica i dettagli importanti con l'agente. Non è una consulenza finanziaria o legale.",
+    "you": "Tu",
+    "entry": "Chiedi all'assistente AI",
+    "entryHint": "es. \"Un 2+1 a Tirana fino a 150.000 €\"",
+    "alternatives": "Trova simili o più economici",
+    "alternativesQuestion": "Trovami immobili simili a questo o più economici.",
+    "compare": {
+      "title": "Confronto",
+      "price": "Prezzo",
+      "pricePerM2": "Prezzo al m²",
+      "area": "Superficie",
+      "bedrooms": "Camere",
+      "bathrooms": "Bagni",
+      "floor": "Piano",
+      "floorOf": "{{floor}} di {{total}}",
+      "location": "Posizione",
+      "amenities": "Caratteristiche",
+      "mixedCurrencies": "Valute diverse: i valori in euro sono approssimativi.",
+      "areaNote": "Superficie come da annuncio (m²); netta e lorda non sono registrate separatamente.",
+      "best": {
+        "price": "Il più economico",
+        "perM2": "Il più basso al m²",
+        "area": "Il più grande",
+        "beds": "Più camere"
+      }
+    },
+    "screens": {
+      "explore": "Apri la ricerca",
+      "favorites": "Preferiti",
+      "saved_searches": "Ricerche salvate",
+      "messages": "Messaggi",
+      "viewings": "Visite",
+      "create_listing": "Pubblica un immobile",
+      "my_listings": "I miei annunci",
+      "agent_dashboard": "Pannello agente",
+      "leads": "Clienti potenziali",
+      "profile": "Profilo",
+      "privacy": "Informativa privacy",
+      "terms": "Termini d'uso"
+    },
+    "results_one": "{{count}} immobile",
+    "results_many": "{{count}} immobili",
+    "results_other": "{{count}} immobili"
+  },
+  "time": {
+    "justNow": "adesso",
+    "minutesAgo": "{{n}} min fa",
+    "hoursAgo": "{{n}} h fa",
+    "daysAgo": "{{n}} g fa"
+  },
+  "performance": {
+    "entry": "Il mio report di rendimento",
+    "entrySub": "I tuoi risultati, visibili solo a te",
+    "kicker": "Il mio report",
+    "headlinePre": "Il mio",
+    "headlineEm": "rendimento.",
+    "privateNote": "Solo tu vedi questo report. Non viene confrontato con altri agenti e non appare sul tuo profilo.",
+    "agentsOnly": "Il report di rendimento è solo per gli agenti.",
+    "period": "Periodo",
+    "periods": {
+      "week": "Questa settimana",
+      "month": "Questo mese",
+      "3m": "Ultimi 3 mesi",
+      "6m": "Ultimi 6 mesi",
+      "year": "Quest'anno",
+      "all": "Da sempre",
+      "custom": "Scegli le date"
+    },
+    "from": "Dal",
+    "to": "Al",
+    "customInvalid": "La data di inizio deve precedere o coincidere con quella di fine.",
+    "sections": {
+      "properties": "I miei immobili",
+      "clients": "I miei clienti",
+      "deals": "Transazioni concluse",
+      "activity": "La mia attività",
+      "history": "Il mio andamento",
+      "impact": "Shtëpia.ime e i miei risultati",
+      "achievements": "I miei traguardi"
+    },
+    "metrics": {
+      "published": "Immobili pubblicati",
+      "activeNow": "Attivi ora",
+      "pausedNow": "In pausa ora",
+      "inquiries": "Nuove richieste dai clienti",
+      "clientsAnswered": "Clienti contattati",
+      "leadsAdded": "Contatti aggiunti",
+      "leadsWon": "Contatti acquisiti",
+      "viewingsScheduled": "Visite programmate",
+      "viewingsCompleted": "Visite effettuate",
+      "viewingsCancelled": "Visite annullate",
+      "sales": "Vendite",
+      "rentals": "Affitti",
+      "transactions": "Totale",
+      "messagesSent": "Messaggi inviati"
+    },
+    "notes": {
+      "snapshot": "Attivi e in pausa mostrano la situazione di oggi.",
+      "deals": "Conta gli immobili che hai segnato come venduti o affittati. Se annullato entro 7 giorni non conta. Il valore delle transazioni non è mostrato: l’app salva solo il prezzo richiesto.",
+      "leadsWon": "I contatti acquisiti sono tra quelli aggiunti in questo periodo."
+    },
+    "history": {
+      "since": "Su Shtëpia.ime dal {{date}}",
+      "listings": "Immobili",
+      "transactions": "Transazioni",
+      "viewings": "Visite",
+      "inquiries": "Richieste",
+      "chartLabel": "{{metric}} al mese",
+      "empty": "Ancora nessuna attività da mostrare."
+    },
+    "impact": {
+      "intro": "Confronta la media mensile registrata dall’app con la tua stima per il periodo prima di Shtëpia.ime.",
+      "disclaimer": "I valori \"prima\" sono una tua stima, non dati dell’app. È un confronto, non la prova che il cambiamento sia dovuto a Shtëpia.ime.",
+      "before": "Prima (tua stima)",
+      "now": "Ora (registrato)",
+      "difference": "Variazione",
+      "notEntered": "Nessuna stima",
+      "enter": "Aggiungi la tua stima",
+      "edit": "Modifica la stima",
+      "updated": "La tua stima, {{date}}",
+      "rows": {
+        "rentals": "Affitti al mese",
+        "sales": "Vendite al mese",
+        "inquiries": "Richieste dei clienti al mese",
+        "viewings": "Visite effettuate al mese"
+      }
+    },
+    "baseline": {
+      "title": "Prima di Shtëpia.ime",
+      "hint": "In media, quanti ne avevi al mese prima di usare Shtëpia.ime? Lascia vuoto ciò che non sai.",
+      "confirm": "Confermo che queste sono mie stime.",
+      "save": "Salva la stima",
+      "invalid": "Inserisci un numero da 0 a 1000.",
+      "mustConfirm": "Conferma la stima prima di salvarla.",
+      "saveFailed": "La stima non è stata salvata. Riprova."
+    },
+    "achievements": {
+      "firstListing": "Primo immobile pubblicato",
+      "firstTransaction": "Prima transazione conclusa",
+      "tenListings": "10 immobili pubblicati",
+      "tenViewings": "10 visite effettuate",
+      "tenTransactions": "10 transazioni concluse",
+      "progress": "{{value}} su {{target}}",
+      "done": "Raggiunto"
+    }
+  },
+  "agents": {
+    "headlinePre": "Agenzie",
+    "headlineEm": "e agenti",
+    "searchPlaceholder": "Cerca per nome",
+    "empty": "Ancora nessuna agenzia",
+    "emptyHint": "Le agenzie compaiono qui quando pubblicano un annuncio.",
+    "noResults": "Nessuno con questo nome",
+    "loadMore": "Carica altri"
+  },
+  "compare": {
+    "add": "Confronta",
+    "added": "Nel confronto",
+    "open": "Confronta · {{total}}",
+    "headlinePre": "Confronta",
+    "headlineEm": "gli immobili",
+    "empty": "Ancora nessun immobile da confrontare",
+    "emptyHint": "Apri un immobile e tocca Confronta. Puoi aggiungerne fino a tre.",
+    "browse": "Sfoglia gli immobili",
+    "remove": "Rimuovi dal confronto",
+    "clear": "Svuota il confronto",
+    "addAnother": "Aggiungi",
+    "yearBuilt": "Anno di costruzione",
+    "type": "Tipo",
+    "loadFailed": "Impossibile caricare il confronto.",
+    "yes": "Sì",
+    "no": "No"
+  },
+  "nearMe": {
+    "button": "Vicino a me",
+    "denied": "Consenti la posizione nelle impostazioni del telefono per vedere gli immobili vicini.",
+    "failed": "Non siamo riusciti a trovare la tua posizione. Riprova."
+  },
+  "import": {
+    "headlinePre": "Importa",
+    "headlineEm": "annunci",
+    "entry": "Importa annunci",
+    "intro": "Carica un file CSV con gli annunci del tuo ufficio. Vedrai il risultato prima della pubblicazione.",
+    "pick": "Scegli file CSV",
+    "required": "Colonne obbligatorie",
+    "optional": "Colonne facoltative",
+    "valuesHint": "lloji: shitje, qira o ditore. tipi: apartament, shtepi, vile, toke, biznes, zyre o garazh.",
+    "photosHint": "Foto: link https separati da |. Anche le caratteristiche vanno separate da |.",
+    "rightsHint": "Importa solo annunci e foto che hai il diritto di pubblicare.",
+    "ready": "pronti da pubblicare",
+    "withErrors": "con errori",
+    "publish": "Pubblica {{total}}",
+    "chooseAnother": "Scegli un altro file",
+    "publishing": "Pubblicazione {{done}} di {{total}}",
+    "doneBody": "{{ok}} pubblicati.",
+    "doneFailed": "{{total}} non pubblicati. Carica di nuovo il file: quelli già pubblicati vengono saltati.",
+    "another": "Importa un altro file",
+    "agentsOnly": "L'importazione è solo per gli agenti.",
+    "fileTooBig": "Il file è troppo grande (massimo 2 MB).",
+    "fileExcel": "Questo è un file Excel. Salvalo come CSV e riprova.",
+    "fileEmpty": "Il file è vuoto.",
+    "missingColumns": "Colonne mancanti: {{list}}",
+    "tooMany": "Massimo {{max}} annunci per file.",
+    "readFailed": "Impossibile leggere il file. Riprova.",
+    "line": "Riga {{n}}",
+    "more": "e altri {{total}}",
+    "err": {
+      "required": "Manca: {{field}}",
+      "invalid": "Non valido: {{field}}",
+      "duplicate": "Esiste già",
+      "encoding": "Caratteri danneggiati. Salva come CSV UTF-8."
+    }
+  },
+  "publicProfile": {
+    "agent": "Agente immobiliare",
+    "unnamed": "Utente",
+    "published": "Immobili pubblicati: {{n}}",
+    "listingsTitle": "Immobili pubblicati da questo utente",
+    "empty": "Nessun immobile pubblicato finora.",
+    "unavailable": "Questo profilo non è disponibile.",
+    "listingsFailed": "Impossibile caricare gli immobili.",
+    "open": "Apri il profilo di {{name}}",
+    "call": "Chiama {{phone}}"
+  },
+  "locations": {
+    "noMatch": "Nessun luogo corrisponde"
+  },
+  "currency": {
+    "title": "Mostra i prezzi in",
+    "asListed": "Come nell'annuncio",
+    "asListedShort": "Originale",
+    "converted": "Approssimativo, al cambio del giorno. Prezzo dell'annuncio: {{price}}"
+  },
+  "site": {
+    "nav": {
+      "search": "Cerca",
+      "agencies": "Agenzie"
+    },
+    "listHome": "Pubblica il tuo immobile",
+    "menu": "Menu",
+    "hero": {
+      "eyebrow": "Case in Albania, ovunque tu sia",
+      "title": "Trova la casa giusta",
+      "titleEm": "in Albania.",
+      "lead": "Appartamenti, ville e uffici in vendita e in affitto, nella tua lingua. Parla direttamente con agenti e proprietari."
+    },
+    "stats": {
+      "listings": "Annunci attivi",
+      "cities": "Città con annunci",
+      "agencies": "Agenzie e agenti",
+      "title": "Shtëpia.ime in numeri",
+      "body": "Numeri reali, letti direttamente dagli immobili pubblicati oggi."
+    },
+    "listings": {
+      "eyebrow": "Appena pubblicati",
+      "title": "Gli immobili più recenti"
+    },
+    "steps": {
+      "eyebrow": "Come funziona",
+      "title": "Dalla ricerca alle chiavi, passo dopo passo",
+      "search": {
+        "title": "Cerca",
+        "body": "Filtra per città, quartiere, prezzo e stanze, in elenco o sulla mappa."
+      },
+      "compare": {
+        "title": "Confronta",
+        "body": "Metti fino a tre case a confronto e guarda lo storico dei prezzi."
+      },
+      "visit": {
+        "title": "Visita",
+        "body": "Prenota una visita o scrivi all'agente nell'app, su WhatsApp o per telefono."
+      },
+      "buy": {
+        "title": "Compra in sicurezza",
+        "body": "Segui la nostra guida e affidati a un avvocato e un notaio abilitati per i passaggi legali."
+      }
+    },
+    "services": {
+      "eyebrow": "Cosa offriamo",
+      "title": "Tutto per trovare casa, in un unico posto",
+      "wanted": {
+        "title": "Case cercate",
+        "body": "Di' cosa cerchi e ti avvisiamo quando esce una casa adatta."
+      },
+      "priceHistory": {
+        "title": "Storico dei prezzi",
+        "body": "Guarda come è cambiato il prezzo di ogni annuncio dalla pubblicazione."
+      },
+      "currency": {
+        "title": "Prezzi nella tua valuta",
+        "body": "Guarda i prezzi in lek, euro, dollari o sterline, al cambio del giorno."
+      },
+      "viewings": {
+        "title": "Visite con un clic",
+        "body": "Scegli l'orario, l'agente conferma e ricevi una notifica."
+      },
+      "chat": {
+        "title": "Chat diretta",
+        "body": "Scrivi all'agente o al proprietario, con foto, senza intermediari."
+      },
+      "guide": {
+        "title": "Acquistare dall'estero",
+        "body": "I passaggi, i documenti e come comprare in sicurezza da lontano."
+      }
+    },
+    "cities": {
+      "eyebrow": "Città"
+    },
+    "cta": {
+      "title": "Pronto a trovare casa?",
+      "body": "Cerca gratis, o pubblica gratis il tuo immobile e raggiungi acquirenti in Albania e all'estero.",
+      "search": "Cerca case"
+    },
+    "footer": {
+      "explore": "Esplora",
+      "sell": "Vendi o affitta",
+      "legal": "Note legali",
+      "tagline": "Il mercato immobiliare dell'Albania, nella tua lingua.",
+      "copyright": "© {{year}} Jorgji Dhaskali. Tutti i diritti riservati.",
+      "contact": "Contatti"
+    },
+    "agentsOnly": "Questa pagina è solo per gli agenti."
   }
 }

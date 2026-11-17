@@ -1,7 +1,10 @@
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useRef } from 'react'
 import { supabase } from '../../../lib/supabase'
+import { applyPriceRange } from '../lib/priceRange'
+import { applyFreeText, applyZoneAndRef } from '../lib/searchFilters'
+import { debugWarn } from '../../../lib/debug'
 
-const PAGE_SIZE = 20
+const PAGE_SIZE = 24
 
 const SORTS = {
   newest: { column: 'created_at', ascending: false },
@@ -11,22 +14,22 @@ const SORTS = {
 
 // Filter predicates live in one place so the row query and the exact-count
 // query can never drift apart.
-// TODO: zona filter — properties has no `zone` column and NewListing never
-// captures one, so a Zona predicate would silently match zero rows. Add
-// `.eq('zone', zone)` here once the column exists and listings are backfilled.
-// TODO: id/referenca filter — not implemented yet.
-function applyFilters(query, { filter, listingType, city, minPrice, maxPrice, beds, baths, minArea, maxArea }) {
+// Zone and reference (F19): zone only counts with the city it belongs to;
+// a reference is exact (properties.ref_code, see lib/searchFilters.js).
+function applyFilters(query, { filter, listingType, city, zone, refCode, minPrice, maxPrice, beds, baths, minArea, maxArea }) {
   if (filter && filter !== 'all') query = query.eq('property_type', filter)
   if (listingType) query = query.eq('listing_type', listingType)
-  if (city) query = query.ilike('city', `%${city}%`)
-  if (minPrice != null) query = query.gte('price', minPrice)
-  if (maxPrice != null) query = query.lte('price', maxPrice)
+  // Free text searches city, zone and address — a partial road name
+  // ("Kavaj") must find listings even though it is not a city name.
+  query = applyFreeText(query, city)
+  // Euros, compared per listing currency (lib/priceRange.js).
+  query = applyPriceRange(query, { minPrice, maxPrice })
   if (beds != null) query = query.gte('beds', beds)
   if (baths != null) query = query.gte('baths', baths)
   // `sqft` is the surface column; it stores m², which is what the UI labels it.
   if (minArea != null) query = query.gte('sqft', minArea)
   if (maxArea != null) query = query.lte('sqft', maxArea)
-  return query
+  return applyZoneAndRef(query, { city, zone, ref: refCode })
 }
 
 function buildQuery(filters) {
@@ -36,7 +39,10 @@ function buildQuery(filters) {
       .from('properties')
       .select('*')
       .eq('status', 'active')
-      .order(order.column, { ascending: order.ascending }),
+      .order(order.column, { ascending: order.ascending })
+      // Rows with the same price or date have no order of their own, so the
+      // pages of one search could repeat or skip them; the id settles it.
+      .order('id', { ascending: true }),
     filters,
   )
 }
@@ -54,20 +60,28 @@ function buildCountQuery(filters) {
   )
 }
 
-export function useProperties({ filter = 'all', listingType = null, city = null, minPrice = null, maxPrice = null, beds = null, baths = null, minArea = null, maxArea = null, paginate = false, limit = null, sort = 'newest' } = {}) {
+export function useProperties({ filter = 'all', listingType = null, city = null, zone = null, refCode = null, minPrice = null, maxPrice = null, beds = null, baths = null, minArea = null, maxArea = null, paginate = false, limit = null, sort = 'newest' } = {}) {
   const [properties, setProperties] = useState([])
   const [loading, setLoading] = useState(true)
   const [loadingMore, setLoadingMore] = useState(false)
   const [error, setError] = useState(null)
   const [hasMore, setHasMore] = useState(false)
+  const [loadMoreFailed, setLoadMoreFailed] = useState(false)
   const [totalCount, setTotalCount] = useState(0)
+  // Bumped whenever the filters change, so a "load more" page that was still
+  // on its way for the previous filters is dropped instead of being appended
+  // to the new results.
+  const generation = useRef(0)
 
   useEffect(() => {
     let active = true
+    generation.current += 1
     setLoading(true)
+    setLoadingMore(false)
+    setLoadMoreFailed(false)
     setError(null)
 
-    const filters = { filter, listingType, city, minPrice, maxPrice, beds, baths, minArea, maxArea, sort }
+    const filters = { filter, listingType, city, zone, refCode, minPrice, maxPrice, beds, baths, minArea, maxArea, sort }
     const query = buildQuery(filters)
     const limited = paginate ? query.range(0, PAGE_SIZE - 1) : limit ? query.limit(limit) : query
 
@@ -77,7 +91,7 @@ export function useProperties({ filter = 'all', listingType = null, city = null,
         // Same rule as useProperty(): the driver's text describes our schema
         // and is English-only, so it stays in the console for debugging and
         // the UI shows a localized message instead.
-        console.error('useProperties failed:', err.message)
+        debugWarn('useProperties', err)
         setError(true)
       } else {
         setProperties(data || [])
@@ -94,28 +108,43 @@ export function useProperties({ filter = 'all', listingType = null, city = null,
     })
 
     return () => { active = false }
-  }, [filter, listingType, city, minPrice, maxPrice, beds, baths, minArea, maxArea, paginate, limit, sort])
+  }, [filter, listingType, city, zone, refCode, minPrice, maxPrice, beds, baths, minArea, maxArea, paginate, limit, sort])
 
   const loadMore = useCallback(() => {
     if (!paginate || loadingMore || !hasMore) return
+    const requested = generation.current
     setLoadingMore(true)
+    setLoadMoreFailed(false)
 
-    const query = buildQuery({ filter, listingType, city, minPrice, maxPrice, beds, baths, minArea, maxArea, sort })
+    const query = buildQuery({ filter, listingType, city, zone, refCode, minPrice, maxPrice, beds, baths, minArea, maxArea, sort })
     query.range(properties.length, properties.length + PAGE_SIZE - 1)
-      .then(({ data }) => {
-        const newItems = data || []
-        setProperties(prev => [...prev, ...newItems])
-        setHasMore(newItems.length === PAGE_SIZE)
+      .then(({ data, error: err }) => {
+        if (requested !== generation.current) return
+        if (err) {
+          // Keep hasMore, so the same button offers to try again.
+          debugWarn('useProperties loadMore', err)
+          setLoadMoreFailed(true)
+        } else {
+          const newItems = data || []
+          setProperties(prev => [...prev, ...newItems.filter(p => !prev.some(q => q.id === p.id))])
+          setHasMore(newItems.length === PAGE_SIZE)
+        }
         setLoadingMore(false)
       })
-  }, [filter, listingType, city, minPrice, maxPrice, beds, baths, minArea, maxArea, paginate, sort, loadingMore, hasMore, properties.length])
+  }, [filter, listingType, city, zone, refCode, minPrice, maxPrice, beds, baths, minArea, maxArea, paginate, sort, loadingMore, hasMore, properties.length])
 
-  return { properties, loading, loadingMore, error, hasMore, loadMore, totalCount }
+  return { properties, loading, loadingMore, loadMoreFailed, error, hasMore, loadMore, totalCount }
 }
 
 export function usePropertiesByIds(ids = []) {
   const [properties, setProperties] = useState([])
   const [loading, setLoading] = useState(true)
+
+  // Callers pass a fresh array literal every render, so depending on `ids`
+  // directly would refetch on every render. Keying on the serialized contents
+  // is the intent; naming it also lets the linter check the dependency
+  // statically instead of flagging an inline expression.
+  const idsKey = JSON.stringify(ids)
 
   useEffect(() => {
     if (!ids.length) { setProperties([]); setLoading(false); return }
@@ -134,7 +163,9 @@ export function usePropertiesByIds(ids = []) {
       })
 
     return () => { active = false }
-  }, [JSON.stringify(ids)])
+    // `ids` itself is intentionally absent: idsKey above is its value-identity.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [idsKey])
 
   return { properties, loading }
 }
@@ -166,7 +197,7 @@ export function useProperty(id) {
           // The real message stays available for debugging, but never reaches
           // the UI: it is untranslated and describes our database, not
           // anything the visitor can act on.
-          console.error('useProperty failed:', err.message)
+          debugWarn('useProperty', err)
           setError(true)
         } else {
           setProperty(data)

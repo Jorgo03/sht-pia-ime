@@ -1,21 +1,45 @@
+import { SignInPrompt } from '@/components/ui/sign-in-prompt';
+import { LoadError } from '@/components/ui/load-error';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useRouter, type Href } from 'expo-router';
+import { useLocalSearchParams, useRouter, type Href } from 'expo-router';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, Modal, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import {
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+  useWindowDimensions,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 
 import { AppHeader } from '@/components/ui/app-header';
+import { ScreenHero } from '@/components/ui/screen-hero';
 import { PrimaryCTA } from '@/components/ui/buttons';
 import { GradientBackground } from '@/components/ui/gradient-background';
+import { KeyboardDoneBar } from '@/components/ui/keyboard-done-bar';
 import { type AtticoPalette, Fonts } from '@/constants/theme';
+import { confirmAction } from '@/lib/confirm';
 import { useAuth } from '@/contexts/auth-context';
 import { useFilters } from '@/contexts/filters-context';
 import { useTheme } from '@/contexts/theme-context';
 import { supabase } from '@/lib/supabase';
 import { formatDate, formatPrice } from '@/lib/format';
 import { PropertyFilters } from '@/data/types';
+import { countMatches, markSeen, newMatchCount, setEmailAlerts } from '@/src/features/saved-searches/lib/matches';
+import { sheetColumn } from '@/constants/web-frame';
+import { FORM_LIMITS, inIntRange } from '@/src/lib/formLimits';
+import { useReadableColumn } from '@/hooks/use-responsive';
+
+// Email alerts are offered only once sending is configured (docs/LAUNCH_TASKS.md F13).
+const EMAIL_ALERTS = process.env.EXPO_PUBLIC_EMAIL_ALERTS === 'true';
 
 type Tab = 'searches' | 'wanted';
 type ListingType = 'sale' | 'rent';
@@ -29,6 +53,11 @@ interface SavedSearch {
   // read defensively so a saved search stays fully replayable if the web
   // create form grows those fields later.
   filters: {
+    zone?: string | null;
+    baths?: number | null;
+    minArea?: number | null;
+    maxArea?: number | null;
+    features?: string[] | null;
     city?: string | null;
     listing_type?: ListingType | null;
     type?: string | null;
@@ -37,6 +66,8 @@ interface SavedSearch {
     beds?: number | null;
   } | null;
   alerts_enabled: boolean;
+  email_alerts?: boolean;
+  last_match_count: number | null;
   created_at: string;
 }
 
@@ -54,16 +85,29 @@ interface WantedHome {
 export default function SavedSearchesScreen() {
   const router = useRouter();
   const { t, i18n } = useTranslation();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const { setFilter, reset: resetFilters } = useFilters();
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
-  const [tab, setTab] = useState<Tab>('searches');
+  // The window, not the 720px app column this screen is drawn in: the form
+  // opens over the whole page, so a wide window gets a centred dialog.
+  const { width: windowWidth } = useWindowDimensions();
+  const desktopWeb = Platform.OS === 'web' && windowWidth >= 1024;
+  // A centred column on an unfolded Fold or a spanned Duo (hooks/use-responsive).
+  const readable = useReadableColumn();
+  // `?tab=wanted&new=1` (the wanted-homes board's button) opens straight on
+  // the new-request form.
+  const params = useLocalSearchParams<{ tab?: string; new?: string }>();
+  const [tab, setTab] = useState<Tab>(params.tab === 'wanted' ? 'wanted' : 'searches');
   const [searches, setSearches] = useState<SavedSearch[]>([]);
   const [wanted, setWanted] = useState<WantedHome[]>([]);
   const [loading, setLoading] = useState(true);
+  // A failed read: shown with a retry rather than as an empty list.
+  const [loadError, setLoadError] = useState(false);
   const [actionError, setActionError] = useState(false);
-  const [formOpen, setFormOpen] = useState(false);
+  const [formOpen, setFormOpen] = useState(params.tab === 'wanted' && params.new === '1');
+  // Current number of matching listings per saved search (id -> count|null).
+  const [matchCounts, setMatchCounts] = useState<Record<string, number | null>>({});
 
   // New-search form fields
   const [searchName, setSearchName] = useState('');
@@ -92,20 +136,45 @@ export default function SavedSearchesScreen() {
       supabase.from('saved_searches').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
       supabase.from('wanted_homes').select('*').eq('client_id', user.id).order('created_at', { ascending: false }),
     ]);
-    setSearches(s.data ?? []);
+    if (s.error || w.error) {
+      setLoadError(true);
+      setLoading(false);
+      return;
+    }
+    setLoadError(false);
+    const rows: SavedSearch[] = s.data ?? [];
+    setSearches(rows);
     setWanted(w.data ?? []);
     setLoading(false);
+    // In-app "alerts": count matches now; the badge compares with last time.
+    const counts = await Promise.all(rows.map((r) => (r.alerts_enabled ? countMatches(supabase, r.filters) : null)));
+    setMatchCounts(Object.fromEntries(rows.map((r, i) => [r.id, counts[i]])));
   }, [user]);
 
   useEffect(() => {
     load();
   }, [load]);
 
+  const toggleEmail = async (row: SavedSearch) => {
+    const next = !row.email_alerts;
+    if (!(await setEmailAlerts(supabase, row.id, next))) return flashError();
+    setSearches((prev) => prev.map((s) => (s.id === row.id ? { ...s, email_alerts: next } : s)));
+  };
+
   const toggleAlerts = async (row: SavedSearch) => {
     const next = !row.alerts_enabled;
     const { error } = await supabase.from('saved_searches').update({ alerts_enabled: next }).eq('id', row.id);
     if (error) return flashError();
     setSearches((prev) => prev.map((s) => (s.id === row.id ? { ...s, alerts_enabled: next } : s)));
+    // Turning it on starts from what matches now, so the badge never counts
+    // listings that were already there.
+    if (next) {
+      const current = await countMatches(supabase, row.filters);
+      if (await markSeen(supabase, row.id, current)) {
+        setSearches((prev) => prev.map((s) => (s.id === row.id ? { ...s, last_match_count: current } : s)));
+      }
+      setMatchCounts((prev) => ({ ...prev, [row.id]: current }));
+    }
   };
 
   const deleteSearch = async (id: string) => {
@@ -114,7 +183,27 @@ export default function SavedSearchesScreen() {
     setSearches((prev) => prev.filter((s) => s.id !== id));
   };
 
+  const askDeleteSearch = (id: string) =>
+    confirmAction({
+      title: t('saved.confirmDeleteSearch'),
+      confirmText: t('saved.delete'),
+      cancelText: t('common.cancel'),
+      destructive: true,
+      onConfirm: () => deleteSearch(id),
+    });
+
+  const askDeleteWanted = (id: string) =>
+    confirmAction({
+      title: t('saved.confirmDeleteWanted'),
+      confirmText: t('saved.delete'),
+      cancelText: t('common.cancel'),
+      destructive: true,
+      onConfirm: () => deleteWanted(id),
+    });
+
   const runSearch = (row: SavedSearch) => {
+    // Opening a saved search counts as seeing its current matches.
+    void markSeen(supabase, row.id, matchCounts[row.id]);
     resetFilters();
     const f = row.filters;
     if (f?.city) setFilter('city', f.city);
@@ -123,6 +212,11 @@ export default function SavedSearchesScreen() {
     if (f?.minPrice) setFilter('minPrice', f.minPrice);
     if (f?.maxPrice) setFilter('maxPrice', f.maxPrice);
     if (f?.beds) setFilter('beds', f.beds);
+    if (f?.zone) setFilter('zone', f.zone);
+    if (f?.baths) setFilter('baths', f.baths);
+    if (f?.minArea) setFilter('minArea', f.minArea);
+    if (f?.maxArea) setFilter('maxArea', f.maxArea);
+    if (f?.features?.length) setFilter('features', f.features);
     router.push('/(tabs)/explore' as Href);
   };
 
@@ -142,11 +236,15 @@ export default function SavedSearchesScreen() {
   const submitSearch = async () => {
     if (!searchName.trim() || !user) return;
     setSaving(true);
+    const filters = { city: searchCity.trim() || null, listing_type: searchType };
+    // Start from what matches today, so only later listings count as new.
+    const current = await countMatches(supabase, filters);
     const { error } = await supabase.from('saved_searches').insert({
       user_id: user.id,
       name: searchName.trim(),
-      filters: { city: searchCity.trim() || null, listing_type: searchType },
+      filters,
       alerts_enabled: true,
+      last_match_count: current ?? 0,
     });
     setSaving(false);
     if (error) return flashError();
@@ -158,6 +256,10 @@ export default function SavedSearchesScreen() {
 
   const submitWanted = async () => {
     if (!wantedCity.trim() || !user) return;
+    // The same ranges the database checks (wanted_homes_*_range).
+    if (!inIntRange(wantedMaxPrice, 1, FORM_LIMITS.maxPrice) || !inIntRange(wantedMinBeds, 0, FORM_LIMITS.maxBedrooms)) {
+      return flashError();
+    }
     setSaving(true);
     const { error } = await supabase.from('wanted_homes').insert({
       client_id: user.id,
@@ -177,24 +279,21 @@ export default function SavedSearchesScreen() {
     load();
   };
 
+  // Signed out: ask to sign in, not an empty "nothing yet" screen (website audit).
+  if (!user) return authLoading ? null : <SignInPrompt />;
   return (
     <GradientBackground>
-      <SafeAreaView style={styles.container} edges={['top']}>
+      <SafeAreaView style={[styles.container, readable]} edges={['top']}>
         <AppHeader onBack={() => router.back()} />
 
         {/* Matches web's SavedSearches.jsx screen-kicker/screen-headline hero. */}
-        <View style={styles.heroBlock}>
-          <View style={styles.kickerRow}>
-            <View style={styles.kickerDash} />
-            <Text style={styles.kicker}>{t('saved.kicker')}</Text>
-          </View>
-          <Text style={styles.headline}>
-            {t('saved.headlinePre')} <Text style={styles.headlineEm}>{t('saved.headlineEm')}</Text>
-          </Text>
-        </View>
+        <ScreenHero
+          pre={t('saved.headlinePre')}
+          em={t('saved.headlineEm')}
+        />
 
         <View style={styles.tabRow}>
-          <TouchableOpacity onPress={() => setTab('searches')} activeOpacity={0.85} style={styles.segmentWrap}>
+          <TouchableOpacity accessibilityRole="button" onPress={() => setTab('searches')} activeOpacity={0.85} style={styles.segmentWrap}>
             {tab === 'searches' ? (
               <LinearGradient colors={[colors.accent, colors.accentEnd]} style={styles.tab}>
                 <Text style={[styles.tabText, styles.tabTextActive]}>
@@ -207,7 +306,7 @@ export default function SavedSearchesScreen() {
               </View>
             )}
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => setTab('wanted')} activeOpacity={0.85} style={styles.segmentWrap}>
+          <TouchableOpacity accessibilityRole="button" onPress={() => setTab('wanted')} activeOpacity={0.85} style={styles.segmentWrap}>
             {tab === 'wanted' ? (
               <LinearGradient colors={[colors.accent, colors.accentEnd]} style={styles.tab}>
                 <Text style={[styles.tabText, styles.tabTextActive]}>
@@ -224,7 +323,7 @@ export default function SavedSearchesScreen() {
 
         {/* Matches web's .pill-btn "+ New Search/Wanted" placed below the
             tabs, not a corner icon button in the header. */}
-        <TouchableOpacity style={styles.addPill} onPress={() => setFormOpen(true)} activeOpacity={0.7}>
+        <TouchableOpacity accessibilityRole="button" style={styles.addPill} onPress={() => setFormOpen(true)} activeOpacity={0.7}>
           <MaterialIcons name="add" size={14} color={colors.textPrimary} />
           <Text style={styles.addPillText}>
             {tab === 'searches' ? t('saved.newSearch') : t('saved.newWanted')}
@@ -237,6 +336,13 @@ export default function SavedSearchesScreen() {
           <View style={styles.center}>
             <ActivityIndicator size="large" color={colors.accent} />
           </View>
+        ) : loadError ? (
+          <LoadError
+            onRetry={() => {
+              setLoading(true);
+              load();
+            }}
+          />
         ) : (
           <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
             {tab === 'searches' ? (
@@ -247,7 +353,9 @@ export default function SavedSearchesScreen() {
                   <Text style={styles.emptyHint}>{t('saved.emptySearchesHint')}</Text>
                 </View>
               ) : (
-                searches.map((s) => (
+                <>
+                <Text style={styles.alertsHint}>{EMAIL_ALERTS ? t('saved.emailHint') : t('saved.alertsHint')}</Text>
+                {searches.map((s) => (
                   <View key={s.id} style={styles.card}>
                     <View style={styles.cardHead}>
                       <Text style={styles.cardTitle}>{s.name}</Text>
@@ -263,8 +371,14 @@ export default function SavedSearchesScreen() {
                         <Text style={styles.cardMeta}>{t(`listing.type.${s.filters.listing_type}`, s.filters.listing_type)}</Text>
                       ) : null}
                     </View>
+                    {s.alerts_enabled && newMatchCount(matchCounts[s.id], s.last_match_count) > 0 ? (
+                      <Text style={styles.newBadge} accessibilityLiveRegion="polite">
+                        {t('saved.newMatches', { n: newMatchCount(matchCounts[s.id], s.last_match_count) })}
+                      </Text>
+                    ) : null}
                     <View style={styles.cardActions}>
                       <TouchableOpacity
+                        accessibilityRole="button"
                         style={styles.actionButton}
                         onPress={() => runSearch(s)}
                         activeOpacity={0.7}
@@ -273,26 +387,44 @@ export default function SavedSearchesScreen() {
                         <Text style={styles.actionButtonText}>{t('saved.run')}</Text>
                       </TouchableOpacity>
                       <TouchableOpacity
+                        accessibilityRole="button"
                         style={styles.iconButton}
                         onPress={() => toggleAlerts(s)}
                         activeOpacity={0.7}
                         accessibilityLabel={s.alerts_enabled ? t('saved.alertsOff') : t('saved.alertsOn')}>
                         <MaterialIcons
                           name={s.alerts_enabled ? 'notifications' : 'notifications-off'}
-                          size={16}
+                          size={20}
                           color={colors.textPrimary}
                         />
                       </TouchableOpacity>
+                      {EMAIL_ALERTS ? (
+                        <TouchableOpacity
+                          style={styles.iconButton}
+                          onPress={() => toggleEmail(s)}
+                          activeOpacity={0.7}
+                          accessibilityRole="switch"
+                          accessibilityState={{ checked: Boolean(s.email_alerts) }}
+                          accessibilityLabel={s.email_alerts ? t('saved.emailOff') : t('saved.emailOn')}>
+                          <MaterialIcons
+                            name={s.email_alerts ? 'mark-email-read' : 'unsubscribe'}
+                            size={20}
+                            color={colors.textPrimary}
+                          />
+                        </TouchableOpacity>
+                      ) : null}
                       <TouchableOpacity
+                        accessibilityRole="button"
                         style={styles.iconButton}
-                        onPress={() => deleteSearch(s.id)}
+                        onPress={() => askDeleteSearch(s.id)}
                         activeOpacity={0.7}
                         accessibilityLabel={t('saved.delete')}>
-                        <MaterialIcons name="delete-outline" size={16} color="#e74c3c" />
+                        <MaterialIcons name="delete-outline" size={20} color="#e74c3c" />
                       </TouchableOpacity>
                     </View>
                   </View>
-                ))
+                ))}
+                </>
               )
             ) : wanted.length === 0 ? (
               <View style={styles.emptyCard}>
@@ -329,17 +461,18 @@ export default function SavedSearchesScreen() {
                     </View>
                     {w.notes ? <Text style={styles.cardMeta}>{w.notes}</Text> : null}
                     <View style={styles.cardActions}>
-                      <TouchableOpacity style={styles.actionButton} onPress={() => closeWanted(w)} activeOpacity={0.7}>
+                      <TouchableOpacity accessibilityRole="button" style={styles.actionButton} onPress={() => closeWanted(w)} activeOpacity={0.7}>
                         <Text style={styles.actionButtonText}>
                           {w.status === 'open' ? t('saved.markClosed') : t('saved.markOpen')}
                         </Text>
                       </TouchableOpacity>
                       <TouchableOpacity
+                        accessibilityRole="button"
                         style={styles.iconButton}
-                        onPress={() => deleteWanted(w.id)}
+                        onPress={() => askDeleteWanted(w.id)}
                         activeOpacity={0.7}
                         accessibilityLabel={t('saved.delete')}>
-                        <MaterialIcons name="delete-outline" size={16} color="#e74c3c" />
+                        <MaterialIcons name="delete-outline" size={20} color="#e74c3c" />
                       </TouchableOpacity>
                     </View>
                   </View>
@@ -350,117 +483,131 @@ export default function SavedSearchesScreen() {
         )}
       </SafeAreaView>
 
-      <Modal visible={formOpen} transparent animationType="slide" onRequestClose={() => setFormOpen(false)}>
-        <View style={styles.modalBackdrop}>
-          <View style={styles.modalSheet}>
+      <Modal visible={formOpen} transparent animationType={desktopWeb ? 'fade' : 'slide'} onRequestClose={() => setFormOpen(false)}>
+        <KeyboardAvoidingView
+          style={[styles.modalBackdrop, desktopWeb && styles.modalBackdropCentered]}
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+          {/* Desktop website: a centred dialog, not a phone sheet from the bottom. */}
+          <View style={[styles.modalSheet, sheetColumn, desktopWeb && styles.modalDialog]}>
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>
                 {tab === 'searches' ? t('saved.newSearch') : t('saved.newWanted')}
               </Text>
-              <TouchableOpacity onPress={() => setFormOpen(false)} hitSlop={8}>
+              <TouchableOpacity accessibilityRole="button" accessibilityLabel={t('common.close')} onPress={() => setFormOpen(false)} hitSlop={8}>
                 <MaterialIcons name="close" size={22} color={colors.textSecondary} />
               </TouchableOpacity>
             </View>
-
-            {tab === 'searches' ? (
-              <>
-                <TextInput
-                  style={styles.input}
-                  placeholder={t('addSheet.searchName')}
-                  placeholderTextColor={colors.textSecondary}
-                  value={searchName}
-                  onChangeText={setSearchName}
-                />
-                <TextInput
-                  style={styles.input}
-                  placeholder={t('listing.city')}
-                  placeholderTextColor={colors.textSecondary}
-                  value={searchCity}
-                  onChangeText={setSearchCity}
-                />
-                <View style={styles.toggleRow}>
-                  {(['sale', 'rent'] as const).map((typ) => (
-                    <TouchableOpacity
-                      key={typ}
-                      style={[styles.toggle, searchType === typ && styles.toggleActive]}
-                      onPress={() => setSearchType(typ)}
-                      activeOpacity={0.7}>
-                      <Text style={[styles.toggleText, searchType === typ && styles.toggleTextActive]}>
-                        {typ === 'sale' ? t('search.sale') : t('search.rent')}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-                {/* Web's AddSheet submits are `.cta-pill`, no trailing glyph. */}
-                <PrimaryCTA
-                  label={saving ? t('common.loading') : t('common.save')}
-                  icon={null}
-                  loading={saving}
-                  onPress={submitSearch}
-                  disabled={saving || !searchName.trim()}
-                />
-              </>
-            ) : (
-              <>
-                <TextInput
-                  style={styles.input}
-                  placeholder={t('listing.city')}
-                  placeholderTextColor={colors.textSecondary}
-                  value={wantedCity}
-                  onChangeText={setWantedCity}
-                />
-                <View style={styles.toggleRow}>
-                  {(['sale', 'rent'] as const).map((typ) => (
-                    <TouchableOpacity
-                      key={typ}
-                      style={[styles.toggle, wantedType === typ && styles.toggleActive]}
-                      onPress={() => setWantedType(typ)}
-                      activeOpacity={0.7}>
-                      <Text style={[styles.toggleText, wantedType === typ && styles.toggleTextActive]}>
-                        {typ === 'sale' ? t('search.sale') : t('search.rent')}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-                <View style={styles.rowInputs}>
+            {/* Capped and scrolling (edit-profile-sheet's pattern): the
+                wanted form (4 inputs, toggles, CTA) pushed its header off the
+                top on 360x380, and on any phone once the keyboard opened. */}
+            <ScrollView contentContainerStyle={styles.modalBody} keyboardShouldPersistTaps="handled">
+              {tab === 'searches' ? (
+                <>
                   <TextInput
-                    style={[styles.input, styles.rowInput]}
-                    placeholder={t('addSheet.maxPrice')}
+                    style={styles.input}
+                    placeholder={t('addSheet.searchName')}
                     placeholderTextColor={colors.textSecondary}
-                    value={wantedMaxPrice}
-                    onChangeText={setWantedMaxPrice}
-                    keyboardType="numeric"
+                    value={searchName}
+                    maxLength={FORM_LIMITS.savedSearchName}
+                    onChangeText={setSearchName}
                   />
                   <TextInput
-                    style={[styles.input, styles.rowInput]}
-                    placeholder={t('addSheet.minBedrooms')}
+                    style={styles.input}
+                    placeholder={t('listing.city')}
                     placeholderTextColor={colors.textSecondary}
-                    value={wantedMinBeds}
-                    onChangeText={setWantedMinBeds}
-                    keyboardType="numeric"
+                    value={searchCity}
+                    maxLength={FORM_LIMITS.city}
+                    onChangeText={setSearchCity}
                   />
-                </View>
-                <TextInput
-                  style={[styles.input, styles.textArea]}
-                  placeholder={t('addSheet.notes')}
-                  placeholderTextColor={colors.textSecondary}
-                  value={wantedNotes}
-                  onChangeText={setWantedNotes}
-                  multiline
-                  numberOfLines={3}
-                  textAlignVertical="top"
-                />
-                <PrimaryCTA
-                  label={saving ? t('common.loading') : t('common.save')}
-                  icon={null}
-                  loading={saving}
-                  onPress={submitWanted}
-                  disabled={saving || !wantedCity.trim()}
-                />
-              </>
-            )}
+                  <View style={styles.toggleRow}>
+                    {(['sale', 'rent'] as const).map((typ) => (
+                      <TouchableOpacity
+                        accessibilityRole="button"
+                        key={typ}
+                        style={[styles.toggle, searchType === typ && styles.toggleActive]}
+                        onPress={() => setSearchType(typ)}
+                        activeOpacity={0.7}>
+                        <Text style={[styles.toggleText, searchType === typ && styles.toggleTextActive]}>
+                          {typ === 'sale' ? t('search.sale') : t('search.rent')}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                  {/* Web's AddSheet submits are `.cta-pill`, no trailing glyph. */}
+                  <PrimaryCTA
+                    label={saving ? t('common.loading') : t('common.save')}
+                    icon={null}
+                    loading={saving}
+                    onPress={submitSearch}
+                    disabled={saving || !searchName.trim()}
+                  />
+                </>
+              ) : (
+                <>
+                  <TextInput
+                    style={styles.input}
+                    placeholder={t('listing.city')}
+                    placeholderTextColor={colors.textSecondary}
+                    value={wantedCity}
+                    maxLength={FORM_LIMITS.city}
+                    onChangeText={setWantedCity}
+                  />
+                  <View style={styles.toggleRow}>
+                    {(['sale', 'rent'] as const).map((typ) => (
+                      <TouchableOpacity
+                        accessibilityRole="button"
+                        key={typ}
+                        style={[styles.toggle, wantedType === typ && styles.toggleActive]}
+                        onPress={() => setWantedType(typ)}
+                        activeOpacity={0.7}>
+                        <Text style={[styles.toggleText, wantedType === typ && styles.toggleTextActive]}>
+                          {typ === 'sale' ? t('search.sale') : t('search.rent')}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                  <View style={styles.rowInputs}>
+                    <TextInput
+                      style={[styles.input, styles.rowInput]}
+                      placeholder={t('addSheet.maxPrice')}
+                      placeholderTextColor={colors.textSecondary}
+                      value={wantedMaxPrice}
+                      onChangeText={setWantedMaxPrice}
+                      keyboardType="numeric"
+                    />
+                    <TextInput
+                      style={[styles.input, styles.rowInput]}
+                      placeholder={t('addSheet.minBedrooms')}
+                      placeholderTextColor={colors.textSecondary}
+                      value={wantedMinBeds}
+                      onChangeText={setWantedMinBeds}
+                      keyboardType="numeric"
+                    />
+                  </View>
+                  <TextInput
+                    style={[styles.input, styles.textArea]}
+                    placeholder={t('addSheet.notes')}
+                    placeholderTextColor={colors.textSecondary}
+                    value={wantedNotes}
+                    maxLength={FORM_LIMITS.wantedNotes}
+                    onChangeText={setWantedNotes}
+                    multiline
+                    numberOfLines={3}
+                    textAlignVertical="top"
+                  />
+                  <PrimaryCTA
+                    label={saving ? t('common.loading') : t('common.save')}
+                    icon={null}
+                    loading={saving}
+                    onPress={submitWanted}
+                    disabled={saving || !wantedCity.trim()}
+                  />
+                </>
+              )}
+            </ScrollView>
           </View>
-        </View>
+        </KeyboardAvoidingView>
+        <KeyboardDoneBar />
       </Modal>
     </GradientBackground>
   );
@@ -470,47 +617,11 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   container: {
     flex: 1,
   },
-  // Matches web's .screen-kicker / .screen-headline exactly.
-  heroBlock: {
-    paddingHorizontal: 20,
-    paddingTop: 16,
-    paddingBottom: 4,
-  },
-  kickerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    marginBottom: 6,
-  },
-  kickerDash: {
-    width: 14,
-    height: 1,
-    backgroundColor: colors.accent,
-  },
-  kicker: {
-    fontFamily: Fonts?.mono,
-    fontSize: 11,
-    letterSpacing: 1.5,
-    textTransform: 'uppercase',
-    color: colors.textSecondary,
-    fontWeight: '600',
-  },
-  headline: {
-    fontFamily: Fonts?.serif,
-    fontSize: 28,
-    fontWeight: '500',
-    color: colors.textPrimary,
-  },
-  headlineEm: {
-    fontStyle: 'italic',
-    color: colors.accent,
-  },
   // Matches web's .segment-control / .segment — bordered track, gradient
   // fill on the active tab (not a flat accent fill).
   tabRow: {
     flexDirection: 'row',
     marginHorizontal: 20,
-    marginTop: 12,
     backgroundColor: colors.primaryLight,
     borderRadius: 14,
     padding: 4,
@@ -528,7 +639,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   tabText: {
     fontSize: 13,
-    fontWeight: '600',
+    fontFamily: Fonts.sansSemiBold,
     color: colors.textSecondary,
   },
   tabTextActive: {
@@ -550,11 +661,12 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   addPillText: {
     fontSize: 13,
-    fontWeight: '600',
+    fontFamily: Fonts.sansSemiBold,
     color: colors.textPrimary,
   },
   errorBanner: {
     textAlign: 'center',
+    fontFamily: Fonts.sans,
     fontSize: 12,
     color: colors.error,
     paddingVertical: 4,
@@ -581,13 +693,31 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   emptyTitle: {
     fontSize: 15,
-    fontWeight: '600',
+    fontFamily: Fonts.sansSemiBold,
     color: colors.textPrimary,
   },
   emptyHint: {
+    fontFamily: Fonts.sans,
     fontSize: 13,
     color: colors.textSecondary,
     textAlign: 'center',
+  },
+  alertsHint: {
+    fontFamily: Fonts.sans,
+    fontSize: 12,
+    color: colors.textSecondary,
+    marginBottom: 4,
+  },
+  newBadge: {
+    alignSelf: 'flex-start',
+    fontSize: 12,
+    fontFamily: Fonts.sansSemiBold,
+    color: '#fff',
+    backgroundColor: colors.accent,
+    borderRadius: 999,
+    paddingHorizontal: 10,
+    paddingVertical: 3,
+    overflow: 'hidden',
   },
   card: {
     backgroundColor: colors.primaryLight,
@@ -606,11 +736,12 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   cardTitle: {
     flex: 1,
     fontSize: 14,
-    fontWeight: '600',
+    fontFamily: Fonts.sansSemiBold,
     color: colors.textPrimary,
   },
   cardDate: {
-    fontSize: 11,
+    fontFamily: Fonts.sans,
+    fontSize: 12,
     color: colors.textSecondary,
   },
   statusPill: {
@@ -619,8 +750,8 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     paddingVertical: 3,
   },
   statusPillText: {
-    fontSize: 10,
-    fontWeight: '700',
+    fontSize: 12,
+    fontFamily: Fonts.sansBold,
   },
   cardMetaRow: {
     flexDirection: 'row',
@@ -628,6 +759,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     gap: 10,
   },
   cardMeta: {
+    fontFamily: Fonts.sans,
     fontSize: 13,
     color: colors.textSecondary,
   },
@@ -650,12 +782,12 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   actionButtonText: {
     fontSize: 12,
-    fontWeight: '600',
+    fontFamily: Fonts.sansSemiBold,
     color: colors.textPrimary,
   },
   iconButton: {
-    width: 30,
-    height: 30,
+    width: 44,
+    height: 44,
     borderRadius: 8,
     backgroundColor: colors.glass,
     borderWidth: 1,
@@ -668,12 +800,18 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.6)',
     justifyContent: 'flex-end',
   },
+  modalBackdropCentered: { justifyContent: 'center', alignItems: 'center', padding: 24 },
+  modalDialog: { maxWidth: 560, borderRadius: 24, paddingBottom: 24 },
   modalSheet: {
     backgroundColor: colors.primaryLight,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     padding: 20,
     paddingBottom: 36,
+    gap: 12,
+    maxHeight: '90%',
+  },
+  modalBody: {
     gap: 12,
   },
   modalHeader: {
@@ -683,7 +821,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   modalTitle: {
     fontSize: 18,
-    fontWeight: '700',
+    fontFamily: Fonts.sansBold,
     color: colors.textPrimary,
   },
   input: {
@@ -691,6 +829,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     borderRadius: 14,
     paddingHorizontal: 16,
     paddingVertical: 14,
+    fontFamily: Fonts.sans,
     fontSize: 15,
     color: colors.textPrimary,
     borderWidth: 1,
@@ -706,6 +845,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   rowInput: {
     flex: 1,
+    minWidth: 0,
   },
   toggleRow: {
     flexDirection: 'row',
@@ -726,7 +866,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   toggleText: {
     fontSize: 13,
-    fontWeight: '600',
+    fontFamily: Fonts.sansSemiBold,
     color: colors.textSecondary,
   },
   toggleTextActive: {

@@ -1,8 +1,10 @@
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useRouter, type Href } from 'expo-router';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
+  Keyboard,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -11,13 +13,16 @@ import {
   Text,
   TextInput,
   View,
+  type ScrollViewInstance,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Fonts, Radii, Shadows, type AtticoPalette } from '@/constants/theme';
+import { KEYBOARD_DONE_BAR_HEIGHT, KeyboardDoneBar } from '@/components/ui/keyboard-done-bar';
 import { useTheme } from '@/contexts/theme-context';
 import { useResponsive } from '@/hooks/use-responsive';
 import { askListingAssistant, type AssistantMessage } from '@/lib/ai';
+import { assistantHistory } from '@/src/features/properties/lib/assistantHistory';
 import { type LangCode } from '@/lib/translate';
 import { type Property } from '@/data/types';
 
@@ -39,30 +44,65 @@ import { type Property } from '@/data/types';
  * the floating LiquidTabBar is never mounted underneath it — the FAB only
  * needs to clear the safe-area inset, not a nav pill.
  */
-export function ListingAssistant({ property }: { property: Property | null }) {
+/** The seller's contact, shown under a reply the listing data cannot answer. */
+export interface ListingContact {
+  name: string;
+  agency?: string | null;
+  /** A phone exists, so Call and WhatsApp are offered. */
+  canCall: boolean;
+  onCall: () => void;
+  onWhatsApp: () => void;
+  onProfile?: () => void;
+}
+
+type ChatMessage = AssistantMessage & { failed?: boolean; contact?: boolean };
+
+export function ListingAssistant({
+  property,
+  contact,
+}: {
+  property: Property | null;
+  contact?: ListingContact | null;
+}) {
   const { t, i18n } = useTranslation();
+  const router = useRouter();
   const { colors } = useTheme();
   const { width: screenWidth, height: screenHeight } = useResponsive();
   const insets = useSafeAreaInsets();
+  const keyboardHeight = useKeyboardHeight();
+  // With the keyboard up the panel (plus the Done bar) is lifted above it but
+  // kept its full height, so on an iPhone SE (667) its header and close button
+  // went ~110px off the top. Window metrics do not shrink for the keyboard on
+  // either platform, so the room left above it is worked out here.
+  const roomAboveKeyboard = keyboardHeight
+    ? screenHeight - keyboardHeight - KEYBOARD_DONE_BAR_HEIGHT - insets.top - 16
+    : Infinity;
   const styles = useMemo(
-    () => createStyles(colors, screenWidth, screenHeight, insets.bottom),
-    [colors, screenWidth, screenHeight, insets.bottom],
+    () => createStyles(colors, screenWidth, screenHeight, insets.bottom, roomAboveKeyboard),
+    [colors, screenWidth, screenHeight, insets.bottom, roomAboveKeyboard],
   );
 
   const [open, setOpen] = useState(false);
-  const [messages, setMessages] = useState<(AssistantMessage & { failed?: boolean })[]>([]);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [text, setText] = useState('');
   const [thinking, setThinking] = useState(false);
-  const scrollRef = useRef<ScrollView>(null);
+  const scrollRef = useRef<ScrollViewInstance>(null);
 
   useEffect(() => {
     if (open) scrollRef.current?.scrollToEnd({ animated: true });
   }, [messages.length, thinking, open]);
 
+  // The listing the open conversation belongs to. A reply that comes back
+  // after the user moved to another listing is dropped, not appended to the
+  // new listing's chat — same as web.
+  const listingRef = useRef(property?.id);
+
   // Reset the conversation when the listing changes — same as web.
   useEffect(() => {
+    listingRef.current = property?.id;
     setMessages([]);
     setOpen(false);
+    setThinking(false);
   }, [property?.id]);
 
   if (!property) return null;
@@ -70,20 +110,29 @@ export function ListingAssistant({ property }: { property: Property | null }) {
   const send = async () => {
     const content = text.trim();
     if (!content || thinking) return;
-    const history: AssistantMessage[] = [
-      ...messages.map(({ role, content: c }) => ({ role, content: c })),
-      { role: 'user', content },
-    ];
-    setMessages(history);
+    // What is sent is trimmed so it always starts with a question, without
+    // failed replies (shared with web); what is shown keeps every bubble
+    // and its `failed` flag.
+    const history = assistantHistory(messages, content);
+    setMessages((prev) => [...prev, { role: 'user', content }]);
     setText('');
     setThinking(true);
     // i18n.language is a plain string at the type level, but this app only
     // ever sets it to one of the 8 supported codes via changeLanguage.
-    const reply = await askListingAssistant(property.id, history, i18n.language as LangCode);
+    const askedAbout = property.id;
+    const answer = await askListingAssistant(askedAbout, history, i18n.language as LangCode);
+    if (listingRef.current !== askedAbout) return;
     setThinking(false);
+    // Not in the listing, or no answer at all: either way the person is
+    // handed to the seller rather than left with a dead end.
     setMessages((prev) => [
       ...prev,
-      { role: 'assistant', content: reply ?? t('assistant.unavailable'), failed: reply == null },
+      {
+        role: 'assistant',
+        content: answer?.reply ?? t(answer ? 'assistant.notInListing' : 'assistant.unavailable'),
+        failed: answer == null,
+        contact: answer == null || answer.contact,
+      },
     ]);
   };
 
@@ -98,7 +147,7 @@ export function ListingAssistant({ property }: { property: Property | null }) {
           colors={[colors.accent, colors.accentEnd]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
-          style={StyleSheet.absoluteFillObject}
+          style={StyleSheet.absoluteFill}
         />
         <MaterialIcons name="auto-awesome" size={18} color="#fff" />
         <Text style={styles.fabLabel}>{t('assistant.fabLabel')}</Text>
@@ -137,11 +186,28 @@ export function ListingAssistant({ property }: { property: Property | null }) {
           <View style={styles.bubble}>
             <Text style={styles.bubbleText}>{t('assistant.intro')}</Text>
           </View>
+          {/* Searching beyond this listing is the full assistant's job: open it
+              with the question ready, sent only when the person taps send. */}
+          <Pressable
+            style={styles.alternatives}
+            onPress={() => {
+              setOpen(false);
+              router.push(
+                `/assistant?property=${property.id}&q=${encodeURIComponent(t('aiAssistant.alternativesQuestion'))}` as Href,
+              );
+            }}
+            accessibilityRole="button">
+            <MaterialIcons name="travel-explore" size={15} color={colors.accentText} />
+            <Text style={styles.alternativesText}>{t('aiAssistant.alternatives')}</Text>
+          </Pressable>
           {messages.map((m, i) => (
-            <View key={i} style={[styles.bubble, m.role === 'user' && styles.bubbleMine]}>
-              <Text style={[styles.bubbleText, m.role === 'user' && styles.bubbleTextMine]}>
-                {m.content}
-              </Text>
+            <View key={i} style={styles.turn}>
+              <View style={[styles.bubble, m.role === 'user' && styles.bubbleMine]}>
+                <Text style={[styles.bubbleText, m.role === 'user' && styles.bubbleTextMine]}>
+                  {m.content}
+                </Text>
+              </View>
+              {m.contact && contact ? <ContactCard contact={contact} styles={styles} /> : null}
             </View>
           ))}
           {thinking && (
@@ -174,15 +240,75 @@ export function ListingAssistant({ property }: { property: Property | null }) {
               colors={[colors.accent, colors.accentEnd]}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
-              style={StyleSheet.absoluteFillObject}
+              style={StyleSheet.absoluteFill}
             />
             <MaterialIcons name="send" size={14} color="#fff" />
           </Pressable>
         </View>
         <Text style={styles.disclaimer}>{t('assistant.disclaimer')}</Text>
       </View>
+      <KeyboardDoneBar />
     </KeyboardAvoidingView>
   );
+}
+
+/** Who to ask, with Call / WhatsApp when there is a phone and the profile when there is one. */
+function ContactCard({
+  contact,
+  styles,
+}: {
+  contact: ListingContact;
+  styles: ReturnType<typeof createStyles>;
+}) {
+  const { t } = useTranslation();
+  const { colors } = useTheme();
+  const actions: { key: string; icon: 'phone' | 'chat' | 'person'; label: string; onPress: () => void }[] = [];
+  if (contact.canCall) {
+    actions.push({ key: 'call', icon: 'phone', label: t('property.call'), onPress: contact.onCall });
+    actions.push({ key: 'wa', icon: 'chat', label: 'WhatsApp', onPress: contact.onWhatsApp });
+  }
+  if (contact.onProfile) {
+    actions.push({ key: 'profile', icon: 'person', label: t('assistant.viewProfile'), onPress: contact.onProfile });
+  }
+  return (
+    <View style={styles.contactCard}>
+      <Text style={styles.contactTitle}>{t('assistant.contactTitle')}</Text>
+      <Text style={styles.contactName} numberOfLines={1}>
+        {contact.name}
+        {contact.agency ? <Text style={styles.contactAgency}>{` · ${contact.agency}`}</Text> : null}
+      </Text>
+      <View style={styles.contactActions}>
+        {actions.map((a) => (
+          <Pressable
+            key={a.key}
+            style={styles.contactBtn}
+            onPress={a.onPress}
+            accessibilityRole="button"
+            accessibilityLabel={`${a.label}, ${contact.name}`}>
+            <MaterialIcons name={a.icon} size={15} color={colors.accentText} />
+            <Text style={styles.contactBtnText}>{a.label}</Text>
+          </Pressable>
+        ))}
+      </View>
+    </View>
+  );
+}
+
+/** The keyboard's height while it is shown, else 0. Web: always 0. */
+function useKeyboardHeight(): number {
+  const [height, setHeight] = useState(0);
+  useEffect(() => {
+    if (Platform.OS === 'web') return;
+    const ios = Platform.OS === 'ios';
+    const subs = [
+      Keyboard.addListener(ios ? 'keyboardWillShow' : 'keyboardDidShow', (e) =>
+        setHeight(e.endCoordinates.height),
+      ),
+      Keyboard.addListener(ios ? 'keyboardWillHide' : 'keyboardDidHide', () => setHeight(0)),
+    ];
+    return () => subs.forEach((s) => s.remove());
+  }, []);
+  return height;
 }
 
 const createStyles = (
@@ -190,12 +316,14 @@ const createStyles = (
   screenWidth: number,
   screenHeight: number,
   insetBottom: number,
+  roomAboveKeyboard: number,
 ) => {
   // Same min()-style clamp web's CSS uses, just computed in JS: a compact
   // floating card, not a full-screen sheet — this is a quick-question widget
-  // that sits over the page, not a primary destination.
+  // that sits over the page, not a primary destination. The 160 floor keeps
+  // the header, one bubble and the input row on the very shortest screens.
   const panelWidth = Math.min(340, screenWidth - 32);
-  const panelHeight = Math.min(460, screenHeight - 180);
+  const panelHeight = Math.max(160, Math.min(460, screenHeight - 180, roomAboveKeyboard));
   const bottomOffset = insetBottom + 16;
 
   return StyleSheet.create({
@@ -252,7 +380,7 @@ const createStyles = (
     },
     subtitle: {
       fontFamily: Fonts?.sans,
-      fontSize: 11,
+      fontSize: 12,
       color: colors.textSecondary,
     },
     scroll: {
@@ -276,6 +404,65 @@ const createStyles = (
       paddingHorizontal: 11,
       paddingVertical: 8,
     },
+    turn: {
+      gap: 6,
+    },
+    contactCard: {
+      alignSelf: 'stretch',
+      gap: 4,
+      padding: 10,
+      borderRadius: 12,
+      borderWidth: 1,
+      borderColor: colors.border,
+      backgroundColor: colors.primaryLight,
+    },
+    contactTitle: {
+      fontFamily: Fonts?.mono,
+      fontSize: 12,
+      letterSpacing: 0.5,
+      color: colors.textSecondary,
+    },
+    contactName: {
+      fontFamily: Fonts?.sansSemiBold,
+      fontSize: 14,
+      color: colors.textPrimary,
+    },
+    contactAgency: {
+      fontFamily: Fonts?.sans,
+      color: colors.textSecondary,
+    },
+    contactActions: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: 6,
+      marginTop: 4,
+    },
+    contactBtn: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 5,
+      minHeight: 36,
+      paddingHorizontal: 12,
+      borderRadius: Radii.pill,
+      backgroundColor: colors.accentTint,
+    },
+    contactBtnText: {
+      fontFamily: Fonts?.sansSemiBold,
+      fontSize: 13,
+      color: colors.accentText,
+    },
+    alternatives: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 6,
+      minHeight: 36,
+      alignSelf: 'flex-start',
+    },
+    alternativesText: {
+      fontFamily: Fonts?.sansSemiBold,
+      fontSize: 13,
+      color: colors.accentText,
+    },
     bubbleMine: {
       alignSelf: 'flex-end',
       backgroundColor: colors.accent,
@@ -294,7 +481,6 @@ const createStyles = (
     },
     thinkingText: {
       color: colors.textSecondary,
-      fontStyle: 'italic',
     },
     inputRow: {
       flexDirection: 'row',
@@ -334,7 +520,7 @@ const createStyles = (
       paddingBottom: 10,
       paddingTop: 2,
       fontFamily: Fonts?.sans,
-      fontSize: 10,
+      fontSize: 12,
       color: colors.textFaint,
       textAlign: 'center',
     },

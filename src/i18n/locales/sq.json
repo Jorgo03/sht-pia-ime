@@ -2,6 +2,7 @@
   "common": {
     "appName": "Shtëpia.ime",
     "loading": "Po ngarkohet...",
+    "loadMore": "Ngarko më shumë",
     "error": "Gabim",
     "save": "Ruaj",
     "cancel": "Anulo",
@@ -25,7 +26,11 @@
     "toggleTheme": "Ndrysho temën",
     "previous": "E mëparshme",
     "next": "Tjetra",
-    "retry": "Provo përsëri"
+    "retry": "Provo përsëri",
+    "done": "U krye",
+    "language": "Gjuha",
+    "closeKeyboard": "Mbyll tastierën",
+    "addShort": "Shto"
   },
   "auth": {
     "roleClient": "Klient",
@@ -43,8 +48,8 @@
     "forgotPassword": "Ke harruar fjalëkalimin?",
     "accessClient": "Akses për blerës dhe qiramarrës",
     "accessAgent": "Akses në portalin e agjentit",
-    "forgotShort": "Harruat?",
-    "resetSent": "Kontrollo emailin për të rivendosur fjalëkalimin.",
+    "forgotShort": "Harrove fjalëkalimin?",
+    "resetSent": "Nëse ka një llogari me këtë email, i dërguam një kod për të rivendosur fjalëkalimin.",
     "recoveryTitle": "Vendos një fjalëkalim të ri",
     "recoverySubtitle": "Zgjidh një fjalëkalim të ri për llogarinë tënde.",
     "newPassword": "Fjalëkalimi i ri",
@@ -78,7 +83,28 @@
     "heroSignUpPre": "Fillo të",
     "heroSignUpEm": "gjesh shtëpinë",
     "heroSignUpPost": "që sot.",
-    "resendIn": "Ridërgo pas {{s}}s"
+    "resendIn": "Ridërgo pas {{s}}s",
+    "showPassword": "Shfaq fjalëkalimin",
+    "hidePassword": "Fshih fjalëkalimin",
+    "codeDigit": "Shifra {{n}} nga 6",
+    "newCodeSent": "Kodi i ri u dërgua. Kodet e mëparshme nuk vlejnë më.",
+    "forgotTitle": "Rivendos fjalëkalimin",
+    "forgotSubtitle": "Shkruaj emailin e llogarisë. Do të të dërgojmë një kod 6-shifror.",
+    "resetCodeSent": "Nëse ka një llogari për {{email}}, i dërguam një kod 6-shifror.",
+    "backToSignIn": "Kthehu te hyrja",
+    "confirmFirst": "Konfirmo fillimisht emailin: fut kodin që të dërguam ose kërko një të ri.",
+    "signupCodeHint": "E hape tashmë lidhjen në email? Atëherë emaili është konfirmuar — hyr.",
+    "emailCode": "Kod me email",
+    "verifyEmailTitle": "Verifiko email-in",
+    "verifyEmailSubtitle": "Të dërguam një kod verifikimi 6-shifror në adresën tënde të email-it.",
+    "verifyAccount": "Verifiko llogarinë",
+    "codeExpiresIn": "Kodi skadon pas {{time}}",
+    "officeName": "Emri i zyrës",
+    "continue": "Vazhdo",
+    "checkInbox": "Kontrollo email-in",
+    "usePassword": "Fjalëkalim",
+    "spamHint": "Nëse nuk e ke marrë email-in, kontrollo dosjen Spam ose Junk, ose kërko një kod të ri.",
+    "browseWithoutAccount": "Shfleto pa llogari"
   },
   "home": {
     "greetingMorning": "Mirëmëngjes",
@@ -91,7 +117,35 @@
     "matched": "Sipas shijes suaj",
     "seeAll": "Shiko të gjitha →",
     "searchPlaceholder": "Qytet, lagje, kod postar...",
-    "country": "Shqipëri"
+    "country": "Shqipëri",
+    "heroPhrases": [
+      {
+        "lead": "Prona e duhur,",
+        "accent": "fillon këtu."
+      },
+      {
+        "lead": "Gjej pronën që",
+        "accent": "të përshtatet."
+      },
+      {
+        "lead": "Investimi i duhur,",
+        "accent": "në vendin e duhur."
+      },
+      {
+        "lead": "Biznesi yt meriton",
+        "accent": "vendin e duhur."
+      },
+      {
+        "lead": "Ktheje mundësinë",
+        "accent": "në investim."
+      },
+      {
+        "lead": "Zbulo mundësinë",
+        "accent": "e radhës."
+      }
+    ],
+    "exploreCities": "Eksploro qytetet",
+    "agencies": "Agjenci dhe agjentë"
   },
   "search": {
     "title": "Kërko pronë",
@@ -155,7 +209,27 @@
     "surface": "Sipërfaqja",
     "minArea": "Sip min",
     "maxArea": "Sip max",
-    "rangeInvalid": "Vlera minimale duhet të jetë më e vogël se maksimalja"
+    "rangeInvalid": "Vlera minimale duhet të jetë më e vogël se maksimalja",
+    "zone": "Lagjja",
+    "reference": "Referenca",
+    "referenceInvalid": "Referenca ka 8 shkronja ose shifra, p.sh. SH-1A2B3C4D.",
+    "rangeMin": "Min",
+    "rangeMax": "Maks",
+    "showHomesAny": "Shfaq shtëpitë",
+    "saveSearch": "Ruaj këtë kërkim",
+    "searchSaved": "U ruajt · Njoftimet aktive",
+    "panel": {
+      "title": "Filtro pronat",
+      "clearAll": "Pastro të gjitha filtrat",
+      "showOnMap": "Shiko në hartë",
+      "showList": "Shiko listën",
+      "otherFilters": "Filtra të tjerë",
+      "moreFilters": "Më shumë filtra",
+      "fewerFilters": "Më pak filtra",
+      "refPlaceholder": "ID / Fjalë kyçe",
+      "results": "Shfaqur {{shown}} nga {{total}} rezultate",
+      "removeFilter": "Hiq filtrin {{name}}"
+    }
   },
   "favourites": {
     "title": "Të preferuarat",
@@ -168,15 +242,16 @@
     "savedCount_one": "{{count}} e ruajtur · e organizuar për ty",
     "savedCount_other": "{{count}} të ruajtura · të organizuara për ty",
     "headlineEm": "jote",
-    "backToProfile": "← Kthehu te profili",
+    "backToProfile": "Kthehu te profili",
     "kicker": "TË PREFERUARAT",
-    "headlinePre": "Lista"
+    "headlinePre": "Lista",
+    "loadFailed": "Shtëpitë e ruajtura nuk u ngarkuan."
   },
   "property": {
-    "beds": "dhoma",
+    "beds": "Dhomë",
     "bedsCount_one": "dhomë",
     "bedsCount_other": "dhoma",
-    "baths": "banjo",
+    "baths": "Banjo",
     "bathsCount_one": "banjo",
     "bathsCount_other": "banjo",
     "sqft": "m²",
@@ -191,7 +266,8 @@
     "similar": "Prona të ngjashme",
     "video": "Video tur",
     "perDay": "/ditë",
-    "forDailyRent": "Qira ditore"
+    "forDailyRent": "Qira ditore",
+    "publishedOn": "Publikuar më {{date}}"
   },
   "detail": {
     "forSale": "Shitje",
@@ -206,7 +282,17 @@
     "area": "Sipërfaqja",
     "year": "Viti",
     "chatInApp": "Bisedo",
-    "share": "Ndaj"
+    "share": "Ndaj",
+    "owner": "Pronari",
+    "linkCopied": "Lidhja u kopjua",
+    "unavailable": "Kjo pronë nuk është më e disponueshme",
+    "unavailableHint": "Mund të jetë shitur, dhënë me qira ose hequr nga agjenti.",
+    "reference": "Ref.",
+    "publishedBy": "Publikuar nga",
+    "video": "Video",
+    "videoFailed": "Videoja nuk u luajt dot.",
+    "priceHistory": "Historiku i çmimit",
+    "priceListed": "Çmimi i parë"
   },
   "messages": {
     "subtitle": "Bisedat me agjentët",
@@ -218,7 +304,7 @@
       "headlinePre": "Mesazhet"
     },
     "agent": {
-      "kicker": "{{leads}} lead aktive · {{newToday}} të reja sot",
+      "kicker": "{{leads}} klientë potencialë aktivë · {{newToday}} të rinj sot",
       "headlineEm": "kërkesat",
       "headlinePre": "Klientë &"
     },
@@ -227,7 +313,12 @@
     "inputPlaceholder": "Shkruaj një mesazh…",
     "noMessages": "Ende pa mesazhe — përshëndetu!",
     "loginPrompt": "Kyçu për të parë mesazhet",
-    "sendFailed": "Mesazhi nuk u dërgua — provo përsëri"
+    "sendFailed": "Mesazhi nuk u dërgua — provo përsëri",
+    "unavailable": "Kjo bisedë nuk është e disponueshme",
+    "loadFailed": "Biseda nuk u ngarkua dot.",
+    "attachFailed": "Skedari nuk u dërgua. Provo përsëri.",
+    "openAttachment": "Hap {{name}}",
+    "selectConversation": "Zgjidh një bisedë nga lista."
   },
   "notFound": {
     "title": "Faqja nuk u gjet",
@@ -255,10 +346,33 @@
     "imageUploadFailed": "Ngarkimi i imazheve dështoi — provo përsëri",
     "updateFailed": "Përditësimi dështoi — provo përsëri",
     "oauthFailed": "Kyçja me ofruesin dështoi — provo përsëri",
-    "invalidCode": "Kodi është i pasaktë ose ka skaduar",
+    "invalidCode": "Kodi është i pasaktë ose nuk vlen më. Përdor kodin e fundit që të dërguam.",
     "videoInvalidType": "Lejohen vetëm video MP4 ose MOV",
     "videoTooLarge": "Video është shumë e madhe (maks. {{max}} MB)",
-    "emailSendFailed": "Nuk arritëm të dërgojmë emailin e konfirmimit. Është një problem konfigurimi i serverit, jo i llogarisë sate — kontakto administratorin."
+    "emailSendFailed": "Nuk arritëm ta dërgojmë kodin e verifikimit. Provo sërish pas pak minutash.",
+    "waitSeconds": "Prit {{s}} sekonda para se të kërkosh një kod të ri.",
+    "photoPrepareFailed": "Një foto nuk u përgatit dot për ngarkim. Provo përsëri ose zgjidh një foto tjetër.",
+    "listingSaveFailed": "Shpallja nuk u ruajt. Gjithçka që plotësove mbetet këtu; provo përsëri.",
+    "network": "Nuk u lidhëm dot me serverin. Kontrollo lidhjen dhe provo sërish.",
+    "sessionExpired": "Seanca jote mbaroi. Hyr përsëri.",
+    "passwordSame": "Zgjidh një fjalëkalim të ndryshëm nga ai aktual.",
+    "passwordPwned": "Ky fjalëkalim është shfaqur në një rrjedhje të dhënash. Zgjidh një tjetër.",
+    "passwordWeak": "Ky fjalëkalim është shumë i thjeshtë. Përziej shkronja, numra dhe simbole.",
+    "passwordTooLong": "Fjalëkalimi është shumë i gjatë. Përdor deri në 72 karaktere.",
+    "reauthNeeded": "Për sigurinë tënde, konfirmo fillimisht me një kod nga emaili.",
+    "signupDisabled": "Për momentin nuk mund të krijohen llogari të reja.",
+    "linkExpired": "Kjo lidhje ka skaduar ose është përdorur tashmë. Kërko një kod të ri.",
+    "linkInvalid": "Kjo lidhje nuk është e vlefshme. Kërko një kod të ri.",
+    "linkOtherDevice": "Kjo lidhje u hap në një shfletues tjetër nga ai ku e kërkove. Fut kodin 6-shifror nga emaili.",
+    "currentPasswordWrong": "Fjalëkalimi aktual është i pasaktë.",
+    "providerUnavailable": "Kjo mënyrë hyrjeje nuk është ende e disponueshme. Zgjidh një tjetër.",
+    "loadFailed": "Nuk u ngarkua dot. Kontrollo lidhjen dhe provo sërish.",
+    "offline": "Je pa internet. Do të ngarkohet sapo të kthehet lidhja.",
+    "tooManyAttempts": "Shumë përpjekje të gabuara. Provo përsëri pas {{seconds}} sekondash.",
+    "codeIncorrect": "Kodi i verifikimit është i pasaktë. Provo sërish.",
+    "codeExpired": "Kodi i verifikimit ka skaduar. Kërko një kod të ri.",
+    "codeAttempts": "Shumë përpjekje të pasakta. Kërko një kod të ri.",
+    "officeRequired": "Shkruaj emrin e zyrës."
   },
   "agentDashboard": {
     "title": "Paneli i Agjentit",
@@ -275,14 +389,38 @@
     "noPendingViewings": "Asnjë kërkesë në pritje",
     "wantedFeed": "Blerës që kërkojnë",
     "wantedFeedSub": "Kërkesa të hapura",
-    "wantedEmpty": "Asnjë kërkesë e hapur për momentin"
+    "wantedEmpty": "Asnjë kërkesë e hapur për momentin",
+    "today": "Sot",
+    "todayEmpty": "Asnjë vizitë sot.",
+    "matches_one": "{{count}} nga pronat e tua përputhet",
+    "matches_other": "{{count}} nga pronat e tua përputhen",
+    "noMatches": "Asnjë nga pronat e tua nuk përputhet ende",
+    "showMatches": "Shfaqi",
+    "hideMatches": "Fshihi"
   },
   "profile": {
     "savedSearches": "Kërkimet e ruajtura",
     "statSaved": "Ruajtur",
     "statSearches": "Kërkime",
     "statListings": "Lista",
-    "statViewings": "Vizita"
+    "statViewings": "Vizita",
+    "edit": {
+      "title": "Ndrysho profilin",
+      "phone": "Numri i telefonit",
+      "phoneHintAgent": "Shfaqet në faqen tënde të agjentit, që njerëzit të të telefonojnë ose të të shkruajnë në WhatsApp. Çdo njoftim ruan numrin e vet të kontaktit. Shto prefiksin e shtetit, p.sh. +355.",
+      "phoneHintClient": "E sheh vetëm agjenti me të cilin flet ose cakton një vizitë.",
+      "nameRequired": "Shkruaj emrin.",
+      "tooLong": "Një nga fushat është shumë e gjatë.",
+      "phoneInvalid": "Ky nuk duket si numër telefoni. Përdor shifra, hapësira dhe + në fillim.",
+      "failed": "Ndryshimet nuk u ruajtën. Provo përsëri.",
+      "photo": "Foto e profilit",
+      "changePhoto": "Ndrysho foton",
+      "removePhoto": "Hiq foton",
+      "photoType": "Zgjidh një foto JPEG, PNG ose WebP.",
+      "photoSize": "Kjo foto është shumë e madhe. Zgjidh një më të vogël se 15 MB.",
+      "photoFailed": "Fotoja nuk u ruajt. Provo përsëri.",
+      "photoPermission": "Lejo aksesin te fotot te cilësimet e telefonit për të zgjedhur një foto."
+    }
   },
   "addSheet": {
     "openLabel": "Krijo",
@@ -291,7 +429,7 @@
     "signInFirst": "Hyni për të vazhduar",
     "searchSaved": "Kërkimi u ruajt",
     "wantedSaved": "Kërkesa u postua",
-    "leadSaved": "Lead u shtua",
+    "leadSaved": "Klienti potencial u shtua",
     "searchName": "Emri i kërkimit",
     "maxPrice": "Çmimi maks (€)",
     "minBedrooms": "Min dhoma gjumi",
@@ -322,7 +460,7 @@
         "sub": "Shto pronë në portofolin tënd"
       },
       "lead": {
-        "title": "Lead i ri",
+        "title": "Klient potencial i ri",
         "sub": "Gjurmo një klient potencial"
       },
       "viewing": {
@@ -330,7 +468,7 @@
         "sub": "Organizo një vizitë prone"
       },
       "open": {
-        "title": "Open house",
+        "title": "Ditë e hapur",
         "sub": "Planifiko shfaqje publike"
       }
     },
@@ -339,7 +477,14 @@
   "account": {
     "welcomeBack": "Mirë se erdhe, {{name}} 👋",
     "myListings": "Listat e mia",
-    "settings": "Cilësimet"
+    "settings": "Cilësimet",
+    "deleteAccount": "Fshi llogarinë",
+    "deleteConfirmBody": "Kjo fshin përgjithmonë profilin, listimet, fotot, të preferuarat, kërkimet e ruajtura dhe mesazhet tuaja. Nuk mund të zhbëhet.",
+    "deleteConfirmCta": "Fshi përgjithmonë",
+    "deleteFailed": "Llogaria nuk u fshi dot. Provoni përsëri.",
+    "downloadData": "Shkarko të dhënat e mia",
+    "downloadDataBusy": "Po përgatiten të dhënat…",
+    "downloadDataFailed": "Të dhënat nuk u shkarkuan. Provo përsëri."
   },
   "listing": {
     "newListing": "Listim i ri",
@@ -353,7 +498,7 @@
     "activate": "Aktivizo",
     "delete": "Fshi",
     "required": "Kjo fushë është e detyrueshme",
-    "minImages": "Minimum 3 foto të nevojshme",
+    "minImages": "Nevojitet të paktën {{min}} foto",
     "listingType": "Lloji i listimit",
     "title": "Titulli",
     "titlePlaceholder": "p.sh. Apartament 2+1 modern në Bllok",
@@ -404,7 +549,7 @@
       "balcony": "Ballkon",
       "parking": "Parking",
       "elevator": "Ashensor",
-      "garden": "Kopsht",
+      "garden": "Kopësht",
       "pool": "Pishinë",
       "furnished": "E mobiluar",
       "airConditioning": "Kondicionim",
@@ -416,9 +561,35 @@
     "draftRestored": "Drafti u rikthye — vazhdo aty ku e le. Fotot duhen shtuar sërish.",
     "discardDraft": "Fillo nga e para",
     "pinLocation": "Vendos pikën në hartë",
-    "mapHint": "Prek hartën për të vendosur vendndodhjen e pronës",
+    "latitude": "Gjerësia gjeografike",
+    "longitude": "Gjatësia gjeografike",
     "videoUpload": "Video e pronës",
-    "dropVideo": "Tërhiq një video këtu ose kliko (MP4 ose MOV)"
+    "dropVideo": "Tërhiq një video këtu ose kliko (MP4 ose MOV)",
+    "roadNeedsCity": "Zgjidhni qytetin që të shfaqen rrugët.",
+    "roadNoResults": "Nuk u gjet asnjë rrugë. Mund ta shkruani vetë.",
+    "dragMarker": "Tërhiqe shënuesin",
+    "pinOrderHint": "Zgjidhni fillimisht rrugën, pastaj vendosni shënuesin në hartë.",
+    "pinAdjustHint": "Tërhiqeni shënuesin te vendndodhja e saktë e pronës.",
+    "edit": "Ndrysho",
+    "editListing": "Ndrysho shpalljen",
+    "saveChanges": "Ruaj ndryshimet",
+    "currentVideo": "Videoja aktuale",
+    "markSold": "Shëno si të shitur",
+    "markRented": "Shëno si të dhënë me qira",
+    "zone": "Lagjja",
+    "zoneNone": "Pa lagje",
+    "fileSizeMb": "{{size}} MB",
+    "removePhoto": "Hiq foton",
+    "removeVideo": "Hiq videon",
+    "confirmSoldTitle": "Ta shënoni si të shitur?",
+    "confirmRentedTitle": "Ta shënoni si të dhënë me qira?",
+    "confirmClosedHint": "Shënojeni vetëm kur marrëveshja është përfunduar. Do të llogaritet në raportin tuaj; nëse e zhbëni brenda 7 ditëve, nuk llogaritet.",
+    "actionView": "Shiko",
+    "actionStats": "Statistika",
+    "actionSold": "Shitur",
+    "actionRented": "Me qira",
+    "pinOutsideAlbania": "Pika është jashtë Shqipërisë. Vendose aty ku ndodhet prona.",
+    "pinOutsideCity": "Pika është jashtë bashkisë {{city}}. Lëvize, ose zgjidh qytetin e duhur."
   },
   "dashboard": {
     "title": "Paneli i pronës",
@@ -433,6 +604,8 @@
   "map": {
     "openInMaps": "Hap në Google Maps",
     "mapView": "Harta",
+    "webUnavailableTitle": "Pamja e hartës",
+    "webUnavailableHint": "Harta interaktive është e disponueshme në aplikacionin celular. Shfletoni listimet si listë.",
     "gridView": "Rrjeta"
   },
   "floorPlan": {
@@ -448,7 +621,10 @@
   },
   "authCallback": {
     "signingIn": "Duke u kyçur…",
-    "preparingMatches": "Duke përgatitur përputhjet e tua…"
+    "preparingMatches": "Duke përgatitur përputhjet e tua…",
+    "returning": "Po ju kthejmë te aplikacioni…",
+    "openApp": "Hap aplikacionin",
+    "tapHint": "Nëse nuk ndodhi asgjë, prekni butonin më sipër."
   },
   "ai": {
     "errorUnavailable": "AI nuk është i disponueshëm tani — shkruaje manualisht.",
@@ -461,7 +637,9 @@
     "regenerateTranslation": "Përkthe sërish",
     "translationFailed": "Përkthimi dështoi. Provo përsëri.",
     "translationNotConfigured": "Përkthimi nuk është i konfiguruar në server. Kontakto administratorin.",
-    "translationBasic": "Përkthim bazë — kontrolloje para publikimit"
+    "translationBasic": "Përkthim bazë — kontrolloje para publikimit",
+    "translationPartialTitle": "U ruajt, por pa disa gjuhë",
+    "translationPartial": "Njoftimi u ruajt. Përkthimi automatik nuk funksionoi për: {{langs}}. Hape njoftimin dhe prek gjuhën për ta provuar përsëri."
   },
   "assistant": {
     "title": "Asistenti i shpalljes",
@@ -471,7 +649,10 @@
     "placeholder": "Bëj një pyetje…",
     "thinking": "Duke menduar…",
     "unavailable": "Nuk mund të përgjigjem tani. Kontakto shitësin përmes faqes së shpalljes.",
-    "disclaimer": "Përgjigjet e AI bazohen vetëm në të dhënat e shpalljes — verifiko detajet e rëndësishme me shitësin."
+    "disclaimer": "Përgjigjet e AI bazohen vetëm në të dhënat e shpalljes — verifiko detajet e rëndësishme me shitësin.",
+    "contactTitle": "Pyete drejtpërdrejt shitësin",
+    "notInListing": "Shpallja nuk e përmend këtë.",
+    "viewProfile": "Profili"
   },
   "viewings": {
     "title": "Vizitat",
@@ -481,9 +662,12 @@
     "requestTitle": "Kërko një",
     "requestTitleEm": "vizitë",
     "when": "Kur?",
+    "tiranaTime": "ora e Tiranës",
+    "pickInTiranaTime": "Orari është sipas orës së Tiranës, ku ndodhet prona.",
     "request": "Dërgo kërkesën",
     "requestSuccess": "Kërkesa u dërgua — do të njoftohesh kur të konfirmohet",
     "requestFailed": "Kërkesa dështoi — provo përsëri",
+    "slotTaken": "Ky orar është zënë. Zgjidhni një orë tjetër.",
     "pastDate": "Zgjidh një datë në të ardhmen",
     "empty": "Ende pa vizita",
     "emptyHint": "Kërko një vizitë nga faqja e një prone",
@@ -497,8 +681,12 @@
       "requested": "E kërkuar",
       "confirmed": "E konfirmuar",
       "declined": "E refuzuar",
-      "cancelled": "E anuluar"
-    }
+      "cancelled": "E anuluar",
+      "completed": "E përfunduar",
+      "no_show": "Nuk u paraqit"
+    },
+    "markCompleted": "U krye",
+    "markNoShow": "Nuk erdhi"
   },
   "saved": {
     "kicker": "Kërkimet dhe kërkesat",
@@ -512,8 +700,8 @@
     "emptyWantedHint": "Posto çfarë kërkon me butonin më sipër",
     "run": "Kërko tani",
     "delete": "Fshi",
-    "alertsOn": "Aktivizo njoftimet",
-    "alertsOff": "Çaktivizo njoftimet",
+    "alertsOn": "Shfaq përputhjet e reja",
+    "alertsOff": "Mos shfaq përputhjet e reja",
     "markClosed": "Mbyll kërkesën",
     "markOpen": "Rihap kërkesën",
     "wantedStatus": {
@@ -521,7 +709,14 @@
       "closed": "E mbyllur"
     },
     "newSearch": "Kërkim i ri",
-    "newWanted": "Kërkesë e re"
+    "newWanted": "Kërkesë e re",
+    "newMatches": "{{n}} më shumë se herën e kaluar",
+    "alertsHint": "Do të njoftohesh kur të dalin prona të reja që përputhen. Njoftimet me email nuk janë ende në dispozicion.",
+    "emailOn": "Më dërgo email për përputhjet e reja",
+    "emailOff": "Mos më dërgo më email",
+    "emailHint": "Përputhjet e reja shfaqen këtu kur hap këtë faqe. Ndiz email-in për t'i marrë edhe me email; çdo email ka një lidhje për ta ndalur.",
+    "confirmDeleteSearch": "Je i sigurt që dëshiron ta fshish këtë kërkim?",
+    "confirmDeleteWanted": "Je i sigurt që dëshiron ta fshish këtë kërkesë?"
   },
   "bell": {
     "label": "Njoftimet",
@@ -531,6 +726,599 @@
   },
   "wanted": {
     "describePlaceholder": "Përshkruaj çfarë kërkon… p.sh. \"apartament 2+1 në Tiranë deri në 150 mijë euro\"",
-    "matchesNow": "Prona që përputhen tani: {{n}}"
+    "matchesNow": "Prona që përputhen tani: {{n}}",
+    "boardPre": "Shtëpi të",
+    "boardEm": "kërkuara",
+    "boardIntro": "Nuk e gjeni shtëpinë që kërkoni? Shkruani buxhetin, qytetin dhe dhomat. Agjentët i shohin kërkesat dhe ju njoftojmë sapo publikohet një pronë që ju përshtatet.",
+    "postCta": "Posto çfarë kërkon",
+    "agentHint": "Kur publikoni një pronë që përputhet me një kërkesë, blerësi njoftohet vetë.",
+    "step1": "Shkruani qytetin, llojin, buxhetin dhe dhomat që ju duhen.",
+    "step2": "Agjentët e shohin kërkesën dhe kërkojnë për ju.",
+    "step3": "Merrni njoftim sapo del një pronë që ju përshtatet.",
+    "homeSub": "Thuaj çfarë kërkon, agjentët të gjejnë",
+    "homeTitle": "Shtëpi të kërkuara"
+  },
+  "legal": {
+    "privacyPolicy": "Politika e privatësisë",
+    "termsOfService": "Kushtet e shërbimit",
+    "lastUpdated": "Përditësuar më {{date}}",
+    "languageNote": "Ky dokument është i disponueshëm në shqip dhe anglisht. Më poshtë është versioni në anglisht; versioni në shqip mbizotëron.",
+    "cookiePolicy": "Politika e cookies",
+    "buyingGuide": "Blerja nga jashtë",
+    "buyingGuideHint": "Hapat, dokumentet dhe si të qëndroni të sigurt"
+  },
+  "safety": {
+    "reportListing": "Raporto këtë shpallje",
+    "reportUser": "Raporto këtë përdorues",
+    "blockUser": "Blloko përdoruesin",
+    "unblockUser": "Zhblloko përdoruesin",
+    "menu": "Më shumë opsione",
+    "reportTitle": "Çfarë nuk shkon?",
+    "reason": {
+      "spam": "Mesazhe të padëshiruara (spam)",
+      "scam": "Mashtrim",
+      "wrong_info": "Informacion i gabuar",
+      "unavailable": "Nuk është më në dispozicion",
+      "offensive": "Përmbajtje fyese",
+      "other": "Tjetër",
+      "inappropriate": "Sjellje e papërshtatshme",
+      "fake_account": "Llogari e rreme",
+      "fraud": "Mashtrim ose veprim i dyshimtë",
+      "harassment": "Ngacmim"
+    },
+    "detailsPlaceholder": "Diçka tjetër që duhet të dimë? (opsionale)",
+    "send": "Dërgo raportin",
+    "sent": "Faleminderit. Do ta shqyrtojmë.",
+    "already": "E keni raportuar tashmë.",
+    "failed": "Raporti nuk u dërgua. Provo përsëri.",
+    "blockConfirm": "Jeni i sigurt që doni të bllokoni {{name}}? Nuk do të mund t'i shkruani njëri-tjetrit derisa ta zhbllokoni.",
+    "blocked": "E keni bllokuar këtë përdorues. Nuk mund t'ju dërgojë mesazhe.",
+    "cannotMessage": "Nuk mund t'i dërgoni mesazhe këtij përdoruesi.",
+    "blockedBadge": "I bllokuar",
+    "signInToReport": "Hyni për të raportuar.",
+    "blockedUsers": "Përdoruesit e bllokuar",
+    "noBlocked": "Nuk keni bllokuar askënd."
+  },
+  "notifications": {
+    "title": "Njoftimet",
+    "off": "Njoftimet janë të fikura në këtë telefon.",
+    "turnOn": "Ndiz njoftimet",
+    "enabled": "Njoftimet janë të ndezura në këtë telefon.",
+    "denied": "Njoftimet janë të fikura te cilësimet e telefonit.",
+    "openSettings": "Hap cilësimet",
+    "unavailable": "Njoftimet nuk funksionojnë ende në këtë version të aplikacionit.",
+    "messages": "Mesazhe të reja",
+    "viewings": "Kërkesa dhe ndryshime vizitash",
+    "saveFailed": "Zgjedhja nuk u ruajt. Provo përsëri.",
+    "privacy": "Njoftimi tregon vetëm kush të shkroi ose çfarë ndodhi me vizitën, kurrë tekstin e mesazhit.",
+    "web": "Njoftimet vijnë vetëm në aplikacionin për telefon.",
+    "registering": "Po lidhim këtë telefon për njoftime…",
+    "registerFailed": "Leja është dhënë, por ky telefon nuk u lidh për njoftime. Provo përsëri.",
+    "settingsHint": "Hap Cilësimet e telefonit, zgjidh Shtëpia.ime dhe ndiz Njoftimet.",
+    "prefsNote": "Këto zgjedhje ruhen në llogarinë tënde. Në këtë telefon nuk do të vijnë njoftime derisa t'i ndezësh.",
+    "loadFailed": "Njoftimet nuk u ngarkuan.",
+    "saving": "Po ruhet…",
+    "all": "Të gjitha",
+    "unread": "Të palexuara",
+    "read": "Të lexuara",
+    "unreadTag": "E palexuar",
+    "markRead": "Shëno si të lexuar",
+    "markAll": "Shëno të gjitha si të lexuara",
+    "loadMore": "Ngarko më shumë",
+    "headlinePre": "Njoftimet",
+    "headlineEm": "e tua",
+    "empty": "Nuk ke ende njoftime",
+    "emptyHint": "Këtu do të shfaqen mesazhet e reja, vizitat dhe ndryshimet për pronat e tua.",
+    "emptyUnread": "Nuk ke njoftime të palexuara",
+    "emptyRead": "Nuk ke njoftime të lexuara",
+    "inviteTitle": "Mos humb asnjë përgjigje",
+    "inviteBody": "Ndiz njoftimet që të dish menjëherë kur të shkruan dikush ose kur ndryshon një vizitë. Mund ta ndryshosh kur të duash te Profili.",
+    "inviteLater": "Jo tani",
+    "kinds": {
+      "message": {
+        "title": "Mesazh i ri",
+        "body": "{{name}} të dërgoi një mesazh",
+        "bodyMany": "{{name}} të dërgoi {{total}} mesazhe",
+        "bodyNoName": "Ke një mesazh të ri"
+      },
+      "inquiry": {
+        "title": "Pyetje e re për pronën",
+        "body": "{{name}} pyeti për pronën tënde",
+        "bodyNoName": "Dikush pyeti për pronën tënde"
+      },
+      "viewing_requested": {
+        "title": "Kërkesë për vizitë",
+        "body": "Dikush dëshiron të vizitojë pronën tënde"
+      },
+      "viewing_updated": {
+        "title": "Ndryshim te vizita",
+        "confirmed": "Vizita u konfirmua",
+        "declined": "Vizita u refuzua",
+        "cancelled": "Një vizitë u anulua",
+        "updated": "Një vizitë u përditësua"
+      },
+      "listing_hidden": {
+        "title": "Listimi u fsheh",
+        "body": "Një listim yt është fshehur ndërsa e rishikojmë"
+      },
+      "listing_restored": {
+        "title": "Listimi u rikthye",
+        "body": "Listimi yt është sërish publik"
+      },
+      "welcome": {
+        "title": "Mirë se erdhe",
+        "body": "Llogaria jote është gati. Kërko pronat ose shto listimin tënd."
+      },
+      "saved_search": {
+        "title": "Prona të reja për ty",
+        "body": "Një pronë e re përputhet me kërkimin tënd",
+        "bodyMany": "{{total}} prona të reja përputhen me kërkimin tënd"
+      },
+      "wanted_match": {
+        "title": "Një pronë për kërkesën tënde",
+        "body": "U publikua një pronë që përputhet me shtëpinë që kërkon"
+      }
+    },
+    "settings": "Cilësimet e njoftimeve"
+  },
+  "pricing": {
+    "title": "Planet dhe çmimet",
+    "subtitle": "Publikimi i njoftimeve është falas. Planet dhe promovimet paguhen paraprakisht dhe nuk rinovohen vetë.",
+    "comingSoon": "Çmimet do të publikohen së shpejti.",
+    "comingSoonHint": "Deri atëherë, publikimi i njoftimeve mbetet falas.",
+    "loadFailed": "Çmimet nuk u ngarkuan.",
+    "kindPlan": "Plan agjencie",
+    "kindPromotion": "Promovim njoftimi",
+    "period": "Kohëzgjatja",
+    "months": "{{n}} muaj",
+    "perMonth": "≈ {{price}} në muaj",
+    "listingCap": "Deri në {{n}} njoftime aktive",
+    "credits": "{{n}} promovime në muaj të përfshira",
+    "prepaid": "Paguhet një herë, pa rinovim automatik",
+    "buy": "Bli",
+    "signInToBuy": "Hyr në llogari për të blerë.",
+    "notYet": "Pagesa online nuk është ende e disponueshme.",
+    "startFailed": "Pagesa nuk filloi. Provo përsëri.",
+    "returnedDone": "Faleminderit. Plani aktivizohet sapo procesori i pagesave ta konfirmojë pagesën; kjo zakonisht zgjat pak minuta.",
+    "returnedCancelled": "Pagesa u anulua. Nuk u tarifove."
+  },
+  "moderation": {
+    "title": "Moderimi",
+    "subtitle": "Raportime nga përdoruesit për njoftime dhe llogari. Njoftimet e fshehura mbeten jashtë linje derisa t'i riktheni.",
+    "notAllowed": "Kjo faqe është vetëm për moderatorët.",
+    "queue": {
+      "open": "Të hapura",
+      "closed": "Të mbyllura"
+    },
+    "loadFailed": "Raportimet nuk u ngarkuan.",
+    "empty": "Asnjë raportim i hapur. Gjithçka në rregull.",
+    "emptyClosed": "Ende asnjë raportim i mbyllur.",
+    "listing": "Njoftimi",
+    "user": "Përdoruesi",
+    "missingTarget": "Nuk ekziston më",
+    "hiddenBadge": "I fshehur për shqyrtim",
+    "hide": "Fshih njoftimin",
+    "restore": "Rikthe njoftimin",
+    "markActioned": "Shëno si të trajtuar",
+    "dismiss": "Hidhe poshtë",
+    "note": "Shënim (opsional)",
+    "actionFailed": "Nuk funksionoi. Provo përsëri.",
+    "loadMore": "Ngarko më shumë",
+    "reportedOn": "Raportuar më {{date}}",
+    "status": {
+      "actioned": "I trajtuar",
+      "dismissed": "I hedhur poshtë"
+    }
+  },
+  "seo": {
+    "siteTitle": "Shtëpia.ime — Shtëpi në shitje dhe me qira në Shqipëri",
+    "siteDescription": "Apartamente, vila dhe zyra në shitje dhe me qira në Tiranë, Durrës dhe në gjithë Shqipërinë. Kontakto direkt agjentët dhe pronarët."
+  },
+  "security": {
+    "row": "Fjalëkalimi dhe siguria",
+    "title": "Ndrysho fjalëkalimin",
+    "currentPassword": "Fjalëkalimi aktual",
+    "save": "Ruaj fjalëkalimin e ri",
+    "success": "Fjalëkalimi yt u ndryshua.",
+    "othersSignedOut": "Pajisjet e tjera u shkëputën nga llogaria.",
+    "forgotCurrent": "Harrove fjalëkalimin aktual?",
+    "codeIntro": "Do të dërgojmë një kod 6-shifror te {{email}}. Fute këtu, pastaj zgjidh fjalëkalimin e ri.",
+    "providerOnly": "Ti hyn me {{providers}}, prandaj nuk ka fjalëkalim Shtëpia.ime për të ndryshuar. Llogarinë tënde e mbron llogaria {{providers}}."
+  },
+  "authConfirm": {
+    "titleEmail": "Konfirmo emailin",
+    "titleRecovery": "Rivendos fjalëkalimin",
+    "titleEmailChange": "Konfirmo emailin e ri",
+    "intro": "Për sigurinë tënde, vazhdo me butonin më poshtë.",
+    "ctaEmail": "Konfirmo dhe hyr",
+    "ctaRecovery": "Vazhdo",
+    "ctaEmailChange": "Konfirmo emailin e ri",
+    "emailChanged": "Adresa e emailit u përditësua.",
+    "requestNew": "Kërko një kod të ri",
+    "goSignIn": "Shko te hyrja"
+  },
+  "leads": {
+    "kicker": "Klientët e tu",
+    "headlinePre": "Klientë",
+    "headlineEm": "potencialë",
+    "search": "Kërko me emër, telefon, email…",
+    "add": "Shto klient",
+    "addTitle": "Klient i ri",
+    "editTitle": "Ndrysho klientin",
+    "all": "Të gjithë",
+    "status": {
+      "new": "I ri",
+      "contacted": "Kontaktuar",
+      "qualified": "I kualifikuar",
+      "won": "Fituar",
+      "lost": "Humbur"
+    },
+    "name": "Emri",
+    "phone": "Telefoni",
+    "email": "Email",
+    "notes": "Shënime",
+    "notesHint": "p.sh. kërkon 2+1 në Tiranë, deri 150.000 €",
+    "statusLabel": "Statusi",
+    "call": "Thirr",
+    "whatsapp": "WhatsApp",
+    "sendEmail": "Email",
+    "delete": "Fshi",
+    "deleteTitle": "Ta fshij këtë klient?",
+    "deleteBody": "{{name}} do të fshihet përgjithmonë.",
+    "empty": "Ende pa klientë",
+    "emptyHint": "Shto çdo njeri që të kontakton, që asnjë mundësi të mos humbasë.",
+    "noResults": "Asnjë klient nuk përputhet me kërkimin.",
+    "nameRequired": "Shkruaj emrin e klientit.",
+    "tooLong": "Një nga fushat është shumë e gjatë.",
+    "phoneInvalid": "Ky nuk duket si numër telefoni.",
+    "emailInvalid": "Ky nuk duket si adresë email-i.",
+    "saveFailed": "Nuk u ruajt. Provo përsëri.",
+    "deleteFailed": "Nuk u fshi. Provo përsëri.",
+    "greeting": "Përshëndetje {{name}}!",
+    "added": "Shtuar më {{date}}"
+  },
+  "aiAssistant": {
+    "title": "Asistenti AI",
+    "subtitle": "Gjej prona reale, krahasoji dhe mëso si funksionon Shtëpia.ime.",
+    "intro": "Përshëndetje! Më trego çfarë kërkon dhe të gjej prona nga Shtëpia.ime, t'i krahasoj ose të shpjegoj si funksionon aplikacioni.",
+    "placeholder": "Shkruaj një mesazh…",
+    "thinking": "Po kërkoj…",
+    "newChat": "Bisedë e re",
+    "startersTitle": "Provo të pyesësh",
+    "starters": {
+      "findApartment": "Më gjej një apartament",
+      "byBudget": "Kërko prona sipas buxhetit tim",
+      "compare": "Më krahaso disa prona",
+      "howItWorks": "Si funksionon Shtëpia.ime?",
+      "publish": "Më ndihmo të publikoj një pronë"
+    },
+    "error": {
+      "unavailable": "Asistenti nuk është i disponueshëm tani. Provo përsëri pak më vonë.",
+      "rate_limited": "Ke bërë shumë pyetje brenda një ore. Provo përsëri pak më vonë.",
+      "refused": "Nuk mund të ndihmoj me këtë kërkesë.",
+      "network": "Nuk u lidh. Kontrollo internetin dhe provo përsëri."
+    },
+    "notSpecified": "Nuk është specifikuar",
+    "disclaimer": "Asistenti përdor të dhënat e shpalljeve në Shtëpia.ime. Verifiko detajet me agjentin. Nuk është këshillë financiare ose ligjore.",
+    "you": "Ti",
+    "entry": "Pyet asistentin AI",
+    "entryHint": "p.sh. \"Dua një 2+1 në Tiranë deri në 150 mijë €\"",
+    "alternatives": "Gjej të ngjashme ose më të lira",
+    "alternativesQuestion": "Më gjej prona të ngjashme ose më të lira se kjo pronë.",
+    "compare": {
+      "title": "Krahasimi",
+      "price": "Çmimi",
+      "pricePerM2": "Çmimi për m²",
+      "area": "Sipërfaqja",
+      "bedrooms": "Dhoma gjumi",
+      "bathrooms": "Banjo",
+      "floor": "Kati",
+      "floorOf": "{{floor}} nga {{total}}",
+      "location": "Vendndodhja",
+      "amenities": "Karakteristikat",
+      "mixedCurrencies": "Monedha të ndryshme: shifrat në euro janë të përafërta.",
+      "areaNote": "Sipërfaqja është ajo e shpalljes (m²); neto dhe bruto nuk shënohen veçmas.",
+      "best": {
+        "price": "Më e lira",
+        "perM2": "Më e lirë për m²",
+        "area": "Më e madhja",
+        "beds": "Më shumë dhoma"
+      }
+    },
+    "screens": {
+      "explore": "Hap kërkimin",
+      "favorites": "Të preferuarat",
+      "saved_searches": "Kërkimet e ruajtura",
+      "messages": "Mesazhet",
+      "viewings": "Vizitat",
+      "create_listing": "Publiko një pronë",
+      "my_listings": "Listat e mia",
+      "agent_dashboard": "Paneli i agjentit",
+      "leads": "Klientët potencialë",
+      "profile": "Profili",
+      "privacy": "Politika e privatësisë",
+      "terms": "Kushtet e përdorimit"
+    },
+    "results_one": "{{count}} pronë",
+    "results_other": "{{count}} prona"
+  },
+  "time": {
+    "justNow": "tani",
+    "minutesAgo": "{{n}} min më parë",
+    "hoursAgo": "{{n}} orë më parë",
+    "daysAgo": "{{n}} ditë më parë"
+  },
+  "performance": {
+    "entry": "Raporti im i performancës",
+    "entrySub": "Rezultatet tuaja, të dukshme vetëm për ju",
+    "kicker": "Raporti im",
+    "headlinePre": "Performanca",
+    "headlineEm": "ime.",
+    "privateNote": "Ky raport shihet vetëm nga ju. Nuk krahasohet me agjentë të tjerë dhe nuk shfaqet në profilin tuaj.",
+    "agentsOnly": "Raporti i performancës është vetëm për agjentët.",
+    "period": "Periudha",
+    "periods": {
+      "week": "Këtë javë",
+      "month": "Këtë muaj",
+      "3m": "3 muajt e fundit",
+      "6m": "6 muajt e fundit",
+      "year": "Këtë vit",
+      "all": "Gjithë kohën",
+      "custom": "Zgjidh datat"
+    },
+    "from": "Nga",
+    "to": "Deri",
+    "customInvalid": "Data e fillimit duhet të jetë para ose e njëjtë me datën e mbarimit.",
+    "sections": {
+      "properties": "Pronat e mia",
+      "clients": "Klientët e mi",
+      "deals": "Transaksionet e përfunduara",
+      "activity": "Aktiviteti im",
+      "history": "Ecuria ime",
+      "impact": "Ndikimi i Shtëpia.ime në rezultatet e mia",
+      "achievements": "Arritjet e mia"
+    },
+    "metrics": {
+      "published": "Prona të publikuara",
+      "activeNow": "Aktive tani",
+      "pausedNow": "Të pezulluara tani",
+      "inquiries": "Kërkesa të reja nga klientët",
+      "clientsAnswered": "Klientë të kontaktuar",
+      "leadsAdded": "Kontakte të shtuara",
+      "leadsWon": "Kontakte të fituara",
+      "viewingsScheduled": "Shikime të planifikuara",
+      "viewingsCompleted": "Shikime të kryera",
+      "viewingsCancelled": "Shikime të anuluara",
+      "sales": "Shitje",
+      "rentals": "Dhënie me qira",
+      "transactions": "Gjithsej",
+      "messagesSent": "Mesazhe të dërguara"
+    },
+    "notes": {
+      "snapshot": "Pronat aktive dhe të pezulluara tregojnë gjendjen e sotme.",
+      "deals": "Llogariten pronat që keni shënuar si të shitura ose të dhëna me qira. Një shënim i zhbërë brenda 7 ditëve nuk llogaritet. Vlera e transaksioneve nuk tregohet: aplikacioni ruan vetëm çmimin e kërkuar.",
+      "leadsWon": "Kontaktet e fituara janë nga ato të shtuara në këtë periudhë."
+    },
+    "history": {
+      "since": "Në Shtëpia.ime që nga {{date}}",
+      "listings": "Prona",
+      "transactions": "Transaksione",
+      "viewings": "Shikime",
+      "inquiries": "Kërkesa",
+      "chartLabel": "{{metric}} për muaj",
+      "empty": "Ende nuk ka aktivitet për t’u treguar."
+    },
+    "impact": {
+      "intro": "Krahasoni mesataren mujore që regjistron aplikacioni me vlerësimin tuaj për periudhën para Shtëpia.ime.",
+      "disclaimer": "Shifrat \"para\" janë vlerësimi juaj, jo të dhëna të aplikacionit. Ky është një krahasim, jo provë që ndryshimi vjen nga Shtëpia.ime.",
+      "before": "Para (vlerësimi juaj)",
+      "now": "Tani (e regjistruar)",
+      "difference": "Ndryshimi",
+      "notEntered": "Pa vlerësim",
+      "enter": "Shto vlerësimin tuaj",
+      "edit": "Ndrysho vlerësimin",
+      "updated": "Vlerësimi juaj, më {{date}}",
+      "rows": {
+        "rentals": "Dhënie me qira në muaj",
+        "sales": "Shitje në muaj",
+        "inquiries": "Kërkesa nga klientët në muaj",
+        "viewings": "Shikime të kryera në muaj"
+      }
+    },
+    "baseline": {
+      "title": "Para Shtëpia.ime",
+      "hint": "Sa kishit mesatarisht në muaj para se të përdornit Shtëpia.ime? Lërini bosh ato që nuk i dini.",
+      "confirm": "Konfirmoj që këto janë vlerësimi im.",
+      "save": "Ruaj vlerësimin",
+      "invalid": "Shkruani një numër nga 0 deri në 1000.",
+      "mustConfirm": "Konfirmoni vlerësimin para se ta ruani.",
+      "saveFailed": "Vlerësimi nuk u ruajt. Provoni përsëri."
+    },
+    "achievements": {
+      "firstListing": "Prona e parë e publikuar",
+      "firstTransaction": "Transaksioni i parë i përfunduar",
+      "tenListings": "10 prona të publikuara",
+      "tenViewings": "10 shikime të kryera",
+      "tenTransactions": "10 transaksione të përfunduara",
+      "progress": "{{value}} nga {{target}}",
+      "done": "Arritur"
+    }
+  },
+  "agents": {
+    "headlinePre": "Agjencitë",
+    "headlineEm": "dhe agjentët",
+    "searchPlaceholder": "Kërko sipas emrit",
+    "empty": "Ende pa agjenci",
+    "emptyHint": "Agjencitë shfaqen këtu sapo të publikojnë një pronë.",
+    "noResults": "Askush me këtë emër",
+    "loadMore": "Ngarko më shumë"
+  },
+  "compare": {
+    "add": "Krahaso",
+    "added": "Në krahasim",
+    "open": "Krahaso · {{total}}",
+    "headlinePre": "Krahaso",
+    "headlineEm": "pronat",
+    "empty": "Ende asnjë pronë për krahasim",
+    "emptyHint": "Hap një pronë dhe shtyp Krahaso. Mund të shtosh deri në tre.",
+    "browse": "Shfleto pronat",
+    "remove": "Hiq nga krahasimi",
+    "clear": "Pastro krahasimin",
+    "addAnother": "Shto pronë",
+    "yearBuilt": "Viti i ndërtimit",
+    "type": "Lloji",
+    "loadFailed": "Krahasimi nuk u ngarkua.",
+    "yes": "Po",
+    "no": "Jo"
+  },
+  "nearMe": {
+    "button": "Pranë meje",
+    "denied": "Lejo vendndodhjen te cilësimet e telefonit për të parë pronat pranë teje.",
+    "failed": "Nuk e gjetëm dot vendndodhjen tënde. Provo sërish."
+  },
+  "import": {
+    "headlinePre": "Importo",
+    "headlineEm": "pronat",
+    "entry": "Importo prona",
+    "intro": "Ngarko një skedar CSV me pronat e zyrës. Do të shohësh rezultatin para se të publikohet.",
+    "pick": "Zgjidh skedarin CSV",
+    "required": "Kolona të detyrueshme",
+    "optional": "Kolona opsionale",
+    "valuesHint": "Lloji: shitje, qira ose ditore. Tipi: apartament, shtepi, vile, toke, biznes, zyre ose garazh.",
+    "photosHint": "Fotot: lidhje https, të ndara me |. Karakteristikat ndahen po ashtu me |.",
+    "rightsHint": "Importo vetëm prona dhe foto që ke të drejtë t'i publikosh.",
+    "ready": "gati për publikim",
+    "withErrors": "me gabime",
+    "publish": "Publiko {{total}}",
+    "chooseAnother": "Zgjidh një skedar tjetër",
+    "publishing": "Po publikohen {{done}} nga {{total}}",
+    "doneBody": "U publikuan {{ok}}.",
+    "doneFailed": "{{total}} nuk u publikuan. Ngarkoje sërish skedarin: të publikuarat anashkalohen.",
+    "another": "Importo një skedar tjetër",
+    "agentsOnly": "Importi është vetëm për agjentë.",
+    "fileTooBig": "Skedari është shumë i madh (maks. 2 MB).",
+    "fileExcel": "Ky është skedar Excel. Ruaje si CSV dhe provo sërish.",
+    "fileEmpty": "Skedari është bosh.",
+    "missingColumns": "Mungojnë kolonat: {{list}}",
+    "tooMany": "Maksimumi {{max}} prona për skedar.",
+    "readFailed": "Skedari nuk u lexua dot. Provo sërish.",
+    "line": "Rreshti {{n}}",
+    "more": "dhe {{total}} të tjera",
+    "err": {
+      "required": "Mungon: {{field}}",
+      "invalid": "E pavlefshme: {{field}}",
+      "duplicate": "Ekziston tashmë",
+      "encoding": "Shkronja të dëmtuara. Ruaje si CSV UTF-8."
+    }
+  },
+  "publicProfile": {
+    "agent": "Agjent imobiliar",
+    "unnamed": "Përdorues",
+    "published": "Prona të publikuara: {{n}}",
+    "listingsTitle": "Pronat e publikuara nga ky përdorues",
+    "empty": "Ende nuk ka prona të publikuara.",
+    "unavailable": "Ky profil nuk është i disponueshëm.",
+    "listingsFailed": "Pronat nuk u ngarkuan.",
+    "open": "Hap profilin e {{name}}",
+    "call": "Telefono {{phone}}"
+  },
+  "locations": {
+    "noMatch": "Asnjë vend nuk përputhet"
+  },
+  "currency": {
+    "title": "Monedha e çmimeve",
+    "asListed": "Si në njoftim",
+    "asListedShort": "Origjinale",
+    "converted": "Çmim i përafërt me kursin ditor. Çmimi i njoftimit: {{price}}"
+  },
+  "site": {
+    "nav": {
+      "search": "Kërko",
+      "agencies": "Agjenci"
+    },
+    "listHome": "Listo pronën",
+    "menu": "Menyja",
+    "hero": {
+      "eyebrow": "Shtëpi në Shqipëri, për ju kudo që jeni",
+      "title": "Gjeni shtëpinë e duhur",
+      "titleEm": "në Shqipëri.",
+      "lead": "Apartamente, vila dhe zyra për shitje dhe qira, në gjuhën tuaj. Flisni drejtpërdrejt me agjentët dhe pronarët."
+    },
+    "stats": {
+      "listings": "Prona aktive",
+      "cities": "Qytete me prona",
+      "agencies": "Agjenci dhe agjentë",
+      "title": "Shtëpia.ime në shifra",
+      "body": "Numra të vërtetë, të lexuar drejtpërdrejt nga pronat e publikuara sot."
+    },
+    "listings": {
+      "eyebrow": "Të rejat",
+      "title": "Pronat më të fundit"
+    },
+    "steps": {
+      "eyebrow": "Si funksionon",
+      "title": "Nga kërkimi te çelësat, hap pas hapi",
+      "search": {
+        "title": "Kërkoni",
+        "body": "Filtroni sipas qytetit, zonës, çmimit dhe dhomave, në listë ose në hartë."
+      },
+      "compare": {
+        "title": "Krahasoni",
+        "body": "Vendosni deri në tre shtëpi krah për krah dhe shihni historikun e çmimit."
+      },
+      "visit": {
+        "title": "Vizitoni",
+        "body": "Kërkoni një vizitë ose shkruani agjentit në aplikacion, në WhatsApp ose me telefon."
+      },
+      "buy": {
+        "title": "Blini të sigurt",
+        "body": "Ndiqni udhëzuesin tonë dhe përdorni avokat e noter të licencuar për hapat ligjorë."
+      }
+    },
+    "services": {
+      "eyebrow": "Çfarë ofrojmë",
+      "title": "Gjithçka për të gjetur shtëpinë, në një vend",
+      "wanted": {
+        "title": "Shtëpi të kërkuara",
+        "body": "Thoni çfarë kërkoni dhe ju njoftojmë kur del një pronë që ju përshtatet."
+      },
+      "priceHistory": {
+        "title": "Historiku i çmimit",
+        "body": "Shihni si ka ndryshuar çmimi i çdo njoftimi që kur u publikua."
+      },
+      "currency": {
+        "title": "Çmime në monedhën tuaj",
+        "body": "Shihni çmimet në lekë, euro, dollarë ose paund, me kursin ditor."
+      },
+      "viewings": {
+        "title": "Vizita me një klik",
+        "body": "Zgjidhni orën, agjenti e konfirmon dhe ju merrni njoftim."
+      },
+      "chat": {
+        "title": "Bisedë e drejtpërdrejtë",
+        "body": "Shkruani agjentit ose pronarit, me foto, pa ndërmjetës."
+      },
+      "guide": {
+        "title": "Blerja nga jashtë",
+        "body": "Hapat, dokumentet dhe si të qëndroni të sigurt kur blini nga larg."
+      }
+    },
+    "cities": {
+      "eyebrow": "Qytetet"
+    },
+    "cta": {
+      "title": "Gati të gjeni shtëpinë tuaj?",
+      "body": "Kërkoni falas, ose listoni pronën tuaj falas dhe arrini blerës nga Shqipëria dhe diaspora.",
+      "search": "Kërko shtëpi"
+    },
+    "footer": {
+      "explore": "Eksploro",
+      "sell": "Shit ose jep me qira",
+      "legal": "Ligjore",
+      "tagline": "Tregu i pronave në Shqipëri, në gjuhën tuaj.",
+      "copyright": "© {{year}} Jorgji Dhaskali. Të gjitha të drejtat e rezervuara.",
+      "contact": "Kontakt"
+    },
+    "agentsOnly": "Kjo faqe është vetëm për agjentët."
   }
 }

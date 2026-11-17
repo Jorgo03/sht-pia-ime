@@ -1,3 +1,6 @@
+import * as Location from 'expo-location';
+import { DEFAULT_RADIUS, NEAR_ME_RADII, regionAround } from '@/src/features/properties/lib/nearMe';
+
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { Image } from 'expo-image';
 import { useRouter, type Href } from 'expo-router';
@@ -6,9 +9,10 @@ import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from 'rea
 import { useTranslation } from 'react-i18next';
 import type { FeatureCollection } from 'geojson';
 
+import { useTabBarClearance } from '@/components/liquid-tab-bar';
 import { MapCanvas } from '@/components/map/map-canvas';
 import type { CountyGroup, MapCanvasHandle, MapRegionLike } from '@/components/map/map-canvas.types';
-import { type AtticoPalette } from '@/constants/theme';
+import { type AtticoPalette, Fonts } from '@/constants/theme';
 import { useFilters } from '@/contexts/filters-context';
 import { useTheme } from '@/contexts/theme-context';
 import { MAP_MARKER_LIMIT } from '@/data/properties';
@@ -16,10 +20,17 @@ import { Property } from '@/data/types';
 import { useMapPropertiesQuery } from '@/hooks/use-property-queries';
 import { Cluster, clusterProperties, MARKER_COLORS } from '@/lib/cluster';
 import { boundsToRegion, geometryBounds, pointInGeometry, type GeoJSONGeometry } from '@/lib/geo';
-import { formatPrice, getLocalizedText, priceSuffixKey } from '@/lib/format';
+import { getLocalizedText, priceSuffixKey } from '@/lib/format';
 import albaniaCountiesRaw from '@/data/albania-counties.json';
+import { useCurrency } from '@/contexts/currency-context';
 
-const LEGEND_TYPES: (keyof typeof MARKER_COLORS)[] = ['sale', 'rent', 'commercial', 'land'];
+/** How long to wait for a fresh position before using the last known one. */
+const LOCATE_TIMEOUT_MS = 12_000;
+
+// Only the colours a bubble can have: markers are coloured by listing type,
+// so the green "commercial" and yellow "land" entries promised markers that
+// were never drawn (and had no translation).
+const LEGEND_TYPES: (keyof typeof MARKER_COLORS)[] = ['sale', 'rent'];
 
 const albaniaCounties = albaniaCountiesRaw as FeatureCollection;
 
@@ -68,9 +79,14 @@ function groupByCounty(properties: Property[]): CountyGroup[] {
 export function MapScreenContent() {
   const router = useRouter();
   const { t, i18n } = useTranslation();
+  const { formatListingPrice } = useCurrency();
   const { queryFilters, activeCount } = useFilters();
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
+  // The map runs to the bottom edge, under the floating tab bar: at bottom 20
+  // the preview card sat under the pill on every phone, and the map's logo and
+  // its centring treated the covered strip as visible. This is the pill's top.
+  const tabBarTop = useTabBarClearance(0);
 
   const mapRef = useRef<MapCanvasHandle | null>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -78,6 +94,50 @@ export function MapScreenContent() {
   const [region, setRegion] = useState<MapRegionLike>(ALBANIA);
   const [queryRegion, setQueryRegion] = useState<MapRegionLike>(ALBANIA);
   const [previewProperty, setPreviewProperty] = useState<Property | null>(null);
+  // Near me: the position stays in this component and is not stored anywhere.
+  const [position, setPosition] = useState<{ latitude: number; longitude: number } | null>(null);
+  const [radius, setRadius] = useState(DEFAULT_RADIUS);
+  const [locating, setLocating] = useState(false);
+  const [locationNotice, setLocationNotice] = useState<string | null>(null);
+
+  const showAround = (center: { latitude: number; longitude: number }, km: number) => {
+    setPreviewProperty(null);
+    mapRef.current?.animateToRegion(regionAround(center, km), 500);
+  };
+
+  const findMe = async () => {
+    if (locating) return;
+    setLocating(true);
+    setLocationNotice(null);
+    try {
+      const permission = await Location.requestForegroundPermissionsAsync();
+      if (permission.status !== 'granted') {
+        setLocationNotice(t('nearMe.denied'));
+        return;
+      }
+      const fix = await Promise.race([
+        Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced }),
+        new Promise<null>((resolve) => setTimeout(() => resolve(null), LOCATE_TIMEOUT_MS)),
+      ]);
+      const known = fix ?? (await Location.getLastKnownPositionAsync());
+      if (!known) {
+        setLocationNotice(t('nearMe.failed'));
+        return;
+      }
+      const center = { latitude: known.coords.latitude, longitude: known.coords.longitude };
+      setPosition(center);
+      showAround(center, radius);
+    } catch {
+      setLocationNotice(t('nearMe.failed'));
+    } finally {
+      setLocating(false);
+    }
+  };
+
+  const chooseRadius = (km: number) => {
+    setRadius(km);
+    if (position) showAround(position, km);
+  };
 
   // onRegionChangeComplete already fires only at gesture end; the extra debounce
   // covers momentum scrolling, which can settle several times in quick succession.
@@ -113,7 +173,7 @@ export function MapScreenContent() {
     }),
     [queryFilters, queryRegion],
   );
-  const { data: properties = [], isLoading: loading } = useMapPropertiesQuery(mapFilters);
+  const { data: properties = [], isLoading: loading, isError: failed, refetch } = useMapPropertiesQuery(mapFilters);
 
   const clusters = useMemo(
     () => clusterProperties(properties, region),
@@ -160,7 +220,7 @@ export function MapScreenContent() {
         350,
       );
     },
-    [region, router],
+    [region],
   );
 
   return (
@@ -178,12 +238,16 @@ export function MapScreenContent() {
         onMarkerPress={handleMarkerPress}
         accentColor={colors.accent}
         properties={properties}
+        bottomInset={tabBarTop}
+        showUserLocation={position !== null}
       />
 
       <View style={styles.overlay} pointerEvents="box-none">
         <View style={styles.card}>
           {loading ? (
             <ActivityIndicator size="small" color={colors.accent} />
+          ) : failed && properties.length === 0 ? (
+            <Text style={styles.count}>{t('errors.generic')}</Text>
           ) : (
             <Text style={styles.count}>
               {/* Base key, not the `_other` variant — naming a plural suffix
@@ -201,6 +265,40 @@ export function MapScreenContent() {
           )}
         </View>
 
+        <TouchableOpacity
+          accessibilityRole="button"
+          accessibilityLabel={t('nearMe.button')}
+          style={styles.nearMeButton}
+          onPress={findMe}
+          disabled={locating}
+          activeOpacity={0.8}>
+          {locating ? (
+            <ActivityIndicator size="small" color={colors.accentText} />
+          ) : (
+            <MaterialIcons name={position ? 'my-location' : 'location-searching'} size={22} color={colors.accentText} />
+          )}
+        </TouchableOpacity>
+
+        {position && (
+          <View style={styles.radiusRow}>
+            {NEAR_ME_RADII.map((km) => (
+              <TouchableOpacity
+                key={km}
+                accessibilityRole="button"
+                accessibilityState={{ selected: radius === km }}
+                style={[styles.radiusChip, radius === km && styles.radiusChipOn]}
+                onPress={() => chooseRadius(km)}
+                activeOpacity={0.8}>
+                <Text style={[styles.radiusText, radius === km && styles.radiusTextOn]}>{km} km</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
+
+        {locationNotice && (
+          <Text style={styles.locationNotice} accessibilityLiveRegion="polite">{locationNotice}</Text>
+        )}
+
         {!isRegionOverview && (
           <View style={styles.legend}>
             {LEGEND_TYPES.map((type) => (
@@ -212,22 +310,34 @@ export function MapScreenContent() {
           </View>
         )}
 
-        {!loading && properties.length === 0 && (
+        {/* A failed load also has zero rows: say so and offer a retry rather
+            than telling the visitor their filters matched nothing. */}
+        {!loading && failed && properties.length === 0 ? (
+          <View style={styles.empty}>
+            <Text style={styles.emptyTitle}>{t('errors.generic')}</Text>
+            <TouchableOpacity accessibilityRole="button" onPress={() => refetch()} style={styles.retry} hitSlop={8}>
+              <Text style={styles.retryText}>{t('common.retry')}</Text>
+            </TouchableOpacity>
+          </View>
+        ) : !loading && properties.length === 0 ? (
           <View style={styles.empty}>
             <Text style={styles.emptyTitle}>{t('search.empty')}</Text>
             <Text style={styles.emptyHint}>{t('search.emptyHint')}</Text>
           </View>
-        )}
+        ) : null}
       </View>
 
       {previewProperty && (
-        <View style={styles.previewCard} pointerEvents="box-none">
+        <View style={[styles.previewCard, { bottom: tabBarTop + 12 }]} pointerEvents="box-none">
+          <View style={styles.previewColumn} pointerEvents="box-none">
           <TouchableOpacity
+            accessibilityRole="button"
             style={styles.previewTouchable}
             activeOpacity={0.9}
             onPress={() => router.push(`/property/${previewProperty.id}` as Href)}>
             {previewProperty.image_urls?.[0] ? (
               <Image
+                accessibilityLabel={getLocalizedText(previewProperty.title_i18n, i18n.language) || previewProperty.title}
                 source={{ uri: previewProperty.image_urls[0] }}
                 style={styles.previewImage}
                 contentFit="cover"
@@ -240,7 +350,7 @@ export function MapScreenContent() {
                 {getLocalizedText(previewProperty.title_i18n, i18n.language) || previewProperty.title}
               </Text>
               <Text style={styles.previewPrice}>
-                {formatPrice(previewProperty.price, i18n.language)}
+                {formatListingPrice(previewProperty.price, previewProperty.currency)}
                 {(() => {
                   const key = priceSuffixKey(previewProperty.listing_type);
                   return key ? t(key) : '';
@@ -258,11 +368,13 @@ export function MapScreenContent() {
             </View>
           </TouchableOpacity>
           <TouchableOpacity
+            accessibilityRole="button" accessibilityLabel={t('common.close')}
             style={styles.previewClose}
             onPress={() => setPreviewProperty(null)}
             hitSlop={10}>
             <MaterialIcons name="close" size={16} color={colors.textPrimary} />
           </TouchableOpacity>
+          </View>
         </View>
       )}
     </View>
@@ -278,6 +390,46 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     flex: 1,
     paddingHorizontal: 20,
     paddingTop: 8,
+  },
+  nearMeButton: {
+    position: 'absolute',
+    top: 8,
+    right: 20,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.primary,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  radiusRow: { flexDirection: 'row', gap: 8, marginTop: 8 },
+  radiusChip: {
+    minHeight: 36,
+    justifyContent: 'center',
+    paddingHorizontal: 14,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: colors.primary,
+  },
+  radiusChipOn: { borderColor: colors.accent },
+  radiusText: { fontFamily: Fonts.sansSemiBold, fontSize: 13, color: colors.textSecondary },
+  radiusTextOn: { color: colors.accentText },
+  locationNotice: {
+    alignSelf: 'flex-start',
+    maxWidth: '86%',
+    marginTop: 8,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 14,
+    overflow: 'hidden',
+    fontFamily: Fonts.sans,
+    fontSize: 13,
+    lineHeight: 18,
+    color: colors.textPrimary,
+    backgroundColor: colors.primary,
   },
   card: {
     flexDirection: 'row',
@@ -300,7 +452,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   count: {
     color: colors.textPrimary,
     fontSize: 14,
-    fontWeight: '700',
+    fontFamily: Fonts.sansBold,
   },
   badge: {
     backgroundColor: colors.accent,
@@ -312,8 +464,8 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   badgeText: {
     color: colors.textPrimary,
-    fontSize: 11,
-    fontWeight: '700',
+    fontSize: 12,
+    fontFamily: Fonts.sansBold,
   },
   empty: {
     alignSelf: 'center',
@@ -330,11 +482,23 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   emptyTitle: {
     color: colors.textPrimary,
     fontSize: 15,
-    fontWeight: '600',
+    fontFamily: Fonts.sansSemiBold,
   },
   emptyHint: {
     color: colors.textSecondary,
+    fontFamily: Fonts.sans,
     fontSize: 13,
+  },
+  retry: {
+    marginTop: 6,
+    minHeight: 44,
+    paddingHorizontal: 18,
+    justifyContent: 'center',
+  },
+  retryText: {
+    color: colors.accentText,
+    fontSize: 14,
+    fontFamily: Fonts.sansSemiBold,
   },
   legend: {
     flexDirection: 'row',
@@ -360,16 +524,24 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     borderRadius: 4,
   },
   legendLabel: {
-    fontSize: 11,
-    fontWeight: '600',
+    fontSize: 12,
+    fontFamily: Fonts.sansSemiBold,
     color: colors.textSecondary,
     textTransform: 'capitalize',
   },
+  // `bottom` is set inline, just above the tab bar.
   previewCard: {
     position: 'absolute',
     left: 16,
     right: 16,
-    bottom: 20,
+    alignItems: 'center',
+  },
+  // At 829-1114 wide the card stretched edge to edge, the photo at one end and
+  // the CTA ~1000px away; capped and centred like the tab bar. Phones (<=430)
+  // are under the cap, so they are unchanged.
+  previewColumn: {
+    width: '100%',
+    maxWidth: 480,
   },
   previewTouchable: {
     flexDirection: 'row',
@@ -400,15 +572,16 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   previewTitle: {
     fontSize: 14,
-    fontWeight: '700',
+    fontFamily: Fonts.sansBold,
     color: colors.textPrimary,
   },
   previewPrice: {
     fontSize: 15,
-    fontWeight: '700',
-    color: colors.accent,
+    fontFamily: Fonts.sansBold,
+    color: colors.accentText,
   },
   previewMeta: {
+    fontFamily: Fonts.sans,
     fontSize: 12,
     color: colors.textSecondary,
     textTransform: 'capitalize',
@@ -424,7 +597,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   previewCtaText: {
     fontSize: 12,
-    fontWeight: '700',
+    fontFamily: Fonts.sansBold,
     color: '#fff',
   },
   previewClose: {

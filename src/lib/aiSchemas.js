@@ -1,5 +1,8 @@
-// Pure sanitizers for AI edge-function responses. No imports — keep this
-// module dependency-free so it can be unit-tested with `node --test`.
+// Pure sanitizers for AI edge-function responses. Only pure imports, so this
+// module can be unit-tested with `node --test`.
+
+import { UNITS_PER_EUR } from '../features/properties/lib/priceRange.js'
+import { resolveCity } from '../features/properties/lib/places.js'
 
 const LISTING_TYPES = ['sale', 'rent', 'daily_rent']
 const PROPERTY_TYPES = ['apartment', 'villa', 'house', 'land', 'commercial', 'office', 'garage']
@@ -17,13 +20,20 @@ export function sanitizeSearchFilters(raw) {
   const out = {}
 
   if (typeof raw.city === 'string' && raw.city.trim()) {
-    out.city = raw.city.trim().slice(0, 60)
+    // The model may answer "Tirana", "Durazzo" or "Dibër": the app's own
+    // city name is what the city filter and picker understand.
+    out.city = resolveCity(raw.city) ?? raw.city.trim().slice(0, 60)
   }
   if (LISTING_TYPES.includes(raw.listing_type)) out.listing = raw.listing_type
   if (PROPERTY_TYPES.includes(raw.property_type)) out.type = raw.property_type
 
-  const min = positiveNumber(raw.min_price, 100_000_000)
-  const max = positiveNumber(raw.max_price, 100_000_000)
+  // The search fields are euros. A query in lekë or dollars ("deri 15 milionë
+  // lekë") comes back in that currency and is converted here, with the same
+  // reference rates the price filter uses. An unknown currency counts as euros.
+  const rate = Object.hasOwn(UNITS_PER_EUR, raw.currency) ? UNITS_PER_EUR[raw.currency] : 1
+  const inEur = (v) => (v == null ? null : Math.max(1, Math.round(v / rate)))
+  const min = inEur(positiveNumber(raw.min_price, 100_000_000 * rate))
+  const max = inEur(positiveNumber(raw.max_price, 100_000_000 * rate))
   if (min != null) out.minPrice = String(min)
   if (max != null) out.maxPrice = String(max)
   if (min != null && max != null && min > max) {

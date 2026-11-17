@@ -1,13 +1,10 @@
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import DateTimePicker from '@react-native-community/datetimepicker';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter, Href } from 'expo-router';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { type ComponentProps, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
-  Alert,
-  Dimensions,
   FlatList,
   KeyboardAvoidingView,
   Linking,
@@ -22,27 +19,50 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  useWindowDimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
+import { SheetCloseButton } from '@/components/ui/sheet-close-button';
+import { formatRef } from '@/src/features/properties/lib/searchFilters';
 
+import { ReportSheet } from '@/components/safety/report-sheet';
 import { AppHeader } from '@/components/ui/app-header';
 import { ActionButton } from '@/components/ui/action-button';
 import { PrimaryCTA } from '@/components/ui/buttons';
-import { ListingAssistant } from '@/components/property/listing-assistant';
+import { ListingAssistant, type ListingContact } from '@/components/property/listing-assistant';
+import { AI_CHAT_ENABLED } from '@/constants/features';
 import { LocationPreviewMap } from '@/components/property/location-preview-map';
 import { PropertyCard } from '@/components/property/property-card';
-import { type AtticoPalette } from '@/constants/theme';
+import { KeyboardDoneBar } from '@/components/ui/keyboard-done-bar';
+import { Fonts, InlineTarget, type AtticoPalette } from '@/constants/theme';
 import { useAuth } from '@/contexts/auth-context';
 import { useFavorites } from '@/contexts/favorites-context';
 import { useTheme } from '@/contexts/theme-context';
+import { useListingPublisher } from '@/hooks/use-listing-publisher';
 import { usePropertiesQuery, usePropertyQuery } from '@/hooks/use-property-queries';
 import { addRecentlyViewed } from '@/hooks/use-recently-viewed';
-import { useResponsive } from '@/hooks/use-responsive';
+import { useReadableColumn, useResponsive } from '@/hooks/use-responsive';
 import { useTranslatedProperty } from '@/hooks/use-translated-property';
 import { logActivity } from '@/lib/activity';
+import { propertyUrl } from '@/lib/site';
 import { supabase } from '@/lib/supabase';
-import { formatPrice, listingBadgeKey, priceSuffixKey, whatsappUrl } from '@/lib/format';
+import { isPlayableVideo, ListingVideo } from '@/components/property/listing-video';
+import { useCompare } from '@/contexts/compare-context';
+import { formatPrice, listingBadgeKey, priceSuffixKey, telUrl, whatsappUrl } from '@/lib/format';
+import { sheetColumn } from '@/constants/web-frame';
+import { useAppDimensions, useIsDesktopWeb } from '@/hooks/use-app-dimensions';
+import { PageHead } from '@/components/web/page-head';
+import { pricePerM2 } from '@/src/features/properties/lib/compare';
+import { PriceHistory } from '@/components/property/price-history';
+import { CARD_CONTAINER_A11Y } from '@/components/property/card-a11y';
+import { ViewingTimePicker } from '@/components/viewings/viewing-time-picker';
+import { FORM_LIMITS } from '@/src/lib/formLimits';
+import { confirmAction, notify } from '@/lib/confirm';
+import { viewingRequestErrorKey } from '@/src/features/viewings/lib/viewingErrors';
+import { LoadError } from '@/components/ui/load-error';
+import { deviceUsesTiranaTime } from '@/src/lib/tiranaTime';
+import { useCurrency } from '@/contexts/currency-context';
 
 // Rounds "now + 1h" to the next half hour — same default the web app's
 // ViewingRequestSheet uses.
@@ -56,16 +76,27 @@ export default function PropertyDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const { t, i18n } = useTranslation();
+  // A phone link on a device that cannot call, WhatsApp not installed, etc.
+  const notifyLinkFailed = () => notify(t('errors.generic'));
   const { user } = useAuth();
+  const { formatListingPrice } = useCurrency();
   const { isFavorite, toggle } = useFavorites();
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
-  const { height: screenHeight, isTablet } = useResponsive();
+  const { height: screenHeight, width: layoutWidth, isTablet } = useResponsive();
+  // Two columns only when the right one gets a phone's width: at 600-819
+  // (Fold open 673x841) it was ~210-240px, too narrow for the agent row,
+  // price and CTA. Below that the content stacks in the readable column.
+  const split = isTablet && layoutWidth >= 820;
+  const desktopWeb = useIsDesktopWeb();
+  const readable = useReadableColumn();
   const favorited = isFavorite(id ?? '');
-  const { data: property = null, isLoading: loading } = usePropertyQuery(id);
+  const { data: property = null, isLoading: loading, isError: loadFailed, refetch } = usePropertyQuery(id);
+  const publisher = useListingPublisher(property);
   const [contactMessage, setContactMessage] = useState('');
   const [sendingMessage, setSendingMessage] = useState(false);
   const [messageSent, setMessageSent] = useState(false);
+  const [messageError, setMessageError] = useState(false);
   const [viewingSheetOpen, setViewingSheetOpen] = useState(false);
   const [viewingDate, setViewingDate] = useState<Date>(nextSlot());
   const [viewingNotes, setViewingNotes] = useState('');
@@ -74,7 +105,28 @@ export default function PropertyDetailScreen() {
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const heroListRef = useRef<FlatList<string>>(null);
   const lightboxListRef = useRef<FlatList<string>>(null);
-  const screenWidth = Dimensions.get('window').width;
+  // The photo carousel is as wide as the app (the phone-width column on the
+  // web); the full-screen photo viewer is as wide as the window.
+  const { width: heroWidth } = useAppDimensions();
+  const { width: screenWidth, height: windowHeight } = useWindowDimensions();
+  // Folding or unfolding a phone changes the page width under a paged
+  // carousel; without this it is left between two photos. Runs on a width
+  // change only (the index is read from a ref), so it never fights a swipe.
+  const imgIndexRef = useRef(0);
+  useEffect(() => {
+    imgIndexRef.current = imgIndex;
+  }, [imgIndex]);
+  useEffect(() => {
+    const i = imgIndexRef.current;
+    heroListRef.current?.scrollToOffset({ offset: i * heroWidth, animated: false });
+    lightboxListRef.current?.scrollToOffset({ offset: i * screenWidth, animated: false });
+  }, [heroWidth, screenWidth]);
+  // The photo in view, tracked while scrolling: the web build never fires
+  // onMomentumScrollEnd, so the index stayed 0 there and a resize jumped
+  // back to the first photo. setImgIndex skips a render when it is unchanged.
+  const trackPhoto = (pageWidth: number) => (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+    setImgIndex(Math.round(e.nativeEvent.contentOffset.x / pageWidth));
+  };
   const { title, description, translating, isTranslated } = useTranslatedProperty(property, i18n.language);
 
   // Matches PropertyDetail.jsx's mount effect exactly — same two calls, same
@@ -99,77 +151,110 @@ export default function PropertyDetailScreen() {
     [similarRaw, property?.id],
   );
 
-  const requireSignIn = () => {
-    Alert.alert(t('favourites.loginPrompt'), '', [
-      { text: t('common.cancel'), style: 'cancel' },
-      // common.signIn, not auth.signIn: the auth namespace has signInTitle /
-      // signInWith / signInWithEmail but never a bare signIn, so this button
-      // rendered the literal text "auth.signIn" in every language.
-      { text: t('common.signIn'), onPress: () => router.push('/(tabs)/profile' as Href) },
-    ]);
-  };
+  // common.signIn, not auth.signIn: the auth namespace has signInTitle /
+  // signInWith / signInWithEmail but never a bare signIn, so this button
+  // rendered the literal text "auth.signIn" in every language.
+  const requireSignIn = () =>
+    confirmAction({
+      title: t('favourites.loginPrompt'),
+      confirmText: t('common.signIn'),
+      cancelText: t('common.cancel'),
+      onConfirm: () => router.push('/(tabs)/profile' as Href),
+    });
 
   const agentId = property?.agent?.id || property?.agent_id || property?.owner_id || null;
   const isOwnListing = !!user && !!agentId && user.id === agentId;
+  const compare = useCompare();
+  // Report is never offered on your own listing (owner or agent).
+  const canReport = !isOwnListing && !(user && property && user.id === property.owner_id);
+  const [reportOpen, setReportOpen] = useState(false);
+
+  // The box shows a suggested message as its placeholder. Sending with
+  // nothing typed sends that suggestion: the button used to stay disabled
+  // under a box that looked filled in, which read as a broken button.
+  const suggestedMessage = t('property.whatsappMessage', { title });
+  const messageToSend = contactMessage.trim() || suggestedMessage;
 
   const handleSendMessage = async () => {
     if (!property) return;
     if (!user) return requireSignIn();
-    if (!contactMessage.trim() || !agentId || agentId === user.id) return;
+    if (!messageToSend || !agentId || agentId === user.id) return;
 
     setSendingMessage(true);
+    setMessageError(false);
     // Matches the web app's startChat(): find-or-create the conversation,
     // then insert the message — same tables, same shape.
-    const { data: existing } = await supabase
-      .from('conversations')
-      .select('id')
-      .eq('property_id', property.id)
-      .eq('client_id', user.id)
-      .eq('agent_id', agentId)
-      .maybeSingle();
-
-    let conversationId = existing?.id;
-    if (!conversationId) {
-      const { data: created } = await supabase
+    const findConversation = async () => {
+      const { data } = await supabase
         .from('conversations')
-        .insert({ property_id: property.id, client_id: user.id, agent_id: agentId })
         .select('id')
-        .single();
-      conversationId = created?.id;
-    }
+        .eq('property_id', property.id)
+        .eq('client_id', user.id)
+        .eq('agent_id', agentId)
+        .maybeSingle();
+      return data?.id as string | undefined;
+    };
 
-    if (conversationId) {
-      await supabase
-        .from('messages')
-        .insert({ conversation_id: conversationId, sender_id: user.id, body: contactMessage.trim() });
+    try {
+      let conversationId = await findConversation();
+      if (!conversationId) {
+        const { data: created } = await supabase
+          .from('conversations')
+          .insert({ property_id: property.id, client_id: user.id, agent_id: agentId })
+          .select('id')
+          .single();
+        // A second tap that lost the race hits the unique key: the
+        // conversation exists now, so use it.
+        conversationId = created?.id ?? (await findConversation());
+      }
+
+      // The message itself can still be refused (offline, a block, the
+      // server's length check): say so and keep the text, never "sent".
+      const { error: sendFailed } = conversationId
+        ? await supabase
+            .from('messages')
+            .insert({ conversation_id: conversationId, sender_id: user.id, body: messageToSend })
+        : { error: true };
+      if (sendFailed) {
+        setMessageError(true);
+        return;
+      }
       logActivity(property.id, 'message');
       setContactMessage('');
       setMessageSent(true);
       setTimeout(() => setMessageSent(false), 3000);
-    } else {
-      Alert.alert(t('common.error'), t('errors.generic'));
+    } catch {
+      setMessageError(true);
+    } finally {
+      setSendingMessage(false);
     }
-    setSendingMessage(false);
   };
 
   const handleShare = () => {
     if (!property) return;
-    Share.share({ message: title, url: `https://shtepia.ime/property/${property.id}` }).catch(() => {});
+    // shtepia.ime is not a registered domain, so the old link led nowhere.
+    // Android's share sheet ignores `url`, so the link has to ride in `message`
+    // there or the recipient gets the title alone.
+    const url = propertyUrl(property.id);
+    Share.share(Platform.OS === 'ios' ? { message: title, url } : { message: `${title}\n${url}` }).catch(() => {});
   };
 
-  // Listing-level contact override wins over the agent's own profile phone —
-  // matches web's `phone` derivation in PropertyDetail.jsx exactly.
-  const contactPhone = property?.contact_phone?.replace(/\s/g, '') || property?.agent?.phone?.replace(/\s/g, '') || null;
+  // The number the "Published by" card shows, so the card, Call and WhatsApp
+  // can never disagree.
+  const contactPhone = publisher.phone?.replace(/\s/g, '') || null;
 
   const handleCall = () => {
-    if (contactPhone) Linking.openURL(`tel:${contactPhone}`);
+    if (!property || !contactPhone) return;
+    logActivity(property.id, 'call');
+    Linking.openURL(telUrl(contactPhone)).catch(() => notifyLinkFailed());
   };
 
   const handleWhatsApp = () => {
     if (!property || !contactPhone) return;
-    const message = t('property.whatsappMessage', { title });
+    // What the box holds, or the suggestion when nothing was typed: the same
+    // message the in-app chat button sends.
     logActivity(property.id, 'message');
-    Linking.openURL(whatsappUrl(contactPhone, message));
+    Linking.openURL(whatsappUrl(contactPhone, messageToSend)).catch(() => notifyLinkFailed());
   };
 
   const openViewingSheet = () => {
@@ -182,7 +267,7 @@ export default function PropertyDetailScreen() {
   const submitViewingRequest = async () => {
     if (!property || !user) return;
     if (viewingDate.getTime() < Date.now()) {
-      Alert.alert(t('common.error'), t('viewings.pastDate'));
+      notify(t('common.error'), t('viewings.pastDate'));
       return;
     }
     setRequestingViewing(true);
@@ -195,12 +280,12 @@ export default function PropertyDetailScreen() {
     });
     setRequestingViewing(false);
     if (error) {
-      Alert.alert(t('common.error'), t('viewings.requestFailed'));
+      notify(t('common.error'), t(viewingRequestErrorKey(error)));
       return;
     }
     logActivity(property.id, 'meeting');
     setViewingSheetOpen(false);
-    Alert.alert(t('viewings.requestSuccess'));
+    notify(t('viewings.requestSuccess'));
   };
 
   if (loading) {
@@ -211,11 +296,29 @@ export default function PropertyDetailScreen() {
     );
   }
 
-  if (!property) {
+  if (!property && loadFailed) {
+    // Offline, a timeout or a server error: the listing may well exist, so
+    // offer a retry rather than calling it unavailable (AUDIT-006).
     return (
-      <View style={styles.errorContainer}>
-        <Text style={styles.errorText}>{t('search.empty')}</Text>
-      </View>
+      <SafeAreaView style={styles.errorContainer}>
+        <LoadError onRetry={() => refetch()} />
+      </SafeAreaView>
+    );
+  }
+
+  if (!property) {
+    // Deleted, sold-and-removed, or a stale deep link: explain and offer a way
+    // out, since a deep link may have opened this screen with nothing beneath it.
+    return (
+      <SafeAreaView style={styles.errorContainer}>
+        <MaterialIcons name="search-off" size={40} color={colors.textSecondary} />
+        <Text style={styles.errorText}>{t('detail.unavailable')}</Text>
+        <Text style={styles.errorHint}>{t('detail.unavailableHint')}</Text>
+        <View style={styles.errorActions}>
+          <ActionButton title={t('common.search')} onPress={() => router.replace('/(tabs)/explore' as Href)} />
+          <ActionButton title={t('common.home')} variant="secondary" onPress={() => router.replace('/(tabs)' as Href)} />
+        </View>
+      </SafeAreaView>
     );
   }
 
@@ -223,21 +326,53 @@ export default function PropertyDetailScreen() {
   // dominating the whole screen, so it can afford to be relatively shorter,
   // leaving more room for that content — especially in landscape, where
   // screenHeight is already constrained.
-  const imageHeight = screenHeight * (isTablet ? 0.32 : 0.42);
+  // Clamped on short screens (360x380 Flip cover, where 42% pinned the hero
+  // over most of what was left); unchanged from ~552 tall up.
+  // Desktop website: a big gallery, as the website audit asks (288px left a
+  // portrait photo as a thin strip).
+  const imageHeight = desktopWeb
+    ? Math.min(640, Math.max(420, screenHeight * 0.66))
+    : Math.min(
+        screenHeight * (isTablet ? 0.32 : 0.42),
+        Math.max(120, screenHeight - 320),
+      );
 
   const images = property.image_urls?.length ? property.image_urls : [];
-  const price = formatPrice(property.price, i18n.language, property.currency);
+  const price = formatListingPrice(property.price, property.currency);
   const suffixKey = priceSuffixKey(property.listing_type);
   const suffix = suffixKey ? t(suffixKey) : '';
   // listingBadgeKey() handles all 3 listing types (sale/rent/daily_rent) —
   // a bare rent-only check silently mislabels daily-rent listings as "For
   // Sale", matching the bug already found and fixed on the property cards.
   const badge = t(listingBadgeKey(property.listing_type));
-  const propertyTypeLabel = property.property_type ? t(`search.${property.property_type}`) : '';
+  // defaultValue: a type with no translation shows as stored, never as a key.
+  const propertyTypeLabel = property.property_type
+    ? t(`search.${property.property_type}`, { defaultValue: property.property_type })
+    : '';
   const agent = property.agent;
-  const agentInitial = agent?.full_name?.[0]?.toUpperCase() || 'A';
+  // A name is not always on file: say what they are rather than show nothing.
+  const publisherName = publisher.name ?? t(publisher.kind === 'agent' ? 'auth.agent' : 'detail.owner');
+  const publisherInitial = publisherName[0]?.toUpperCase() || '?';
+  const openAgent = agent ? () => router.push(`/agent/${agent.id}` as Href) : undefined;
+  // Shown in the listing assistant when the listing does not hold the answer:
+  // the same phone and actions as the contact section below. Not on your own
+  // listing, and not when there is neither a phone nor a profile to open.
+  const assistantContact: ListingContact | null =
+    isOwnListing || (!contactPhone && !agent?.id)
+      ? null
+      : {
+          name: agent?.full_name || t('auth.agent'),
+          agency: agent?.agency_name ?? null,
+          canCall: !!contactPhone,
+          onCall: handleCall,
+          onWhatsApp: handleWhatsApp,
+          onProfile: agent?.id ? () => router.push(`/agent/${agent.id}` as Href) : undefined,
+        };
   const features = property.features ?? [];
-  const pricePerSqm = property.sqft && property.sqft > 0 ? Math.round(property.price / property.sqft) : null;
+  // Sales only: a monthly or daily rent per m² is not a figure anyone compares.
+  // One rule for every screen (src/features/properties/lib/compare.js): sales
+  // only; a rental's price per m² means nothing.
+  const pricePerSqm = pricePerM2(property);
 
   const amenities = [
     // *Count keys: property.beds/baths are the form-field labels and have no
@@ -245,7 +380,8 @@ export default function PropertyDetailScreen() {
     { id: 'bed', name: `${property.beds ?? 0} ${t('property.bedsCount', { count: property.beds ?? 0 })}`, icon: 'bed' },
     { id: 'bath', name: `${property.baths ?? 0} ${t('property.bathsCount', { count: property.baths ?? 0 })}`, icon: 'bathtub' },
     { id: 'sqft', name: `${property.sqft ?? '-'} ${t('property.sqft')}`, icon: 'square-foot' },
-    { id: 'type', name: property.property_type ?? 'N/A', icon: 'home' },
+    // The translated type, not the raw database value ('apartment').
+    { id: 'type', name: propertyTypeLabel || '—', icon: 'home' },
     ...(property.year_built
       ? [{ id: 'year', name: `${property.year_built}`, icon: 'calendar-today' }]
       : []),
@@ -254,6 +390,53 @@ export default function PropertyDetailScreen() {
   // Split into two content groups so tablet can lay them out as columns
   // (per-brief: gallery full-width, info + agent/contact side by side below)
   // while phone renders the exact same JSX in a single stacked column.
+  // On a phone it sits with the listing details, above the similar homes, so
+  // nobody has to scroll past them to see who published this.
+  const publisherCard = (publisher.loading || publisher.name || publisher.phone) ? (
+        <View style={styles.sectionCard}>
+          <View style={styles.sectionHeader}>
+            <MaterialIcons name="person" size={22} color={colors.accent} />
+            <Text style={styles.sectionTitle} accessibilityRole="header">{t('detail.publishedBy')}</Text>
+          </View>
+          {publisher.loading && !publisher.name ? (
+            <View style={styles.publisherSkeleton} />
+          ) : (
+            <TouchableOpacity
+              {...CARD_CONTAINER_A11Y}
+              style={styles.agentRow}
+              activeOpacity={0.8}
+              disabled={!openAgent}
+              onPress={openAgent}>
+              <View style={styles.agentAvatar}>
+                <Text style={styles.agentAvatarText}>{publisherInitial}</Text>
+              </View>
+              <View style={styles.agentInfo}>
+                <Text style={styles.agentName} accessibilityRole={openAgent ? 'link' : undefined} onPress={openAgent}>
+                  {publisherName}
+                </Text>
+                {publisher.office ? (
+                  <View style={styles.publisherOffice}>
+                    <MaterialIcons name="business" size={14} color={colors.accentText} />
+                    <Text style={styles.agentRole}>{publisher.office}</Text>
+                  </View>
+                ) : null}
+              </View>
+            </TouchableOpacity>
+          )}
+          {publisher.phone ? (
+            <TouchableOpacity
+              accessibilityRole="button"
+              accessibilityLabel={`${t('property.call')}, ${publisher.phone}`}
+              style={styles.publisherPhone}
+              onPress={handleCall}
+              activeOpacity={0.7}>
+              <MaterialIcons name="phone" size={20} color={colors.accent} />
+              <Text style={styles.publisherPhoneText}>{publisher.phone}</Text>
+            </TouchableOpacity>
+          ) : null}
+        </View>
+  ) : null;
+
   const infoContent = (
     <>
       <View style={styles.kickerRow}>
@@ -263,13 +446,18 @@ export default function PropertyDetailScreen() {
           {propertyTypeLabel ? ` · ${propertyTypeLabel.toUpperCase()}` : ''}
         </Text>
       </View>
-      <Text style={styles.name}>{title}</Text>
+      <Text style={styles.name} accessibilityRole="header">{title}</Text>
       <View style={styles.locationRow}>
         <MaterialIcons name="location-on" size={16} color={colors.accent} />
         <Text style={styles.location}>
-          {property.address}, {property.city}
+          {[property.address, property.zone, property.city].filter(Boolean).join(', ')}
         </Text>
       </View>
+      {property.ref_code ? (
+        <Text style={styles.reference} selectable>
+          {t('detail.reference')} {formatRef(property.ref_code)}
+        </Text>
+      ) : null}
 
       {translating ? (
         <View style={styles.shimmerGroup}>
@@ -293,7 +481,7 @@ export default function PropertyDetailScreen() {
         {amenities.map((a) => (
           <View key={a.id} style={styles.amenityItem}>
             <View style={styles.amenityIcon}>
-              <MaterialIcons name={a.icon as any} size={22} color={colors.accent} />
+              <MaterialIcons name={a.icon as ComponentProps<typeof MaterialIcons>['name']} size={22} color={colors.accent} />
             </View>
             <Text style={styles.amenityLabel}>{a.name}</Text>
           </View>
@@ -327,9 +515,10 @@ export default function PropertyDetailScreen() {
             <LocationPreviewMap latitude={property.latitude} longitude={property.longitude} />
           </View>
           <TouchableOpacity
+            accessibilityRole="button"
             style={styles.openMapsLink}
             onPress={() =>
-              Linking.openURL(`https://www.google.com/maps?q=${property.latitude},${property.longitude}`)
+              Linking.openURL(`https://www.google.com/maps?q=${property.latitude},${property.longitude}`).catch(() => notifyLinkFailed())
             }
             activeOpacity={0.7}>
             <MaterialIcons name="open-in-new" size={14} color={colors.accent} />
@@ -337,6 +526,8 @@ export default function PropertyDetailScreen() {
           </TouchableOpacity>
         </View>
       )}
+
+      {!split && publisherCard}
 
       {similar.length > 0 && (
         <View style={styles.sectionCard}>
@@ -353,36 +544,23 @@ export default function PropertyDetailScreen() {
           </ScrollView>
         </View>
       )}
+
+      {/* Required by the App Store and Google Play for user posts. */}
+      {canReport && (
+        <TouchableOpacity
+          style={styles.reportLink}
+          onPress={() => (user ? setReportOpen(true) : requireSignIn())}
+          accessibilityRole="button">
+          <MaterialIcons name="flag" size={15} color={colors.textSecondary} />
+          <Text style={styles.reportLinkText}>{t('safety.reportListing')}</Text>
+        </TouchableOpacity>
+      )}
     </>
   );
 
   const agentAndContactContent = (
     <>
-      {agent && (
-        <View style={styles.sectionCard}>
-          <View style={styles.sectionHeader}>
-            <MaterialIcons name="person" size={22} color={colors.accent} />
-            <Text style={styles.sectionTitle}>{t('auth.agent')}</Text>
-          </View>
-          <TouchableOpacity
-            style={styles.agentRow}
-            activeOpacity={0.8}
-            onPress={() => router.push(`/agent/${agent.id}` as Href)}>
-            <View style={styles.agentAvatar}>
-              <Text style={styles.agentAvatarText}>{agentInitial}</Text>
-            </View>
-            <View style={styles.agentInfo}>
-              <Text style={styles.agentName}>{agent.full_name || t('auth.agent')}</Text>
-              {agent.agency_name ? <Text style={styles.agentRole}>{agent.agency_name}</Text> : null}
-            </View>
-            {contactPhone ? (
-              <TouchableOpacity style={styles.callButton} onPress={handleCall} activeOpacity={0.7}>
-                <MaterialIcons name="phone" size={20} color="#fff" />
-              </TouchableOpacity>
-            ) : null}
-          </TouchableOpacity>
-        </View>
-      )}
+      {split && publisherCard}
 
       {!isOwnListing && (
         <View style={styles.sectionCard}>
@@ -392,10 +570,11 @@ export default function PropertyDetailScreen() {
           </View>
           <TextInput
             style={[styles.contactInput, styles.contactMessage]}
-            placeholder={t('property.whatsappMessage', { title })}
+            placeholder={suggestedMessage}
             placeholderTextColor={colors.textSecondary}
             value={contactMessage}
             onChangeText={setContactMessage}
+            maxLength={FORM_LIMITS.message}
             multiline
             numberOfLines={4}
             textAlignVertical="top"
@@ -406,11 +585,16 @@ export default function PropertyDetailScreen() {
             <ActionButton
               title={sendingMessage ? t('common.loading') : t('detail.chatInApp')}
               onPress={handleSendMessage}
-              disabled={sendingMessage || !contactMessage.trim()}
+              disabled={sendingMessage}
             />
           )}
+          {messageError ? (
+            <Text style={styles.sendError} accessibilityLiveRegion="polite">
+              {t('messages.sendFailed')}
+            </Text>
+          ) : null}
           {contactPhone ? (
-            <TouchableOpacity style={styles.whatsappButton} onPress={handleWhatsApp} activeOpacity={0.8}>
+            <TouchableOpacity accessibilityRole="button" style={styles.whatsappButton} onPress={handleWhatsApp} activeOpacity={0.8}>
               <MaterialIcons name="chat" size={18} color={colors.accent} />
               <Text style={styles.whatsappButtonText}>WhatsApp</Text>
             </TouchableOpacity>
@@ -427,11 +611,30 @@ export default function PropertyDetailScreen() {
           </Text>
           {pricePerSqm != null && (
             <Text style={styles.pricePerSqm}>
-              ≈ {formatPrice(pricePerSqm, i18n.language, property.currency)}{t('detail.perSqm')}
+              ≈ {formatListingPrice(pricePerSqm, property.currency).replace(/^≈ /, '')}{t('detail.perSqm')}
             </Text>
           )}
         </View>
+        {/* A full list opens the comparison, where one can be taken out. */}
+        <TouchableOpacity
+          accessibilityRole="button"
+          accessibilityLabel={compare.has(property.id) ? t('compare.added') : t('compare.add')}
+          accessibilityState={{ selected: compare.has(property.id) }}
+          style={[styles.compareBtn, compare.has(property.id) && styles.compareBtnOn]}
+          onPress={() => (compare.full && !compare.has(property.id) ? router.push('/compare' as Href) : compare.toggle(property.id))}
+          activeOpacity={0.75}>
+          <MaterialIcons name={compare.has(property.id) ? 'check' : 'compare-arrows'} size={18} color={colors.accentText} />
+          <Text style={styles.compareBtnText}>{compare.has(property.id) ? t('compare.added') : t('compare.add')}</Text>
+        </TouchableOpacity>
       </View>
+      {price.startsWith('≈') && (
+        // A converted price says so, with the lister's own figure.
+        <Text style={styles.pricePerSqm}>
+          {t('currency.converted', { price: formatPrice(property.price, i18n.language, property.currency) })}
+        </Text>
+      )}
+
+      <PriceHistory propertyId={property.id} />
 
       {!isOwnListing && (
         // Web's sticky CTA is `.cta-pill` (globals.css:229) — 54px gradient
@@ -444,6 +647,10 @@ export default function PropertyDetailScreen() {
 
   return (
     <View style={styles.container}>
+      <PageHead
+        title={property.city ? `${title} - ${property.city}` : title}
+        description={(description || '').replace(/\s+/g, ' ').trim().slice(0, 160) || null}
+      />
       <View style={[styles.imageContainer, { height: imageHeight }]}>
         {images.length > 0 ? (
           <FlatList
@@ -453,16 +660,15 @@ export default function PropertyDetailScreen() {
             pagingEnabled
             showsHorizontalScrollIndicator={false}
             keyExtractor={(uri, i) => `${uri}-${i}`}
-            onMomentumScrollEnd={(e: NativeSyntheticEvent<NativeScrollEvent>) => {
-              const idx = Math.round(e.nativeEvent.contentOffset.x / screenWidth);
-              setImgIndex(idx);
-            }}
+            onScroll={trackPhoto(heroWidth)}
+            scrollEventThrottle={32}
             renderItem={({ item }) => (
               <TouchableOpacity
+                accessibilityRole="button" accessibilityLabel={t('listing.images')}
                 activeOpacity={0.95}
                 onPress={() => setLightboxOpen(true)}
-                style={{ width: screenWidth, height: imageHeight }}>
-                <Image source={{ uri: item }} style={styles.image} contentFit="cover" transition={300} />
+                style={{ width: heroWidth, height: imageHeight }}>
+                <Image accessibilityLabel={title} source={{ uri: item }} style={styles.image} contentFit="cover" transition={300} />
               </TouchableOpacity>
             )}
           />
@@ -489,12 +695,14 @@ export default function PropertyDetailScreen() {
             trailing={
               <>
                 <TouchableOpacity
+                  accessibilityRole="button" accessibilityLabel={t('detail.share')}
                   style={styles.headerButton}
                   onPress={handleShare}
                   activeOpacity={0.7}>
                   <MaterialIcons name="share" size={20} color="#fff" />
                 </TouchableOpacity>
                 <TouchableOpacity
+                  accessibilityRole="button" accessibilityLabel={t('common.save')}
                   style={styles.headerButton}
                   onPress={() => toggle(id ?? '')}
                   activeOpacity={0.7}>
@@ -508,6 +716,8 @@ export default function PropertyDetailScreen() {
             }
           />
         </SafeAreaView>
+
+        {isPlayableVideo(property.video_url) && <ListingVideo uri={property.video_url} />}
 
         {images.length > 1 && (
           images.length <= 8 ? (
@@ -528,9 +738,13 @@ export default function PropertyDetailScreen() {
 
       <ScrollView
         style={styles.content}
-        contentContainerStyle={styles.contentInner}
-        showsVerticalScrollIndicator={false}>
-        {isTablet ? (
+        contentContainerStyle={[
+          styles.contentInner,
+          !split && readable && { paddingHorizontal: 24 + readable.paddingHorizontal },
+        ]}
+        showsVerticalScrollIndicator={false}
+        keyboardDismissMode={Platform.OS === 'ios' ? 'interactive' : 'on-drag'}>
+        {split ? (
           <View style={styles.tabletSplit}>
             <View style={styles.tabletColumnLeft}>{infoContent}</View>
             <View style={styles.tabletColumnRight}>{agentAndContactContent}</View>
@@ -542,12 +756,13 @@ export default function PropertyDetailScreen() {
           </>
         )}
       </ScrollView>
+      <KeyboardDoneBar />
 
       <Modal visible={viewingSheetOpen} transparent animationType="slide" onRequestClose={() => setViewingSheetOpen(false)}>
         <KeyboardAvoidingView
           style={styles.modalBackdrop}
           behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-          <View style={styles.modalSheet}>
+          <View style={[styles.modalSheet, sheetColumn]}>
             <View style={styles.modalHeader}>
               {/* requestTitle ("Request a") + requestTitleEm ("viewing") — same
                   two-key split as the web sheet's <h2>, joined with a space
@@ -556,41 +771,44 @@ export default function PropertyDetailScreen() {
               <Text style={styles.modalTitle}>
                 {t('viewings.requestTitle')} {t('viewings.requestTitleEm')}
               </Text>
-              <TouchableOpacity onPress={() => setViewingSheetOpen(false)} hitSlop={8}>
-                <MaterialIcons name="close" size={22} color={colors.textSecondary} />
-              </TouchableOpacity>
+              <SheetCloseButton onPress={() => setViewingSheetOpen(false)} />
             </View>
-            <Text style={styles.modalLabel}>{t('viewings.when')}</Text>
-            <DateTimePicker
-              value={viewingDate}
-              mode="datetime"
-              display="spinner"
-              minimumDate={nextSlot()}
-              onChange={(_event, date) => date && setViewingDate(date)}
-              themeVariant="dark"
-            />
-            <TextInput
-              style={[styles.contactInput, styles.contactMessage, { marginTop: 12 }]}
-              placeholder={t('addSheet.notes')}
-              placeholderTextColor={colors.textSecondary}
-              value={viewingNotes}
-              onChangeText={setViewingNotes}
-              multiline
-              numberOfLines={3}
-              textAlignVertical="top"
-            />
-            {/* Web's ViewingRequestSheet submit is a `.cta-pill` with no
-                trailing glyph — hence icon={null}. */}
-            <PrimaryCTA
-              label={requestingViewing ? t('common.loading') : t('viewings.request')}
-              icon={null}
-              loading={requestingViewing}
-              onPress={submitViewingRequest}
-              disabled={requestingViewing}
-            />
+            {/* Capped and scrolling (edit-profile-sheet's pattern): the ~530px
+                picker + notes + CTA pushed the header off the top on 360x380,
+                and on any phone once the keyboard opened. */}
+            <ScrollView contentContainerStyle={styles.modalBody} keyboardShouldPersistTaps="handled">
+              <Text style={styles.modalLabel}>{t('viewings.when')}</Text>
+              <ViewingTimePicker value={viewingDate} minimumDate={nextSlot()} onChange={setViewingDate} />
+              {!deviceUsesTiranaTime(viewingDate) && (
+                <Text style={[styles.modalLabel, { marginTop: 8 }]}>{t('viewings.pickInTiranaTime')}</Text>
+              )}
+              <TextInput
+                style={[styles.contactInput, styles.contactMessage, { marginTop: 12 }]}
+                placeholder={t('addSheet.notes')}
+                placeholderTextColor={colors.textSecondary}
+                value={viewingNotes}
+                onChangeText={setViewingNotes}
+                maxLength={FORM_LIMITS.viewingNotes}
+                multiline
+                numberOfLines={3}
+                textAlignVertical="top"
+              />
+              {/* Web's ViewingRequestSheet submit is a `.cta-pill` with no
+                  trailing glyph — hence icon={null}. */}
+              <PrimaryCTA
+                label={requestingViewing ? t('common.loading') : t('viewings.request')}
+                icon={null}
+                loading={requestingViewing}
+                onPress={submitViewingRequest}
+                disabled={requestingViewing}
+              />
+            </ScrollView>
           </View>
         </KeyboardAvoidingView>
+        <KeyboardDoneBar />
       </Modal>
+
+      <ReportSheet visible={reportOpen} propertyId={property?.id} onClose={() => setReportOpen(false)} />
 
       <Modal
         visible={lightboxOpen}
@@ -599,6 +817,7 @@ export default function PropertyDetailScreen() {
         onRequestClose={() => setLightboxOpen(false)}>
         <View style={styles.lightboxBackdrop}>
           <TouchableOpacity
+            accessibilityRole="button" accessibilityLabel={t('common.close')}
             style={styles.lightboxClose}
             onPress={() => setLightboxOpen(false)}
             activeOpacity={0.7}
@@ -614,12 +833,13 @@ export default function PropertyDetailScreen() {
             initialScrollIndex={imgIndex}
             getItemLayout={(_data, i) => ({ length: screenWidth, offset: screenWidth * i, index: i })}
             keyExtractor={(uri, i) => `lightbox-${uri}-${i}`}
-            onMomentumScrollEnd={(e: NativeSyntheticEvent<NativeScrollEvent>) => {
-              setImgIndex(Math.round(e.nativeEvent.contentOffset.x / screenWidth));
-            }}
+            onScroll={trackPhoto(screenWidth)}
+            scrollEventThrottle={32}
             renderItem={({ item }) => (
-              <View style={{ width: screenWidth, justifyContent: 'center', alignItems: 'center' }}>
-                <Image source={{ uri: item }} style={styles.lightboxImage} contentFit="contain" />
+              // A height in pixels: the web build wraps each cell in a row of no
+              // height, so without it the page collapses and the photo is not drawn.
+              <View style={{ width: screenWidth, height: windowHeight, justifyContent: 'center', alignItems: 'center' }}>
+                <Image accessibilityLabel={title} source={{ uri: item }} style={styles.lightboxImage} contentFit="contain" />
               </View>
             )}
           />
@@ -633,7 +853,9 @@ export default function PropertyDetailScreen() {
 
       {/* Web gates this on `status === 'active'` too — a paused/draft/sold
           listing shouldn't invite questions the agent isn't fielding. */}
-      {property.status === 'active' && <ListingAssistant property={property} />}
+      {AI_CHAT_ENABLED && property.status === 'active' && (
+        <ListingAssistant property={property} contact={assistantContact} />
+      )}
     </View>
   );
 }
@@ -647,21 +869,38 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    paddingHorizontal: 32,
     backgroundColor: colors.primary,
   },
   errorText: {
-    fontSize: 16,
+    fontSize: 18,
     color: colors.textPrimary,
+    fontFamily: Fonts.serif,
+    textAlign: 'center',
+    marginTop: 12,
+  },
+  errorHint: {
+    fontSize: 14,
+    color: colors.textSecondary,
+    fontFamily: Fonts.sans,
+    textAlign: 'center',
+    marginTop: 6,
+    lineHeight: 20,
+  },
+  errorActions: {
+    alignSelf: 'stretch',
+    gap: 10,
+    marginTop: 24,
   },
   imageContainer: {
     // height is computed per-render (imageHeight) so it responds to
     // rotation and differs between phone and tablet proportions.
   },
   image: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
   },
   imageOverlay: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
   },
   imageHeader: {
     position: 'absolute',
@@ -672,7 +911,8 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 16,
+    // No side padding here: AppHeader already pads to the 20px gutter, and
+    // both together put the chevron and buttons 36px in.
     paddingTop: 8,
   },
   headerButton: {
@@ -717,8 +957,8 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   heroCounterText: {
     backgroundColor: 'rgba(0,0,0,0.5)',
     color: '#fff',
-    fontSize: 11,
-    fontWeight: '600',
+    fontSize: 12,
+    fontFamily: Fonts.sansSemiBold,
     paddingHorizontal: 10,
     paddingVertical: 3,
     borderRadius: 999,
@@ -756,7 +996,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.6)',
     color: '#fff',
     fontSize: 13,
-    fontWeight: '600',
+    fontFamily: Fonts.sansSemiBold,
     paddingHorizontal: 16,
     paddingVertical: 6,
     borderRadius: 12,
@@ -771,7 +1011,10 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   contentInner: {
     padding: 24,
-    paddingBottom: 40,
+    // Clears the floating "Ask about this property" button (listing-assistant,
+    // pinned 16px above the safe area, ~48px tall), which otherwise covered the
+    // "Schedule a viewing" button once the page was scrolled to the end.
+    paddingBottom: 104,
   },
   // Per the brief's own tablet diagram for this screen: gallery stays
   // full-width above, info + agent/contact split into two columns below.
@@ -800,14 +1043,14 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     backgroundColor: colors.accent,
   },
   kicker: {
-    fontSize: 11,
+    fontSize: 12,
     letterSpacing: 1.5,
     color: colors.textSecondary,
-    fontWeight: '600',
+    fontFamily: Fonts.sansSemiBold,
   },
   name: {
     fontSize: 26,
-    fontWeight: '700',
+    fontFamily: Fonts.sansBold,
     color: colors.textPrimary,
     marginBottom: 8,
   },
@@ -818,10 +1061,19 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     marginBottom: 16,
   },
   location: {
+    fontFamily: Fonts.sans,
     fontSize: 14,
     color: colors.textSecondary,
   },
+  reference: {
+    fontFamily: Fonts.mono,
+    fontSize: 12,
+    letterSpacing: 0.5,
+    color: colors.textSecondary,
+    marginTop: 4,
+  },
   description: {
+    fontFamily: Fonts.sans,
     fontSize: 14,
     lineHeight: 22,
     color: colors.textSecondary,
@@ -844,8 +1096,8 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     marginBottom: 8,
   },
   translatedBadgeText: {
-    fontSize: 11,
-    fontWeight: '500',
+    fontSize: 12,
+    fontFamily: Fonts.sansMedium,
     color: colors.textSecondary,
   },
   featuresGrid: {
@@ -872,7 +1124,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   featurePillText: {
     fontSize: 12,
-    fontWeight: '500',
+    fontFamily: Fonts.sansMedium,
     color: colors.textPrimary,
   },
   mapPreview: {
@@ -885,15 +1137,21 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     alignItems: 'center',
     gap: 6,
     alignSelf: 'flex-start',
+    ...InlineTarget,
   },
   openMapsLinkText: {
     fontSize: 13,
-    fontWeight: '600',
-    color: colors.accent,
+    fontFamily: Fonts.sansSemiBold,
+    color: colors.accentText,
   },
+  // Wraps: four or five labels overran the right edge at 280-320 (and at
+  // 360 with large system text).
   amenityRow: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     justifyContent: 'space-around',
+    rowGap: 12,
+    columnGap: 8,
     paddingVertical: 16,
   },
   amenityItem: {
@@ -913,7 +1171,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   amenityLabel: {
     fontSize: 12,
     color: colors.textSecondary,
-    fontWeight: '500',
+    fontFamily: Fonts.sansMedium,
   },
 
   sectionCard: {
@@ -932,8 +1190,22 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 17,
-    fontWeight: '700',
+    fontFamily: Fonts.sansBold,
     color: colors.textPrimary,
+  },
+  reportLink: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    gap: 6,
+    minHeight: 44,
+    paddingHorizontal: 4,
+  },
+  reportLinkText: {
+    fontFamily: Fonts.sans,
+    fontSize: 13,
+    color: colors.textSecondary,
+    textDecorationLine: 'underline',
   },
 
   similarRow: {
@@ -960,8 +1232,8 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   agentAvatarText: {
     fontSize: 18,
-    fontWeight: '700',
-    color: colors.accent,
+    fontFamily: Fonts.sansBold,
+    color: colors.accentText,
   },
   agentInfo: {
     flex: 1,
@@ -969,21 +1241,39 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   agentName: {
     fontSize: 16,
-    fontWeight: '600',
+    fontFamily: Fonts.sansSemiBold,
     color: colors.textPrimary,
   },
   agentRole: {
     fontSize: 12,
-    color: colors.accent,
-    fontWeight: '500',
+    color: colors.accentText,
+    fontFamily: Fonts.sansMedium,
   },
-  callButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: colors.accent,
-    justifyContent: 'center',
+  publisherOffice: {
+    flexDirection: 'row',
     alignItems: 'center',
+    gap: 4,
+  },
+  publisherPhone: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    minHeight: 48,
+    marginTop: 10,
+    paddingTop: 10,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: colors.border,
+  },
+  publisherPhoneText: {
+    flexShrink: 1,
+    fontSize: 16,
+    fontFamily: Fonts.sansSemiBold,
+    color: colors.textPrimary,
+  },
+  publisherSkeleton: {
+    height: 52,
+    borderRadius: 12,
+    backgroundColor: colors.glass,
   },
 
   contactInput: {
@@ -991,6 +1281,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 14,
+    fontFamily: Fonts.sans,
     fontSize: 14,
     color: colors.textPrimary,
     borderWidth: 1,
@@ -1002,9 +1293,16 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   sentConfirm: {
     textAlign: 'center',
-    color: colors.accent,
-    fontWeight: '600',
+    color: colors.accentText,
+    fontFamily: Fonts.sansSemiBold,
     paddingVertical: 14,
+  },
+  sendError: {
+    textAlign: 'center',
+    fontFamily: Fonts.sans,
+    fontSize: 12,
+    color: colors.error,
+    paddingVertical: 4,
   },
   whatsappButton: {
     flexDirection: 'row',
@@ -1018,8 +1316,8 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   whatsappButtonText: {
     fontSize: 14,
-    fontWeight: '600',
-    color: colors.accent,
+    fontFamily: Fonts.sansSemiBold,
+    color: colors.accentText,
   },
 
   priceRow: {
@@ -1028,22 +1326,43 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     alignItems: 'center',
     marginBottom: 24,
   },
+  compareBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    minHeight: 44,
+    paddingHorizontal: 14,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: colors.glass,
+  },
+  compareBtnOn: {
+    borderColor: colors.accent,
+  },
+  compareBtnText: {
+    fontFamily: Fonts.sansSemiBold,
+    fontSize: 13,
+    color: colors.accentText,
+  },
   priceLabel: {
+    fontFamily: Fonts.sans,
     fontSize: 13,
     color: colors.textSecondary,
     marginBottom: 4,
   },
   price: {
     fontSize: 28,
-    fontWeight: '700',
-    color: colors.accent,
+    fontFamily: Fonts.sansBold,
+    color: colors.accentText,
   },
   priceSuffix: {
     fontSize: 14,
-    fontWeight: '400',
+    fontFamily: Fonts.sans,
     color: colors.textSecondary,
   },
   pricePerSqm: {
+    fontFamily: Fonts.sans,
     fontSize: 12,
     color: colors.textSecondary,
     marginTop: 2,
@@ -1061,6 +1380,10 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     padding: 20,
     paddingBottom: 36,
     gap: 12,
+    maxHeight: '90%',
+  },
+  modalBody: {
+    gap: 12,
   },
   modalHeader: {
     flexDirection: 'row',
@@ -1069,12 +1392,12 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   modalTitle: {
     fontSize: 18,
-    fontWeight: '700',
+    fontFamily: Fonts.sansBold,
     color: colors.textPrimary,
   },
   modalLabel: {
     fontSize: 13,
-    fontWeight: '600',
+    fontFamily: Fonts.sansSemiBold,
     color: colors.textSecondary,
   },
 });

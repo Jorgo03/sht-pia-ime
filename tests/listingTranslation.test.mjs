@@ -10,6 +10,7 @@ import assert from 'node:assert/strict'
 import {
   SOURCE_LANG,
   TranslationState,
+  languagesNeedingTranslation,
   markGenerated,
   markManual,
   mergeTranslation,
@@ -402,4 +403,97 @@ test('quota, auth and bad-input failures keep their own distinct codes', () => {
   assert.equal(classifyBody({ error: 'empty_content' }), 'empty_content')
   assert.equal(classifyBody({ error: 'unsupported_target_language' }), 'invalid_response')
   assert.equal(classifyBody({ error: 'target_equals_source' }), 'invalid_response')
+})
+
+// ---------- languagesNeedingTranslation (the publish-time pass) ----------
+//
+// This is what a listing gets filled with when it is published, rather than
+// only the languages whose tab an agent happened to open. Getting it wrong is
+// expensive in both directions: too eager re-bills seven Edge Function calls
+// per publish, too shy ships a listing whose cards read the fallback language
+// in every locale the visitor picks.
+
+const FP = sourceFingerprint(SQ_TITLE, SQ_DESC)
+
+test('a fresh listing targets every language except the source', () => {
+  const targets = languagesNeedingTranslation({
+    titles: { [SOURCE_LANG]: SQ_TITLE },
+    descriptions: { [SOURCE_LANG]: SQ_DESC },
+    meta: {},
+    fingerprint: FP,
+  })
+  assert.deepEqual(targets, ['en', 'de', 'it', 'es', 'pl', 'ru', 'fr'])
+  assert.ok(!targets.includes(SOURCE_LANG))
+})
+
+test('languages already current are not re-billed', () => {
+  // The whole point of the fingerprint: publishing twice, or publishing after
+  // opening a few tabs by hand, must not pay for the same work again.
+  const targets = languagesNeedingTranslation({
+    titles: { [SOURCE_LANG]: SQ_TITLE, en: 'Modern 2+1 apartment', de: 'Moderne 2+1 Wohnung' },
+    descriptions: { [SOURCE_LANG]: SQ_DESC, en: 'A modern flat.', de: 'Eine moderne Wohnung.' },
+    meta: markGenerated(markGenerated({}, 'en', FP), 'de', FP),
+    fingerprint: FP,
+  })
+  assert.ok(!targets.includes('en'))
+  assert.ok(!targets.includes('de'))
+  assert.ok(targets.includes('it'))
+})
+
+test('a translation the agent wrote by hand is never overwritten by publishing', () => {
+  // markManual is the pin. Publishing is an automated pass and must not be the
+  // thing that destroys someone's own wording.
+  const targets = languagesNeedingTranslation({
+    titles: { [SOURCE_LANG]: SQ_TITLE, it: 'Il mio titolo scritto a mano' },
+    descriptions: { [SOURCE_LANG]: SQ_DESC, it: 'Testo mio.' },
+    meta: markManual({}, 'it', FP),
+    fingerprint: FP,
+  })
+  assert.ok(!targets.includes('it'))
+})
+
+test('text with no provenance counts as hand-written and is left alone', () => {
+  // Listings from before translation_meta existed, and anything the retired
+  // "Translate all" button filled in, have entries with no metadata. There is
+  // no way to tell those from an agent's own words, so they are treated as
+  // manual — preserving a human's text costs one Regenerate tap, guessing the
+  // other way destroys it silently.
+  const targets = languagesNeedingTranslation({
+    titles: { [SOURCE_LANG]: SQ_TITLE, ru: 'Ранее введённый текст' },
+    descriptions: { [SOURCE_LANG]: SQ_DESC, ru: 'Описание.' },
+    meta: {},
+    fingerprint: FP,
+  })
+  assert.ok(!targets.includes('ru'))
+})
+
+test('editing the Albanian makes every generated language a target again', () => {
+  const edited = sourceFingerprint(SQ_TITLE + ' me ballkon', SQ_DESC)
+  const targets = languagesNeedingTranslation({
+    titles: { [SOURCE_LANG]: SQ_TITLE + ' me ballkon', en: 'Old english title' },
+    descriptions: { [SOURCE_LANG]: SQ_DESC, en: 'Old english text.' },
+    meta: markGenerated({}, 'en', FP), // generated from the PREVIOUS source
+    fingerprint: edited,
+  })
+  assert.ok(targets.includes('en'))
+})
+
+test('a listing with no source text translates nothing', () => {
+  // Guards against publishing an empty draft into seven paid calls that would
+  // each have nothing to work from.
+  assert.deepEqual(
+    languagesNeedingTranslation({ titles: {}, descriptions: {}, meta: {}, fingerprint: '' }),
+    [],
+  )
+})
+
+test('targets come back in tab order, so progress and work agree', () => {
+  const targets = languagesNeedingTranslation({
+    titles: { [SOURCE_LANG]: SQ_TITLE },
+    descriptions: { [SOURCE_LANG]: SQ_DESC },
+    meta: {},
+    fingerprint: FP,
+  })
+  const order = ['en', 'de', 'it', 'es', 'pl', 'ru', 'fr']
+  assert.deepEqual(targets, order)
 })

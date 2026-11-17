@@ -2,7 +2,7 @@ import { memo, useEffect, useMemo, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Marker } from 'react-native-maps';
 
-import { type AtticoPalette } from '@/constants/theme';
+import { type AtticoPalette, Fonts } from '@/constants/theme';
 import { useTheme } from '@/contexts/theme-context';
 import { Cluster, formatBubblePrice, markerColorFor } from '@/lib/cluster';
 
@@ -51,7 +51,7 @@ function ClusterMarkerBase({ cluster, onPress }: Props) {
         <Text style={styles.label} numberOfLines={1}>
           {isCluster
             ? String(count)
-            : formatBubblePrice(cluster.properties[0].price)}
+            : formatBubblePrice(cluster.properties[0].price, cluster.properties[0].currency)}
         </Text>
       </View>
     </Marker>
@@ -86,6 +86,6 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   label: {
     color: colors.textPrimary,
     fontSize: 13,
-    fontWeight: '700',
+    fontFamily: Fonts.sansBold,
   },
 });

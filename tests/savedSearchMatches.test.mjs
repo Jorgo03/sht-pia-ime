@@ -1,0 +1,94 @@
+import { test } from 'node:test'
+import assert from 'node:assert/strict'
+import { priceRangeExpression } from '../src/features/properties/lib/priceRange.js'
+import { applySavedFilters, countMatches, markSeen, newMatchCount, setEmailAlerts } from '../src/features/saved-searches/lib/matches.js'
+
+// Saved-search "new matches" (docs/LAUNCH_TASKS.md L06). The bell used to
+// promise alerts nothing sent; the app now shows how many more listings match
+// than last time. These pin the filter rules (same as the Search page) and the
+// count arithmetic.
+
+function recorder(result = { count: 0, error: null }) {
+  const calls = []
+  const q = new Proxy({}, {
+    get(_, op) {
+      if (op === 'then') return (resolve) => resolve(result)
+      return (...args) => { calls.push([op, ...args]); return q }
+    },
+  })
+  return { calls, q, client: { from: (t) => { calls.push(['from', t]); return q } } }
+}
+
+test('filters follow the Search page rules', () => {
+  const { calls, q } = recorder()
+  applySavedFilters(q, { city: 'Tiranë', listing_type: 'rent', type: 'apartment', minPrice: '200', maxPrice: 900, beds: 2 })
+  assert.deepEqual(calls, [
+    ['or', 'city.ilike.%Tiranë%,zone.ilike.%Tiranë%,address.ilike.%Tiranë%'],
+    ['eq', 'listing_type', 'rent'],
+    ['eq', 'property_type', 'apartment'],
+    // Euros, converted per listing currency (tests/priceRange.test.mjs).
+    ['or', priceRangeExpression('200', 900)],
+    ['gte', 'beds', 2],
+  ])
+})
+
+test('a zone is applied only together with its own city', () => {
+  const { calls, q } = recorder()
+  applySavedFilters(q, { city: 'Tiranë', zone: 'Blloku' })
+  applySavedFilters(q, { city: 'Durrës', zone: 'Blloku' })
+  assert.deepEqual(calls, [
+    ['or', 'city.ilike.%Tiranë%,zone.ilike.%Tiranë%,address.ilike.%Tiranë%'],
+    ['eq', 'zone', 'Blloku'],
+    ['or', 'city.ilike.%Durrës%,zone.ilike.%Durrës%,address.ilike.%Durrës%'],
+  ])
+})
+
+test('empty, "all" and nonsense values add no filter', () => {
+  const { calls, q } = recorder()
+  applySavedFilters(q, { city: '', type: 'all', minPrice: '', maxPrice: 'abc', beds: null })
+  applySavedFilters(q, null)
+  assert.deepEqual(calls, [])
+})
+
+test('the count only looks at active listings', async () => {
+  const r = recorder({ count: 7, error: null })
+  assert.equal(await countMatches(r.client, { city: 'Durrës' }), 7)
+  assert.deepEqual(r.calls.slice(0, 3), [
+    ['from', 'properties'],
+    ['select', 'id', { count: 'exact', head: true }],
+    ['eq', 'status', 'active'],
+  ])
+})
+
+test('a failed count is unknown (null), not zero', async () => {
+  assert.equal(await countMatches(recorder({ count: null, error: { message: 'x' } }).client, {}), null)
+  assert.equal(await countMatches({ from() { throw new Error('offline') } }, {}), null)
+})
+
+test('new matches = more than last time, never negative', () => {
+  assert.equal(newMatchCount(9, 6), 3)
+  assert.equal(newMatchCount(4, 6), 0)
+  assert.equal(newMatchCount(5, null), 5)
+  assert.equal(newMatchCount(null, 2), 0)
+})
+
+test('marking as seen stores the current count, and skips an unknown one', async () => {
+  const r = recorder({ error: null })
+  assert.equal(await markSeen(r.client, 's1', 9), true)
+  assert.deepEqual(r.calls, [['from', 'saved_searches'], ['update', { last_match_count: 9 }], ['eq', 'id', 's1']])
+  const r2 = recorder()
+  assert.equal(await markSeen(r2.client, 's1', null), false)
+  assert.deepEqual(r2.calls, [])
+})
+
+test('email alerts: on starts the window now, off just stops', async () => {
+  const r = recorder({ error: null })
+  assert.equal(await setEmailAlerts(r.client, 's1', true), true)
+  const patch = r.calls[1][1]
+  assert.equal(patch.email_alerts, true)
+  assert.ok(Math.abs(Date.parse(patch.last_alerted_at) - Date.now()) < 5000)
+  const r2 = recorder({ error: null })
+  await setEmailAlerts(r2.client, 's1', false)
+  assert.deepEqual(r2.calls, [['from', 'saved_searches'], ['update', { email_alerts: false }], ['eq', 'id', 's1']])
+  assert.equal(await setEmailAlerts({ from() { throw new Error('x') } }, 's1', true), false)
+})

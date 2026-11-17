@@ -1,6 +1,16 @@
-import { keepPreviousData, useInfiniteQuery, useQuery } from '@tanstack/react-query';
+import { useEffect } from 'react';
+import {
+  infiniteQueryOptions,
+  keepPreviousData,
+  useInfiniteQuery,
+  useQuery,
+  useQueryClient,
+} from '@tanstack/react-query';
 
 import {
+  getAgentDirectory,
+  getCityTiles,
+  getCompareProperties,
   getMapProperties,
   getProperties,
   getPropertiesByIds,
@@ -26,6 +36,9 @@ export const propertyKeys = {
   map: (filters: PropertyFilters) => ['properties', 'map', filters] as const,
   byIds: (ids: string[]) => ['properties', 'by-ids', ids] as const,
   detail: (id: string) => ['properties', 'detail', id] as const,
+  cityTiles: () => ['properties', 'city-tiles'] as const,
+  agents: () => ['properties', 'agents'] as const,
+  compare: (ids: string[]) => ['properties', 'compare', ids] as const,
 };
 
 /** A single fixed-size page — Home's "Matched"/"Featured" source, and
@@ -42,15 +55,42 @@ export function usePropertiesQuery(filters: PropertyFilters, limit: number = PAG
   });
 }
 
-/** Explore's paginated "load more" list. */
-export function useInfinitePropertiesQuery(filters: PropertyFilters) {
-  return useInfiniteQuery({
+const infiniteListOptions = (filters: PropertyFilters) =>
+  infiniteQueryOptions({
     queryKey: propertyKeys.infiniteList(filters),
     queryFn: ({ pageParam }) => getProperties(filters, { offset: pageParam, limit: PAGE_SIZE }),
     initialPageParam: 0,
     getNextPageParam: (lastPage, allPages) =>
       lastPage.length === PAGE_SIZE ? allPages.length * PAGE_SIZE : undefined,
   });
+
+/** Explore's paginated "load more" list. */
+export function useInfinitePropertiesQuery(filters: PropertyFilters) {
+  return useInfiniteQuery(infiniteListOptions(filters));
+}
+
+const LISTING_TABS: PropertyFilters['listingType'][] = [null, 'sale', 'rent'];
+
+/**
+ * Loads the first page of Explore's other All/Sale/Rent tabs in the
+ * background, so tapping one shows its homes at once instead of a spinner.
+ * One page each (24 rows), and only when the cache has nothing fresh: the
+ * query client's staleTime makes a repeat a no-op.
+ */
+export function usePrefetchListingTabs(filters: PropertyFilters, enabled: boolean = true) {
+  const queryClient = useQueryClient();
+  useEffect(() => {
+    if (!enabled) return;
+    for (const listingType of LISTING_TABS) {
+      if (listingType === (filters.listingType ?? null)) continue;
+      const sibling = { ...filters, listingType };
+      queryClient.prefetchInfiniteQuery(infiniteListOptions(sibling));
+      queryClient.prefetchQuery({
+        queryKey: propertyKeys.count(sibling),
+        queryFn: () => getPropertiesCount(sibling),
+      });
+    }
+  }, [enabled, filters, queryClient]);
 }
 
 /** Exact result count for a filter set — Explore's header and the filter
@@ -81,6 +121,25 @@ export function usePropertiesByIdsQuery(ids: string[]) {
   return useQuery({
     queryKey: propertyKeys.byIds(ids),
     queryFn: () => getPropertiesByIds(ids),
+    enabled: ids.length > 0,
+  });
+}
+
+/** Home's "by city" tiles. */
+export function useCityTilesQuery() {
+  return useQuery({ queryKey: propertyKeys.cityTiles(), queryFn: getCityTiles });
+}
+
+/** Home's agencies rail and the full directory: one query, one cache entry. */
+export function useAgentDirectoryQuery() {
+  return useQuery({ queryKey: propertyKeys.agents(), queryFn: getAgentDirectory });
+}
+
+/** The homes picked for comparison. */
+export function useComparePropertiesQuery(ids: string[]) {
+  return useQuery({
+    queryKey: propertyKeys.compare(ids),
+    queryFn: () => getCompareProperties(ids),
     enabled: ids.length > 0,
   });
 }

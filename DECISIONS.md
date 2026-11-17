@@ -5,6 +5,224 @@ AUDIT.md was fixed; see the final report for the change log.
 
 ---
 
+## ═══ COLOUR — 2026-11-03 ═══
+
+### C1. White text on orange: keep the brand orange (DECIDED by owner, 2026-11-03)
+
+White on `#ff6b00` is 2.85:1 and on `#e85d00` 3.5:1, below WCAG AA (4.5:1).
+A darker fill (`#c24e00` → `#a84300`, white 4.8:1) was built and passed axe
+(commit d97b961), but the owner did not like the look and it was reverted
+(ba2d0c2). The brand orange stays; these remain the only known axe failures.
+To revisit, `git revert ba2d0c2` brings the darker fill back.
+
+### C2. AI chat parked (DECIDED by owner, 2026-11-04)
+
+The owner wants AI chat later, not now. Hidden behind `AI_CHAT_ENABLED = false`
+in `constants/features.ts`: the Home "Pyet asistentin AI" entry, the Search ✦
+button, the `/assistant` screen (redirects Home) and the chat on each listing.
+The Vite site's listing chat is off too (`aiAssistant: false` in `src/lib/flags.js`).
+Kept: all the code, the `ai-assistant` and `ai-listing-assistant` Edge Functions
+(nothing calls them now), the locale strings and the tests (the AI chat e2e
+tests skip while the switch is off; X52 checks nothing shows). Not chat, so
+unchanged: AI search, listing translation, the agent's listing-writing help.
+To bring it back: set both switches to true, and replace `ANTHROPIC_API_KEY`
+first (it was rejected with 401 on 2026-11-04).
+
+---
+
+## ═══ WEBSITE FROM THE APP — 2026-11-16 ═══
+
+### W9. The website follows the reference site's look closely (DECIDED by owner, 2026-11-16)
+
+The owner, pointing at equitifyasset.com again: "make just like this one".
+Followed: its layout and visual language, studied in a browser (computed
+fonts, colours, sections). Not copied: its name, text, logos or photos.
+Shtëpia.ime keeps its own words, orange and data. On the web:
+- Home is full-bleed: a full-screen dark hero under a transparent header
+  (white uppercase links in a pill, orange pill button) that turns solid once
+  scrolled past (`lib/web/hero-state.js`);
+- big thin headings with tight letter-spacing (Manrope 400; the reference
+  uses Aspekta, which the app does not ship);
+- light sections framed by thin grid lines with small orange corner squares,
+  numbered cards (01, 02), a dark "how it works" band, live numbers in large
+  thin figures, a dark services grid with an orange glow, the newest homes
+  in a horizontal row, a dark closing band;
+- a black footer: large headline, call to action, link columns, the brand
+  symbol large in the corner.
+Photos (owner, 2026-11-17: "Pick free stock photos"): two free Unsplash
+photos, credited in `assets/web/CREDITS.md`: Tirana's towers for the hero,
+Sarandë from the air for the closing band, each under a dark shade so the
+white text reads. A photo of Skanderbeg Square was left out: it is covered in
+sponsors' banners.
+
+### W8. Plazh and Currila are Durrës areas again (DECIDED by owner, 2026-11-16)
+
+The locations audit (2026-11-14) removed both: no official source lists them
+as a place. The owner asked for them back. They are kept as real-estate area
+names (type `zone`, like "Myslym Shyri"), located by OpenStreetMap: Plazh at
+the "Durrës Plazh" railway halt (node/11001912339), Currila at the "Kodër
+Currila" stop on Rruga e Currilave (node/12572443763). Changed in
+`docs/locations/decisions.json`, regenerated per docs/locations/SOURCES.md,
+and the two rows added to the live `public.locations` (661 rows). The
+database guard accepts them on a Durrës listing and still refuses invented
+zones.
+
+### W7. Website parity pass (JUDGMENT CALLS, 2026-11-16, owner may reverse)
+
+From the owner's parity brief (docs/APP_WEBSITE_PARITY_REPORT.md):
+- City lists show Tirana, then Durrës, then the rest alphabetically
+  (`orderCities`); the generated dataset itself is unchanged.
+- Agent-only screens (dashboard, leads, report) show a client an
+  "agents only" notice; the database already gave clients nothing.
+- Plazh and Currila: added on the owner's yes (W8).
+- The page keeps scrolling inside its container (React Native for web); the
+  wheel now also works over the margins. A true document scroll would mean
+  restructuring every screen.
+
+### W6. The production website is the Expo web build (DECIDED by owner, 2026-11-16)
+
+The owner: "change it with the link of web on vercel, because that is a
+mobile version, add this one instead of it". W1 stage 2 and W2's hold are
+lifted for the website: the production Vercel project
+(real-estate-app-hazel-seven.vercel.app) now builds the Expo web export from
+the root `vercel.json` instead of the Vite site, on the same address. No
+domain or dashboard change: the build reuses the project's VITE_SUPABASE_*
+variables when EXPO_PUBLIC_ ones are absent. `src/` is kept, unbuilt, for a
+rollback window: to roll back, promote the last Vite deployment in Vercel, or
+restore the previous root `vercel.json`. The build also writes title,
+description, canonical and language links into every public page's HTML
+(the static render no longer writes head tags by itself).
+
+### W5. The website looks like a website, not like the app (DECIDED by owner, 2026-11-16)
+
+The owner pointed at equitifyasset.com: "i want it just like this one, don't
+make like app", and chose "website style". Reverses W1's "the website looks
+like the app" for the web only; the phone apps are unchanged, and the
+website is still the Expo app's web export (one codebase, same features,
+same orange palette and fonts). Its structure was followed, not its text,
+brand or images. On the web:
+- a full-width site header (components/web/site-header) on every page:
+  brand, menu (Home, Search, Wanted homes, Agencies, Buying from abroad),
+  language/currency, notifications, theme, "List your home", account. No
+  bottom tab bar;
+- Home is a landing page (components/web/website-home, app/(tabs)/index.web.tsx):
+  hero with search, live numbers from the database, newest homes, how it
+  works (4 steps), what the site offers (6 cards), cities, a closing call to
+  action and the footer (components/web/site-footer);
+- public pages are drawn up to 1280px; signed-in app screens in a centred
+  720px column (constants/web-frame.ts).
+
+### W4. The website is built from the Expo app, to the owner's brief (DECIDED by owner, 2026-11-16)
+
+Un-parks W2's website work (not the domain). Gap report: `docs/WEBSITE_GAP.md`.
+The owner approved the recommendations as a set:
+- **Languages:** add Greek (el) and Turkish (tr), keep Polish and Russian:
+  10 languages. el and tr are machine-translated and need a human review.
+- **Desktop layout:** wide screens get a desktop layout on Home, Search
+  (filter sidebar on the left) and Property; every other screen stays a
+  centred column.
+- **Database:** the live schema stays; no renames to the brief's names.
+- **Deploy:** the `deploy/expo-web` preview project may be set up; the
+  production domain stays on the Vite site (W2 stage 2 still off).
+- **Built without database changes:** hreflang and canonical tags, cookies
+  page, public wanted-homes board, remote-buying guide, data-export request.
+- **Database changes approved:** price history and a currency toggle with
+  daily rates. Fair price and listing integrity wait for a new Anthropic
+  key. Agent verification and stats in moderation: not approved yet.
+
+## ═══ ONE CODEBASE — 2026-10-21 ═══
+
+### W1. The Expo app is the source of truth; the website becomes its web build (DECIDED by owner)
+
+Approved "two-stage Expo web" after the parity audit (all 17 shared screens
+differed). Stage 1: `deploy/expo-web` is a separate Vercel preview project of
+`expo export -p web`, with the website-only pages ported (privacy, terms,
+pricing, moderation, OAuth callback), page titles, pre-rendered listing pages
+and a 480px column. Stage 2, only on the owner's approval: move the
+production domain, then retire `src/`. Accepted trade-off: the first page
+load is heavier than the Vite site (one ~0.9 MB compressed script versus
+~0.3 MB), and the 164 Vite e2e tests must be rewritten for the new build
+before the switch.
+
+### W2. Website parked; the store apps come first (DECIDED by owner, 2026-10-21)
+
+The owner will design a new website later. Until then the Vite site in `src/`
+stays in production with bug fixes only, and the `deploy/expo-web` preview
+(W1 stage 1) is not being set up. Stage 2 of W1 (moving the domain, retiring
+`src/`) is off. All work now goes to finishing the Expo app and releasing it
+on the App Store and Google Play.
+
+### W3. The Google/LinkedIn sign-in relay accepts the owner's own Expo tunnel (JUDGMENT CALL, 2026-11-06, owner may reverse)
+
+Symptom: on Android, through `npm run expo:tunnel:qr`, Google sign-in left
+the tester on the Vercel website instead of returning to Expo Go. Cause:
+Expo Go's `exp://` address cannot be allow-listed in Supabase, so the app
+sends the sign-in through the website's `/auth/callback?rt=<app address>`,
+and the relay (`src/lib/oauthRelay.js` and its two inline copies) refused
+every tunnel host. The page then signed the tester in on the website. On the
+owner's Wi-Fi (an iPhone at `exp://192.168.x.x`) the relay forwards, which is
+why iOS worked.
+
+The 2026-10-26 refusal stands for ngrok tunnels (`*.exp.direct`), whose names
+anyone can register. The tunnel Expo now uses has names of the form
+`c-<account>-<id>-<id>.on.expo.app`, issued by Expo's server for one account
+(`createSignedTunnelUrlAsync`; names a user picks go to `boltexpo.dev`). The
+relay now also accepts exactly `c-jorgo03-<id>-<id>.on.expo.app`, no port, on
+the app's callback path, as `exp://` or `exps://`. The tunnel is https, so
+Expo Go's address for it is `exps://`: the first version accepted only
+`exp://`, and the auth logs (2026-11-07 23:44) show that sign-in still ending
+on the website. Remaining risk: whoever can start a tunnel as the
+jorgo03 Expo account. Takes effect when the website is next deployed from
+master. A development build (`shtepia-ime://`) never needs the relay. To
+reverse: delete the `OWNER_TUNNEL` line in the module and in both inline
+copies.
+
+## ═══ MONETISATION — 2026-10-14 ═══
+
+### M1. Paid products: listing promotion AND agency monthly plans (DECIDED by owner)
+
+Resolves the "Monetization model" open question in CLAUDE.md. Posting stays
+free for owners and agents; revenue comes from promoting a listing (per
+listing, fixed days, no auto-renew) and monthly agency plans (higher listing
+cap, promotion credits, verified badge, analytics). Design:
+`replica/payments-plan.md`. Still open: payment provider (depends on where
+FHO is registered), in-app purchase vs web-only checkout, and the prices,
+caps and credits (`/replica-launch`). Schema not applied — awaits approval.
+
+Answered the same day: **company registered in Albania**, so no standard
+Stripe account; candidates are Paddle (merchant of record, lists Albania;
+seller eligibility unconfirmed) or a bank virtual POS such as Raiffeisen
+raiAccept (supports recurring). **Checkout is website-only**: the phone apps
+show plan and promotion status, with no in-app purchase and no Apple/Google
+fee. Schema **applied 2026-10-14** after the owner's review
+(`20261014214726_add_payments_foundation`); 14/14 live checks as agent,
+client, signed out and payment server, in a rolled-back transaction.
+
+### M2. Website-only checkout conflicts with Apple 3.1.3(b): AWAITING OWNER DECISION (2026-10-24)
+
+The rules were read on 2026-10-24 on Apple's guidelines page. M1's plan is to
+sell only on the website, with the apps showing plan and promotion status.
+That works under Google Play's rules: a consumption-only app may mention web
+purchases, as long as it has no links. Apple's rules are stricter:
+
+- **3.1.1:** unlocking features inside the app must use in-app purchase.
+- **3.1.3(b):** something bought on the website may be used in the app only if
+  the same item is also available as an in-app purchase.
+- **3.1.1(a):** outside the US storefront, the app may not link or call people
+  to an outside purchase.
+
+Agency plans (listing caps, analytics, badge) and promotions are used or shown
+inside the app, so web-only selling risks rejection on iOS.
+
+Plan (`docs/PLANI_I_PUBLIKIMIT.md`, phase 9):
+
+- Ship 1.0 with no payments.
+- Then the owner chooses one of three routes:
+  - **A** (recommended): web checkout plus in-app purchase;
+  - **B:** web only, accepting the iOS risk;
+  - **C:** in-app purchase only.
+- The website `/pricing` stays off until that choice is made.
+
 ## ═══ AUTH INCIDENT REMEDIATION — 2026-08-19 ═══
 
 Full findings in `AUTH_AUDIT.md`; fixes on branch `fix/auth-recovery-and-validation`.
@@ -350,9 +568,19 @@ error. To enable:
 Button calls `signInWithProvider('linkedin_oidc')` (the current provider id;
 the old `linkedin` provider is deprecated).
 
-1. **LinkedIn Developer portal** (https://developer.linkedin.com):
+Re-checked live 2026-10-28: `/auth/v1/settings` still says
+`linkedin_oidc: false`. The app side needs no change: both apps show the
+button, the phone says "not available" instead of failing while it is off,
+and `handle_new_user` reads the name and photo LinkedIn sends (`full_name`/
+`name`, `avatar_url`).
+
+1. **LinkedIn Developer portal** (https://www.linkedin.com/developers/apps):
+   - The app must belong to a **LinkedIn Page** (a company page, e.g.
+     "Shtëpia.ime" or Future Home Orange). Create the page first if there is
+     none; its admin confirms the app.
    - Create an app, request the **"Sign In with LinkedIn using OpenID
-     Connect"** product.
+     Connect"** product (self-serve, granted at once). The Auth tab should
+     then list the scopes `openid`, `profile`, `email`.
    - Add redirect URL:
      `https://xzzzhlwmzotibrxdqmcm.supabase.co/auth/v1/callback`.
    - Copy Client ID + Client Secret.
@@ -788,7 +1016,7 @@ listing, and `removeUploadedImages()` — the rollback both forms run when
 the properties INSERT fails after photos are uploaded — never deleted
 anything, leaking the images permanently on every failed publish.
 
-Fixed in `20260827230000_add_storage_select_policies.sql`, scoped to the
+Fixed in `20260827215959_add_storage_select_policies.sql`, scoped to the
 caller's own folder. This grants no new read access in practice (both
 buckets are already `public = true`, so objects are fetchable via their
 CDN URL regardless); it only lets a user enumerate, and therefore delete,
@@ -797,3 +1025,134 @@ objects, while user A still deletes 0 of B's files and sees 0 files in
 B's folder.
 
 No new security advisories were introduced.
+
+
+## 17. Auth email and sign-in settings: what only the owner can do — 2026-10-26
+
+Code side done in AUDIT.md Pass 20. Verified live today: Confirm email is
+**off** (`mailer_autoconfirm: true`) and a reset email to our own test
+account fails with **500 "Error sending recovery email"**, so forgot-password
+and email-code sign-in fail for everyone. No secret belongs in chat or in
+this repo; every value below is typed into the provider's own page.
+
+**Order matters.** Turning Confirm email back on before mail works would make
+sign-up impossible again (§15). So: 1 → 2 → 3 → test → 4.
+
+1. **A domain.** Buy one you control (e.g. a `.al` or `.com`); the same
+   domain later serves the website, Google branding and the app links.
+2. **Transactional email: keep Resend** (already wired into Supabase, free
+   tier 3,000/month, 100/day, fine for beta). Alternatives if you prefer:
+   Postmark (best inbox reputation, paid from the start), Brevo (EU-based,
+   free 300/day), Amazon SES (cheapest at volume, more setup). No account is
+   created or paid for without you.
+   - Resend → Domains → Add `mail.<your-domain>` (a subdomain keeps it apart
+     from any mailbox you use on the main domain).
+   - Add **exactly** the DNS records Resend shows (SPF TXT on
+     `send.mail.<domain>`, the bounce MX, DKIM TXT `resend._domainkey…`).
+     Do not invent or retype values; copy them. If the domain already has an
+     SPF record, merge, never add a second one.
+   - DMARC: TXT on `_dmarc.<your-domain>` starting with `v=DMARC1; p=none;
+     rua=mailto:<an address you read>`; move to `p=quarantine` only after a
+     few weeks of reports showing only Resend and your own mail.
+   - Wait for Resend to show the domain **Verified** (not just "records
+     added").
+3. **Supabase → Authentication → Emails → SMTP Settings**: host
+   `smtp.resend.com`, port `465` (or `587`), username `resend`, password = a
+   Resend API key with sending access only (paste it there, nowhere else),
+   sender `no-reply@mail.<your-domain>`, sender name `Shtëpia.ime`.
+   Then **Authentication → Rate limits**: emails per hour to what Resend
+   allows (e.g. 30–100, not the 2 of the built-in mailer).
+4. **Templates and notices** (Authentication → Emails): paste the four files
+   in `supabase/templates/` (confirmation, recovery, magic link, email
+   change) with the subjects in `supabase/config.toml`, and switch on
+   Security notifications → *Password changed* with
+   `password_changed_notification.html`. The new links need step 5.
+5. **URL Configuration**: Site URL = the live website's address (today the
+   Vercel production URL; later your domain). Redirect URLs must include
+   `<site>/auth/callback`, `<site>/profile`, `<site>/auth/confirm`,
+   `shtepia-ime://auth/callback`, and `http://localhost:5173/**` for
+   development. No localhost as the Site URL.
+6. **Then turn Confirm email back on** (Providers → Email). Also there:
+   **Secure password change** on, **Minimum password length 8** (the apps
+   already ask for 8), **Leaked password protection** on (rejects breached
+   passwords; the apps explain the refusal).
+7. **Optional, recommended before launch:** CAPTCHA (Turnstile, free) on
+   sign-up and reset; needs a small app change I can make once you have the
+   site key.
+8. **Test together:** give me two addresses you own (one Gmail, one
+   Outlook/other). I send one confirmation and one reset to each, and report
+   arrival, folder, and the SPF/DKIM/DMARC results from the message headers
+   — separately from "Supabase accepted it".
+
+## 18. Foldable phones: hinge skipped, no real-device test — 2026-10-27
+
+Owner answers (AUDIT.md Pass 22):
+
+- **Hinge detection: skipped.** No new library for the Surface Duo hinge or a
+  half-folded Fold. The Duo stopped getting updates in 2023, and a fully open
+  Fold already gets the tablet layouts. Revisit only if a real user reports
+  content under the fold.
+- **Real-device test: not available.** The owner has no foldable phone, and
+  this laptop has no Android emulator (installing one means accepting Google's
+  SDK licence). Foldable support is therefore verified in the browser at
+  280, 344, 360×380, 690, 829 and 1114 wide. Tests X34, X37 and X38 cover
+  overflow and state across fold and unfold. If a foldable becomes
+  available, run the three checks listed at the end of Pass 22.
+
+## 19. Email login: Gmail until there is a domain — 2026-11-08
+
+Owner decision. Login codes are to go through a dedicated Gmail account over
+Supabase SMTP (steps in `docs/EMAIL_LOGIN_SETUP.md`), replacing Resend without
+a verified domain. Supabase keeps generating and checking the codes: no second
+code system. The app opens on email and password, with the emailed code one tap
+away: the owner tried an email-first screen the same day and chose to keep the
+password as the default. Per-code wrong-guess limits exist only in the app, because
+Supabase has no per-code limit and clients can call its verify endpoint
+directly; the server-side limit is per IP (Token verifications). Delivery
+events, bounce webhooks and SPF/DKIM/DMARC on our own name wait for a domain.
+
+## 20. Public profile from the chat: one database function to approve — 2026-11-11
+
+Tapping the photo or name in a chat opens that person's profile
+(`app/user/[id].tsx`, also what `/agent/<id>` now shows): agent or client,
+phone, an agent's office, and every active listing they publish. Client
+profiles are private in the database, so the page reads them through
+`public_profile()` (migration `20261111230117_public_profile.sql`), the same
+kind of narrow function as `listing_publisher()`. It answers only for an agent,
+yourself, someone you share a conversation with, or a client with an active
+listing, and returns only name, photo (not for the listing-only case), phone,
+office (agents only) and the active-listing count. No table policy changes.
+
+**Applied live 2026-11-12 on the owner's OK** (migration version
+20261111230117). `supabase/tests/rls_public_profile.sql` passed 16/16 against
+the live function, inside a transaction that is always rolled back; nothing
+was left behind. The app's fallback to reading `profiles` directly (for a
+database without the function, code PGRST202) stays harmless and can be
+removed later.
+
+Listings on a profile are matched by `owner_id` or `agent_id` (all three live
+listings today are client-published, with no `agent_id`, which the old agent
+page missed) and only `status = 'active'`: drafts, paused, sold and rented stay
+off, as on every other public list.
+
+## 21. Chats are text only; reports and blocks tightened — 2026-11-14 (owner)
+
+Owner: the chat composer is a text box and Send, nothing else. The paperclip,
+the Photo / Document menu and all sending code are removed. Files sent before
+(the feature lived 2026-11-13 to 2026-11-14) still show in their bubbles, so
+history stays whole; the private `message-attachments` bucket and
+`messages.attachment` stay for them. To bring sending back, restore it from
+commit 17e7c18.
+
+Same request, applied live as migration `20261114154750_chat_safety`
+(test `supabase/tests/rls_chat_safety.sql`, 14/14, rolled back):
+- Reporting a person has its own reasons (inappropriate behaviour, spam, fake
+  account, fraud, harassment, other); a report from a chat records the
+  conversation, which must be the reporter's own and name its other
+  participant. Listing reports keep the listing reasons. Duplicates stay
+  refused (one open report per reporter and target).
+- A block now stops messages both ways (before, the blocker could still write
+  through the API) and stops new conversations between the two, about any
+  listing. The block checks answer only about the caller, so nobody can learn
+  whether two others blocked each other.
+- Blocked people are listed under Profile → Blocked users, with Unblock.

@@ -1,12 +1,17 @@
 export interface Property {
   id: string;
-  agent_id: string;
+  /** Null when the owner published it themselves (owner_type client). */
+  agent_id: string | null;
   owner_id?: string | null;
   /** Present when fetched via getPropertyById's embedded profiles select. */
   agent?: Pick<Profile, 'id' | 'full_name' | 'phone' | 'agency_name' | 'avatar_url'> | null;
   title: string;
   title_i18n: Record<string, string> | null;
   description: string | null;
+  /** Neighbourhood within the city (F19). */
+  zone?: string | null;
+  /** Generated short reference, shown as SH-XXXXXXXX (F19). */
+  ref_code?: string | null;
   description_i18n: Record<string, string> | null;
   price: number;
   address: string;
@@ -27,6 +32,8 @@ export interface Property {
     | null;
   listing_type: 'sale' | 'rent' | 'daily_rent';
   image_urls: string[];
+  /** The tour an agent uploaded; only the listing page reads it. */
+  video_url?: string | null;
   features?: string[] | null;
   status:
     | 'active'
@@ -72,12 +79,18 @@ export interface PropertyFilters {
   propertyType?: Property['property_type'] | null;
   listingType?: Property['listing_type'] | null;
   city?: string | null;
+  /** Neighbourhood of `city` (F19); ignored unless it belongs to that city. */
+  zone?: string | null;
+  /** What the person typed as a listing reference (SH-XXXXXXXX). */
+  refCode?: string | null;
   minPrice?: number | null;
   maxPrice?: number | null;
   beds?: number | null;
   baths?: number | null;
   minArea?: number | null;
   maxArea?: number | null;
+  /** Amenities a home must have, all of them. */
+  features?: string[] | null;
   sort?: PropertySort;
   /** Map-only: restricts results to the visible region. */
   bounds?: MapBounds | null;

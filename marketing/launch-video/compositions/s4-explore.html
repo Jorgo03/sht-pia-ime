@@ -1,0 +1,72 @@
+<!-- Scene 4 — explore (12–17 s): the map. Daylight opens out of the dark, the camera
+     pushes into the pins, then lands on a listing's own location map. -->
+<template>
+  <html data-composition-variables='[
+    {"id":"lead","type":"string","label":"Caption","default":"Gjej mundësinë"},
+    {"id":"accent","type":"string","label":"Caption, orange","default":"e duhur për ty."}
+  ]'>
+  <div id="s4-explore" data-composition-id="s4-explore" data-width="1080" data-height="1920" class="scene">
+    <style>
+      #s4-explore .s4-day { position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 60%, #fff8f0 0%, var(--cream) 60%, #e9e2d8 100%); }
+      #s4-explore .caption { color: #141414; z-index: 10; }
+      #s4-explore .caption em { color: #c24e00; }
+      #s4-explore .phone-body { box-shadow: inset 0 0 0 2px rgba(255,255,255,0.12), inset 0 0 0 9px #050404, 0 70px 140px rgba(60, 30, 10, 0.32), 0 24px 50px rgba(60, 30, 10, 0.22); }
+      /* A ring that pulses out of a map pin; placed over the screenshot's own pins. */
+      #s4-explore .s4-ping {
+        position: absolute; width: 90px; height: 90px; margin: -45px 0 0 -45px; border-radius: 50%;
+        border: 5px solid var(--orange-app); opacity: 0; z-index: 4;
+      }
+    </style>
+    <div class="s4-day"></div>
+    <div class="floor" style="top: 1800px; opacity: 0.6"></div>
+    <div class="stage">
+      <div class="phone s4-phone">
+        <div class="phone-body"><div class="screen">
+          <img class="shot s4-map" src="assets/screens/light/map.png" alt="" />
+          <img class="shot s4-loc" src="assets/screens/light/detail-1-scrolled.png" alt="" style="opacity: 0" />
+          <div class="s4-ping s4-ping1" style="left: 43.3%; top: 60.3%"></div>
+          <div class="s4-ping s4-ping2" style="left: 43%; top: 88.9%"></div>
+          <div class="s4-ping s4-ping3" style="left: 59.3%; top: 87.5%"></div>
+          <div class="island"></div><div class="glare s4-glare"></div>
+        </div></div>
+      </div>
+    </div>
+    <h1 class="caption s4-caption"></h1>
+    <script>
+      (() => {
+        const root = document.getElementById('s4-explore');
+        const q = (s) => root.querySelector(s);
+        const { lead, accent } = film.vars({"lead": "Gjej mundësinë", "accent": "e duhur për ty."});
+        const words = film.caption(q('.s4-caption'), lead, accent);
+        const phone = q('.s4-phone');
+        const tl = gsap.timeline({ paused: true });
+
+        // Daylight opens as a circle from the phone, out of scene 3's dark.
+        tl.fromTo(q('.s4-day'), { clipPath: 'circle(0% at 50% 60%)' }, { clipPath: 'circle(80% at 50% 60%)', duration: 0.9, ease: 'power3.inOut' }, 0);
+        tl.fromTo(phone, { y: 260, scale: 0.78, rotationX: 14, rotationY: 10, opacity: 0 },
+          { y: 170, scale: 0.8, rotationX: 0, rotationY: -6, opacity: 1, duration: 1.1, ease: 'power3.out' }, 0.15);
+        film.wordsIn(tl, words, 0.55);
+
+        // Push in towards the pins in central Albania, pins ping. The phone's top
+        // edge stays below the caption (y keeps it at ~440 px at this scale).
+        tl.to(phone, { scale: 1.3, y: 352, rotationY: 4, duration: 1.6, ease: 'power2.inOut' }, 1.35);
+        ['.s4-ping1', '.s4-ping2', '.s4-ping3'].forEach((sel, i) => {
+          for (let k = 0; k < 2; k++) {
+            tl.fromTo(q(sel), { opacity: 0.95, scale: 0.4 }, { opacity: 0, scale: 2.2, duration: 1.1, ease: 'power1.out' }, 1.7 + i * 0.18 + k * 0.75);
+          }
+        });
+
+        // Into a listing: its location map. Camera eases back out.
+        film.swap(tl, q('.s4-map'), q('.s4-loc'), 3.25, 0.6);
+        tl.to(phone, { scale: 0.82, y: 170, rotationY: 8, duration: 1.4, ease: 'power3.inOut' }, 3.2);
+        film.glare(tl, q('.s4-glare'), 3.4, 1.3);
+
+        film.wordsOut(tl, words, 4.45);
+
+        window.__timelines = window.__timelines || {};
+        window.__timelines['s4-explore'] = tl;
+      })();
+    </script>
+  </div>
+  </html>
+</template>

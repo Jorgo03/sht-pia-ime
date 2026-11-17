@@ -172,7 +172,7 @@
 
 .dropdown-option.selected {
   background: linear-gradient(135deg, rgba(255, 122, 64, 0.15), rgba(232, 93, 44, 0.1));
-  color: var(--fho-orange-1);
+  color: var(--fho-orange-text);
   font-weight: 500;
 }
 
@@ -214,7 +214,7 @@
 
 [data-theme="light"] .dropdown-option.selected {
   background: rgba(255, 122, 64, 0.08);
-  color: var(--fho-orange-2);
+  color: var(--fho-orange-text);
 }
 
 }

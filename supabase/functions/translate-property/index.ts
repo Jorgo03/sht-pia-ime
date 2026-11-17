@@ -32,7 +32,8 @@
 //   { text, source?='sq' }
 //   -> { sq, en, de, it, es, pl, ru, fr }
 //
-// Auth: a signed-in user (rate-limited 60/hour) or the service role.
+// Auth: a signed-in user (rate-limited 60/hour per account), a signed-out
+// visitor (20/hour per IP) or the service role (unlimited).
 
 import { createClient } from 'npm:@supabase/supabase-js@2';
 
@@ -51,6 +52,13 @@ const json = (body: unknown, status = 200) =>
 const ANTHROPIC_KEY = Deno.env.get('ANTHROPIC_API_KEY');
 const MODEL = 'claude-sonnet-5';
 const RATE_LIMIT_PER_HOUR = 60;
+
+// Signed-out visitors get a smaller hourly budget, keyed by IP rather than by
+// user id. Deliberately lower than the signed-in ceiling: an IP is a much weaker
+// identity than an account — shared by everyone behind one NAT, and trivially
+// rotated — so this buys availability for ordinary browsing without turning the
+// endpoint into a free unauthenticated translation API.
+const ANON_RATE_LIMIT_PER_HOUR = 20;
 
 // Optional. MyMemory's anonymous quota is ~5k characters/day per calling IP,
 // which an edge function shares with everyone else on that IP. Setting this to
@@ -77,17 +85,50 @@ const admin = createClient(
   Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
 );
 
+// One atomic step in the database (ai_take_quota): count the last hour and
+// record this call together, so parallel requests cannot all slip through.
 async function rateLimit(key: string, feature: string, max: number): Promise<boolean> {
-  const since = new Date(Date.now() - 3600_000).toISOString();
-  const { count } = await admin
+  const { data, error } = await admin.rpc('ai_take_quota', {
+    p_key: key,
+    p_feature: feature,
+    p_max: max,
+    p_window_seconds: 3600,
+  });
+  // Fail closed: if usage cannot be recorded, no paid call is made.
+  return !error && data === true;
+}
+
+// Project-wide ceiling on paid AI calls per feature per 24 hours, across every
+// caller (docs/LAUNCH_TASKS.md F1). The per-user and per-IP limits stop one
+// caller; this stops many, including one rotating a spoofed x-forwarded-for.
+// Set AI_DAILY_CALL_CAP as an Edge Function secret to change it. The default
+// is a safety net against runaway cost, not a budget the owner chose; the real
+// spend cap belongs in the Anthropic console.
+const AI_DAILY_CALL_CAP = Number(Deno.env.get('AI_DAILY_CALL_CAP') ?? '2000');
+
+async function underDailyCap(feature: string): Promise<boolean> {
+  const since = new Date(Date.now() - 86_400_000).toISOString();
+  const { count, error } = await admin
     .from('ai_usage')
     .select('id', { count: 'exact', head: true })
-    .eq('key', key)
     .eq('feature', feature)
     .gte('created_at', since);
-  if ((count ?? 0) >= max) return false;
-  await admin.from('ai_usage').insert({ key, feature });
-  return true;
+  if (error) return false;
+  return (count ?? 0) < AI_DAILY_CALL_CAP;
+}
+
+/**
+ * Best-effort caller IP, used only as a rate-limit bucket for signed-out callers.
+ *
+ * It guards a spend ceiling, never access: it is not, and must not become, an
+ * authorization check. The fixed fallback means a request arriving with no
+ * forwarding header shares one bucket instead of escaping the limit entirely.
+ */
+function clientIp(req: Request): string {
+  // cf-connecting-ip and the right-most hop are written by the platform; the
+  // left-most entry is whatever the client sent (audit 2026-11-17).
+  const hops = (req.headers.get('x-forwarded-for') ?? '').split(',').map((h) => h.trim()).filter(Boolean);
+  return `ip:${req.headers.get('cf-connecting-ip')?.trim() || hops[hops.length - 1] || 'unknown'}`;
 }
 
 /**
@@ -95,7 +136,7 @@ async function rateLimit(key: string, feature: string, max: number): Promise<boo
  *
  * Safe only because it grants nothing: Supabase's gateway has already rejected
  * the request unless the JWT is validly signed by this project. This only
- * decides which of two already-trusted callers gets rate-limited.
+ * decides which already-trusted caller gets rate-limited, and how hard.
  */
 function jwtRole(token: string): string | null {
   try {
@@ -419,7 +460,8 @@ async function translateViaAnthropic(
   });
 
   if (!response.ok) {
-    console.error('Anthropic error', response.status, await response.text());
+    // Status only: the upstream body can echo the listing text.
+    console.error('Anthropic error', response.status);
     throw Object.assign(new Error('upstream'), { upstreamStatus: response.status });
   }
 
@@ -450,8 +492,11 @@ async function translate(
   source: Lang,
   targets: Lang[],
   fields: FieldPair,
+  paidAllowed = true,
 ): Promise<{ result: Record<string, FieldPair>; provider: string }> {
-  if (ANTHROPIC_KEY) {
+  // Past the daily ceiling the free engine takes over, so listings still
+  // translate and the paid key stops being spent.
+  if (ANTHROPIC_KEY && paidAllowed) {
     try {
       return { result: await translateViaAnthropic(source, targets, fields), provider: 'anthropic' };
     } catch (err) {
@@ -475,14 +520,31 @@ Deno.serve(async (req) => {
     const token = req.headers.get('Authorization')?.replace('Bearer ', '') ?? '';
     const role = jwtRole(token);
     let rateLimitKey: string | null = null;
+    let rateLimitMax = RATE_LIMIT_PER_HOUR;
 
     if (role === 'service_role') {
       rateLimitKey = null;
     } else {
       const { data: userData } = await admin.auth.getUser(token);
       const user = userData?.user;
-      if (!user) return json({ error: 'unauthorized' }, 401);
-      rateLimitKey = user.id;
+      if (user) {
+        rateLimitKey = user.id;
+      } else if (role === 'anon') {
+        // Reading a listing is the one thing this marketplace has to do for a
+        // visitor with no account, and a listing nobody can read is not browsable.
+        // Rejecting the anon key here left every signed-out property page showing
+        // untranslated Albanian in all eight languages — silently, because the
+        // callers degrade to the original text rather than surfacing an error.
+        //
+        // The anon key is not a weaker *signature* than a user's: the gateway has
+        // already rejected anything not signed by this project, which is what makes
+        // branching on the unverified role claim safe at all. It is a weaker
+        // *identity*, so it is billed against the caller's IP instead of an account.
+        rateLimitKey = clientIp(req);
+        rateLimitMax = ANON_RATE_LIMIT_PER_HOUR;
+      } else {
+        return json({ error: 'unauthorized' }, 401);
+      }
     }
 
     let body: Record<string, unknown>;
@@ -522,11 +584,13 @@ Deno.serve(async (req) => {
       return json({ error: 'empty_content' }, 400);
     }
 
-    if (rateLimitKey && !(await rateLimit(rateLimitKey, 'translate-property', RATE_LIMIT_PER_HOUR))) {
+    if (rateLimitKey && !(await rateLimit(rateLimitKey, 'translate-property', rateLimitMax))) {
       return json({ error: 'rate_limited' }, 429);
     }
 
-    const { result, provider } = await translate(source, targets, fields);
+    // The service role (bulk scripts) is exempt, like its hourly limit.
+    const paidAllowed = rateLimitKey === null || (await underDailyCap('translate-property'));
+    const { result, provider } = await translate(source, targets, fields, paidAllowed);
 
     if (legacy) {
       const flat: Record<string, string> = { [source]: fields.title };
@@ -560,7 +624,7 @@ Deno.serve(async (req) => {
         503,
       );
     }
-    console.error('translate-property error', err);
+    console.error('translate-property error', err instanceof Error ? err.message : String(err));
     return json({ error: 'ai_unavailable' }, 503);
   }
 });

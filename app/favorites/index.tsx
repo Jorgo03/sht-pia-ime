@@ -1,3 +1,5 @@
+import { useAuth } from '@/contexts/auth-context';
+import { SignInPrompt } from '@/components/ui/sign-in-prompt';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { Image } from 'expo-image';
 import { useRouter, type Href } from 'expo-router';
@@ -13,12 +15,15 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 
+import { AppHeader } from '@/components/ui/app-header';
+import { ScreenHero } from '@/components/ui/screen-hero';
 import { GradientBackground } from '@/components/ui/gradient-background';
-import { type AtticoPalette, Fonts } from '@/constants/theme';
+import { type AtticoPalette, Fonts, Radii } from '@/constants/theme';
 import { useFavorites } from '@/contexts/favorites-context';
 import { useTheme } from '@/contexts/theme-context';
 import { Property } from '@/data/types';
 import { formatPrice, getLocalizedText, priceSuffixKey } from '@/lib/format';
+import { useReadableColumn } from '@/hooks/use-responsive';
 
 // Matches web's Favorites.jsx exactly — a vertical list of image+details
 // rows (.fav-row), not a property-card grid. Moved out of the tab bar to
@@ -26,38 +31,49 @@ import { formatPrice, getLocalizedText, priceSuffixKey } from '@/lib/format';
 // primary nav destination — reached from Profile's menu list instead, same
 // as Messages/Viewings/My Listings.
 export default function FavoritesScreen() {
+  const { user, loading: authLoading } = useAuth();
   const router = useRouter();
   const { t, i18n } = useTranslation();
-  const { favoriteProperties, loading, toggle } = useFavorites();
+  const { favoriteProperties, loading, error, reload, toggle } = useFavorites();
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
+  // A centred column on an unfolded Fold or a spanned Duo (hooks/use-responsive).
+  const readable = useReadableColumn();
 
+  // Signed out: ask to sign in, not an empty "nothing yet" screen (website audit).
+  if (!user) return authLoading ? null : <SignInPrompt />;
   return (
     <GradientBackground>
-      <SafeAreaView style={styles.container} edges={['top']}>
-        <TouchableOpacity
-          style={styles.backLink}
-          onPress={() => router.push('/(tabs)/profile' as Href)}
-          hitSlop={8}>
-          <MaterialIcons name="chevron-left" size={16} color={colors.textSecondary} />
-          <Text style={styles.backLinkText}>{t('favourites.backToProfile').replace('← ', '')}</Text>
-        </TouchableOpacity>
+      <SafeAreaView style={[styles.container, readable]} edges={['top']}>
+        {/* Was a bare "‹ Kthehu te profili" text link floating above the
+            kicker, which read as loose body copy rather than chrome. Now the
+            same AppHeader every other pushed screen uses (Messages, Viewings,
+            My Listings): chevron, centred wordmark, language + theme.
+            Still targets /profile explicitly rather than router.back() — this
+            screen is reachable from a deep link, where there is no history
+            entry to go back to. */}
+        <AppHeader onBack={() => router.push('/(tabs)/profile' as Href)} />
 
-        <View style={styles.heroBlock}>
-          <View style={styles.kickerRow}>
-            <View style={styles.kickerDash} />
-            <Text style={styles.kicker}>
-              {loading ? t('common.loading') : t('favourites.savedCount', { count: favoriteProperties.length })}
-            </Text>
-          </View>
-          <Text style={styles.headline}>
-            {t('favourites.headlinePre')} <Text style={styles.headlineEm}>{t('favourites.headlineEm')}</Text>
-          </Text>
-        </View>
+        <ScreenHero
+          pre={t('favourites.headlinePre')}
+          em={t('favourites.headlineEm')}
+        />
 
         {loading ? (
           <View style={styles.center}>
             <ActivityIndicator size="large" color={colors.accent} />
+          </View>
+        ) : error && favoriteProperties.length === 0 ? (
+          <View style={styles.center}>
+            <MaterialIcons name="cloud-off" size={36} color={colors.textSecondary} />
+            <Text style={styles.emptyText}>{t('favourites.loadFailed')}</Text>
+            <TouchableOpacity
+              accessibilityRole="button"
+              style={styles.retryBtn}
+              onPress={reload}
+              activeOpacity={0.85}>
+              <Text style={styles.retryText}>{t('common.retry')}</Text>
+            </TouchableOpacity>
           </View>
         ) : favoriteProperties.length === 0 ? (
           <View style={styles.center}>
@@ -107,10 +123,10 @@ function FavRow({
   const suffix = suffixKey ? t(suffixKey) : '';
 
   return (
-    <TouchableOpacity style={styles.row} onPress={onTap} activeOpacity={0.85}>
+    <TouchableOpacity accessibilityRole="button" style={styles.row} onPress={onTap} activeOpacity={0.85}>
       <View style={styles.rowImageWrap}>
         {property.image_urls?.[0] ? (
-          <Image source={{ uri: property.image_urls[0] }} style={styles.rowImage} contentFit="cover" />
+          <Image accessibilityLabel={title} source={{ uri: property.image_urls[0] }} style={styles.rowImage} contentFit="cover" />
         ) : (
           <View style={[styles.rowImage, styles.rowImagePlaceholder]} />
         )}
@@ -144,52 +160,6 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   container: {
     flex: 1,
   },
-  backLink: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    alignSelf: 'flex-start',
-    paddingHorizontal: 20,
-    paddingTop: 12,
-  },
-  backLinkText: {
-    fontSize: 13,
-    color: colors.textSecondary,
-  },
-  // Matches web's .screen-kicker / .screen-headline exactly.
-  heroBlock: {
-    paddingHorizontal: 20,
-    paddingTop: 12,
-    paddingBottom: 20,
-  },
-  kickerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    marginBottom: 6,
-  },
-  kickerDash: {
-    width: 14,
-    height: 1,
-    backgroundColor: colors.accent,
-  },
-  kicker: {
-    fontFamily: Fonts?.mono,
-    fontSize: 11,
-    letterSpacing: 1.5,
-    textTransform: 'uppercase',
-    color: colors.textSecondary,
-    fontWeight: '600',
-  },
-  headline: {
-    fontFamily: Fonts?.serif,
-    fontSize: 28,
-    fontWeight: '500',
-    color: colors.textPrimary,
-  },
-  headlineEm: {
-    fontStyle: 'italic',
-    color: colors.accent,
-  },
   center: {
     flex: 1,
     justifyContent: 'center',
@@ -208,10 +178,26 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     alignItems: 'center',
   },
   emptyText: {
+    fontFamily: Fonts.sans,
     fontSize: 14,
     color: colors.textSecondary,
     textAlign: 'center',
     paddingHorizontal: 24,
+  },
+  retryBtn: {
+    marginTop: 14,
+    minHeight: 44,
+    paddingHorizontal: 22,
+    borderRadius: Radii.pill,
+    borderWidth: 1,
+    borderColor: colors.accent,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  retryText: {
+    fontFamily: Fonts.sansSemiBold,
+    fontSize: 14,
+    color: colors.accentText,
   },
   list: {
     paddingHorizontal: 20,
@@ -250,7 +236,6 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   rowTitle: {
     fontFamily: Fonts?.serif,
     fontSize: 15,
-    fontWeight: '500',
     color: colors.textPrimary,
   },
   rowLocRow: {
@@ -260,6 +245,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     marginBottom: 4,
   },
   rowLoc: {
+    fontFamily: Fonts.sans,
     fontSize: 12,
     color: colors.textSecondary,
     flex: 1,
@@ -267,12 +253,11 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   rowPrice: {
     fontFamily: Fonts?.serif,
     fontSize: 16,
-    fontWeight: '500',
-    color: colors.accent,
+    color: colors.accentText,
   },
   rowPriceSuffix: {
     fontSize: 12,
-    fontWeight: '400',
+    fontFamily: Fonts.sans,
     color: colors.textSecondary,
   },
   rowHeart: {

@@ -3,7 +3,10 @@
  * There are many other ways to style your app. For example, [Nativewind](https://www.nativewind.dev/), [Tamagui](https://tamagui.dev/), [unistyles](https://reactnativeunistyles.vercel.app), etc.
  */
 
+import i18n from 'i18next';
 import { Platform } from 'react-native';
+
+import { headlineFont } from '@/src/lib/headlineFonts';
 
 const tintColorLight = '#0a7ea4';
 const tintColorDark = '#fff';
@@ -33,16 +36,17 @@ export type AtticoPalette = typeof AtticoColorsDark;
 // web app's canonical dark palette (see CLAUDE.md: accent #ff7d1a) — so both
 // apps render the same brand colors, not a native-only approximation of them.
 export const AtticoColorsDark = {
-  primary: '#141210', // --fho-bg (dark)
-  primaryLight: '#1e1b18', // --fho-surface (dark)
+  primary: '#0e0b09', // --fho-bg (dark)
+  primaryLight: '#1a1612', // --fho-surface (dark)
   accent: '#ff6b00', // ShtepiaColors.orange (design handoff §4)
   accentEnd: '#e85d00', // --fho-orange-2 — the gradient's end stop + accent text
   accentDeep: '#cc5200', // --fho-orange-deep
   accentTint: 'rgba(255,107,0,0.12)', // dark-theme form of ShtepiaColors.orangeTint
   accentLight: '#ffb380', // --fho-orange-soft
+  accentText: '#ff7d1a', // --fho-orange-text (dark): orange for text, 5.4–7.7:1 on every dark surface
   accentGlow: 'rgba(255,107,0,0.35)',
   surface: '#FFFFFF',
-  surface2: '#252220', // --fho-surface-2 (dark) — inputs / deepest cards
+  surface2: '#221d18', // --fho-surface-2 (dark) — inputs / deepest cards
   surfaceAlt: '#F5F5F5',
   // ShtepiaColors.glassBg/glassBorder/cream100 (§4) — the auth hero's
   // translucent form card, which is dark-on-dark in both themes.
@@ -50,12 +54,19 @@ export const AtticoColorsDark = {
   glassOnDarkBorder: 'rgba(255,255,255,0.12)',
   cream100: '#faf6ef',
   glass: 'rgba(255,255,255,0.06)',
-  glassBorder: 'rgba(255,255,255,0.10)', // matches --fho-glass-border (dark) exactly — for actual translucent/blurred surfaces only (e.g. liquid-tab-bar's BlurView), NOT a general-purpose border color
+  glassBorder: 'rgba(255,255,255,0.08)', // matches --fho-glass-border (dark) exactly — for actual translucent/blurred surfaces only (e.g. liquid-tab-bar's BlurView), NOT a general-purpose border color
   border: 'rgba(255,255,255,0.08)', // --fho-border (dark) — the general card/chip/input border
-  borderStrong: 'rgba(255,255,255,0.14)', // --fho-border-strong (dark)
-  textPrimary: '#f0ece6', // --fho-text (dark)
-  textSecondary: '#8d8a86', // --fho-text-muted (dark) flattened from rgba to a solid native color
-  textFaint: '#5c5955', // --fho-text-faint (dark) flattened
+  borderStrong: 'rgba(255,255,255,0.18)', // --fho-border-strong (dark)
+  textPrimary: '#faf6ef', // --fho-text (dark)
+  // --fho-text-muted / --fho-text-faint (dark) flattened from rgba to solid
+  // native colors. Both are now a WARM cast — rgba(255,235,210,·) rather than
+  // the old neutral rgba(240,236,230,·) — composited over the new #0e0b09
+  // ground, so they track the web dusk palette instead of the charcoal one.
+  // Raised 2026-10-21 for WCAG AA (BUG-008): muted ≥ 4.8:1 on every dark
+  // surface including the #282420/#2e2924 chips; faint ≥ 4.5:1 on the ground
+  // and both surfaces, like --fho-text-faint (dark, 0.5) on the web.
+  textSecondary: '#a09384',
+  textFaint: '#908477',
   textDark: '#1A1A1A',
   // Listing/viewing status colors. Web reads these from --fho-status-* which
   // swap per theme; RN screens used to hardcode the LIGHT values in both
@@ -67,6 +78,8 @@ export const AtticoColorsDark = {
   statusDraft: '#95a5a6',
   // ShtepiaColors.danger / .ok (§4).
   error: '#d63a3a',
+  // Sign out / delete text and icons: #dc3545 was 4.3:1 on the dark ground.
+  signOut: '#f26d78',
   ok: '#5b8a5a',
   gradientStart: '#0A0A0A',
   gradientEnd: '#141414',
@@ -83,6 +96,7 @@ export const AtticoColorsLight: AtticoPalette = {
   accentDeep: '#cc5200', // --fho-orange-deep (same both themes)
   accentTint: '#fff1e6', // ShtepiaColors.orangeTint (§4) — a solid cream, not the dark theme's translucent orange
   accentLight: '#ffb380', // --fho-orange-soft (same both themes)
+  accentText: '#b34700', // --fho-orange-text (light): orange for text, 4.7–5.5:1 on every cream (BUG-008)
   accentGlow: 'rgba(255,107,0,0.25)',
   surface: '#FFFFFF',
   surface2: '#ffffff', // --fho-surface-2 (light)
@@ -101,17 +115,21 @@ export const AtticoColorsLight: AtticoPalette = {
   border: 'rgba(26,23,20,0.08)', // --fho-border (light) — the general card/chip/input border
   borderStrong: 'rgba(26,23,20,0.16)', // --fho-border-strong (light)
   textPrimary: '#1a1714', // --fho-text (light)
-  textSecondary: '#7b7773', // --fho-text-muted (light) flattened
-  textFaint: '#96928d', // --fho-text-faint (light) flattened
+  textSecondary: '#63605b', // --fho-text-muted (light, 0.66) flattened on #f1ede6: 5.4:1 (BUG-008)
+  textFaint: '#6c6864', // --fho-text-faint (light, 0.62) flattened on #f1ede6: 4.7:1 (BUG-008)
   textDark: '#1A1A1A',
-  // --fho-status-* (light) — see the dark palette's note above.
-  statusActive: '#27ae60',
-  statusPaused: '#f39c12',
+  // --fho-status-* (light) — see the dark palette's note above. Now the earthy
+  // set from IMPLEMENTATION.md §1, muted to sit with the warm cream ground
+  // rather than the saturated web-safe values these replace.
+  // Darkened 2026-10-27 for WCAG AA as badge text (mirrors --fho-status-*).
+  statusActive: '#3d6b3c',
+  statusPaused: '#8a6414',
   statusSold: '#c0392b',
-  statusRented: '#8e44ad',
+  statusRented: '#8a4d80',
   ok: '#5b8a5a', // ShtepiaColors.ok (§4)
-  statusDraft: '#7f8c8d',
+  statusDraft: '#66625b',
   error: '#d63a3a', // ShtepiaColors.danger (§4)
+  signOut: '#b42330', // --fho-signout (light): #dc3545 was 3.9:1 on cream
   gradientStart: '#faf6ef',
   gradientEnd: '#f1ede6',
 };
@@ -149,6 +167,30 @@ export const Spacing = {
   md: 14,
   lg: 22,
   xl: 28,
+} as const;
+
+/**
+ * A form control's box: text fields (Field) and the selects beside them
+ * (SelectField variant="form") share it, so a price field and its currency
+ * select are the same height with the same padding. 54 is the handoff's
+ * Field height (§17).
+ */
+export const Control = {
+  height: 54,
+  paddingHorizontal: 16,
+  gap: 10,
+  iconSize: 18,
+} as const;
+
+/**
+ * A text link that stands alone ("See all", "Forgot?") is drawn ~17px tall.
+ * hitSlop grows the tap area on a phone but is ignored on the web, so this
+ * grows it with padding and gives the space back with a negative margin:
+ * a target of 24px+ (WCAG 2.5.8) with the layout unchanged.
+ */
+export const InlineTarget = {
+  paddingVertical: 10,
+  marginVertical: -10,
 } as const;
 
 /**
@@ -209,12 +251,22 @@ export const Fonts = {
   sansSemiBold: 'Manrope_600SemiBold',
   sansBold: 'Manrope_700Bold',
   sansExtraBold: 'Manrope_800ExtraBold',
-  serif: 'Newsreader_500Medium',
+  // Headline serif. Getters, because Newsreader has no Cyrillic: in Russian
+  // they answer with Manrope instead (src/lib/headlineFonts.js), so both
+  // phones draw the same font rather than each one's system fallback.
+  // Styles are rebuilt on a language change (contexts/theme-context.tsx).
+  get serif() {
+    return headlineFont('serif', i18n.language);
+  },
   /** True italic glyphs — pair with this instead of `fontStyle: 'italic'`
    *  on `serif`, which only synthesizes a slant on the upright font. */
-  serifItalic: 'Newsreader_500Medium_Italic',
+  get serifItalic() {
+    return headlineFont('serifItalic', i18n.language);
+  },
   /** Brand wordmark weight (CLAUDE_CODE_BRIEF.md §3.7: serif/600). */
-  serifSemiBold: 'Newsreader_600SemiBold',
+  get serifSemiBold() {
+    return headlineFont('serifSemiBold', i18n.language);
+  },
   mono: 'JetBrainsMono_400Regular',
   monoMedium: 'JetBrainsMono_500Medium',
   rounded: Platform.select({

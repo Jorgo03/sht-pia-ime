@@ -84,6 +84,32 @@
   .lang-label { display: none; }
 }
 
+/* Signed in, the header holds the wordmark and four buttons: about 350px at
+   the sizes above, so on a 320 phone or a 280 Galaxy Fold cover screen the
+   account button sat past the edge. Tighter spacing first, then a smaller
+   wordmark (same design) and no chevron on the language button. */
+@media (max-width: 380px) {
+  .app-header { padding: 10px 12px; gap: 8px; }
+  .header-actions { gap: 6px; }
+  .header-brand { font-size: 20px; }
+}
+
+/* Below 360 both menus anchor to the actions row's right edge instead of
+   their own button, and never get wider than the screen. */
+@media (max-width: 359px) {
+  .header-actions { position: relative; }
+  .header-actions .lang-switcher,
+  .header-actions .account-switcher { position: static; }
+  .lang-dropdown,
+  .account-dropdown { max-width: calc(100vw - 24px); }
+}
+
+@media (max-width: 340px) {
+  .header-brand { font-size: 18px; }
+  .lang-btn { padding: 7px 8px; }
+  .lang-btn .lang-chevron { display: none; }
+}
+
 .lang-dropdown {
   position: absolute;
   top: calc(100% + 6px);
@@ -95,6 +121,11 @@
   box-shadow: var(--fho-card-shadow);
   padding: 4px;
   z-index: 100;
+  /* The header is sticky, so on a short screen (360x380 Flip cover) a menu
+     taller than the viewport could never be scrolled into view. */
+  max-height: calc(100vh - 72px);
+  max-height: calc(100dvh - 72px);
+  overflow-y: auto;
   animation: dropIn 150ms var(--ease-out);
 }
 
@@ -150,6 +181,34 @@
 .theme-btn:hover {
   border-color: var(--fho-border-strong);
 }
+
+/* Light/dark swap: the incoming icon spins in and grows, the button springs
+   and an accent ring ripples out. Same motion as the phone app's
+   ThemeToggleButton. Only after a tap (.is-swapping), never on page load. */
+.theme-btn { position: relative; }
+.theme-btn__icon { display: inline-flex; }
+.theme-btn.is-swapping .theme-btn__icon { animation: theme-icon-in 500ms cubic-bezier(0.2, 0.7, 0.3, 1); }
+.theme-btn__ripple {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1.5px solid var(--fho-orange-1);
+  pointer-events: none;
+  animation: theme-ripple 600ms cubic-bezier(0.2, 0.7, 0.3, 1) forwards;
+}
+@keyframes theme-icon-in {
+  from { opacity: 0; transform: rotate(-120deg) scale(0.4); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes theme-ripple {
+  from { opacity: 0.45; transform: scale(0.7); }
+  to { opacity: 0; transform: scale(1.6); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .theme-btn.is-swapping .theme-btn__icon { animation: theme-fade 150ms ease-out; }
+  .theme-btn__ripple { display: none; }
+}
+@keyframes theme-fade { from { opacity: 0; } to { opacity: 1; } }
 
 /* New listing button */
 
@@ -226,6 +285,9 @@
   box-shadow: var(--fho-card-shadow);
   padding: 6px;
   z-index: 100;
+  max-height: calc(100vh - 72px);
+  max-height: calc(100dvh - 72px);
+  overflow-y: auto;
   animation: dropIn 150ms var(--ease-out);
 }
 

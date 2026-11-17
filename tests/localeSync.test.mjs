@@ -10,7 +10,7 @@ import { dirname, join } from 'node:path'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const LOCALES_DIR = join(__dirname, '..', 'src', 'i18n', 'locales')
-const LANGS = ['sq', 'en', 'de', 'it', 'es', 'pl', 'ru', 'fr']
+const LANGS = ['sq', 'en', 'de', 'it', 'es', 'pl', 'ru', 'fr', 'el', 'tr']
 
 function flattenKeys(obj, prefix = '') {
   const keys = []

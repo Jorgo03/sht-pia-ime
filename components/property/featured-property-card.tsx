@@ -11,8 +11,11 @@ import { Fonts, type AtticoPalette } from '@/constants/theme';
 import { useFavorites } from '@/contexts/favorites-context';
 import { useTheme } from '@/contexts/theme-context';
 import { useResponsive } from '@/hooks/use-responsive';
+import { cardImageUrl } from '@/lib/image';
 import { Property } from '@/data/types';
-import { formatPrice, getLocalizedText, listingBadgeKey, priceSuffixKey } from '@/lib/format';
+import { getLocalizedText, listingBadgeKey, priceSuffixKey } from '@/lib/format';
+import { CARD_CONTAINER_A11Y } from '@/components/property/card-a11y';
+import { useCurrency } from '@/contexts/currency-context';
 
 /** Matches web's .featured-card__img exactly — a fixed height regardless of
  *  viewport width, not an aspect ratio (src/styles/home.css has no media
@@ -45,13 +48,14 @@ function FeaturedPropertyCardBase({
   const { pressStyle, onPressIn, onPressOut } = usePressScale();
   const heartStyle = useHeartPop(favorited);
   const title = getLocalizedText(property.title_i18n, i18n.language) || property.title;
-  const price = formatPrice(property.price, i18n.language, property.currency);
+  const { formatListingPrice } = useCurrency();
+  const price = formatListingPrice(property.price, property.currency);
   const suffixKey = priceSuffixKey(property.listing_type);
   const suffix = suffixKey ? t(suffixKey) : '';
   // Matches web's listingBadgeKey() — the badge reads "For Sale"/"For Rent"/
   // "For Daily Rent" (a bare `=== 'rent'` check silently drops daily_rent
   // into "For Sale"), never "Featured" (that label is reserved for the
-  // section header above this card, via home.featured/home.editorsPick).
+  // section header above this card, via home.featured).
   const badgeLabel = t(listingBadgeKey(property.listing_type));
 
   const cardWidth = isTablet
@@ -63,13 +67,15 @@ function FeaturedPropertyCardBase({
   return (
     <Animated.View style={pressStyle}>
     <Pressable
+      {...CARD_CONTAINER_A11Y}
       style={[styles.card, { width: cardWidth }]}
       onPress={handlePress}
       onPressIn={onPressIn}
       onPressOut={onPressOut}>
       <View style={styles.imageWrap}>
         <Image
-          source={{ uri: property.image_urls[0] }}
+          accessibilityLabel={title}
+          source={{ uri: cardImageUrl(property.image_urls[0], cardWidth) }}
           // Ties the loaded image to this listing, so a FlatList row reused
           // for a different property cannot flash the previous one.
           recyclingKey={property.id}
@@ -81,6 +87,9 @@ function FeaturedPropertyCardBase({
           <Text style={styles.badgeText}>{badgeLabel.toUpperCase()}</Text>
         </View>
         <TouchableOpacity
+          accessibilityRole="button"
+          accessibilityLabel={t('common.save')}
+          accessibilityState={{ selected: favorited }}
           style={styles.heartButton}
           onPress={handleFavorite}
           activeOpacity={0.7}
@@ -96,7 +105,7 @@ function FeaturedPropertyCardBase({
       </View>
 
       <View style={styles.body}>
-        <Text style={styles.name} numberOfLines={1}>
+        <Text style={styles.name} numberOfLines={1} accessibilityRole="link" onPress={handlePress}>
           {title}
         </Text>
         <View style={styles.locationRow}>
@@ -133,33 +142,39 @@ function FeaturedPropertyCardBase({
 export const FeaturedPropertyCard = memo(FeaturedPropertyCardBase);
 
 const createStyles = (colors: AtticoPalette) => StyleSheet.create({
+  // One border on the card itself, as on the smaller cards below: a border on
+  // the body alone was cut off where the card's rounded corners clipped it.
   card: {
     borderRadius: 20,
     overflow: 'hidden',
     alignSelf: 'center',
     marginHorizontal: CARD_MARGIN,
+    backgroundColor: colors.primaryLight,
+    borderWidth: 1,
+    borderColor: colors.border,
   },
   imageWrap: {
     height: IMAGE_HEIGHT,
     width: '100%',
   },
   image: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
   },
   badge: {
     position: 'absolute',
     top: 14,
     left: 14,
-    backgroundColor: 'rgba(0,0,0,0.4)',
-    paddingHorizontal: 10,
+    // The same dark chip as the grid cards: a clear edge on any photo.
+    backgroundColor: 'rgba(20,17,14,0.72)',
+    paddingHorizontal: 12,
     paddingVertical: 5,
-    borderRadius: 10,
+    borderRadius: 999,
   },
   badgeText: {
-    fontSize: 10.5,
-    fontWeight: '500',
+    fontSize: 12,
+    fontFamily: Fonts.sansSemiBold,
     color: '#fff',
-    letterSpacing: 1,
+    letterSpacing: 0.6,
     textTransform: 'uppercase',
   },
   heartButton: {
@@ -178,21 +193,13 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     shadowOffset: { width: 0, height: 3 },
     elevation: 3,
   },
-  // Matches web's .featured-card__body — the border wraps only the body,
-  // not the image above it (border-top: none), unlike a border around the
-  // whole card.
   body: {
-    backgroundColor: colors.primaryLight,
     paddingHorizontal: 18,
     paddingVertical: 16,
-    borderWidth: 1,
-    borderTopWidth: 0,
-    borderColor: colors.border,
   },
   name: {
     fontFamily: Fonts?.serif,
     fontSize: 18,
-    fontWeight: '500',
     color: colors.textPrimary,
     marginBottom: 4,
   },
@@ -203,6 +210,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     marginBottom: 12,
   },
   location: {
+    fontFamily: Fonts.sans,
     fontSize: 13,
     color: colors.textSecondary,
   },
@@ -221,14 +229,14 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     backgroundColor: colors.glass,
   },
   statText: {
+    fontFamily: Fonts.sans,
     fontSize: 12,
     color: colors.textSecondary,
   },
+  // The same upright font as every other card's price.
   price: {
     fontFamily: Fonts?.serif,
     fontSize: 22,
-    fontWeight: '500',
-    fontStyle: 'italic',
-    color: colors.accent,
+    color: colors.accentText,
   },
 });

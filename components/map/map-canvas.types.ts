@@ -33,6 +33,8 @@ export interface MapCanvasProps {
   onMarkerPress: (cluster: Cluster) => void;
   accentColor: string;
   properties: Property[];
+  /** Draw the phone's own position, once the person has asked for it. */
+  showUserLocation?: boolean;
 }
 
 export interface MapCanvasHandle {

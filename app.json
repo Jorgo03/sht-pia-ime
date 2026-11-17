@@ -4,27 +4,34 @@
     "slug": "real-estate-app",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/icon-light.png",
     "scheme": "shtepia-ime",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.shtepiaime.app",
+      "icon": {
+        "light": "./assets/images/icon-light.png",
+        "dark": "./assets/images/icon-dark.png",
+        "tinted": "./assets/images/icon-tinted.png"
+      },
       "usesAppleSignIn": true,
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "CFBundleAllowMixedLocalizations": true
       }
     },
     "android": {
       "package": "com.shtepiaime.app",
+      "blockedPermissions": [
+        "android.permission.SYSTEM_ALERT_WINDOW"
+      ],
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
+        "backgroundColor": "#FFFFFF",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
-      "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false
     },
     "web": {
@@ -37,12 +44,12 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash-icon.png",
+          "image": "./assets/images/splash-door.png",
           "imageWidth": 200,
           "resizeMode": "contain",
-          "backgroundColor": "#ffffff",
+          "backgroundColor": "#FFFFFF",
           "dark": {
-            "backgroundColor": "#000000"
+            "backgroundColor": "#0e0b09"
           }
         }
       ],
@@ -51,7 +58,23 @@
         "expo-image-picker",
         {
           "photosPermission": "Shtëpia.ime needs access to your photos so you can add them to a listing.",
+          "cameraPermission": false,
           "microphonePermission": false
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/android-icon-monochrome.png",
+          "color": "#ff7d1a"
+        }
+      ],
+      "expo-image",
+      "expo-web-browser",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Shtëpia.ime uses your location to show homes near you on the map. It is not stored."
         }
       ]
     ],
@@ -64,6 +87,10 @@
       "eas": {
         "projectId": "ed500f91-752b-49d7-a3f7-51fadaedce3b"
       }
+    },
+    "locales": {
+      "sq": "./store-locales/sq.json",
+      "en": "./store-locales/en.json"
     }
   }
 }

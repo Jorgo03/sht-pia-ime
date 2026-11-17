@@ -1,16 +1,40 @@
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useIsFocused, useRouter, type Href } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
 import { useMemo, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+import {
+  Modal,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  useWindowDimensions,
+  View,
+  type LayoutChangeEvent,
+} from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { NotificationBell } from '@/components/notifications/notification-bell';
+import { ThemeToggleButton } from '@/components/ui/theme-toggle-button';
 import { Fonts, Radii, Shadows, type AtticoPalette } from '@/constants/theme';
+import { IS_WEB, WEB_MAX_WIDTH } from '@/constants/web-frame';
 import { useAuth } from '@/contexts/auth-context';
+import { useCurrency } from '@/contexts/currency-context';
+import { DISPLAY_CURRENCIES } from '@/lib/currency';
 import { useTheme } from '@/contexts/theme-context';
 import { supabase } from '@/lib/supabase';
 
 /** Same list, same native-language labels as web's Header.jsx LANGUAGES. */
+/** The bar's side padding: the app's page gutter. */
+const HEADER_GUTTER = 20;
+/** Space between the phone's status bar and the bar's controls. */
+const HEADER_TOP_PADDING = 16;
+/** Minimum space between the centred wordmark and the controls either side. */
+const BRAND_CLEARANCE = 8;
+
 const LANGUAGES = [
   { code: 'sq', name: 'Shqip', flag: '🇦🇱' },
   { code: 'en', name: 'English', flag: '🇬🇧' },
@@ -20,6 +44,8 @@ const LANGUAGES = [
   { code: 'pl', name: 'Polski', flag: '🇵🇱' },
   { code: 'ru', name: 'Русский', flag: '🇷🇺' },
   { code: 'fr', name: 'Français', flag: '🇫🇷' },
+  { code: 'el', name: 'Ελληνικά', flag: '🇬🇷' },
+  { code: 'tr', name: 'Türkçe', flag: '🇹🇷' },
 ];
 
 /**
@@ -38,6 +64,17 @@ const LANGUAGES = [
  * both themes. Everywhere else it follows the palette, exactly like web's
  * theme-driven `--fho-surface`.
  */
+/**
+ * Light clock and battery icons over a dark header. The app-wide status bar
+ * (app/_layout.tsx) follows the theme, so in light mode it drew dark icons on
+ * the always-dark sign-in screen and over listing photos. Only while focused:
+ * tabs stay mounted, and a hidden screen must not keep the icons white.
+ */
+function LightStatusBarWhileFocused() {
+  const focused = useIsFocused();
+  return focused ? <StatusBar style="light" /> : null;
+}
+
 export function AppHeader({
   /** Right-most slot — web puts the avatar (signed in) or a person icon
    *  (signed out) here. Omit it on the account screen itself, where it would
@@ -64,7 +101,17 @@ export function AppHeader({
    *  property hero share/save matter more than switching language. */
   showControls = true,
   onDark = false,
+  titleIsHeading = false,
+  onIdentityPress,
+  identityLabel,
+  site = false,
+  compact = false,
 }: {
+  /** Notifications only, without language and theme (the site header on a
+   *  phone, whose menu holds those two). */
+  compact?: boolean;
+  /** The website's own top header (components/web/site-header). */
+  site?: boolean;
   trailing?: ReactNode;
   onBack?: () => void;
   title?: string;
@@ -73,32 +120,70 @@ export function AppHeader({
   floating?: boolean;
   showControls?: boolean;
   onDark?: boolean;
+  /** The title is the screen's only heading (an <h1> on the web, a heading
+   *  for VoiceOver/TalkBack). Off where the screen has its own headline. */
+  titleIsHeading?: boolean;
+  /** Makes the avatar and the title (not the subtitle) open something: the
+   *  message thread opens the other person's profile. The avatar is the
+   *  button screen readers get, labelled `identityLabel`; the title stays a
+   *  heading and is also tappable. */
+  onIdentityPress?: () => void;
+  identityLabel?: string;
 }) {
   const { t, i18n } = useTranslation();
-  const { user } = useAuth();
-  const { theme, colors, toggle: toggleTheme } = useTheme();
+  const { theme, colors } = useTheme();
+  // Website: the site header (components/web/site-header, which passes
+  // `site`) shows the brand, menu and controls once at the top of every
+  // page. A screen's own header then only keeps what is specific to it: a
+  // back button, a title, or the actions over a listing's photos.
+  const router = useRouter();
+  const onWebScreen = IS_WEB && !site;
+  if (onWebScreen) showControls = false;
   const styles = useMemo(
     () => createStyles(colors, onDark || floating, !!onBack, floating),
     [colors, onDark, onBack, floating],
   );
   const [langOpen, setLangOpen] = useState(false);
+  const insets = useSafeAreaInsets();
+  const { width: windowWidth, height: windowHeight } = useWindowDimensions();
+  // The menu hangs under the bar: the top inset, the bar's 54 (10 + 34 + 10)
+  // and web's 6px gap. A fixed 96 put it over the header on notched iPhones,
+  // and its 8 rows (~358) ran off a 360x380 Flip cover, so it now scrolls
+  // within the window. On the web the Modal covers the whole browser window,
+  // not the 480 column, so the menu is anchored to the column's right edge.
+  const menuTop = insets.top + 66;
+  const menuMaxHeight = Math.max(120, windowHeight - menuTop - insets.bottom - 24);
+  const menuRight = IS_WEB && !site
+    ? Math.max(HEADER_GUTTER, (windowWidth - WEB_MAX_WIDTH) / 2 + HEADER_GUTTER)
+    : HEADER_GUTTER;
+  // Widths of the bar, its two sides and the wordmark, so the centred
+  // wordmark is shown only when it fits between equal insets. Fixed insets
+  // assumed an 88px control group; language + theme is ~106px, and at 320-
+  // 360px the wordmark slid under the controls.
+  const [box, setBox] = useState({ bar: 0, lead: 0, act: 0, brand: 0 });
+  const track = (key: keyof typeof box) => (e: LayoutChangeEvent) => {
+    const w = Math.ceil(e.nativeEvent.layout.width);
+    setBox((b) => (b[key] === w ? b : { ...b, [key]: w }));
+  };
+  const side = Math.max(box.lead, box.act);
+  const brandFits = box.bar > 0 && box.brand > 0 && box.brand <= box.bar - 2 * (HEADER_GUTTER + side + BRAND_CLEARANCE);
+
+  // Nothing of its own to show on a website page: the site header covers it.
+  const empty = onWebScreen && !onBack && !title && !floating && !trailing;
 
   const currentFlag =
     LANGUAGES.find((l) => l.code === i18n.language)?.flag ?? LANGUAGES[0].flag;
 
-  // Mirrors web's Header.jsx changeLanguage(): i18next's own storage-backed
-  // detector persists the choice, and it's also written to the profile row so
-  // the preference follows the account across devices.
-  const changeLanguage = async (next: string) => {
-    await i18n.changeLanguage(next);
-    setLangOpen(false);
-    if (user) {
-      await supabase.from('profiles').update({ preferred_language: next }).eq('id', user.id);
-    }
-  };
+
+  if (empty) return null;
 
   return (
-    <View style={styles.header}>
+    // Reaches up behind the clock and battery, so the bar's colour runs to the
+    // top of the screen instead of leaving the page's darker ground above it.
+    <View
+      style={[styles.header, !floating && { marginTop: -insets.top, paddingTop: insets.top + HEADER_TOP_PADDING }]}
+      onLayout={track('bar')}>
+      {(onDark || floating) && <LightStatusBarWhileFocused />}
       {/* A floating header lets the hero image show through, so it gets no
           blur layer and no tint — only the controls sit on top. */}
       {!floating && (
@@ -112,7 +197,7 @@ export function AppHeader({
         </>
       )}
 
-      <View style={styles.leading}>
+      <View style={[styles.leading, site && { flexShrink: 0 }]} onLayout={track('lead')}>
         {onBack && (
           <Pressable
             style={styles.backBtn}
@@ -123,10 +208,26 @@ export function AppHeader({
             <MaterialIcons name="chevron-left" size={26} color={styles.langCode.color} />
           </Pressable>
         )}
-        {avatar}
+        {avatar && onIdentityPress ? (
+          <Pressable
+            onPress={onIdentityPress}
+            hitSlop={6}
+            accessibilityRole="button"
+            accessibilityLabel={identityLabel}
+            style={({ pressed }) => pressed && styles.identityPressed}>
+            {avatar}
+          </Pressable>
+        ) : (
+          avatar
+        )}
         {title ? (
           <View style={styles.titleBlock}>
-            <Text style={styles.title} numberOfLines={1}>
+            <Text
+              style={styles.title}
+              numberOfLines={1}
+              accessibilityRole={titleIsHeading ? 'header' : undefined}
+              onPress={onIdentityPress}
+              suppressHighlighting>
               {title}
             </Text>
             {subtitle}
@@ -135,7 +236,10 @@ export function AppHeader({
           /* `.header-brand`: serif 22/600 in orange, with `.ime` a lighter
              weight. These are static per-weight files, so the pair is
              Newsreader 600 + 500 rather than one family at two weights. */
-          <Text style={styles.brand}>
+          <Text
+            style={styles.brand}
+            accessibilityRole={site ? 'link' : undefined}
+            onPress={site ? () => router.push('/' as Href) : undefined}>
             Shtëpia<Text style={styles.brandIme}>.ime</Text>
           </Text>
         ) : null}
@@ -149,37 +253,36 @@ export function AppHeader({
           that got shoved into a corner. Screens with their own `title` are
           untouched; that block still sits next to the chevron. */}
       {!title && onBack && (
-        <View style={styles.brandCentered} pointerEvents="none">
-          <Text style={styles.brand}>
+        <View
+          style={[styles.brandCentered, !floating && { top: insets.top }, !brandFits && styles.brandHidden]}
+          pointerEvents="none"
+          accessibilityElementsHidden={!brandFits}
+          importantForAccessibility={brandFits ? 'auto' : 'no-hide-descendants'}>
+          <Text style={styles.brand} numberOfLines={1} onLayout={track('brand')}>
             Shtëpia<Text style={styles.brandIme}>.ime</Text>
           </Text>
         </View>
       )}
 
-      <View style={styles.actions}>
+      <View style={styles.actions} onLayout={track('act')}>
         {showControls && (
           <>
-            {/* No accessibilityLabel: the visible code is the name, same as
-                web's `.lang-btn`, which has no aria-label either. */}
+            {/* Labelled: the visible content is only a flag emoji, which a
+                screen reader reads as "flag" rather than "Language". */}
+            {!compact && (
             <Pressable
-              style={styles.langBtn}
-              onPress={() => setLangOpen(true)}
-              accessibilityRole="button">
-              <Text style={styles.langCode}>{currentFlag}</Text>
-              <MaterialIcons name="expand-more" size={14} color={styles.langCode.color} />
-            </Pressable>
+                style={styles.langBtn}
+                hitSlop={6}
+                onPress={() => setLangOpen(true)}
+                accessibilityRole="button"
+                accessibilityLabel={t('common.language')}>
+                <Text style={styles.langCode}>{currentFlag}</Text>
+                <MaterialIcons name="expand-more" size={14} color={styles.langCode.color} />
+              </Pressable>
+            )}
 
-            <Pressable
-              style={styles.iconBtn}
-              onPress={toggleTheme}
-              accessibilityRole="button"
-              accessibilityLabel={t('common.toggleTheme')}>
-              <MaterialIcons
-                name={theme === 'dark' ? 'light-mode' : 'dark-mode'}
-                size={17}
-                color={styles.langCode.color}
-              />
-            </Pressable>
+            <NotificationBell style={styles.iconBtn} iconColor={styles.langCode.color} />
+            {!compact && <ThemeToggleButton style={styles.iconBtn} iconColor={styles.langCode.color} />}
           </>
         )}
 
@@ -194,37 +297,95 @@ export function AppHeader({
         transparent
         animationType="fade"
         onRequestClose={() => setLangOpen(false)}>
-        <Pressable style={styles.langBackdrop} onPress={() => setLangOpen(false)}>
+        <Pressable
+          style={[styles.langBackdrop, { paddingTop: menuTop, paddingRight: menuRight }]}
+          onPress={() => setLangOpen(false)}>
           <Pressable style={styles.langCard} onPress={(e) => e.stopPropagation()}>
-            {LANGUAGES.map((lang) => {
-              const active = lang.code === i18n.language;
-              return (
-                <Pressable
-                  key={lang.code}
-                  style={styles.langRowWrap}
-                  onPress={() => changeLanguage(lang.code)}
-                  accessibilityRole="button"
-                  accessibilityState={{ selected: active }}>
-                  {active ? (
-                    <LinearGradient
-                      colors={[colors.accent, colors.accentEnd]}
-                      style={styles.langRow}>
-                      <Text style={styles.langRowCode}>{lang.flag}</Text>
-                      <Text style={[styles.langRowName, styles.langRowActive]}>{lang.name}</Text>
-                    </LinearGradient>
-                  ) : (
-                    <View style={styles.langRow}>
-                      <Text style={styles.langRowCode}>{lang.flag}</Text>
-                      <Text style={styles.langRowName}>{lang.name}</Text>
-                    </View>
-                  )}
-                </Pressable>
-              );
-            })}
+            {/* flexGrow 0: a ScrollView grows by default, which stretched the
+                card to menuMaxHeight (the whole screen) on iOS instead of
+                fitting its rows; it still scrolls when the rows don't fit. */}
+            <ScrollView
+              style={{ flexGrow: 0, maxHeight: menuMaxHeight }}
+              contentContainerStyle={styles.langList}
+              bounces={false}>
+              <LanguageOptions onChosen={() => setLangOpen(false)} />
+            </ScrollView>
           </Pressable>
         </Pressable>
       </Modal>
     </View>
+  );
+}
+
+
+/**
+ * The language list and the price-currency choice: the app header's
+ * dropdown, and the website's menu on a phone (components/web/site-header).
+ */
+export function LanguageOptions({ onChosen }: { onChosen?: () => void }) {
+  const { t, i18n } = useTranslation();
+  const { user } = useAuth();
+  const { colors } = useTheme();
+  const { currency, setCurrency } = useCurrency();
+  const styles = useMemo(() => createStyles(colors, false, false, false), [colors]);
+  // Mirrors web's Header.jsx changeLanguage(): i18next's own storage-backed
+  // detector persists the choice, and it's also written to the profile row so
+  // the preference follows the account across devices.
+  const changeLanguage = async (next: string) => {
+    await i18n.changeLanguage(next);
+    onChosen?.();
+    if (user) {
+      await supabase.from('profiles').update({ preferred_language: next }).eq('id', user.id);
+    }
+  };
+  return (
+    <>
+              {LANGUAGES.map((lang) => {
+                const active = lang.code === i18n.language;
+                return (
+                  <Pressable
+                    key={lang.code}
+                    style={styles.langRowWrap}
+                    onPress={() => changeLanguage(lang.code)}
+                    accessibilityRole="button"
+                    accessibilityState={{ selected: active }}>
+                    {active ? (
+                      <LinearGradient
+                        colors={[colors.accent, colors.accentEnd]}
+                        style={styles.langRow}>
+                        <Text style={styles.langRowCode}>{lang.flag}</Text>
+                        <Text style={[styles.langRowName, styles.langRowActive]}>{lang.name}</Text>
+                      </LinearGradient>
+                    ) : (
+                      <View style={styles.langRow}>
+                        <Text style={styles.langRowCode}>{lang.flag}</Text>
+                        <Text style={styles.langRowName}>{lang.name}</Text>
+                      </View>
+                    )}
+                  </Pressable>
+                );
+              })}
+              {/* Price currency (ALL / EUR / USD / GBP) for visitors from
+                  abroad; in the same menu as the language, since both are
+                  "show me this in my terms". */}
+              <Text style={styles.currencyLabel}>{t('currency.title')}</Text>
+              <View style={styles.currencyRow}>
+                {([null, ...DISPLAY_CURRENCIES] as const).map((c) => {
+                  const active = c === currency;
+                  return (
+                    <Pressable
+                      key={c ?? 'listed'}
+                      onPress={() => setCurrency(c)}
+                      accessibilityRole="button"
+                      accessibilityState={{ selected: active }}
+                      accessibilityLabel={c ?? t('currency.asListed')}
+                      style={[styles.currencyChip, active && { backgroundColor: colors.accent, borderColor: colors.accent }]}>
+                      <Text style={[styles.currencyChipText, active && styles.langRowActive]}>{c ?? t('currency.asListedShort')}</Text>
+                    </Pressable>
+                  );
+                })}
+              </View>
+    </>
   );
 }
 
@@ -259,8 +420,10 @@ const createStyles = (
       // breathing room — `leading`'s `flexShrink: 1` only kicks in once
       // they're already touching.
       gap: 8,
-      paddingHorizontal: 20,
-      paddingVertical: 10,
+      paddingHorizontal: HEADER_GUTTER,
+      // More above than below: clear of the phone's clock and battery.
+      paddingTop: HEADER_TOP_PADDING,
+      paddingBottom: 10,
       // The floating variant is chrome over a photo — a border would draw a
       // line across the image.
       borderBottomWidth: floating ? 0 : StyleSheet.hairlineWidth,
@@ -286,22 +449,19 @@ const createStyles = (
       marginLeft: hasBack ? -6 : 0,
     },
     // The centered wordmark for a back-button screen with no title of its
-    // own. Insets are fixed rather than measured against the actual chevron/
-    // actions width — that's the standard nav-bar trade-off (Slack, iOS
-    // Mail, etc. all do the same): a screen with no trailing controls won't
-    // be pixel-perfect optically centered, but it's still dead-centered on
-    // the bar itself, which reads as intentional. 56 clears the chevron on
-    // one side and a two-icon action group (share + favorite, ~88px) on the
-    // other with room to spare.
+    // own: dead-centre on the bar (the standard back/title/actions layout).
+    // It spans the whole bar so the text measures at its natural width; the
+    // component hides it when that width doesn't fit between the two sides.
     brandCentered: {
       position: 'absolute',
-      left: 56,
-      right: 56,
+      left: 0,
+      right: 0,
       top: 0,
       bottom: 0,
       alignItems: 'center',
       justifyContent: 'center',
     },
+    brandHidden: { opacity: 0 },
     backBtn: {
       width: 28,
       height: 34,
@@ -313,6 +473,9 @@ const createStyles = (
       fontSize: 22,
       letterSpacing: -0.44,
       color: colors.accent,
+    },
+    identityPressed: {
+      opacity: 0.6,
     },
     titleBlock: {
       flexShrink: 1,
@@ -337,7 +500,8 @@ const createStyles = (
       flexDirection: 'row',
       alignItems: 'center',
       gap: 6,
-      paddingVertical: 7,
+      // The height of the buttons beside it, so its contents centre in it.
+      height: 34,
       paddingHorizontal: 11,
       borderRadius: Radii.pill,
       borderWidth: 1,
@@ -351,8 +515,10 @@ const createStyles = (
     // `styles.langCode.color`, so this stays even though it's no longer
     // rendering a text code.
     langCode: {
+      fontFamily: Fonts.sans,
       fontSize: 16,
-      lineHeight: 18,
+      // No lineHeight: squeezing the line pushed the flag emoji up on iPhone.
+      includeFontPadding: false,
       color: fg,
     },
     // `.theme-btn` / `.account-signin-btn`: 34px square, r-sm.
@@ -372,8 +538,8 @@ const createStyles = (
       backgroundColor: 'rgba(0,0,0,0.35)',
       alignItems: 'flex-end',
       justifyContent: 'flex-start',
-      paddingTop: 96,
-      paddingHorizontal: 20,
+      // paddingTop and paddingRight are set inline, from the insets and window.
+      paddingHorizontal: HEADER_GUTTER,
     },
     langCard: {
       // Web's min-width: 170px — sized to its content, not full-bleed.
@@ -383,8 +549,10 @@ const createStyles = (
       borderColor: colors.border,
       borderRadius: Radii.md,
       padding: 4,
-      gap: 2,
       ...Shadows.card,
+    },
+    langList: {
+      gap: 2,
     },
     langRowWrap: {
       borderRadius: 10,
@@ -399,6 +567,7 @@ const createStyles = (
       borderRadius: 10,
     },
     langRowCode: {
+      fontFamily: Fonts.sans,
       fontSize: 18,
       lineHeight: 20,
       width: 24,
@@ -411,6 +580,40 @@ const createStyles = (
     },
     langRowActive: {
       color: '#fff',
+    },
+    currencyLabel: {
+      fontFamily: Fonts.sansSemiBold,
+      fontSize: 12,
+      color: colors.textSecondary,
+      paddingHorizontal: 14,
+      paddingTop: 10,
+      paddingBottom: 4,
+      borderTopWidth: StyleSheet.hairlineWidth,
+      borderTopColor: colors.border,
+      marginTop: 4,
+    },
+    currencyRow: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: 6,
+      paddingHorizontal: 10,
+      paddingBottom: 8,
+      maxWidth: 220,
+    },
+    currencyChip: {
+      minHeight: 36,
+      minWidth: 44,
+      paddingHorizontal: 10,
+      alignItems: 'center',
+      justifyContent: 'center',
+      borderRadius: 10,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    currencyChipText: {
+      fontFamily: Fonts.sansMedium,
+      fontSize: 13,
+      color: colors.textPrimary,
     },
   });
 };

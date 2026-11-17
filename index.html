@@ -4,7 +4,27 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="theme-color" content="#FF7A40" />
-    <title>Future Home Orange</title>
+    <title>Shtëpia.ime — Shtëpi në shitje dhe me qira në Shqipëri</title>
+    <meta name="description" content="Apartamente, vila dhe zyra në shitje dhe me qira në Tiranë, Durrës dhe në gjithë Shqipërinë. Kontakto direkt agjentët dhe pronarët. Në shqip, anglisht, italisht, gjermanisht e më shumë." />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <!-- Link previews (WhatsApp, Facebook, X, LinkedIn) and Google. These are
+         site-wide: the app is a single-page bundle, so a crawler that does not
+         run JavaScript sees this page for every URL, listings included. No
+         canonical or og:url here for the same reason: a fixed one would tell
+         Google every listing is a duplicate of the home page.
+         %VITE_SITE_URL% is filled in at build time (vite.config.js). -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Shtëpia.ime" />
+    <meta property="og:locale" content="sq_AL" />
+    <meta property="og:title" content="Shtëpia.ime — Shtëpi në shitje dhe me qira në Shqipëri" />
+    <meta property="og:description" content="Apartamente, vila dhe zyra në shitje dhe me qira në gjithë Shqipërinë. Kontakto direkt agjentët dhe pronarët." />
+    <meta property="og:image" content="%VITE_SITE_URL%/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Shtëpia.ime" />
+    <meta name="twitter:card" content="summary_large_image" />
     <!-- Canonical cascade-layer order. MUST be declared before any stylesheet
          loads (module imports hoist page CSS ahead of tailwind.css), otherwise
          the first @layer block seen would re-order the cascade and preflight
@@ -40,21 +60,147 @@
     -->
     <script>
       (function () {
+        // Same rules as src/lib/oauthRelay.js (a test keeps the two equal):
+        // exp:// only to this device or a private network on the app's
+        // callback path, the owner's own Expo tunnel (its name is signed by Expo
+        // for that account), or shtepia-ime://auth/callback. Other tunnels
+        // are refused: anyone can register one and collect the code.
+        function isAppCallback(u) {
+          if (!u || u.username || u.password) return false;
+          if (u.protocol === 'shtepia-ime:') return u.hostname === 'auth' && u.pathname === '/callback';
+          if ((u.protocol !== 'exp:' && u.protocol !== 'exps:') || u.pathname !== '/--/auth/callback') return false;
+          var h = u.hostname;
+          if (!u.port && /^c-jorgo03-[a-z0-9]+-[a-z0-9]+\.on\.expo\.app$/.test(h)) return true;
+          if (u.protocol !== 'exp:') return false;
+          if (h === 'localhost' || h === '[::1]') return true;
+          var m = /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/.exec(h);
+          if (!m) return false;
+          var p = [Number(m[1]), Number(m[2]), Number(m[3]), Number(m[4])];
+          for (var i = 0; i < 4; i++) if (p[i] > 255) return false;
+          return p[0] === 10 || p[0] === 127 || (p[0] === 172 && p[1] >= 16 && p[1] <= 31) || (p[0] === 192 && p[1] === 168);
+        }
         try {
           var params = new URLSearchParams(window.location.search);
           var target = params.get('rt');
           if (!target) return;
           var parsed = new URL(target);
-          if (parsed.protocol !== 'exp:' && parsed.protocol !== 'shtepia-ime:') return;
+          if (!isAppCallback(parsed)) return;
           params.delete('rt');
           params.forEach(function (value, key) { parsed.searchParams.set(key, value); });
           if (window.location.hash && window.location.hash.length > 1) {
             parsed.hash = window.location.hash;
           }
-          window.location.replace(parsed.toString());
+          var relay = parsed.toString();
+          // The code belongs to the phone. Keep it for AuthCallback's button
+          // and take it out of the address before the Supabase client loads.
+          window.__FHO_RELAY_TARGET__ = relay;
+          history.replaceState(null, '', window.location.pathname);
+          // Android's Chrome refuses a scripted jump to an app scheme without
+          // a tap, and the attempt also stopped this page loading, so it sat
+          // blank (Samsung A23, 2026-10-25). There the page loads and shows a
+          // button instead; a tap is allowed through.
+          if (!/Android/i.test(navigator.userAgent)) window.location.replace(relay);
         } catch (e) {
           /* fall through to the React relay, which renders a tappable link */
         }
+      })();
+    </script>
+    <!--
+      Boot guard — the last line of defence against a blank page.
+
+      src/shared/ErrorBoundary.jsx catches render errors, but it can only do
+      that once it is mounted, and mounting happens in main.jsx *after* the
+      whole import graph has been evaluated. Anything that throws during that
+      evaluation — a missing VITE_SUPABASE_* pair, a browser that refuses
+      localStorage, a bundle that 404s behind a bad deploy — kills the page
+      before React exists. The user gets white nothing, and in production
+      there is no console open to explain it.
+
+      So this runs first, as a classic script, and paints a readable panel if
+      and only if #root never received anything. It cannot use the app's CSS
+      (the failure may be that nothing loaded), so every style is inline.
+
+      Three triggers, because a blank page has three distinct causes:
+        - 'error' in the capture phase, which also catches a <script> or
+          stylesheet that failed to load, not just thrown exceptions;
+        - 'unhandledrejection', for a top-level await or an async boot step;
+        - a watchdog, for the case where nothing throws at all and the app
+          simply never mounts.
+    -->
+    <script>
+      (function () {
+        var painted = false;
+
+        function paint(detail) {
+          if (painted) return;
+          var root = document.getElementById('root');
+          // Never take over a page that rendered. A late async error belongs
+          // in the console, not over the top of a working app.
+          if (!root || root.childElementCount > 0) return;
+          painted = true;
+
+          var dark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+          var ink = dark ? '#F3ECE4' : '#1A1512';
+          var soft = dark ? '#A79C90' : '#6E655B';
+          var card = dark ? '#1E1A17' : '#FFFFFF';
+          var line = dark ? '#332B25' : '#E9E1D7';
+
+          document.body.style.background = dark ? '#14110F' : '#FDFBF8';
+          document.body.style.margin = '0';
+
+          root.innerHTML =
+            '<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;' +
+            'font-family:Manrope,-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif;color:' + ink + '">' +
+              '<div style="max-width:460px;background:' + card + ';border:1px solid ' + line + ';' +
+              'border-radius:14px;padding:26px 28px">' +
+                '<div style="font-size:11px;letter-spacing:.14em;text-transform:uppercase;' +
+                'color:#E85D00;font-weight:700;margin-bottom:10px">Shtëpia.ime</div>' +
+                '<h1 style="font-size:20px;line-height:1.3;margin:0 0 10px;font-weight:700">' +
+                  'The app could not start' +
+                '</h1>' +
+                '<p style="font-size:14px;line-height:1.6;color:' + soft + ';margin:0 0 16px">' +
+                  'Something failed before the page could load. The reason is below — ' +
+                  'it is usually missing configuration on the deployment rather than a fault ' +
+                  'in the site itself.' +
+                '</p>' +
+                '<pre style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;' +
+                'line-height:1.5;background:' + (dark ? '#171310' : '#F6F1EA') + ';border:1px solid ' + line + ';' +
+                'border-radius:8px;padding:12px 14px;margin:0 0 18px;white-space:pre-wrap;' +
+                'word-break:break-word;color:' + ink + '"></pre>' +
+                '<button type="button" style="font:inherit;font-size:14px;font-weight:600;cursor:pointer;' +
+                'background:#E85D00;color:#fff;border:none;border-radius:8px;padding:10px 18px">' +
+                  'Reload' +
+                '</button>' +
+              '</div>' +
+            '</div>';
+
+          // textContent, not innerHTML: the message can carry a URL or markup
+          // from a third-party stack and must never be parsed as HTML here.
+          root.querySelector('pre').textContent = detail;
+          root.querySelector('button').onclick = function () { window.location.reload(); };
+        }
+
+        window.addEventListener('error', function (event) {
+          // A failed resource (script/link) reports through event.target and
+          // carries no message; a thrown exception carries the message.
+          var target = event && event.target;
+          if (target && target !== window && (target.src || target.href)) {
+            paint('Failed to load ' + (target.src || target.href));
+            return;
+          }
+          paint((event && event.message) || 'Uncaught script error');
+        }, true);
+
+        window.addEventListener('unhandledrejection', function (event) {
+          var reason = event && event.reason;
+          paint((reason && reason.message) || String(reason || 'Unhandled promise rejection'));
+        });
+
+        // Nothing threw, nothing 404'd, and still no app. Long enough that a
+        // slow phone on a bad connection finishes first.
+        window.setTimeout(function () {
+          paint('The application did not start within 15 seconds, and reported no error.');
+        }, 15000);
       })();
     </script>
   </head>

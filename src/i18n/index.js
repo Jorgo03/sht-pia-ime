@@ -11,6 +11,13 @@ import pl from './locales/pl.json'
 import ru from './locales/ru.json'
 import fr from './locales/fr.json'
 
+// <html lang> follows the active language, including the one restored from
+// localStorage on load: index.html ships lang="sq", so without this a returning
+// English visitor got English text that screen readers pronounced as Albanian.
+i18n.on('languageChanged', (lng) => {
+  if (typeof document !== 'undefined') document.documentElement.lang = lng
+})
+
 i18n // eslint-disable-line import/no-named-as-default-member
   .use(LanguageDetector)
   .use(initReactI18next)

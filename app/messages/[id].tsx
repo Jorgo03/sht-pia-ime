@@ -1,27 +1,52 @@
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter, type Href } from 'expo-router';
+import { MessagesTwoPane } from '@/app/(tabs)/messages';
+import { useIsDesktopWeb } from '@/hooks/use-app-dimensions';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
+  AppState,
+  Alert,
   FlatList,
   KeyboardAvoidingView,
+  Modal,
   Platform,
+  Pressable,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 
+import { ReportSheet } from '@/components/safety/report-sheet';
+import { confirmAction } from '@/lib/confirm';
 import { AppHeader } from '@/components/ui/app-header';
-import { type AtticoPalette } from '@/constants/theme';
+import { SignInPrompt } from '@/components/ui/sign-in-prompt';
+import { type AtticoPalette, Fonts } from '@/constants/theme';
 import { useAuth } from '@/contexts/auth-context';
+import { KeyboardDoneBar } from '@/components/ui/keyboard-done-bar';
 import { useTheme } from '@/contexts/theme-context';
 import { supabase } from '@/lib/supabase';
 import { formatRelativeTime, getLocalizedText } from '@/lib/format';
+import {
+  blockUser,
+  isBlockedSendError,
+  loadBlockedIds,
+  unblockUser,
+} from '@/src/features/safety/lib/safety';
+import { isNotFound, loadThreadMessages } from '@/src/features/messaging/lib/thread';
+import { createCatchUp, mergeMessages } from '@/src/features/messaging/lib/catchUp';
+import { fetchPublicProfile, otherParticipant } from '@/src/features/profiles/lib/publicProfile';
+// Chats are text only (owner, 2026-11-14): nothing can be attached any more,
+// but a photo or document already sent still shows, so history stays whole.
+import { MessageAttachment } from '@/components/messaging/message-attachment';
+import { readAttachment } from '@/src/features/messaging/lib/attachments';
+import { FORM_LIMITS } from '@/src/lib/formLimits';
+import { useReadableColumn } from '@/hooks/use-responsive';
 
 interface Message {
   id: string;
@@ -29,6 +54,8 @@ interface Message {
   sender_id: string;
   body: string;
   created_at: string;
+  /** A photo or document (src/features/messaging/lib/attachments.js). */
+  attachment?: unknown;
 }
 
 interface ConversationInfo {
@@ -38,13 +65,23 @@ interface ConversationInfo {
   property_id: string | null;
 }
 
-export default function ThreadScreen() {
+function ThreadScreen({ embedded = false }: { embedded?: boolean } = {}) {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const { t, i18n } = useTranslation();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
+  // A centred column on an unfolded Fold or a spanned Duo (hooks/use-responsive).
+  const readableColumn = useReadableColumn();
+  const readable = embedded ? null : readableColumn;
+  // The composer pads itself clear of the home indicator / Android nav bar
+  // (SafeAreaView edges below); the KAV offset takes that inset back off so
+  // the row still sits flush on the iOS keyboard.
+  const insets = useSafeAreaInsets();
+  // The conversation could not be read: not this account's (an old
+  // notification after switching accounts), or gone.
+  const [unavailable, setUnavailable] = useState(false);
   const [conversation, setConversation] = useState<ConversationInfo | null>(null);
   const [otherName, setOtherName] = useState('?');
   const [propertyTitle, setPropertyTitle] = useState<string | null>(null);
@@ -52,8 +89,20 @@ export default function ThreadScreen() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [text, setText] = useState('');
   const [sending, setSending] = useState(false);
-  const [sendError, setSendError] = useState(false);
+  // null, or the reason the last send failed.
+  const [sendError, setSendError] = useState<null | 'failed' | 'blockedByThem'>(null);
   const [loading, setLoading] = useState(true);
+  // The load failed for a reason other than "not yours / gone" (offline,
+  // timeout): shown with a retry, which bumps reloadKey.
+  const [loadFailed, setLoadFailed] = useState(false);
+  const [reloadKey, setReloadKey] = useState(0);
+  const [otherId, setOtherId] = useState<string | null>(null);
+  // Whether *I* blocked the other person (only the blocker can see a block).
+  const [blocked, setBlocked] = useState(false);
+  const [reportOpen, setReportOpen] = useState(false);
+  // The web's Report / Block menu (phones use the native Alert sheet).
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [safetyError, setSafetyError] = useState(false);
   const listRef = useRef<FlatList<Message>>(null);
   // The postgres_changes handler below is created once when the effect
   // mounts (conversation is still null at that point) and never recreated,
@@ -61,11 +110,19 @@ export default function ThreadScreen() {
   // kept fresh by the effect underneath.
   const conversationRef = useRef<ConversationInfo | null>(null);
 
-  const meIsClient = conversation?.client_id === user?.id;
-
   useEffect(() => {
     conversationRef.current = conversation;
   }, [conversation]);
+
+  // Back to the inbox, whose bottom menu leads anywhere. With no history (a
+  // notification cold start, a deep link) there is nothing to pop, so the
+  // inbox is opened instead.
+  const goBack = useCallback(() => {
+    if (router.canGoBack()) router.back();
+    else router.replace('/messages' as Href);
+  }, [router]);
+
+  const userId = user?.id;
 
   const markRead = useCallback(
     (convo: ConversationInfo, isClient: boolean) => {
@@ -79,42 +136,69 @@ export default function ThreadScreen() {
   // the message history, then subscribes for new INSERTs — same shape as
   // the web app's Thread component.
   useEffect(() => {
-    if (!id || !user) return;
+    if (!id || !userId) return;
     let cancelled = false;
 
     (async () => {
-      const { data: convo } = await supabase
+      const { data: convo, error: convoError } = await supabase
         .from('conversations')
         .select('id, client_id, agent_id, property_id')
         .eq('id', id)
         .single();
-      if (cancelled || !convo) return;
+      if (cancelled) return;
+      if (!convo) {
+        // Only "no such row" means not yours or gone; a dropped connection
+        // used to say the same and offered no way to try again.
+        if (convoError && !isNotFound(convoError)) setLoadFailed(true);
+        else setUnavailable(true);
+        setLoading(false);
+        return;
+      }
       setConversation(convo);
 
-      const otherId = convo.client_id === user.id ? convo.agent_id : convo.client_id;
-      const [profRes, propRes] = await Promise.all([
-        supabase.from('profiles').select('full_name, agency_name').eq('id', otherId).single(),
+      const otherId = convo.client_id === userId ? convo.agent_id : convo.client_id;
+      setOtherId(otherId);
+      // public_profile() rather than the profiles table: the table hides a
+      // client from another client, so writing to a client who published a
+      // listing showed "?" as the name. A failure only costs the name.
+      const [profile, propRes, blockedIds] = await Promise.all([
+        fetchPublicProfile(supabase, otherId).catch(() => null),
         convo.property_id
           ? supabase.from('properties').select('id, title, title_i18n').eq('id', convo.property_id).single()
           : Promise.resolve({ data: null }),
+        loadBlockedIds(supabase),
       ]);
       if (cancelled) return;
-      setOtherName(profRes.data?.full_name || profRes.data?.agency_name || '?');
+      setBlocked(blockedIds.has(otherId));
+      setOtherName(profile?.full_name?.trim() || profile?.agency_name?.trim() || '?');
       if (propRes.data) {
         setPropertyId(propRes.data.id);
         setPropertyTitle(getLocalizedText(propRes.data.title_i18n, i18n.language) || propRes.data.title);
       }
 
-      const { data: msgs } = await supabase
-        .from('messages')
-        .select('*')
-        .eq('conversation_id', id)
-        .order('created_at', { ascending: true });
+      const { messages: msgs } = await loadThreadMessages<Message>(supabase, id);
       if (cancelled) return;
-      setMessages(msgs ?? []);
+      if (!msgs) {
+        setLoadFailed(true);
+        setLoading(false);
+        return;
+      }
+      // Anything realtime delivered meanwhile stays, without duplicates.
+      setMessages((prev) => [...msgs, ...prev.filter((m) => !msgs.some((l) => l.id === m.id))]);
       setLoading(false);
-      markRead(convo, convo.client_id === user.id);
+      markRead(convo, convo.client_id === userId);
     })();
+
+    // Realtime does not replay what was missed while the channel was down or
+    // the app was in the background: re-read then, and merge (AUDIT-024).
+    const catchUp = createCatchUp(async () => {
+      const { messages: fresh } = await loadThreadMessages<Message>(supabase, id);
+      if (cancelled || !fresh) return;
+      setMessages((prev) => mergeMessages(prev, fresh));
+      const convo = conversationRef.current;
+      if (convo) markRead(convo, convo.client_id === userId);
+    });
+    const appStateSub = AppState.addEventListener('change', catchUp.onAppState);
 
     const channel = supabase
       .channel(`thread-${id}`)
@@ -124,20 +208,23 @@ export default function ThreadScreen() {
         ({ new: msg }: { new: Message }) => {
           setMessages((prev) => (prev.some((m) => m.id === msg.id) ? prev : [...prev, msg]));
           const convo = conversationRef.current;
-          if (msg.sender_id !== user.id && convo) markRead(convo, convo.client_id === user.id);
+          if (msg.sender_id !== userId && convo) markRead(convo, convo.client_id === userId);
         },
       )
-      .subscribe();
+      .subscribe((status) => catchUp.onStatus(status));
 
     return () => {
       cancelled = true;
+      appStateSub.remove();
       supabase.removeChannel(channel);
     };
     // conversation is intentionally excluded — the realtime handler reads
     // conversationRef instead, so this effect doesn't need to restart (and
     // resubscribe the channel) every time conversation state loads/changes.
+    // The user's id, not the user object: a token refresh stores a new
+    // object every hour, which used to drop and re-open the chat channel.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id, user, markRead]);
+  }, [id, userId, markRead, reloadKey]);
 
   useEffect(() => {
     if (messages.length > 0) listRef.current?.scrollToEnd({ animated: true });
@@ -147,7 +234,7 @@ export default function ThreadScreen() {
     const body = text.trim();
     if (!body || sending || !user || !id) return;
     setSending(true);
-    setSendError(false);
+    setSendError(null);
     const { data, error } = await supabase
       .from('messages')
       .insert({ conversation_id: id, sender_id: user.id, body })
@@ -158,15 +245,104 @@ export default function ThreadScreen() {
       setText('');
       setMessages((prev) => (prev.some((m) => m.id === data.id) ? prev : [...prev, data]));
     } else {
-      setSendError(true);
+      // Refused by the database because there is a block between the two.
+      setSendError(isBlockedSendError(error) ? 'blockedByThem' : 'failed');
     }
   };
 
+  const toggleBlock = async () => {
+    if (!otherId) return;
+    setSafetyError(false);
+    if (blocked) {
+      if (await unblockUser(supabase, otherId)) setBlocked(false);
+      else setSafetyError(true);
+      return;
+    }
+    confirmAction({
+      title: t('safety.blockUser'),
+      message: t('safety.blockConfirm', { name: otherName }),
+      confirmText: t('safety.blockUser'),
+      cancelText: t('common.cancel'),
+      destructive: true,
+      onConfirm: async () => {
+        if (await blockUser(supabase, otherId)) setBlocked(true);
+        else setSafetyError(true);
+      },
+    });
+  };
+
+  // A native action sheet would need a new library; an Alert with options is
+  // the built-in equivalent on phones. react-native-web's Alert.alert does
+  // nothing, so the web opens the same two choices as a small menu instead.
+  const openMenu = () => {
+    if (Platform.OS === 'web') {
+      setMenuOpen(true);
+      return;
+    }
+    Alert.alert(otherName, undefined, [
+      { text: t('safety.reportUser'), onPress: () => setReportOpen(true) },
+      {
+        text: blocked ? t('safety.unblockUser') : t('safety.blockUser'),
+        style: blocked ? 'default' : 'destructive',
+        onPress: () => void toggleBlock(),
+      },
+      { text: t('common.cancel'), style: 'cancel' },
+    ]);
+  };
+
+  const profileTarget = otherParticipant(conversation, user?.id);
+  const openProfile = () => {
+    if (profileTarget) router.push(`/user/${profileTarget}` as Href);
+  };
+
+  // Signed out (a notification left in the tray, a link) the load never
+  // starts, so this used to be a spinner forever.
+  if (!user) return authLoading ? null : <SignInPrompt message={t('messages.loginPrompt')} />;
+
+  if (unavailable) {
+    return (
+      <SafeAreaView style={[styles.container, readable]} edges={['top']}>
+        <AppHeader onBack={goBack} showControls={false} />
+        <View style={styles.center}>
+          <Text style={styles.unavailableText}>{t('messages.unavailable')}</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  if (loadFailed) {
+    return (
+      <SafeAreaView style={[styles.container, readable]} edges={['top']}>
+        <AppHeader onBack={goBack} showControls={false} />
+        <View style={styles.center}>
+          <Text style={styles.unavailableText} accessibilityLiveRegion="polite">
+            {t('messages.loadFailed')}
+          </Text>
+          <TouchableOpacity
+            accessibilityRole="button"
+            onPress={() => {
+              setLoadFailed(false);
+              setLoading(true);
+              setReloadKey((k) => k + 1);
+            }}
+            style={styles.retryButton}>
+            <Text style={styles.retryText}>{t('common.retry')}</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
   if (loading) {
     return (
-      <View style={styles.center}>
-        <ActivityIndicator size="large" color={colors.accent} />
-      </View>
+      <SafeAreaView style={[styles.container, readable]} edges={['top', 'bottom']}>
+        {/* The header and the way back render at once; only the bubbles
+            wait on the network — never a blank spinner with no chrome. */}
+        <AppHeader onBack={goBack} showControls={false} title={otherName} titleIsHeading />
+        <View style={styles.center}>
+          <ActivityIndicator size="large" color={colors.accent} />
+        </View>
+      </SafeAreaView>
     );
   }
 
@@ -174,16 +350,34 @@ export default function ThreadScreen() {
     <KeyboardAvoidingView
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}>
-      <SafeAreaView style={styles.container} edges={['top']}>
+      // The KAV is the screen root at y=0 (headerShown: false), so there is
+      // no nav header to offset for; the old 90 floated the composer 90pt
+      // above the keyboard.
+      keyboardVerticalOffset={Platform.OS === 'ios' ? -insets.bottom : 0}>
+      <SafeAreaView style={[styles.container, readable]} edges={['top', 'bottom']}>
         {/* The correspondent's name and avatar stay — they're the only cue as
             to who you're talking to — so they take the header's title/avatar
             slots rather than being displaced by the wordmark. Language and
             theme are off for room; both are a tap away on Profile. */}
         <AppHeader
-          onBack={() => router.back()}
+          onBack={goBack}
           showControls={false}
           title={otherName}
+          titleIsHeading
+          // The other participant's own profile, never the viewer's: the id
+          // comes from the conversation row, not from anything shown.
+          onIdentityPress={profileTarget ? openProfile : undefined}
+          identityLabel={t('publicProfile.open', { name: otherName })}
+          trailing={
+            <TouchableOpacity
+              onPress={openMenu}
+              style={styles.menuButton}
+              accessibilityRole="button"
+              accessibilityLabel={t('safety.menu')}
+              hitSlop={8}>
+              <MaterialIcons name="more-vert" size={22} color={colors.textPrimary} />
+            </TouchableOpacity>
+          }
           avatar={
             <LinearGradient colors={[colors.accent, colors.accentEnd]} style={styles.headerAvatar}>
               <Text style={styles.headerAvatarText}>{otherName[0]?.toUpperCase() || '?'}</Text>
@@ -192,6 +386,7 @@ export default function ThreadScreen() {
           subtitle={
             propertyTitle ? (
               <TouchableOpacity
+                accessibilityRole="button"
                 onPress={() => propertyId && router.push(`/property/${propertyId}` as Href)}>
                 <Text style={styles.headerProperty} numberOfLines={1}>
                   {propertyTitle}
@@ -211,9 +406,13 @@ export default function ThreadScreen() {
           }
           renderItem={({ item }) => {
             const mine = item.sender_id === user?.id;
+            const attachment = readAttachment(item.attachment);
             const body = (
               <>
-                <Text style={[styles.bubbleText, mine && styles.bubbleTextMine]}>{item.body}</Text>
+                {attachment ? <MessageAttachment attachment={attachment} mine={mine} /> : null}
+                {item.body?.trim() ? (
+                  <Text style={[styles.bubbleText, mine && styles.bubbleTextMine]}>{item.body}</Text>
+                ) : null}
                 <Text style={[styles.bubbleTime, mine && styles.bubbleTimeMine]}>
                   {formatRelativeTime(item.created_at, i18n.language)}
                 </Text>
@@ -229,8 +428,24 @@ export default function ThreadScreen() {
           }}
         />
 
-        {sendError && <Text style={styles.sendError}>{t('messages.sendFailed')}</Text>}
+        {sendError || safetyError ? (
+          <Text style={styles.sendError} accessibilityLiveRegion="polite">
+            {safetyError
+              ? t('errors.generic')
+              : sendError === 'blockedByThem'
+                ? t('safety.cannotMessage')
+                : t('messages.sendFailed')}
+          </Text>
+        ) : null}
 
+        {blocked ? (
+          <View style={styles.blockedRow} accessibilityLiveRegion="polite">
+            <Text style={styles.blockedText}>{t('safety.blocked')}</Text>
+            <TouchableOpacity onPress={toggleBlock} style={styles.unblockButton} accessibilityRole="button">
+              <Text style={styles.unblockText}>{t('safety.unblockUser')}</Text>
+            </TouchableOpacity>
+          </View>
+        ) : (
         <View style={styles.inputRow}>
           <TextInput
             style={styles.input}
@@ -238,10 +453,12 @@ export default function ThreadScreen() {
             placeholderTextColor={colors.textSecondary}
             value={text}
             onChangeText={setText}
+            maxLength={FORM_LIMITS.message}
             onSubmitEditing={send}
             returnKeyType="send"
           />
           <TouchableOpacity
+            accessibilityRole="button" accessibilityLabel={t('common.send')}
             onPress={send}
             disabled={sending || !text.trim()}
             activeOpacity={0.8}
@@ -251,12 +468,93 @@ export default function ThreadScreen() {
             </LinearGradient>
           </TouchableOpacity>
         </View>
+        )}
+        <ReportSheet
+          visible={reportOpen}
+          userId={otherId}
+          conversationId={id ?? null}
+          onClose={() => setReportOpen(false)}
+        />
+        {Platform.OS === 'web' && (
+          <Modal visible={menuOpen} transparent animationType="fade" onRequestClose={() => setMenuOpen(false)}>
+            <Pressable style={styles.menuBackdrop} onPress={() => setMenuOpen(false)} accessibilityLabel={t('common.cancel')}>
+              <View style={styles.menuCard} accessibilityRole="menu">
+                <Text style={styles.menuTitle} numberOfLines={1}>{otherName}</Text>
+                <TouchableOpacity
+                  accessibilityRole="menuitem"
+                  style={styles.menuItem}
+                  onPress={() => {
+                    setMenuOpen(false);
+                    setReportOpen(true);
+                  }}>
+                  <Text style={styles.menuItemText}>{t('safety.reportUser')}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  accessibilityRole="menuitem"
+                  style={styles.menuItem}
+                  onPress={() => {
+                    setMenuOpen(false);
+                    void toggleBlock();
+                  }}>
+                  <Text style={[styles.menuItemText, !blocked && styles.menuItemDanger]}>
+                    {blocked ? t('safety.unblockUser') : t('safety.blockUser')}
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity accessibilityRole="menuitem" style={styles.menuItem} onPress={() => setMenuOpen(false)}>
+                  <Text style={styles.menuItemCancel}>{t('common.cancel')}</Text>
+                </TouchableOpacity>
+              </View>
+            </Pressable>
+          </Modal>
+        )}
+        <KeyboardDoneBar />
       </SafeAreaView>
     </KeyboardAvoidingView>
   );
 }
 
 const createStyles = (colors: AtticoPalette) => StyleSheet.create({
+  menuBackdrop: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 24,
+  },
+  menuCard: {
+    width: '100%',
+    maxWidth: 320,
+    borderRadius: 16,
+    paddingVertical: 8,
+    backgroundColor: colors.primaryLight,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  menuTitle: {
+    paddingHorizontal: 18,
+    paddingVertical: 10,
+    fontFamily: Fonts.sans,
+    fontSize: 13,
+    color: colors.textSecondary,
+  },
+  menuItem: {
+    minHeight: 48,
+    justifyContent: 'center',
+    paddingHorizontal: 18,
+  },
+  menuItemText: {
+    fontFamily: Fonts.sans,
+    fontSize: 16,
+    color: colors.textPrimary,
+  },
+  menuItemDanger: {
+    color: colors.signOut,
+  },
+  menuItemCancel: {
+    fontFamily: Fonts.sans,
+    fontSize: 16,
+    color: colors.textSecondary,
+  },
   container: {
     flex: 1,
     backgroundColor: colors.primary,
@@ -266,6 +564,23 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: colors.primary,
+  },
+  retryButton: {
+    marginTop: 16,
+    minHeight: 44,
+    paddingHorizontal: 22,
+    justifyContent: 'center',
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  retryText: { fontSize: 14, fontFamily: Fonts.sansSemiBold, color: colors.textPrimary },
+  unavailableText: {
+    fontFamily: Fonts.sans,
+    fontSize: 14,
+    color: colors.textSecondary,
+    textAlign: 'center',
+    paddingHorizontal: 32,
   },
   headerAvatar: {
     width: 36,
@@ -277,12 +592,13 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   headerAvatarText: {
     fontSize: 14,
-    fontWeight: '700',
+    fontFamily: Fonts.sansBold,
     color: '#fff',
   },
   headerProperty: {
+    fontFamily: Fonts.sans,
     fontSize: 12,
-    color: colors.accent,
+    color: colors.accentText,
   },
   messageList: {
     padding: 16,
@@ -292,6 +608,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   emptyText: {
     textAlign: 'center',
     color: colors.textSecondary,
+    fontFamily: Fonts.sans,
     fontSize: 13,
     marginTop: 40,
   },
@@ -322,6 +639,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     borderBottomRightRadius: 4,
   },
   bubbleText: {
+    fontFamily: Fonts.sans,
     fontSize: 14,
     color: colors.textPrimary,
   },
@@ -329,7 +647,8 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     color: '#fff',
   },
   bubbleTime: {
-    fontSize: 10,
+    fontFamily: Fonts.sans,
+    fontSize: 12,
     color: colors.textSecondary,
     marginTop: 4,
   },
@@ -338,6 +657,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   sendError: {
     textAlign: 'center',
+    fontFamily: Fonts.sans,
     fontSize: 12,
     color: colors.error,
     paddingVertical: 4,
@@ -357,6 +677,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     borderRadius: 20,
     paddingHorizontal: 16,
     paddingVertical: 10,
+    fontFamily: Fonts.sans,
     fontSize: 14,
     color: colors.textPrimary,
     borderWidth: 1,
@@ -373,4 +694,53 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   sendButtonDisabled: {
     opacity: 0.5,
   },
+  menuButton: {
+    width: 44,
+    height: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  blockedRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderTopWidth: 1,
+    borderTopColor: colors.border,
+  },
+  blockedText: {
+    flex: 1,
+    fontFamily: Fonts.sans,
+    fontSize: 13,
+    color: colors.textSecondary,
+  },
+  unblockButton: {
+    minHeight: 44,
+    justifyContent: 'center',
+    paddingHorizontal: 14,
+    borderRadius: 22,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  unblockText: {
+    fontSize: 13,
+    fontFamily: Fonts.sansSemiBold,
+    color: colors.textPrimary,
+  },
 });
+
+/**
+ * A conversation. Desktop website (website audit): beside the conversation
+ * list, as one two-pane Messages page; elsewhere the chat alone.
+ */
+export default function ThreadRoute() {
+  const desktop = useIsDesktopWeb();
+  const { id } = useLocalSearchParams<{ id: string }>();
+  if (!desktop) return <ThreadScreen />;
+  return (
+    <MessagesTwoPane activeId={id}>
+      <ThreadScreen key={id} embedded />
+    </MessagesTwoPane>
+  );
+}

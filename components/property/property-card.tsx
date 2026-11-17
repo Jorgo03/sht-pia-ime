@@ -5,6 +5,7 @@ import { memo, useMemo } from 'react';
 import { Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { useTranslation } from 'react-i18next';
+import { formatRef } from '@/src/features/properties/lib/searchFilters';
 
 import { useHeartPop, usePressScale } from '@/components/ui/motion';
 
@@ -13,16 +14,24 @@ import { useFavorites } from '@/contexts/favorites-context';
 import { useTheme } from '@/contexts/theme-context';
 import { useResponsive } from '@/hooks/use-responsive';
 import { Property } from '@/data/types';
-import { formatPrice, getLocalizedText, priceSuffixKey } from '@/lib/format';
+import { formatDate, getLocalizedText, listingBadgeKey, priceSuffixKey } from '@/lib/format';
+import { cardImageUrl } from '@/lib/image';
+import { CARD_CONTAINER_A11Y } from '@/components/property/card-a11y';
+import { useCurrency } from '@/contexts/currency-context';
 
 const COMPACT_GAP = 12;
 
 /** Matches web's .compact-card: 70% of viewport, floored at 240px — not a
  *  fixed width, so it scales with screen size like the browser does.
  *  Exported so callers (Home's horizontal rail) can compute a matching
- *  `snapToInterval` instead of hand-duplicating this formula. */
+ *  `snapToInterval` instead of hand-duplicating this formula. Capped at
+ *  COMPACT_MAX_WIDTH: on an unfolded Fold (690 wide) or a spanned Duo (1114)
+ *  70% made one card fill the rail under a 130-high photo; the widest phone
+ *  (~430) stays under the cap, so phones are unchanged. */
+const COMPACT_MAX_WIDTH = 320;
+
 export function getCompactCardWidth(screenWidth: number): number {
-  return Math.max(screenWidth * 0.7, 240);
+  return Math.min(Math.max(screenWidth * 0.7, 240), COMPACT_MAX_WIDTH);
 }
 
 export function getCompactCardSnapInterval(screenWidth: number): number {
@@ -40,22 +49,30 @@ interface PropertyCardProps {
   /** 'compact' mirrors web's PropertyCard variant="compact" — the smaller
    *  card used in horizontal-scroll rails (Matched, Recently Viewed). */
   variant?: 'grid' | 'compact';
+  /** Grid only: also the listing's title and when it was published, for a
+   *  list of one person's listings (their public profile), where each card
+   *  has to say which home it is. Off everywhere else. */
+  detailed?: boolean;
+  /** Website results grid: reference, title, place, specs and a large price,
+   *  as on a listings portal (owner's reference, 2026-11-17). */
+  rich?: boolean;
 }
 
-function PropertyCardBase({ property, onPress, variant = 'grid' }: PropertyCardProps) {
+function PropertyCardBase({ property, onPress, variant = 'grid', detailed = false, rich = false }: PropertyCardProps) {
   const { t, i18n } = useTranslation();
   const { isFavorite, toggle } = useFavorites();
   const router = useRouter();
   const handlePress = onPress ?? (() => router.push(`/property/${property.id}` as Href));
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
-  const { width: screenWidth } = useResponsive();
+  const { width: screenWidth, columns } = useResponsive();
   const favorited = isFavorite(property.id);
   // Ports polish.css's press compression + heart pop (see components/ui/motion).
   const { pressStyle, onPressIn, onPressOut } = usePressScale();
   const heartStyle = useHeartPop(favorited);
   const title = getLocalizedText(property.title_i18n, i18n.language) || property.title;
-  const price = formatPrice(property.price, i18n.language, property.currency);
+  const { formatListingPrice } = useCurrency();
+  const price = formatListingPrice(property.price, property.currency);
   const suffixKey = priceSuffixKey(property.listing_type);
   const suffix = suffixKey ? t(suffixKey) : '';
 
@@ -63,13 +80,15 @@ function PropertyCardBase({ property, onPress, variant = 'grid' }: PropertyCardP
     return (
       <Animated.View style={pressStyle}>
       <Pressable
+        {...CARD_CONTAINER_A11Y}
         style={[styles.compactCard, { width: getCompactCardWidth(screenWidth) }]}
         onPress={handlePress}
         onPressIn={onPressIn}
         onPressOut={onPressOut}>
         <View>
           <Image
-            source={{ uri: property.image_urls[0] }}
+            accessibilityLabel={title}
+            source={{ uri: cardImageUrl(property.image_urls[0], getCompactCardWidth(screenWidth)) }}
             // Ties the loaded image to this listing, so a FlatList row reused
             // for a different property cannot flash the previous one.
             recyclingKey={property.id}
@@ -78,6 +97,9 @@ function PropertyCardBase({ property, onPress, variant = 'grid' }: PropertyCardP
             transition={300}
           />
           <TouchableOpacity
+            accessibilityRole="button"
+            accessibilityLabel={t('common.save')}
+            accessibilityState={{ selected: favorited }}
             style={styles.compactHeart}
             onPress={() => toggle(property.id)}
             activeOpacity={0.7}
@@ -92,7 +114,7 @@ function PropertyCardBase({ property, onPress, variant = 'grid' }: PropertyCardP
           </TouchableOpacity>
         </View>
         <View style={styles.compactInfo}>
-          <Text style={styles.compactTitle} numberOfLines={1}>
+          <Text style={styles.compactTitle} numberOfLines={1} accessibilityRole="link" onPress={handlePress}>
             {title}
           </Text>
           <View style={styles.compactLocationRow}>
@@ -118,14 +140,29 @@ function PropertyCardBase({ property, onPress, variant = 'grid' }: PropertyCardP
     );
   }
 
-  // Matches web's PropertyCard default ("mini-card") variant exactly —
-  // used for Explore's results grid. No badge, no title: just image+heart,
-  // then price, then location, in that order. Web's grid card genuinely
-  // doesn't show the property title at all; this isn't a simplification,
-  // it's what the reference implementation does.
+  // Explore's results grid. The photo carries the listing type (sale/rent);
+  // under it come the price, the property type with the place, and the
+  // rooms and size — each only when the listing has it, so a sparse listing
+  // shows a shorter card rather than zeros or dashes.
+  const typeLabel = property.property_type
+    ? t(`search.${property.property_type}`, { defaultValue: property.property_type })
+    : '';
+  const place = property.city ?? property.address;
+  const specs = [
+    property.beds ? { icon: 'bed' as const, value: String(property.beds) } : null,
+    property.baths ? { icon: 'bathtub' as const, value: String(property.baths) } : null,
+    property.sqft ? { icon: 'square-foot' as const, value: `${property.sqft} m²` } : null,
+  ].filter((x): x is { icon: 'bed' | 'bathtub' | 'square-foot'; value: string } => x !== null);
+  const specsLabel = [
+    property.beds ? `${property.beds} ${t('property.bedsCount', { count: property.beds })}` : '',
+    property.baths ? `${property.baths} ${t('property.bathsCount', { count: property.baths })}` : '',
+    property.sqft ? `${property.sqft} m²` : '',
+  ].filter(Boolean).join(', ');
+
   return (
     <Animated.View style={[styles.cardOuter, pressStyle]}>
     <Pressable
+      {...CARD_CONTAINER_A11Y}
       style={styles.card}
       onPress={handlePress}
       onPressIn={onPressIn}
@@ -134,7 +171,8 @@ function PropertyCardBase({ property, onPress, variant = 'grid' }: PropertyCardP
           with its own smaller radius, not flush with the card edges. */}
       <View style={styles.imageWrap}>
         <Image
-          source={{ uri: property.image_urls[0] }}
+          accessibilityLabel={title}
+          source={{ uri: cardImageUrl(property.image_urls[0], screenWidth / columns) }}
           // Ties the loaded image to this listing, so a FlatList row reused
           // for a different property cannot flash the previous one.
           recyclingKey={property.id}
@@ -143,10 +181,14 @@ function PropertyCardBase({ property, onPress, variant = 'grid' }: PropertyCardP
           transition={300}
         />
         <TouchableOpacity
+          accessibilityRole="button"
+          accessibilityLabel={t('common.save')}
+          accessibilityState={{ selected: favorited }}
           style={styles.heartButton}
           onPress={() => toggle(property.id)}
           activeOpacity={0.7}
-          hitSlop={8}>
+          // 24px drawn; 10 on each side makes the 44px a finger needs.
+          hitSlop={10}>
           <Animated.View style={heartStyle}>
             <MaterialIcons
               name={favorited ? 'favorite' : 'favorite-border'}
@@ -155,18 +197,79 @@ function PropertyCardBase({ property, onPress, variant = 'grid' }: PropertyCardP
             />
           </Animated.View>
         </TouchableOpacity>
-      </View>
-      <View style={styles.info}>
-        {/* Matches web's .mini-price — price and suffix share one plain text
-            node with no distinct sub-styling for the suffix. */}
-        <Text style={styles.price}>{price}{suffix}</Text>
-        <View style={styles.locationRow}>
-          <MaterialIcons name="location-on" size={11} color={colors.textSecondary} />
-          <Text style={styles.location} numberOfLines={1}>
-            {property.city ?? property.address}
+        <View style={styles.typeBadge} pointerEvents="none">
+          <Text style={styles.typeBadgeText} numberOfLines={1}>
+            {t(listingBadgeKey(property.listing_type))}
           </Text>
         </View>
       </View>
+      {rich ? (
+        <View style={styles.richInfo}>
+          {property.ref_code ? <Text style={styles.richRef} numberOfLines={1}>{formatRef(property.ref_code)}</Text> : null}
+          <Text style={styles.richTitle} numberOfLines={1} accessibilityRole="link" accessibilityLabel={[title, `${price}${suffix}`, specsLabel].filter(Boolean).join(', ')} onPress={handlePress}>
+            {title}
+          </Text>
+          <View style={styles.locationRow}>
+            <MaterialIcons name="location-on" size={12} color={colors.textSecondary} />
+            <Text style={styles.location} numberOfLines={1}>
+              {[property.zone, place].filter(Boolean).join(', ')}
+            </Text>
+          </View>
+          <View style={styles.richSpecs} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+            {specs.map((sp) => (
+              <View key={sp.icon} style={styles.spec}>
+                <MaterialIcons name={sp.icon} size={13} color={colors.textSecondary} />
+                <Text style={styles.specText}>{sp.value}</Text>
+              </View>
+            ))}
+            {typeLabel ? (
+              <View style={styles.spec}>
+                <MaterialIcons name="home-work" size={13} color={colors.textSecondary} />
+                <Text style={styles.specText}>{typeLabel}</Text>
+              </View>
+            ) : null}
+          </View>
+          <Text style={styles.richPrice}>{price}{suffix}</Text>
+        </View>
+      ) : (
+      <View style={styles.info}>
+        {detailed && title ? (
+          <Text style={styles.detailTitle} numberOfLines={2} accessibilityElementsHidden importantForAccessibility="no">
+            {title}
+          </Text>
+        ) : null}
+        {/* Matches web's .mini-price — price and suffix share one plain text
+            node with no distinct sub-styling for the suffix. */}
+        <Text
+          style={styles.price}
+          accessibilityRole="link"
+          accessibilityLabel={[title, `${price}${suffix}`, specsLabel].filter(Boolean).join(', ')}
+          onPress={handlePress}>
+          {price}{suffix}
+        </Text>
+        <View style={styles.locationRow}>
+          <MaterialIcons name="location-on" size={11} color={colors.textSecondary} />
+          <Text style={styles.location} numberOfLines={1}>
+            {[typeLabel, place].filter(Boolean).join(' · ')}
+          </Text>
+        </View>
+        {specs.length > 0 && (
+          <View style={styles.specRow} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+            {specs.map((sp) => (
+              <View key={sp.icon} style={styles.spec}>
+                <MaterialIcons name={sp.icon} size={11} color={colors.textSecondary} />
+                <Text style={styles.specText}>{sp.value}</Text>
+              </View>
+            ))}
+          </View>
+        )}
+        {detailed && property.created_at ? (
+          <Text style={styles.detailDate} numberOfLines={1}>
+            {t('property.publishedOn', { date: formatDate(property.created_at) })}
+          </Text>
+        ) : null}
+      </View>
+      )}
     </Pressable>
     </Animated.View>
   );
@@ -194,11 +297,47 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   // Matches web's .mini-img — fixed 90px, its own r-sm (10px) radius, inset
   // within the card's padding rather than sharing the card's own radius.
+  // 4:3 at every width: the photo is what people choose a home by. The old
+  // fixed 90px on phones was a ~2:1 strip that cropped rooms to a band.
   imageWrap: {
-    height: 90,
+    aspectRatio: 4 / 3,
     borderRadius: 10,
     overflow: 'hidden',
     marginBottom: 8,
+  },
+  // Sale / rent, on a dark glass chip so it reads on any photo.
+  typeBadge: {
+    position: 'absolute',
+    top: 6,
+    left: 6,
+    maxWidth: '70%',
+    paddingHorizontal: 7,
+    paddingVertical: 3,
+    borderRadius: 999,
+    backgroundColor: 'rgba(20,17,14,0.72)',
+  },
+  typeBadgeText: {
+    fontFamily: Fonts?.sansSemiBold,
+    fontSize: 12,
+    letterSpacing: 0.3,
+    color: '#fff',
+  },
+  specRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    columnGap: 8,
+    rowGap: 2,
+    marginTop: 3,
+  },
+  spec: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 2,
+  },
+  specText: {
+    fontFamily: Fonts?.sansMedium,
+    fontSize: 12,
+    color: colors.textSecondary,
   },
   image: {
     width: '100%',
@@ -220,21 +359,39 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   info: {
     gap: 2,
   },
+  richInfo: { gap: 4, paddingHorizontal: 4, paddingBottom: 4 },
+  richRef: { fontFamily: Fonts.sansSemiBold, fontSize: 12, letterSpacing: 0.4, color: colors.accentText },
+  richTitle: { fontFamily: Fonts.sansBold, fontSize: 15, color: colors.textPrimary, textTransform: 'uppercase' },
+  richSpecs: { flexDirection: 'row', flexWrap: 'wrap', columnGap: 12, rowGap: 4, marginTop: 4 },
+  richPrice: { fontFamily: Fonts.sansExtraBold, fontSize: 20, color: colors.textPrimary, marginTop: 6 },
   locationRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 2,
   },
   location: {
-    fontSize: 11,
+    fontFamily: Fonts.sans,
+    fontSize: 12,
     color: colors.textSecondary,
     flex: 1,
+  },
+  // `detailed` cards (a person's public profile) only.
+  detailTitle: {
+    fontFamily: Fonts.sansSemiBold,
+    fontSize: 13,
+    lineHeight: 17,
+    color: colors.textPrimary,
+  },
+  detailDate: {
+    fontFamily: Fonts.sans,
+    fontSize: 12,
+    color: colors.textSecondary,
+    marginTop: 3,
   },
   // Matches web's .mini-price — serif, not the plain sans used elsewhere.
   price: {
     fontFamily: Fonts?.serif,
     fontSize: 14,
-    fontWeight: '500',
     color: colors.textPrimary,
     marginBottom: 2,
   },
@@ -272,7 +429,6 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   compactTitle: {
     fontFamily: Fonts?.serif,
     fontSize: 15,
-    fontWeight: '500',
     color: colors.textPrimary,
     marginBottom: 3,
   },
@@ -283,6 +439,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     marginBottom: 8,
   },
   compactLocation: {
+    fontFamily: Fonts.sans,
     fontSize: 12,
     color: colors.textSecondary,
     flex: 1,
@@ -296,8 +453,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   compactPrice: {
     fontFamily: Fonts?.serif,
     fontSize: 16,
-    fontWeight: '500',
-    color: colors.accent,
+    color: colors.accentText,
   },
   compactBeds: {
     flexDirection: 'row',
@@ -305,8 +461,8 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     gap: 3,
   },
   compactBedsText: {
-    fontSize: 11,
+    fontSize: 12,
     color: colors.textSecondary,
-    fontWeight: '500',
+    fontFamily: Fonts.sansMedium,
   },
 });

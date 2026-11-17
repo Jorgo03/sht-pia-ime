@@ -95,3 +95,10 @@ export function sanitizeTranslationResponse(
   raw: unknown,
   opts: { wantTitle: boolean; wantDescription: boolean },
 ): { title: string; description: string } | null
+
+export function languagesNeedingTranslation(args: {
+  titles?: I18nMap | null
+  descriptions?: I18nMap | null
+  meta?: TranslationMeta | null
+  fingerprint: string
+}): LangCode[]

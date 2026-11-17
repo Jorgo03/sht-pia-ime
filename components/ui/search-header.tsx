@@ -3,41 +3,44 @@ import { useMemo } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
+import { HeroTypewriter } from '@/components/home/hero-typewriter';
 import { Fonts, type AtticoPalette } from '@/constants/theme';
 import { useTheme } from '@/contexts/theme-context';
 
 interface SearchHeaderProps {
-  kicker: string;
-  headline: string;
-  /** Rendered in accent-orange italic, appended after `headline` — mirrors
-   *  web's <em> match-count segment in Home.jsx's screen-headline. */
-  emphasis?: string;
   onSearchPress?: () => void;
 }
 
 /**
- * Home's header: the "editorial" kicker+headline pattern shared by every
- * web screen (screen-kicker / screen-headline in src/styles/globals.css),
+ * Home's header: the brand headline, typed phrase by phrase (HeroTypewriter;
+ * the words are in the translation files under home.heroPhrases), in web's
+ * screen-headline style (src/styles/globals.css; no kicker above it),
  * plus web's full-width tappable home-search-bar — not just a small icon
  * button, so the search entry point actually reads as a search field.
  */
-export function SearchHeader({ kicker, headline, emphasis, onSearchPress }: SearchHeaderProps) {
-  const { t } = useTranslation();
+export function SearchHeader({ onSearchPress }: SearchHeaderProps) {
+  const { t, i18n } = useTranslation();
+  const language = i18n.language;
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- the phrases change with the language
+  const phrases = useMemo(() => t('home.heroPhrases', { returnObjects: true }), [language]);
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
 
   return (
     <View style={styles.container}>
-      <View style={styles.kickerRow}>
-        <View style={styles.kickerDash} />
-        <Text style={styles.kicker}>{kicker}</Text>
+      <View style={styles.headlineWrap}>
+        {/* A new language starts cleanly rather than mid-phrase. */}
+        <HeroTypewriter
+          key={language}
+          phrases={phrases}
+          language={language}
+          textStyle={styles.headline}
+          accentStyle={styles.headlineEmphasis}
+          cursorColor={colors.accentText}
+        />
       </View>
-      <Text style={styles.headline}>
-        {headline}
-        {emphasis ? <Text style={styles.headlineEmphasis}> {emphasis}</Text> : null}
-      </Text>
 
-      <TouchableOpacity style={styles.searchBar} onPress={onSearchPress} activeOpacity={0.8}>
+      <TouchableOpacity accessibilityRole="button" style={styles.searchBar} onPress={onSearchPress} activeOpacity={0.8}>
         <MaterialIcons name="search" size={18} color={colors.textSecondary} />
         <Text style={styles.searchPlaceholder} numberOfLines={1}>
           {t('home.searchPlaceholder')}
@@ -55,47 +58,30 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     paddingTop: 8,
     paddingBottom: 4,
   },
-  kickerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-    paddingHorizontal: 20,
-    marginBottom: 6,
-  },
-  kickerDash: {
-    width: 14,
-    height: 1,
-    backgroundColor: colors.accent,
-  },
-  kicker: {
-    fontFamily: Fonts?.mono,
-    fontSize: 11,
-    letterSpacing: 1.5,
-    textTransform: 'uppercase',
-    color: colors.textSecondary,
-  },
   // Matches web's .screen-headline exactly (src/styles/globals.css).
+  headlineWrap: {
+    marginHorizontal: 20,
+  },
   headline: {
-    paddingHorizontal: 20,
     fontFamily: Fonts?.serif,
-    fontWeight: '500',
     fontSize: 30,
     lineHeight: 31.5,
     letterSpacing: -0.75,
     color: colors.textPrimary,
   },
+  // The italic family itself rather than a fontStyle override, which made
+  // the browser and Android slant the upright file. In Russian this answers
+  // with Manrope (Newsreader has no Cyrillic), like the rest of the headline.
   headlineEmphasis: {
-    fontFamily: Fonts?.serif,
-    fontStyle: 'italic',
-    fontWeight: '500',
-    color: colors.accent,
+    fontFamily: Fonts?.serifItalic,
+    color: colors.accentText,
   },
   searchBar: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
     marginHorizontal: 20,
-    marginTop: 18,
+    marginTop: 12,
     paddingHorizontal: 16,
     paddingVertical: 14,
     backgroundColor: colors.glass,
@@ -105,6 +91,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   searchPlaceholder: {
     flex: 1,
+    fontFamily: Fonts.sans,
     fontSize: 14,
     color: colors.textSecondary,
   },
@@ -112,11 +99,11 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 5,
     borderRadius: 999,
-    backgroundColor: colors.accentGlow,
+    backgroundColor: colors.accentTint,
   },
   filtersChipText: {
     fontSize: 12,
-    fontWeight: '600',
-    color: colors.accent,
+    fontFamily: Fonts.sansSemiBold,
+    color: colors.accentText,
   },
 });

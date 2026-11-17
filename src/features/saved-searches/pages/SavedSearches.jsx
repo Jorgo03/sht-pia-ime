@@ -1,12 +1,17 @@
 import { useCallback, useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Search as SearchIcon, Heart, Trash2, Bell, BellOff, Play, MapPin, Plus } from 'lucide-react'
+import { Search as SearchIcon, Heart, Trash2, Bell, BellOff, Play, MapPin, Plus, Mail, MailX } from 'lucide-react'
 import { useAuth } from '../../auth/AuthContext'
 import { useAddSheet } from '../../quick-add/AddSheetContext'
 import BackButton from '../../../shared/BackButton'
 import { supabase } from '../../../lib/supabase'
 import { formatPrice, formatDate } from '../../../lib/format'
+import { countMatches, markSeen, newMatchCount, setEmailAlerts } from '../lib/matches'
+import LoadError from '../../../shared/LoadError'
+
+// Email alerts are offered only once sending is configured (docs/LAUNCH_TASKS.md F13).
+const EMAIL_ALERTS = import.meta.env.VITE_EMAIL_ALERTS === 'true'
 
 // saved_searches.filters JSONB → /search URL params. Only known keys pass.
 function filtersToParams(filters = {}) {
@@ -36,7 +41,11 @@ export default function SavedSearches() {
   const [searches, setSearches] = useState([])
   const [wanted, setWanted] = useState([])
   const [loading, setLoading] = useState(true)
+  // A failed read: shown with a retry rather than as an empty list.
+  const [loadError, setLoadError] = useState(false)
   const [actionError, setActionError] = useState(false)
+  // Current number of matching listings per saved search (id -> count|null).
+  const [matchCounts, setMatchCounts] = useState({})
 
   const flashError = () => {
     setActionError(true)
@@ -49,18 +58,45 @@ export default function SavedSearches() {
       supabase.from('saved_searches').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
       supabase.from('wanted_homes').select('*').eq('client_id', user.id).order('created_at', { ascending: false }),
     ])
-    setSearches(s.data ?? [])
+    if (s.error || w.error) { setLoadError(true); setLoading(false); return }
+    setLoadError(false)
+    const rows = s.data ?? []
+    setSearches(rows)
     setWanted(w.data ?? [])
     setLoading(false)
+    // In-app "alerts": count matches now; the badge compares with last time.
+    const counts = await Promise.all(rows.map(r => (r.alerts_enabled ? countMatches(supabase, r.filters) : null)))
+    setMatchCounts(Object.fromEntries(rows.map((r, i) => [r.id, counts[i]])))
   }, [user])
 
+  // Opening a saved search counts as seeing its current matches.
+  const runSearch = async (row) => {
+    await markSeen(supabase, row.id, matchCounts[row.id])
+    navigate(`/search?${filtersToParams(row.filters)}`)
+  }
+
   useEffect(() => { load() }, [load])
+
+  const toggleEmail = async (row) => {
+    const next = !row.email_alerts
+    if (!(await setEmailAlerts(supabase, row.id, next))) { flashError(); return }
+    setSearches(prev => prev.map(s => s.id === row.id ? { ...s, email_alerts: next } : s))
+  }
 
   const toggleAlerts = async (row) => {
     const next = !row.alerts_enabled
     const { error } = await supabase.from('saved_searches').update({ alerts_enabled: next }).eq('id', row.id)
     if (error) { flashError(); return }
     setSearches(prev => prev.map(s => s.id === row.id ? { ...s, alerts_enabled: next } : s))
+    // Turning it on starts from what matches now, so the badge never counts
+    // listings that were already there.
+    if (next) {
+      const current = await countMatches(supabase, row.filters)
+      if (await markSeen(supabase, row.id, current)) {
+        setSearches(prev => prev.map(s => s.id === row.id ? { ...s, last_match_count: current } : s))
+      }
+      setMatchCounts(prev => ({ ...prev, [row.id]: current }))
+    }
   }
 
   const deleteSearch = async (id) => {
@@ -115,6 +151,8 @@ export default function SavedSearches() {
 
       {loading ? (
         <div style={{ padding: '2rem 0', textAlign: 'center', color: 'var(--fho-text-muted)' }}>{t('common.loading')}</div>
+      ) : loadError ? (
+        <LoadError onRetry={() => { setLoading(true); load() }} />
       ) : tab === 'searches' ? (
         searches.length === 0 ? (
           <div className="placeholder-card" style={{ marginTop: 16 }}>
@@ -124,6 +162,7 @@ export default function SavedSearches() {
           </div>
         ) : (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 16 }}>
+            <p className="m-0 text-[12px] text-fho-text-muted">{EMAIL_ALERTS ? t('saved.emailHint') : t('saved.alertsHint')}</p>
             {searches.map(s => (
               <div key={s.id} className="placeholder-card" style={{ textAlign: 'left', alignItems: 'stretch', gap: 6 }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
@@ -134,8 +173,13 @@ export default function SavedSearches() {
                   {s.filters?.city && <span><MapPin size={12} style={{ display: 'inline', verticalAlign: -2 }} /> {s.filters.city}</span>}
                   {s.filters?.listing_type && <span>{t(`listing.type.${s.filters.listing_type}`, s.filters.listing_type)}</span>}
                 </div>
+                {s.alerts_enabled && newMatchCount(matchCounts[s.id], s.last_match_count) > 0 && (
+                  <div className="self-start rounded-full bg-fho-orange-1 px-2.5 py-0.5 text-[12px] font-semibold text-[#1a1714]" role="status">
+                    {t('saved.newMatches', { n: newMatchCount(matchCounts[s.id], s.last_match_count) })}
+                  </div>
+                )}
                 <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
-                  <button className="pill-btn" onClick={() => navigate(`/search?${filtersToParams(s.filters)}`)}>
+                  <button className="pill-btn" onClick={() => runSearch(s)}>
                     <Play size={13} /> {t('saved.run')}
                   </button>
                   <button
@@ -146,6 +190,17 @@ export default function SavedSearches() {
                   >
                     {s.alerts_enabled ? <Bell size={14} /> : <BellOff size={14} />}
                   </button>
+                  {EMAIL_ALERTS && (
+                    <button
+                      style={iconBtn}
+                      onClick={() => toggleEmail(s)}
+                      aria-pressed={Boolean(s.email_alerts)}
+                      aria-label={s.email_alerts ? t('saved.emailOff') : t('saved.emailOn')}
+                      title={s.email_alerts ? t('saved.emailOff') : t('saved.emailOn')}
+                    >
+                      {s.email_alerts ? <Mail size={14} /> : <MailX size={14} />}
+                    </button>
+                  )}
                   <button style={{ ...iconBtn, color: '#e74c3c' }} onClick={() => deleteSearch(s.id)} aria-label={t('saved.delete')} title={t('saved.delete')}>
                     <Trash2 size={14} />
                   </button>

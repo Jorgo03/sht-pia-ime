@@ -7,7 +7,7 @@ import {
   useWindowDimensions,
   View,
 } from 'react-native';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import { GestureDetector, usePanGesture } from 'react-native-gesture-handler';
 import Animated, {
   runOnJS,
   useAnimatedStyle,
@@ -18,6 +18,7 @@ import Animated, {
 
 import { Radii, Shadows, type AtticoPalette } from '@/constants/theme';
 import { useTheme } from '@/contexts/theme-context';
+import { sheetColumn } from '@/constants/web-frame';
 
 /**
  * Reusable bottom sheet (§17) — backdrop, sliding card, drag handle.
@@ -64,19 +65,22 @@ export function BottomSheet({
 
   const close = () => onClose();
 
-  const pan = Gesture.Pan()
-    .onUpdate((e) => {
+  const pan = usePanGesture({
+    onUpdate: (e) => {
+      // eslint-disable-next-line react-hooks/immutability -- Reanimated SharedValue: assigning .value IS its API, and it is a worklet value, not React state. The compiler rule does not model SharedValue.
       translateY.value = Math.max(0, e.translationY);
-    })
-    .onEnd((e) => {
+    },
+    onDeactivate: (e) => {
       if (translateY.value > dismissThreshold || e.velocityY > 800) {
+        // eslint-disable-next-line react-hooks/immutability -- Reanimated SharedValue: assigning .value IS its API, and it is a worklet value, not React state. The compiler rule does not model SharedValue.
         translateY.value = withTiming(sheetHeight, { duration: 200 }, () => {
           runOnJS(close)();
         });
       } else {
         translateY.value = withSpring(0, { damping: 22, stiffness: 300 });
       }
-    });
+    },
+  });
 
   const sheetStyle = useAnimatedStyle(() => ({
     transform: [{ translateY: translateY.value }],
@@ -86,11 +90,12 @@ export function BottomSheet({
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
       <View style={styles.backdrop}>
         <Pressable
+          accessibilityRole="button"
           style={StyleSheet.absoluteFill}
           onPress={onClose}
           accessibilityLabel={t('common.close')}
         />
-        <Animated.View style={[styles.sheet, sheetStyle]}>
+        <Animated.View style={[styles.sheet, sheetColumn, sheetStyle]}>
           <GestureDetector gesture={pan}>
             <View style={styles.gripZone}>
               <View style={styles.grip} />

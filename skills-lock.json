@@ -6,6 +6,12 @@
       "sourceType": "github",
       "skillPath": "plugins/expo/skills/building-native-ui/SKILL.md",
       "computedHash": "a0316d2ce842d2dd8067a144e339cf502329dc7701f9f5122268fdb3d4c980f7"
+    },
+    "swiftui-pro": {
+      "source": "twostraws/swiftui-agent-skill",
+      "sourceType": "github",
+      "skillPath": "swiftui-pro/SKILL.md",
+      "computedHash": "e0edf9a937bbb8c86c170b130ff825f158cc286f07ec477b67835e9c1b20267e"
     }
   }
 }

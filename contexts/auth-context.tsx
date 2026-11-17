@@ -1,13 +1,7 @@
-import { Provider } from '@supabase/supabase-js';
-import { Session, User } from '@supabase/supabase-js';
+import { Provider, Session, User } from '@supabase/supabase-js';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { makeRedirectUri } from 'expo-auth-session';
 import * as WebBrowser from 'expo-web-browser';
-
-// Dismisses a lingering auth session left over from a previous attempt (a
-// reload mid-flow, a backgrounded browser). Documented as required for
-// expo-auth-session flows; a no-op when there is nothing pending.
-WebBrowser.maybeCompleteAuthSession();
 import {
   createContext,
   ReactNode,
@@ -18,9 +12,13 @@ import {
 } from 'react';
 import { Platform } from 'react-native';
 
-import Constants, { ExecutionEnvironment } from 'expo-constants';
+import { isRunningInExpoGo } from 'expo';
+// Internal re-export, the same one expo-linking and expo-asset use: the
+// address the running bundle was really loaded from.
+import { getBundleOrigin } from 'expo/internal/bundle-origin';
 
 import { signInWithAppleNative } from '@/lib/apple-auth';
+import { forgetDevice } from '@/lib/push';
 import { supabase } from '@/lib/supabase';
 // Same classifier the web AuthContext uses, imported rather than re-written:
 // it is a pure function with no imports of its own, so it costs the mobile
@@ -28,6 +26,32 @@ import { supabase } from '@/lib/supabase';
 // reaches into src/ this way for the shared locale JSON (see i18n/index.ts).
 // Its 8 unit tests in tests/authEvents.test.mjs now cover both apps.
 import { classifyAuthEvent } from '../src/lib/authEvents.js';
+// Shared with web the same way (tests/signOut.test.mjs).
+import { signOutOfDevice } from '../src/lib/signOut.js';
+import { expoGoCallback, isAllowedRelayTarget } from '../src/lib/oauthRelay.js';
+import { oauthQueryParams } from '@/src/features/auth/lib/oauthOptions';
+import {
+  createLoginThrottle,
+  isWrongPassword,
+  THROTTLE_STORAGE_KEY,
+  tooManyAttemptsError,
+} from '@/src/features/auth/lib/loginThrottle';
+import {
+  changePassword as changePasswordOnServer,
+  signOutOtherDevices,
+  type ChangePasswordResult,
+} from '@/src/features/auth/lib/password';
+import {
+  existingAccountError,
+  isExistingAccount,
+  isUnverifiedEmailUser,
+} from '@/src/features/auth/lib/signupCode';
+import { debugWarn } from '@/lib/debug';
+
+// Dismisses a lingering auth session left over from a previous attempt (a
+// reload mid-flow, a backgrounded browser). Documented as required for
+// expo-auth-session flows; a no-op when there is nothing pending.
+WebBrowser.maybeCompleteAuthSession();
 
 /** Hard ceiling on how long anything may hold the splash screen. */
 const AUTH_INIT_TIMEOUT_MS = 8000;
@@ -54,6 +78,7 @@ const PROFILE_FETCH_TIMEOUT_MS = 4000;
  * not an error path.
  */
 const timedOut = Symbol('timedOut');
+const PROFILE_FAILED = Symbol('profileFailed');
 function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T | typeof timedOut> {
   return new Promise((resolve) => {
     const timer = setTimeout(() => resolve(timedOut), ms);
@@ -80,8 +105,13 @@ function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T | typeof tim
  * of app-side code can reclaim that scheme. A dev-client build owns
  * `shtepia-ime://` (app.json `scheme`, already registered in the Android
  * manifest) and does not have this problem.
+ *
+ * Detected by Expo Go's own native module (isRunningInExpoGo), not
+ * Constants.executionEnvironment: on a Samsung A23 in Expo Go (SDK 58) that
+ * did not report Expo Go, so Google sign-in skipped the web relay, Supabase
+ * refused the exp:// address and the browser was left on a blank page.
  */
-const IS_EXPO_GO = Constants.executionEnvironment === ExecutionEnvironment.StoreClient;
+const IS_EXPO_GO = isRunningInExpoGo();
 
 // Dev-only OAuth diagnostics (Metro console), on failure paths only — the
 // happy path is silent. Never logs token/credential values, only the shape
@@ -95,8 +125,8 @@ const IS_EXPO_GO = Constants.executionEnvironment === ExecutionEnvironment.Store
 // silent 'cancel' indistinguishable from the user closing the browser.
 // Without these the next such failure is invisible.
 function oauthDebug(label: string, data?: Record<string, unknown>) {
-  if (!__DEV__) return;
-  console.log(`[oauth] ${label}`, data ?? '');
+  // Through the redacting dev-only logger (lib/debug), never raw console.
+  debugWarn('oauth', `${label} ${data ? JSON.stringify(data) : ''}`);
 }
 
 type Role = 'buyer' | 'agent';
@@ -157,14 +187,29 @@ interface AuthContextValue {
   /** Verifies the 6-digit code from the recovery e-mail, establishing a
    *  recovery session so the password can be changed in-app. */
   verifyRecoveryCode: (email: string, token: string) => Promise<{ error: Error | null }>;
-  /** Sets a new password on the active (recovery) session. */
-  updatePassword: (newPassword: string) => Promise<{ error: Error | null }>;
+  /** Sets a new password on the active (recovery) session, then ends the
+   *  account's other sessions (best effort, reported in othersSignedOut). */
+  updatePassword: (newPassword: string) => Promise<{ error: Error | null; othersSignedOut: boolean }>;
+  /** Signed in: checks the current password on the server, then sets the new
+   *  one and signs the other devices out (src/features/auth/lib/password.js). */
+  changePassword: (currentPassword: string, newPassword: string) => Promise<ChangePasswordResult>;
   /** Resolves with the sign-out error, if any. The local session is dropped
    *  regardless — callers may surface the error but must not block on it. */
   signOut: () => Promise<{ error: Error | null }>;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
+
+// The web build keeps the count across reloads in localStorage; the phone
+// apps keep it in memory, for as long as the app runs.
+const loginThrottle = createLoginThrottle(
+  Platform.OS === 'web' && typeof localStorage !== 'undefined'
+    ? {
+        load: () => localStorage.getItem(THROTTLE_STORAGE_KEY),
+        save: (v) => localStorage.setItem(THROTTLE_STORAGE_KEY, v),
+      }
+    : {},
+);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
@@ -182,10 +227,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // arrived. Mirrors web's AuthContext.
   const generation = useRef(0);
 
+  // null = this account has no profile row; a failed read throws instead, so
+  // a network blip is never mistaken for "no profile" (which hides the
+  // agent tools and the role until the next sign-in).
   const loadProfile = async (userId: string): Promise<Profile | null> => {
-    const { data } = await supabase.from('profiles').select('*').eq('id', userId).single();
+    const { data, error } = await supabase.from('profiles').select('*').eq('id', userId).maybeSingle();
+    if (error) throw error;
     return (data as Profile | null) ?? null;
   };
+  // On a failed read keep what we had for this same account.
+  const keepOnFailure = (userId: string) => (prev: Profile | null) => (prev?.id === userId ? prev : null);
 
   // Mirrors web's AuthContext.applyPendingRole. OAuth and email-code signups
   // can't carry the role toggle through the provider/magic-link redirect, so
@@ -229,19 +280,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setLoading(false);
         return;
       }
+      // An unconfirmed email address opens nothing behind sign-in
+      // (src/features/auth/lib/signupCode.js). Dropped locally: the token
+      // stays unused rather than being revoked for a person still mid-signup.
+      if (isUnverifiedEmailUser(s.user)) {
+        setSession(null);
+        setProfile(null);
+        setLoading(false);
+        supabase.auth.signOut({ scope: 'local' }).catch(() => {});
+        return;
+      }
 
       // Started once, awaited with a ceiling, and still honoured if it lands
       // late — so a slow network delays the profile, never the whole app.
       const user = s.user;
-      const profilePromise = loadProfile(user.id)
+      const profilePromise: Promise<Profile | null | typeof PROFILE_FAILED> = loadProfile(user.id)
         .then((p) => applyPendingRole(user, p))
-        .catch(() => null);
+        .catch(() => PROFILE_FAILED);
 
       const result = await withTimeout(profilePromise, PROFILE_FETCH_TIMEOUT_MS);
       if (!active || myGeneration !== generation.current) return;
 
       setSession(s);
-      if (result !== timedOut) setProfile(result);
+      if (result === PROFILE_FAILED) setProfile(keepOnFailure(user.id));
+      else if (result !== timedOut) setProfile(result);
       setLoading(false);
 
       // Took too long to block on, but the answer is still wanted: apply it
@@ -249,7 +311,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (result === timedOut) {
         profilePromise.then((late) => {
           if (!active || myGeneration !== generation.current) return;
-          setProfile(late);
+          if (late === PROFILE_FAILED) setProfile(keepOnFailure(user.id));
+          else setProfile(late);
         });
       }
     };
@@ -304,7 +367,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (!active) return;
       setLoading((current) => {
         if (current) {
-          console.warn('Auth init exceeded %dms; opening the app anyway.', AUTH_INIT_TIMEOUT_MS);
+          debugWarn('auth', `init exceeded ${AUTH_INIT_TIMEOUT_MS}ms; opening the app anyway`);
         }
         return false;
       });
@@ -319,8 +382,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const refreshProfile = async () => {
     if (!session?.user) return;
-    const p = await loadProfile(session.user.id);
-    setProfile(p);
+    const id = session.user.id;
+    try {
+      setProfile(await loadProfile(id));
+    } catch {
+      setProfile(keepOnFailure(id));
+    }
   };
 
   const signUp = async (
@@ -345,6 +412,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // there is a session and no mail is ever sent. Sending everyone to the
     // code screen strands an already-signed-in user on a dead end.
     // Mirrors src/features/auth/AuthContext.jsx.
+    // A registered address gets a look-alike answer and no email; saying so
+    // beats a code screen waiting for a code that never comes.
+    if (!error && isExistingAccount(data)) {
+      return { error: existingAccountError() as Error, needsConfirmation: false };
+    }
     return {
       error: error as Error | null,
       needsConfirmation: !error && !data?.session,
@@ -352,10 +424,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signIn = async (email: string, password: string) => {
+    // Password guessing waits here first (src/features/auth/lib/loginThrottle.js).
+    const gate = loginThrottle.check(email);
+    if (!gate.allowed) return { error: tooManyAttemptsError(gate.waitMs) as Error };
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
+    if (isWrongPassword(error)) loginThrottle.fail(email);
+    else if (!error) loginThrottle.succeed(email);
     return { error: error as Error | null };
   };
 
@@ -368,7 +445,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const origin = typeof window !== 'undefined' ? window.location.origin : '';
       const { error } = await supabase.auth.signInWithOAuth({
         provider,
-        options: { redirectTo: origin },
+        options: { redirectTo: origin, queryParams: oauthQueryParams(provider) },
       });
       return { error: error as Error | null };
     }
@@ -388,7 +465,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // session ends with no callback. That failure is indistinguishable from
     // a user cancelling, which is exactly why the exact value is logged
     // below rather than guessed at.
-    const appRedirect = makeRedirectUri({ path: 'auth/callback' });
+    //
+    // Except in Expo Go: there makeRedirectUri can answer with the store
+    // build's shtepia-ime://auth/callback (it trusts executionEnvironment,
+    // which a Samsung in Expo Go misreports), an address Expo Go cannot
+    // receive, and sign-in ended on the website. Expo Go's return address is
+    // built from the origin it loaded the code from instead
+    // (src/lib/oauthRelay.js expoGoCallback).
+    const madeRedirect = makeRedirectUri({ path: 'auth/callback' });
+    const appRedirect = IS_EXPO_GO
+      ? expoGoCallback(getBundleOrigin()) ?? (/^exps?:\/\//.test(madeRedirect) ? madeRedirect : null)
+      : madeRedirect;
+
+    // Under Expo Go the website relay only hands the code to an allowed
+    // address (oauthRelay.isAppCallback). Anything else would sign the person
+    // in on the website and leave the app signed out, so refuse up front
+    // rather than send them on a sign-in that cannot come back.
+    if (IS_EXPO_GO && !isAllowedRelayTarget(appRedirect)) {
+      oauthDebug('Expo Go return address cannot receive a sign-in', { appRedirect, madeRedirect });
+      return { error: new Error('expo_go_return_address_not_allowed') };
+    }
+    if (!appRedirect) {
+      return { error: new Error('no_app_return_address') };
+    }
 
     // Expo Go's address cannot be allow-listed. Verified against the live
     // project by binding a redirect_to to an OAuth state and replaying the
@@ -417,6 +516,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       options: {
         redirectTo,
         skipBrowserRedirect: true,
+        // Google's account chooser every time (src/features/auth/lib/oauthOptions.js).
+        queryParams: oauthQueryParams(provider),
       },
     });
 
@@ -556,19 +657,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
    *  authorizes the change, exactly as on web. */
   const updatePassword = async (newPassword: string) => {
     const { error } = await supabase.auth.updateUser({ password: newPassword });
-    return { error: error as Error | null };
+    if (error) return { error: error as Error | null, othersSignedOut: false };
+    // Resetting a forgotten password may be locking someone else out: end
+    // every other session too, as web does.
+    return { error: null, othersSignedOut: await signOutOtherDevices(supabase) };
   };
+
+  const changePassword = (currentPassword: string, newPassword: string) =>
+    changePasswordOnServer(supabase, { email: session?.user?.email ?? '', currentPassword, newPassword });
 
   const signOut = async () => {
     // Invalidate first: a profile fetch already in flight is now stale and
     // would otherwise still match the current generation and commit.
     generation.current += 1;
-    const { error } = await supabase.auth.signOut();
-    // This previously relied solely on the SIGNED_OUT event to clear state.
-    // supabase-js drops the local session even when the server call fails
-    // (an already-revoked token is the common case), so clearing here makes
-    // sign-out synchronous rather than event-dependent — and surfaces the
-    // error instead of discarding it, matching web.
+    // While still signed in: stop this device getting the account's pushes
+    // (a shared phone must not keep receiving the previous person's).
+    await forgetDevice();
+    // supabase-js keeps the stored session when the server cannot be reached
+    // (offline, a timeout, a paused project), which brought the account back
+    // on the next launch; signOutOfDevice removes it either way.
+    const { error } = await signOutOfDevice(supabase);
+    // Cleared here too, so sign-out is synchronous rather than waiting on the
+    // SIGNED_OUT event, and the error is surfaced instead of discarded,
+    // matching web.
     setSession(null);
     setProfile(null);
     setLoading(false);
@@ -594,6 +705,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         resetPassword,
         verifyRecoveryCode,
         updatePassword,
+        changePassword,
         signOut,
       }}>
       {children}

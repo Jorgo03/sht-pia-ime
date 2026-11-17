@@ -1,0 +1,7 @@
+{
+  "ios": {
+    "CFBundleDisplayName": "Shtëpia.ime",
+    "NSPhotoLibraryUsageDescription": "Shtëpia.ime needs access to your photos so you can add them to a listing.",
+    "NSLocationWhenInUseUsageDescription": "Shtëpia.ime uses your location to show homes near you on the map. It is not stored."
+  }
+}

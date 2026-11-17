@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
@@ -5,6 +6,8 @@ import type { ErrorBoundaryProps } from 'expo-router';
 
 import i18n from '@/i18n';
 import { AtticoColorsDark, Fonts } from '@/constants/theme';
+import { reportError } from '@/lib/report-error';
+import { debugWarn } from '@/lib/debug';
 
 /**
  * Route-level crash screen, exported from app/_layout.tsx so expo-router
@@ -21,10 +24,13 @@ import { AtticoColorsDark, Fonts } from '@/constants/theme';
  * before the theme context resolves.
  */
 export function AppErrorBoundary({ error, retry }: ErrorBoundaryProps) {
-  if (__DEV__) {
-    // Full detail stays in the dev console, never on screen.
-    console.error('[ErrorBoundary] uncaught render error:', error);
-  }
+  // Redacted report to client_errors, once per error (src/lib/errorReport.js).
+  useEffect(() => {
+    void reportError('render', error, null);
+  }, [error]);
+
+  // Detail stays in the dev console (redacted, dev builds only), never on screen.
+  debugWarn('ErrorBoundary', error);
 
   return (
     <View style={styles.container} accessibilityRole="alert">
@@ -32,7 +38,7 @@ export function AppErrorBoundary({ error, retry }: ErrorBoundaryProps) {
         <MaterialIcons name="error-outline" size={30} color={AtticoColorsDark.accent} />
       </View>
 
-      <Text style={styles.title}>{i18n.t('errors.generic')}</Text>
+      <Text style={[styles.title, { fontFamily: Fonts.serif }]}>{i18n.t('errors.generic')}</Text>
 
       {/* error.message is deliberately not rendered — it can carry internal
           detail (ids, query text) and is not translated. */}
@@ -64,8 +70,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: AtticoColorsDark.accentGlow,
   },
+  // fontFamily is set where it is drawn (Fonts.serif depends on the
+  // language, and these styles are built once at start-up).
   title: {
-    fontFamily: Fonts?.serif,
+    fontFamily: Fonts.sans,
     fontSize: 20,
     textAlign: 'center',
     color: AtticoColorsDark.textPrimary,

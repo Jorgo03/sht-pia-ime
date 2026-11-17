@@ -1,13 +1,21 @@
 import Ionicons from '@expo/vector-icons/Ionicons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Provider } from '@supabase/supabase-js';
+
+import { PRIVACY_POLICY_URL, TERMS_URL } from '@/lib/legal';
+import { IS_WEB } from '@/constants/web-frame';
+import { isModerator } from '@/src/features/moderation/lib/moderation';
+import { collectMyData, deliverMyData } from '@/lib/data-export';
+import { supabase } from '@/lib/supabase';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useRouter, type Href } from 'expo-router';
-import { useEffect, useMemo, useState } from 'react';
+import { useLocalSearchParams, useRouter, type Href } from 'expo-router';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Alert,
   KeyboardAvoidingView,
+  Linking,
   Platform,
   ScrollView,
   StyleSheet,
@@ -19,69 +27,49 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 
-import { type AtticoPalette, Fonts, Radii } from '@/constants/theme';
+import { type AtticoPalette, Fonts, InlineTarget, Radii } from '@/constants/theme';
 import { useAuth } from '@/contexts/auth-context';
 import { useFavorites } from '@/contexts/favorites-context';
+import { KeyboardDoneBar } from '@/components/ui/keyboard-done-bar';
 import { useTheme } from '@/contexts/theme-context';
 import { useTabBarClearance } from '@/components/liquid-tab-bar';
 import { AppHeader } from '@/components/ui/app-header';
+import { EditProfileSheet } from '@/components/profile/edit-profile-sheet';
+import { NotificationsSheet } from '@/components/profile/notifications-sheet';
 import { BottomSheet } from '@/components/ui/bottom-sheet';
 import { GhostBtn, PrimaryCTA } from '@/components/ui/buttons';
 import { DuskHero } from '@/components/ui/dusk-hero';
 import { GoogleLogo } from '@/components/ui/google-logo';
 import { GradientBackground } from '@/components/ui/gradient-background';
 import { OtpInput, OTP_LENGTH } from '@/components/ui/otp-input';
+// One mapper for both apps (error codes first, then Supabase's text).
+import { friendlyError as friendlyAuthError, retryAfterSeconds } from '@/src/lib/authErrors';
+import {
+  blockedCodeKey,
+  codeExpiry,
+  formatCountdown,
+  pendingCodeNote,
+  rejectedCodeKey,
+  RESEND_WAIT_S as RESEND_COOLDOWN_S,
+  restorableCode,
+  secondsLeft,
+} from '@/src/features/auth/lib/signupCode';
+import { newPasswordError, passwordStrengthError } from '@/src/features/auth/lib/password';
+import { providerEnabled } from '@/src/features/auth/lib/authLinks';
+import { openedAtLaunch, START_PARAM } from '@/src/features/auth/lib/startScreen';
+import { ChangePasswordSheet } from '@/components/profile/change-password-sheet';
 import { useProfileStats } from '@/hooks/use-profile-stats';
+import type { ProfileFields } from '@/src/features/auth/lib/profileForm';
 import { useUnreadMessages } from '@/hooks/use-unread-messages';
+import { useReadableColumn } from '@/hooks/use-responsive';
+import { APPLE_SIGN_IN_ENABLED } from '@/src/features/auth/lib/oauthOptions';
 
 type Role = 'buyer' | 'agent';
 
 /** Seconds the resend link stays locked after a code goes out — same 30 web uses. */
-const RESEND_COOLDOWN_S = 30;
+const PENDING_CODE_KEY = 'fho_pending_code';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-/**
- * Maps raw Supabase Auth error text to a localized, user-facing message.
- * Mirrors web's `friendlyError()` in src/features/auth/pages/Profile.jsx
- * exactly (same match strings) — before this, every failure on this screen
- * surfaced Supabase's own English driver text via a bare `error.message`,
- * regardless of the user's selected language.
- */
-function friendlyAuthError(
-  err: { message?: string; code?: string } | null | undefined,
-  t: (key: string) => string,
-): string {
-  if (!err?.message) return t('errors.generic');
-  if (err.code === 'email_address_invalid') return t('errors.invalidEmail');
-  const map: Record<string, string> = {
-    'Invalid login credentials': 'errors.invalidCredentials',
-    'User already registered': 'errors.userExists',
-    'Email not confirmed': 'errors.emailNotConfirmed',
-    'Token has expired or is invalid': 'errors.invalidCode',
-    'is invalid': 'errors.invalidEmail',
-    // Supabase rejects a malformed address with code `validation_failed` and
-    // this text, matching none of the other patterns. Mirrors the web fix.
-    'Unable to validate email address': 'errors.invalidEmail',
-    // Server-side password policy, if ever set stricter than the client rule.
-    'Password should be at least': 'errors.passwordMin',
-    'For security purposes, you can only request this after': 'errors.rateLimited',
-    // Distinct from the per-identity cooldown above: Supabase's project-wide
-    // email-sending quota (code: over_email_send_rate_limit), confirmed live
-    // in production. Mirrors the web fix in src/lib/authErrors.js.
-    'email rate limit exceeded': 'errors.rateLimited',
-    // The SMTP provider refused the message, so GoTrue fails the whole
-    // request (500) and NO account is created. Matched on the shared prefix
-    // so confirmation, recovery, magic-link and invite mails all land here.
-    // Must not fall through to errors.generic ("try again") — retrying cannot
-    // succeed until server configuration changes. Mirrors src/lib/authErrors.js.
-    'Error sending': 'errors.emailSendFailed',
-    'provider is not enabled': 'errors.providerNotConfigured',
-    'Unsupported provider': 'errors.providerNotConfigured',
-  };
-  const key = Object.keys(map).find((k) => err.message!.includes(k));
-  return key ? t(map[key]) : t('errors.generic');
-}
 
 export default function ProfileScreen() {
   const router = useRouter();
@@ -90,6 +78,7 @@ export default function ProfileScreen() {
     user,
     profile,
     isAgent: isAgentAccount,
+    refreshProfile,
     signIn,
     signUp,
     signOut,
@@ -104,6 +93,8 @@ export default function ProfileScreen() {
   } = useAuth();
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
+  // A centred column on an unfolded Fold or a spanned Duo (hooks/use-responsive).
+  const readable = useReadableColumn();
   // Replaces the hardcoded 110 these scrolls used to carry — that was
   // eyeballed against one device's home-indicator inset and came up short on
   // any phone with a larger one.
@@ -111,6 +102,43 @@ export default function ProfileScreen() {
   const unreadMessages = useUnreadMessages();
   const { favoriteProperties } = useFavorites();
   const stats = useProfileStats();
+
+  // Website only: a "Moderation" row for people in public.moderators (the
+  // page itself is web only, and the database enforces the same rule).
+  const [canModerate, setCanModerate] = useState(false);
+  useEffect(() => {
+    if (!IS_WEB || !user) return;
+    let active = true;
+    isModerator(supabase).then((ok) => {
+      if (active) setCanModerate(ok);
+    });
+    return () => {
+      active = false;
+    };
+  }, [user]);
+
+  // Opened as the app's first screen (components/auth/signed-out-start.tsx):
+  // offer browsing without an account, and go Home once signed in.
+  const params = useLocalSearchParams<{ [START_PARAM]?: string }>();
+  const atLaunch = openedAtLaunch(params[START_PARAM]);
+  const leaveStart = () => {
+    router.setParams({ [START_PARAM]: undefined });
+    router.navigate('/' as Href);
+  };
+  const sentHome = useRef(false);
+  useEffect(() => {
+    if (!atLaunch || !user || sentHome.current) return;
+    sentHome.current = true;
+    router.setParams({ [START_PARAM]: undefined });
+    router.navigate('/' as Href);
+  }, [atLaunch, user, router]);
+
+  // On the website the documents are this app's own pages; the phone apps
+  // open them on the website (lib/legal.ts).
+  const openLegal = (doc: 'privacy' | 'terms') => {
+    if (IS_WEB) router.push(`/${doc}` as Href);
+    else Linking.openURL(doc === 'privacy' ? PRIVACY_POLICY_URL : TERMS_URL).catch(() => {});
+  };
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -118,12 +146,19 @@ export default function ProfileScreen() {
   const [fullName, setFullName] = useState('');
   const [agencyName, setAgencyName] = useState('');
   const [isSignUp, setIsSignUp] = useState(false);
+  // Signing in opens on email and password (owner decision, DECISIONS.md §19);
+  // the emailed code is one tap away.
+  const [useEmailCode, setUseEmailCode] = useState(false);
+  const emailFirst = !isSignUp && useEmailCode;
   const [role, setRole] = useState<Role>('buyer');
   const [loading, setLoading] = useState(false);
   // Tracks which provider button is mid-redirect, so the others stay usable
   // and a double-tap on the same one can't fire a second redirect — mirrors
   // web's single `providerLoading` state rather than one flag per provider.
   const [providerLoading, setProviderLoading] = useState<Provider | null>(null);
+  // Width of the sign-in provider buttons' row: one column below 300px.
+  const [socialRowWidth, setSocialRowWidth] = useState(0);
+  const socialOneColumn = socialRowWidth > 0 && socialRowWidth < 300;
   // Email-code (OTP) flow — web's equivalent lives in Profile.jsx's
   // handleGoogleOtp/otpStep state.
   const [otpSending, setOtpSending] = useState(false);
@@ -140,15 +175,77 @@ export default function ProfileScreen() {
   // Reddens the six boxes together after a rejected code, cleared on the next
   // keystroke — same signal web gives via `.otp-digit.error`.
   const [otpError, setOtpError] = useState(false);
+  // The sign-up code's 10-minute life and wrong-guess count
+  // (src/features/auth/lib/signupCode.js). The expiry is null when the code
+  // was sent before this screen opened, so its start is unknown.
+  const [codeExpiresAt, setCodeExpiresAt] = useState<number | null>(null);
+  const [codeAttempts, setCodeAttempts] = useState(0);
+  const [clock, setClock] = useState(() => Date.now());
+  // Said on the code screen itself rather than in Alert.alert, which
+  // react-native-web leaves empty: the website build showed nothing at all.
+  const [codeNotice, setCodeNotice] = useState<{ text: string; tone: 'error' | 'info' } | null>(null);
+  // The sign-in / sign-up form's own message, for the same reason.
+  const [formError, setFormError] = useState<string | null>(null);
   // Seconds left on the resend lock. Web starts this at 30 on every send so a
   // user can't hammer the endpoint into a Supabase rate-limit.
   const [cooldown, setCooldown] = useState(0);
+  // Set synchronously, before the button re-renders as busy: a quick double
+  // tap would otherwise send two codes (the second silently invalidates the
+  // first), or verify one code twice (the second attempt fails as "used").
+  const sendingCode = useRef(false);
+  const verifyingCode = useRef(false);
   const [resetSending, setResetSending] = useState(false);
   const [signOutOpen, setSignOutOpen] = useState(false);
-  // Password recovery, completed in-app: null → 'code' (enter the 6 digits
-  // from the e-mail) → 'password' (choose a new one). Mirrors the web flow,
-  // which reaches the same two steps via the PASSWORD_RECOVERY event.
-  const [recoveryStep, setRecoveryStep] = useState<'code' | 'password' | null>(null);
+  const [editOpen, setEditOpen] = useState(false);
+  const [securityOpen, setSecurityOpen] = useState(false);
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
+  // Local copies so TypeScript keeps the null-narrowing inside the onPress
+  // closures below — narrowing of an imported binding does not survive one.
+  // Account deletion is mandatory for store approval (Apple 5.1.1(v), Google
+  // Play data-deletion policy) when an app lets users create accounts.
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState(false);
+  // "Download my data" (privacy policy §8): one JSON file of the person's own rows.
+  const [exporting, setExporting] = useState(false);
+  const [exportError, setExportError] = useState(false);
+
+  const handleDownloadData = async () => {
+    if (exporting || !user) return;
+    setExporting(true);
+    setExportError(false);
+    try {
+      await deliverMyData(await collectMyData(user.id));
+    } catch {
+      setExportError(true);
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    if (deleting) return;
+    setDeleting(true);
+    setDeleteError(false);
+    try {
+      // The Edge Function derives the account from the caller's verified
+      // access token — nothing identifying is sent in the body.
+      const { error } = await supabase.functions.invoke('delete-account', { body: {} });
+      if (error) throw error;
+      setDeleteOpen(false);
+      // The auth user is gone; clear the local session so the app returns to
+      // the signed-out state rather than holding a token for a deleted user.
+      await signOut();
+    } catch {
+      setDeleteError(true);
+    } finally {
+      setDeleting(false);
+    }
+  };
+  // Password recovery, completed in-app: null → 'email' (which account) →
+  // 'code' (the 6 digits from the e-mail) → 'password' (choose a new one).
+  // Mirrors the web flow.
+  const [recoveryStep, setRecoveryStep] = useState<'email' | 'code' | 'password' | null>(null);
   const [newPassword, setNewPassword] = useState('');
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
 
@@ -161,6 +258,70 @@ export default function ProfileScreen() {
     return () => clearInterval(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cooldown > 0]);
+
+  const forgetPendingCode = () => {
+    AsyncStorage.removeItem(PENDING_CODE_KEY).catch(() => {});
+  };
+
+  // Back to the code screen after the system closed the app while the person
+  // read the email (signupCode.js restorableCode).
+  useEffect(() => {
+    let alive = true;
+    AsyncStorage.getItem(PENDING_CODE_KEY)
+      .then((raw) => {
+        if (!alive || !raw) return;
+        const pending = restorableCode(raw);
+        if (!pending) {
+          AsyncStorage.removeItem(PENDING_CODE_KEY).catch(() => {});
+          return;
+        }
+        setEmail(pending.email);
+        setUseEmailCode(true);
+        setOtpType('email');
+        setCodeExpiresAt(pending.expiresAt);
+        setClock(Date.now());
+        setCooldown(pending.resendWait);
+        setOtpStep(true);
+      })
+      .catch(() => {});
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (user) AsyncStorage.removeItem(PENDING_CODE_KEY).catch(() => {});
+  }, [user]);
+
+  // Code expiry countdown: one interval while a code with a known expiry is
+  // on screen.
+  useEffect(() => {
+    if (!otpStep || codeExpiresAt == null) return;
+    const id = setInterval(() => setClock(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, [otpStep, codeExpiresAt]);
+  const codeLeft = otpStep ? secondsLeft(codeExpiresAt, clock) : null;
+  const codeExpired = codeLeft === 0;
+  // Once the code has expired that is the news, over any earlier info line.
+  const shownNotice =
+    codeExpired && codeNotice?.tone !== 'error'
+      ? { text: t('errors.codeExpired'), tone: 'error' as const }
+      : codeNotice;
+
+  // Opens code entry. `fresh` when this screen just had the code sent, so
+  // its expiry is known; `resendWait` locks the resend button that long.
+  const openCodeEntry = (type: 'email' | 'signup', resendWait: number, fresh: boolean) => {
+    const now = Date.now();
+    setOtpType(type);
+    setOtpCode('');
+    setOtpError(false);
+    setCodeNotice(null);
+    setCodeAttempts(0);
+    setClock(now);
+    setCodeExpiresAt(fresh ? codeExpiry(now) : null);
+    setCooldown(resendWait);
+    setOtpStep(true);
+  };
 
   // Mirrors web's validate(): same rules, same order, so the two apps reject
   // (and word) a bad submission identically. Previously this screen only
@@ -175,28 +336,22 @@ export default function ProfileScreen() {
   // password showed "at least 8 characters" instead of a login-appropriate
   // message — same defect web's Profile.jsx had, fixed there first.
   const validateAuth = (): boolean => {
-    if (!EMAIL_RE.test(email.trim())) {
-      Alert.alert(t('common.error'), t('errors.invalidEmail'));
-      return false;
-    }
-    if (isSignUp) {
-      if (password.length < 8) {
-        Alert.alert(t('common.error'), t('errors.passwordMin'));
-        return false;
+    const problem = (() => {
+      if (!EMAIL_RE.test(email.trim())) return 'errors.invalidEmail';
+      if (isSignUp) {
+        const weak = passwordStrengthError(password);
+        if (weak) return weak;
+        if (fullName.trim().length < 2) return 'errors.nameRequired';
+        if (password !== confirmPassword) return 'errors.passwordMismatch';
+        // The office is part of an agent's account; buyers have none.
+        if (role === 'agent' && agencyName.trim().length < 2) return 'errors.officeRequired';
+      } else if (!password) {
+        return 'errors.passwordRequired';
       }
-      if (fullName.trim().length < 2) {
-        Alert.alert(t('common.error'), t('errors.nameRequired'));
-        return false;
-      }
-      if (password !== confirmPassword) {
-        Alert.alert(t('common.error'), t('errors.passwordMismatch'));
-        return false;
-      }
-    } else if (!password) {
-      Alert.alert(t('common.error'), t('errors.passwordRequired'));
-      return false;
-    }
-    return true;
+      return null;
+    })();
+    setFormError(problem ? t(problem) : null);
+    return !problem;
   };
 
   const handleAuth = async () => {
@@ -227,17 +382,13 @@ export default function ProfileScreen() {
       });
       setLoading(false);
       if (error) {
-        Alert.alert(t('common.error'), friendlyAuthError(error, t));
+        // Includes an address that already has an account (auth-context's
+        // isExistingAccount): stay on the form, nothing was sent.
+        setFormError(friendlyAuthError(error, t));
       } else if (needsConfirmation) {
-        // Straight to code entry, same as web: the confirmation email carries
-        // a 6-digit code, and previously this only showed an alert and left
-        // the user on the signup form with no way to enter it.
-        setOtpType('signup');
-        setOtpCode('');
-        setOtpError(false);
-        setCooldown(RESEND_COOLDOWN_S);
-        setOtpStep(true);
-        Alert.alert('OK', t('auth.checkEmail'));
+        // The pending account exists and its code is on the way: the
+        // "Verify your email" step, with the code's 10 minutes counting.
+        openCodeEntry('signup', RESEND_COOLDOWN_S, true);
       }
       // Otherwise email confirmation is off and signUp already returned a
       // session: the auth listener swaps this screen to the signed-in profile
@@ -246,8 +397,12 @@ export default function ProfileScreen() {
     } else {
       const { error } = await signIn(cleanEmail, password);
       setLoading(false);
-      if (error) {
-        Alert.alert(t('common.error'), friendlyAuthError(error, t));
+      if ((error as { code?: string } | null)?.code === 'email_not_confirmed') {
+        // Not a dead end: the confirmation code (or a fresh one) finishes it.
+        openCodeEntry('signup', 0, false);
+        setCodeNotice({ text: t('auth.confirmFirst'), tone: 'info' });
+      } else if (error) {
+        setFormError(friendlyAuthError(error, t));
       }
     }
   };
@@ -256,10 +411,11 @@ export default function ProfileScreen() {
   // swaps the form to code entry rather than navigating away.
   const handleSendOtp = async () => {
     const cleanEmail = email.trim();
-    if (!cleanEmail) {
-      Alert.alert(t('common.error'), t('auth.enterEmail'));
+    if (!EMAIL_RE.test(cleanEmail)) {
+      setFormError(t(cleanEmail ? 'errors.invalidEmail' : 'auth.enterEmail'));
       return;
     }
+    setFormError(null);
     setEmail(cleanEmail);
     // OTP signups carry no role metadata either — same stash-and-apply path
     // as OAuth (see auth-context's applyPendingRole), and overwriting here
@@ -269,18 +425,29 @@ export default function ProfileScreen() {
     } catch {
       /* storage blocked — role stays buyer */
     }
+    if (sendingCode.current) return;
+    sendingCode.current = true;
     setOtpSending(true);
-    const { error } = await sendOtp(cleanEmail);
+    const { error } = await sendOtp(cleanEmail).finally(() => {
+      sendingCode.current = false;
+    });
     setOtpSending(false);
-    if (error) {
-      Alert.alert(t('common.error'), friendlyAuthError(error, t));
+    const wait = retryAfterSeconds(error);
+    if (wait) {
+      // A code went to this address moments ago and is still valid: go to
+      // code entry, and unlock "resend" when the server will accept it.
+      openCodeEntry('email', wait, false);
+      setCodeNotice({ text: t('errors.waitSeconds', { s: wait }), tone: 'info' });
       return;
     }
-    setOtpType('email');
-    setOtpCode('');
-    setOtpError(false);
-    setCooldown(RESEND_COOLDOWN_S);
-    setOtpStep(true);
+    // Only a request Supabase accepted reaches the code screen. A refusal
+    // stays here with a plain message, never the server's own wording.
+    if (error) {
+      setFormError(friendlyAuthError(error, t));
+      return;
+    }
+    AsyncStorage.setItem(PENDING_CODE_KEY, pendingCodeNote(cleanEmail)).catch(() => {});
+    openCodeEntry('email', RESEND_COOLDOWN_S, true);
   };
 
   // Resend is a distinct call from the first send: a code that came from a
@@ -292,14 +459,24 @@ export default function ProfileScreen() {
     // Same guard web has: `email` can be blank if the screen re-rendered
     // between steps, and resending with an empty address 400s.
     if (!EMAIL_RE.test(email.trim())) {
-      Alert.alert(t('common.error'), t('errors.invalidEmail'));
+      setCodeNotice({ text: t('errors.invalidEmail'), tone: 'error' });
       return;
     }
+    if (sendingCode.current) return;
+    sendingCode.current = true;
     setOtpSending(true);
-    const { error } = await resendCode(email.trim(), otpType);
+    const { error } = await resendCode(email.trim(), otpType).finally(() => {
+      sendingCode.current = false;
+    });
     setOtpSending(false);
+    const wait = retryAfterSeconds(error);
+    if (wait) {
+      setCooldown(wait);
+      setCodeNotice({ text: t('errors.waitSeconds', { s: wait }), tone: 'info' });
+      return;
+    }
     if (error) {
-      Alert.alert(t('common.error'), friendlyAuthError(error, t));
+      setCodeNotice({ text: friendlyAuthError(error, t), tone: 'error' });
       return;
     }
     // Success was previously silent — the only signal was the link text
@@ -310,30 +487,49 @@ export default function ProfileScreen() {
     // The stale digits are cleared too: a resend invalidates the previous
     // code, so leaving the old (often wrong) ones on screen invites the user
     // to submit a code that can no longer succeed.
-    setOtpCode('');
-    setOtpError(false);
-    setCooldown(RESEND_COOLDOWN_S);
-    // Single-argument alert: auth.checkEmail is signup-specific wording
-    // ("...to confirm your account") and would be wrong as a title here.
-    Alert.alert(t('auth.otpSent'));
+    // A new code: a new 10 minutes and a new allowance of wrong guesses.
+    if (otpType === 'email') {
+      AsyncStorage.setItem(PENDING_CODE_KEY, pendingCodeNote(email.trim())).catch(() => {});
+    }
+    openCodeEntry(otpType, RESEND_COOLDOWN_S, true);
+    // Says that earlier codes stopped working: entering the first email's
+    // code after a resend is the common way to hit "wrong or expired".
+    setCodeNotice({ text: t('auth.newCodeSent'), tone: 'info' });
   };
 
   // Takes the code as an argument rather than reading `otpCode` — the
   // auto-verify fires from inside onChangeText, before that state update has
   // flushed, so the state value would still be 5 digits here.
   const handleVerifyOtp = async (code: string) => {
-    if (code.length < OTP_LENGTH) return;
+    if (code.length < OTP_LENGTH || verifyingCode.current) return;
+    // An expired code, or one past the wrong-guess cap, would only be refused
+    // and spend the per-IP verification budget: ask for a new one instead.
+    const blocked = blockedCodeKey({ expiresAt: codeExpiresAt, attempts: codeAttempts });
+    if (blocked) {
+      setCodeNotice({ text: t(blocked), tone: 'error' });
+      setOtpCode('');
+      setOtpError(true);
+      return;
+    }
+    verifyingCode.current = true;
     setOtpVerifying(true);
-    const { error } = await verifyOtp(email, code, otpType);
+    setCodeNotice(null);
+    const { error } = await verifyOtp(email, code, otpType).finally(() => {
+      verifyingCode.current = false;
+    });
     setOtpVerifying(false);
     if (error) {
-      Alert.alert(t('common.error'), friendlyAuthError(error, t));
+      const attempts = codeAttempts + 1;
+      setCodeAttempts(attempts);
+      const key = rejectedCodeKey(error, { expiresAt: codeExpiresAt, attempts });
+      setCodeNotice({ text: key ? t(key) : friendlyAuthError(error, t), tone: 'error' });
       setOtpCode('');
       setOtpError(true);
       return;
     }
     // A successful verify puts a session in place; AuthProvider's
     // onAuthStateChange swaps this screen to the signed-in dashboard.
+    forgetPendingCode();
     setOtpStep(false);
   };
 
@@ -342,31 +538,45 @@ export default function ProfileScreen() {
   // session and the new password can be set here — no deep link, and no
   // sending the user to the web app to finish, which was a dead end for
   // anyone who only has the app installed.
+  // Step A. The answer is the same whether or not the address has an account
+  // (Supabase answers 200 either way), so the app never tells a stranger who
+  // is registered. Guarded like the other sends: a second reset email would
+  // make the first one's code stop working.
   const handleForgotPassword = async () => {
     const cleanEmail = email.trim();
     if (!EMAIL_RE.test(cleanEmail)) {
       Alert.alert(t('common.error'), t('errors.invalidEmail'));
       return;
     }
+    if (sendingCode.current) return;
+    sendingCode.current = true;
     setEmail(cleanEmail);
     setResetSending(true);
-    const { error } = await resetPassword(cleanEmail);
+    const { error } = await resetPassword(cleanEmail).finally(() => {
+      sendingCode.current = false;
+    });
     setResetSending(false);
-    if (error) {
+    const wait = retryAfterSeconds(error);
+    if (error && !wait) {
       Alert.alert(t('common.error'), friendlyAuthError(error, t));
       return;
     }
+    // A code went to this address moments ago and is still valid: go on to
+    // the code, with the resend unlocked when the server will take it.
     setOtpCode('');
     setOtpError(false);
-    setCooldown(RESEND_COOLDOWN_S);
+    setCooldown(wait ?? RESEND_COOLDOWN_S);
     setRecoveryStep('code');
-    Alert.alert(t('auth.checkEmail'), t('auth.resetSent'));
+    Alert.alert(wait ? t('errors.waitSeconds', { s: wait }) : t('auth.resetCodeSent', { email: cleanEmail }));
   };
 
   const handleVerifyRecovery = async (code: string) => {
-    if (code.length < OTP_LENGTH || otpVerifying) return;
+    if (code.length < OTP_LENGTH || verifyingCode.current) return;
+    verifyingCode.current = true;
     setOtpVerifying(true);
-    const { error } = await verifyRecoveryCode(email.trim(), code);
+    const { error } = await verifyRecoveryCode(email.trim(), code).finally(() => {
+      verifyingCode.current = false;
+    });
     setOtpVerifying(false);
     if (error) {
       setOtpCode('');
@@ -379,16 +589,14 @@ export default function ProfileScreen() {
   };
 
   const handleSetNewPassword = async () => {
-    if (newPassword.length < 8) {
-      Alert.alert(t('common.error'), t('errors.passwordMin'));
-      return;
-    }
-    if (newPassword !== confirmNewPassword) {
-      Alert.alert(t('common.error'), t('errors.passwordMismatch'));
+    if (loading) return;
+    const invalid = newPasswordError(newPassword, confirmNewPassword);
+    if (invalid) {
+      Alert.alert(t('common.error'), t(invalid));
       return;
     }
     setLoading(true);
-    const { error } = await updatePassword(newPassword);
+    const { error, othersSignedOut } = await updatePassword(newPassword);
     setLoading(false);
     if (error) {
       Alert.alert(t('common.error'), friendlyAuthError(error, t));
@@ -399,14 +607,23 @@ export default function ProfileScreen() {
     setNewPassword('');
     setConfirmNewPassword('');
     setRecoveryStep(null);
-    Alert.alert(t('auth.recoverySuccess'));
+    Alert.alert(t('auth.recoverySuccess'), othersSignedOut ? t('security.othersSignedOut') : undefined);
   };
 
   const handleResendRecovery = async () => {
-    if (cooldown > 0 || resetSending) return;
+    if (cooldown > 0 || resetSending || sendingCode.current) return;
+    sendingCode.current = true;
     setResetSending(true);
-    const { error } = await resetPassword(email.trim());
+    const { error } = await resetPassword(email.trim()).finally(() => {
+      sendingCode.current = false;
+    });
     setResetSending(false);
+    const wait = retryAfterSeconds(error);
+    if (wait) {
+      setCooldown(wait);
+      Alert.alert(t('errors.waitSeconds', { s: wait }));
+      return;
+    }
     if (error) {
       Alert.alert(t('common.error'), friendlyAuthError(error, t));
       return;
@@ -414,7 +631,7 @@ export default function ProfileScreen() {
     setOtpCode('');
     setOtpError(false);
     setCooldown(RESEND_COOLDOWN_S);
-    Alert.alert(t('auth.otpSent'));
+    Alert.alert(t('auth.newCodeSent'));
   };
 
   const handleProvider = async (provider: Provider) => {
@@ -429,6 +646,13 @@ export default function ProfileScreen() {
       /* storage blocked — role stays buyer */
     }
     setProviderLoading(provider);
+    // A provider switched off in the dashboard fails only after the browser
+    // round trip (or as a raw error page on the web); say so before that.
+    if ((await providerEnabled(supabase, provider)) === false) {
+      setProviderLoading(null);
+      Alert.alert(t('common.error'), t('errors.providerUnavailable'));
+      return;
+    }
     const { error } = await signInWithProvider(provider);
     setProviderLoading(null);
     if (error) {
@@ -441,26 +665,33 @@ export default function ProfileScreen() {
 
   if (authLoading) return null;
 
-  if (user) {
+  // The recovery code signs the user in (verifyOtp), so the new-password step
+  // must stay on screen with a user present; the dashboard follows once the
+  // password is saved or the step is left.
+  if (user && recoveryStep !== 'password') {
     const displayName = profile?.full_name || user.user_metadata?.full_name || user.email?.split('@')[0] || '?';
     const initial = (displayName[0] ?? '?').toUpperCase();
 
     return (
       <GradientBackground>
-        <SafeAreaView style={styles.flex} edges={['top']}>
+        <SafeAreaView style={[styles.flex, readable]} edges={['top']}>
           {/* The signed-in dashboard used to carry its own title row with a
               duplicate theme toggle and language pill — the shared header
               provides both, so this screen now matches web's layout instead
               of running a parallel one. */}
           <AppHeader />
           <ScrollView contentContainerStyle={[styles.scrollContent, { paddingBottom: tabBarClearance }]} showsVerticalScrollIndicator={false}>
-            <Text style={styles.topBarTitle}>{t('common.profile')}</Text>
+            <Text style={styles.topBarTitle} accessibilityRole="header">{t('common.profile')}</Text>
 
             {/* Matches web's .profile-card exactly. */}
             <View style={styles.profileCard}>
-              <LinearGradient colors={[colors.accent, colors.accentEnd]} style={styles.avatar}>
-                <Text style={styles.avatarText}>{initial}</Text>
-              </LinearGradient>
+              {typeof profile?.avatar_url === 'string' && profile.avatar_url ? (
+                <Image source={{ uri: profile.avatar_url }} style={styles.avatar} contentFit="cover" accessibilityLabel={displayName} />
+              ) : (
+                <LinearGradient colors={[colors.accent, colors.accentEnd]} style={styles.avatar}>
+                  <Text style={styles.avatarText}>{initial}</Text>
+                </LinearGradient>
+              )}
               <Text style={styles.profileName}>{displayName}</Text>
               <View style={styles.roleBadge}>
                 <Text style={styles.roleBadgeText}>{isAgentAccount ? t('auth.agent') : t('auth.user')}</Text>
@@ -493,6 +724,37 @@ export default function ProfileScreen() {
                 nav pill already covers it. */}
             <View style={styles.menuList}>
               <TouchableOpacity
+                accessibilityRole="button"
+                style={styles.menuRow}
+                onPress={() => setEditOpen(true)}
+                activeOpacity={0.7}>
+                <MaterialIcons name="edit" size={20} color={colors.textPrimary} />
+                <Text style={styles.menuRowText}>{t('profile.edit.title')}</Text>
+                <MaterialIcons name="chevron-right" size={18} color={colors.textSecondary} />
+              </TouchableOpacity>
+              <View style={styles.menuDivider} />
+              <TouchableOpacity
+                accessibilityRole="button"
+                style={styles.menuRow}
+                onPress={() => setSecurityOpen(true)}
+                activeOpacity={0.7}>
+                <MaterialIcons name="lock-outline" size={20} color={colors.textPrimary} />
+                <Text style={styles.menuRowText}>{t('security.row')}</Text>
+                <MaterialIcons name="chevron-right" size={18} color={colors.textSecondary} />
+              </TouchableOpacity>
+              <View style={styles.menuDivider} />
+              <TouchableOpacity
+                accessibilityRole="button"
+                style={styles.menuRow}
+                onPress={() => setNotificationsOpen(true)}
+                activeOpacity={0.7}>
+                <MaterialIcons name="notifications-none" size={20} color={colors.textPrimary} />
+                <Text style={styles.menuRowText}>{t('notifications.settings')}</Text>
+                <MaterialIcons name="chevron-right" size={18} color={colors.textSecondary} />
+              </TouchableOpacity>
+              <View style={styles.menuDivider} />
+              <TouchableOpacity
+                accessibilityRole="button"
                 style={styles.menuRow}
                 onPress={() => router.push('/favorites' as Href)}
                 activeOpacity={0.7}>
@@ -509,10 +771,11 @@ export default function ProfileScreen() {
               </TouchableOpacity>
               <View style={styles.menuDivider} />
               <TouchableOpacity
+                accessibilityRole="button"
                 style={styles.menuRow}
-                onPress={() => router.push('/messages' as Href)}
+                onPress={() => router.navigate('/messages' as Href)}
                 activeOpacity={0.7}>
-                <MaterialIcons name="search" size={20} color={colors.textPrimary} />
+                <MaterialIcons name="chat-bubble-outline" size={20} color={colors.textPrimary} />
                 <Text style={styles.menuRowText}>{t('common.messages')}</Text>
                 {unreadMessages > 0 && (
                   <View style={styles.menuBadge}>
@@ -523,6 +786,7 @@ export default function ProfileScreen() {
               </TouchableOpacity>
               <View style={styles.menuDivider} />
               <TouchableOpacity
+                accessibilityRole="button"
                 style={styles.menuRow}
                 onPress={() => router.push('/saved-searches' as Href)}
                 activeOpacity={0.7}>
@@ -537,6 +801,7 @@ export default function ProfileScreen() {
               </TouchableOpacity>
               <View style={styles.menuDivider} />
               <TouchableOpacity
+                accessibilityRole="button"
                 style={styles.menuRow}
                 onPress={() => router.push('/viewings' as Href)}
                 activeOpacity={0.7}>
@@ -546,6 +811,7 @@ export default function ProfileScreen() {
               </TouchableOpacity>
               <View style={styles.menuDivider} />
               <TouchableOpacity
+                accessibilityRole="button"
                 style={styles.menuRow}
                 onPress={() => router.push('/my-listings' as Href)}
                 activeOpacity={0.7}>
@@ -553,10 +819,21 @@ export default function ProfileScreen() {
                 <Text style={styles.menuRowText}>{t('listing.myListings')}</Text>
                 <MaterialIcons name="chevron-right" size={18} color={colors.textSecondary} />
               </TouchableOpacity>
+              <View style={styles.menuDivider} />
+              <TouchableOpacity
+                accessibilityRole="button"
+                style={styles.menuRow}
+                onPress={() => router.push('/blocked-users' as Href)}
+                activeOpacity={0.7}>
+                <MaterialIcons name="block" size={20} color={colors.textPrimary} />
+                <Text style={styles.menuRowText}>{t('safety.blockedUsers')}</Text>
+                <MaterialIcons name="chevron-right" size={18} color={colors.textSecondary} />
+              </TouchableOpacity>
               {isAgentAccount && (
                 <>
                   <View style={styles.menuDivider} />
                   <TouchableOpacity
+                    accessibilityRole="button"
                     style={styles.menuRow}
                     onPress={() => router.push('/agent-dashboard' as Href)}
                     activeOpacity={0.7}>
@@ -566,19 +843,98 @@ export default function ProfileScreen() {
                   </TouchableOpacity>
                 </>
               )}
+              {canModerate && (
+                <>
+                  <View style={styles.menuDivider} />
+                  <TouchableOpacity
+                    accessibilityRole="button"
+                    style={styles.menuRow}
+                    onPress={() => router.push('/moderation' as Href)}
+                    activeOpacity={0.7}>
+                    <MaterialIcons name="verified-user" size={20} color={colors.textPrimary} />
+                    <Text style={styles.menuRowText}>{t('moderation.title')}</Text>
+                    <MaterialIcons name="chevron-right" size={18} color={colors.textSecondary} />
+                  </TouchableOpacity>
+                </>
+              )}
             </View>
 
             {/* Signing out is one tap from a scroll — easy to hit by accident,
                 and it costs the user their session. Confirm first. */}
             <TouchableOpacity
+              accessibilityRole="button"
               style={styles.signOutButton}
               onPress={() => setSignOutOpen(true)}
               activeOpacity={0.8}>
-              <MaterialIcons name="logout" size={18} color="#dc3545" />
+              <MaterialIcons name="logout" size={18} color={colors.signOut} />
               <Text style={styles.signOutText}>{t('common.signOut')}</Text>
             </TouchableOpacity>
+
+            <TouchableOpacity
+              accessibilityRole="button"
+              accessibilityState={{ busy: exporting }}
+              style={styles.deleteAccountButton}
+              onPress={handleDownloadData}
+              activeOpacity={0.7}>
+              <Text style={styles.legalLink}>{exporting ? t('account.downloadDataBusy') : t('account.downloadData')}</Text>
+            </TouchableOpacity>
+            {exportError && <Text style={styles.deleteErrorText}>{t('account.downloadDataFailed')}</Text>}
+
+            {/* Store-required: the user must be able to start account deletion
+                from inside the app. Deliberately the last item, plain text
+                rather than a button, so it reads as deliberate and is hard to
+                hit by accident — it is irreversible. */}
+            <TouchableOpacity
+              accessibilityRole="button"
+              style={styles.deleteAccountButton}
+              onPress={() => { setDeleteError(false); setDeleteOpen(true); }}
+              activeOpacity={0.7}>
+              <Text style={styles.deleteAccountText}>{t('account.deleteAccount')}</Text>
+            </TouchableOpacity>
+
+            {/* Both stores require the Privacy Policy to be reachable from
+                inside the app. The pages live on the website (lib/legal.ts). */}
+            <View style={styles.legalRow}>
+              <Text style={styles.legalLink} accessibilityRole="link" onPress={() => openLegal('privacy')}>
+                {t('legal.privacyPolicy')}
+              </Text>
+              <Text style={styles.legalDot}>·</Text>
+              <Text style={styles.legalLink} accessibilityRole="link" onPress={() => openLegal('terms')}>
+                {t('legal.termsOfService')}
+              </Text>
+              {/* Only the website stores anything in a browser. */}
+              {IS_WEB && (
+                <>
+                  <Text style={styles.legalDot}>·</Text>
+                  <Text style={styles.legalLink} accessibilityRole="link" onPress={() => router.push('/cookies' as Href)}>
+                    {t('legal.cookiePolicy')}
+                  </Text>
+                </>
+              )}
+            </View>
           </ScrollView>
         </SafeAreaView>
+
+        {notificationsOpen && (
+          // Keyed by account: another person never sees, or saves over, the previous one's choices.
+          <NotificationsSheet key={user.id} userId={user.id} onClose={() => setNotificationsOpen(false)} />
+        )}
+
+        {securityOpen && (
+          // Keyed by account, so a password typed for one never shows for another.
+          <ChangePasswordSheet key={user.id} user={user} onClose={() => setSecurityOpen(false)} />
+        )}
+
+        {editOpen && (
+          <EditProfileSheet
+            visible
+            userId={user.id}
+            profile={profile as ProfileFields | null}
+            isAgent={isAgentAccount}
+            onSaved={refreshProfile}
+            onClose={() => setEditOpen(false)}
+          />
+        )}
 
         <BottomSheet
           visible={signOutOpen}
@@ -586,7 +942,7 @@ export default function ProfileScreen() {
           heightRatio={0.32}>
           <View style={styles.confirmBody}>
             <View style={styles.confirmIcon}>
-              <MaterialIcons name="logout" size={22} color="#dc3545" />
+              <MaterialIcons name="logout" size={22} color={colors.signOut} />
             </View>
             <Text style={styles.confirmTitle}>{t('common.signOut')}</Text>
             <Text style={styles.confirmText}>{t('common.confirmSignOut')}</Text>
@@ -601,6 +957,31 @@ export default function ProfileScreen() {
             <GhostBtn label={t('common.cancel')} onPress={() => setSignOutOpen(false)} />
           </View>
         </BottomSheet>
+
+        <BottomSheet
+          visible={deleteOpen}
+          onClose={() => !deleting && setDeleteOpen(false)}
+          heightRatio={0.42}>
+          <View style={styles.confirmBody}>
+            <View style={styles.confirmIcon}>
+              <MaterialIcons name="delete-forever" size={22} color={colors.signOut} />
+            </View>
+            <Text style={styles.confirmTitle}>{t('account.deleteAccount')}</Text>
+            <Text style={styles.confirmText}>{t('account.deleteConfirmBody')}</Text>
+            {deleteError && (
+              <Text style={styles.deleteErrorText}>{t('account.deleteFailed')}</Text>
+            )}
+            <PrimaryCTA
+              label={deleting ? t('common.loading') : t('account.deleteConfirmCta')}
+              icon={null}
+              onPress={handleDeleteAccount}
+            />
+            <GhostBtn
+              label={t('common.cancel')}
+              onPress={() => !deleting && setDeleteOpen(false)}
+            />
+          </View>
+        </BottomSheet>
       </GradientBackground>
     );
   }
@@ -611,7 +992,7 @@ export default function ProfileScreen() {
           sky + lit skyline. The signed-in dashboard keeps GradientBackground,
           same split as web (DuskHero only renders on the auth branch). */}
       <DuskHero />
-      <SafeAreaView style={styles.flex} edges={['top']}>
+      <SafeAreaView style={[styles.flex, readable]} edges={['top']}>
         {/* Web shows its `.app-header` on every page including this one —
             wordmark, language, theme toggle. Mobile had only a bare floating
             language pill here, which is what stopped the two screens reading
@@ -639,7 +1020,7 @@ export default function ProfileScreen() {
                   48px/0.98. Each line is its own <Text> rather than one
                   wrapping paragraph, so the break points are fixed by the
                   copy instead of by the device width. */}
-              <View>
+              <View accessibilityRole="header">
                 <Text style={styles.authHeadline}>
                   {isSignUp ? t('auth.heroSignUpPre') : t('auth.heroSignInPre')}
                 </Text>
@@ -655,26 +1036,28 @@ export default function ProfileScreen() {
             <View style={styles.authGlass}>
               <View style={styles.roleToggle}>
                 <TouchableOpacity
+                  accessibilityRole="button"
                   style={[styles.roleBtn, role === 'buyer' && styles.roleBtnActive]}
                   onPress={() => setRole('buyer')}
                   activeOpacity={0.7}>
                   <MaterialIcons
                     name="person"
                     size={16}
-                    color={role === 'buyer' ? '#fff' : 'rgba(255,255,255,0.5)'}
+                    color={role === 'buyer' ? '#fff' : 'rgba(255,255,255,0.85)'}
                   />
                   <Text style={[styles.roleBtnText, role === 'buyer' && styles.roleBtnTextActive]}>
                     {t('auth.roleClient')}
                   </Text>
                 </TouchableOpacity>
                 <TouchableOpacity
+                  accessibilityRole="button"
                   style={[styles.roleBtn, role === 'agent' && styles.roleBtnActive]}
                   onPress={() => setRole('agent')}
                   activeOpacity={0.7}>
                   <MaterialIcons
                     name="business-center"
                     size={16}
-                    color={role === 'agent' ? '#fff' : 'rgba(255,255,255,0.5)'}
+                    color={role === 'agent' ? '#fff' : 'rgba(255,255,255,0.85)'}
                   />
                   <Text style={[styles.roleBtnText, role === 'agent' && styles.roleBtnTextActive]}>
                     {t('auth.roleAgent')}
@@ -682,7 +1065,40 @@ export default function ProfileScreen() {
                 </TouchableOpacity>
               </View>
 
-              {recoveryStep === 'code' ? (
+              {recoveryStep === 'email' ? (
+                /* Password recovery, step A: which account. */
+                <>
+                  <Text style={styles.otpTitle} accessibilityRole="header">{t('auth.forgotTitle')}</Text>
+                  <Text style={styles.otpSubtitle}>{t('auth.forgotSubtitle')}</Text>
+                  <View style={styles.fieldRow}>
+                    <MaterialIcons name="mail-outline" size={18} color="rgba(255,255,255,0.8)" style={styles.fieldIcon} />
+                    <TextInput
+                      style={styles.fieldInput}
+                      placeholder={t('auth.email')}
+                      placeholderTextColor="rgba(255,255,255,0.8)"
+                      value={email}
+                      onChangeText={setEmail}
+                      autoCapitalize="none"
+                      autoCorrect={false}
+                      keyboardType="email-address"
+                      textContentType="emailAddress"
+                      autoComplete="email"
+                      accessibilityLabel={t('auth.email')}
+                      onSubmitEditing={handleForgotPassword}
+                      autoFocus
+                    />
+                  </View>
+                  <TouchableOpacity accessibilityRole="button" onPress={handleForgotPassword} activeOpacity={0.85} disabled={resetSending}>
+                    <LinearGradient colors={[colors.accent, colors.accentEnd]} style={styles.ctaPill}>
+                      <Text style={styles.ctaPillText}>{resetSending ? t('common.loading') : t('auth.sendCode')}</Text>
+                      <MaterialIcons name="arrow-forward" size={18} color="#fff" />
+                    </LinearGradient>
+                  </TouchableOpacity>
+                  <TouchableOpacity accessibilityRole="button" onPress={() => setRecoveryStep(null)} style={styles.linkButton}>
+                    <Text style={styles.linkButtonText}>{t('auth.backToSignIn')}</Text>
+                  </TouchableOpacity>
+                </>
+              ) : recoveryStep === 'code' ? (
                 /* Password recovery, step 1: the 6-digit code from the
                    recovery e-mail. Verified as type 'recovery', which yields
                    a real session — no deep link needed. */
@@ -701,6 +1117,7 @@ export default function ProfileScreen() {
                   />
                   {otpVerifying && <Text style={styles.otpSubtitle}>{t('common.loading')}</Text>}
                   <TouchableOpacity
+                    accessibilityRole="button"
                     onPress={handleResendRecovery}
                     style={styles.linkButton}
                     disabled={cooldown > 0 || resetSending}>
@@ -708,7 +1125,7 @@ export default function ProfileScreen() {
                       {cooldown > 0 ? t('auth.resendIn', { s: cooldown }) : t('auth.resendCode')}
                     </Text>
                   </TouchableOpacity>
-                  <TouchableOpacity onPress={() => setRecoveryStep(null)} style={styles.linkButton}>
+                  <TouchableOpacity accessibilityRole="button" onPress={() => setRecoveryStep('email')} style={styles.linkButton}>
                     <Text style={styles.linkButtonText}>{t('common.back')}</Text>
                   </TouchableOpacity>
                 </>
@@ -720,45 +1137,69 @@ export default function ProfileScreen() {
                   <Text style={styles.otpSubtitle}>{t('auth.recoverySubtitle')}</Text>
 
                   <View style={styles.fieldRow}>
-                    <MaterialIcons name="lock-outline" size={18} color="rgba(255,255,255,0.35)" style={styles.fieldIcon} />
+                    <MaterialIcons name="lock-outline" size={18} color="rgba(255,255,255,0.8)" style={styles.fieldIcon} />
                     <TextInput
                       style={styles.fieldInput}
                       placeholder={t('auth.newPassword')}
-                      placeholderTextColor="rgba(255,255,255,0.35)"
+                      placeholderTextColor="rgba(255,255,255,0.8)"
                       value={newPassword}
                       onChangeText={setNewPassword}
                       secureTextEntry={!showPassword}
+                      textContentType="newPassword"
+                      autoComplete="new-password"
+                      accessibilityLabel={t('auth.newPassword')}
                       editable={!loading}
                     />
-                    <TouchableOpacity style={styles.fieldEye} onPress={() => setShowPassword((v) => !v)} hitSlop={8}>
+                    <TouchableOpacity
+                      style={styles.fieldEye}
+                      onPress={() => setShowPassword((v) => !v)}
+                      hitSlop={8}
+                      accessibilityRole="button"
+                      accessibilityLabel={showPassword ? t('auth.hidePassword') : t('auth.showPassword')}>
                       <MaterialIcons
                         name={showPassword ? 'visibility-off' : 'visibility'}
                         size={18}
-                        color="rgba(255,255,255,0.35)"
+                        color="rgba(255,255,255,0.8)"
                       />
                     </TouchableOpacity>
                   </View>
 
                   <View style={styles.fieldRow}>
-                    <MaterialIcons name="lock-outline" size={18} color="rgba(255,255,255,0.35)" style={styles.fieldIcon} />
+                    <MaterialIcons name="lock-outline" size={18} color="rgba(255,255,255,0.8)" style={styles.fieldIcon} />
                     <TextInput
                       style={styles.fieldInput}
                       placeholder={t('auth.confirmPassword')}
-                      placeholderTextColor="rgba(255,255,255,0.35)"
+                      placeholderTextColor="rgba(255,255,255,0.8)"
                       value={confirmNewPassword}
                       onChangeText={setConfirmNewPassword}
                       secureTextEntry={!showPassword}
+                      textContentType="newPassword"
+                      autoComplete="new-password"
+                      accessibilityLabel={t('auth.confirmPassword')}
                       editable={!loading}
                     />
                   </View>
 
-                  <TouchableOpacity onPress={handleSetNewPassword} activeOpacity={0.85} disabled={loading}>
+                  <TouchableOpacity accessibilityRole="button" onPress={handleSetNewPassword} activeOpacity={0.85} disabled={loading}>
                     <LinearGradient colors={[colors.accent, colors.accentEnd]} style={styles.ctaPill}>
                       <Text style={styles.ctaPillText}>
                         {loading ? t('common.loading') : t('auth.updatePassword')}
                       </Text>
                       <MaterialIcons name="arrow-forward" size={18} color="#fff" />
                     </LinearGradient>
+                  </TouchableOpacity>
+                  {/* Leaving keeps the old password: signed in (the code did
+                      that) if the recovery session is live, else the sign-in form. */}
+                  <TouchableOpacity
+                    accessibilityRole="button"
+                    onPress={() => {
+                      setNewPassword('');
+                      setConfirmNewPassword('');
+                      setRecoveryStep(null);
+                    }}
+                    style={styles.linkButton}
+                    disabled={loading}>
+                    <Text style={styles.linkButtonText}>{t('common.back')}</Text>
                   </TouchableOpacity>
                 </>
               ) : otpStep ? (
@@ -767,8 +1208,13 @@ export default function ProfileScreen() {
                    verification fires automatically once 6 digits land (web
                    does the same from handleOtpChange, no submit button). */
                 <>
-                  <Text style={styles.otpTitle}>{t('auth.enterCode')}</Text>
-                  <Text style={styles.otpSubtitle}>{t('auth.codeSentTo', { email })}</Text>
+                  {/* A sign-up gets the "Verify your email" step; an email
+                      sign-in code keeps its own wording. */}
+                  <Text style={styles.otpTitle} accessibilityRole="header">
+                    {otpType === 'signup' ? t('auth.verifyEmailTitle') : t('auth.checkInbox')}
+                  </Text>
+                  <Text style={styles.otpSubtitle}>{t('auth.verifyEmailSubtitle')}</Text>
+                  <Text style={styles.otpEmail}>{email}</Text>
                   <OtpInput
                     value={otpCode}
                     error={otpError}
@@ -779,8 +1225,34 @@ export default function ProfileScreen() {
                     }}
                     onComplete={handleVerifyOtp}
                   />
-                  {otpVerifying && <Text style={styles.otpSubtitle}>{t('common.loading')}</Text>}
+                  {shownNotice && (
+                    <Text
+                      style={[styles.otpNotice, shownNotice.tone === 'error' && styles.otpNoticeError]}
+                      accessibilityRole="alert"
+                      accessibilityLiveRegion="polite">
+                      {shownNotice.text}
+                    </Text>
+                  )}
+                  {codeLeft != null && codeLeft > 0 && (
+                    <Text style={styles.otpSubtitle}>
+                      {t('auth.codeExpiresIn', { time: formatCountdown(codeLeft) })}
+                    </Text>
+                  )}
                   <TouchableOpacity
+                    accessibilityRole="button"
+                    accessibilityState={{ disabled: otpCode.length < OTP_LENGTH || otpVerifying || codeExpired }}
+                    onPress={() => handleVerifyOtp(otpCode)}
+                    activeOpacity={0.85}
+                    disabled={otpCode.length < OTP_LENGTH || otpVerifying || codeExpired}
+                    style={(otpCode.length < OTP_LENGTH || codeExpired) && styles.ctaDisabled}>
+                    <LinearGradient colors={[colors.accent, colors.accentEnd]} style={styles.ctaPill}>
+                      <Text style={styles.ctaPillText}>
+                        {otpVerifying ? t('common.loading') : t('auth.verifyAccount')}
+                      </Text>
+                    </LinearGradient>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    accessibilityRole="button"
                     onPress={handleResendOtp}
                     style={styles.linkButton}
                     disabled={cooldown > 0 || otpSending}>
@@ -791,7 +1263,25 @@ export default function ProfileScreen() {
                         : t('auth.resendCode')}
                     </Text>
                   </TouchableOpacity>
-                  <TouchableOpacity onPress={() => setOtpStep(false)} style={styles.linkButton}>
+                  <Text style={styles.otpNotice}>{t('auth.spamHint')}</Text>
+                  {otpType === 'signup' && (
+                    <TouchableOpacity
+                      accessibilityRole="button"
+                      onPress={() => {
+                        setOtpStep(false);
+                        setIsSignUp(false);
+                      }}
+                      style={styles.linkButton}>
+                      <Text style={styles.linkButtonText}>{t('auth.signupCodeHint')}</Text>
+                    </TouchableOpacity>
+                  )}
+                  <TouchableOpacity
+                    accessibilityRole="button"
+                    onPress={() => {
+                      forgetPendingCode();
+                      setOtpStep(false);
+                    }}
+                    style={styles.linkButton}>
                     <Text style={styles.linkButtonText}>{t('common.back')}</Text>
                   </TouchableOpacity>
                 </>
@@ -799,74 +1289,100 @@ export default function ProfileScreen() {
                 <>
               {isSignUp && (
                 <View style={styles.fieldRow}>
-                  <MaterialIcons name="person-outline" size={18} color="rgba(255,255,255,0.35)" style={styles.fieldIcon} />
+                  <MaterialIcons name="person-outline" size={18} color="rgba(255,255,255,0.8)" style={styles.fieldIcon} />
                   <TextInput
                     style={styles.fieldInput}
                     placeholder={t('auth.fullName')}
-                    placeholderTextColor="rgba(255,255,255,0.35)"
+                    placeholderTextColor="rgba(255,255,255,0.8)"
                     value={fullName}
                     onChangeText={setFullName}
                     autoCapitalize="words"
+                    textContentType="name"
+                    autoComplete="name"
+                    accessibilityLabel={t('auth.fullName')}
                   />
                 </View>
               )}
 
               <View style={styles.fieldRow}>
-                <MaterialIcons name="mail-outline" size={18} color="rgba(255,255,255,0.35)" style={styles.fieldIcon} />
+                <MaterialIcons name="mail-outline" size={18} color="rgba(255,255,255,0.8)" style={styles.fieldIcon} />
                 <TextInput
                   style={styles.fieldInput}
                   placeholder={t('auth.email')}
-                  placeholderTextColor="rgba(255,255,255,0.35)"
+                  placeholderTextColor="rgba(255,255,255,0.8)"
                   value={email}
                   onChangeText={setEmail}
                   autoCapitalize="none"
+                  autoCorrect={false}
                   keyboardType="email-address"
+                  textContentType={isSignUp ? 'emailAddress' : 'username'}
+                  autoComplete="email"
+                  accessibilityLabel={t('auth.email')}
+                  onSubmitEditing={emailFirst ? handleSendOtp : undefined}
                 />
               </View>
 
+              {!emailFirst && (
               <View style={styles.fieldRow}>
-                <MaterialIcons name="lock-outline" size={18} color="rgba(255,255,255,0.35)" style={styles.fieldIcon} />
+                <MaterialIcons name="lock-outline" size={18} color="rgba(255,255,255,0.8)" style={styles.fieldIcon} />
                 <TextInput
                   style={styles.fieldInput}
                   placeholder={t('auth.password')}
-                  placeholderTextColor="rgba(255,255,255,0.35)"
+                  placeholderTextColor="rgba(255,255,255,0.8)"
                   value={password}
                   onChangeText={setPassword}
                   secureTextEntry={!showPassword}
+                  autoCapitalize="none"
+                  textContentType={isSignUp ? 'newPassword' : 'password'}
+                  autoComplete={isSignUp ? 'new-password' : 'current-password'}
+                  accessibilityLabel={t('auth.password')}
                 />
-                <TouchableOpacity style={styles.fieldEye} onPress={() => setShowPassword((v) => !v)} hitSlop={8}>
+                <TouchableOpacity
+                  style={styles.fieldEye}
+                  onPress={() => setShowPassword((v) => !v)}
+                  hitSlop={8}
+                  accessibilityRole="button"
+                  accessibilityLabel={showPassword ? t('auth.hidePassword') : t('auth.showPassword')}>
                   <MaterialIcons
                     name={showPassword ? 'visibility-off' : 'visibility'}
                     size={18}
-                    color="rgba(255,255,255,0.35)"
+                    color="rgba(255,255,255,0.8)"
                   />
                 </TouchableOpacity>
               </View>
+              )}
 
               {isSignUp && (
                 <View style={styles.fieldRow}>
-                  <MaterialIcons name="lock-outline" size={18} color="rgba(255,255,255,0.35)" style={styles.fieldIcon} />
+                  <MaterialIcons name="lock-outline" size={18} color="rgba(255,255,255,0.8)" style={styles.fieldIcon} />
                   <TextInput
                     style={styles.fieldInput}
                     placeholder={t('auth.confirmPassword')}
-                    placeholderTextColor="rgba(255,255,255,0.35)"
+                    placeholderTextColor="rgba(255,255,255,0.8)"
                     value={confirmPassword}
                     onChangeText={setConfirmPassword}
                     secureTextEntry={!showPassword}
+                    autoCapitalize="none"
+                    textContentType="newPassword"
+                    autoComplete="new-password"
+                    accessibilityLabel={t('auth.confirmPassword')}
                   />
                 </View>
               )}
 
               {isSignUp && role === 'agent' && (
                 <View style={styles.fieldRow}>
-                  <MaterialIcons name="business" size={18} color="rgba(255,255,255,0.35)" style={styles.fieldIcon} />
+                  <MaterialIcons name="business" size={18} color="rgba(255,255,255,0.8)" style={styles.fieldIcon} />
                   <TextInput
                     style={styles.fieldInput}
-                    placeholder={t('auth.agencyName')}
-                    placeholderTextColor="rgba(255,255,255,0.35)"
+                    placeholder={t('auth.officeName')}
+                    placeholderTextColor="rgba(255,255,255,0.8)"
                     value={agencyName}
                     onChangeText={setAgencyName}
                     autoCapitalize="words"
+                    textContentType="organizationName"
+                    autoComplete="organization"
+                    accessibilityLabel={t('auth.officeName')}
                   />
                 </View>
               )}
@@ -878,32 +1394,66 @@ export default function ProfileScreen() {
               {!isSignUp && (
                 <View style={styles.accessRow}>
                   <Text style={styles.accessText} numberOfLines={2}>
-                    {role === 'agent' ? t('auth.accessAgent') : t('auth.accessClient')}
+                    {emailFirst ? t('auth.otpSubtitle') : role === 'agent' ? t('auth.accessAgent') : t('auth.accessClient')}
                   </Text>
-                  <TouchableOpacity
-                    onPress={handleForgotPassword}
-                    disabled={resetSending}
-                    hitSlop={8}>
-                    <Text style={styles.accessForgot}>
-                      {resetSending ? t('common.loading') : t('auth.forgotShort')}
-                    </Text>
-                  </TouchableOpacity>
+                  {!emailFirst && (
+                    <TouchableOpacity
+                      accessibilityRole="button"
+                      onPress={() => setRecoveryStep('email')}
+                      style={InlineTarget}
+                      hitSlop={8}>
+                      <Text style={styles.accessForgot}>{t('auth.forgotShort')}</Text>
+                    </TouchableOpacity>
+                  )}
                 </View>
               )}
 
-              <TouchableOpacity onPress={handleAuth} activeOpacity={0.85} disabled={loading}>
+              {formError && (
+                <Text
+                  style={[styles.otpNotice, styles.otpNoticeError]}
+                  accessibilityRole="alert"
+                  accessibilityLiveRegion="polite">
+                  {formError}
+                </Text>
+              )}
+
+              <TouchableOpacity
+                accessibilityRole="button"
+                onPress={emailFirst ? handleSendOtp : handleAuth}
+                activeOpacity={0.85}
+                disabled={loading || otpSending}>
                 <LinearGradient colors={[colors.accent, colors.accentEnd]} style={styles.ctaPill}>
                   {/* Prototype CTA copy: "Step inside" on sign-in,
                       "Create account" on sign-up — not the bare verbs. */}
                   <Text style={styles.ctaPillText}>
-                    {loading
+                    {loading || (emailFirst && otpSending)
                       ? t('common.loading')
                       : isSignUp
                         ? t('auth.createAccount')
-                        : t('auth.stepInside')}
+                        : emailFirst
+                          ? t('auth.continue')
+                          : t('auth.stepInside')}
                   </Text>
                   <MaterialIcons name="arrow-forward" size={18} color="#fff" />
                 </LinearGradient>
+              </TouchableOpacity>
+
+              {/* Right under the main button: a new person must not have to
+                  scroll past the other sign-in options to find how to join. */}
+              <TouchableOpacity
+                accessibilityRole="button"
+                onPress={() => {
+                  setIsSignUp(!isSignUp);
+                  setUseEmailCode(false);
+                  setFormError(null);
+                }}
+                style={styles.linkButton}>
+                <Text style={styles.linkButtonText}>
+                  {isSignUp ? t('auth.hasAccount') : t('auth.noAccount')}{' '}
+                  <Text style={styles.linkButtonTextStrong}>
+                    {isSignUp ? t('common.signIn') : t('common.signUp')}
+                  </Text>
+                </Text>
               </TouchableOpacity>
 
               <View style={styles.divider}>
@@ -916,16 +1466,22 @@ export default function ProfileScreen() {
                   and the prototype's is the same 1fr 1fr pair — these were
                   stacked full-width here, which read as two primary actions
                   instead of one row of alternatives. */}
-              <View style={styles.socialRow}>
+              <View
+                style={styles.socialRow}
+                onLayout={(e) => {
+                  const w = Math.round(e.nativeEvent.layout.width);
+                  setSocialRowWidth((prev) => (prev === w ? prev : w));
+                }}>
                 <TouchableOpacity
-                  style={styles.socialButton}
+                  accessibilityRole="button"
+                  style={[styles.socialButton, socialOneColumn && styles.socialButtonFull]}
                   onPress={() => handleProvider('google' as Provider)}
                   activeOpacity={0.8}
                   disabled={!!providerLoading}>
                   <GoogleLogo size={18} />
                   {/* Full label, allowed to wrap to a second line — that's
                       what web does in the same half-width cell. */}
-                  <Text style={styles.socialLabel}>
+                  <Text style={styles.socialLabel} numberOfLines={1}>
                     {providerLoading === 'google' ? t('common.loading') : t('auth.continueWithGoogle')}
                   </Text>
                 </TouchableOpacity>
@@ -949,59 +1505,88 @@ export default function ProfileScreen() {
                       a fetchable request, so a disabled provider's raw JSON
                       400 replaces the page before any app code runs. Not
                       fixable from in-app error handling; goes away once the
-                      Dashboard config lands. */}
-                <TouchableOpacity
-                  style={styles.socialButton}
-                  onPress={() => handleProvider('apple' as Provider)}
-                  activeOpacity={0.8}
-                  disabled={!!providerLoading}>
-                  <Ionicons name="logo-apple" size={19} color="#f5f0e8" />
-                  <Text style={styles.socialLabel}>
-                    {providerLoading === 'apple' ? t('common.loading') : t('auth.continueWithApple')}
-                  </Text>
-                </TouchableOpacity>
+                      Dashboard config lands.
+                    2026-11-13 (AUDIT-001): Apple is hidden behind
+                    APPLE_SIGN_IN_ENABLED until the provider is on, since the
+                    button could only fail. LinkedIn is on live. */}
+                {APPLE_SIGN_IN_ENABLED && (
+                  <TouchableOpacity
+                    accessibilityRole="button"
+                    style={[styles.socialButton, socialOneColumn && styles.socialButtonFull]}
+                    onPress={() => handleProvider('apple' as Provider)}
+                    activeOpacity={0.8}
+                    disabled={!!providerLoading}>
+                    <Ionicons name="logo-apple" size={19} color="#f5f0e8" />
+                    <Text style={styles.socialLabel} numberOfLines={1}>
+                      {providerLoading === 'apple' ? t('common.loading') : t('auth.continueWithApple')}
+                    </Text>
+                  </TouchableOpacity>
+                )}
 
                 <TouchableOpacity
-                  style={styles.socialButton}
+                  accessibilityRole="button"
+                  style={[styles.socialButton, socialOneColumn && styles.socialButtonFull]}
                   onPress={() => handleProvider('linkedin_oidc' as Provider)}
                   activeOpacity={0.8}
                   disabled={!!providerLoading}>
                   <Ionicons name="logo-linkedin" size={18} color="#0A66C2" />
-                  <Text style={styles.socialLabel}>
+                  <Text style={styles.socialLabel} numberOfLines={1}>
                     {providerLoading === 'linkedin_oidc' ? t('common.loading') : t('auth.continueWithLinkedIn')}
                   </Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                  style={styles.socialButton}
-                  onPress={handleSendOtp}
+                  accessibilityRole="button"
+                  style={[styles.socialButton, socialOneColumn && styles.socialButtonFull]}
+                  onPress={
+                    isSignUp
+                      ? handleSendOtp
+                      : () => {
+                          setUseEmailCode(!useEmailCode);
+                          setFormError(null);
+                        }
+                  }
                   activeOpacity={0.8}
+                  accessibilityLabel={emailFirst ? t('auth.usePassword') : t('auth.signInWithEmail')}
                   disabled={otpSending}>
                   {/* Was colors.textPrimary — near-black in the light theme,
                       which made the icon vanish against the dark glass card.
                       The card is dark in both themes, so this is fixed cream
                       like its own label. */}
-                  <MaterialIcons name="mail-outline" size={18} color="#f5f0e8" />
-                  <Text style={styles.socialLabel}>
-                    {otpSending ? t('common.loading') : t('auth.signInWithEmail')}
+                  <MaterialIcons name={emailFirst ? 'lock-outline' : 'mail-outline'} size={18} color="#f5f0e8" />
+                  <Text style={styles.socialLabel} numberOfLines={1}>
+                    {emailFirst ? t('auth.usePassword') : otpSending ? t('common.loading') : t('auth.emailCode')}
                   </Text>
                 </TouchableOpacity>
               </View>
 
-              <TouchableOpacity
-                onPress={() => setIsSignUp(!isSignUp)}
-                style={styles.linkButton}>
-                <Text style={styles.linkButtonText}>
-                  {isSignUp ? t('auth.hasAccount') : t('auth.noAccount')}{' '}
-                  <Text style={styles.linkButtonTextStrong}>
-                    {isSignUp ? t('common.signIn') : t('common.signUp')}
-                  </Text>
+              {/* Reachable before signing up too: this is where people
+                  decide whether to hand over their details. */}
+              <View style={[styles.legalRow, styles.legalRowAuth]}>
+                <Text style={[styles.legalLink, styles.legalLinkAuth]} accessibilityRole="link" onPress={() => openLegal('privacy')}>
+                  {t('legal.privacyPolicy')}
                 </Text>
-              </TouchableOpacity>
+                <Text style={[styles.legalDot, styles.legalLinkAuth]}>·</Text>
+                <Text style={[styles.legalLink, styles.legalLinkAuth]} accessibilityRole="link" onPress={() => openLegal('terms')}>
+                  {t('legal.termsOfService')}
+                </Text>
+              </View>
+              {/* Apple 5.1.1(v): browsing homes needs no account, so the
+                  sign-in screen the app opens on lets people skip it. */}
+              {atLaunch ? (
+                <TouchableOpacity
+                  accessibilityRole="button"
+                  onPress={leaveStart}
+                  style={styles.browseButton}
+                  hitSlop={8}>
+                  <Text style={styles.browseText}>{t('auth.browseWithoutAccount')}</Text>
+                </TouchableOpacity>
+              ) : null}
                 </>
               )}
             </View>
           </ScrollView>
+          <KeyboardDoneBar />
         </KeyboardAvoidingView>
       </SafeAreaView>
 
@@ -1017,15 +1602,16 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   flex: {
     flex: 1,
   },
+  // 16 below the header's line, as on the other screens.
   scrollContent: {
     paddingHorizontal: 20,
-    paddingTop: 8,
+    paddingTop: 16,
     paddingBottom: 110,
   },
   topBarTitle: {
+    marginBottom: 12,
     fontFamily: Fonts?.serif,
     fontSize: 20,
-    fontWeight: '500',
     color: colors.textPrimary,
   },
 
@@ -1050,32 +1636,30 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     marginBottom: 8,
   },
   avatarText: {
-    fontFamily: Fonts?.serif,
+    fontFamily: Fonts?.serifSemiBold,
     fontSize: 24,
-    fontWeight: '700',
     color: '#fff',
   },
   profileName: {
     fontFamily: Fonts?.serif,
     fontSize: 18,
-    fontWeight: '500',
     color: colors.textPrimary,
   },
   roleBadge: {
     paddingHorizontal: 14,
     paddingVertical: 4,
     borderRadius: 999,
-    backgroundColor: colors.accentGlow,
+    backgroundColor: colors.accentTint,
   },
   roleBadgeText: {
-    fontFamily: Fonts?.mono,
-    fontSize: 11,
-    fontWeight: '600',
+    fontFamily: Fonts?.monoMedium,
+    fontSize: 12,
     letterSpacing: 1,
     textTransform: 'uppercase',
-    color: colors.accentEnd,
+    color: colors.accentText,
   },
   profileEmail: {
+    fontFamily: Fonts.sans,
     fontSize: 13,
     color: colors.textSecondary,
     marginTop: 2,
@@ -1103,12 +1687,11 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   statValue: {
     fontFamily: Fonts?.serif,
     fontSize: 20,
-    fontWeight: '500',
     color: colors.textPrimary,
   },
   statLabel: {
     fontFamily: Fonts?.mono,
-    fontSize: 10.5,
+    fontSize: 12,
     letterSpacing: 1,
     textTransform: 'uppercase',
     color: colors.textSecondary,
@@ -1133,7 +1716,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   menuRowText: {
     flex: 1,
     fontSize: 15,
-    fontWeight: '500',
+    fontFamily: Fonts.sansMedium,
     color: colors.textPrimary,
   },
   menuBadge: {
@@ -1146,9 +1729,8 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     justifyContent: 'center',
   },
   menuBadgeText: {
-    fontFamily: Fonts?.mono,
-    fontSize: 11,
-    fontWeight: '700',
+    fontFamily: Fonts?.monoMedium,
+    fontSize: 12,
     color: '#fff',
   },
   menuDivider: {
@@ -1165,12 +1747,76 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     paddingVertical: 14,
     borderRadius: 16,
     borderWidth: 1.5,
-    borderColor: '#dc3545',
+    borderColor: colors.signOut,
   },
   signOutText: {
     fontSize: 15,
-    fontWeight: '600',
-    color: '#dc3545',
+    fontFamily: Fonts.sansSemiBold,
+    color: colors.signOut,
+  },
+  // Deliberately quieter than Sign out: a plain, unboxed text link at the very
+  // bottom. Deleting an account is irreversible, so it should take intent to
+  // find rather than sitting there as a second red button to mis-tap.
+  deleteAccountButton: {
+    alignSelf: 'center',
+    paddingVertical: 16,
+    paddingHorizontal: 24,
+  },
+  deleteAccountText: {
+    fontFamily: Fonts.sans,
+    fontSize: 13,
+    color: colors.textSecondary,
+    textDecorationLine: 'underline',
+  },
+  deleteErrorText: {
+    fontFamily: Fonts.sans,
+    fontSize: 13,
+    color: colors.signOut,
+    textAlign: 'center',
+  },
+  legalRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 8,
+    paddingBottom: 8,
+  },
+  // 12px text; the vertical padding makes a ~34px tap row instead of 14px.
+  legalLink: {
+    paddingVertical: 10,
+    fontFamily: Fonts.sans,
+    fontSize: 12,
+    color: colors.textSecondary,
+    textDecorationLine: 'underline',
+  },
+  legalDot: {
+    fontFamily: Fonts.sans,
+    fontSize: 12,
+    color: colors.textFaint,
+  },
+  // The signed-out card is dark glass in both themes, like linkButtonText.
+  legalRowAuth: {
+    paddingTop: 12,
+    paddingBottom: 0,
+  },
+  legalLinkAuth: {
+    color: 'rgba(255,255,255,0.9)',
+  },
+  // "Browse without an account" under the sign-in card, when it is the
+  // app's first screen.
+  browseButton: {
+    alignSelf: 'center',
+    minHeight: 44,
+    justifyContent: 'center',
+    paddingHorizontal: 16,
+    marginTop: 8,
+  },
+  browseText: {
+    fontFamily: Fonts.sansSemiBold,
+    fontSize: 15,
+    color: '#fff',
+    textDecorationLine: 'underline',
   },
 
   // ─── Auth (signed-out) screen — matches web's .auth-screen family ───
@@ -1192,15 +1838,34 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   otpTitle: {
     fontFamily: Fonts?.serif,
     fontSize: 20,
-    fontWeight: '500',
     color: '#fff',
     textAlign: 'center',
   },
   otpSubtitle: {
     fontFamily: Fonts?.sans,
     fontSize: 13,
-    color: 'rgba(255,255,255,0.55)',
+    color: 'rgba(255,255,255,0.9)',
     textAlign: 'center',
+  },
+  otpEmail: {
+    fontFamily: Fonts?.sansBold,
+    fontSize: 14,
+    color: '#fff',
+    textAlign: 'center',
+  },
+  // The card is dark in both themes, so these are fixed rather than themed.
+  otpNotice: {
+    fontFamily: Fonts?.sans,
+    fontSize: 13,
+    lineHeight: 18,
+    color: 'rgba(255,255,255,0.8)',
+    textAlign: 'center',
+  },
+  otpNoticeError: {
+    color: '#ffb4a8',
+  },
+  ctaDisabled: {
+    opacity: 0.5,
   },
 
   // Sign-out confirmation sheet.
@@ -1243,12 +1908,11 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     backgroundColor: colors.accentLight,
   },
   kickerOnDark: {
-    fontFamily: Fonts?.mono,
-    fontSize: 11,
+    fontFamily: Fonts?.monoMedium,
+    fontSize: 12,
     letterSpacing: 1.5,
     textTransform: 'uppercase',
-    color: 'rgba(255,255,255,0.6)',
-    fontWeight: '600',
+    color: 'rgba(255,255,255,0.9)',
   },
   // Prototype's hero: serif 48px / line-height 0.98 / letter-spacing -0.03em.
   authHeadline: {
@@ -1294,8 +1958,8 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   roleBtnText: {
     fontSize: 14,
-    fontWeight: '600',
-    color: 'rgba(255,255,255,0.5)',
+    fontFamily: Fonts.sansSemiBold,
+    color: 'rgba(255,255,255,0.9)',
   },
   roleBtnTextActive: {
     color: '#fff',
@@ -1319,6 +1983,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     borderColor: 'rgba(255,255,255,0.10)',
     backgroundColor: 'rgba(255,255,255,0.06)',
     color: '#f5f0e8',
+    fontFamily: Fonts.sans,
     fontSize: 14,
   },
   fieldEye: {
@@ -1336,7 +2001,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   ctaPillText: {
     fontSize: 15,
-    fontWeight: '700',
+    fontFamily: Fonts.sansBold,
     color: '#fff',
   },
   divider: {
@@ -1350,8 +2015,9 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.10)',
   },
   dividerText: {
+    fontFamily: Fonts.sans,
     fontSize: 12,
-    color: 'rgba(255,255,255,0.4)',
+    color: 'rgba(255,255,255,0.9)',
   },
   // Prototype's role-context / "Forgot?" row: 12.5px, space-between, 4px
   // inset so it lines up with the fields rather than the card edge.
@@ -1367,13 +2033,14 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     // "Forgot?" off the card.
     flexShrink: 1,
     fontFamily: Fonts?.sans,
-    fontSize: 12.5,
-    color: 'rgba(255,235,210,0.7)',
+    fontSize: 13,
+    color: 'rgba(255,235,210,0.95)',
   },
   accessForgot: {
     fontFamily: Fonts?.sansBold,
-    fontSize: 12.5,
-    color: colors.accentLight,
+    fontSize: 13,
+    color: '#fff',
+    textDecorationLine: 'underline',
   },
 
   // Web's .social-buttons: `grid-template-columns: 1fr 1fr; gap: 8px`.
@@ -1385,6 +2052,9 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     flexWrap: 'wrap',
     gap: 8,
   },
+  // Every button the same height with its label on one line: the long
+  // email-code label wrapped to 2-4 lines and made its row taller than the
+  // first (60px vs 45px on a phone, 96px on a 280px Fold cover screen).
   socialButton: {
     width: '47%',
     flexGrow: 1,
@@ -1392,12 +2062,18 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
+    minHeight: 48,
     paddingVertical: 11,
     paddingHorizontal: 12,
     borderRadius: Radii.md,
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.10)',
     backgroundColor: 'rgba(255,255,255,0.06)',
+  },
+  // Under 300px of card (a Fold cover screen) the labels no longer fit two
+  // across, so each button takes its own row.
+  socialButtonFull: {
+    width: '100%',
   },
   socialLabel: {
     // Shrinks and wraps inside the half-width cell instead of overflowing it.
@@ -1406,21 +2082,29 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     fontSize: 13,
     color: '#f5f0e8',
   },
+  // Same position as a 4px top padding, with a target tall enough to tap.
   linkButton: {
     alignItems: 'center',
-    paddingTop: 4,
+    paddingTop: 12,
+    marginTop: -8,
+    paddingBottom: 12,
+    marginBottom: -12,
   },
   linkButtonText: {
+    fontFamily: Fonts.sans,
     fontSize: 13,
-    color: 'rgba(255,255,255,0.5)',
+    color: 'rgba(255,255,255,0.9)',
   },
+  // "Sign up" is how a new person gets in: white and underlined, because
+  // orange on this gradient's orange end could hardly be read.
   linkButtonTextStrong: {
-    color: colors.accentLight,
-    fontWeight: '600',
+    color: '#fff',
+    fontFamily: Fonts.sansBold,
+    textDecorationLine: 'underline',
   },
   // Resend link while the 30s lock is counting down.
   linkButtonTextMuted: {
-    color: 'rgba(255,255,255,0.3)',
+    color: 'rgba(255,255,255,0.7)',
   },
 
 });

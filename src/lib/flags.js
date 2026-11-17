@@ -5,7 +5,7 @@
 
 const DEFAULTS = {
   aiSearch: true,           // Feature B — natural-language search parsing
-  aiAssistant: true,        // Feature C — per-listing buyer chat
+  aiAssistant: false,       // Feature C — per-listing buyer chat; parked 2026-11-04 (DECISIONS.md C2)
   autoTranslate: true,      // Feature E — language-tab listing translation
 }
 

@@ -1,7 +1,9 @@
 import { useEffect, useId, useState } from 'react';
+import { AppState } from 'react-native';
 
 import { useAuth } from '@/contexts/auth-context';
 import { supabase } from '@/lib/supabase';
+import { createCatchUp } from '@/src/features/messaging/lib/catchUp';
 
 /**
  * Total unread message count across all of the current user's conversations
@@ -28,11 +30,22 @@ export function useUnreadMessages(): number {
       return;
     }
 
+    // Only the newest refresh may set the count, and none after this account
+    // signs out: realtime fires refreshes that can finish out of order.
+    let active = true;
+    let latest = 0;
     const refresh = async () => {
-      const { data } = await supabase
+      const run = ++latest;
+      const { data, error } = await supabase
         .from('conversations')
         .select('client_id, agent_id, unread_for_client, unread_for_agent')
-        .or(`client_id.eq.${user.id},agent_id.eq.${user.id}`);
+        // Only conversations with something unread on this user's side: the
+        // badge needs no other rows, so the read stays small for anyone.
+        .or(`and(client_id.eq.${user.id},unread_for_client.gt.0),and(agent_id.eq.${user.id},unread_for_agent.gt.0)`)
+        .limit(1000);
+      if (!active || run !== latest) return;
+      // A failed read keeps the last count rather than hiding unread messages.
+      if (error) return;
 
       const total = (data ?? []).reduce((sum, c) => {
         const mine = c.client_id === user.id ? c.unread_for_client : c.unread_for_agent;
@@ -43,12 +56,19 @@ export function useUnreadMessages(): number {
 
     refresh();
 
+    // Re-sum after a reconnect or a return to the foreground: realtime does
+    // not replay the changes missed meanwhile (AUDIT-024).
+    const catchUp = createCatchUp(refresh);
+    const appStateSub = AppState.addEventListener('change', catchUp.onAppState);
+
     const channel = supabase
       .channel(`unread-messages-${instanceId}`)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'conversations' }, refresh)
-      .subscribe();
+      .subscribe((status) => catchUp.onStatus(status));
 
     return () => {
+      active = false;
+      appStateSub.remove();
       supabase.removeChannel(channel);
     };
     // Depends on user.id (a stable primitive), not the user object — matches

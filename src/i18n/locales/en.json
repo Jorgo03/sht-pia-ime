@@ -2,6 +2,7 @@
   "common": {
     "appName": "Shtëpia.ime",
     "loading": "Loading...",
+    "loadMore": "Load more",
     "error": "Error",
     "save": "Save",
     "cancel": "Cancel",
@@ -25,7 +26,11 @@
     "toggleTheme": "Toggle theme",
     "previous": "Previous",
     "next": "Next",
-    "retry": "Retry"
+    "retry": "Retry",
+    "done": "Done",
+    "language": "Language",
+    "closeKeyboard": "Closes the keyboard",
+    "addShort": "Add"
   },
   "auth": {
     "roleClient": "Client",
@@ -43,8 +48,8 @@
     "forgotPassword": "Forgot your password?",
     "accessClient": "Buyer & renter access",
     "accessAgent": "Agent portal access",
-    "forgotShort": "Forgot?",
-    "resetSent": "Check your email to reset your password.",
+    "forgotShort": "Forgot password?",
+    "resetSent": "If an account exists for this email, we've sent it a code to reset the password.",
     "recoveryTitle": "Set a new password",
     "recoverySubtitle": "Choose a new password for your account.",
     "newPassword": "New password",
@@ -78,7 +83,28 @@
     "heroSignUpPre": "Start",
     "heroSignUpEm": "finding home",
     "heroSignUpPost": "today.",
-    "resendIn": "Resend in {{s}}s"
+    "resendIn": "Resend in {{s}}s",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "codeDigit": "Digit {{n}} of 6",
+    "newCodeSent": "A new code was sent. Earlier codes no longer work.",
+    "forgotTitle": "Reset your password",
+    "forgotSubtitle": "Enter your account's email. We'll send you a 6-digit code.",
+    "resetCodeSent": "If an account exists for {{email}}, we've sent it a 6-digit code.",
+    "backToSignIn": "Back to sign in",
+    "confirmFirst": "Confirm your email first: enter the code we sent you, or ask for a new one.",
+    "signupCodeHint": "Already opened the link in the email? Then your email is confirmed — sign in.",
+    "emailCode": "Email code",
+    "verifyEmailTitle": "Verify Your Email",
+    "verifyEmailSubtitle": "We've sent a 6-digit verification code to your email address.",
+    "verifyAccount": "Verify Account",
+    "codeExpiresIn": "Code expires in {{time}}",
+    "officeName": "Office Name",
+    "continue": "Continue",
+    "checkInbox": "Check your email",
+    "usePassword": "Password",
+    "spamHint": "If you haven't received the email, check your Spam/Junk folder or request a new code.",
+    "browseWithoutAccount": "Browse without an account"
   },
   "addSheet": {
     "openLabel": "Create new",
@@ -143,7 +169,35 @@
     "matched": "Matched to your taste",
     "seeAll": "See all →",
     "searchPlaceholder": "City, neighborhood, postcode…",
-    "country": "Albania"
+    "country": "Albania",
+    "heroPhrases": [
+      {
+        "lead": "The right property",
+        "accent": "starts here."
+      },
+      {
+        "lead": "Find the property",
+        "accent": "that fits you."
+      },
+      {
+        "lead": "The right investment,",
+        "accent": "in the right place."
+      },
+      {
+        "lead": "Your business deserves",
+        "accent": "the right address."
+      },
+      {
+        "lead": "Turn opportunity",
+        "accent": "into investment."
+      },
+      {
+        "lead": "Discover",
+        "accent": "your next opportunity."
+      }
+    ],
+    "exploreCities": "Explore by city",
+    "agencies": "Agencies and agents"
   },
   "search": {
     "title": "Search properties",
@@ -207,7 +261,27 @@
     "surface": "Surface area",
     "minArea": "Min m²",
     "maxArea": "Max m²",
-    "rangeInvalid": "Minimum must be lower than maximum"
+    "rangeInvalid": "Minimum must be lower than maximum",
+    "zone": "Neighborhood",
+    "reference": "Reference",
+    "referenceInvalid": "A reference has 8 letters or digits, e.g. SH-1A2B3C4D.",
+    "rangeMin": "Min",
+    "rangeMax": "Max",
+    "showHomesAny": "Show homes",
+    "saveSearch": "Save this search",
+    "searchSaved": "Saved · Alerts on",
+    "panel": {
+      "title": "Filter homes",
+      "clearAll": "Clear all filters",
+      "showOnMap": "Show on map",
+      "showList": "Show list",
+      "otherFilters": "Other filters",
+      "moreFilters": "More filters",
+      "fewerFilters": "Fewer filters",
+      "refPlaceholder": "ID / Keyword",
+      "results": "Showing {{shown}} of {{total}} results",
+      "removeFilter": "Remove filter {{name}}"
+    }
   },
   "detail": {
     "forSale": "For Sale",
@@ -222,7 +296,17 @@
     "area": "Area",
     "year": "Year",
     "chatInApp": "Chat",
-    "share": "Share"
+    "share": "Share",
+    "owner": "Owner",
+    "linkCopied": "Link copied",
+    "unavailable": "This listing is no longer available",
+    "unavailableHint": "It may have been sold, rented out or removed by the agent.",
+    "reference": "Ref.",
+    "publishedBy": "Published by",
+    "video": "Video",
+    "videoFailed": "The video couldn't be played.",
+    "priceHistory": "Price history",
+    "priceListed": "First price"
   },
   "favourites": {
     "title": "Favorites",
@@ -230,14 +314,15 @@
     "savedCount_one": "{{count}} saved · organized for you",
     "savedCount_other": "{{count}} saved · organized for you",
     "headlineEm": "shortlist",
-    "backToProfile": "← Back to profile",
+    "backToProfile": "Back to profile",
     "empty": "No favorites yet. Tap the heart icon on a property to save it.",
     "emptyDescription": "Tap the heart icon on a property to save it",
     "loginPrompt": "Sign in to see your favorites",
     "loginCta": "Sign In",
     "remove": "Remove",
     "kicker": "FAVORITES",
-    "headlinePre": "Your"
+    "headlinePre": "Your",
+    "loadFailed": "Your saved homes couldn't be loaded."
   },
   "messages": {
     "subtitle": "Conversations with agents",
@@ -258,13 +343,18 @@
     "inputPlaceholder": "Write a message…",
     "noMessages": "No messages yet — say hello!",
     "loginPrompt": "Sign in to see your messages",
-    "sendFailed": "Message not sent — try again"
+    "sendFailed": "Message not sent — try again",
+    "unavailable": "This conversation is not available",
+    "loadFailed": "Couldn't load this conversation.",
+    "attachFailed": "The file wasn't sent. Try again.",
+    "openAttachment": "Open {{name}}",
+    "selectConversation": "Choose a conversation from the list."
   },
   "property": {
-    "beds": "beds",
+    "beds": "Bedrooms",
     "bedsCount_one": "bed",
     "bedsCount_other": "beds",
-    "baths": "baths",
+    "baths": "Bathrooms",
     "bathsCount_one": "bath",
     "bathsCount_other": "baths",
     "sqft": "m²",
@@ -279,7 +369,8 @@
     "similar": "Similar properties",
     "video": "Video tour",
     "perDay": "/day",
-    "forDailyRent": "Daily Rent"
+    "forDailyRent": "Daily Rent",
+    "publishedOn": "Published {{date}}"
   },
   "notFound": {
     "title": "Page not found",
@@ -307,10 +398,33 @@
     "imageUploadFailed": "Image upload failed — try again",
     "updateFailed": "Update failed — try again",
     "oauthFailed": "Sign-in with the provider failed — try again",
-    "invalidCode": "The code is wrong or has expired",
+    "invalidCode": "The code is wrong or no longer valid. Use the most recent code we sent.",
     "videoInvalidType": "Only MP4 or MOV videos are allowed",
     "videoTooLarge": "Video is too large (max {{max}} MB)",
-    "emailSendFailed": "We could not send the confirmation email. This is a server configuration problem, not a problem with your account — please contact the administrator."
+    "emailSendFailed": "We couldn't send the verification code. Please try again in a few minutes.",
+    "waitSeconds": "Wait {{s}} seconds before asking for a new code.",
+    "photoPrepareFailed": "A photo couldn't be prepared for upload. Try again or choose a different photo.",
+    "listingSaveFailed": "The listing wasn't saved. Everything you entered is still here; try again.",
+    "network": "Couldn't reach the server. Check your connection and try again.",
+    "sessionExpired": "Your session has ended. Please sign in again.",
+    "passwordSame": "Choose a password different from your current one.",
+    "passwordPwned": "This password has appeared in a data breach. Please choose another one.",
+    "passwordWeak": "This password is too simple. Mix letters, numbers and symbols.",
+    "passwordTooLong": "That password is too long. Use at most 72 characters.",
+    "reauthNeeded": "For your security, confirm it's you with a code from your email first.",
+    "signupDisabled": "New accounts can't be created right now.",
+    "linkExpired": "This link has expired or has already been used. Ask for a new code.",
+    "linkInvalid": "This link isn't valid. Ask for a new code.",
+    "linkOtherDevice": "This link was opened in a different browser from the one you asked in. Enter the 6-digit code from the email instead.",
+    "currentPasswordWrong": "Your current password is incorrect.",
+    "providerUnavailable": "This sign-in option isn't available yet. Please choose another one.",
+    "loadFailed": "Couldn't load this. Check your connection and try again.",
+    "offline": "You're offline. Things will load again when you're back online.",
+    "tooManyAttempts": "Too many wrong attempts. Try again in {{seconds}} seconds.",
+    "codeIncorrect": "Incorrect verification code. Please try again.",
+    "codeExpired": "Your verification code has expired. Please request a new one.",
+    "codeAttempts": "Too many incorrect attempts. Please request a new code.",
+    "officeRequired": "Please enter your office name."
   },
   "agentDashboard": {
     "title": "Agent Dashboard",
@@ -327,19 +441,50 @@
     "noPendingViewings": "No pending requests",
     "wantedFeed": "Buyers looking now",
     "wantedFeedSub": "Open requests",
-    "wantedEmpty": "No open buyer requests right now"
+    "wantedEmpty": "No open buyer requests right now",
+    "today": "Today",
+    "todayEmpty": "No viewings today.",
+    "matches_one": "{{count}} of your listings matches",
+    "matches_other": "{{count}} of your listings match",
+    "noMatches": "None of your listings match yet",
+    "showMatches": "Show",
+    "hideMatches": "Hide"
   },
   "profile": {
     "savedSearches": "Saved searches",
     "statSaved": "Saved",
     "statSearches": "Searches",
     "statListings": "Listings",
-    "statViewings": "Viewings"
+    "statViewings": "Viewings",
+    "edit": {
+      "title": "Edit profile",
+      "phone": "Phone number",
+      "phoneHintAgent": "Shown on your agent page so people can call or WhatsApp you. Each listing keeps its own contact number. Include the country code, e.g. +355.",
+      "phoneHintClient": "Only agents you message or book a viewing with can see it.",
+      "nameRequired": "Enter your name.",
+      "tooLong": "One of the fields is too long.",
+      "phoneInvalid": "That doesn't look like a phone number. Use digits, spaces and a leading +.",
+      "failed": "Your changes weren't saved. Try again.",
+      "photo": "Profile photo",
+      "changePhoto": "Change photo",
+      "removePhoto": "Remove photo",
+      "photoType": "Choose a JPEG, PNG or WebP photo.",
+      "photoSize": "That photo is too large. Choose one under 15 MB.",
+      "photoFailed": "The photo wasn't saved. Try again.",
+      "photoPermission": "Allow photo access in your phone's settings to choose a photo."
+    }
   },
   "account": {
     "welcomeBack": "Welcome back, {{name}} 👋",
     "myListings": "My Listings",
-    "settings": "Settings"
+    "settings": "Settings",
+    "deleteAccount": "Delete account",
+    "deleteConfirmBody": "This permanently deletes your profile, listings, photos, favourites, saved searches and messages. This cannot be undone.",
+    "deleteConfirmCta": "Delete permanently",
+    "deleteFailed": "Could not delete your account. Please try again.",
+    "downloadData": "Download my data",
+    "downloadDataBusy": "Preparing your data…",
+    "downloadDataFailed": "Could not download your data. Please try again."
   },
   "listing": {
     "newListing": "New Listing",
@@ -353,7 +498,7 @@
     "activate": "Activate",
     "delete": "Delete",
     "required": "This field is required",
-    "minImages": "Minimum 3 images required",
+    "minImages": "At least {{min}} photo required",
     "listingType": "Listing type",
     "title": "Title",
     "titlePlaceholder": "e.g. Modern 2+1 apartment in Blloku",
@@ -416,9 +561,35 @@
     "draftRestored": "Draft restored — continue where you left off. Photos need re-adding.",
     "discardDraft": "Start fresh",
     "pinLocation": "Pin the location",
-    "mapHint": "Tap the map to set the property location",
+    "latitude": "Latitude",
+    "longitude": "Longitude",
     "videoUpload": "Property video",
-    "dropVideo": "Drag a video here or click (MP4 or MOV)"
+    "dropVideo": "Drag a video here or click (MP4 or MOV)",
+    "roadNeedsCity": "Select a city to see its roads.",
+    "roadNoResults": "No roads found. You can type your own.",
+    "dragMarker": "Drag the marker",
+    "pinOrderHint": "Select the road first, then place the marker on the map.",
+    "pinAdjustHint": "Drag the marker to the exact location of the property.",
+    "edit": "Edit",
+    "editListing": "Edit listing",
+    "saveChanges": "Save changes",
+    "currentVideo": "Current video",
+    "markSold": "Mark as sold",
+    "markRented": "Mark as rented",
+    "zone": "Neighborhood",
+    "zoneNone": "No neighborhood",
+    "fileSizeMb": "{{size}} MB",
+    "removePhoto": "Remove photo",
+    "removeVideo": "Remove video",
+    "confirmSoldTitle": "Mark as sold?",
+    "confirmRentedTitle": "Mark as rented?",
+    "confirmClosedHint": "Only do this once the deal is complete. It counts in your report; undone within 7 days, it does not.",
+    "actionView": "View",
+    "actionStats": "Stats",
+    "actionSold": "Sold",
+    "actionRented": "Rented",
+    "pinOutsideAlbania": "The pin is outside Albania. Place it where the property is.",
+    "pinOutsideCity": "The pin is outside the {{city}} municipality. Move it, or choose the right city."
   },
   "dashboard": {
     "title": "Property Dashboard",
@@ -433,6 +604,8 @@
   "map": {
     "openInMaps": "Open in Google Maps",
     "mapView": "Map",
+    "webUnavailableTitle": "Map view",
+    "webUnavailableHint": "Interactive map is available in the mobile app. Browse listings as a list instead.",
     "gridView": "Grid"
   },
   "floorPlan": {
@@ -448,7 +621,10 @@
   },
   "authCallback": {
     "signingIn": "Signing you in…",
-    "preparingMatches": "Preparing your matches…"
+    "preparingMatches": "Preparing your matches…",
+    "returning": "Returning you to the app…",
+    "openApp": "Open the app",
+    "tapHint": "If nothing happened, tap the button above."
   },
   "ai": {
     "errorUnavailable": "AI is unavailable right now — please write manually.",
@@ -461,7 +637,9 @@
     "regenerateTranslation": "Translate again",
     "translationFailed": "Translation failed. Please try again.",
     "translationNotConfigured": "Translation is not configured on the server. Contact the administrator.",
-    "translationBasic": "Basic translation — check it before publishing"
+    "translationBasic": "Basic translation — check it before publishing",
+    "translationPartialTitle": "Saved, with some languages missing",
+    "translationPartial": "Your listing was saved. Automatic translation didn't work for: {{langs}}. Open the listing and tap a language to try again."
   },
   "assistant": {
     "title": "Listing assistant",
@@ -471,7 +649,10 @@
     "placeholder": "Ask a question…",
     "thinking": "Thinking…",
     "unavailable": "I can't answer right now. Please contact the seller via the listing page.",
-    "disclaimer": "AI answers are based only on listing data — verify important details with the seller."
+    "disclaimer": "AI answers are based only on listing data — verify important details with the seller.",
+    "contactTitle": "Ask the seller directly",
+    "notInListing": "The listing doesn’t say.",
+    "viewProfile": "Profile"
   },
   "viewings": {
     "title": "Viewings",
@@ -481,9 +662,12 @@
     "requestTitle": "Request a",
     "requestTitleEm": "viewing",
     "when": "When?",
+    "tiranaTime": "Tirana time",
+    "pickInTiranaTime": "Times are in Tirana time, where the property is.",
     "request": "Send request",
     "requestSuccess": "Request sent — you'll be notified once it's confirmed",
     "requestFailed": "Request failed — try again",
+    "slotTaken": "That time is already taken. Please pick another time.",
     "pastDate": "Pick a date in the future",
     "empty": "No viewings yet",
     "emptyHint": "Request one from any property page",
@@ -497,8 +681,12 @@
       "requested": "Requested",
       "confirmed": "Confirmed",
       "declined": "Declined",
-      "cancelled": "Cancelled"
-    }
+      "cancelled": "Cancelled",
+      "completed": "Completed",
+      "no_show": "No-show"
+    },
+    "markCompleted": "Completed",
+    "markNoShow": "No-show"
   },
   "saved": {
     "kicker": "Searches & requests",
@@ -512,8 +700,8 @@
     "emptyWantedHint": "Post what you're looking for with the button above",
     "run": "Run search",
     "delete": "Delete",
-    "alertsOn": "Turn alerts on",
-    "alertsOff": "Turn alerts off",
+    "alertsOn": "Show new matches",
+    "alertsOff": "Stop showing new matches",
     "markClosed": "Mark as found",
     "markOpen": "Reopen",
     "wantedStatus": {
@@ -521,7 +709,14 @@
       "closed": "Closed"
     },
     "newSearch": "New saved search",
-    "newWanted": "New wanted post"
+    "newWanted": "New wanted post",
+    "newMatches": "{{n}} more than last time",
+    "alertsHint": "We'll notify you when new homes match. Email alerts are not available yet.",
+    "emailOn": "Email me new matches",
+    "emailOff": "Stop emailing me",
+    "emailHint": "New matches show up here when you open this page. Turn on email to get them by email too; every email has a link to stop.",
+    "confirmDeleteSearch": "Delete this saved search?",
+    "confirmDeleteWanted": "Delete this request?"
   },
   "bell": {
     "label": "Notifications",
@@ -531,6 +726,599 @@
   },
   "wanted": {
     "describePlaceholder": "Describe what you want… e.g. \"2-bed apartment in Tirana up to €150k\"",
-    "matchesNow": "Listings matching right now: {{n}}"
+    "matchesNow": "Listings matching right now: {{n}}",
+    "boardPre": "Homes",
+    "boardEm": "wanted",
+    "boardIntro": "Can't find the home you want? Tell us your budget, city and rooms. Agents see the requests, and we let you know as soon as a matching home is published.",
+    "postCta": "Post what you're looking for",
+    "agentHint": "When you publish a listing that fits a request, the buyer is told automatically.",
+    "step1": "Write the city, type, budget and rooms you need.",
+    "step2": "Agents see your request and look for you.",
+    "step3": "Get a notification as soon as a home that fits is listed.",
+    "homeSub": "Say what you want, agents find you",
+    "homeTitle": "Wanted homes"
+  },
+  "legal": {
+    "privacyPolicy": "Privacy Policy",
+    "termsOfService": "Terms of Service",
+    "lastUpdated": "Last updated {{date}}",
+    "languageNote": "This document is available in Albanian and English. The English version is shown below; the Albanian version prevails.",
+    "cookiePolicy": "Cookie policy",
+    "buyingGuide": "Buying from abroad",
+    "buyingGuideHint": "Steps, documents and how to stay safe"
+  },
+  "safety": {
+    "reportListing": "Report this listing",
+    "reportUser": "Report this user",
+    "blockUser": "Block user",
+    "unblockUser": "Unblock user",
+    "menu": "More options",
+    "reportTitle": "What is wrong?",
+    "reason": {
+      "spam": "Spam",
+      "scam": "Scam or fraud",
+      "wrong_info": "Wrong information",
+      "unavailable": "No longer available",
+      "offensive": "Offensive content",
+      "other": "Something else",
+      "inappropriate": "Inappropriate behaviour",
+      "fake_account": "Fake account",
+      "fraud": "Fraud or suspicious activity",
+      "harassment": "Harassment"
+    },
+    "detailsPlaceholder": "Anything else we should know? (optional)",
+    "send": "Send report",
+    "sent": "Thank you. We will look into it.",
+    "already": "You have already reported this.",
+    "failed": "The report could not be sent. Try again.",
+    "blockConfirm": "Are you sure you want to block {{name}}? You won't be able to message each other until you unblock them.",
+    "blocked": "You blocked this user. They cannot message you.",
+    "cannotMessage": "You can't send messages to this user.",
+    "blockedBadge": "Blocked",
+    "signInToReport": "Sign in to report.",
+    "blockedUsers": "Blocked users",
+    "noBlocked": "You haven't blocked anyone."
+  },
+  "notifications": {
+    "title": "Notifications",
+    "off": "Notifications are off on this phone.",
+    "turnOn": "Turn on notifications",
+    "enabled": "Notifications are on for this phone.",
+    "denied": "Notifications are turned off in your phone's settings.",
+    "openSettings": "Open settings",
+    "unavailable": "Notifications don't work in this version of the app yet.",
+    "messages": "New messages",
+    "viewings": "Viewing requests and changes",
+    "saveFailed": "Your choice wasn't saved. Try again.",
+    "privacy": "A notification only says who wrote to you or what happened to a viewing, never the message text.",
+    "web": "Notifications only arrive in the phone app.",
+    "registering": "Connecting this phone for notifications…",
+    "registerFailed": "Permission is on, but this phone couldn't be connected for notifications. Try again.",
+    "settingsHint": "Open your phone's Settings, choose Shtëpia.ime and turn on Notifications.",
+    "prefsNote": "These choices are saved to your account. This phone won't get notifications until you turn them on.",
+    "loadFailed": "Couldn't load your notifications.",
+    "saving": "Saving…",
+    "all": "All",
+    "unread": "Unread",
+    "read": "Read",
+    "unreadTag": "Unread",
+    "markRead": "Mark as read",
+    "markAll": "Mark all as read",
+    "loadMore": "Load more",
+    "headlinePre": "Your",
+    "headlineEm": "notifications",
+    "empty": "No notifications yet",
+    "emptyHint": "New messages, viewings and changes to your properties will appear here.",
+    "emptyUnread": "Nothing unread",
+    "emptyRead": "No read notifications",
+    "inviteTitle": "Don't miss a reply",
+    "inviteBody": "Turn on notifications to know right away when someone writes to you or a viewing changes. You can change this any time in Profile.",
+    "inviteLater": "Not now",
+    "kinds": {
+      "message": {
+        "title": "New message",
+        "body": "{{name}} sent you a message",
+        "bodyMany": "{{name}} sent you {{total}} messages",
+        "bodyNoName": "You have a new message"
+      },
+      "inquiry": {
+        "title": "New property inquiry",
+        "body": "{{name}} asked about your property",
+        "bodyNoName": "Someone asked about your property"
+      },
+      "viewing_requested": {
+        "title": "Viewing request",
+        "body": "Someone wants to view your property"
+      },
+      "viewing_updated": {
+        "title": "Viewing update",
+        "confirmed": "Your viewing was confirmed",
+        "declined": "Your viewing was declined",
+        "cancelled": "A viewing was cancelled",
+        "updated": "A viewing was updated"
+      },
+      "listing_hidden": {
+        "title": "Listing hidden",
+        "body": "One of your listings is hidden while we review it"
+      },
+      "listing_restored": {
+        "title": "Listing restored",
+        "body": "Your listing is public again"
+      },
+      "welcome": {
+        "title": "Welcome",
+        "body": "Your account is ready. Search homes or add your own listing."
+      },
+      "saved_search": {
+        "title": "New homes for you",
+        "body": "A new home matches your saved search",
+        "bodyMany": "{{total}} new homes match your saved search"
+      },
+      "wanted_match": {
+        "title": "A home for your request",
+        "body": "A new listing fits the home you asked for"
+      }
+    },
+    "settings": "Notification settings"
+  },
+  "pricing": {
+    "title": "Plans and prices",
+    "subtitle": "Posting listings is free. Plans and promotions are prepaid and never renew by themselves.",
+    "comingSoon": "Prices will be published soon.",
+    "comingSoonHint": "Until then, posting listings stays free.",
+    "loadFailed": "Prices couldn't be loaded.",
+    "kindPlan": "Agency plan",
+    "kindPromotion": "Listing promotion",
+    "period": "Length",
+    "months": "{{n}} months",
+    "perMonth": "≈ {{price}} per month",
+    "listingCap": "Up to {{n}} active listings",
+    "credits": "{{n}} promotions a month included",
+    "prepaid": "Paid once, no automatic renewal",
+    "buy": "Buy",
+    "signInToBuy": "Sign in to buy.",
+    "notYet": "Online payment isn't available yet.",
+    "startFailed": "The payment didn't start. Try again.",
+    "returnedDone": "Thank you. Your plan turns on as soon as the payment provider confirms the payment, usually within a few minutes.",
+    "returnedCancelled": "The payment was cancelled. You were not charged."
+  },
+  "moderation": {
+    "title": "Moderation",
+    "subtitle": "Reports from users about listings and accounts. Hidden listings stay offline until you restore them.",
+    "notAllowed": "This page is only for moderators.",
+    "queue": {
+      "open": "Open",
+      "closed": "Closed"
+    },
+    "loadFailed": "The reports could not be loaded.",
+    "empty": "No open reports. All clear.",
+    "emptyClosed": "No closed reports yet.",
+    "listing": "Listing",
+    "user": "User",
+    "missingTarget": "No longer exists",
+    "hiddenBadge": "Hidden for review",
+    "hide": "Hide listing",
+    "restore": "Restore listing",
+    "markActioned": "Mark as handled",
+    "dismiss": "Dismiss",
+    "note": "Note (optional)",
+    "actionFailed": "That did not work. Try again.",
+    "loadMore": "Load more",
+    "reportedOn": "Reported {{date}}",
+    "status": {
+      "actioned": "Handled",
+      "dismissed": "Dismissed"
+    }
+  },
+  "seo": {
+    "siteTitle": "Shtëpia.ime — Homes for sale and rent in Albania",
+    "siteDescription": "Apartments, villas and offices for sale and rent in Tirana, Durrës and across Albania. Contact agents and owners directly."
+  },
+  "security": {
+    "row": "Password & security",
+    "title": "Change password",
+    "currentPassword": "Current password",
+    "save": "Save new password",
+    "success": "Your password has been changed.",
+    "othersSignedOut": "Your other devices have been signed out.",
+    "forgotCurrent": "Forgot your current password?",
+    "codeIntro": "We'll email a 6-digit code to {{email}}. Enter it here, then choose a new password.",
+    "providerOnly": "You sign in with {{providers}}, so there is no Shtëpia.ime password to change. Your account is protected by your {{providers}} account."
+  },
+  "authConfirm": {
+    "titleEmail": "Confirm your email",
+    "titleRecovery": "Reset your password",
+    "titleEmailChange": "Confirm your new email",
+    "intro": "For your security, continue with the button below.",
+    "ctaEmail": "Confirm and sign in",
+    "ctaRecovery": "Continue",
+    "ctaEmailChange": "Confirm new email",
+    "emailChanged": "Your email address has been updated.",
+    "requestNew": "Request a new code",
+    "goSignIn": "Go to sign in"
+  },
+  "leads": {
+    "kicker": "Your clients",
+    "headlinePre": "Your",
+    "headlineEm": "leads",
+    "search": "Search by name, phone, email…",
+    "add": "Add lead",
+    "addTitle": "New lead",
+    "editTitle": "Edit lead",
+    "all": "All",
+    "status": {
+      "new": "New",
+      "contacted": "Contacted",
+      "qualified": "Qualified",
+      "won": "Won",
+      "lost": "Lost"
+    },
+    "name": "Name",
+    "phone": "Phone",
+    "email": "Email",
+    "notes": "Notes",
+    "notesHint": "e.g. wants a 2-bed in Tirana, up to €150,000",
+    "statusLabel": "Status",
+    "call": "Call",
+    "whatsapp": "WhatsApp",
+    "sendEmail": "Email",
+    "delete": "Delete",
+    "deleteTitle": "Delete this lead?",
+    "deleteBody": "{{name}} will be deleted for good.",
+    "empty": "No leads yet",
+    "emptyHint": "Add everyone who contacts you, so no opportunity slips away.",
+    "noResults": "No lead matches your search.",
+    "nameRequired": "Enter the lead's name.",
+    "tooLong": "One of the fields is too long.",
+    "phoneInvalid": "That doesn't look like a phone number.",
+    "emailInvalid": "That doesn't look like an email address.",
+    "saveFailed": "Couldn't save. Try again.",
+    "deleteFailed": "Couldn't delete. Try again.",
+    "greeting": "Hello {{name}}!",
+    "added": "Added {{date}}"
+  },
+  "aiAssistant": {
+    "title": "AI assistant",
+    "subtitle": "Find real listings, compare them and learn how Shtëpia.ime works.",
+    "intro": "Hi! Tell me what you are looking for and I will find listings on Shtëpia.ime, compare them, or explain how the app works.",
+    "placeholder": "Type a message…",
+    "thinking": "Searching…",
+    "newChat": "New chat",
+    "startersTitle": "Try asking",
+    "starters": {
+      "findApartment": "Find me an apartment",
+      "byBudget": "Search listings within my budget",
+      "compare": "Compare some listings for me",
+      "howItWorks": "How does Shtëpia.ime work?",
+      "publish": "Help me publish a listing"
+    },
+    "error": {
+      "unavailable": "The assistant is not available right now. Please try again a little later.",
+      "rate_limited": "You have asked a lot of questions this hour. Please try again a little later.",
+      "refused": "I can't help with this request.",
+      "network": "Could not connect. Check your internet and try again."
+    },
+    "notSpecified": "Not specified",
+    "disclaimer": "The assistant uses the listings on Shtëpia.ime. Check important details with the agent. This is not financial or legal advice.",
+    "you": "You",
+    "entry": "Ask the AI assistant",
+    "entryHint": "e.g. \"A 2+1 in Tirana up to €150k\"",
+    "alternatives": "Find similar or cheaper listings",
+    "alternativesQuestion": "Find me listings similar to this one, or cheaper.",
+    "compare": {
+      "title": "Comparison",
+      "price": "Price",
+      "pricePerM2": "Price per m²",
+      "area": "Area",
+      "bedrooms": "Bedrooms",
+      "bathrooms": "Bathrooms",
+      "floor": "Floor",
+      "floorOf": "{{floor}} of {{total}}",
+      "location": "Location",
+      "amenities": "Features",
+      "mixedCurrencies": "Different currencies: euro figures are approximate.",
+      "areaNote": "Area as listed (m²); net and gross are not recorded separately.",
+      "best": {
+        "price": "Cheapest",
+        "perM2": "Lowest per m²",
+        "area": "Largest",
+        "beds": "Most bedrooms"
+      }
+    },
+    "screens": {
+      "explore": "Open search",
+      "favorites": "Favourites",
+      "saved_searches": "Saved searches",
+      "messages": "Messages",
+      "viewings": "Viewings",
+      "create_listing": "Publish a listing",
+      "my_listings": "My listings",
+      "agent_dashboard": "Agent dashboard",
+      "leads": "Leads",
+      "profile": "Profile",
+      "privacy": "Privacy policy",
+      "terms": "Terms of use"
+    },
+    "results_one": "{{count}} listing",
+    "results_other": "{{count}} listings"
+  },
+  "time": {
+    "justNow": "just now",
+    "minutesAgo": "{{n}} min ago",
+    "hoursAgo": "{{n}} h ago",
+    "daysAgo": "{{n}} d ago"
+  },
+  "performance": {
+    "entry": "My performance report",
+    "entrySub": "Your results, visible only to you",
+    "kicker": "My report",
+    "headlinePre": "My",
+    "headlineEm": "performance.",
+    "privateNote": "Only you can see this report. It is not compared with other agents and does not appear on your profile.",
+    "agentsOnly": "The performance report is for agents only.",
+    "period": "Period",
+    "periods": {
+      "week": "This week",
+      "month": "This month",
+      "3m": "Last 3 months",
+      "6m": "Last 6 months",
+      "year": "This year",
+      "all": "All time",
+      "custom": "Pick dates"
+    },
+    "from": "From",
+    "to": "To",
+    "customInvalid": "The start date must be on or before the end date.",
+    "sections": {
+      "properties": "My properties",
+      "clients": "My clients",
+      "deals": "Completed transactions",
+      "activity": "My activity",
+      "history": "My progress",
+      "impact": "Shtëpia.ime and my results",
+      "achievements": "My achievements"
+    },
+    "metrics": {
+      "published": "Properties published",
+      "activeNow": "Active now",
+      "pausedNow": "Paused now",
+      "inquiries": "New client inquiries",
+      "clientsAnswered": "Clients contacted",
+      "leadsAdded": "Leads added",
+      "leadsWon": "Leads won",
+      "viewingsScheduled": "Viewings scheduled",
+      "viewingsCompleted": "Viewings completed",
+      "viewingsCancelled": "Viewings cancelled",
+      "sales": "Sales",
+      "rentals": "Rentals",
+      "transactions": "Total",
+      "messagesSent": "Messages sent"
+    },
+    "notes": {
+      "snapshot": "Active and paused show today’s state.",
+      "deals": "Counts the properties you marked as sold or rented. A mark undone within 7 days is not counted. Transaction value is not shown: the app only stores the asking price.",
+      "leadsWon": "Leads won are among those added in this period."
+    },
+    "history": {
+      "since": "On Shtëpia.ime since {{date}}",
+      "listings": "Properties",
+      "transactions": "Transactions",
+      "viewings": "Viewings",
+      "inquiries": "Inquiries",
+      "chartLabel": "{{metric}} per month",
+      "empty": "No activity to show yet."
+    },
+    "impact": {
+      "intro": "Compare the monthly average the app records with your own estimate for the time before Shtëpia.ime.",
+      "disclaimer": "The \"before\" figures are your estimate, not app data. This is a comparison, not proof that Shtëpia.ime caused the change.",
+      "before": "Before (your estimate)",
+      "now": "Now (recorded)",
+      "difference": "Change",
+      "notEntered": "No estimate",
+      "enter": "Add your estimate",
+      "edit": "Edit estimate",
+      "updated": "Your estimate, {{date}}",
+      "rows": {
+        "rentals": "Rentals per month",
+        "sales": "Sales per month",
+        "inquiries": "Client inquiries per month",
+        "viewings": "Viewings completed per month"
+      }
+    },
+    "baseline": {
+      "title": "Before Shtëpia.ime",
+      "hint": "On average, how many per month did you have before using Shtëpia.ime? Leave blank what you do not know.",
+      "confirm": "I confirm these are my own estimates.",
+      "save": "Save estimate",
+      "invalid": "Enter a number from 0 to 1000.",
+      "mustConfirm": "Confirm the estimate before saving it.",
+      "saveFailed": "The estimate was not saved. Try again."
+    },
+    "achievements": {
+      "firstListing": "First property published",
+      "firstTransaction": "First completed transaction",
+      "tenListings": "10 properties published",
+      "tenViewings": "10 viewings completed",
+      "tenTransactions": "10 completed transactions",
+      "progress": "{{value}} of {{target}}",
+      "done": "Reached"
+    }
+  },
+  "agents": {
+    "headlinePre": "Agencies",
+    "headlineEm": "and agents",
+    "searchPlaceholder": "Search by name",
+    "empty": "No agencies yet",
+    "emptyHint": "Agencies appear here once they publish a listing.",
+    "noResults": "No one by that name",
+    "loadMore": "Load more"
+  },
+  "compare": {
+    "add": "Compare",
+    "added": "In comparison",
+    "open": "Compare · {{total}}",
+    "headlinePre": "Compare",
+    "headlineEm": "homes",
+    "empty": "No homes to compare yet",
+    "emptyHint": "Open a home and tap Compare. You can add up to three.",
+    "browse": "Browse homes",
+    "remove": "Remove from comparison",
+    "clear": "Clear comparison",
+    "addAnother": "Add a home",
+    "yearBuilt": "Year built",
+    "type": "Type",
+    "loadFailed": "The comparison couldn't be loaded.",
+    "yes": "Yes",
+    "no": "No"
+  },
+  "nearMe": {
+    "button": "Near me",
+    "denied": "Allow location in your phone settings to see homes near you.",
+    "failed": "We couldn't find your location. Please try again."
+  },
+  "import": {
+    "headlinePre": "Import",
+    "headlineEm": "listings",
+    "entry": "Import listings",
+    "intro": "Upload a CSV file with your office's listings. You will see the result before anything is published.",
+    "pick": "Choose CSV file",
+    "required": "Required columns",
+    "optional": "Optional columns",
+    "valuesHint": "lloji: shitje, qira or ditore. tipi: apartament, shtepi, vile, toke, biznes, zyre or garazh.",
+    "photosHint": "Photos: https links separated by |. Features are separated by | too.",
+    "rightsHint": "Only import listings and photos you have the right to publish.",
+    "ready": "ready to publish",
+    "withErrors": "with errors",
+    "publish": "Publish {{total}}",
+    "chooseAnother": "Choose another file",
+    "publishing": "Publishing {{done}} of {{total}}",
+    "doneBody": "{{ok}} published.",
+    "doneFailed": "{{total}} could not be published. Upload the file again: those already published are skipped.",
+    "another": "Import another file",
+    "agentsOnly": "Importing is for agents only.",
+    "fileTooBig": "The file is too large (2 MB maximum).",
+    "fileExcel": "This is an Excel file. Save it as CSV and try again.",
+    "fileEmpty": "The file is empty.",
+    "missingColumns": "Missing columns: {{list}}",
+    "tooMany": "Maximum {{max}} listings per file.",
+    "readFailed": "The file couldn't be read. Please try again.",
+    "line": "Row {{n}}",
+    "more": "and {{total}} more",
+    "err": {
+      "required": "Missing: {{field}}",
+      "invalid": "Invalid: {{field}}",
+      "duplicate": "Already exists",
+      "encoding": "Damaged characters. Save as CSV UTF-8."
+    }
+  },
+  "publicProfile": {
+    "agent": "Real estate agent",
+    "unnamed": "User",
+    "published": "Published properties: {{n}}",
+    "listingsTitle": "Properties published by this user",
+    "empty": "No properties published yet.",
+    "unavailable": "This profile is not available.",
+    "listingsFailed": "Couldn't load the properties.",
+    "open": "Open {{name}}'s profile",
+    "call": "Call {{phone}}"
+  },
+  "locations": {
+    "noMatch": "No place matches"
+  },
+  "currency": {
+    "title": "Show prices in",
+    "asListed": "As listed",
+    "asListedShort": "Original",
+    "converted": "Approximate, at today's rate. Listed price: {{price}}"
+  },
+  "site": {
+    "nav": {
+      "search": "Search",
+      "agencies": "Agencies"
+    },
+    "listHome": "List your home",
+    "menu": "Menu",
+    "hero": {
+      "eyebrow": "Homes in Albania, wherever you are",
+      "title": "Find the right home",
+      "titleEm": "in Albania.",
+      "lead": "Apartments, villas and offices for sale and rent, in your language. Talk directly to agents and owners."
+    },
+    "stats": {
+      "listings": "Active listings",
+      "cities": "Cities with listings",
+      "agencies": "Agencies and agents",
+      "title": "Shtëpia.ime in numbers",
+      "body": "Real numbers, read straight from the homes published today."
+    },
+    "listings": {
+      "eyebrow": "Just listed",
+      "title": "Latest homes"
+    },
+    "steps": {
+      "eyebrow": "How it works",
+      "title": "From search to keys, step by step",
+      "search": {
+        "title": "Search",
+        "body": "Filter by city, neighbourhood, price and rooms, in a list or on the map."
+      },
+      "compare": {
+        "title": "Compare",
+        "body": "Put up to three homes side by side and see each one's price history."
+      },
+      "visit": {
+        "title": "Visit",
+        "body": "Book a viewing or message the agent in the app, on WhatsApp or by phone."
+      },
+      "buy": {
+        "title": "Buy safely",
+        "body": "Follow our guide and use a licensed lawyer and notary for the legal steps."
+      }
+    },
+    "services": {
+      "eyebrow": "What you get",
+      "title": "Everything to find your home, in one place",
+      "wanted": {
+        "title": "Wanted homes",
+        "body": "Say what you want and we tell you when a matching home is listed."
+      },
+      "priceHistory": {
+        "title": "Price history",
+        "body": "See how each listing's price has changed since it was published."
+      },
+      "currency": {
+        "title": "Prices in your currency",
+        "body": "See prices in lek, euro, dollars or pounds, at the daily rate."
+      },
+      "viewings": {
+        "title": "Viewings in one click",
+        "body": "Pick a time, the agent confirms it and you get notified."
+      },
+      "chat": {
+        "title": "Direct chat",
+        "body": "Message the agent or owner, with photos, without a middleman."
+      },
+      "guide": {
+        "title": "Buying from abroad",
+        "body": "The steps, the documents and how to stay safe when buying from afar."
+      }
+    },
+    "cities": {
+      "eyebrow": "Cities"
+    },
+    "cta": {
+      "title": "Ready to find your home?",
+      "body": "Search for free, or list your property for free and reach buyers in Albania and abroad.",
+      "search": "Search homes"
+    },
+    "footer": {
+      "explore": "Explore",
+      "sell": "Sell or rent out",
+      "legal": "Legal",
+      "tagline": "Albania's property marketplace, in your language.",
+      "copyright": "© {{year}} Jorgji Dhaskali. All rights reserved.",
+      "contact": "Contact"
+    },
+    "agentsOnly": "This page is for agents only."
   }
 }

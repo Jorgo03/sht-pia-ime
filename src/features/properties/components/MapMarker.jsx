@@ -1,5 +1,6 @@
 import L from 'leaflet'
 import { formatCompactPrice } from '../../../lib/format'
+import { escapeHtml } from '../../../lib/escapeHtml'
 
 const COLORS = {
   sale: '#FF7A40',
@@ -43,15 +44,15 @@ const priceIconCache = {}
  * and use CSS (translate(-50%,-50%) in map.css) to center the bubble over
  * it regardless of width.
  */
-export function getPriceMarkerIcon(listingType, price) {
+export function getPriceMarkerIcon(listingType, price, currency) {
   const color = COLORS[listingType] || COLORS.sale
-  const label = formatCompactPrice(price)
+  const label = formatCompactPrice(price, currency)
   const key = `${color}:${label}`
   if (priceIconCache[key]) return priceIconCache[key]
 
   const icon = L.divIcon({
     className: 'price-marker-icon',
-    html: `<div class="price-marker" style="background:${color}">${label}</div>`,
+    html: `<div class="price-marker" style="background:${escapeHtml(color)}">${escapeHtml(label)}</div>`,
     iconSize: [0, 0],
     iconAnchor: [0, 0],
     popupAnchor: [0, -18],
@@ -72,7 +73,7 @@ export function getCountMarkerIcon(count) {
 
   const icon = L.divIcon({
     className: 'county-marker-icon',
-    html: `<div class="county-marker">${count}</div>`,
+    html: `<div class="county-marker">${escapeHtml(count)}</div>`,
     iconSize: [0, 0],
     iconAnchor: [0, 0],
   })

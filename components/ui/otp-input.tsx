@@ -1,10 +1,11 @@
 import { useMemo, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   StyleSheet,
   TextInput,
   View,
-  type NativeSyntheticEvent,
-  type TextInputKeyPressEventData,
+  type TextInputInstance,
+  type TextInputKeyPressEvent,
 } from 'react-native';
 
 import { Fonts, Radii, type AtticoPalette } from '@/constants/theme';
@@ -41,9 +42,10 @@ export function OtpInput({
   editable?: boolean;
   autoFocus?: boolean;
 }) {
+  const { t } = useTranslation();
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
-  const refs = useRef<(TextInput | null)[]>([]);
+  const refs = useRef<(TextInputInstance | null)[]>([]);
 
   const digits = Array.from({ length: OTP_LENGTH }, (_, i) => value[i] ?? '');
 
@@ -76,7 +78,7 @@ export function OtpInput({
 
   const handleKeyPress = (
     index: number,
-    e: NativeSyntheticEvent<TextInputKeyPressEventData>,
+    e: TextInputKeyPressEvent,
   ) => {
     if (e.nativeEvent.key !== 'Backspace') return;
     if (digits[index]) {
@@ -118,7 +120,7 @@ export function OtpInput({
           selectTextOnFocus
           editable={editable}
           autoFocus={autoFocus && i === 0}
-          accessibilityLabel={`Digit ${i + 1}`}
+          accessibilityLabel={t('auth.codeDigit', { n: i + 1 })}
         />
       ))}
     </View>
@@ -127,14 +129,20 @@ export function OtpInput({
 
 const createStyles = (colors: AtticoPalette) =>
   StyleSheet.create({
+    // Six fixed 44px boxes need 304px, more than the auth card leaves below
+    // ~386 wide (off screen at 280-344): they share the row instead, capped
+    // at 44 so wider phones look the same.
     row: {
       flexDirection: 'row',
       justifyContent: 'center',
+      alignSelf: 'stretch',
       gap: 8,
       marginVertical: 8,
     },
     box: {
-      width: 44,
+      flex: 1,
+      minWidth: 0,
+      maxWidth: 44,
       height: 52,
       borderRadius: Radii.md,
       borderWidth: 1.5,

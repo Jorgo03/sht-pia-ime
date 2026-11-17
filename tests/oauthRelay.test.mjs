@@ -1,0 +1,100 @@
+import { test } from 'node:test'
+import assert from 'node:assert/strict'
+import fs from 'node:fs'
+import vm from 'node:vm'
+import { buildRelayTarget, expoGoCallback, isAllowedRelayTarget, isAppCallback } from '../src/lib/oauthRelay.js'
+
+// The mobile sign-in relay forwards a Google sign-in code to the address in
+// ?rt=. An open relay is an account takeover, so only the app's own callback
+// on a private network, or its own scheme, may receive it.
+
+const ALLOWED = [
+  'exp://192.168.1.20:8081/--/auth/callback', // home Wi-Fi
+  'exp://10.0.0.5:8081/--/auth/callback',
+  'exp://172.20.10.3:8081/--/auth/callback', // iPhone hotspot
+  'exp://127.0.0.1:8081/--/auth/callback',
+  'exp://localhost:8081/--/auth/callback',
+  'shtepia-ime://auth/callback', // dev-client and store builds
+  'exp://c-jorgo03-t1zil1-mw5ijj2z2arsescp.on.expo.app/--/auth/callback', // the owner's Expo tunnel
+  'exps://c-jorgo03-t1zil1-mw5me89njc9fazob.on.expo.app/--/auth/callback', // the same, as Expo Go names it (https)
+]
+const REFUSED = [
+  'exp://u-attacker-8081.exp.direct/--/auth/callback', // Expo tunnel: anyone can register one
+  'exp://evil.example:8081/--/auth/callback',
+  'exp://8.8.8.8:8081/--/auth/callback', // public address
+  'exp://172.32.0.1:8081/--/auth/callback', // just outside 172.16/12
+  'exp://192.169.1.1:8081/--/auth/callback',
+  'exp://192.168.1.999:8081/--/auth/callback',
+  'exp://192.168.1.20:8081/--/somewhere-else', // wrong path
+  'exp://user:pw@192.168.1.20:8081/--/auth/callback',
+  'shtepia-ime://other/callback',
+  'https://evil.example/auth/callback',
+  'javascript:alert(1)',
+  'exp://c-someone-t1zil1-mw5ijj2z2arsescp.on.expo.app/--/auth/callback', // another account's tunnel
+  'exp://c-jorgo03-x-t1zil1-mw5ijj2z2arsescp.on.expo.app/--/auth/callback', // an account named jorgo03-x
+  'exp://c-jorgo03-t1zil1-mw5ijj2z2arsescp.on.expo.app.evil.example/--/auth/callback',
+  'exp://c-jorgo03-t1zil1-mw5ijj2z2arsescp.on.expo.app:8081/--/auth/callback', // a port: not a tunnel
+  'exp://c-jorgo03-t1zil1-mw5ijj2z2arsescp.on.expo.app/--/other', // wrong path
+  'exp://a-jorgo03-t1zil1-mw5ijj2z2arsescp.on.expo.app/--/auth/callback', // not the signed namespace
+  'exp://jorgo03.boltexpo.dev/--/auth/callback', // a name anyone can choose
+  'exps://192.168.1.20:8081/--/auth/callback', // exps only for the owner's tunnel
+  'exps://c-someone-t1zil1-mw5me89njc9fazob.on.expo.app/--/auth/callback',
+  'exps://c-jorgo03-t1zil1-mw5me89njc9fazob.on.expo.app/--/other',
+  'expx://c-jorgo03-t1zil1-mw5me89njc9fazob.on.expo.app/--/auth/callback',
+  'exp://user@c-jorgo03-t1zil1-mw5ijj2z2arsescp.on.expo.app/--/auth/callback',
+]
+
+test('only the app callback on a private network, or the app scheme, is allowed', () => {
+  for (const u of ALLOWED) assert.equal(isAppCallback(new URL(u)), true, u)
+  for (const u of REFUSED) assert.equal(isAppCallback(new URL(u)), false, u)
+  assert.equal(isAllowedRelayTarget('not a url'), false)
+  assert.equal(isAllowedRelayTarget(undefined), false)
+})
+
+test('Expo Go returns to the address it loaded the app from, never the store scheme', () => {
+  // Home Wi-Fi: http on the LAN, port kept.
+  assert.equal(expoGoCallback('http://192.168.0.8:8081'), 'exp://192.168.0.8:8081/--/auth/callback')
+  // The owner's tunnel is https, so Expo Go answers on exps://, no port.
+  const tunnel = 'c-jorgo03-t1zil1-mw5mtwkokmxdeuwu.on.expo.app'
+  assert.equal(expoGoCallback(`https://${tunnel}`), `exps://${tunnel}/--/auth/callback`)
+  // Both pass the relay's allow-list, so the website hands the code back.
+  assert.equal(isAllowedRelayTarget(expoGoCallback('http://192.168.0.8:8081')), true)
+  assert.equal(isAllowedRelayTarget(expoGoCallback(`https://${tunnel}`)), true)
+  // A path or query on the origin is not carried over.
+  assert.equal(expoGoCallback('http://10.0.0.5:8081/index.bundle?platform=android'), 'exp://10.0.0.5:8081/--/auth/callback')
+  // No usable origin: null, so the caller can refuse instead of guessing.
+  for (const bad of [null, undefined, '', 'not a url', 'file:///data/app/index.bundle', 'http://user:pw@192.168.0.8:8081']) {
+    assert.equal(expoGoCallback(bad), null, String(bad))
+  }
+})
+
+test('the forwarded address carries the code and drops rt', () => {
+  const app = 'exp://192.168.1.20:8081/--/auth/callback'
+  assert.equal(buildRelayTarget(`?rt=${encodeURIComponent(app)}&code=abc`, ''), `${app}?code=abc`)
+  assert.equal(buildRelayTarget(`?rt=${encodeURIComponent(app)}&error=access_denied`, ''), `${app}?error=access_denied`)
+  assert.equal(buildRelayTarget('?code=abc', ''), null)
+  assert.equal(buildRelayTarget(`?rt=${encodeURIComponent('exp://x.exp.direct/--/auth/callback')}&code=abc`, ''), null)
+})
+
+// The inline copies run before the app's bundle, so they cannot import the module.
+function inlineCheck(file, unescape) {
+  let src = fs.readFileSync(new URL(`../${file}`, import.meta.url), 'utf8')
+  const start = src.indexOf('function isAppCallback(u) {')
+  assert.ok(start > 0, `${file} has the inline check`)
+  let depth = 0
+  let end = start
+  for (; end < src.length; end++) {
+    if (src[end] === '{') depth++
+    if (src[end] === '}' && --depth === 0) break
+  }
+  let fn = src.slice(start, end + 1)
+  if (unescape) fn = fn.replace(/\\\\/g, '\\') // template literal in a .tsx file
+  return vm.runInNewContext(`(${fn})`)
+}
+
+test('the inline copies in index.html and app/+html.tsx give the same answers', () => {
+  for (const [file, unescape] of [['index.html', false], ['app/+html.tsx', true]]) {
+    const check = inlineCheck(file, unescape)
+    for (const u of [...ALLOWED, ...REFUSED]) assert.equal(check(new URL(u)), isAppCallback(new URL(u)), `${file}: ${u}`)
+  }
+})

@@ -5,6 +5,9 @@
 .auth-screen {
   position: relative;
   min-height: calc(100vh - 62px);
+  /* svh: the card is docked to the bottom, so it sits above the nav with the
+     browser toolbar showing too, and does not move while the toolbar slides. */
+  min-height: calc(100svh - 62px);
   overflow: hidden;
 }
 
@@ -15,6 +18,7 @@
   flex-direction: column;
   justify-content: flex-end;
   min-height: calc(100vh - 62px);
+  min-height: calc(100svh - 62px);
   /* .liquid-nav sits at bottom:18px, height:62px (z-index:50) — the card is
      flex-end docked, so without this clearance its bottom (Sign Up link)
      renders underneath the fixed nav pill instead of above it. 18+62=80px
@@ -317,11 +321,19 @@
   margin: 8px 0;
 }
 
+@media (max-width: 383px) {
+  .otp-inputs { gap: 4px; }
+}
+
 /* The boxes always sit on the dark DuskHero art (both app themes), so the
  * state colors are theme-independent. Idle must be clearly visible — the
  * old 6%-white fill vanished against the gradient. */
 .otp-digit {
   width: 44px;
+  /* Shrinks below ~384 wide (a 280 Fold cover screen, a 320 phone), where
+     six fixed 44px boxes ran past the card and the outer two were cut off. */
+  flex: 0 1 44px;
+  min-width: 0;
   height: 52px;
   border-radius: var(--r-md);
   border: 1.5px solid rgba(255,255,255,0.38);
@@ -396,7 +408,7 @@
   padding: 4px 14px;
   border-radius: var(--r-pill);
   background: var(--fho-orange-tint);
-  color: var(--fho-orange-2);
+  color: var(--fho-orange-text);
   font-size: 11px;
   font-weight: 600;
   font-family: var(--font-mono);
@@ -493,10 +505,10 @@
 .profile-signout {
   width: 100%;
   padding: 14px;
-  border: 1.5px solid #dc3545;
+  border: 1.5px solid var(--fho-signout, #dc3545);
   border-radius: var(--r-lg);
   background: transparent;
-  color: #dc3545;
+  color: var(--fho-signout, #dc3545);
   font-size: 15px;
   font-weight: 600;
   font-family: var(--font-sans);
@@ -530,5 +542,84 @@
   align-items: center;
   justify-content: center;
 }
+
+/* --- Account deletion (store-required) --- */
+
+/* Quieter than .profile-signout on purpose: a plain underlined link, last on
+   the page. Irreversible actions should take intent to find, not sit beside
+   Sign out as a second red button to mis-click. */
+.profile-delete-account {
+  display: block;
+  margin: 8px auto 0;
+  padding: 14px 24px;
+  background: none;
+  border: none;
+  color: var(--fho-text-muted);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.profile-delete-account:hover { color: var(--fho-danger); }
+
+.delete-account-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  background: rgba(10, 8, 7, 0.5);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.delete-account-dialog {
+  width: 100%;
+  max-width: 380px;
+  background: var(--fho-surface);
+  border: 1px solid var(--fho-border);
+  border-radius: var(--r-lg);
+  padding: 22px;
+  box-shadow: var(--fho-card-shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.delete-account-dialog h2 {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-size: 20px;
+  color: var(--fho-text);
+}
+
+.delete-account-dialog p {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--fho-text-muted);
+}
+
+/* Privacy Policy / Terms — store-required links, shown only when real URLs
+   are configured (src/lib/legal.js). */
+.profile-legal {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0 8px;
+  font-size: 12px;
+  color: var(--fho-text-faint);
+}
+
+.profile-legal a {
+  color: var(--fho-text-muted);
+  text-decoration: underline;
+}
+
+.profile-legal a:hover { color: var(--fho-orange-text); }
 
 }

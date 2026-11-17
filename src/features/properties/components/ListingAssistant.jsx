@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Sparkles, X, Send } from 'lucide-react'
 import { askListingAssistant } from '../../../lib/ai'
+import { assistantHistory } from '../lib/assistantHistory'
 
 // Feature C — per-listing buyer assistant. Grounded server-side in this
 // listing's data only; the edge function refuses questions outside it.
@@ -17,19 +18,33 @@ export default function ListingAssistant({ property }) {
     if (open) bottomRef.current?.scrollIntoView({ block: 'end' })
   }, [messages.length, thinking, open])
 
+  // The listing the open conversation belongs to. A reply that comes back
+  // after the visitor moved to another listing is dropped, not appended to
+  // the new listing's chat.
+  const listingRef = useRef(property?.id)
+
   // Reset the conversation when the listing changes.
-  useEffect(() => { setMessages([]); setOpen(false) }, [property?.id])
+  useEffect(() => {
+    listingRef.current = property?.id
+    setMessages([])
+    setOpen(false)
+    setThinking(false)
+  }, [property?.id])
 
   if (!property) return null
 
   const send = async () => {
     const content = text.trim()
     if (!content || thinking) return
-    const history = [...messages, { role: 'user', content }]
-    setMessages(history)
+    // Sent: trimmed to start with a question, without failed replies (shared
+    // with the phone app). Shown: every bubble.
+    const history = assistantHistory(messages, content)
+    setMessages(prev => [...prev, { role: 'user', content }])
     setText('')
     setThinking(true)
-    const reply = await askListingAssistant(property.id, history, i18n.language)
+    const askedAbout = property.id
+    const reply = await askListingAssistant(askedAbout, history, i18n.language)
+    if (listingRef.current !== askedAbout) return
     setThinking(false)
     setMessages(prev => [
       ...prev,

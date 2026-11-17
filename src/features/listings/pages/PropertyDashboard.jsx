@@ -1,10 +1,11 @@
 import { useEffect, useState, useMemo } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { ArrowLeft, Phone, MessageCircle, Calendar, Eye, Heart } from 'lucide-react'
+import { ArrowLeft, Phone, MessageCircle, Calendar, Eye, Heart, RotateCcw } from 'lucide-react'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
 import { supabase } from '../../../lib/supabase'
 import { formatDate } from '../../../lib/format'
+import { debugWarn } from '../../../lib/debug'
 
 const TYPES = ['view', 'call', 'message', 'meeting', 'favourite']
 const TYPE_ICONS = { call: Phone, message: MessageCircle, meeting: Calendar, view: Eye, favourite: Heart }
@@ -22,6 +23,7 @@ export default function PropertyDashboard() {
   const navigate = useNavigate()
   const [activity, setActivity] = useState([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(false)
   const [metric, setMetric] = useState('view')
 
   useEffect(() => {
@@ -35,8 +37,17 @@ export default function PropertyDashboard() {
       .gte('created_at', since.toISOString())
       .order('created_at', { ascending: false })
       .limit(500)
-      .then(({ data }) => {
-        setActivity(data || [])
+      .then(({ data, error: err }) => {
+        // Without this the error was dropped and `activity` stayed empty, so a
+        // failed query rendered as a real dashboard reading zero views, zero
+        // leads — an agent would conclude their listing was getting no
+        // interest rather than that the fetch broke.
+        if (err) {
+          debugWarn('PropertyDashboard activity', err)
+          setError(true)
+        } else {
+          setActivity(data || [])
+        }
         setLoading(false)
       })
   }, [id])
@@ -76,6 +87,15 @@ export default function PropertyDashboard() {
 
       {loading ? (
         <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--fho-text-muted)' }}>{t('common.loading')}</div>
+      ) : error ? (
+        <div className="placeholder-card">
+          {t('errors.generic')}
+          <div style={{ marginTop: 12 }}>
+            <button className="empty-reset-btn" onClick={() => window.location.reload()}>
+              <RotateCcw size={14} /> {t('common.retry')}
+            </button>
+          </div>
+        </div>
       ) : (
         <>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: 10, marginBottom: 20 }}>

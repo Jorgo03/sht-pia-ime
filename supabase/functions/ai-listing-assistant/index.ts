@@ -7,8 +7,11 @@
 //
 // Model: claude-haiku-4-5-20251001 (high-volume, cheap).
 // Auth: anon allowed (listing pages are public). Rate limit: 30/hour per key.
+// Reply: { reply, contact }. contact is true when the answer is not in the
+// listing data; the app then shows the owner's or agent's contact.
 
 import { createClient } from 'npm:@supabase/supabase-js@2';
+import { CONTACT_RULE, parseReply } from './reply.js';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -31,24 +34,52 @@ const admin = createClient(
   Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!,
 );
 
+// One atomic step in the database (ai_take_quota): count the last hour and
+// record this call together, so parallel requests cannot all slip through.
 async function rateLimit(key: string, feature: string, max: number): Promise<boolean> {
-  const since = new Date(Date.now() - 3600_000).toISOString();
-  const { count } = await admin
+  const { data, error } = await admin.rpc('ai_take_quota', {
+    p_key: key,
+    p_feature: feature,
+    p_max: max,
+    p_window_seconds: 3600,
+  });
+  // Fail closed: if usage cannot be recorded, no paid call is made.
+  return !error && data === true;
+}
+
+// Project-wide ceiling on paid AI calls per feature per 24 hours, across every
+// caller (docs/LAUNCH_TASKS.md F1). The per-user and per-IP limits stop one
+// caller; this stops many, including one rotating a spoofed x-forwarded-for.
+// Set AI_DAILY_CALL_CAP as an Edge Function secret to change it. The default
+// is a safety net against runaway cost, not a budget the owner chose; the real
+// spend cap belongs in the Anthropic console.
+const AI_DAILY_CALL_CAP = Number(Deno.env.get('AI_DAILY_CALL_CAP') ?? '2000');
+
+async function underDailyCap(feature: string): Promise<boolean> {
+  const since = new Date(Date.now() - 86_400_000).toISOString();
+  const { count, error } = await admin
     .from('ai_usage')
     .select('id', { count: 'exact', head: true })
-    .eq('key', key)
     .eq('feature', feature)
     .gte('created_at', since);
-  if ((count ?? 0) >= max) return false;
-  await admin.from('ai_usage').insert({ key, feature });
-  return true;
+  if (error) return false;
+  return (count ?? 0) < AI_DAILY_CALL_CAP;
+}
+
+// Signed-out callers are bucketed by IP. The left-most x-forwarded-for entry
+// is whatever the client sent; Cloudflare's cf-connecting-ip and the right-most
+// hop are written by the platform in front of us, so a caller cannot pick a
+// fresh bucket by sending a made-up header.
+function clientIp(req: Request): string {
+  const hops = (req.headers.get('x-forwarded-for') ?? '').split(',').map((h) => h.trim()).filter(Boolean);
+  return req.headers.get('cf-connecting-ip')?.trim() || hops[hops.length - 1] || 'anon';
 }
 
 async function callerKey(req: Request): Promise<string> {
   const token = req.headers.get('Authorization')?.replace('Bearer ', '') ?? '';
   const { data } = await admin.auth.getUser(token);
   if (data?.user) return data.user.id;
-  return req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'anon';
+  return clientIp(req);
 }
 
 const LANG_NAMES: Record<string, string> = {
@@ -62,11 +93,26 @@ Deno.serve(async (req) => {
   try {
     if (!ANTHROPIC_KEY) return json({ error: 'ai_unavailable' }, 503);
 
-    const { property_id, messages = [], language = 'sq' } = await req.json();
-    if (!property_id) return json({ error: 'missing_property' }, 400);
+    // A malformed body is the caller's mistake (400), not "AI unavailable".
+    let body: { property_id?: unknown; messages?: unknown; language?: unknown };
+    try {
+      body = await req.json();
+    } catch {
+      return json({ error: 'bad_request' }, 400);
+    }
+    const property_id = typeof body?.property_id === 'string' ? body.property_id : '';
+    const messages = Array.isArray(body?.messages) ? body.messages.filter((m) => m && typeof m === 'object') : [];
+    const language = typeof body?.language === 'string' ? body.language : 'sq';
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(property_id)) {
+      return json({ error: 'missing_property' }, 400);
+    }
 
     if (!(await rateLimit(await callerKey(req), 'listing-assistant', RATE_LIMIT_PER_HOUR))) {
       return json({ error: 'rate_limited' }, 429);
+    }
+    if (!(await underDailyCap('listing-assistant'))) {
+      // Same answer as any AI outage: the client keeps working without AI.
+      return json({ error: 'ai_unavailable' }, 503);
     }
 
     // Active listings only — the assistant must never see drafts/paused rows.
@@ -78,7 +124,7 @@ Deno.serve(async (req) => {
       .maybeSingle();
     if (!property) return json({ error: 'not_found' }, 404);
 
-    const langName = LANG_NAMES[language] ?? 'Albanian';
+    const langName = Object.hasOwn(LANG_NAMES, language) ? LANG_NAMES[language] : 'Albanian';
 
     // Cap history: last 10 turns, 1000 chars each.
     const history = (Array.isArray(messages) ? messages : [])
@@ -88,6 +134,10 @@ Deno.serve(async (req) => {
         role: m.role,
         content: String(m.content).slice(0, 1000),
       }));
+    // The Messages API needs the person's turn first; an even cut of an
+    // alternating chat starts with an answer (every question from the 6th
+    // failed). The apps now send a trimmed history too.
+    while (history.length > 0 && history[0].role !== 'user') history.shift();
     if (history.length === 0 || history[history.length - 1].role !== 'user') {
       return json({ error: 'empty_query' }, 400);
     }
@@ -107,8 +157,8 @@ Deno.serve(async (req) => {
           `You answer questions about ONE listing. Reply in ${langName}, briefly (1-3 sentences unless asked for detail).\n\n` +
           `LISTING DATA (your ONLY source of truth):\n${JSON.stringify(property)}\n\n` +
           `Rules:\n` +
-          `- Answer ONLY from the listing data above. If the answer is not in the data, say you don't have that ` +
-          `information and suggest contacting the seller through the listing page.\n` +
+          `- Answer ONLY from the listing data above.\n` +
+          `${CONTACT_RULE}\n` +
           `- Never invent neighborhood facts, distances, schools, prices, or legal details.\n` +
           `- No financial, legal, or investment advice. No negotiating on the seller's behalf.\n` +
           `- You may do simple arithmetic on the data (e.g. price per m²), labeling it as calculated.\n` +
@@ -119,7 +169,8 @@ Deno.serve(async (req) => {
     });
 
     if (!r.ok) {
-      console.error('Anthropic error', r.status, await r.text());
+      // Status only: the upstream body can echo the prompt (listing text).
+      console.error('Anthropic error', r.status);
       return json({ error: 'ai_unavailable' }, 503);
     }
 
@@ -127,9 +178,12 @@ Deno.serve(async (req) => {
     const text = data.content?.find((b: { type: string }) => b.type === 'text')?.text;
     if (!text) return json({ error: 'ai_unavailable' }, 503);
 
-    return json({ reply: text });
+    // An empty reply (only the marker) is sent as null; the app fills in a
+    // "the listing doesn't say" line above the contact card.
+    const { reply, contact } = parseReply(text);
+    return json({ reply: reply || null, contact });
   } catch (err) {
-    console.error('ai-listing-assistant error', err);
+    console.error('ai-listing-assistant error', err instanceof Error ? err.message : String(err));
     return json({ error: 'ai_unavailable' }, 503);
   }
 });

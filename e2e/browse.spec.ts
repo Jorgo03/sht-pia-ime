@@ -1,0 +1,100 @@
+import { LEK_LISTING, LISTINGS } from './support/fixtures';
+import { t } from './support/i18n';
+import { expect, test } from './support/test';
+
+// F01: browsing and searching (replica/test-plan.md).
+
+test('F01-H1 home shows the listings', async ({ page }) => {
+  await page.goto('/');
+  // The newest is featured and the next six fill the rail (Home.jsx); search
+  // lists every listing (F01-H2).
+  const newest = [...LISTINGS].sort((a, b) => String(b.created_at).localeCompare(String(a.created_at))).slice(0, 7);
+  for (const listing of newest) {
+    await expect(page.getByRole('heading', { name: listing.title, level: 3 }).first()).toBeVisible();
+  }
+});
+
+test('F01-H2 search lists every active listing', async ({ page }) => {
+  await page.goto('/search');
+  for (const listing of LISTINGS) {
+    await expect(page.getByRole('link', { name: listing.title, exact: true })).toBeVisible();
+  }
+});
+
+test('F01-H3 opening a card goes to its detail page', async ({ page }) => {
+  const listing = LISTINGS[1];
+  await page.goto('/search');
+  await page.getByRole('link', { name: listing.title, exact: true }).click();
+  await expect(page).toHaveURL(`/property/${listing.id}`);
+  await expect(page.getByRole('heading', { name: listing.title, level: 1 })).toBeVisible();
+});
+
+test('F01-H4 a price range in euros also finds a listing priced in lek', async ({ page }) => {
+  await page.goto('/search?maxPrice=200000');
+  await expect(page.getByRole('link', { name: LEK_LISTING.title, exact: true })).toBeVisible();
+  await page.goto('/search?maxPrice=120000');
+  await expect(page.getByRole('link', { name: LISTINGS[0].title, exact: true })).toBeVisible();
+  await expect(page.getByRole('link', { name: LEK_LISTING.title, exact: true })).toBeHidden();
+});
+
+test('F01-E1 search still answers when the AI search is down', async ({ page }) => {
+  await page.goto('/search');
+  const box = page.getByRole('textbox', { name: t('search.aiPlaceholder') });
+  await box.fill('Durrës');
+  await box.press('Enter');
+  // ai-parse-search answers 503 in the mock; the page must fall back to a
+  // plain search instead of hanging or showing nothing.
+  await expect(page.getByRole('link', { name: 'Apartament pranë plazhit', exact: true })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Vilë me oborr në Sauk', exact: true })).toBeHidden();
+});
+
+test('F01-E2 no page scrolls sideways on a phone', async ({ page, isMobile }) => {
+  test.skip(!isMobile, 'phone layout only');
+  for (const path of ['/', '/search', `/property/${LISTINGS[0].id}`, `/property/${LISTINGS[4].id}`, '/profile', '/privacy']) {
+    await page.goto(path);
+    await page.waitForLoadState('networkidle');
+    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+    expect(overflow, `${path} is ${overflow}px wider than the screen`).toBeLessThanOrEqual(0);
+  }
+});
+
+test('F03-N1 saving a favourite from a card while signed out goes to sign-in', async ({ page }) => {
+  await page.goto('/search');
+  await page.getByRole('button', { name: t('common.save') }).first().click();
+  await expect(page).toHaveURL('/profile');
+});
+
+// AUDIT-028: two quick taps on a heart mean save, then unsave. The second tap
+// used to read the state from before the first and save again, so the server
+// kept a favourite the visitor had just removed.
+test.describe('signed in: favourites', () => {
+  test.use({ signedIn: true });
+
+  test('F-N28 a quick second tap unsaves, and the server sees save then unsave', async ({ page, writes }) => {
+    let delayed = 0;
+    // A real network: the save first reads the listing (to show it in the
+    // list), so give that read half a second, as on a phone connection.
+    await page.route(
+      (url) => url.pathname.endsWith('/rest/v1/properties') && /id=eq\./.test(url.search) && !url.search.includes('status'),
+      async (route) => {
+        delayed++;
+        await new Promise((r) => setTimeout(r, 500));
+        await route.fallback();
+      },
+    );
+    await page.goto('/');
+    const heart = page.getByRole('button', { name: t('common.save') }).first();
+    await expect(heart).toBeVisible();
+    // The same button both times: saving can add a "saved" row above the
+    // list, which would move `.first()` to another listing's heart.
+    const button = await heart.elementHandle();
+    await button!.click();
+    await button!.click();
+    await expect.poll(() => writes.filter((w) => w.table === 'favorites').length).toBe(2);
+    const favs = writes.filter((w) => w.table === 'favorites');
+    expect(favs.map((w) => w.method)).toEqual(['POST', 'DELETE']);
+    expect(favs[0].body?.property_id).toBeTruthy();
+    expect(favs[1].query).toContain(`property_id=eq.${favs[0].body.property_id}`);
+    expect(delayed).toBeGreaterThan(0);
+  });
+});

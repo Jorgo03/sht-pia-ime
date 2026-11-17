@@ -1,19 +1,65 @@
 import { useState, useRef, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate, useLocation } from 'react-router-dom'
-import { User, Briefcase, Mail, Lock, Eye, EyeOff, ArrowLeft, ArrowRight, Heart, Building2, LogOut, ChevronRight, Search as SearchIcon, Calendar, Loader2, Apple, Linkedin } from 'lucide-react'
+import { User, Briefcase, Mail, Lock, Eye, EyeOff, ArrowLeft, ArrowRight, Heart, Building2, LogOut, ChevronRight, Search as SearchIcon, Calendar, Loader2, Apple, Linkedin, UserPen, ShieldCheck, KeyRound } from 'lucide-react'
 import { useAuth } from '../AuthContext'
 import { useProfileStats } from '../hooks/useProfileStats'
 import DuskHero from '../components/DuskHero'
-import { EMAIL_RE, friendlyError } from '../../../lib/authErrors'
+import EditProfileSheet from '../components/EditProfileSheet'
+import ChangePasswordSheet from '../components/ChangePasswordSheet'
+import { newPasswordError, passwordStrengthError } from '../lib/password'
+import { blockedCodeKey, codeExpiry, formatCountdown, rejectedCodeKey, secondsLeft } from '../lib/signupCode'
+import { authRedirectError, hasAuthCode, linkErrorKey, providerEnabled } from '../lib/authLinks'
+import Avatar from '../../../shared/Avatar'
+import { EMAIL_RE, friendlyError, retryAfterSeconds } from '../../../lib/authErrors'
+import { supabase } from '../../../lib/supabase'
+import LegalLinks from '../../../shared/LegalLinks'
+import { isModerator } from '../../moderation/lib/moderation'
+import { APPLE_SIGN_IN_ENABLED } from '../lib/oauthOptions'
 import '../../../styles/profile.css'
 
 export default function Profile() {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const location = useLocation()
-  const { user, profile, isAgent, signIn, signUp, signInWithProvider, sendOtp, verifyOtp, resendCode, signOut, resetPassword, passwordRecovery, updatePassword, loading: authLoading } = useAuth()
+  const { user, profile, isAgent, refreshProfile, signIn, signUp, signInWithProvider, sendOtp, verifyOtp, resendCode, signOut, resetPassword, verifyRecoveryCode, passwordRecovery, updatePassword, loading: authLoading } = useAuth()
   const stats = useProfileStats()
+
+  // The moderation queue link shows only for moderators (F3); the database
+  // enforces the same rule on the page itself.
+  const [canModerate, setCanModerate] = useState(false)
+  useEffect(() => {
+    if (!user) return
+    let active = true
+    isModerator(supabase).then((ok) => { if (active) setCanModerate(ok) })
+    return () => { active = false }
+  }, [user])
+
+  // Account deletion — store-mandated (Apple 5.1.1(v), Google Play data
+  // deletion). Same delete-account Edge Function the mobile app calls.
+  const [deleteOpen, setDeleteOpen] = useState(false)
+  const [deleting, setDeleting] = useState(false)
+  const [deleteError, setDeleteError] = useState(false)
+  const [editOpen, setEditOpen] = useState(false)
+  const [securityOpen, setSecurityOpen] = useState(false)
+
+  const handleDeleteAccount = async () => {
+    if (deleting) return
+    setDeleting(true)
+    setDeleteError(false)
+    try {
+      // Identity comes from the caller's verified access token, not the body.
+      const { error } = await supabase.functions.invoke('delete-account', { body: {} })
+      if (error) throw error
+      setDeleteOpen(false)
+      await signOut()
+      navigate('/')
+    } catch {
+      setDeleteError(true)
+    } finally {
+      setDeleting(false)
+    }
+  }
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -29,6 +75,7 @@ export default function Profile() {
   const [confirmNewPassword, setConfirmNewPassword] = useState('')
   const [showNewPw, setShowNewPw] = useState(false)
   const [recoveryDone, setRecoveryDone] = useState(false)
+  const [recoveryOthersOut, setRecoveryOthersOut] = useState(false)
   // 'google' | 'apple' | 'linkedin_oidc' while the OAuth redirect is starting
   const [providerLoading, setProviderLoading] = useState(null)
   const oauthErrorShown = useRef(false)
@@ -67,14 +114,69 @@ export default function Profile() {
   const [otpType, setOtpType] = useState('email')
   const [otpError, setOtpError] = useState(false)
   const [cooldown, setCooldown] = useState(0)
+  // The code's 10-minute life and wrong-guess count (lib/signupCode.js); the
+  // expiry is null when the code was sent before this page asked for it.
+  const [codeExpiresAt, setCodeExpiresAt] = useState(null)
+  const [codeAttempts, setCodeAttempts] = useState(0)
+  const [clock, setClock] = useState(() => Date.now())
+  const startCode = (fresh) => {
+    const now = Date.now()
+    setClock(now)
+    setCodeAttempts(0)
+    setCodeExpiresAt(fresh ? codeExpiry(now) : null)
+  }
   const otpRefs = useRef([])
+  // Set synchronously, before the button re-renders as busy: a double click
+  // would otherwise send two codes (the second invalidates the first) or
+  // verify one code twice (the second attempt fails as already used).
+  const sendingCode = useRef(false)
+  const verifyingCode = useRef(false)
 
-  // Resend cooldown ticker
+  // A reset link lands here (redirectTo /profile). Read from window.location:
+  // supabase-js cleans the address itself, behind the router's back.
+  //  - Expired or already used: Supabase appends #error_code=otp_expired.
+  //  - Opened in another browser: ?code= stays, because the PKCE verifier
+  //    lives in the browser that asked, so no session is made.
+  // Both used to leave the person on the sign-in form with no word at all.
+  // Either way the reset form opens, where the emailed code still works.
+  // AuthConfirm sends people here with intent 'forgot' for the same form.
+  const linkChecked = useRef(false)
   useEffect(() => {
-    if (cooldown <= 0) return
+    if (authLoading || linkChecked.current) return
+    linkChecked.current = true
+    const href = window.location.href
+    // ?error=oauth_failed is AuthCallback's own report, handled above.
+    const linkError = new URL(href).searchParams.get('error') === 'oauth_failed' ? null : authRedirectError(href)
+    const strandedCode = !user && hasAuthCode(href)
+    if (linkError || strandedCode) {
+      setMessage(t(linkError ? linkErrorKey(linkError) : 'errors.linkOtherDevice'))
+      setOtpEmail('')
+      setOtpStep('forgot')
+      navigate('/profile', { replace: true })
+    } else if (location.state?.intent === 'forgot' && !user) {
+      setOtpStep('forgot')
+    }
+  }, [authLoading, user, location.state, navigate, t])
+
+  // Resend cooldown ticker. Keyed on whether a countdown is running, not on
+  // the value: depending on `cooldown` itself would clear and recreate the
+  // interval on every tick. Named so the linter can check it statically.
+  const isCoolingDown = cooldown > 0
+  useEffect(() => {
+    if (!isCoolingDown) return
     const id = setInterval(() => setCooldown((s) => (s > 1 ? s - 1 : 0)), 1000)
     return () => clearInterval(id)
-  }, [cooldown > 0])
+  }, [isCoolingDown])
+
+  // Code expiry countdown, while a code with a known expiry is on screen.
+  const onCodeStep = otpStep === 'enter-code'
+  useEffect(() => {
+    if (!onCodeStep || codeExpiresAt == null) return
+    const id = setInterval(() => setClock(Date.now()), 1000)
+    return () => clearInterval(id)
+  }, [onCodeStep, codeExpiresAt])
+  const codeLeft = onCodeStep ? secondsLeft(codeExpiresAt, clock) : null
+  const codeExpired = codeLeft === 0
 
   const validate = () => {
     if (!EMAIL_RE.test(email.trim())) {
@@ -87,8 +189,9 @@ export default function Profile() {
       // and Supabase's own /token endpoint (not this form) is the authority
       // on whether a login password is correct. Applying it to login would
       // silently lock out that account before any request is even sent.
-      if (password.length < 8) {
-        setMessage(t('errors.passwordMin'))
+      const weak = passwordStrengthError(password)
+      if (weak) {
+        setMessage(t(weak))
         return false
       }
       if (fullName.trim().length < 2) {
@@ -97,6 +200,11 @@ export default function Profile() {
       }
       if (password !== confirmPassword) {
         setMessage(t('errors.passwordMismatch'))
+        return false
+      }
+      // The office is part of an agent's account; buyers have none.
+      if (role === 'agent' && agencyName.trim().length < 2) {
+        setMessage(t('errors.officeRequired'))
         return false
       }
     } else if (!password) {
@@ -133,7 +241,8 @@ export default function Profile() {
           setOtpError(false)
           setOtpStep('enter-code')
           setCooldown(30)
-          setMessage(t('auth.checkEmail'))
+          // The "Verify your email" step says where the code went.
+          startCode(true)
         } else {
           // Email confirmation is off: signUp already returned a session, so
           // the account exists and is signed in. Sending this user to the code
@@ -142,7 +251,17 @@ export default function Profile() {
         }
       } else {
         const { error } = await signIn(cleanEmail, password)
-        if (error) {
+        if (error?.code === 'email_not_confirmed') {
+          // Not a dead end: the confirmation code (or a fresh one) finishes it.
+          setOtpEmail(cleanEmail)
+          setOtpType('signup')
+          setOtpCode(['', '', '', '', '', ''])
+          setOtpError(false)
+          setCooldown(0)
+          setOtpStep('enter-code')
+          startCode(false)
+          setMessage(t('auth.confirmFirst'))
+        } else if (error) {
           setMessage(friendlyError(error, t))
         } else {
           setPendingRedirect(location.state?.from || '/')
@@ -163,6 +282,13 @@ export default function Profile() {
     // only to a freshly created account — existing profiles are never
     // rewritten by signing in again.
     try { localStorage.setItem('fho_pending_role', role) } catch { /* storage blocked — role stays client */ }
+    // A provider switched off in the dashboard would replace this page with
+    // Supabase's raw JSON error; say so here instead.
+    if ((await providerEnabled(supabase, provider)) === false) {
+      setProviderLoading(null)
+      setMessage(t('errors.providerUnavailable'))
+      return
+    }
     const { error } = await signInWithProvider(provider)
     if (error) {
       setProviderLoading(null)
@@ -192,12 +318,18 @@ export default function Profile() {
     // path as OAuth, and overwriting here means an aborted OAuth click
     // can't leak its role choice into this flow.
     try { localStorage.setItem('fho_pending_role', role) } catch { /* ignore */ }
+    if (sendingCode.current) return
+    sendingCode.current = true
     setLoading(true); setMessage('')
     try {
       const { error } = await sendOtp(cleanEmail)
-      if (error) setMessage(friendlyError(error, t))
-      else { setOtpStep('enter-code'); setOtpError(false); setCooldown(30); setMessage(t('auth.otpSent')) }
+      const wait = retryAfterSeconds(error)
+      // A code went to this address moments ago and is still valid.
+      if (wait) { setOtpStep('enter-code'); setOtpError(false); setCooldown(wait); startCode(false); setMessage(t('errors.waitSeconds', { s: wait })) }
+      else if (error) setMessage(friendlyError(error, t))
+      else { setOtpStep('enter-code'); setOtpError(false); setCooldown(30); startCode(true); setMessage(t('auth.otpSent')) }
     } finally {
+      sendingCode.current = false
       setLoading(false)
     }
   }
@@ -207,12 +339,17 @@ export default function Profile() {
     // Guarded too: otpEmail is cleared when the component remounts after a
     // magic-link login, and resending with an empty address 400s.
     if (!EMAIL_RE.test(otpEmail)) { setMessage(t('errors.invalidEmail')); return }
+    if (sendingCode.current) return
+    sendingCode.current = true
     setLoading(true); setMessage(''); setOtpError(false)
     try {
-      const { error } = await resendCode(otpEmail, otpType)
-      if (error) setMessage(friendlyError(error, t))
-      else { setCooldown(30); setMessage(t('auth.otpSent')) }
+      const { error } = otpType === 'recovery' ? await resetPassword(otpEmail) : await resendCode(otpEmail, otpType)
+      const wait = retryAfterSeconds(error)
+      if (wait) { setCooldown(wait); setMessage(t('errors.waitSeconds', { s: wait })) }
+      else if (error) setMessage(friendlyError(error, t))
+      else { setCooldown(30); setOtpCode(['', '', '', '', '', '']); startCode(true); setMessage(t('auth.newCodeSent')) }
     } finally {
+      sendingCode.current = false
       setLoading(false)
     }
   }
@@ -244,48 +381,93 @@ export default function Profile() {
   }
 
   const handleVerifyOtp = async (code) => {
+    if (verifyingCode.current) return
+    // An expired code, or one past the wrong-guess cap, would only be refused
+    // and spend the per-IP verification budget: ask for a new one instead.
+    const blocked = blockedCodeKey({ expiresAt: codeExpiresAt, attempts: codeAttempts })
+    if (blocked) {
+      setOtpError(true)
+      setMessage(t(blocked))
+      setOtpCode(['', '', '', '', '', ''])
+      return
+    }
+    verifyingCode.current = true
     setLoading(true); setMessage('')
     try {
-      const { error } = await verifyOtp(otpEmail, code, otpType)
+      // A recovery code fires PASSWORD_RECOVERY, which brings up the
+      // new-password form below; the other codes sign in.
+      const { error } = otpType === 'recovery' ? await verifyRecoveryCode(otpEmail, code) : await verifyOtp(otpEmail, code, otpType)
       if (error) {
+        const attempts = codeAttempts + 1
+        setCodeAttempts(attempts)
+        const key = rejectedCodeKey(error, { expiresAt: codeExpiresAt, attempts })
         setOtpError(true)
-        setMessage(friendlyError(error, t))
+        setMessage(key ? t(key) : friendlyError(error, t))
         setOtpCode(['', '', '', '', '', ''])
         otpRefs.current[0]?.focus()
       } else {
         setOtpStep(null)
-        setPendingRedirect(location.state?.from || '/')
+        if (otpType !== 'recovery') setPendingRedirect(location.state?.from || '/')
       }
     } finally {
+      verifyingCode.current = false
       setLoading(false)
     }
   }
 
-  const handleForgotPassword = async () => {
-    const cleanEmail = email.trim()
-    if (!cleanEmail) { setMessage(t('auth.enterEmail')); return }
-    setEmail(cleanEmail)
+  // "Forgot?" opens its own step, with the address typed so far.
+  const openForgot = () => {
+    setOtpEmail(email.trim())
+    setOtpError(false)
     setMessage('')
-    const { error } = await resetPassword(cleanEmail)
-    setMessage(error ? friendlyError(error, t) : t('auth.resetSent'))
+    setOtpStep('forgot')
+  }
+
+  // Step A of a reset. The answer is the same whether or not the address has
+  // an account (Supabase answers 200 either way), so the page never tells a
+  // stranger who is registered. The code then goes in the usual code boxes.
+  const handleSendReset = async () => {
+    const cleanEmail = otpEmail.trim()
+    if (!EMAIL_RE.test(cleanEmail)) { setMessage(t('errors.invalidEmail')); return }
+    if (sendingCode.current) return
+    sendingCode.current = true
+    setOtpEmail(cleanEmail)
+    setLoading(true); setMessage('')
+    try {
+      const { error } = await resetPassword(cleanEmail)
+      const wait = retryAfterSeconds(error)
+      const toCode = (seconds, text, fresh) => {
+        setOtpType('recovery'); setOtpCode(['', '', '', '', '', '']); setOtpError(false)
+        setCooldown(seconds); setOtpStep('enter-code'); startCode(fresh); setMessage(text)
+      }
+      // A code went to this address moments ago and is still valid.
+      if (wait) toCode(wait, t('errors.waitSeconds', { s: wait }), false)
+      else if (error) setMessage(friendlyError(error, t))
+      else toCode(30, t('auth.resetCodeSent', { email: cleanEmail }), true)
+    } finally {
+      sendingCode.current = false
+      setLoading(false)
+    }
   }
 
   // Completes a password-recovery link. Reuses the signup password policy
   // (8-char minimum) since a fresh password set here is exactly that case,
   // not a login — see validate()'s equivalent branch.
   const handleUpdatePassword = async () => {
+    if (loading) return
     setMessage('')
-    if (newPassword.length < 8) { setMessage(t('errors.passwordMin')); return }
-    if (newPassword !== confirmNewPassword) { setMessage(t('errors.passwordMismatch')); return }
+    const invalid = newPasswordError(newPassword, confirmNewPassword)
+    if (invalid) { setMessage(t(invalid)); return }
     setLoading(true)
     try {
-      const { error } = await updatePassword(newPassword)
+      const { error, othersSignedOut } = await updatePassword(newPassword)
       if (error) {
         setMessage(friendlyError(error, t))
       } else {
         setNewPassword('')
         setConfirmNewPassword('')
         setRecoveryDone(true)
+        setRecoveryOthersOut(othersSignedOut)
         setMessage(t('auth.recoverySuccess'))
       }
     } finally {
@@ -300,7 +482,11 @@ export default function Profile() {
   // real (the user IS authenticated), but landing on the ordinary dashboard
   // here would mean the reset never actually happens — the old password
   // stays in effect with no indication anything is wrong.
-  if (passwordRecovery) {
+  // Stays on screen after the update too (recoveryDone), so the person sees
+  // that it worked: AuthContext ends the recovery state as soon as the new
+  // password is saved, which used to swap this screen for the dashboard
+  // before the success message could ever show.
+  if (passwordRecovery || recoveryDone) {
     return (
       <div className="profile-page auth-screen">
         <DuskHero />
@@ -317,12 +503,14 @@ export default function Profile() {
                     type={showNewPw ? 'text' : 'password'}
                     className="form-input"
                     placeholder={t('auth.newPassword')}
+                    aria-label={t('auth.newPassword')}
+                    autoComplete="new-password"
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleUpdatePassword()}
                     autoFocus
                   />
-                  <button className="field-eye" onClick={() => setShowNewPw(!showNewPw)} type="button">{showNewPw ? <EyeOff size={18} /> : <Eye size={18} />}</button>
+                  <button className="field-eye" onClick={() => setShowNewPw(!showNewPw)} type="button" aria-label={showNewPw ? t('auth.hidePassword') : t('auth.showPassword')} aria-pressed={showNewPw}>{showNewPw ? <EyeOff size={18} /> : <Eye size={18} />}</button>
                 </div>
                 <div className="field-row">
                   <Lock size={18} className="field-icon" />
@@ -330,6 +518,8 @@ export default function Profile() {
                     type={showNewPw ? 'text' : 'password'}
                     className="form-input"
                     placeholder={t('auth.confirmPassword')}
+                    aria-label={t('auth.confirmPassword')}
+                    autoComplete="new-password"
                     value={confirmNewPassword}
                     onChange={(e) => setConfirmNewPassword(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleUpdatePassword()}
@@ -341,6 +531,18 @@ export default function Profile() {
               </>
             )}
             {message && <div className={`auth-message ${recoveryDone ? '' : 'auth-message--error'}`} role="status">{message}</div>}
+            {recoveryDone && recoveryOthersOut && <p className="auth-subtitle">{t('security.othersSignedOut')}</p>}
+            {/* Leaving ends the reset session: the old password stays. */}
+            {!recoveryDone && (
+              <button className="link-btn" disabled={loading} onClick={() => { setMessage(''); signOut() }}>
+                {t('auth.backToSignIn')}
+              </button>
+            )}
+            {recoveryDone && (
+              <button className="cta-pill" onClick={() => { setRecoveryDone(false); setMessage('') }}>
+                {t('common.done')}
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -353,17 +555,22 @@ export default function Profile() {
     const initial = displayName[0]?.toUpperCase() || '?'
 
     const settingsRows = [
+      { icon: UserPen, label: t('profile.edit.title'), onClick: () => setEditOpen(true) },
+      { icon: KeyRound, label: t('security.row'), onClick: () => setSecurityOpen(true) },
       { icon: Heart, label: t('favourites.title'), to: '/favorites', badge: stats.saved || null },
       { icon: SearchIcon, label: t('profile.savedSearches'), to: '/saved-searches', badge: stats.searches || null },
       { icon: Calendar, label: t('viewings.title'), to: '/viewings' },
       { icon: Building2, label: t('listing.myListings'), to: '/my-listings' },
       ...(isAgent ? [{ icon: Briefcase, label: t('agentDashboard.title'), to: '/agent-dashboard' }] : []),
+      ...(canModerate ? [{ icon: ShieldCheck, label: t('moderation.title'), to: '/moderation' }] : []),
     ]
 
     return (
       <div className="page profile-page">
         <div className="profile-card">
-          <div className="profile-avatar">{initial}</div>
+          {profile?.avatar_url
+            ? <Avatar src={profile.avatar_url} name={displayName} size={60} className="mb-2" />
+            : <div className="profile-avatar">{initial}</div>}
           <div className="profile-name">{displayName}</div>
           <div className="profile-role-badge">{isAgent ? t('auth.agent') : t('auth.user')}</div>
           <div className="profile-email-row">{user.email}</div>
@@ -388,7 +595,7 @@ export default function Profile() {
           {settingsRows.map((row, i) => {
             const Icon = row.icon
             return (
-              <button key={i} className="profile-row" onClick={() => row.to && navigate(row.to)}>
+              <button key={i} className="profile-row" onClick={() => (row.onClick ? row.onClick() : row.to && navigate(row.to))}>
                 <Icon size={20} />
                 <span>{row.label}</span>
                 {row.badge ? <span className="profile-row__badge">{row.badge}</span> : null}
@@ -402,6 +609,68 @@ export default function Profile() {
           <LogOut size={18} />
           {t('common.signOut')}
         </button>
+
+        {/* Google Play's data-deletion policy wants deletion reachable on the
+            web too, not only in the app binary. Quiet, plain-text, and last —
+            it is irreversible, so it should take intent to find. */}
+        <button
+          className="profile-delete-account"
+          onClick={() => { setDeleteError(false); setDeleteOpen(true) }}
+        >
+          {t('account.deleteAccount')}
+        </button>
+
+        {/* Both stores expect a reachable Privacy Policy; the pages are part
+            of this web app (src/features/legal), so the links always work. */}
+        <LegalLinks className="profile-legal" />
+
+        {editOpen && (
+          <EditProfileSheet
+            userId={user.id}
+            profile={profile}
+            isAgent={isAgent}
+            onSaved={refreshProfile}
+            onClose={() => setEditOpen(false)}
+          />
+        )}
+
+        {securityOpen && <ChangePasswordSheet user={user} onClose={() => setSecurityOpen(false)} />}
+
+        {deleteOpen && (
+          <div className="delete-account-backdrop" onClick={() => !deleting && setDeleteOpen(false)}>
+            <div className="delete-account-dialog" role="dialog" aria-modal="true" onClick={e => e.stopPropagation()}>
+              <h2>{t('account.deleteAccount')}</h2>
+              <p>{t('account.deleteConfirmBody')}</p>
+              {deleteError && <div className="auth-message" role="alert">{t('account.deleteFailed')}</div>}
+              <button className="profile-signout" disabled={deleting} onClick={handleDeleteAccount}>
+                {deleting ? t('common.loading') : t('account.deleteConfirmCta')}
+              </button>
+              <button className="ghost-btn" disabled={deleting} onClick={() => setDeleteOpen(false)}>
+                {t('common.cancel')}
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    )
+  }
+
+  // ─── Forgot password: ask for the address ───
+  if (otpStep === 'forgot') {
+    return (
+      <div className="profile-page auth-screen">
+        <DuskHero />
+        <div className="auth-content">
+          <div className="auth-glass">
+            <button className="link-btn otp-back" onClick={() => { setOtpStep(null); setMessage('') }}><ArrowLeft size={16} /> {t('auth.backToSignIn')}</button>
+            <div className="otp-icon"><Lock size={32} /></div>
+            <h2 className="auth-title">{t('auth.forgotTitle')}</h2>
+            <p className="auth-subtitle">{t('auth.forgotSubtitle')}</p>
+            <div className="field-row"><Mail size={18} className="field-icon" /><input type="email" className="form-input" placeholder={t('auth.email')} aria-label={t('auth.email')} autoComplete="email" value={otpEmail} onChange={(e) => setOtpEmail(e.target.value)} autoFocus onKeyDown={(e) => e.key === 'Enter' && handleSendReset()} /></div>
+            <button className="cta-pill" onClick={handleSendReset} disabled={loading}>{loading ? t('common.loading') : t('auth.sendCode')}</button>
+            {message && <div className="auth-message" role="status">{message}</div>}
+          </div>
+        </div>
       </div>
     )
   }
@@ -417,9 +686,9 @@ export default function Profile() {
             <div className="otp-icon"><Mail size={32} /></div>
             <h2 className="auth-title">{t('auth.otpTitle')}</h2>
             <p className="auth-subtitle">{t('auth.otpSubtitle')}</p>
-            <div className="field-row"><Mail size={18} className="field-icon" /><input type="email" className="form-input" placeholder={t('auth.email')} value={otpEmail} onChange={(e) => setOtpEmail(e.target.value)} autoFocus onKeyDown={(e) => e.key === 'Enter' && handleSendOtp()} /></div>
+            <div className="field-row"><Mail size={18} className="field-icon" /><input type="email" className="form-input" placeholder={t('auth.email')} aria-label={t('auth.email')} autoComplete="email" value={otpEmail} onChange={(e) => setOtpEmail(e.target.value)} autoFocus onKeyDown={(e) => e.key === 'Enter' && handleSendOtp()} /></div>
             <button className="cta-pill" onClick={handleSendOtp} disabled={loading}>{loading ? t('common.loading') : t('auth.sendCode')}</button>
-            {message && <div className="auth-message">{message}</div>}
+            {message && <div className="auth-message" role="status">{message}</div>}
           </div>
         </div>
       </div>
@@ -433,20 +702,43 @@ export default function Profile() {
         <DuskHero />
         <div className="auth-content">
           <div className="auth-glass">
-            <button className="link-btn otp-back" onClick={() => setOtpStep(otpType === 'signup' ? null : 'enter-email')}><ArrowLeft size={16} /> {t('common.back')}</button>
+            <button className="link-btn otp-back" onClick={() => setOtpStep(otpType === 'signup' ? null : otpType === 'recovery' ? 'forgot' : 'enter-email')}><ArrowLeft size={16} /> {t('common.back')}</button>
             <div className="otp-icon"><Mail size={32} /></div>
-            <h2 className="auth-title">{t('auth.enterCode')}</h2>
-            <p className="auth-subtitle">{t('auth.codeSentTo', { email: otpEmail })}</p>
+            {otpType === 'signup' ? (
+              <>
+                <h2 className="auth-title">{t('auth.verifyEmailTitle')}</h2>
+                <p className="auth-subtitle">{t('auth.verifyEmailSubtitle')}</p>
+                <p className="auth-subtitle"><strong>{otpEmail}</strong></p>
+              </>
+            ) : (
+              <>
+                <h2 className="auth-title">{t('auth.enterCode')}</h2>
+                <p className="auth-subtitle">{t('auth.codeSentTo', { email: otpEmail })}</p>
+              </>
+            )}
             <div className="otp-inputs" onPaste={handleOtpPaste}>
               {otpCode.map((digit, i) => (
-                <input key={i} ref={(el) => (otpRefs.current[i] = el)} type="text" inputMode="numeric" maxLength={1} className={`otp-digit ${digit ? 'filled' : ''} ${otpError ? 'error' : ''}`} value={digit} onChange={(e) => handleOtpChange(i, e.target.value)} onKeyDown={(e) => handleOtpKeyDown(i, e)} autoFocus={i === 0} />
+                <input key={i} ref={(el) => (otpRefs.current[i] = el)} type="text" inputMode="numeric" autoComplete={i === 0 ? 'one-time-code' : 'off'} aria-label={t('auth.codeDigit', { n: i + 1 })} maxLength={1} className={`otp-digit ${digit ? 'filled' : ''} ${otpError ? 'error' : ''}`} value={digit} onChange={(e) => handleOtpChange(i, e.target.value)} onKeyDown={(e) => handleOtpKeyDown(i, e)} autoFocus={i === 0} />
               ))}
             </div>
-            {loading && <p className="auth-subtitle">{t('common.loading')}</p>}
+            {codeLeft > 0 && <p className="auth-subtitle">{t('auth.codeExpiresIn', { time: formatCountdown(codeLeft) })}</p>}
+            {/* Once the code has expired that is the news, over any earlier info line. */}
+            {codeExpired && !otpError ? (
+              <div className="auth-message auth-message--error" role="alert">{t('errors.codeExpired')}</div>
+            ) : message && (
+              <div className={`auth-message ${otpError ? 'auth-message--error' : ''}`} role={otpError ? 'alert' : 'status'}>{message}</div>
+            )}
+            <button className="cta-pill" onClick={() => handleVerifyOtp(otpCode.join(''))} disabled={loading || codeExpired || otpCode.some((d) => d === '')}>
+              {loading ? t('common.loading') : t('auth.verifyAccount')}
+            </button>
             <button className="link-btn" onClick={handleResend} disabled={loading || cooldown > 0}>
               {cooldown > 0 ? t('auth.resendIn', { s: cooldown }) : t('auth.resendCode')}
             </button>
-            {message && <div className={`auth-message ${otpError ? 'auth-message--error' : ''}`} role={otpError ? 'alert' : 'status'}>{message}</div>}
+            {otpType === 'signup' && (
+              <button className="link-btn" onClick={() => { setOtpStep(null); setIsSignUp(false); setMessage('') }}>
+                {t('auth.signupCodeHint')}
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -476,26 +768,26 @@ export default function Profile() {
           </div>
 
           {isSignUp && (
-            <div className="field-row"><User size={18} className="field-icon" /><input type="text" className="form-input" placeholder={t('auth.fullName')} value={fullName} onChange={(e) => setFullName(e.target.value)} /></div>
+            <div className="field-row"><User size={18} className="field-icon" /><input type="text" className="form-input" placeholder={t('auth.fullName')} aria-label={t('auth.fullName')} autoComplete="name" value={fullName} onChange={(e) => setFullName(e.target.value)} /></div>
           )}
 
-          <div className="field-row"><Mail size={18} className="field-icon" /><input type="email" className="form-input" placeholder={t('auth.email')} value={email} onChange={(e) => setEmail(e.target.value)} /></div>
+          <div className="field-row"><Mail size={18} className="field-icon" /><input type="email" className="form-input" placeholder={t('auth.email')} aria-label={t('auth.email')} autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} /></div>
 
           <div className="field-row">
             <Lock size={18} className="field-icon" />
-            <input type={showPw ? 'text' : 'password'} className="form-input" placeholder={t('auth.password')} value={password} onChange={(e) => setPassword(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleAuth()} />
-            <button className="field-eye" onClick={() => setShowPw(!showPw)} type="button">{showPw ? <EyeOff size={18} /> : <Eye size={18} />}</button>
+            <input type={showPw ? 'text' : 'password'} className="form-input" placeholder={t('auth.password')} aria-label={t('auth.password')} autoComplete={isSignUp ? 'new-password' : 'current-password'} value={password} onChange={(e) => setPassword(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleAuth()} />
+            <button className="field-eye" onClick={() => setShowPw(!showPw)} type="button" aria-label={showPw ? t('auth.hidePassword') : t('auth.showPassword')} aria-pressed={showPw}>{showPw ? <EyeOff size={18} /> : <Eye size={18} />}</button>
           </div>
 
           {isSignUp && (
             <div className="field-row">
               <Lock size={18} className="field-icon" />
-              <input type={showPw ? 'text' : 'password'} className="form-input" placeholder={t('auth.confirmPassword')} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleAuth()} />
+              <input type={showPw ? 'text' : 'password'} className="form-input" placeholder={t('auth.confirmPassword')} aria-label={t('auth.confirmPassword')} autoComplete="new-password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleAuth()} />
             </div>
           )}
 
           {isSignUp && role === 'agent' && (
-            <div className="field-row"><Building2 size={18} className="field-icon" /><input type="text" className="form-input" placeholder={t('auth.agencyName')} value={agencyName} onChange={(e) => setAgencyName(e.target.value)} /></div>
+            <div className="field-row"><Building2 size={18} className="field-icon" /><input type="text" className="form-input" placeholder={t('auth.officeName')} aria-label={t('auth.officeName')} autoComplete="organization" value={agencyName} onChange={(e) => setAgencyName(e.target.value)} /></div>
           )}
 
           {/* Prototype's row above the CTA: what the selected role gets you on
@@ -503,7 +795,7 @@ export default function Profile() {
           {!isSignUp && (
             <div className="auth-access-row">
               <span>{role === 'agent' ? t('auth.accessAgent') : t('auth.accessClient')}</span>
-              <button type="button" className="auth-forgot" onClick={handleForgotPassword}>
+              <button type="button" className="auth-forgot" onClick={openForgot}>
                 {t('auth.forgotShort')}
               </button>
             </div>
@@ -515,7 +807,7 @@ export default function Profile() {
             <ArrowRight size={18} />
           </button>
 
-          {message && <div className="auth-message">{message}</div>}
+          {message && <div className="auth-message" role="status">{message}</div>}
 
           <div className="divider"><span>{t('auth.signInWith')}</span></div>
 
@@ -541,11 +833,15 @@ export default function Profile() {
                 OTP/password paths, which stay on this page. This is the
                 exact rough edge the 2026-07-12 removal was avoiding — it's
                 back now because that's what was asked for, but it isn't
-                solved, only re-exposed until the Dashboard config lands. */}
-            <button className="social-btn" onClick={() => handleProvider('apple')} disabled={!!providerLoading}>
-              {providerLoading === 'apple' ? <Loader2 size={18} className="animate-spin" /> : <Apple size={18} />}
-              {t('auth.continueWithApple')}
-            </button>
+                solved, only re-exposed until the Dashboard config lands.
+                2026-11-13 (AUDIT-001): Apple is hidden behind
+                APPLE_SIGN_IN_ENABLED until the provider is on. */}
+            {APPLE_SIGN_IN_ENABLED && (
+              <button className="social-btn" onClick={() => handleProvider('apple')} disabled={!!providerLoading}>
+                {providerLoading === 'apple' ? <Loader2 size={18} className="animate-spin" /> : <Apple size={18} />}
+                {t('auth.continueWithApple')}
+              </button>
+            )}
             <button className="social-btn" onClick={() => handleProvider('linkedin_oidc')} disabled={!!providerLoading}>
               {providerLoading === 'linkedin_oidc' ? <Loader2 size={18} className="animate-spin" /> : <Linkedin size={18} />}
               {t('auth.continueWithLinkedIn')}
