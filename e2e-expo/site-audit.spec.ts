@@ -46,6 +46,7 @@ export const ROUTES: RouteSpec[] = [
   { path: `/messages/${CONV}`, name: 'chat', access: 'signed-in' },
   { path: '/favorites', name: 'favorites', access: 'signed-in' },
   { path: '/saved-searches', name: 'saved-searches', access: 'signed-in' },
+  { path: '/saved-searches?tab=wanted&new=1', name: 'wanted-form', access: 'signed-in' },
   { path: '/viewings', name: 'viewings', access: 'signed-in' },
   { path: '/notifications', name: 'notifications', access: 'signed-in' },
   { path: '/my-listings', name: 'my-listings', access: 'signed-in' },
@@ -95,7 +96,9 @@ function measure(page: Page) {
     const inScroller = (el: Element) => {
       for (let n = el.parentElement; n; n = n.parentElement) {
         const ox = getComputedStyle(n).overflowX;
-        if ((ox === 'auto' || ox === 'scroll' || ox === 'hidden') && n.scrollWidth > n.clientWidth + 1) return true;
+        // Only a real sideways scroller (chip rows, carousels) excuses a control
+        // past the edge; one clipped by overflow:hidden is cut off for the user.
+        if ((ox === 'auto' || ox === 'scroll') && n.scrollWidth > n.clientWidth + 1) return true;
       }
       return false;
     };
@@ -118,6 +121,10 @@ function measure(page: Page) {
         const x = controls[j];
         if (controls[i].contains(x) || x.contains(controls[i])) continue;
         const b = x.getBoundingClientRect();
+        // A button placed inside a text field (show password, clear) is by design.
+        const inside = (o: DOMRect, i: DOMRect) => i.left >= o.left - 1 && i.right <= o.right + 1 && i.top >= o.top - 1 && i.bottom <= o.bottom + 1;
+        const field = (el: Element) => el.tagName === 'INPUT' || el.tagName === 'TEXTAREA';
+        if ((field(controls[i]) && inside(a, b)) || (field(x) && inside(b, a))) continue;
         const w = Math.min(a.right, b.right) - Math.max(a.left, b.left);
         const h = Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top);
         if (w > 4 && h > 4 && w * h > 0.25 * Math.min(a.width * a.height, b.width * b.height)) overlaps.push(`${label(controls[i])} × ${label(x)}`);

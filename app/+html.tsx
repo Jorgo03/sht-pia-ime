@@ -67,6 +67,11 @@ html, body, #root { height: 100%; }
 body { background-color: #f1ede6; overscroll-behavior-y: none; }
 @media (prefers-color-scheme: dark) { body { background-color: #0e0b09; } }
 @supports (height: 100dvh) { html, body, #root { height: 100dvh; } }
+/* A browser text field keeps a built-in minimum width (about 20 characters),
+   so two fields sharing a row (price min/max, price/bedrooms) could not
+   shrink and ran off the edge on 320–375px phones. Fields take the width
+   their layout gives them. */
+input, textarea, select { min-width: 0; }
 `;
 
 // Link previews need an absolute image URL; the site address is set per

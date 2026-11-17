@@ -36,6 +36,7 @@ import { countMatches, markSeen, newMatchCount, setEmailAlerts } from '@/src/fea
 import { sheetColumn } from '@/constants/web-frame';
 import { FORM_LIMITS, inIntRange } from '@/src/lib/formLimits';
 import { useReadableColumn } from '@/hooks/use-responsive';
+import { useIsDesktopWeb } from '@/hooks/use-app-dimensions';
 
 // Email alerts are offered only once sending is configured (docs/LAUNCH_TASKS.md F13).
 const EMAIL_ALERTS = process.env.EXPO_PUBLIC_EMAIL_ALERTS === 'true';
@@ -88,6 +89,7 @@ export default function SavedSearchesScreen() {
   const { setFilter, reset: resetFilters } = useFilters();
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
+  const desktopWeb = useIsDesktopWeb();
   // A centred column on an unfolded Fold or a spanned Duo (hooks/use-responsive).
   const readable = useReadableColumn();
   // `?tab=wanted&new=1` (the wanted-homes board's button) opens straight on
@@ -478,11 +480,12 @@ export default function SavedSearchesScreen() {
         )}
       </SafeAreaView>
 
-      <Modal visible={formOpen} transparent animationType="slide" onRequestClose={() => setFormOpen(false)}>
+      <Modal visible={formOpen} transparent animationType={desktopWeb ? 'fade' : 'slide'} onRequestClose={() => setFormOpen(false)}>
         <KeyboardAvoidingView
-          style={styles.modalBackdrop}
+          style={[styles.modalBackdrop, desktopWeb && styles.modalBackdropCentered]}
           behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-          <View style={[styles.modalSheet, sheetColumn]}>
+          {/* Desktop website: a centred dialog, not a phone sheet from the bottom. */}
+          <View style={[styles.modalSheet, sheetColumn, desktopWeb && styles.modalDialog]}>
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>
                 {tab === 'searches' ? t('saved.newSearch') : t('saved.newWanted')}
@@ -794,6 +797,8 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.6)',
     justifyContent: 'flex-end',
   },
+  modalBackdropCentered: { justifyContent: 'center', alignItems: 'center', padding: 24 },
+  modalDialog: { maxWidth: 560, borderRadius: 24, paddingBottom: 24 },
   modalSheet: {
     backgroundColor: colors.primaryLight,
     borderTopLeftRadius: 24,
@@ -837,6 +842,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   rowInput: {
     flex: 1,
+    minWidth: 0,
   },
   toggleRow: {
     flexDirection: 'row',

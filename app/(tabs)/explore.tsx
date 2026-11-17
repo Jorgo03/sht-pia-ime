@@ -51,7 +51,11 @@ export default function ExploreScreen() {
   const columns = desktop ? Math.max(2, Math.floor((layoutWidth - SIDEBAR_WIDTH - 60) / 300)) : deviceColumns;
   // A centred column for the title/search/tabs on an unfolded Fold or a
   // spanned Duo; the grid below keeps the full width for its columns.
-  const readable = useReadableColumn();
+  // On the website the grid already spans the page, so the title and search
+  // line up with it (left edge, capped width) instead of floating centred
+  // above it — the centred column looked detached at tablet and desktop.
+  const readableColumn = useReadableColumn();
+  const readable = IS_WEB && layoutWidth >= 768 ? styles.webChrome : readableColumn;
 
   // Local echo of filters.city so the field feels instant; the shared
   // filters-context already debounces the actual query (same 350ms web
@@ -439,6 +443,7 @@ const SIDEBAR_WIDTH = 320;
 const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   flex: { flex: 1 },
   desktopBody: { flex: 1, flexDirection: 'row', gap: 20, paddingLeft: 20 },
+  webChrome: { width: '100%', maxWidth: 820 },
   desktopSidebar: { width: SIDEBAR_WIDTH, paddingBottom: 24 },
   container: {
     flex: 1,

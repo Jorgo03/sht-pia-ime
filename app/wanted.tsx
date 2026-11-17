@@ -15,6 +15,7 @@ import { Fonts, type AtticoPalette } from '@/constants/theme';
 import { useAuth } from '@/contexts/auth-context';
 import { useTheme } from '@/contexts/theme-context';
 import { PAGE_SIZE } from '@/data/properties';
+import { useAppDimensions } from '@/hooks/use-app-dimensions';
 import { useReadableColumn } from '@/hooks/use-responsive';
 import { formatPrice } from '@/lib/format';
 import { supabase } from '@/lib/supabase';
@@ -44,6 +45,10 @@ export default function WantedBoardScreen() {
   const readable = useReadableColumn();
   const listCol = { gap: 10, paddingHorizontal: 20 + (readable?.paddingHorizontal ?? 0) };
   const insets = useSafeAreaInsets();
+  // Wide website screens: the explainer and the steps side by side in a
+  // wider column, instead of one narrow phone column.
+  const { width } = useAppDimensions();
+  const wide = width >= 900;
   const { user, isAgent, loading: authLoading } = useAuth();
 
   const board = useInfiniteQuery({
@@ -81,7 +86,7 @@ export default function WantedBoardScreen() {
       {/* The column is only for the content: the site footer below is drawn
           the full width of the page (inside the column it was cramped). */}
       <SafeAreaView style={styles.container} edges={['top']}>
-        <View style={readable}>
+        <View style={wide ? styles.wideWrap : readable}>
           <AppHeader onBack={back} />
           <ScreenHero pre={t('wanted.boardPre')} em={t('wanted.boardEm')} />
         </View>
@@ -91,10 +96,10 @@ export default function WantedBoardScreen() {
           </View>
         ) : !isAgent ? (
           <ScrollView contentContainerStyle={{ paddingBottom: 24 + insets.bottom }}>
-            <View style={readable}>
-              <View style={styles.list}>
-                {explainer}
-                <Steps styles={styles} />
+            <View style={wide ? styles.wideWrap : readable}>
+              <View style={[styles.list, wide && styles.wideRow]}>
+                <View style={wide && styles.wideCol}>{explainer}</View>
+                <View style={wide && styles.wideCol}><Steps styles={styles} /></View>
               </View>
             </View>
             <SiteFooter />
@@ -188,7 +193,10 @@ type Styles = ReturnType<typeof createStyles>;
 const createStyles = (colors: AtticoPalette) =>
   StyleSheet.create({
     container: { flex: 1 },
-    list: { paddingHorizontal: 20, gap: 10 },
+    list: { paddingHorizontal: 20, gap: 10, paddingBottom: 48 },
+    wideWrap: { width: '100%', maxWidth: 1080, alignSelf: 'center' },
+    wideRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 48 },
+    wideCol: { flex: 1, minWidth: 0 },
     skeleton: { height: 96, borderRadius: 18, backgroundColor: colors.glass },
     center: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12, padding: 32 },
     centerText: { fontSize: 16, fontFamily: Fonts.sansSemiBold, color: colors.textPrimary, textAlign: 'center' },
