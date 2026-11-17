@@ -104,7 +104,11 @@
     "checkInbox": "Проверьте почту",
     "usePassword": "Пароль",
     "spamHint": "Если письмо не пришло, проверьте папку «Спам» или запросите новый код.",
-    "browseWithoutAccount": "Смотреть без аккаунта"
+    "browseWithoutAccount": "Смотреть без аккаунта",
+    "existingAccountHint": "Войдите с этим email, сбросьте пароль или, если аккаунт создан через Google, продолжите с Google.",
+    "signInThisEmail": "Войти с этим email",
+    "continueWithGoogleFull": "Продолжить с Google",
+    "wrongPasswordHint": "Проверьте пароль, сбросьте его или, если аккаунт создан через Google, продолжите с Google."
   },
   "home": {
     "greetingMorning": "Доброе утро",

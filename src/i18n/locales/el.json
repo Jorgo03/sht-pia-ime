@@ -104,7 +104,11 @@
     "checkInbox": "Ελέγξτε το email σας",
     "usePassword": "Κωδικός",
     "spamHint": "Αν δεν λάβατε το email, ελέγξτε τον φάκελο ανεπιθύμητης αλληλογραφίας ή ζητήστε νέο κωδικό.",
-    "browseWithoutAccount": "Περιήγηση χωρίς λογαριασμό"
+    "browseWithoutAccount": "Περιήγηση χωρίς λογαριασμό",
+    "existingAccountHint": "Συνδεθείτε με αυτό το email, επαναφέρετε τον κωδικό σας ή, αν δημιουργήσατε τον λογαριασμό με Google, συνεχίστε με Google.",
+    "signInThisEmail": "Σύνδεση με αυτό το email",
+    "continueWithGoogleFull": "Συνέχεια με Google",
+    "wrongPasswordHint": "Ελέγξτε τον κωδικό, επαναφέρετέ τον ή, αν δημιουργήσατε τον λογαριασμό με Google, συνεχίστε με Google."
   },
   "addSheet": {
     "openLabel": "Δημιουργία",

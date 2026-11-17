@@ -104,7 +104,11 @@
     "checkInbox": "Prüfe deine E-Mails",
     "usePassword": "Passwort",
     "spamHint": "Falls du die E-Mail nicht erhalten hast, prüfe deinen Spam-Ordner oder fordere einen neuen Code an.",
-    "browseWithoutAccount": "Ohne Konto stöbern"
+    "browseWithoutAccount": "Ohne Konto stöbern",
+    "existingAccountHint": "Melde dich mit dieser E-Mail an, setze dein Passwort zurück oder, wenn du das Konto mit Google erstellt hast, fahre mit Google fort.",
+    "signInThisEmail": "Mit dieser E-Mail anmelden",
+    "continueWithGoogleFull": "Weiter mit Google",
+    "wrongPasswordHint": "Prüfe das Passwort, setze es zurück oder, wenn du das Konto mit Google erstellt hast, fahre mit Google fort."
   },
   "home": {
     "greetingMorning": "Guten Morgen",

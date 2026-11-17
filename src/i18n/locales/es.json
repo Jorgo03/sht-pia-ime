@@ -104,7 +104,11 @@
     "checkInbox": "Revisa tu correo",
     "usePassword": "Contraseña",
     "spamHint": "Si no has recibido el correo, revisa la carpeta de spam o solicita un código nuevo.",
-    "browseWithoutAccount": "Explorar sin cuenta"
+    "browseWithoutAccount": "Explorar sin cuenta",
+    "existingAccountHint": "Inicia sesión con este correo, restablece tu contraseña o, si creaste la cuenta con Google, continúa con Google.",
+    "signInThisEmail": "Iniciar sesión con este correo",
+    "continueWithGoogleFull": "Continuar con Google",
+    "wrongPasswordHint": "Revisa la contraseña, restablécela o, si creaste la cuenta con Google, continúa con Google."
   },
   "home": {
     "greetingMorning": "Buenos días",

@@ -104,7 +104,11 @@
     "checkInbox": "Controlla la tua email",
     "usePassword": "Password",
     "spamHint": "Se non hai ricevuto l’email, controlla la cartella Spam o richiedi un nuovo codice.",
-    "browseWithoutAccount": "Sfoglia senza account"
+    "browseWithoutAccount": "Sfoglia senza account",
+    "existingAccountHint": "Accedi con questa email, reimposta la password oppure, se hai creato l'account con Google, continua con Google.",
+    "signInThisEmail": "Accedi con questa email",
+    "continueWithGoogleFull": "Continua con Google",
+    "wrongPasswordHint": "Controlla la password, reimpostala oppure, se hai creato l'account con Google, continua con Google."
   },
   "home": {
     "greetingMorning": "Buongiorno",

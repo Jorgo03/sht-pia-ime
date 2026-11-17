@@ -104,7 +104,11 @@
     "checkInbox": "Vérifiez vos e-mails",
     "usePassword": "Mot de passe",
     "spamHint": "Si vous n’avez pas reçu l’e-mail, vérifiez votre dossier Spam ou demandez un nouveau code.",
-    "browseWithoutAccount": "Parcourir sans compte"
+    "browseWithoutAccount": "Parcourir sans compte",
+    "existingAccountHint": "Connectez-vous avec cet e-mail, réinitialisez votre mot de passe ou, si vous avez créé le compte avec Google, continuez avec Google.",
+    "signInThisEmail": "Se connecter avec cet e-mail",
+    "continueWithGoogleFull": "Continuer avec Google",
+    "wrongPasswordHint": "Vérifiez le mot de passe, réinitialisez-le ou, si vous avez créé le compte avec Google, continuez avec Google."
   },
   "home": {
     "greetingMorning": "Bonjour",

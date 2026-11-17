@@ -104,7 +104,11 @@
     "checkInbox": "E-postanızı kontrol edin",
     "usePassword": "Şifre",
     "spamHint": "E-postayı almadıysanız Spam/Gereksiz klasörünü kontrol edin veya yeni kod isteyin.",
-    "browseWithoutAccount": "Hesap olmadan göz atın"
+    "browseWithoutAccount": "Hesap olmadan göz atın",
+    "existingAccountHint": "Bu e-postayla giriş yapın, şifrenizi sıfırlayın veya hesabı Google ile oluşturduysanız Google ile devam edin.",
+    "signInThisEmail": "Bu e-postayla giriş yap",
+    "continueWithGoogleFull": "Google ile devam et",
+    "wrongPasswordHint": "Şifreyi kontrol edin, sıfırlayın veya hesabı Google ile oluşturduysanız Google ile devam edin."
   },
   "addSheet": {
     "openLabel": "Oluştur",

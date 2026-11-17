@@ -104,7 +104,11 @@
     "checkInbox": "Sprawdź e-mail",
     "usePassword": "Hasło",
     "spamHint": "Jeśli e-mail nie dotarł, sprawdź folder Spam lub poproś o nowy kod.",
-    "browseWithoutAccount": "Przeglądaj bez konta"
+    "browseWithoutAccount": "Przeglądaj bez konta",
+    "existingAccountHint": "Zaloguj się tym adresem, zresetuj hasło albo, jeśli konto zostało utworzone przez Google, kontynuuj z Google.",
+    "signInThisEmail": "Zaloguj się tym adresem",
+    "continueWithGoogleFull": "Kontynuuj z Google",
+    "wrongPasswordHint": "Sprawdź hasło, zresetuj je albo, jeśli konto zostało utworzone przez Google, kontynuuj z Google."
   },
   "home": {
     "greetingMorning": "Dzień dobry",
