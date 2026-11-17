@@ -15,6 +15,7 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  useWindowDimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
@@ -36,7 +37,6 @@ import { countMatches, markSeen, newMatchCount, setEmailAlerts } from '@/src/fea
 import { sheetColumn } from '@/constants/web-frame';
 import { FORM_LIMITS, inIntRange } from '@/src/lib/formLimits';
 import { useReadableColumn } from '@/hooks/use-responsive';
-import { useIsDesktopWeb } from '@/hooks/use-app-dimensions';
 
 // Email alerts are offered only once sending is configured (docs/LAUNCH_TASKS.md F13).
 const EMAIL_ALERTS = process.env.EXPO_PUBLIC_EMAIL_ALERTS === 'true';
@@ -89,7 +89,10 @@ export default function SavedSearchesScreen() {
   const { setFilter, reset: resetFilters } = useFilters();
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
-  const desktopWeb = useIsDesktopWeb();
+  // The window, not the 720px app column this screen is drawn in: the form
+  // opens over the whole page, so a wide window gets a centred dialog.
+  const { width: windowWidth } = useWindowDimensions();
+  const desktopWeb = Platform.OS === 'web' && windowWidth >= 1024;
   // A centred column on an unfolded Fold or a spanned Duo (hooks/use-responsive).
   const readable = useReadableColumn();
   // `?tab=wanted&new=1` (the wanted-homes board's button) opens straight on
