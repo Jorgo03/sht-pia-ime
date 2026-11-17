@@ -16,7 +16,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { ASSET_FROM, ASSET_TO, STATIC_PAGES, applyHead, isListingId, listingHead, relocateAssetRefs, robotsTxt, sitemapXml, staticPageHead } from './expo-web/seo.mjs';
+import { ASSET_FROM, ASSET_TO, STATIC_PAGES, applyHead, applyPrivateHead, isPrivateRoute, routeOfFile, isListingId, listingHead, relocateAssetRefs, robotsTxt, sitemapXml, staticPageHead } from './expo-web/seo.mjs';
 
 const dir = path.resolve(process.argv[2] || 'dist-expo');
 if (!fs.existsSync(path.join(dir, 'index.html'))) {
@@ -94,6 +94,18 @@ if (site.startsWith('https://')) {
     headed += 1;
   }
   console.log(`expo-web-postbuild: head tags written into ${headed} public pages`);
+}
+// Signed-in pages: a title and noindex in the HTML (see applyPrivateHead).
+{
+  const walk = (d) => fs.readdirSync(d, { withFileTypes: true }).flatMap((e) =>
+    e.isDirectory() ? (e.name === '_expo' || e.name === 'assets' ? [] : walk(path.join(d, e.name))) : e.name.endsWith('.html') ? [path.join(d, e.name)] : []);
+  let hidden = 0;
+  for (const file of walk(dir)) {
+    if (!isPrivateRoute(routeOfFile(path.relative(dir, file)))) continue;
+    fs.writeFileSync(file, applyPrivateHead(fs.readFileSync(file, 'utf8'), sq.seo.siteTitle));
+    hidden += 1;
+  }
+  console.log(`expo-web-postbuild: noindex written into ${hidden} signed-in pages`);
 }
 if (site.startsWith('https://')) {
   for (const row of listings) {

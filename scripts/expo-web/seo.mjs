@@ -98,6 +98,31 @@ export function staticPageHead(page, sq, site) {
   };
 }
 
+/**
+ * The route an exported file serves ("favorites/index.html" → "/favorites",
+ * "messages/[id].html" → "/messages/[id]").
+ */
+export function routeOfFile(file) {
+  const r = '/' + String(file).replace(/\\/g, '/').replace(/\.html$/, '').replace(/(^|\/)index$/, '');
+  return r.length > 1 ? r.replace(/\/$/, '') : '/';
+}
+
+export const isPrivateRoute = (route) => PRIVATE_ROUTES.some((r) => route === r.replace(/\/$/, '') || route.startsWith(r.endsWith('/') ? r : `${r}/`));
+
+/**
+ * A signed-in page's exported HTML: the site title (the static render writes
+ * none) and "noindex, nofollow", so search engines never list it even when
+ * linked from elsewhere. robots.txt only asks crawlers not to fetch it.
+ */
+export function applyPrivateHead(html, title) {
+  if (/name="robots"/.test(html)) return html;
+  const tags = [
+    /<title[\s>]/.test(html) ? '' : `<title>${escapeText(title)}</title>`,
+    '<meta name="robots" content="noindex, nofollow"/>',
+  ].join('');
+  return html.replace('</head>', `${tags}</head>`);
+}
+
 export function sitemapXml(site, listings) {
   const url = (loc, lastmod) => `  <url><loc>${escapeText(site + loc)}</loc>${lastmod ? `<lastmod>${String(lastmod).slice(0, 10)}</lastmod>` : ''}</url>`;
   return [

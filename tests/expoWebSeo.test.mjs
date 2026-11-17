@@ -1,8 +1,20 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import {
-  applyHead, isListingId, listingHead, relocateAssetRefs, robotsTxt, sitemapXml,
+  applyHead, applyPrivateHead, isListingId, isPrivateRoute, listingHead, relocateAssetRefs, robotsTxt, routeOfFile, sitemapXml,
 } from '../scripts/expo-web/seo.mjs'
+
+test('signed-in pages get a title and noindex in their HTML; public ones are found as public', () => {
+  assert.equal(routeOfFile('favorites/index.html'), '/favorites')
+  assert.equal(routeOfFile('messages\\[id].html'), '/messages/[id]')
+  assert.equal(routeOfFile('index.html'), '/')
+  assert.equal(routeOfFile('listing/new.html'), '/listing/new')
+  for (const r of ['/favorites', '/messages', '/messages/[id]', '/listing/new', '/agent-dashboard', '/performance']) assert.ok(isPrivateRoute(r), r)
+  for (const r of ['/', '/explore', '/property/[id]', '/user/[id]', '/agents', '/listings']) assert.ok(!isPrivateRoute(r), r)
+  const out = applyPrivateHead('<html><head></head><body></body></html>', 'Shtëpia.ime')
+  assert.match(out, /<title>Shtëpia\.ime<\/title><meta name="robots" content="noindex, nofollow"\/><\/head>/)
+  assert.equal(applyPrivateHead(out, 'x'), out)
+})
 
 // The website built from the Expo app: per-listing pages for search engines
 // and link previews (scripts/expo-web-postbuild.mjs).
