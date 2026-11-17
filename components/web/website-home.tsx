@@ -466,7 +466,7 @@ const createStyles = (colors: AtticoPalette) =>
     pressed: { opacity: 0.85 },
 
     hero: { backgroundColor: INK, overflow: 'hidden', justifyContent: 'flex-end' },
-    photoShade: { backgroundColor: 'rgba(11,10,9,0.28)' },
+    photoShade: { backgroundColor: 'rgba(11,10,9,0.4)' },
     bandShade: { backgroundColor: 'rgba(11,10,9,0.55)' },
     heroInner: { paddingTop: 140, paddingBottom: 72, gap: 18 },
     heroEyebrow: { fontFamily: Fonts.sansMedium, fontSize: 13, letterSpacing: 1.4, color: ON_INK_SOFT, textTransform: 'uppercase' },

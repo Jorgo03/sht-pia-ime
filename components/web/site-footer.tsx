@@ -70,8 +70,8 @@ export function SiteFooter() {
       <View style={styles.inner}>
         <View style={[styles.top, stacked && styles.topStacked]}>
           <View style={styles.lead}>
-            <Text style={[styles.headline, phone && styles.headlinePhone]}>{t('site.cta.title')}</Text>
-            <Text style={styles.tagline}>{t('site.footer.tagline')}</Text>
+            {/* Not the closing band's question again: the site's own line. */}
+            <Text style={[styles.headline, phone && styles.headlinePhone]}>{t('site.footer.tagline')}</Text>
             <View style={styles.ctaRow}>
               <Pressable
                 accessibilityRole="link"
