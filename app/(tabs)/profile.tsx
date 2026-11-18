@@ -59,7 +59,7 @@ import { providerEnabled } from '@/src/features/auth/lib/authLinks';
 import { openedAtLaunch, START_PARAM } from '@/src/features/auth/lib/startScreen';
 import { ChangePasswordSheet } from '@/components/profile/change-password-sheet';
 import { useProfileStats } from '@/hooks/use-profile-stats';
-import type { ProfileFields } from '@/src/features/auth/lib/profileForm';
+import { PROFILE_LIMITS, type ProfileFields } from '@/src/features/auth/lib/profileForm';
 import { useUnreadMessages } from '@/hooks/use-unread-messages';
 import { useReadableColumn } from '@/hooks/use-responsive';
 import { APPLE_SIGN_IN_ENABLED } from '@/src/features/auth/lib/oauthOptions';
@@ -186,6 +186,13 @@ export default function ProfileScreen() {
   const [codeNotice, setCodeNotice] = useState<{ text: string; tone: 'error' | 'info' } | null>(null);
   // The sign-in / sign-up form's own message, for the same reason.
   const [formError, setFormError] = useState<string | null>(null);
+  // Sign-up for an address that already has an account: the error alone read
+  // as a broken form (REGISTRATION_FAILURE_AUDIT.md RC1), so it comes with
+  // the three ways forward.
+  const [existingAccount, setExistingAccount] = useState(false);
+  // A refused password gets the same help: most often the account was made
+  // with Google (no password) or the password is forgotten.
+  const [wrongPassword, setWrongPassword] = useState(false);
   // Seconds left on the resend lock. Web starts this at 30 on every send so a
   // user can't hammer the endpoint into a Supabase rate-limit.
   const [cooldown, setCooldown] = useState(0);
@@ -351,6 +358,8 @@ export default function ProfileScreen() {
       return null;
     })();
     setFormError(problem ? t(problem) : null);
+    setExistingAccount(false);
+    setWrongPassword(false);
     return !problem;
   };
 
@@ -384,6 +393,8 @@ export default function ProfileScreen() {
       if (error) {
         // Includes an address that already has an account (auth-context's
         // isExistingAccount): stay on the form, nothing was sent.
+        const code = (error as { code?: string }).code;
+        setExistingAccount(code === 'user_already_exists' || code === 'email_exists');
         setFormError(friendlyAuthError(error, t));
       } else if (needsConfirmation) {
         // The pending account exists and its code is on the way: the
@@ -402,6 +413,7 @@ export default function ProfileScreen() {
         openCodeEntry('signup', 0, false);
         setCodeNotice({ text: t('auth.confirmFirst'), tone: 'info' });
       } else if (error) {
+        setWrongPassword((error as { code?: string }).code === 'invalid_credentials');
         setFormError(friendlyAuthError(error, t));
       }
     }
@@ -1296,6 +1308,7 @@ export default function ProfileScreen() {
                     placeholderTextColor="rgba(255,255,255,0.8)"
                     value={fullName}
                     onChangeText={setFullName}
+                    maxLength={PROFILE_LIMITS.full_name}
                     autoCapitalize="words"
                     textContentType="name"
                     autoComplete="name"
@@ -1379,6 +1392,7 @@ export default function ProfileScreen() {
                     placeholderTextColor="rgba(255,255,255,0.8)"
                     value={agencyName}
                     onChangeText={setAgencyName}
+                    maxLength={PROFILE_LIMITS.agency_name}
                     autoCapitalize="words"
                     textContentType="organizationName"
                     autoComplete="organization"
@@ -1409,12 +1423,56 @@ export default function ProfileScreen() {
               )}
 
               {formError && (
-                <Text
-                  style={[styles.otpNotice, styles.otpNoticeError]}
-                  accessibilityRole="alert"
-                  accessibilityLiveRegion="polite">
-                  {formError}
-                </Text>
+                <View style={styles.formNotice} accessibilityRole="alert" accessibilityLiveRegion="polite">
+                  <View style={styles.formNoticeRow}>
+                    <MaterialIcons name="error-outline" size={18} color="#fff" />
+                    <Text style={styles.formNoticeText}>{formError}</Text>
+                  </View>
+                  {((existingAccount && isSignUp) || (wrongPassword && !isSignUp)) && (
+                    <>
+                      <Text style={styles.formNoticeHint}>
+                        {isSignUp ? t('auth.existingAccountHint') : t('auth.wrongPasswordHint')}
+                      </Text>
+                      <View style={styles.formNoticeActions}>
+                        {isSignUp && (
+                        <TouchableOpacity
+                          accessibilityRole="button"
+                          style={styles.formNoticeAction}
+                          onPress={() => {
+                            // Same address, the password form, nothing else kept.
+                            setIsSignUp(false);
+                            setUseEmailCode(false);
+                            setPassword('');
+                            setConfirmPassword('');
+                            setFormError(null);
+                            setExistingAccount(false);
+                          }}>
+                          <Text style={styles.formNoticeActionText}>{t('auth.signInThisEmail')}</Text>
+                        </TouchableOpacity>
+                        )}
+                        <TouchableOpacity
+                          accessibilityRole="button"
+                          style={styles.formNoticeAction}
+                          onPress={() => {
+                            setIsSignUp(false);
+                            setFormError(null);
+                            setExistingAccount(false);
+                            setWrongPassword(false);
+                            setRecoveryStep('email');
+                          }}>
+                          <Text style={styles.formNoticeActionText}>{t('auth.forgotPassword')}</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                          accessibilityRole="button"
+                          style={styles.formNoticeAction}
+                          disabled={!!providerLoading}
+                          onPress={() => handleProvider('google' as Provider)}>
+                          <Text style={styles.formNoticeActionText}>{t('auth.continueWithGoogleFull')}</Text>
+                        </TouchableOpacity>
+                      </View>
+                    </>
+                  )}
+                </View>
               )}
 
               <TouchableOpacity
@@ -1446,6 +1504,8 @@ export default function ProfileScreen() {
                   setIsSignUp(!isSignUp);
                   setUseEmailCode(false);
                   setFormError(null);
+                  setExistingAccount(false);
+                  setWrongPassword(false);
                 }}
                 style={styles.linkButton}>
                 <Text style={styles.linkButtonText}>
@@ -1863,6 +1923,51 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   otpNoticeError: {
     color: '#ffb4a8',
+  },
+  // The form's error: a solid panel, so it reads on any part of the gradient.
+  formNotice: {
+    backgroundColor: 'rgba(16,10,8,0.62)',
+    borderRadius: Radii.md,
+    borderWidth: 1,
+    borderColor: 'rgba(255,180,168,0.6)',
+    padding: 12,
+    gap: 8,
+  },
+  formNoticeRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 8,
+  },
+  formNoticeText: {
+    flex: 1,
+    fontFamily: Fonts?.sansBold,
+    fontSize: 14,
+    lineHeight: 20,
+    color: '#fff',
+  },
+  formNoticeHint: {
+    fontFamily: Fonts?.sans,
+    fontSize: 13,
+    lineHeight: 18,
+    color: 'rgba(255,255,255,0.88)',
+  },
+  formNoticeActions: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  formNoticeAction: {
+    minHeight: 44,
+    paddingHorizontal: 14,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.55)',
+    justifyContent: 'center',
+  },
+  formNoticeActionText: {
+    fontFamily: Fonts?.sansBold,
+    fontSize: 13,
+    color: '#fff',
   },
   ctaDisabled: {
     opacity: 0.5,

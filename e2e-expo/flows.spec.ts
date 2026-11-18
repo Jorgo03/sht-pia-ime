@@ -2264,6 +2264,69 @@ test.describe('sign-up verification', () => {
     await expect(page.getByRole('heading', { name: t('auth.verifyEmailTitle') })).toHaveCount(0);
   });
 
+  // REGISTRATION_FAILURE_AUDIT.md RC1: what production answers today, with
+  // Confirm email off. The owner tapped 17 times on one such address: the
+  // answer now says what to do next.
+  test('X109 a registered address gets 422 and three ways forward: sign in, reset, Google', async ({ page }) => {
+    const calls: AuthCall[] = [];
+    await answerAuth(page, 'signup', () => [422, { code: 422, error_code: 'user_already_exists', msg: 'User already registered' }], calls);
+    await signUpInApp(page);
+    const notice = page.getByRole('alert');
+    await expect(notice).toContainText(t('errors.userExists'));
+    await expect(notice).toContainText(t('auth.existingAccountHint'));
+    await expect(notice.getByRole('button', { name: t('auth.forgotPassword') })).toBeVisible();
+    await expect(notice.getByRole('button', { name: t('auth.continueWithGoogleFull') })).toBeVisible();
+    expect(await axeViolations(page, { known: ['color-contrast'] })).toEqual([]);
+
+    await notice.getByRole('button', { name: t('auth.signInThisEmail') }).click();
+    await expect(page.getByRole('button', { name: t('auth.stepInside') })).toBeVisible();
+    await expect(page.getByRole('textbox', { name: t('auth.email') })).toHaveValue(SIGNUP_EMAIL);
+    await expect(page.getByLabel(t('auth.password'), { exact: true })).toHaveValue('');
+    await expect(page.getByRole('alert')).toHaveCount(0);
+    expect(calls).toHaveLength(1);
+  });
+
+  test('X110 with Confirm email off a new address is signed in at once, without a code screen', async ({ page }) => {
+    const calls: AuthCall[] = [];
+    await answerAuth(page, 'signup', () => [200, fakeSession()], calls);
+    await page.route('**/auth/v1/user*', (route) => json(route, SIGNED_IN_USER));
+    await signUpInApp(page, { agent: true, office: 'Zyra Tirana' });
+    await expect(page.getByRole('heading', { name: t('common.profile'), level: 1 })).toBeVisible();
+    await expect(page.getByRole('heading', { name: t('auth.verifyEmailTitle') })).toHaveCount(0);
+    expect(calls[0].body).toMatchObject({ email: SIGNUP_EMAIL, data: { role: 'agent', full_name: 'Ana Hoxha', agency_name: 'Zyra Tirana' } });
+  });
+
+  test('X112 a refused password offers a reset and Google, the two ways back in', async ({ page }) => {
+    const calls: AuthCall[] = [];
+    // Supabase's live answer to a wrong password (2026-11-17 logs).
+    await answerAuth(page, 'token', () => [400, { code: 400, error_code: 'invalid_credentials', msg: 'Invalid login credentials' }], calls);
+    await page.goto('/profile');
+    await ready(page);
+    await page.getByRole('textbox', { name: t('auth.email') }).fill(SIGNUP_EMAIL);
+    await page.getByLabel(t('auth.password'), { exact: true }).fill('not-the-password');
+    await page.getByRole('button', { name: t('auth.stepInside') }).click();
+    const notice = page.getByRole('alert');
+    await expect(notice).toContainText(t('errors.invalidCredentials'));
+    await expect(notice).toContainText(t('auth.wrongPasswordHint'));
+    await expect(notice.getByRole('button', { name: t('auth.continueWithGoogleFull') })).toBeVisible();
+    await expect(notice.getByRole('button', { name: t('auth.signInThisEmail') })).toHaveCount(0);
+    await notice.getByRole('button', { name: t('auth.forgotPassword') }).click();
+    await expect(page.getByRole('heading', { name: t('auth.forgotTitle') })).toBeVisible();
+    await expect(page.getByRole('textbox', { name: t('auth.email') })).toHaveValue(SIGNUP_EMAIL);
+    expect(calls).toHaveLength(1);
+  });
+
+  test('X111 name and office stop at 80 characters, the database limit', async ({ page }) => {
+    await page.goto('/profile');
+    await ready(page);
+    await page.getByRole('button', { name: new RegExp(t('common.signUp')) }).click();
+    await page.getByRole('button', { name: new RegExp(t('auth.roleAgent')) }).click();
+    await page.getByRole('textbox', { name: t('auth.fullName') }).fill('N'.repeat(100));
+    await page.getByRole('textbox', { name: t('auth.officeName') }).fill('Z'.repeat(100));
+    await expect(page.getByRole('textbox', { name: t('auth.fullName') })).toHaveValue('N'.repeat(80));
+    await expect(page.getByRole('textbox', { name: t('auth.officeName') })).toHaveValue('Z'.repeat(80));
+  });
+
   test('X61 the dashboard stays shut while the email is unverified', async ({ page }) => {
     const calls: AuthCall[] = [];
     await answerAuth(page, 'signup', () => [200, PENDING_USER], calls);

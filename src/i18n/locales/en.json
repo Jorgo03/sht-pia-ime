@@ -104,7 +104,11 @@
     "checkInbox": "Check your email",
     "usePassword": "Password",
     "spamHint": "If you haven't received the email, check your Spam/Junk folder or request a new code.",
-    "browseWithoutAccount": "Browse without an account"
+    "browseWithoutAccount": "Browse without an account",
+    "existingAccountHint": "Sign in with this email, reset your password, or, if you created the account with Google, continue with Google.",
+    "signInThisEmail": "Sign in with this email",
+    "continueWithGoogleFull": "Continue with Google",
+    "wrongPasswordHint": "Check the password, reset it, or, if you created the account with Google, continue with Google."
   },
   "addSheet": {
     "openLabel": "Create new",

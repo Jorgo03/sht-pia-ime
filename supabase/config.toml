@@ -257,7 +257,7 @@ otp_expiry = 600
 # docs/ACCOUNT_AND_RELEASE_HANDOFF.md). tests/authEmailTemplates.test.mjs
 # checks both stay in step.
 [auth.email.template.confirmation]
-subject = "Kodi i konfirmimit · Confirm your account — Shtëpia.ime"
+subject = "Konfirmo llogarinë tënde — Shtepia Ime"
 content_path = "./supabase/templates/confirmation.html"
 
 [auth.email.template.recovery]
