@@ -1762,8 +1762,12 @@ test.describe('signed in: CRM', () => {
   });
 
   test('X41 dashboard: today\'s agenda, the leads link, and buyer requests matched to your listings', async ({ page }) => {
-    const today = new Date();
-    today.setHours(17, 0, 0, 0);
+    // 17:00 today in Tirana, where the dashboard shows times: built from the
+    // Tirana date and offset, not the test machine's own zone (UTC on CI made
+    // it 18:00 there and the test failed only on GitHub).
+    const tirana = (opt: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Tirane', ...opt }).format(new Date());
+    const offset = tirana({ timeZoneName: 'longOffset' }).match(/GMT([+-]\d{2}:\d{2})/)?.[1] ?? '+01:00';
+    const today = new Date(`${tirana({ year: 'numeric', month: '2-digit', day: '2-digit' })}T17:00:00${offset}`);
     await page.route('**/rest/v1/viewings*', (route) =>
       json(route, [{
         id: 'e2e00000-0000-4000-8000-000000000001', client_id: CHAT_CLIENT_ID, agent_id: SIGNED_IN_USER.id,
