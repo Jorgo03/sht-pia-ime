@@ -108,7 +108,17 @@
     "existingAccountHint": "Hyr me këtë email, rivendos fjalëkalimin, ose, nëse llogarinë e krijove me Google, vazhdo me Google.",
     "signInThisEmail": "Hyr me këtë email",
     "continueWithGoogleFull": "Vazhdo me Google",
-    "wrongPasswordHint": "Kontrollo fjalëkalimin, rivendose, ose, nëse llogarinë e krijove me Google, vazhdo me Google."
+    "wrongPasswordHint": "Kontrollo fjalëkalimin, rivendose, ose, nëse llogarinë e krijove me Google, vazhdo me Google.",
+    "pwRules": "Kërkesat e fjalëkalimit",
+    "pwRuleMet": "plotësuar",
+    "pwRuleMissing": "ende jo",
+    "pwRule": {
+      "length": "Të paktën 8 karaktere",
+      "upper": "Një shkronjë e madhe",
+      "lower": "Një shkronjë e vogël",
+      "digit": "Një numër",
+      "symbol": "Një karakter special"
+    }
   },
   "home": {
     "greetingMorning": "Mirëmëngjes",
@@ -376,7 +386,11 @@
     "codeIncorrect": "Kodi i verifikimit është i pasaktë. Provo sërish.",
     "codeExpired": "Kodi i verifikimit ka skaduar. Kërko një kod të ri.",
     "codeAttempts": "Shumë përpjekje të pasakta. Kërko një kod të ri.",
-    "officeRequired": "Shkruaj emrin e zyrës."
+    "officeRequired": "Shkruaj emrin e zyrës.",
+    "passwordUpper": "Fjalëkalimi duhet të ketë një shkronjë të madhe (A–Z).",
+    "passwordLower": "Fjalëkalimi duhet të ketë një shkronjë të vogël (a–z).",
+    "passwordDigit": "Fjalëkalimi duhet të ketë një numër (0–9).",
+    "passwordSymbol": "Fjalëkalimi duhet të ketë një karakter special, p.sh. ! ? @ # - _"
   },
   "agentDashboard": {
     "title": "Paneli i Agjentit",

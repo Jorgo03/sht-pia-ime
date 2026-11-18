@@ -3,6 +3,14 @@ import type { SupabaseClient, User } from '@supabase/supabase-js';
 
 export const PASSWORD_MIN_LENGTH: number;
 export const PASSWORD_MAX_BYTES: number;
+export interface PasswordChecks {
+  length: boolean;
+  upper: boolean;
+  lower: boolean;
+  digit: boolean;
+  symbol: boolean;
+}
+export function passwordChecks(password: string): PasswordChecks;
 export function passwordStrengthError(password: string): string | null;
 export function newPasswordError(password: string, confirm: string, options?: { current?: string }): string | null;
 export function signInMethods(user: User | null | undefined): string[];

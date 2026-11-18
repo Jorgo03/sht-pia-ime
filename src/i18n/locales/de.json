@@ -108,7 +108,17 @@
     "existingAccountHint": "Melde dich mit dieser E-Mail an, setze dein Passwort zurück oder, wenn du das Konto mit Google erstellt hast, fahre mit Google fort.",
     "signInThisEmail": "Mit dieser E-Mail anmelden",
     "continueWithGoogleFull": "Weiter mit Google",
-    "wrongPasswordHint": "Prüfe das Passwort, setze es zurück oder, wenn du das Konto mit Google erstellt hast, fahre mit Google fort."
+    "wrongPasswordHint": "Prüfe das Passwort, setze es zurück oder, wenn du das Konto mit Google erstellt hast, fahre mit Google fort.",
+    "pwRules": "Passwortanforderungen",
+    "pwRuleMet": "erfüllt",
+    "pwRuleMissing": "noch nicht",
+    "pwRule": {
+      "length": "Mindestens 8 Zeichen",
+      "upper": "Ein Großbuchstabe",
+      "lower": "Ein Kleinbuchstabe",
+      "digit": "Eine Zahl",
+      "symbol": "Ein Sonderzeichen"
+    }
   },
   "home": {
     "greetingMorning": "Guten Morgen",
@@ -400,7 +410,11 @@
     "codeIncorrect": "Falscher Bestätigungscode. Bitte versuche es erneut.",
     "codeExpired": "Dein Bestätigungscode ist abgelaufen. Bitte fordere einen neuen an.",
     "codeAttempts": "Zu viele falsche Versuche. Bitte fordere einen neuen Code an.",
-    "officeRequired": "Bitte gib den Namen deines Büros ein."
+    "officeRequired": "Bitte gib den Namen deines Büros ein.",
+    "passwordUpper": "Das Passwort braucht einen Großbuchstaben (A–Z).",
+    "passwordLower": "Das Passwort braucht einen Kleinbuchstaben (a–z).",
+    "passwordDigit": "Das Passwort braucht eine Zahl (0–9).",
+    "passwordSymbol": "Das Passwort braucht ein Sonderzeichen, z. B. ! ? @ # - _"
   },
   "agentDashboard": {
     "title": "Makler-Dashboard",

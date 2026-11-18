@@ -42,6 +42,7 @@ import { DuskHero } from '@/components/ui/dusk-hero';
 import { GoogleLogo } from '@/components/ui/google-logo';
 import { GradientBackground } from '@/components/ui/gradient-background';
 import { OtpInput, OTP_LENGTH } from '@/components/ui/otp-input';
+import { PasswordChecklist } from '@/components/ui/password-checklist';
 // One mapper for both apps (error codes first, then Supabase's text).
 import { friendlyError as friendlyAuthError, retryAfterSeconds } from '@/src/lib/authErrors';
 import {
@@ -1176,6 +1177,8 @@ export default function ProfileScreen() {
                     </TouchableOpacity>
                   </View>
 
+                  <PasswordChecklist password={newPassword} onDark />
+
                   <View style={styles.fieldRow}>
                     <MaterialIcons name="lock-outline" size={18} color="rgba(255,255,255,0.8)" style={styles.fieldIcon} />
                     <TextInput
@@ -1364,6 +1367,8 @@ export default function ProfileScreen() {
                 </TouchableOpacity>
               </View>
               )}
+
+              {isSignUp && <PasswordChecklist password={password} onDark />}
 
               {isSignUp && (
                 <View style={styles.fieldRow}>

@@ -108,7 +108,17 @@
     "existingAccountHint": "Accedi con questa email, reimposta la password oppure, se hai creato l'account con Google, continua con Google.",
     "signInThisEmail": "Accedi con questa email",
     "continueWithGoogleFull": "Continua con Google",
-    "wrongPasswordHint": "Controlla la password, reimpostala oppure, se hai creato l'account con Google, continua con Google."
+    "wrongPasswordHint": "Controlla la password, reimpostala oppure, se hai creato l'account con Google, continua con Google.",
+    "pwRules": "Requisiti della password",
+    "pwRuleMet": "soddisfatto",
+    "pwRuleMissing": "non ancora",
+    "pwRule": {
+      "length": "Almeno 8 caratteri",
+      "upper": "Una lettera maiuscola",
+      "lower": "Una lettera minuscola",
+      "digit": "Un numero",
+      "symbol": "Un carattere speciale"
+    }
   },
   "home": {
     "greetingMorning": "Buongiorno",
@@ -408,7 +418,11 @@
     "codeIncorrect": "Codice di verifica errato. Riprova.",
     "codeExpired": "Il tuo codice di verifica è scaduto. Richiedine uno nuovo.",
     "codeAttempts": "Troppi tentativi errati. Richiedi un nuovo codice.",
-    "officeRequired": "Inserisci il nome del tuo ufficio."
+    "officeRequired": "Inserisci il nome del tuo ufficio.",
+    "passwordUpper": "La password deve contenere una lettera maiuscola (A–Z).",
+    "passwordLower": "La password deve contenere una lettera minuscola (a–z).",
+    "passwordDigit": "La password deve contenere un numero (0–9).",
+    "passwordSymbol": "La password deve contenere un carattere speciale, ad es. ! ? @ # - _"
   },
   "agentDashboard": {
     "title": "Dashboard Agente",

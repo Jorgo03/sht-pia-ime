@@ -108,7 +108,17 @@
     "existingAccountHint": "Bu e-postayla giriş yapın, şifrenizi sıfırlayın veya hesabı Google ile oluşturduysanız Google ile devam edin.",
     "signInThisEmail": "Bu e-postayla giriş yap",
     "continueWithGoogleFull": "Google ile devam et",
-    "wrongPasswordHint": "Şifreyi kontrol edin, sıfırlayın veya hesabı Google ile oluşturduysanız Google ile devam edin."
+    "wrongPasswordHint": "Şifreyi kontrol edin, sıfırlayın veya hesabı Google ile oluşturduysanız Google ile devam edin.",
+    "pwRules": "Şifre gereksinimleri",
+    "pwRuleMet": "karşılandı",
+    "pwRuleMissing": "henüz değil",
+    "pwRule": {
+      "length": "En az 8 karakter",
+      "upper": "Bir büyük harf",
+      "lower": "Bir küçük harf",
+      "digit": "Bir rakam",
+      "symbol": "Bir özel karakter"
+    }
   },
   "addSheet": {
     "openLabel": "Oluştur",
@@ -428,7 +438,11 @@
     "codeIncorrect": "Doğrulama kodu hatalı. Lütfen tekrar deneyin.",
     "codeExpired": "Doğrulama kodunuzun süresi doldu. Lütfen yenisini isteyin.",
     "codeAttempts": "Çok fazla hatalı deneme. Lütfen yeni bir kod isteyin.",
-    "officeRequired": "Lütfen ofis adınızı girin."
+    "officeRequired": "Lütfen ofis adınızı girin.",
+    "passwordUpper": "Şifrede bir büyük harf (A–Z) olmalı.",
+    "passwordLower": "Şifrede bir küçük harf (a–z) olmalı.",
+    "passwordDigit": "Şifrede bir rakam (0–9) olmalı.",
+    "passwordSymbol": "Şifrede bir özel karakter olmalı, örneğin ! ? @ # - _"
   },
   "agentDashboard": {
     "title": "Emlakçı paneli",

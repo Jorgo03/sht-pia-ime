@@ -12,7 +12,7 @@ import { axeViolations, expect, test } from './support/test';
 
 const CORS = { 'access-control-allow-origin': '*' };
 const EMAIL = 'new.user@example.com';
-const PASSWORD = 'correct-horse-battery';
+const PASSWORD = 'Correct-horse-7';
 
 const json = (route: Route, status: number, body: unknown) =>
   route.fulfill({ status, contentType: 'application/json', headers: CORS, body: JSON.stringify(body) });
@@ -115,6 +115,14 @@ test('F4-N2 sign-up checks the form before sending anything', async ({ page }) =
   await page.getByPlaceholder(t('auth.confirmPassword')).fill('short');
   await page.getByRole('button', { name: t('auth.createAccount') }).click();
   await expect(page.getByText(t('errors.passwordMin'))).toBeVisible();
+
+  // Owner's rule (2026-11-18): uppercase, lowercase, number, special character.
+  for (const [weak, key] of [['no-upper-case-1', 'errors.passwordUpper'], ['NoSymbolHere1', 'errors.passwordSymbol']] as const) {
+    await page.getByPlaceholder(t('auth.password'), { exact: true }).fill(weak);
+    await page.getByPlaceholder(t('auth.confirmPassword')).fill(weak);
+    await page.getByRole('button', { name: t('auth.createAccount') }).click();
+    await expect(page.getByText(t(key))).toBeVisible();
+  }
   expect(log).toEqual([]);
 });
 
@@ -159,11 +167,11 @@ test('F4-H2 password recovery: request, open the emailed link, set a new passwor
   await expect(page.getByText(t('errors.passwordMin'))).toBeVisible();
   expect(log.some((s) => s.path === 'user' && s.body.password)).toBe(false);
 
-  await page.getByPlaceholder(t('auth.newPassword')).fill('a-new-long-password');
-  await page.getByPlaceholder(t('auth.confirmPassword')).fill('a-new-long-password');
+  await page.getByPlaceholder(t('auth.newPassword')).fill('A-new-long-pass1');
+  await page.getByPlaceholder(t('auth.confirmPassword')).fill('A-new-long-pass1');
   await page.getByRole('button', { name: t('auth.updatePassword') }).click();
   await expect(page.getByText(t('auth.recoverySuccess'))).toBeVisible();
-  expect(log.find((s) => s.path === 'user' && s.body.password)?.body).toMatchObject({ password: 'a-new-long-password' });
+  expect(log.find((s) => s.path === 'user' && s.body.password)?.body).toMatchObject({ password: 'A-new-long-pass1' });
   // Whoever else was in the account is signed out.
   expect(log.find((s) => s.path === 'logout')?.query.get('scope')).toBe('others');
   await expect(page.getByText(t('security.othersSignedOut'))).toBeVisible();
@@ -332,13 +340,13 @@ test('F4-H6 reset with the emailed code on any device: one send, code, new passw
   await expect(page.getByRole('heading', { name: t('auth.recoveryTitle') })).toBeVisible();
   expect(log.find((s) => s.path === 'verify')?.body).toMatchObject({ email: EMAIL, token: '654321', type: 'recovery' });
 
-  await page.getByPlaceholder(t('auth.newPassword')).fill('a-new-long-password');
-  await page.getByPlaceholder(t('auth.confirmPassword')).fill('a-new-long-passworD');
+  await page.getByPlaceholder(t('auth.newPassword')).fill('A-new-long-pass1');
+  await page.getByPlaceholder(t('auth.confirmPassword')).fill('A-new-long-pass2');
   await page.getByRole('button', { name: t('auth.updatePassword') }).click();
   await expect(page.getByText(t('errors.passwordMismatch'))).toBeVisible();
   expect(log.some((s) => s.path === 'user' && s.body.password)).toBe(false);
 
-  await page.getByPlaceholder(t('auth.confirmPassword')).fill('a-new-long-password');
+  await page.getByPlaceholder(t('auth.confirmPassword')).fill('A-new-long-pass1');
   await page.getByRole('button', { name: t('auth.updatePassword') }).click();
   await expect(page.getByText(t('auth.recoverySuccess'))).toBeVisible();
 });
@@ -496,8 +504,8 @@ test.describe('signed in: Password & security', () => {
     expect(await axeViolations(page, { include: '[role="dialog"]' })).toEqual([]);
 
     await dialog.getByLabel(t('security.currentPassword')).fill('not-it-at-all');
-    await dialog.getByLabel(t('auth.newPassword')).fill('a-brand-new-password');
-    await dialog.getByLabel(t('auth.confirmPassword')).fill('a-brand-new-password');
+    await dialog.getByLabel(t('auth.newPassword')).fill('A-brand-new-pass1');
+    await dialog.getByLabel(t('auth.confirmPassword')).fill('A-brand-new-pass1');
     await dialog.getByRole('button', { name: t('security.save') }).click();
     await expect(dialog.getByText(t('errors.currentPasswordWrong'))).toBeVisible();
     expect(log.some((s) => s.path === 'user')).toBe(false);
@@ -509,11 +517,11 @@ test.describe('signed in: Password & security', () => {
     const checks = log.filter((s) => s.path === 'token');
     expect(checks.at(-1)?.body).toMatchObject({ email: SIGNED_IN_USER.email, password: CURRENT });
     expect(log.filter((s) => s.path === 'user')).toHaveLength(1);
-    expect(log.find((s) => s.path === 'user')?.body).toMatchObject({ password: 'a-brand-new-password' });
+    expect(log.find((s) => s.path === 'user')?.body).toMatchObject({ password: 'A-brand-new-pass1' });
     expect(log.find((s) => s.path === 'logout')?.query.get('scope')).toBe('others');
     // The passwords are not left behind anywhere the page can read later.
     const stored = await page.evaluate(() => JSON.stringify({ ...localStorage }) + JSON.stringify({ ...sessionStorage }));
-    expect(stored).not.toContain('a-brand-new-password');
+    expect(stored).not.toContain('A-brand-new-pass1');
     expect(stored).not.toContain(CURRENT);
   });
 
@@ -529,7 +537,7 @@ test.describe('signed in: Password & security', () => {
     };
     await fill(CURRENT, 'short', 'short');
     await expect(dialog.getByText(t('errors.passwordMin'), { exact: true }).last()).toBeVisible();
-    await fill(CURRENT, 'long-enough-one', 'long-enough-two');
+    await fill(CURRENT, 'Long-enough-1', 'Long-enough-2');
     await expect(dialog.getByText(t('errors.passwordMismatch'))).toBeVisible();
     await fill(CURRENT, CURRENT, CURRENT);
     await expect(dialog.getByText(t('errors.passwordSame'))).toBeVisible();
@@ -545,8 +553,8 @@ test.describe('signed in: Password & security', () => {
       : json(route, 200, SIGNED_IN_USER));
     const dialog = page.getByRole('dialog', { name: t('security.title') });
     await dialog.getByLabel(t('security.currentPassword')).fill(CURRENT);
-    await dialog.getByLabel(t('auth.newPassword')).fill('a-brand-new-password');
-    await dialog.getByLabel(t('auth.confirmPassword')).fill('a-brand-new-password');
+    await dialog.getByLabel(t('auth.newPassword')).fill('A-brand-new-pass1');
+    await dialog.getByLabel(t('auth.confirmPassword')).fill('A-brand-new-pass1');
     await dialog.getByRole('button', { name: t('security.save') }).click();
     await expect(dialog.getByText(t('errors.sessionExpired'))).toBeVisible();
   });
