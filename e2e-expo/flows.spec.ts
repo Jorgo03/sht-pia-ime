@@ -1480,8 +1480,8 @@ test.describe('signed in: Password & security', () => {
     await expect(page.getByText(t('security.title')).first()).toBeVisible();
 
     await page.getByLabel(t('security.currentPassword')).fill('not-it-at-all');
-    await page.getByLabel(t('auth.newPassword')).fill('a-brand-new-password');
-    await page.getByLabel(t('auth.confirmPassword')).fill('a-brand-new-password');
+    await page.getByLabel(t('auth.newPassword')).fill('A-brand-new-pass1');
+    await page.getByLabel(t('auth.confirmPassword')).fill('A-brand-new-pass1');
     await page.getByRole('button', { name: t('security.save') }).click();
     await expect(page.getByText(t('errors.currentPasswordWrong'))).toBeVisible();
     expect(saved).toEqual([]);
@@ -1492,7 +1492,7 @@ test.describe('signed in: Password & security', () => {
     await expect(page.getByText(t('security.othersSignedOut'))).toBeVisible();
     expect(checks.at(-1)).toMatchObject({ email: SIGNED_IN_USER.email, password: CURRENT });
     expect(saved).toHaveLength(1);
-    expect(saved[0]).toMatchObject({ password: 'a-brand-new-password' });
+    expect(saved[0]).toMatchObject({ password: 'A-brand-new-pass1' });
     expect(logouts.some((u) => u.includes('scope=others'))).toBe(true);
   });
 
@@ -1507,8 +1507,8 @@ test.describe('signed in: Password & security', () => {
     await page.getByLabel(t('auth.confirmPassword')).fill('short');
     await page.getByRole('button', { name: t('security.save') }).click();
     await expect(page.getByText(t('errors.passwordMin')).last()).toBeVisible();
-    await page.getByLabel(t('auth.newPassword')).fill('long-enough-one');
-    await page.getByLabel(t('auth.confirmPassword')).fill('long-enough-two');
+    await page.getByLabel(t('auth.newPassword')).fill('Long-enough-1');
+    await page.getByLabel(t('auth.confirmPassword')).fill('Long-enough-2');
     await page.getByRole('button', { name: t('security.save') }).click();
     await expect(page.getByText(t('errors.passwordMismatch'))).toBeVisible();
     expect(calls).toEqual([]);
@@ -2135,7 +2135,7 @@ test.describe('web confirmations actually ask and act', () => {
 // address stopped at the form, and nothing behind sign-in for an unverified
 // address. Supabase holds the code (hashed, single use).
 const SIGNUP_EMAIL = 'new.user@example.com';
-const SIGNUP_PASSWORD = 'correct-horse-battery';
+const SIGNUP_PASSWORD = 'Correct-horse-7';
 const PENDING_USER = { id: SIGNED_IN_USER.id, aud: 'authenticated', email: SIGNUP_EMAIL, identities: [{ provider: 'email' }] };
 const CODE_REFUSED = { code: 'otp_expired', msg: 'Token has expired or is invalid' };
 const digit = (n: number) => t('auth.codeDigit').replace('{{n}}', String(n));
@@ -2329,6 +2329,40 @@ test.describe('sign-up verification', () => {
     await page.getByRole('textbox', { name: t('auth.officeName') }).fill('Z'.repeat(100));
     await expect(page.getByRole('textbox', { name: t('auth.fullName') })).toHaveValue('N'.repeat(80));
     await expect(page.getByRole('textbox', { name: t('auth.officeName') })).toHaveValue('Z'.repeat(80));
+  });
+
+  // Owner's rule (2026-11-18), the same on the website, iPhone and Android.
+  test('X113 the password checklist ticks as you type and a weak password is never sent', async ({ page }) => {
+    const calls: AuthCall[] = [];
+    await answerAuth(page, 'signup', () => [200, PENDING_USER], calls);
+    await page.goto('/profile');
+    await ready(page);
+    await page.getByRole('button', { name: new RegExp(t('common.signUp')) }).click();
+    const rule = (r: string, met: boolean) =>
+      page.getByLabel(`${t(`auth.pwRule.${r}`)}: ${met ? t('auth.pwRuleMet') : t('auth.pwRuleMissing')}`, { exact: true });
+    for (const r of ['length', 'upper', 'lower', 'digit', 'symbol']) await expect(rule(r, false)).toBeVisible();
+
+    const password = page.getByLabel(t('auth.password'), { exact: true });
+    await password.fill('shtepia');
+    await expect(rule('lower', true)).toBeVisible();
+    await expect(rule('upper', false)).toBeVisible();
+    await password.fill('Shtepia2026');
+    for (const r of ['length', 'upper', 'lower', 'digit']) await expect(rule(r, true)).toBeVisible();
+    await expect(rule('symbol', false)).toBeVisible();
+
+    await page.getByRole('textbox', { name: t('auth.fullName') }).fill('Ana Hoxha');
+    await page.getByRole('textbox', { name: t('auth.email') }).fill(SIGNUP_EMAIL);
+    await page.getByLabel(t('auth.confirmPassword'), { exact: true }).fill('Shtepia2026');
+    await page.getByRole('button', { name: t('auth.createAccount') }).click();
+    await expect(page.getByText(t('errors.passwordSymbol'))).toBeVisible();
+    expect(calls).toEqual([]);
+
+    await password.fill('Shtepia-2026');
+    await page.getByLabel(t('auth.confirmPassword'), { exact: true }).fill('Shtepia-2026');
+    for (const r of ['length', 'upper', 'lower', 'digit', 'symbol']) await expect(rule(r, true)).toBeVisible();
+    await page.getByRole('button', { name: t('auth.createAccount') }).click();
+    await expect(page.getByRole('heading', { name: t('auth.verifyEmailTitle') })).toBeVisible();
+    expect(calls[0].body).toMatchObject({ email: SIGNUP_EMAIL, password: 'Shtepia-2026' });
   });
 
   test('X61 the dashboard stays shut while the email is unverified', async ({ page }) => {

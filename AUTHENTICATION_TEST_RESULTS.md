@@ -50,3 +50,14 @@ written to production.
 | E8 | Email provider failure shown as "could not send" | Mapping unit-tested (`authErrors`); live provider failure seen in logs | | unit |
 | F | Real email delivery to a non-owner address | **BLOCKED**: SMTP sender (owner step 1 in `REGISTRATION_FIX_REPORT.md`) | | |
 | G | Google sign-in | Live success in the logs at 23:28:57 UTC; not changed | | logs |
+
+## Password rules (2026-11-18 afternoon)
+
+| Check | Result | How |
+| --- | --- | --- |
+| Unit: each missing class gives its own message; the symbol set matches Supabase's; ë/Ë and € do not count; 72-byte limit kept; checklist agrees with the rule | PASSED (`npm test` 636/636) | `tests/password.test.mjs` |
+| `npx tsc --noEmit`, `npm run lint` | PASSED (0 errors) | |
+| Vercel preview of `03ae82b` (the real web build), phone size, Albanian | **PASSED**: `shtepia2026` → checklist shows uppercase and special missing; Create Account refused with "Fjalëkalimi duhet të ketë një shkronjë të madhe (A–Z)." and nothing sent; `Shtepia-2026` → all five ticked, sent once, verify step opens | Playwright, sign-up request intercepted |
+| Live website after deploy `4e95d87` (Vercel READY), Albanian | **PASSED**: no lowercase / no number / no special character each refused with its own message, nothing sent; `Shtepia-2026` sent once and the verify step opens | Playwright on the live site, sign-up intercepted |
+| e2e X113 / F4-N2 (new) and the full suites | **NOT RUN locally**: this laptop ran out of memory (Node could not allocate 50 MB; about 1.3 GB of commit free with the other sessions, Chrome and Cursor open). Left to CI on GitHub | |
+| Phone devices | NOT TESTED (same screen code as the web build) | |

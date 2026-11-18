@@ -108,7 +108,17 @@
     "existingAccountHint": "Zaloguj się tym adresem, zresetuj hasło albo, jeśli konto zostało utworzone przez Google, kontynuuj z Google.",
     "signInThisEmail": "Zaloguj się tym adresem",
     "continueWithGoogleFull": "Kontynuuj z Google",
-    "wrongPasswordHint": "Sprawdź hasło, zresetuj je albo, jeśli konto zostało utworzone przez Google, kontynuuj z Google."
+    "wrongPasswordHint": "Sprawdź hasło, zresetuj je albo, jeśli konto zostało utworzone przez Google, kontynuuj z Google.",
+    "pwRules": "Wymagania hasła",
+    "pwRuleMet": "spełnione",
+    "pwRuleMissing": "jeszcze nie",
+    "pwRule": {
+      "length": "Co najmniej 8 znaków",
+      "upper": "Jedna wielka litera",
+      "lower": "Jedna mała litera",
+      "digit": "Jedna cyfra",
+      "symbol": "Jeden znak specjalny"
+    }
   },
   "home": {
     "greetingMorning": "Dzień dobry",
@@ -416,7 +426,11 @@
     "codeIncorrect": "Nieprawidłowy kod weryfikacyjny. Spróbuj ponownie.",
     "codeExpired": "Twój kod weryfikacyjny wygasł. Poproś o nowy.",
     "codeAttempts": "Zbyt wiele błędnych prób. Poproś o nowy kod.",
-    "officeRequired": "Podaj nazwę swojego biura."
+    "officeRequired": "Podaj nazwę swojego biura.",
+    "passwordUpper": "Hasło musi zawierać wielką literę (A–Z).",
+    "passwordLower": "Hasło musi zawierać małą literę (a–z).",
+    "passwordDigit": "Hasło musi zawierać cyfrę (0–9).",
+    "passwordSymbol": "Hasło musi zawierać znak specjalny, np. ! ? @ # - _"
   },
   "agentDashboard": {
     "title": "Panel Agenta",

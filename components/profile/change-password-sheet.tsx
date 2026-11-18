@@ -25,6 +25,7 @@ import { useAuth } from '@/contexts/auth-context';
 import { useTheme } from '@/contexts/theme-context';
 import { friendlyError, retryAfterSeconds } from '@/src/lib/authErrors';
 import { hasPasswordSignIn, newPasswordError, providerLabels } from '@/src/features/auth/lib/password';
+import { PasswordChecklist } from '@/components/ui/password-checklist';
 
 type Step = 'form' | 'code' | 'new' | 'done';
 
@@ -228,6 +229,7 @@ export function ChangePasswordSheet({ user, onClose }: { user: User; onClose: ()
     body = (
       <>
         {passwordField(t('auth.newPassword'), next, setNext, 'newPassword')}
+        <PasswordChecklist password={next} />
         {passwordField(t('auth.confirmPassword'), confirm, setConfirm, 'newPassword')}
         {showToggle}
         {errorText}
@@ -239,7 +241,7 @@ export function ChangePasswordSheet({ user, onClose }: { user: User; onClose: ()
       <>
         {passwordField(t('security.currentPassword'), current, setCurrent, 'password')}
         {passwordField(t('auth.newPassword'), next, setNext, 'newPassword')}
-        <Text style={styles.hint}>{t('errors.passwordMin')}</Text>
+        <PasswordChecklist password={next} />
         {passwordField(t('auth.confirmPassword'), confirm, setConfirm, 'newPassword')}
         {showToggle}
         {errorText}

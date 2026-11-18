@@ -5,6 +5,7 @@ import {
   changePassword,
   hasPasswordSignIn,
   newPasswordError,
+  passwordChecks,
   passwordStrengthError,
   providerLabels,
 } from '../src/features/auth/lib/password.js'
@@ -106,12 +107,34 @@ test('no connection is a failure, never a throw', async () => {
 
 test('new password rules: length, bcrypt bytes, same as current, confirmation', () => {
   assert.equal(passwordStrengthError('short'), 'errors.passwordMin')
-  assert.equal(passwordStrengthError('a'.repeat(72)), null)
-  assert.equal(passwordStrengthError('a'.repeat(73)), 'errors.passwordTooLong')
+  assert.equal(passwordStrengthError('Aa1!' + 'a'.repeat(68)), null, '72 bytes is allowed')
+  assert.equal(passwordStrengthError('Aa1!' + 'a'.repeat(69)), 'errors.passwordTooLong')
   assert.equal(passwordStrengthError('ë'.repeat(37)), 'errors.passwordTooLong', '74 bytes in 37 letters')
-  assert.equal(newPasswordError('long-enough', 'long-enough', { current: 'long-enough' }), 'errors.passwordSame')
-  assert.equal(newPasswordError('long-enough', 'long-enougH'), 'errors.passwordMismatch')
-  assert.equal(newPasswordError('long-enough', 'long-enough', { current: 'other' }), null)
+  assert.equal(newPasswordError('Long-enough1', 'Long-enough1', { current: 'Long-enough1' }), 'errors.passwordSame')
+  assert.equal(newPasswordError('Long-enough1', 'Long-enougH1'), 'errors.passwordMismatch')
+  assert.equal(newPasswordError('Long-enough1', 'Long-enough1', { current: 'other' }), null)
+})
+
+test('a new password needs an uppercase, a lowercase, a number and a special character', () => {
+  assert.equal(passwordStrengthError('lower-case-1'), 'errors.passwordUpper')
+  assert.equal(passwordStrengthError('UPPER-CASE-1'), 'errors.passwordLower')
+  assert.equal(passwordStrengthError('No-Number-Here'), 'errors.passwordDigit')
+  assert.equal(passwordStrengthError('NoSymbol123'), 'errors.passwordSymbol')
+  assert.equal(passwordStrengthError('Shtepia-2026'), null)
+  for (const symbol of "!@#$%^&*()_+-=[]{};':\"|<>?,./`~") assert.equal(passwordStrengthError(`Abcdefg1${symbol}`), null, symbol)
+  // Supabase counts only a-z / A-Z as letters and only its symbol set.
+  assert.equal(passwordStrengthError('ËËËËËë1!'), 'errors.passwordUpper', 'ë and Ë are not a-z for the server')
+  assert.equal(passwordStrengthError('Abcdefg1 '), 'errors.passwordSymbol', 'a space is not a symbol')
+  assert.equal(passwordStrengthError('Abcdefg1€'), 'errors.passwordSymbol', '€ is not in the set')
+})
+
+test('the checklist and the rule agree', () => {
+  assert.deepEqual(passwordChecks(''), { length: false, upper: false, lower: false, digit: false, symbol: false })
+  assert.deepEqual(passwordChecks('Shtepia-2026'), { length: true, upper: true, lower: true, digit: true, symbol: true })
+  for (const p of ['', 'short', 'lower-case-1', 'UPPER-CASE-1', 'No-Number-Here', 'NoSymbol123', 'Shtepia-2026', 'Aa1!']) {
+    const allMet = Object.values(passwordChecks(p)).every(Boolean)
+    assert.equal(allMet, passwordStrengthError(p) === null, p)
+  }
 })
 
 test('only accounts with an email identity get a password form', () => {

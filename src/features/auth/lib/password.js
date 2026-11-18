@@ -16,10 +16,35 @@ function utf8Length(s) {
   return n
 }
 
-/** Error key for a password someone is choosing, or null when it is allowed. */
+// The owner's rule (2026-11-18): an uppercase letter, a lowercase letter, a
+// number and a special character. The classes are the ones Supabase checks
+// with "Password requirements: lowercase, uppercase letters, digits and
+// symbols", so the app never accepts what the server would refuse: a-z and
+// A-Z only (ë or Ç do not count as letters there), and this symbol set.
+const SYMBOLS = "!@#$%^&*()_+-=[]{};':\"|<>?,./`~"
+
+/** Which of the five requirements a password meets, for the live checklist. */
+export function passwordChecks(password) {
+  return {
+    length: password.length >= PASSWORD_MIN_LENGTH,
+    upper: /[A-Z]/.test(password),
+    lower: /[a-z]/.test(password),
+    digit: /[0-9]/.test(password),
+    symbol: [...password].some((ch) => SYMBOLS.includes(ch)),
+  }
+}
+
+/** Error key for a password someone is choosing, or null when it is allowed.
+ *  Only for choosing one: sign-in never applies it, so older passwords that
+ *  predate the rule still work. */
 export function passwordStrengthError(password) {
-  if (password.length < PASSWORD_MIN_LENGTH) return 'errors.passwordMin'
+  const checks = passwordChecks(password)
+  if (!checks.length) return 'errors.passwordMin'
   if (utf8Length(password) > PASSWORD_MAX_BYTES) return 'errors.passwordTooLong'
+  if (!checks.upper) return 'errors.passwordUpper'
+  if (!checks.lower) return 'errors.passwordLower'
+  if (!checks.digit) return 'errors.passwordDigit'
+  if (!checks.symbol) return 'errors.passwordSymbol'
   return null
 }
 

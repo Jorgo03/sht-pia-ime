@@ -108,7 +108,17 @@
     "existingAccountHint": "Connectez-vous avec cet e-mail, réinitialisez votre mot de passe ou, si vous avez créé le compte avec Google, continuez avec Google.",
     "signInThisEmail": "Se connecter avec cet e-mail",
     "continueWithGoogleFull": "Continuer avec Google",
-    "wrongPasswordHint": "Vérifiez le mot de passe, réinitialisez-le ou, si vous avez créé le compte avec Google, continuez avec Google."
+    "wrongPasswordHint": "Vérifiez le mot de passe, réinitialisez-le ou, si vous avez créé le compte avec Google, continuez avec Google.",
+    "pwRules": "Exigences du mot de passe",
+    "pwRuleMet": "respectée",
+    "pwRuleMissing": "pas encore",
+    "pwRule": {
+      "length": "Au moins 8 caractères",
+      "upper": "Une lettre majuscule",
+      "lower": "Une lettre minuscule",
+      "digit": "Un chiffre",
+      "symbol": "Un caractère spécial"
+    }
   },
   "home": {
     "greetingMorning": "Bonjour",
@@ -408,7 +418,11 @@
     "codeIncorrect": "Code de vérification incorrect. Veuillez réessayer.",
     "codeExpired": "Votre code de vérification a expiré. Veuillez en demander un nouveau.",
     "codeAttempts": "Trop de tentatives incorrectes. Veuillez demander un nouveau code.",
-    "officeRequired": "Veuillez saisir le nom de votre bureau."
+    "officeRequired": "Veuillez saisir le nom de votre bureau.",
+    "passwordUpper": "Le mot de passe doit contenir une majuscule (A–Z).",
+    "passwordLower": "Le mot de passe doit contenir une minuscule (a–z).",
+    "passwordDigit": "Le mot de passe doit contenir un chiffre (0–9).",
+    "passwordSymbol": "Le mot de passe doit contenir un caractère spécial, par ex. ! ? @ # - _"
   },
   "agentDashboard": {
     "title": "Tableau de bord Agent",

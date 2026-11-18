@@ -108,7 +108,17 @@
     "existingAccountHint": "Sign in with this email, reset your password, or, if you created the account with Google, continue with Google.",
     "signInThisEmail": "Sign in with this email",
     "continueWithGoogleFull": "Continue with Google",
-    "wrongPasswordHint": "Check the password, reset it, or, if you created the account with Google, continue with Google."
+    "wrongPasswordHint": "Check the password, reset it, or, if you created the account with Google, continue with Google.",
+    "pwRules": "Password requirements",
+    "pwRuleMet": "met",
+    "pwRuleMissing": "not yet",
+    "pwRule": {
+      "length": "At least 8 characters",
+      "upper": "One uppercase letter",
+      "lower": "One lowercase letter",
+      "digit": "One number",
+      "symbol": "One special character"
+    }
   },
   "addSheet": {
     "openLabel": "Create new",
@@ -428,7 +438,11 @@
     "codeIncorrect": "Incorrect verification code. Please try again.",
     "codeExpired": "Your verification code has expired. Please request a new one.",
     "codeAttempts": "Too many incorrect attempts. Please request a new code.",
-    "officeRequired": "Please enter your office name."
+    "officeRequired": "Please enter your office name.",
+    "passwordUpper": "The password needs an uppercase letter (A–Z).",
+    "passwordLower": "The password needs a lowercase letter (a–z).",
+    "passwordDigit": "The password needs a number (0–9).",
+    "passwordSymbol": "The password needs a special character, such as ! ? @ # - _"
   },
   "agentDashboard": {
     "title": "Agent Dashboard",

@@ -108,7 +108,17 @@
     "existingAccountHint": "Inicia sesión con este correo, restablece tu contraseña o, si creaste la cuenta con Google, continúa con Google.",
     "signInThisEmail": "Iniciar sesión con este correo",
     "continueWithGoogleFull": "Continuar con Google",
-    "wrongPasswordHint": "Revisa la contraseña, restablécela o, si creaste la cuenta con Google, continúa con Google."
+    "wrongPasswordHint": "Revisa la contraseña, restablécela o, si creaste la cuenta con Google, continúa con Google.",
+    "pwRules": "Requisitos de la contraseña",
+    "pwRuleMet": "cumplido",
+    "pwRuleMissing": "aún no",
+    "pwRule": {
+      "length": "Al menos 8 caracteres",
+      "upper": "Una letra mayúscula",
+      "lower": "Una letra minúscula",
+      "digit": "Un número",
+      "symbol": "Un carácter especial"
+    }
   },
   "home": {
     "greetingMorning": "Buenos días",
@@ -408,7 +418,11 @@
     "codeIncorrect": "Código de verificación incorrecto. Inténtalo de nuevo.",
     "codeExpired": "Tu código de verificación ha caducado. Solicita uno nuevo.",
     "codeAttempts": "Demasiados intentos incorrectos. Solicita un código nuevo.",
-    "officeRequired": "Introduce el nombre de tu oficina."
+    "officeRequired": "Introduce el nombre de tu oficina.",
+    "passwordUpper": "La contraseña necesita una letra mayúscula (A–Z).",
+    "passwordLower": "La contraseña necesita una letra minúscula (a–z).",
+    "passwordDigit": "La contraseña necesita un número (0–9).",
+    "passwordSymbol": "La contraseña necesita un carácter especial, como ! ? @ # - _"
   },
   "agentDashboard": {
     "title": "Panel del Agente",

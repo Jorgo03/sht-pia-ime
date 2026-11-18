@@ -82,3 +82,30 @@ re-running the previous definition (named in the file).
 - Greek and Turkish are UI languages, but `profiles.preferred_language` accepts
   only the other eight; a Greek or Turkish sign-up gets `sq` stored. Separate
   follow-up.
+
+## Update 2026-11-18 afternoon: "a new email" and password rules
+
+**The "new" address was not new.** Both attempts at 14:12:20 and 14:14:18 UTC
+were 422 `user_already_exists` for account `fb44047f` (`sht…@gmail.com`), an
+**agent account created on 2026-11-06 22:01** with email and password, signed
+in once at creation. The owner chose to keep it and sign in with it; nothing
+was deleted.
+
+**Password rules (owner's request), live on the website, iPhone and Android.**
+The Expo screen is all three. A new password needs at least 8 characters, an
+uppercase letter (A–Z), a lowercase letter (a–z), a number and a special
+character. The special characters are the ones Supabase's own setting counts:
+`! @ # $ % ^ & * ( ) _ + - = [ ] { } ; ' : " | < > ? , . / ` ~`.
+
+- One rule in `src/features/auth/lib/password.js` (`passwordChecks`,
+  `passwordStrengthError`), used by sign-up, the reset step and the
+  change-password sheet. The legacy Vite site shares the same file.
+- A live checklist under the password field: `components/ui/password-checklist.tsx`.
+- Sign-in is unchanged: older passwords keep working.
+- Messages in all 10 languages, e.g. "Fjalëkalimi duhet të ketë një shkronjë të
+  madhe (A–Z)."
+
+**Owner step for the server side.** Supabase → Authentication → Sign In /
+Providers → Email → *Password Requirements*: **"Lowercase, uppercase letters,
+digits and symbols"**, minimum length **8**. The apps already enforce it; this
+makes the server refuse a weak password sent around the apps as well.
