@@ -18,7 +18,9 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: 0,
-  reporter: [[process.env.CI ? 'line' : 'list'], ['html', { open: 'never' }]],
+  // On CI also 'github': each failure becomes an annotation on the run, readable
+  // without downloading the report.
+  reporter: [[process.env.CI ? 'line' : 'list'], ...(process.env.CI ? [['github'] as ['github']] : []), ['html', { open: 'never' }]],
   use: {
     baseURL: `http://localhost:${PORT}`,
     trace: 'retain-on-failure',
