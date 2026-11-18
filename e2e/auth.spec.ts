@@ -479,7 +479,7 @@ test('F4-N16 Continue with Google asks Google for its account chooser, never the
 
 test.describe('signed in: Password & security', () => {
   test.use({ signedIn: true });
-  const CURRENT = 'the-current-one';
+  const CURRENT = 'The-current-1'; // meets the password rule, so "unchanged" is what gets refused
 
   async function openSecurity(page: Page, log: Sent[]) {
     await authRoute(page, 'token', (sent) => sent.body.password === CURRENT
