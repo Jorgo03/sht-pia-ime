@@ -50,7 +50,7 @@ test('before the fix: an 81-character office aborts the whole sign-up', async ()
 });
 
 test('a long name or office is trimmed, the account and profile are created', async () => {
-  const db = await dbWith('./migrations/20261118120000_handle_new_user_trims_lengths.sql');
+  const db = await dbWith('./migrations/20261118001327_handle_new_user_trims_lengths.sql');
   await signUp(db, ID, { role: 'agent', full_name: `  ${LONG}  `, agency_name: LONG });
   const p = await profile(db, ID);
   assert.equal(p.full_name.length, 80);
@@ -59,7 +59,7 @@ test('a long name or office is trimmed, the account and profile are created', as
 });
 
 test('the role is agent only when asked for, and a buyer never keeps an office', async () => {
-  const db = await dbWith('./migrations/20261118120000_handle_new_user_trims_lengths.sql');
+  const db = await dbWith('./migrations/20261118001327_handle_new_user_trims_lengths.sql');
   const ids = ['01', '02', '03', '04'].map((n) => `00000000-0000-4000-8000-0000000000${n}`);
   await signUp(db, ids[0], { role: 'buyer', full_name: 'Ana', agency_name: 'Zyra' });
   await signUp(db, ids[1], { role: 'admin', full_name: 'Eve' });
@@ -77,7 +77,7 @@ test('the role is agent only when asked for, and a buyer never keeps an office',
 });
 
 test('an existing profile is left alone', async () => {
-  const db = await dbWith('./migrations/20261118120000_handle_new_user_trims_lengths.sql');
+  const db = await dbWith('./migrations/20261118001327_handle_new_user_trims_lengths.sql');
   await db.exec(`alter table public.profiles drop constraint profiles_id_fkey`);
   await db.query(`insert into public.profiles (id, full_name, role) values ($1, 'Kept', 'agent')`, [ID]);
   await signUp(db, ID, { role: 'buyer', full_name: 'New' });

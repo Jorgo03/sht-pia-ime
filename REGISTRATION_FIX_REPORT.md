@@ -10,7 +10,7 @@ Root causes and evidence: `REGISTRATION_FAILURE_AUDIT.md`. Test evidence:
 | RC1 | A sign-up for an address that already has an account showed one faint line and no way forward; the owner retried the same address 17 times | App (web + phone) | **Fixed in code**, e2e-verified |
 | RC2 | Supabase SMTP is Resend with no verified domain: every email to anyone but the owner fails (550 → 500) | Dashboard configuration | **Owner step** (below). Not fixable from the repo |
 | RC3 | "Confirm email" is off (`mailer_autoconfirm: true`): no sign-up code is ever sent | Dashboard configuration | **Owner step, after RC2**. Left off on purpose until mail works |
-| RC4 | An 81+ character name or office aborts the sign-up inside the profile trigger (500, no account) | Database function + form | **Form fixed**; trigger migration written and tested offline, **not applied to production** (needs the owner's OK) |
+| RC4 | An 81+ character name or office aborts the sign-up inside the profile trigger (500, no account) | Database function + form | **Fixed**: form limits, and the trigger migration **applied to production on the owner's OK** (2026-11-18, version 20261118001327) |
 
 **Sign-in (reported later the same evening).** The logs at 23:28 UTC show
 three password sign-ins refused as `invalid_credentials` (wrong password for
@@ -33,7 +33,7 @@ used an address that already had an account.
 | `app/(tabs)/profile.tsx` | The form's error is now a solid, readable panel (white on a dark panel, icon, 14 px, `role=alert`) instead of 13 px pale text on the gradient. For an existing address it adds a hint and three buttons: **Sign in with this email** (switches to the sign-in form, address kept, password cleared), **Forgot your password?** (opens the reset step for that address), **Continue with Google** (for accounts made with Google, which have no password). Name and office are limited to 80 characters, the database limit. Same screen on the website and the phone apps |
 | `src/i18n/locales/*.json` (10) | `auth.existingAccountHint`, `auth.signInThisEmail`, `auth.continueWithGoogleFull` in every language. Albanian wording from the owner: `errors.invalidEmail` "Email-i është i pavlefshëm.", `errors.userExists` "Ky email është regjistruar më parë.", `errors.invalidCode` "Kodi i konfirmimit është i pasaktë ose ka skaduar.", `errors.emailSendFailed` "Email-i nuk mund të dërgohej. Provo përsëri.", `errors.passwordWeak` "Fjalëkalimi duhet të plotësojë kërkesat: …" |
 | `supabase/config.toml`, `supabase/templates/confirmation.html` | Confirmation subject **"Konfirmo llogarinë tënde — Shtepia Ime"** (the template already carries the logo mark, the 6-digit code, 10-minute expiry and do-not-share line) |
-| `supabase/migrations/20261118120000_handle_new_user_trims_lengths.sql` | `handle_new_user()` trims name and office to 80 characters and blanks to NULL; role/office/language rules unchanged. **Not applied** |
+| `supabase/migrations/20261118001327_handle_new_user_trims_lengths.sql` | `handle_new_user()` trims name and office to 80 characters and blanks to NULL; role/office/language rules unchanged. **Applied live on the owner's OK** |
 | `supabase/tests_handle_new_user.test.mjs` | PGlite test: the current live function aborts an 81-character office; the new one creates the account; role stays `buyer` unless `agent` is asked for (an `admin` request becomes `buyer`); a buyer never keeps an office; an existing profile is left alone |
 | `e2e-expo/flows.spec.ts` | X109 (production's 422 answer → hint + three buttons; sign-in keeps the address), X110 (Confirm email off: a new agent is signed in at once with role and office sent), X111 (80-character limits) |
 
@@ -49,7 +49,7 @@ What was deliberately **not** changed:
 
 ## Database
 
-No production change was made. The migration above waits for the owner's OK.
+Applied on the owner's OK (2026-11-18). Checked afterwards on the live database: the function trims, `anon` and `authenticated` cannot execute it, the trigger is enabled.
 It replaces one function; no row changes, so no backup is needed; rollback is
 re-running the previous definition (named in the file).
 
@@ -71,8 +71,6 @@ re-running the previous definition (named in the file).
    Email OTP expiration `600`, length `6`. From then on every new account gets
    the 6-digit code and cannot open anything until it is verified (the apps
    already refuse unverified sessions).
-5. **Approve the trigger migration** (`20261118120000`) if you want long names
-   to stop failing on the server as well; the form already stops them.
 
 ## Still open / not verified
 
