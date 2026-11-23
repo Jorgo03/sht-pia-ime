@@ -59,5 +59,5 @@ written to production.
 | `npx tsc --noEmit`, `npm run lint` | PASSED (0 errors) | |
 | Vercel preview of `03ae82b` (the real web build), phone size, Albanian | **PASSED**: `shtepia2026` → checklist shows uppercase and special missing; Create Account refused with "Fjalëkalimi duhet të ketë një shkronjë të madhe (A–Z)." and nothing sent; `Shtepia-2026` → all five ticked, sent once, verify step opens | Playwright, sign-up request intercepted |
 | Live website after deploy `4e95d87` (Vercel READY), Albanian | **PASSED**: no lowercase / no number / no special character each refused with its own message, nothing sent; `Shtepia-2026` sent once and the verify step opens | Playwright on the live site, sign-up intercepted |
-| e2e X113 / F4-N2 (new) and the full suites | **NOT RUN locally**: this laptop ran out of memory (Node could not allocate 50 MB; about 1.3 GB of commit free with the other sessions, Chrome and Cursor open). Left to CI on GitHub | |
+| e2e X113 / F4-N2 (new) and both full suites | **PASSED on GitHub CI**, run 44337550434 on master `cd4ed78` (contains every commit here): lint/types/unit, End-to-end, End-to-end Expo web build all green. Locally the website suite passed; the Expo-web export could not run on this laptop (out of memory) | CI |
 | Phone devices | NOT TESTED (same screen code as the web build) | |
