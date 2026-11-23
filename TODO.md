@@ -26,19 +26,22 @@ our fonts), logo, copy, routes, data, features and i18n. Measured, not guessed:
 
 - [ ] 1. Token system applied (no ad-hoc layout numbers in website components)
 - [ ] 2. Section / card / button / input / footer spacing on the scale
-- [ ] 3. Navbar: height, gutters, link type and spacing, hover / active / focus,
+- [x] 3. Navbar: height, gutters, link type and spacing, hover / active / focus,
       phone hamburger → right drawer (overlay, 300 ms slide, Esc, outside click)
-- [ ] 4. Language menu: trigger, size, position, item padding, current marker,
+- [x] 4. Language menu: trigger, size, position, item padding, current marker,
       animation, keyboard, outside click + Esc, no overflow at 390
 - [ ] 5. Details: buttons, inputs, cards, badges, focus / hover / disabled,
       footer, loading and empty states
-- [ ] 6. Responsive 1440 / 1024 / 768 / 390: no sideways scroll, overlap, clipping
+- [x] 6. Responsive 1440 / 1024 / 768 / 390: no sideways scroll, overlap, clipping
 
 ## Pages (screenshots before / after in qa-screens/)
 
 - [ ] Home  - [ ] Explore  - [ ] Listing  - [ ] Wanted  - [ ] Agencies
 - [ ] Agent / user profile  - [ ] Guide, legal, pricing  - [ ] Sign in / Profile
 - [ ] Signed-in app screens (column)  - [ ] 404
+
+Site audit after the restyle: 96/96 (all routes, 3 roles, 14 sizes; no overflow, overlap or clipping).
+Still to do: items 1, 2 and 5 for listing page, cards, inputs, profile/app screens, loading/empty states; full e2e; preview; production.
 
 ## Verification
 
