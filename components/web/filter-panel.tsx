@@ -5,7 +5,7 @@ import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { SelectField } from '@/components/ui/select-field';
 import { useAppDimensions } from '@/hooks/use-app-dimensions';
-import { type AtticoPalette, Fonts } from '@/constants/theme';
+import { type AtticoPalette, Fonts, Site } from '@/constants/theme';
 import { useFilters } from '@/contexts/filters-context';
 import { useTheme } from '@/contexts/theme-context';
 import type { Property, PropertyFilters, PropertySort } from '@/data/types';
@@ -101,9 +101,9 @@ export function FilterPanel({ viewMode, onViewMode, onShowResults, search, onSea
             <MaterialIcons name={viewMode === 'map' ? 'grid-view' : 'map'} size={17} color={colors.textSecondary} />
             <Text style={styles.outlineText}>{viewMode === 'map' ? t('search.panel.showList') : t('search.panel.showOnMap')}</Text>
           </Pressable>
-          <Pressable accessibilityRole="button" accessibilityLabel={count != null ? t('search.showHomes', { count }) : t('search.showHomesAny')} onPress={onShowResults} style={[styles.primaryButton, { backgroundColor: colors.accentEnd }]}>
+          <Pressable accessibilityRole="button" accessibilityLabel={count != null ? t('search.showHomes', { count }) : t('search.showHomesAny')} onPress={onShowResults} style={[styles.primaryButton, { backgroundColor: colors.accent }]}>
             <Text style={styles.primaryText}>{count != null ? t('search.showHomes', { count }) : t('search.showHomesAny')}</Text>
-            <MaterialIcons name="arrow-forward" size={18} color="#fff" />
+            <MaterialIcons name="arrow-forward" size={18} color={Site.onAccent} />
           </Pressable>
         </View>
       </View>
@@ -309,11 +309,11 @@ export function ResultsBar({ shown, total, tabs }: { shown: number; total: numbe
 
 const createStyles = (c: AtticoPalette) =>
   StyleSheet.create({
-    select: { minHeight: 48, borderRadius: 12, borderWidth: 1, borderColor: c.border, backgroundColor: c.primary },
+    select: { minHeight: Site.control.height, borderRadius: Site.control.radius, borderWidth: 1, borderColor: c.border, backgroundColor: c.primary },
     panel: {
       marginTop: 18,
       backgroundColor: c.primaryLight,
-      borderRadius: 18,
+      borderRadius: Site.radius.sm,
       borderWidth: 1,
       borderColor: c.border,
       padding: 24,
@@ -328,12 +328,13 @@ const createStyles = (c: AtticoPalette) =>
     headActions: { flexDirection: 'row', alignItems: 'center', gap: 12, flexWrap: 'wrap' },
     linkButton: { flexDirection: 'row', alignItems: 'center', gap: 6, minHeight: 44, paddingHorizontal: 6 },
     linkText: { fontFamily: Fonts.sansSemiBold, fontSize: 14, color: c.textPrimary },
-    outlineButton: { flexDirection: 'row', alignItems: 'center', gap: 8, minHeight: 44, paddingHorizontal: 16, borderRadius: 12, borderWidth: 1, borderColor: c.border },
+    outlineButton: { flexDirection: 'row', alignItems: 'center', gap: 8, minHeight: Site.control.height, paddingHorizontal: Site.control.paddingX, borderRadius: Site.control.radius, borderWidth: 1, borderColor: c.border },
     outlineText: { fontFamily: Fonts.sansMedium, fontSize: 14, color: c.textSecondary },
-    primaryButton: { flexDirection: 'row', alignItems: 'center', gap: 10, minHeight: 44, paddingHorizontal: 18, borderRadius: 12 },
-    primaryText: { fontFamily: Fonts.sansSemiBold, fontSize: 14, color: '#fff' },
+    primaryButton: { flexDirection: 'row', alignItems: 'center', gap: 10, minHeight: Site.control.height, paddingHorizontal: Site.control.paddingX + 4, borderRadius: Site.control.radius },
+    // Dark text on the orange: 6.25:1 (white was 3.5:1).
+    primaryText: { fontFamily: Fonts.sansBold, fontSize: 15, color: Site.onAccent },
     chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-    chip: { flexDirection: 'row', alignItems: 'center', gap: 6, minHeight: 34, paddingHorizontal: 12, borderRadius: 8, backgroundColor: c.accentTint },
+    chip: { flexDirection: 'row', alignItems: 'center', gap: 6, minHeight: 34, paddingHorizontal: 12, borderRadius: Site.radius.sm, backgroundColor: c.accentTint },
     chipText: { fontFamily: Fonts.sansMedium, fontSize: 13, color: c.textPrimary },
     divider: { height: StyleSheet.hairlineWidth, backgroundColor: c.border },
     sectionLabel: { fontFamily: Fonts.sansSemiBold, fontSize: 14, color: c.textPrimary },
@@ -346,7 +347,7 @@ const createStyles = (c: AtticoPalette) =>
       gap: 10,
       minHeight: 52,
       paddingHorizontal: 16,
-      borderRadius: 12,
+      borderRadius: Site.control.radius,
       borderWidth: 1,
       borderColor: c.border,
       backgroundColor: c.primary,
@@ -363,9 +364,9 @@ const createStyles = (c: AtticoPalette) =>
       flexDirection: 'row',
       alignItems: 'center',
       gap: 8,
-      minHeight: 48,
+      minHeight: Site.control.height,
       paddingHorizontal: 14,
-      borderRadius: 12,
+      borderRadius: Site.control.radius,
       borderWidth: 1,
       borderColor: c.border,
       backgroundColor: c.primary,
@@ -375,7 +376,7 @@ const createStyles = (c: AtticoPalette) =>
     warning: { fontFamily: Fonts.sans, fontSize: 13, color: c.accentText },
     moreToggle: { flexDirection: 'row', alignItems: 'center', gap: 4, alignSelf: 'flex-start', minHeight: 36 },
     moreText: { fontFamily: Fonts.sansSemiBold, fontSize: 14, color: c.accentText },
-    amenity: { minHeight: 38, paddingHorizontal: 14, justifyContent: 'center', borderRadius: 10, borderWidth: 1, borderColor: c.border, backgroundColor: c.primary },
+    amenity: { minHeight: 38, paddingHorizontal: 14, justifyContent: 'center', borderRadius: Site.radius.sm, borderWidth: 1, borderColor: c.border, backgroundColor: c.primary },
     resultsBar: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap', marginTop: 28, marginBottom: 16 },
     resultsText: { fontFamily: Fonts.sansSemiBold, fontSize: 18, color: c.textPrimary },
     resultsRight: { flexDirection: 'row', alignItems: 'center', gap: 16, flexWrap: 'wrap' },

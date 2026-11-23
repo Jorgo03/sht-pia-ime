@@ -1,9 +1,8 @@
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { BlurView } from 'expo-blur';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useIsFocused, useRouter, type Href } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { useMemo, useState, type ReactNode } from 'react';
+import { useMemo, useRef, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   Modal,
@@ -110,7 +109,12 @@ export function AppHeader({
   identityLabel,
   site = false,
   compact = false,
+  gutter,
+  height,
 }: {
+  /** The website's side gutter and bar height (constants/theme Site). */
+  gutter?: number;
+  height?: number;
   /** Notifications only, without language and theme (the site header on a
    *  phone, whose menu holds those two). */
   compact?: boolean;
@@ -155,6 +159,18 @@ export function AppHeader({
     [colors, onDark, onBack, floating],
   );
   const [langOpen, setLangOpen] = useState(false);
+  // Where the language menu hangs: under its own button (measured when it
+  // opens), kept inside the window so it never runs off a 390px phone.
+  const langBtnRef = useRef<{ measureInWindow?: (cb: (x: number, y: number, w: number, h: number) => void) => void } | null>(null);
+  const [langAnchor, setLangAnchor] = useState<{ top: number; right: number } | null>(null);
+  const openLang = () => {
+    const node = langBtnRef.current;
+    if (!node?.measureInWindow) return setLangOpen(true);
+    node.measureInWindow((x, y, w, h) => {
+      setLangAnchor({ top: y + h + 6, right: Math.max(8, windowWidth - (x + w)) });
+      setLangOpen(true);
+    });
+  };
   const insets = useSafeAreaInsets();
   // The menu hangs under the bar: the top inset, the bar's 54 (10 + 34 + 10)
   // and web's 6px gap. A fixed 96 put it over the header on notched iPhones,
@@ -191,7 +207,12 @@ export function AppHeader({
     // Reaches up behind the clock and battery, so the bar's colour runs to the
     // top of the screen instead of leaving the page's darker ground above it.
     <View
-      style={[styles.header, !floating && { marginTop: -insets.top, paddingTop: insets.top + HEADER_TOP_PADDING }]}
+      style={[
+        styles.header,
+        !floating && { marginTop: -insets.top, paddingTop: insets.top + HEADER_TOP_PADDING },
+        gutter != null && { paddingHorizontal: gutter },
+        height != null && { minHeight: height, paddingTop: 0, paddingBottom: 0 },
+      ]}
       onLayout={track('bar')}>
       {(onDark || floating) && <LightStatusBarWhileFocused />}
       {/* A floating header lets the hero image show through, so it gets no
@@ -281,11 +302,14 @@ export function AppHeader({
                 screen reader reads as "flag" rather than "Language". */}
             {!compact && (
             <Pressable
-                style={styles.langBtn}
+                ref={langBtnRef as never}
+                style={({ hovered, focused }: { hovered?: boolean; focused?: boolean }) => [styles.langBtn, hovered && styles.langBtnHover, focused && styles.focusRing]}
                 hitSlop={6}
-                onPress={() => setLangOpen(true)}
+                onPress={openLang}
                 accessibilityRole="button"
-                accessibilityLabel={t('common.language')}>
+                accessibilityLabel={t('common.language')}
+                accessibilityState={{ expanded: langOpen }}
+                aria-haspopup="menu">
                 <Text style={styles.langCode}>{currentFlag}</Text>
                 <MaterialIcons name="expand-more" size={14} color={styles.langCode.color} />
               </Pressable>
@@ -308,7 +332,12 @@ export function AppHeader({
         animationType="fade"
         onRequestClose={() => setLangOpen(false)}>
         <Pressable
-          style={[styles.langBackdrop, { paddingTop: menuTop, paddingRight: menuRight }]}
+          style={[
+            styles.langBackdrop,
+            langAnchor && IS_WEB
+              ? { paddingTop: langAnchor.top, paddingRight: langAnchor.right, paddingHorizontal: 0, backgroundColor: 'transparent' }
+              : { paddingTop: menuTop, paddingRight: menuRight },
+          ]}
           onPress={() => setLangOpen(false)}>
           <Pressable style={styles.langCard} onPress={(e) => e.stopPropagation()}>
             {/* flexGrow 0: a ScrollView grows by default, which stretched the
@@ -317,7 +346,11 @@ export function AppHeader({
             <ScrollView
               style={{ flexGrow: 0, maxHeight: menuMaxHeight }}
               contentContainerStyle={styles.langList}
-              bounces={false}>
+              bounces={false}
+              accessibilityRole="menu"
+              // Web: ↑/↓ move between the choices (Tab still works; Esc and a
+              // click outside close it through the Modal).
+              {...(IS_WEB ? ({ onKeyDown: menuArrowKeys } as object) : {})}>
               <LanguageOptions onChosen={() => setLangOpen(false)} />
             </ScrollView>
           </Pressable>
@@ -355,23 +388,19 @@ export function LanguageOptions({ onChosen }: { onChosen?: () => void }) {
                 return (
                   <Pressable
                     key={lang.code}
-                    style={styles.langRowWrap}
+                    style={({ hovered, focused }: { hovered?: boolean; focused?: boolean }) => [styles.langRowWrap, (hovered || focused) && styles.langRowHover, active && styles.langRowCurrent, focused && styles.focusRing]}
                     onPress={() => changeLanguage(lang.code)}
-                    accessibilityRole="button"
-                    accessibilityState={{ selected: active }}>
-                    {active ? (
-                      <LinearGradient
-                        colors={[colors.accent, colors.accentEnd]}
-                        style={styles.langRow}>
-                        <Text style={styles.langRowCode}>{lang.flag}</Text>
-                        <Text style={[styles.langRowName, styles.langRowActive]}>{lang.name}</Text>
-                      </LinearGradient>
-                    ) : (
-                      <View style={styles.langRow}>
-                        <Text style={styles.langRowCode}>{lang.flag}</Text>
-                        <Text style={styles.langRowName}>{lang.name}</Text>
-                      </View>
-                    )}
+                    accessibilityRole={IS_WEB ? ('menuitemradio' as 'menuitem') : 'button'}
+                    accessibilityState={{ selected: active, checked: active }}
+                    // The current language takes the focus when the menu opens.
+                    {...(IS_WEB && active ? ({ autoFocus: true } as object) : {})}>
+                    {/* The current one: a tinted row in the darker orange
+                        text (AA) with a tick, not white on orange (3.1:1). */}
+                    <View style={styles.langRow}>
+                      <Text style={styles.langRowCode}>{lang.flag}</Text>
+                      <Text style={[styles.langRowName, active && styles.langRowCurrentText]}>{lang.name}</Text>
+                      {active ? <MaterialIcons name="check" size={16} color={colors.accentText} style={styles.langRowCheck} /> : null}
+                    </View>
                   </Pressable>
                 );
               })}
@@ -397,6 +426,25 @@ export function LanguageOptions({ onChosen }: { onChosen?: () => void }) {
               </View>
     </>
   );
+}
+
+/**
+ * ↑ / ↓ (and Home / End) move the focus between a web menu's choices, as
+ * the ARIA menu pattern expects; Tab, Enter, Space and Esc keep working.
+ */
+function menuArrowKeys(e: { key: string; currentTarget: unknown; preventDefault: () => void }) {
+  if (!['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(e.key)) return;
+  const root = e.currentTarget as HTMLElement;
+  const items = Array.from(root.querySelectorAll<HTMLElement>('[role^="menuitem"], [role="button"]'));
+  if (!items.length) return;
+  e.preventDefault();
+  const at = items.indexOf(document.activeElement as HTMLElement);
+  const next =
+    e.key === 'Home' ? 0
+    : e.key === 'End' ? items.length - 1
+    : e.key === 'ArrowDown' ? (at + 1) % items.length
+    : (at - 1 + items.length) % items.length;
+  items[next]?.focus();
 }
 
 const createStyles = (
@@ -591,6 +639,13 @@ const createStyles = (
     langRowActive: {
       color: '#fff',
     },
+    langRowHover: { backgroundColor: colors.glass },
+    langRowCurrent: { backgroundColor: colors.accentTint },
+    langRowCurrentText: { color: colors.accentText, fontFamily: Fonts.sansBold },
+    langRowCheck: { marginLeft: 'auto' },
+    langBtnHover: { borderColor: onDark ? 'rgba(255,255,255,0.5)' : colors.borderStrong },
+    // Visible keyboard focus (WCAG 2.4.7): 4.7:1 on cream, 7.4:1 on black.
+    focusRing: IS_WEB ? ({ outlineStyle: 'solid', outlineWidth: 2, outlineColor: onDark ? '#ff6b00' : '#b34700', outlineOffset: 2 } as object) : {},
     currencyLabel: {
       fontFamily: Fonts.sansSemiBold,
       fontSize: 12,

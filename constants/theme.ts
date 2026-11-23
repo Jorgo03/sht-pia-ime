@@ -238,6 +238,51 @@ export const Motion = {
   pressScaleButton: 0.96,
 } as const;
 
+/**
+ * The website's layout system (owner's reference, 2026-11-23): measured from
+ * century21albania.com's computed styles at 1440/1024/768/390, colours ours.
+ * One source for gutters, header, section rhythm, type, controls and motion,
+ * so website components stop inventing their own numbers. Mirrored in
+ * replica/design/tokens.json (checked for WCAG AA with contrast.py).
+ */
+export const Site = {
+  /** Content width inside the gutters (1440 − 2 × 104). */
+  containerMax: 1232,
+  headerHeight: 73,
+  headerHeightCompact: 64,
+  section: { sm: 48, md: 80, lg: 160 },
+  space: { xs: 4, sm: 8, md: 12, lg: 16, xl: 24, '2xl': 32, '3xl': 48 },
+  control: { height: 50, paddingX: 16, radius: 4 },
+  radius: { none: 0, sm: 4, pill: 999 },
+  /** Nav links: plain text, no pill, measured 29px apart at 1440. */
+  nav: { fontSize: 16, lineHeight: 20, gap: 28 },
+  ink: '#000000',
+  onInk: '#ffffff',
+  onInkMuted: '#d9d4cc',
+  /** Focus ring: 4.7:1 on the cream ground (the brand orange is 2.45:1). */
+  focus: '#b34700',
+  /** Text on an orange button: 6.25:1 (white is 3.5:1, large text only). */
+  onAccent: '#1a1714',
+  overlay: 'rgba(0,0,0,0.6)',
+  motion: { base: 300, fast: 150, ease: [0, 0, 0.2, 1] as const },
+} as const;
+
+/** Side gutter for a window width: 104 / 80 / 56 / 16, as measured. */
+export function siteGutter(width: number): number {
+  if (width >= 1280) return 104;
+  if (width >= 1024) return 80;
+  if (width >= 768) return 56;
+  return 16;
+}
+
+/** Headline sizes per width, as measured: [fontSize, lineHeight]. */
+export function siteHeading(level: 1 | 2, width: number): { fontSize: number; lineHeight: number } {
+  const h1: [number, number] = width >= 1280 ? [64, 76] : width >= 1024 ? [56, 66] : [32, 40];
+  const h2: [number, number] = width >= 1280 ? [56, 66] : width >= 1024 ? [44, 52] : width >= 768 ? [32, 40] : [28, 34];
+  const [fontSize, lineHeight] = level === 1 ? h1 : h2;
+  return { fontSize, lineHeight };
+}
+
 // The web app's actual type pairing (CLAUDE_CODE_BRIEF.md §1.1): Newsreader
 // for headlines, Manrope for UI, JetBrains Mono for labels/kickers — loaded
 // as real font files via app/_layout.tsx's useFonts() call (which also

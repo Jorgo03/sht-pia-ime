@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 
-import { Fonts } from '@/constants/theme';
+import { Fonts, Site, siteGutter } from '@/constants/theme';
 import { IS_WEB } from '@/constants/web-frame';
 import { useTheme } from '@/contexts/theme-context';
 import { useAppDimensions } from '@/hooks/use-app-dimensions';
@@ -67,7 +67,7 @@ export function SiteFooter() {
 
   return (
     <View style={styles.footer} accessibilityRole="contentinfo">
-      <View style={styles.inner}>
+      <View style={[styles.inner, { maxWidth: Site.containerMax + 2 * siteGutter(width), paddingHorizontal: siteGutter(width) }]}>
         <View style={[styles.top, stacked && styles.topStacked]}>
           <View style={styles.lead}>
             {/* Not the closing band's question again: the site's own line. */}
@@ -77,15 +77,21 @@ export function SiteFooter() {
                 accessibilityRole="link"
                 accessibilityLabel={t('site.listHome')}
                 onPress={() => go('/listing/new')}
-                style={({ pressed }) => [styles.pill, { backgroundColor: colors.accentEnd }, pressed && styles.pressed]}>
-                <Text style={styles.pillText}>{t('site.listHome').toUpperCase()}</Text>
+                style={(st) => {
+                  const { hovered, focused, pressed } = st as typeof st & { hovered?: boolean; focused?: boolean };
+                  return [styles.pill, { backgroundColor: hovered ? colors.accentLight : colors.accent }, focused && styles.focus, pressed && styles.pressed];
+                }}>
+                <Text style={styles.pillText}>{t('site.listHome')}</Text>
               </Pressable>
               <Pressable
                 accessibilityRole="link"
                 accessibilityLabel={t('site.cta.search')}
                 onPress={() => go('/explore')}
-                style={({ pressed }) => [styles.round, { backgroundColor: colors.accentEnd }, pressed && styles.pressed]}>
-                <MaterialIcons name="arrow-forward" size={20} color="#fff" />
+                style={(st) => {
+                  const { hovered, focused, pressed } = st as typeof st & { hovered?: boolean; focused?: boolean };
+                  return [styles.round, { backgroundColor: hovered ? colors.accentLight : colors.accent }, focused && styles.focus, pressed && styles.pressed];
+                }}>
+                <MaterialIcons name="arrow-forward" size={20} color={Site.onAccent} />
               </Pressable>
             </View>
           </View>
@@ -94,8 +100,12 @@ export function SiteFooter() {
               <View key={col.title} style={[styles.col, phone && styles.colPhone]}>
                 <Text style={styles.colTitle}>{t(col.title).toUpperCase()}</Text>
                 {col.links.map((l) => (
-                  <Pressable key={l.href} accessibilityRole="link" onPress={() => go(l.href)} style={styles.linkHit}>
-                    <Text style={styles.link}>{t(l.key)}</Text>
+                  <Pressable
+                    key={l.href}
+                    accessibilityRole="link"
+                    onPress={() => go(l.href)}
+                    style={(st) => [styles.linkHit, (st as typeof st & { focused?: boolean }).focused && styles.focus]}>
+                    {(st) => <Text style={[styles.link, (st as typeof st & { hovered?: boolean }).hovered && { color: colors.accent }]}>{t(l.key)}</Text>}
                   </Pressable>
                 ))}
               </View>
@@ -121,26 +131,29 @@ export function SiteFooter() {
 }
 
 const styles = StyleSheet.create({
-  footer: { width: '100%', backgroundColor: INK, paddingTop: 88, paddingBottom: 32, marginTop: 0 },
-  inner: { width: '100%', maxWidth: 1280, alignSelf: 'center', paddingHorizontal: 24, gap: 56 },
-  top: { flexDirection: 'row', gap: 48 },
+  footer: { width: '100%', backgroundColor: INK, paddingTop: Site.section.md, paddingBottom: Site.space['2xl'], marginTop: 0 },
+  // Width and gutter from the window (siteGutter), set inline.
+  inner: { width: '100%', alignSelf: 'center', gap: Site.space['3xl'] },
+  top: { flexDirection: 'row', gap: Site.space['3xl'] },
   topStacked: { flexDirection: 'column' },
   lead: { flex: 1, gap: 18, minWidth: 260 },
-  headline: { fontFamily: Fonts.sans, fontSize: 56, lineHeight: 58, letterSpacing: -1.7, color: ON_INK, maxWidth: 560 },
-  headlinePhone: { fontFamily: Fonts.sans, fontSize: 38, lineHeight: 41, letterSpacing: -1 },
+  headline: { fontFamily: Fonts.sansBold, fontSize: 56, lineHeight: 66, letterSpacing: -1, color: ON_INK, maxWidth: 560 },
+  headlinePhone: { fontSize: 32, lineHeight: 40, letterSpacing: -0.5 },
   tagline: { fontFamily: Fonts.sans, fontSize: 16, lineHeight: 24, color: ON_INK_SOFT, maxWidth: 420 },
-  ctaRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 6 },
-  pill: { minHeight: 46, paddingHorizontal: 22, borderRadius: 40, justifyContent: 'center' },
-  pillText: { fontFamily: Fonts.sansSemiBold, fontSize: 14, letterSpacing: 0.5, color: '#fff' },
-  round: { width: 46, height: 46, borderRadius: 23, alignItems: 'center', justifyContent: 'center' },
+  ctaRow: { flexDirection: 'row', alignItems: 'center', gap: Site.space.sm, marginTop: Site.space.sm },
+  pill: { minHeight: Site.control.height, paddingHorizontal: Site.control.paddingX + 8, borderRadius: Site.control.radius, justifyContent: 'center' },
+  // Dark text on the orange: 6.25:1 (white was 3.5:1).
+  pillText: { fontFamily: Fonts.sansBold, fontSize: 15, color: Site.onAccent },
+  focus: { outlineStyle: 'solid', outlineWidth: 2, outlineColor: '#ff6b00', outlineOffset: 2 } as object,
+  round: { width: Site.control.height, height: Site.control.height, borderRadius: Site.control.radius, alignItems: 'center', justifyContent: 'center' },
   pressed: { opacity: 0.85 },
   columns: { flex: 1, flexDirection: 'row', flexWrap: 'wrap', gap: 40 },
   columnsPhone: { gap: 28 },
   col: { minWidth: 150, gap: 4 },
   colPhone: { minWidth: 130 },
   colTitle: { fontFamily: Fonts.sansMedium, fontSize: 12, letterSpacing: 1.2, color: ON_INK_SOFT, marginBottom: 8 },
-  linkHit: { minHeight: 30, justifyContent: 'center' },
-  link: { fontFamily: Fonts.sans, fontSize: 15, color: ON_INK },
+  linkHit: { minHeight: 32, justifyContent: 'center', alignSelf: 'flex-start', borderRadius: Site.radius.sm },
+  link: { fontFamily: Fonts.sans, fontSize: 16, lineHeight: 20, color: ON_INK },
   bottom: { flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between', gap: 24 },
   bottomStacked: { flexDirection: 'column', alignItems: 'flex-start' },
   small: { fontFamily: Fonts.sans, fontSize: 12, color: ON_INK_SOFT },

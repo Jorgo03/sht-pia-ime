@@ -11,7 +11,7 @@ import { CityRail } from '@/components/home/city-rail';
 import { PropertyCard } from '@/components/property/property-card';
 import { SkeletonCard } from '@/components/ui/skeleton-card';
 import { SiteFooter } from '@/components/web/site-footer';
-import { Fonts, type AtticoPalette } from '@/constants/theme';
+import { Fonts, Site, siteGutter, type AtticoPalette } from '@/constants/theme';
 import { useFilters } from '@/contexts/filters-context';
 import { useTheme } from '@/contexts/theme-context';
 import { useAppDimensions } from '@/hooks/use-app-dimensions';
@@ -27,7 +27,6 @@ const HERO_PHOTO = require('@/assets/web/hero-tirana.jpg');
 const BAND_PHOTO = require('@/assets/web/band-sarande.jpg');
 
 const LATEST_COUNT = 8;
-const CONTENT_MAX = 1280;
 /** The dark sections' ground, the same in both themes, as on the reference. */
 const INK = '#0b0a09';
 const ON_INK = '#fbfbfb';
@@ -362,12 +361,15 @@ export function WebsiteHome() {
 }
 
 /** Centres a section's content at the site width, with the page gutter. */
+// The measured gutters (constants/theme Site): 104 / 80 / 56 / 16.
 function Contain({ children, style }: { children?: ReactNode; style?: StyleProp<ViewStyle> }) {
-  return <View style={[containStyles.contain, style]}>{children}</View>;
+  const { width } = useAppDimensions();
+  const gutter = siteGutter(width);
+  return <View style={[containStyles.contain, { maxWidth: Site.containerMax + 2 * gutter, paddingHorizontal: gutter }, style]}>{children}</View>;
 }
 
 const containStyles = StyleSheet.create({
-  contain: { width: '100%', maxWidth: CONTENT_MAX, alignSelf: 'center', paddingHorizontal: 24 },
+  contain: { width: '100%', alignSelf: 'center' },
 });
 
 /** A soft orange light, the reference's glow, drawn with a blurred circle. */
@@ -432,20 +434,29 @@ function PillButton({ label, onPress, arrow = false, ghost = false, onInk = fals
         accessibilityRole="link"
         accessibilityLabel={label}
         onPress={onPress}
-        style={({ pressed }) => [
-          pillStyles.pill,
-          ghost ? [pillStyles.ghost, onInk && pillStyles.ghostOnInk] : { backgroundColor: colors.accentEnd },
-          pressed && { opacity: 0.85 },
-        ]}>
-        <Text style={[pillStyles.text, ghost && { color: onInk ? ON_INK : colors.textPrimary }]}>{label.toUpperCase()}</Text>
+        style={(st) => {
+          const { hovered, focused, pressed } = st as typeof st & { hovered?: boolean; focused?: boolean };
+          return [
+            pillStyles.pill,
+            ghost ? [pillStyles.ghost, onInk && pillStyles.ghostOnInk] : { backgroundColor: hovered ? colors.accentLight : colors.accent },
+            ghost && hovered && pillStyles.ghostHover,
+            focused && (onInk ? pillStyles.focusOnInk : pillStyles.focus),
+            pressed && { opacity: 0.85 },
+          ];
+        }}>
+        {/* Dark text on the orange (6.25:1); white on it was 3.5:1. */}
+        <Text style={[pillStyles.text, ghost && { color: onInk ? ON_INK : colors.textPrimary }]}>{label}</Text>
       </Pressable>
       {arrow && (
         <Pressable
           accessibilityRole="link"
           accessibilityLabel={label}
           onPress={onPress}
-          style={({ pressed }) => [pillStyles.round, { backgroundColor: colors.accentEnd }, pressed && { opacity: 0.85 }]}>
-          <MaterialIcons name="arrow-forward" size={20} color="#fff" />
+          style={(st) => {
+            const { hovered, focused, pressed } = st as typeof st & { hovered?: boolean; focused?: boolean };
+            return [pillStyles.round, { backgroundColor: hovered ? colors.accentLight : colors.accent }, focused && (onInk ? pillStyles.focusOnInk : pillStyles.focus), pressed && { opacity: 0.85 }];
+          }}>
+          <MaterialIcons name="arrow-forward" size={20} color={Site.onAccent} />
         </Pressable>
       )}
     </View>
@@ -453,12 +464,16 @@ function PillButton({ label, onPress, arrow = false, ghost = false, onInk = fals
 }
 
 const pillStyles = StyleSheet.create({
-  row: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  pill: { minHeight: 46, paddingHorizontal: 22, borderRadius: 40, justifyContent: 'center' },
-  ghost: { borderWidth: 1, borderColor: 'rgba(127,127,127,0.45)', backgroundColor: 'rgba(127,127,127,0.10)' },
-  ghostOnInk: { borderColor: 'rgba(251,251,251,0.45)', backgroundColor: 'rgba(251,251,251,0.06)' },
-  text: { fontFamily: Fonts.sansSemiBold, fontSize: 14, letterSpacing: 0.5, color: '#fff' },
-  round: { width: 46, height: 46, borderRadius: 23, alignItems: 'center', justifyContent: 'center' },
+  row: { flexDirection: 'row', alignItems: 'center', gap: Site.space.sm },
+  // The reference's button: 50px tall, 16px sides, square-ish corners.
+  pill: { minHeight: Site.control.height, paddingHorizontal: Site.control.paddingX + 8, borderRadius: Site.control.radius, justifyContent: 'center' },
+  ghost: { borderWidth: 1, borderColor: 'rgba(127,127,127,0.55)', backgroundColor: 'transparent' },
+  ghostOnInk: { borderColor: 'rgba(251,251,251,0.55)' },
+  ghostHover: { backgroundColor: 'rgba(127,127,127,0.12)' },
+  focus: { outlineStyle: 'solid', outlineWidth: 2, outlineColor: Site.focus, outlineOffset: 2 } as object,
+  focusOnInk: { outlineStyle: 'solid', outlineWidth: 2, outlineColor: '#ff6b00', outlineOffset: 2 } as object,
+  text: { fontFamily: Fonts.sansBold, fontSize: 15, color: Site.onAccent },
+  round: { width: Site.control.height, height: Site.control.height, borderRadius: Site.control.radius, alignItems: 'center', justifyContent: 'center' },
 });
 
 const createStyles = (colors: AtticoPalette) =>
@@ -473,11 +488,11 @@ const createStyles = (colors: AtticoPalette) =>
     hero: { backgroundColor: INK, overflow: 'hidden', justifyContent: 'flex-end' },
     photoShade: { backgroundColor: 'rgba(11,10,9,0.4)' },
     bandShade: { backgroundColor: 'rgba(11,10,9,0.55)' },
-    heroInner: { paddingTop: 140, paddingBottom: 72, gap: 18 },
+    heroInner: { paddingTop: 140, paddingBottom: Site.section.md, gap: Site.space.lg },
     heroEyebrow: { fontFamily: Fonts.sansMedium, fontSize: 13, letterSpacing: 1.4, color: ON_INK_SOFT, textTransform: 'uppercase' },
-    heroTitle: { fontFamily: Fonts.sans, fontSize: 60, lineHeight: 62, letterSpacing: -1.8, color: ON_INK, maxWidth: 900 },
-    heroTitleWide: { fontFamily: Fonts.sans, fontSize: 88, lineHeight: 88, letterSpacing: -2.8 },
-    heroTitlePhone: { fontFamily: Fonts.sans, fontSize: 42, lineHeight: 44, letterSpacing: -1.2 },
+    heroTitle: { fontFamily: Fonts.sansBold, fontSize: 56, lineHeight: 66, letterSpacing: -1, color: ON_INK, maxWidth: 900 },
+    heroTitleWide: { fontSize: 64, lineHeight: 76 },
+    heroTitlePhone: { fontSize: 32, lineHeight: 40, letterSpacing: -0.5 },
     heroLead: { fontFamily: Fonts.sans, fontSize: 18, lineHeight: 27, color: ON_INK_SOFT, maxWidth: 620 },
     searchBox: {
       flexDirection: 'row',
@@ -486,23 +501,23 @@ const createStyles = (colors: AtticoPalette) =>
       marginTop: 6,
       paddingLeft: 18,
       padding: 6,
-      borderRadius: 40,
+      borderRadius: Site.control.radius,
       backgroundColor: '#fbfbfb',
       maxWidth: 640,
     },
     searchBoxPhone: { paddingLeft: 14 },
-    searchInput: { flex: 1, minWidth: 0, width: 0, minHeight: 46, fontFamily: Fonts.sans, fontSize: 16, color: '#1a1612' },
-    searchBtn: { minHeight: 46, paddingHorizontal: 22, borderRadius: 40, justifyContent: 'center', backgroundColor: colors.accentEnd },
-    searchBtnText: { fontFamily: Fonts.sansSemiBold, fontSize: 14, color: '#fff' },
+    searchInput: { flex: 1, minWidth: 0, width: 0, minHeight: Site.control.height, fontFamily: Fonts.sans, fontSize: 16, color: '#1a1612' },
+    searchBtn: { minHeight: Site.control.height, paddingHorizontal: Site.control.paddingX + 8, borderRadius: Site.control.radius, justifyContent: 'center', backgroundColor: colors.accent },
+    searchBtnText: { fontFamily: Fonts.sansBold, fontSize: 15, color: Site.onAccent },
 
-    light: { backgroundColor: colors.primary, paddingVertical: 72 },
-    frame: { position: 'relative', borderLeftWidth: 1, borderRightWidth: 1, borderColor: colors.border, paddingVertical: 64 },
+    light: { backgroundColor: colors.primary, paddingVertical: Site.section.md },
+    frame: { position: 'relative', borderLeftWidth: 1, borderRightWidth: 1, borderColor: colors.border, paddingVertical: Site.section.sm },
     frameTopLine: { borderTopWidth: 1, paddingVertical: 0 },
     frameBottomLine: { borderBottomWidth: 1 },
     rowCells: { flexDirection: 'row' },
-    h2Center: { fontFamily: Fonts.sans, fontSize: 64, lineHeight: 66, letterSpacing: -1.9, color: colors.textPrimary, textAlign: 'center', maxWidth: 760, alignSelf: 'center' },
-    h2: { fontFamily: Fonts.sans, fontSize: 56, lineHeight: 58, letterSpacing: -1.7, color: colors.textPrimary },
-    h2Phone: { fontFamily: Fonts.sans, fontSize: 36, lineHeight: 39, letterSpacing: -1 },
+    h2Center: { fontFamily: Fonts.sansBold, fontSize: 56, lineHeight: 66, letterSpacing: -1, color: colors.textPrimary, textAlign: 'center', maxWidth: 760, alignSelf: 'center' },
+    h2: { fontFamily: Fonts.sansBold, fontSize: 56, lineHeight: 66, letterSpacing: -1, color: colors.textPrimary },
+    h2Phone: { fontSize: 28, lineHeight: 34, letterSpacing: -0.5 },
     bigCell: { flex: 1, padding: 32, gap: 16, minHeight: 300 },
     cellDivider: { borderRightWidth: 1, borderColor: colors.border },
     cellDividerBottom: { borderBottomWidth: 1, borderColor: colors.border },
@@ -519,9 +534,9 @@ const createStyles = (colors: AtticoPalette) =>
     stripLabel: { fontFamily: Fonts.sansMedium, fontSize: 14, color: colors.textPrimary },
     stripName: { flexShrink: 1, fontFamily: Fonts.sansMedium, fontSize: 14, color: colors.textSecondary },
 
-    dark: { backgroundColor: INK, paddingVertical: 96, overflow: 'hidden' },
+    dark: { backgroundColor: INK, paddingVertical: Site.section.md, overflow: 'hidden' },
     darkHead: { marginBottom: 48 },
-    h2OnInk: { fontFamily: Fonts.sans, fontSize: 56, lineHeight: 58, letterSpacing: -1.7, color: ON_INK, maxWidth: 820 },
+    h2OnInk: { fontFamily: Fonts.sansBold, fontSize: 56, lineHeight: 66, letterSpacing: -1, color: ON_INK, maxWidth: 820 },
     gridOnInk: { borderTopWidth: 1, borderColor: LINE_ON_INK },
     wrapRow: { flexDirection: 'row', flexWrap: 'wrap' },
     half: { width: '50%' },
@@ -549,8 +564,8 @@ const createStyles = (colors: AtticoPalette) =>
     notice: { alignItems: 'flex-start', gap: 8, padding: 24, borderWidth: 1, borderColor: colors.border },
     citiesBlock: { marginTop: 56 },
 
-    band: { paddingVertical: 128 },
+    band: { paddingVertical: Site.section.lg },
     bandInner: { alignItems: 'center', gap: 20 },
-    bandTitle: { fontFamily: Fonts.sans, fontSize: 64, lineHeight: 66, letterSpacing: -1.9, color: ON_INK, textAlign: 'center', maxWidth: 860 },
+    bandTitle: { fontFamily: Fonts.sansBold, fontSize: 56, lineHeight: 66, letterSpacing: -1, color: ON_INK, textAlign: 'center', maxWidth: 860 },
     bandBody: { fontFamily: Fonts.sans, fontSize: 18, lineHeight: 27, color: ON_INK_SOFT, textAlign: 'center', maxWidth: 560 },
   });
