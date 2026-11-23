@@ -1,5 +1,7 @@
 import { LinearGradient } from 'expo-linear-gradient';
-import { StyleSheet, type ViewProps } from 'react-native';
+import { StyleSheet, View, type ViewProps } from 'react-native';
+
+import { IS_WEB } from '@/constants/web-frame';
 
 import { useTheme } from '@/contexts/theme-context';
 
@@ -15,6 +17,17 @@ export function GradientBackground({
 }: GradientBackgroundProps) {
   const { theme, colors: palette } = useTheme();
   const middleStop = theme === 'dark' ? '#1a1000' : '#fbe8d3';
+
+  // Website: no panel of its own. The page's ground (the root layout's web
+  // column) runs the full width of the browser, so a screen no longer reads
+  // as a lighter phone-shaped panel in the middle of a desktop window.
+  if (IS_WEB && !colors) {
+    return (
+      <View style={[styles.container, style]} {...rest}>
+        {children}
+      </View>
+    );
+  }
 
   return (
     <LinearGradient

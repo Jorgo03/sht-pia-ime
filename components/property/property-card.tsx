@@ -2,7 +2,7 @@ import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { Image } from 'expo-image';
 import { useRouter, type Href } from 'expo-router';
 import { memo, useMemo } from 'react';
-import { Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Pressable, StyleSheet, Text, TouchableOpacity, View, type GestureResponderEvent } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { useTranslation } from 'react-i18next';
 import { formatRef } from '@/src/features/properties/lib/searchFilters';
@@ -18,6 +18,7 @@ import { formatDate, getLocalizedText, listingBadgeKey, priceSuffixKey } from '@
 import { cardImageUrl } from '@/lib/image';
 import { CARD_CONTAINER_A11Y } from '@/components/property/card-a11y';
 import { useCurrency } from '@/contexts/currency-context';
+import { IS_WEB } from '@/constants/web-frame';
 
 const COMPACT_GAP = 12;
 
@@ -63,6 +64,20 @@ function PropertyCardBase({ property, onPress, variant = 'grid', detailed = fals
   const { isFavorite, toggle } = useFavorites();
   const router = useRouter();
   const handlePress = onPress ?? (() => router.push(`/property/${property.id}` as Href));
+  // Website: the card's title/price is a real <a href>, so a listing can be
+  // opened in a new tab and search engines can follow it. A plain click
+  // still navigates inside the app; a ctrl/cmd/shift click is left to the
+  // browser.
+  const linkProps = IS_WEB && !onPress ? ({ href: `/property/${property.id}` } as object) : {};
+  const onLinkPress = (e?: GestureResponderEvent) => {
+    const ev = e as unknown as { metaKey?: boolean; ctrlKey?: boolean; shiftKey?: boolean; preventDefault?: () => void; stopPropagation?: () => void } | undefined;
+    if (IS_WEB && (ev?.metaKey || ev?.ctrlKey || ev?.shiftKey)) {
+      ev?.stopPropagation?.();
+      return;
+    }
+    ev?.preventDefault?.();
+    handlePress();
+  };
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const { width: screenWidth, columns } = useResponsive();
@@ -114,7 +129,7 @@ function PropertyCardBase({ property, onPress, variant = 'grid', detailed = fals
           </TouchableOpacity>
         </View>
         <View style={styles.compactInfo}>
-          <Text style={styles.compactTitle} numberOfLines={1} accessibilityRole="link" onPress={handlePress}>
+          <Text style={styles.compactTitle} numberOfLines={1} accessibilityRole="link" {...linkProps} onPress={onLinkPress}>
             {title}
           </Text>
           <View style={styles.compactLocationRow}>
@@ -206,7 +221,7 @@ function PropertyCardBase({ property, onPress, variant = 'grid', detailed = fals
       {rich ? (
         <View style={styles.richInfo}>
           {property.ref_code ? <Text style={styles.richRef} numberOfLines={1}>{formatRef(property.ref_code)}</Text> : null}
-          <Text style={styles.richTitle} numberOfLines={1} accessibilityRole="link" accessibilityLabel={[title, `${price}${suffix}`, specsLabel].filter(Boolean).join(', ')} onPress={handlePress}>
+          <Text style={styles.richTitle} numberOfLines={1} accessibilityRole="link" accessibilityLabel={[title, `${price}${suffix}`, specsLabel].filter(Boolean).join(', ')} {...linkProps} onPress={onLinkPress}>
             {title}
           </Text>
           <View style={styles.locationRow}>
@@ -244,7 +259,8 @@ function PropertyCardBase({ property, onPress, variant = 'grid', detailed = fals
           style={styles.price}
           accessibilityRole="link"
           accessibilityLabel={[title, `${price}${suffix}`, specsLabel].filter(Boolean).join(', ')}
-          onPress={handlePress}>
+          {...linkProps}
+          onPress={onLinkPress}>
           {price}{suffix}
         </Text>
         <View style={styles.locationRow}>

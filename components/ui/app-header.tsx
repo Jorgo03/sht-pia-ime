@@ -24,6 +24,7 @@ import { IS_WEB, WEB_MAX_WIDTH } from '@/constants/web-frame';
 import { useAuth } from '@/contexts/auth-context';
 import { useCurrency } from '@/contexts/currency-context';
 import { DISPLAY_CURRENCIES } from '@/lib/currency';
+import { useHydrated } from '@/hooks/use-hydrated';
 import { useTheme } from '@/contexts/theme-context';
 import { supabase } from '@/lib/supabase';
 
@@ -75,6 +76,9 @@ function LightStatusBarWhileFocused() {
   return focused ? <StatusBar style="light" /> : null;
 }
 
+/** From this browser width a titleless screen shows no bar of its own. */
+const WEB_DESKTOP_BAR_MIN = 768;
+
 export function AppHeader({
   /** Right-most slot — web puts the avatar (signed in) or a person icon
    *  (signed out) here. Omit it on the account screen itself, where it would
@@ -83,7 +87,7 @@ export function AppHeader({
   /** Pushed screens pass this to get a back chevron in the left slot. Web has
    *  no equivalent — the browser's own back button covers it — but a stack
    *  screen with no way back is a dead end on a phone. */
-  onBack,
+  onBack: onBackProp,
   /** Only for pushed screens whose title lives in the header rather than in a
    *  hero below it. Replaces the wordmark: a chevron, wordmark, title and two
    *  controls do not fit across 375px. */
@@ -139,13 +143,19 @@ export function AppHeader({
   const router = useRouter();
   const onWebScreen = IS_WEB && !site;
   if (onWebScreen) showControls = false;
+  const { width: windowWidth, height: windowHeight } = useWindowDimensions();
+  // On a desktop browser a screen with no title of its own drops its bar:
+  // the site header and the browser's Back cover it, and a back arrow and a
+  // second logo under the site menu made every page look like the phone app.
+  // After hydration only, so the pre-rendered page and the first draw agree.
+  const hydrated = useHydrated();
+  const onBack = onWebScreen && hydrated && !title && !floating && windowWidth >= WEB_DESKTOP_BAR_MIN ? undefined : onBackProp;
   const styles = useMemo(
     () => createStyles(colors, onDark || floating, !!onBack, floating),
     [colors, onDark, onBack, floating],
   );
   const [langOpen, setLangOpen] = useState(false);
   const insets = useSafeAreaInsets();
-  const { width: windowWidth, height: windowHeight } = useWindowDimensions();
   // The menu hangs under the bar: the top inset, the bar's 54 (10 + 34 + 10)
   // and web's 6px gap. A fixed 96 put it over the header on notched iPhones,
   // and its 8 rows (~358) ran off a 360x380 Flip cover, so it now scrolls

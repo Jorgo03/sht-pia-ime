@@ -135,9 +135,14 @@ function WebColumn({ children }: { children: ReactNode }) {
 
 function ThemedNavigation() {
   const { theme } = useTheme();
+  const base = theme === 'dark' ? DarkTheme : DefaultTheme;
+  // Website: screens draw on the page's own ground (WebColumn's background),
+  // not the navigator's grey card, which showed as a phone-shaped panel
+  // between beige margins on a desktop browser.
+  const navTheme = IS_WEB ? { ...base, colors: { ...base.colors, background: 'transparent' } } : base;
 
   return (
-    <NavigationThemeProvider value={theme === 'dark' ? DarkTheme : DefaultTheme}>
+    <NavigationThemeProvider value={navTheme}>
       <RouteHead />
       <WebColumn>
         {/* Every screen draws its own header (AppHeader), so the system one is

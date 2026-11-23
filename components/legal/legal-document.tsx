@@ -88,7 +88,7 @@ export function LegalDocument({ doc }: { doc: Doc }) {
 function Section({ section, contact, styles }: { section: LegalSection; contact: LegalContact; styles: Styles }) {
   return (
     <View style={styles.section}>
-      <Text style={styles.sectionTitle} accessibilityRole="header">{section.h}</Text>
+      <Text style={styles.sectionTitle} accessibilityRole="header" aria-level={2}>{section.h}</Text>
       {section.p?.map((text, i) => <Text key={`p${i}`} style={styles.paragraph}>{text}</Text>)}
       {section.ul?.map((text, i) => (
         <View key={`li${i}`} style={styles.bulletRow}>

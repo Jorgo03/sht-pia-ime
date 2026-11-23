@@ -1,7 +1,7 @@
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useRouter, type Href } from 'expo-router';
+import { useIsFocused, useRouter, type Href } from 'expo-router';
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View, useWindowDimensions, type StyleProp, type ViewStyle } from 'react-native';
@@ -61,6 +61,9 @@ const SERVICES: { key: string; icon: IconName; href: string }[] = [
  */
 export function WebsiteHome() {
   const { t } = useTranslation();
+  // Home stays mounted under the other pages (it is a tab): its headline is
+  // the page's h1 only while Home is showing, or every page has two.
+  const focused = useIsFocused();
   const router = useRouter();
   const { colors } = useTheme();
   const { width } = useAppDimensions();
@@ -128,8 +131,8 @@ export function WebsiteHome() {
           <Text style={styles.heroEyebrow}>{t('site.hero.eyebrow')}</Text>
           <Text
             style={[styles.heroTitle, wide ? styles.heroTitleWide : phone ? styles.heroTitlePhone : null]}
-            accessibilityRole="header"
-            aria-level={1}>
+            accessibilityRole={focused ? 'header' : undefined}
+            aria-level={focused ? 1 : undefined}>
             {t('site.hero.title')} {t('site.hero.titleEm')}
           </Text>
           <Text style={styles.heroLead}>{t('site.hero.lead')}</Text>

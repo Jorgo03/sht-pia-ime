@@ -48,9 +48,11 @@ export const APP_SCREEN_MAX_WIDTH = 720;
 export function isWebsiteRoute(pathname: string): boolean {
   return (
     pathname === '/' ||
-    /^\/(explore|wanted|guide|agents|privacy|terms|cookies|pricing|compare)$/.test(pathname) ||
+    /^\/(explore|wanted|guide|agents|privacy|terms|cookies|pricing|compare|profile)$/.test(pathname) ||
     /^\/(property|agent|user)\/[^/]+$/.test(pathname) ||
     /^\/agent-dashboard$/.test(pathname) ||
+    // The sign-in screen's dusk artwork runs the page's full width; the
+    // profile's own content stays in its readable column.
     // Messages is two panes on a desktop (the list beside the open chat).
     /^\/messages(\/[^/]+)?$/.test(pathname)
   );

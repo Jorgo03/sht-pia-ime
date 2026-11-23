@@ -64,6 +64,8 @@ const ROUTE_TITLES: Record<string, string> = {
   cookies: 'legal.cookiePolicy',
   guide: 'legal.buyingGuide',
   wanted: 'wanted.homeTitle',
+  agents: 'site.nav.agencies',
+  compare: 'compare.add',
   pricing: 'pricing.title',
   moderation: 'moderation.title',
   '+not-found': 'notFound.title',
