@@ -138,7 +138,7 @@ const styles = StyleSheet.create({
   topStacked: { flexDirection: 'column' },
   lead: { flex: 1, gap: 18, minWidth: 260 },
   headline: { fontFamily: Fonts.sansBold, fontSize: 56, lineHeight: 66, letterSpacing: -1, color: ON_INK, maxWidth: 560 },
-  headlinePhone: { fontSize: 32, lineHeight: 40, letterSpacing: -0.5 },
+  headlinePhone: { fontFamily: Fonts.sansBold, fontSize: 32, lineHeight: 40, letterSpacing: -0.5 },
   tagline: { fontFamily: Fonts.sans, fontSize: 16, lineHeight: 24, color: ON_INK_SOFT, maxWidth: 420 },
   ctaRow: { flexDirection: 'row', alignItems: 'center', gap: Site.space.sm, marginTop: Site.space.sm },
   pill: { minHeight: Site.control.height, paddingHorizontal: Site.control.paddingX + 8, borderRadius: Site.control.radius, justifyContent: 'center' },
