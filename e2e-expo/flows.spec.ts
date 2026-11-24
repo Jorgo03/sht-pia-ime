@@ -335,7 +335,8 @@ test('X07 language: switching to English sticks after a reload', async ({ page }
   await page.goto('/');
   await ready(page);
   await openLanguage(page);
-  await page.getByRole('button', { name: /English/ }).click();
+  // The language rows are a menu's radio items (the ARIA menu pattern).
+  await page.getByRole('menuitemradio', { name: /English/ }).click();
   await expect(page.locator('html')).toHaveAttribute('lang', 'en');
   await page.reload();
   await ready(page);
@@ -365,7 +366,7 @@ test('X64 Russian headlines switch to Manrope at once, and back to Newsreader in
   // The menu button's own label is in the current language.
   const pickLanguage = async (menuLabel: string, name: RegExp, siteMenu?: string) => {
     await openLanguage(page, menuLabel, siteMenu);
-    await page.getByRole('button', { name }).click();
+    await page.getByRole('menuitemradio', { name }).click();
   };
   await page.goto('/');
   await ready(page);
@@ -623,7 +624,8 @@ test('X10 a wide screen shows a website: a full-width header with the menu, and 
   await expect(page.getByRole('tablist')).toHaveCount(0);
   await expect(page.getByRole('link', { name: t('site.nav.agencies'), exact: true }).first()).toBeVisible();
   const brand = await page.getByRole('link', { name: 'Shtëpia.ime' }).first().boundingBox();
-  expect(brand!.x).toBeLessThan(80);
+  // Inside the site gutter (constants/theme siteGutter: 104 from 1280 wide).
+  expect(brand!.x).toBeLessThanOrEqual(105);
   const heading = await page.getByRole('heading', { level: 1 }).boundingBox();
   expect(heading!.width).toBeGreaterThan(480);
 });
