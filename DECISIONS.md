@@ -30,6 +30,29 @@ first (it was rejected with 401 on 2026-11-04).
 
 ---
 
+## ═══ WEBSITE STARTED AGAIN — 2026-11-24 ═══
+
+### W10. The website is erased and rebuilt as its own project (DECIDED by owner, 2026-11-24)
+
+The owner: "erase everything on website, i want to build it from the
+beginning", choosing "New separate website" (the phone apps untouched) and,
+for the live address, "erase it and i will bring something new".
+Done:
+- The live address no longer serves the Expo app's web build. It builds
+  `website/` (scripts/build-website.mjs): an empty home page, marked noindex
+  until the new design arrives.
+- Kept, because the phone apps depend on the address: `/privacy`, `/terms`,
+  `/cookies` (rendered from `src/features/legal/content/`, the texts the apps
+  show; the app stores require a privacy URL), `/api/auth-relay` (Google
+  sign-in back to the app), `public/` (icons, `/.well-known/` app links).
+  Links shared from the apps (`/property/<id>`, `/user/<id>`, `/agent/<id>`)
+  open the home page until the new site has those pages.
+- Nothing deleted from the phone apps or the database. The Expo web code
+  (`components/web/`, the `.web.tsx` routes, `e2e-expo/`) stays in the repo
+  for now: the apps share files with it, and removing it is a separate,
+  careful step once the new website exists. W1-W9 below describe the old
+  website and no longer apply to what is live.
+
 ## ═══ WEBSITE FROM THE APP — 2026-11-16 ═══
 
 ### W9. The website follows the reference site's look closely (DECIDED by owner, 2026-11-16)
