@@ -197,7 +197,10 @@ for (const role of ['visitor', 'client', 'agent'] as Role[]) {
           }
 
           // Not blank, not wider than the window, nothing off screen, no broken or squashed image.
-          expect.soft(m.textLength, `${spec.path} at ${key} is blank`).toBeGreaterThan(40);
+          // 30: the shortest real page is the signed-out prompt on a phone,
+          // logo + "Hyni për të vazhduar" + "Hyr" (36 characters); a blank
+          // page is the logo alone (11).
+          expect.soft(m.textLength, `${spec.path} at ${key} is blank`).toBeGreaterThan(30);
           expect.soft(m.pageWider, `${spec.path} at ${key} is wider than the window`).toBe(false);
           expect.soft(m.offScreen, `${spec.path} at ${key}: controls off screen`).toEqual([]);
           expect.soft(m.overlaps, `${spec.path} at ${key}: controls on top of each other`).toEqual([]);
