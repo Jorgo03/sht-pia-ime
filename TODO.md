@@ -53,4 +53,4 @@ drawer; fixed in 6e32f24.
 ## Verification
 
 - [x] tsc  - [x] lint (0 errors)  - [x] unit tests 636/636  - [x] test:e2e:expo 443 + 5 rerun after test updates
-- [x] Vercel preview checked  - [x] master → production  - [ ] live URL checked after the drawer fix
+- [x] Vercel preview checked  - [x] master → production  - [x] live URL checked after the drawer fix (2026-11-24: language names readable in the phone drawer)
