@@ -215,7 +215,7 @@ export function SiteHeader() {
               <>
                 <View style={styles.menuDivider} />
                 <Text style={styles.menuLabel}>{t('common.language')}</Text>
-                <LanguageOptions onChosen={() => setMenuOpen(false)} />
+                <LanguageOptions onDark onChosen={() => setMenuOpen(false)} />
                 <View style={styles.menuItem}>
                   <ThemeToggleButton style={styles.iconBtn} iconColor={Site.onInk} />
                 </View>

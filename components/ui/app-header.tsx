@@ -365,7 +365,7 @@ export function AppHeader({
  * The language list and the price-currency choice: the app header's
  * dropdown, and the website's menu on a phone (components/web/site-header).
  */
-export function LanguageOptions({ onChosen }: { onChosen?: () => void }) {
+export function LanguageOptions({ onChosen, onDark = false }: { onChosen?: () => void; onDark?: boolean }) {
   const { t, i18n } = useTranslation();
   const { user } = useAuth();
   const { colors } = useTheme();
@@ -388,7 +388,7 @@ export function LanguageOptions({ onChosen }: { onChosen?: () => void }) {
                 return (
                   <Pressable
                     key={lang.code}
-                    style={({ hovered, focused }: { hovered?: boolean; focused?: boolean }) => [styles.langRowWrap, (hovered || focused) && styles.langRowHover, active && styles.langRowCurrent, focused && styles.focusRing]}
+                    style={({ hovered, focused }: { hovered?: boolean; focused?: boolean }) => [styles.langRowWrap, (hovered || focused) && (onDark ? styles.langRowHoverDark : styles.langRowHover), active && styles.langRowCurrent, focused && styles.focusRing]}
                     onPress={() => changeLanguage(lang.code)}
                     accessibilityRole={IS_WEB ? ('menuitemradio' as 'menuitem') : 'button'}
                     accessibilityState={{ selected: active, checked: active }}
@@ -398,7 +398,7 @@ export function LanguageOptions({ onChosen }: { onChosen?: () => void }) {
                         text (AA) with a tick, not white on orange (3.1:1). */}
                     <View style={styles.langRow}>
                       <Text style={styles.langRowCode}>{lang.flag}</Text>
-                      <Text style={[styles.langRowName, active && styles.langRowCurrentText]}>{lang.name}</Text>
+                      <Text style={[styles.langRowName, onDark && !active && styles.onDarkText, active && styles.langRowCurrentText]}>{lang.name}</Text>
                       {active ? <MaterialIcons name="check" size={16} color={colors.accentText} style={styles.langRowCheck} /> : null}
                     </View>
                   </Pressable>
@@ -407,7 +407,7 @@ export function LanguageOptions({ onChosen }: { onChosen?: () => void }) {
               {/* Price currency (ALL / EUR / USD / GBP) for visitors from
                   abroad; in the same menu as the language, since both are
                   "show me this in my terms". */}
-              <Text style={styles.currencyLabel}>{t('currency.title')}</Text>
+              <Text style={[styles.currencyLabel, onDark && styles.onDarkMuted]}>{t('currency.title')}</Text>
               <View style={styles.currencyRow}>
                 {([null, ...DISPLAY_CURRENCIES] as const).map((c) => {
                   const active = c === currency;
@@ -418,8 +418,8 @@ export function LanguageOptions({ onChosen }: { onChosen?: () => void }) {
                       accessibilityRole="button"
                       accessibilityState={{ selected: active }}
                       accessibilityLabel={c ?? t('currency.asListed')}
-                      style={[styles.currencyChip, active && { backgroundColor: colors.accent, borderColor: colors.accent }]}>
-                      <Text style={[styles.currencyChipText, active && styles.langRowActive]}>{c ?? t('currency.asListedShort')}</Text>
+                      style={[styles.currencyChip, onDark && styles.currencyChipDark, active && { backgroundColor: colors.accent, borderColor: colors.accent }]}>
+                      <Text style={[styles.currencyChipText, onDark && styles.onDarkText, active && styles.currencyChipTextActive]}>{c ?? t('currency.asListedShort')}</Text>
                     </Pressable>
                   );
                 })}
@@ -640,6 +640,13 @@ const createStyles = (
       color: '#fff',
     },
     langRowHover: { backgroundColor: colors.glass },
+    langRowHoverDark: { backgroundColor: 'rgba(255,255,255,0.08)' },
+    // The website's dark drawer (components/web/site-header).
+    onDarkText: { color: '#ffffff' },
+    onDarkMuted: { color: '#d9d4cc' },
+    currencyChipDark: { borderColor: 'rgba(255,255,255,0.3)' },
+    // Dark on the orange chip: 6.25:1 (white was 3.1:1).
+    currencyChipTextActive: { color: '#1a1714', fontFamily: Fonts.sansBold },
     langRowCurrent: { backgroundColor: colors.accentTint },
     langRowCurrentText: { color: colors.accentText, fontFamily: Fonts.sansBold },
     langRowCheck: { marginLeft: 'auto' },
