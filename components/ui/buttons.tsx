@@ -5,7 +5,8 @@ import { Pressable, StyleSheet, Text, type StyleProp, type ViewStyle } from 'rea
 import Animated from 'react-native-reanimated';
 
 import { usePressScale } from '@/components/ui/motion';
-import { Fonts, Motion, Radii, Shadows, type AtticoPalette } from '@/constants/theme';
+import { Fonts, Motion, Radii, Shadows, Site, type AtticoPalette } from '@/constants/theme';
+import { IS_WEB } from '@/constants/web-frame';
 import { useTheme } from '@/contexts/theme-context';
 
 /**
@@ -48,7 +49,7 @@ export function PrimaryCTA({
         disabled={inert}
         accessibilityRole="button"
         accessibilityState={{ disabled: inert }}
-        style={[styles.cta, inert && styles.ctaDisabled]}>
+        style={(st) => [styles.cta, inert && styles.ctaDisabled, (st as typeof st & { focused?: boolean }).focused && styles.focusRing]}>
         <LinearGradient
           colors={[colors.accent, colors.accentEnd]}
           start={{ x: 0, y: 0 }}
@@ -58,7 +59,7 @@ export function PrimaryCTA({
         <Text style={styles.ctaLabel} numberOfLines={2} maxFontSizeMultiplier={1.4}>
           {label}
         </Text>
-        {icon && !loading ? <MaterialIcons name={icon} size={18} color="#fff" /> : null}
+        {icon && !loading ? <MaterialIcons name={icon} size={18} color={IS_WEB ? Site.onAccent : '#fff'} /> : null}
       </Pressable>
     </Animated.View>
   );
@@ -95,7 +96,7 @@ export function GhostBtn({
         disabled={disabled}
         accessibilityRole="button"
         accessibilityState={{ disabled }}
-        style={[styles.ghost, onDark && styles.ghostOnDark, disabled && styles.ctaDisabled]}>
+        style={(st) => [styles.ghost, onDark && styles.ghostOnDark, disabled && styles.ctaDisabled, (st as typeof st & { focused?: boolean }).focused && styles.focusRing]}>
         {icon ? (
           <MaterialIcons
             name={icon}
@@ -130,7 +131,11 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     gap: 8,
     overflow: 'hidden',
     ...Shadows.cta,
+    // Website: the reference's 50px, square-ish button, without the glow.
+    ...(IS_WEB ? { minHeight: Site.control.height, borderRadius: Site.control.radius, shadowOpacity: 0 } : null),
   },
+  // Website keyboard focus (WCAG 2.4.7), 4.7:1 on cream.
+  focusRing: IS_WEB ? ({ outlineStyle: 'solid', outlineWidth: 2, outlineColor: Site.focus, outlineOffset: 2 } as object) : {},
   ctaDisabled: {
     opacity: 0.45,
   },
@@ -139,7 +144,8 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     textAlign: 'center',
     fontFamily: Fonts?.sansBold,
     fontSize: 16,
-    color: '#fff',
+    // Website: dark text on the orange (5.3–6.25:1); white is 3.5:1.
+    color: IS_WEB ? Site.onAccent : '#fff',
   },
   // Same minHeight floor as the CTA.
   ghost: {
@@ -154,6 +160,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
     backgroundColor: 'transparent',
+    ...(IS_WEB ? { minHeight: Site.control.height, borderRadius: Site.control.radius, borderColor: colors.borderStrong } : null),
   },
   ghostOnDark: {
     borderColor: colors.glassOnDarkBorder,

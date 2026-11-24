@@ -35,7 +35,7 @@ import { AI_CHAT_ENABLED } from '@/constants/features';
 import { LocationPreviewMap } from '@/components/property/location-preview-map';
 import { PropertyCard } from '@/components/property/property-card';
 import { KeyboardDoneBar } from '@/components/ui/keyboard-done-bar';
-import { Fonts, InlineTarget, type AtticoPalette } from '@/constants/theme';
+import { Fonts, InlineTarget, Site, type AtticoPalette } from '@/constants/theme';
 import { useAuth } from '@/contexts/auth-context';
 import { useFavorites } from '@/contexts/favorites-context';
 import { useTheme } from '@/contexts/theme-context';
@@ -50,7 +50,7 @@ import { supabase } from '@/lib/supabase';
 import { isPlayableVideo, ListingVideo } from '@/components/property/listing-video';
 import { useCompare } from '@/contexts/compare-context';
 import { formatPrice, listingBadgeKey, priceSuffixKey, telUrl, whatsappUrl } from '@/lib/format';
-import { sheetColumn } from '@/constants/web-frame';
+import { IS_WEB, sheetColumn } from '@/constants/web-frame';
 import { useAppDimensions, useIsDesktopWeb } from '@/hooks/use-app-dimensions';
 import { PageHead } from '@/components/web/page-head';
 import { pricePerM2 } from '@/src/features/properties/lib/compare';
@@ -1129,7 +1129,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   mapPreview: {
     height: 160,
-    borderRadius: 14,
+    borderRadius: IS_WEB ? Site.radius.sm : 14,
     overflow: 'hidden',
   },
   openMapsLink: {
@@ -1176,7 +1176,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
 
   sectionCard: {
     backgroundColor: colors.primaryLight,
-    borderRadius: 20,
+    borderRadius: IS_WEB ? Site.radius.sm : 20,
     padding: 16,
     marginBottom: 16,
     borderWidth: 1,

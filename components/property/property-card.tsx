@@ -9,7 +9,7 @@ import { formatRef } from '@/src/features/properties/lib/searchFilters';
 
 import { useHeartPop, usePressScale } from '@/components/ui/motion';
 
-import { type AtticoPalette, Fonts } from '@/constants/theme';
+import { type AtticoPalette, Fonts, Site } from '@/constants/theme';
 import { useFavorites } from '@/contexts/favorites-context';
 import { useTheme } from '@/contexts/theme-context';
 import { useResponsive } from '@/hooks/use-responsive';
@@ -178,13 +178,13 @@ function PropertyCardBase({ property, onPress, variant = 'grid', detailed = fals
     <Animated.View style={[styles.cardOuter, pressStyle]}>
     <Pressable
       {...CARD_CONTAINER_A11Y}
-      style={styles.card}
+      style={[styles.card, rich && styles.cardRich]}
       onPress={handlePress}
       onPressIn={onPressIn}
       onPressOut={onPressOut}>
       {/* Matches web's .mini-img — inset within the card's own 8px padding
           with its own smaller radius, not flush with the card edges. */}
-      <View style={styles.imageWrap}>
+      <View style={[styles.imageWrap, rich && styles.imageWrapRich]}>
         <Image
           accessibilityLabel={title}
           source={{ uri: cardImageUrl(property.image_urls[0], screenWidth / columns) }}
@@ -375,7 +375,10 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   info: {
     gap: 2,
   },
-  richInfo: { gap: 4, paddingHorizontal: 4, paddingBottom: 4 },
+  // Website results grid: the reference's square-ish card and photo.
+  cardRich: { borderRadius: Site.radius.sm, padding: 0, overflow: 'hidden' },
+  imageWrapRich: { borderRadius: 0, marginBottom: Site.space.md },
+  richInfo: { gap: 4, paddingHorizontal: Site.space.md, paddingBottom: Site.space.md },
   richRef: { fontFamily: Fonts.sansSemiBold, fontSize: 12, letterSpacing: 0.4, color: colors.accentText },
   richTitle: { fontFamily: Fonts.sansBold, fontSize: 15, color: colors.textPrimary, textTransform: 'uppercase' },
   richSpecs: { flexDirection: 'row', flexWrap: 'wrap', columnGap: 12, rowGap: 4, marginTop: 4 },

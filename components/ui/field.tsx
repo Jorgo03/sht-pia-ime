@@ -20,7 +20,8 @@ import Animated, {
   Easing,
 } from 'react-native-reanimated';
 
-import { Control, Fonts, Motion, Radii, type AtticoPalette } from '@/constants/theme';
+import { Control, Fonts, Motion, Radii, type AtticoPalette, Site } from '@/constants/theme';
+import { IS_WEB } from '@/constants/web-frame';
 import { useTheme } from '@/contexts/theme-context';
 
 /**
@@ -171,7 +172,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     alignItems: 'center',
     gap: Control.gap,
     paddingHorizontal: Control.paddingHorizontal,
-    borderRadius: Radii.md,
+    borderRadius: IS_WEB ? Site.control.radius : Radii.md,
     borderWidth: 1,
     borderColor: colors.border,
     backgroundColor: colors.surface2,

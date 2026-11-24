@@ -12,9 +12,9 @@ import {
   type ViewStyle,
 } from 'react-native';
 
-import { Control, Fonts, Radii, type AtticoPalette } from '@/constants/theme';
+import { Control, Fonts, Radii, type AtticoPalette, Site } from '@/constants/theme';
 import { useTheme } from '@/contexts/theme-context';
-import { sheetColumn } from '@/constants/web-frame';
+import { IS_WEB, sheetColumn } from '@/constants/web-frame';
 import { fold } from '@/src/features/properties/lib/places';
 
 export interface SelectOption {
@@ -158,7 +158,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     backgroundColor: colors.surface2,
     borderWidth: 1,
     borderColor: colors.border,
-    borderRadius: Radii.md,
+    borderRadius: IS_WEB ? Site.control.radius : Radii.md,
   },
   // Field's box: same height, side padding and gap as a text field.
   fieldForm: {

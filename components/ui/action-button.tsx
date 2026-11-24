@@ -1,7 +1,8 @@
 import { useMemo } from 'react';
 import { StyleSheet, Text, TouchableOpacity } from 'react-native';
 
-import { type AtticoPalette, Fonts } from '@/constants/theme';
+import { type AtticoPalette, Fonts, Site } from '@/constants/theme';
+import { IS_WEB } from '@/constants/web-frame';
 import { useTheme } from '@/contexts/theme-context';
 
 interface ActionButtonProps {
@@ -46,6 +47,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     paddingHorizontal: 32,
     borderRadius: 28,
     alignItems: 'center',
+    ...(IS_WEB ? { minHeight: Site.control.height, paddingVertical: 0, justifyContent: 'center' as const, borderRadius: Site.control.radius } : null),
   },
   secondary: {
     backgroundColor: 'transparent',
@@ -58,7 +60,8 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   text: {
     fontSize: 16,
     fontFamily: Fonts.sansBold,
-    color: '#fff',
+    // Website: dark text on the orange (6.25:1); white is 3.5:1.
+    color: IS_WEB ? Site.onAccent : '#fff',
   },
   secondaryText: {
     color: colors.textPrimary,
