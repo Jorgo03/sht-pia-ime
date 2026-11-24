@@ -104,7 +104,21 @@ configureForegroundNotifications();
  * Native builds render the navigator directly.
  */
 function WebColumn({ children }: { children: ReactNode }) {
-  const { colors } = useTheme();
+  const { colors, theme } = useTheme();
+  // Scrollbars follow the site's theme: thin, a quiet thumb on a clear track,
+  // instead of the browser's light-grey bar, which stood out on the dark
+  // theme. color-scheme also gives form controls the matching look.
+  useEffect(() => {
+    if (!IS_WEB) return;
+    // scrollbar-width is not inherited, so it goes in a rule for every scroller.
+    let tag = document.getElementById('site-scrollbars') as HTMLStyleElement | null;
+    if (!tag) {
+      tag = document.createElement('style');
+      tag.id = 'site-scrollbars';
+      document.head.appendChild(tag);
+    }
+    tag.textContent = `:root{color-scheme:${theme}}*{scrollbar-width:thin;scrollbar-color:${colors.borderStrong} transparent}`;
+  }, [theme, colors.borderStrong]);
   const pathname = usePathname();
   const pageRef = useRef<unknown>(null);
   const columnRef = useRef<unknown>(null);

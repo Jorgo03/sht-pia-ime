@@ -283,7 +283,8 @@ export function AppHeader({
           layout — reads as an intentional page title instead of branding
           that got shoved into a corner. Screens with their own `title` are
           untouched; that block still sits next to the chevron. */}
-      {!title && onBack && (
+      {/* Not on the website: the site header above already shows the logo. */}
+      {!title && onBack && !onWebScreen && (
         <View
           style={[styles.brandCentered, !floating && { top: insets.top }, !brandFits && styles.brandHidden]}
           pointerEvents="none"
@@ -397,7 +398,7 @@ export function LanguageOptions({ onChosen, onDark = false }: { onChosen?: () =>
                     {/* The current one: a tinted row in the darker orange
                         text (AA) with a tick, not white on orange (3.1:1). */}
                     <View style={styles.langRow}>
-                      <Text style={styles.langRowCode}>{lang.flag}</Text>
+                      <Text style={[styles.langRowCode, onDark && !active && styles.onDarkMuted]}>{lang.flag}</Text>
                       <Text style={[styles.langRowName, onDark && !active && styles.onDarkText, active && styles.langRowCurrentText]}>{lang.name}</Text>
                       {active ? <MaterialIcons name="check" size={16} color={colors.accentText} style={styles.langRowCheck} /> : null}
                     </View>
@@ -630,6 +631,11 @@ const createStyles = (
       lineHeight: 20,
       width: 24,
       textAlign: 'center',
+      // Where a browser has no flag glyphs (Windows) the flag shows as its
+      // two letters, so it needs a text colour that reads on the menu: in
+      // the dark phone drawer it was black on black for every row but the
+      // current one.
+      color: colors.textSecondary,
     },
     langRowName: {
       fontFamily: Fonts?.sansMedium,
