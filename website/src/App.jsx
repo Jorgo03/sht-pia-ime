@@ -7,6 +7,10 @@ import Home from './pages/Home'
 import Search from './pages/Search'
 import Property from './pages/Property'
 import NotFound from './pages/NotFound'
+import Login from './pages/Login'
+import Signup from './pages/Signup'
+import ForgotPassword from './pages/ForgotPassword'
+import Account from './pages/Account'
 
 export default function App() {
   const { pathname, hash } = useLocation()
@@ -27,6 +31,10 @@ export default function App() {
           <Route path="/" element={<Home />} />
           <Route path="/search" element={<Search />} />
           <Route path="/property/:id" element={<Property />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/account" element={<Account />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>

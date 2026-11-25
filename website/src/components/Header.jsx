@@ -1,12 +1,14 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, NavLink, useLocation } from 'react-router-dom'
-import { Menu, Smartphone, X } from 'lucide-react'
+import { Menu, UserRound, X } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import Logo from './Logo'
 import LanguageSelect from './LanguageSelect'
+import { useAuth } from '../auth/AuthContext'
 
 export default function Header({ overHero }) {
   const { t } = useTranslation()
+  const { session, profile } = useAuth()
   const { pathname, search } = useLocation()
   const [scrolled, setScrolled] = useState(false)
   const [open, setOpen] = useState(false)
@@ -43,6 +45,9 @@ export default function Header({ overHero }) {
     { to: '/#agents', label: t('site.nav.agencies'), active: false },
   ]
   const light = overHero && !scrolled && !open
+  const account = session
+    ? { to: '/account', label: profile?.full_name?.split(' ')[0] || t('web.account.title') }
+    : { to: '/login', label: t('common.signIn') }
 
   return (
     <header className={`site-header ${overHero ? 'is-overlay' : ''} ${light ? 'is-light' : 'is-solid'}`}>
@@ -50,7 +55,8 @@ export default function Header({ overHero }) {
         <div className="container topbar-inner">
           <p>{t('site.footer.tagline')}</p>
           <div className="topbar-end">
-            <Link to="/#agents">{t('site.listHome')}</Link>
+            <Link to={session ? '/account' : '/signup'}>{t('site.listHome')}</Link>
+            <Link to="/#app">{t('web.nav.app')}</Link>
             <LanguageSelect />
           </div>
         </div>
@@ -66,9 +72,9 @@ export default function Header({ overHero }) {
             </NavLink>
           ))}
         </nav>
-        <Link to="/#app" className="btn btn-outline nav-app">
-          <Smartphone size={16} aria-hidden="true" />
-          {t('web.nav.app')}
+        <Link to={account.to} className="btn btn-outline nav-account" aria-current={pathname === account.to ? 'page' : undefined}>
+          <UserRound size={16} aria-hidden="true" />
+          <span className="nav-account-label">{account.label}</span>
         </Link>
         <button
           ref={menuButton}
@@ -90,6 +96,7 @@ export default function Header({ overHero }) {
             </Link>
           ))}
           <Link to="/#app">{t('web.nav.app')}</Link>
+          {!session && <Link to="/signup">{t('auth.createAccount')}</Link>}
         </nav>
         <LanguageSelect className="is-block" />
       </div>

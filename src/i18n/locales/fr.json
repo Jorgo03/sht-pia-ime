@@ -1401,6 +1401,33 @@
       "gone": "Ce bien n'est plus en ligne.",
       "back": "Retour à la recherche",
       "floorOf": "{{floor}} sur {{total}}"
+    },
+    "auth": {
+      "signInLead": "Connectez-vous pour enregistrer des biens et écrire aux agents.",
+      "signUpLead": "Un seul compte pour acheteurs, agents et agences immobilières.",
+      "accountType": "Type de compte",
+      "type": {
+        "client": "Acheteur ou locataire",
+        "agent": "Agent",
+        "office": "Agence immobilière"
+      },
+      "typeHint": {
+        "client": "Cherchez, enregistrez des biens et contactez les agents.",
+        "agent": "Publiez et gérez des biens en tant qu’agent.",
+        "office": "Les annonces de votre agence sous son nom."
+      },
+      "officeRequired": "Indiquez le nom de votre agence.",
+      "agencyOptional": "Agence (facultatif)",
+      "officeHint": "Affiché sur vos annonces et dans la liste des agences.",
+      "agree": "En créant un compte, vous acceptez :"
+    },
+    "account": {
+      "title": "Mon compte",
+      "saved": "Modifications enregistrées.",
+      "agentTitle": "Vos annonces",
+      "agentBody": "Pour l’instant, annonces, messages et visites se gèrent dans l’app Shtëpia.ime, avec ce même compte.",
+      "clientTitle": "Trouvez votre logement",
+      "clientBody": "Cherchez ici. Dans l’app, avec ce même compte, vous enregistrez des biens et écrivez aux agents."
     }
   }
 }

@@ -32,6 +32,19 @@ first (it was rejected with 401 on 2026-11-04).
 
 ## ═══ WEBSITE STARTED AGAIN — 2026-11-24 ═══
 
+### W12. Website sign-in for buyers, agents and real estate offices (DECIDED by owner, 2026-11-26)
+
+Owner: "add the login page because the app will be used by users, real estate
+agents, and real estate offices". Added `/login`, `/signup`, `/forgot-password`
+and `/account` to `website/`, on the phone app's accounts and rules. No database
+change: an office is an `agent` profile whose agency name is required (it is what
+the agencies directory shows); the website records `account_type: 'office'` in
+user metadata to tell it apart from an agent who named their agency. Listing
+management stays in the app for now; `/account` edits name, agency/office name
+and phone through the shared profileForm rules. Not tested end to end with a
+real new account (creating one writes to production); sign-in errors,
+validation and redirects were tested against the live project.
+
 ### W11. The new website: home, search and listing pages (DECIDED by owner, 2026-11-26)
 
 Built in `website/` (Vite + React, plain CSS, no new dependencies), inspired by a

@@ -1411,6 +1411,33 @@
       "gone": "Ta nieruchomość nie jest już ogłaszana.",
       "back": "Wróć do wyszukiwania",
       "floorOf": "{{floor}} z {{total}}"
+    },
+    "auth": {
+      "signInLead": "Zaloguj się, aby zapisywać nieruchomości i pisać do agentów.",
+      "signUpLead": "Jedno konto dla kupujących, agentów i biur nieruchomości.",
+      "accountType": "Rodzaj konta",
+      "type": {
+        "client": "Kupujący lub najemca",
+        "agent": "Agent",
+        "office": "Biuro nieruchomości"
+      },
+      "typeHint": {
+        "client": "Szukaj, zapisuj nieruchomości i kontaktuj się z agentami.",
+        "agent": "Publikuj i zarządzaj ofertami jako agent.",
+        "office": "Oferty biura pod jego nazwą."
+      },
+      "officeRequired": "Podaj nazwę biura.",
+      "agencyOptional": "Agencja (opcjonalnie)",
+      "officeHint": "Widoczna przy ofertach i na liście agencji.",
+      "agree": "Zakładając konto, akceptujesz:"
+    },
+    "account": {
+      "title": "Moje konto",
+      "saved": "Zmiany zapisane.",
+      "agentTitle": "Twoje oferty",
+      "agentBody": "Na razie oferty, wiadomości i oglądania obsługujesz w aplikacji Shtëpia.ime, na tym samym koncie.",
+      "clientTitle": "Znajdź swój dom",
+      "clientBody": "Szukaj tutaj. W aplikacji, na tym samym koncie, zapisujesz oferty i piszesz do agentów."
     }
   }
 }

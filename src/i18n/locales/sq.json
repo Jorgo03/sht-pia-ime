@@ -1391,6 +1391,33 @@
       "gone": "Kjo shtëpi nuk është më e shpallur.",
       "back": "Kthehu te kërkimi",
       "floorOf": "{{floor}} nga {{total}}"
+    },
+    "auth": {
+      "signInLead": "Hyr për të ruajtur shtëpitë dhe për të folur me agjentët.",
+      "signUpLead": "Një llogari për blerës, agjentë dhe zyra imobiliare.",
+      "accountType": "Lloji i llogarisë",
+      "type": {
+        "client": "Blerës ose qiramarrës",
+        "agent": "Agjent",
+        "office": "Zyrë imobiliare"
+      },
+      "typeHint": {
+        "client": "Kërko, ruaj shtëpi dhe kontakto agjentët.",
+        "agent": "Publiko dhe menaxho shtëpi si agjent.",
+        "office": "Shpalljet e zyrës nën emrin e saj."
+      },
+      "officeRequired": "Shkruaj emrin e zyrës.",
+      "agencyOptional": "Agjencia (opsionale)",
+      "officeHint": "Shfaqet te shpalljet dhe në listën e agjencive.",
+      "agree": "Duke krijuar llogarinë pranon:"
+    },
+    "account": {
+      "title": "Llogaria ime",
+      "saved": "Ndryshimet u ruajtën.",
+      "agentTitle": "Shpalljet e tua",
+      "agentBody": "Publikimi dhe menaxhimi i shpalljeve, mesazhet dhe vizitat bëhen tani në aplikacionin Shtëpia.ime, me të njëjtën llogari.",
+      "clientTitle": "Gjej shtëpinë tënde",
+      "clientBody": "Kërko shtëpi këtu. Në aplikacion, me të njëjtën llogari, ruan shtëpitë dhe u shkruan agjentëve."
     }
   }
 }

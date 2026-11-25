@@ -23,6 +23,22 @@
     {
       "source": "/property/:id",
       "destination": "/"
+    },
+    {
+      "source": "/login",
+      "destination": "/"
+    },
+    {
+      "source": "/signup",
+      "destination": "/"
+    },
+    {
+      "source": "/forgot-password",
+      "destination": "/"
+    },
+    {
+      "source": "/account",
+      "destination": "/"
     }
   ],
   "headers": [

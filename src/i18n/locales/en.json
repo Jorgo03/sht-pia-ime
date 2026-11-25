@@ -1391,6 +1391,33 @@
       "gone": "This home is no longer listed.",
       "back": "Back to search",
       "floorOf": "{{floor}} of {{total}}"
+    },
+    "auth": {
+      "signInLead": "Sign in to save homes and talk to agents.",
+      "signUpLead": "One account for buyers, agents and real estate offices.",
+      "accountType": "Account type",
+      "type": {
+        "client": "Buyer or renter",
+        "agent": "Agent",
+        "office": "Real estate office"
+      },
+      "typeHint": {
+        "client": "Search, save homes and contact agents.",
+        "agent": "List and manage homes as an agent.",
+        "office": "Your office's listings under its own name."
+      },
+      "officeRequired": "Enter your office's name.",
+      "agencyOptional": "Agency (optional)",
+      "officeHint": "Shown on your listings and in the agencies list.",
+      "agree": "By creating an account you accept:"
+    },
+    "account": {
+      "title": "My account",
+      "saved": "Your changes are saved.",
+      "agentTitle": "Your listings",
+      "agentBody": "Publishing and managing listings, messages and viewings happen in the Shtëpia.ime app for now, with this same account.",
+      "clientTitle": "Find your home",
+      "clientBody": "Search homes here. In the app, with this same account, you can save homes and message agents."
     }
   }
 }
