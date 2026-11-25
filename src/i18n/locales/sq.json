@@ -1338,5 +1338,59 @@
       "contact": "Kontakt"
     },
     "agentsOnly": "Kjo faqe është vetëm për agjentët."
+  },
+  "web": {
+    "skip": "Kalo te përmbajtja",
+    "nav": {
+      "buy": "Blej",
+      "rent": "Me qira",
+      "app": "Merr aplikacionin"
+    },
+    "search": {
+      "location": "Vendndodhja",
+      "anyCity": "Kudo në Shqipëri",
+      "any": "Çdo",
+      "area": "Sipërfaqja",
+      "areaMin": "{{n}}+ m²",
+      "rooms": "Dhoma gjumi",
+      "roomsMin": "{{n}}+",
+      "priceUpTo": "Deri në {{price}}",
+      "submit": "Kërko",
+      "all": "Të gjitha"
+    },
+    "seeAll": "Shiko të gjitha shtëpitë",
+    "cities": {
+      "title": "Kërko sipas qytetit"
+    },
+    "agents": {
+      "title": "Agjentë dhe agjenci",
+      "body": "Profesionistë vendas me shtëpi të publikuara tani në Shtëpia.ime.",
+      "empty": "Asnjë agjenci nuk ka ende shpallje online. Bëhu i pari.",
+      "joinTitle": "Je agjent apo agjenci?",
+      "joinBody": "Publiko shtëpitë falas dhe arri blerës në Shqipëri dhe jashtë saj, në gjuhën e tyre."
+    },
+    "app": {
+      "title": "Shtëpia jote e radhës, në xhep",
+      "body": "Ruaj shtëpitë, merr njoftim kur del një shtëpi që të përshtatet dhe shkruaju agjentëve nga telefoni.",
+      "soon": "Së shpejti në App Store dhe Google Play.",
+      "appStore": "App Store",
+      "googlePlay": "Google Play"
+    },
+    "error": "Shtëpitë nuk u ngarkuan. Kontrollo lidhjen dhe provo përsëri.",
+    "gallery": {
+      "prev": "Fotoja e mëparshme",
+      "next": "Fotoja tjetër",
+      "count": "Foto {{n}} nga {{total}}"
+    },
+    "property": {
+      "contactTitle": "Të intereson kjo shtëpi?",
+      "whatsapp": "WhatsApp",
+      "email": "Email",
+      "noContact": "Shkruaji pronarit nga aplikacioni Shtëpia.ime.",
+      "openMap": "Hape në hartë",
+      "gone": "Kjo shtëpi nuk është më e shpallur.",
+      "back": "Kthehu te kërkimi",
+      "floorOf": "{{floor}} nga {{total}}"
+    }
   }
 }

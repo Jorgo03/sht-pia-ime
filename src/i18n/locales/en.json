@@ -1338,5 +1338,59 @@
       "contact": "Contact"
     },
     "agentsOnly": "This page is for agents only."
+  },
+  "web": {
+    "skip": "Skip to content",
+    "nav": {
+      "buy": "Buy",
+      "rent": "Rent",
+      "app": "Get the app"
+    },
+    "search": {
+      "location": "Location",
+      "anyCity": "Anywhere in Albania",
+      "any": "Any",
+      "area": "Floor area",
+      "areaMin": "{{n}}+ m²",
+      "rooms": "Bedrooms",
+      "roomsMin": "{{n}}+",
+      "priceUpTo": "Up to {{price}}",
+      "submit": "Search",
+      "all": "All"
+    },
+    "seeAll": "See all homes",
+    "cities": {
+      "title": "Browse by city"
+    },
+    "agents": {
+      "title": "Agents and agencies",
+      "body": "Local professionals with homes listed on Shtëpia.ime right now.",
+      "empty": "No agency has listings online yet. Be the first.",
+      "joinTitle": "Are you an agent or an agency?",
+      "joinBody": "Publish your homes for free and reach buyers in Albania and abroad, in their own language."
+    },
+    "app": {
+      "title": "Your next home, in your pocket",
+      "body": "Save homes, get a message when a match is listed, and chat with agents from your phone.",
+      "soon": "Coming soon to the App Store and Google Play.",
+      "appStore": "App Store",
+      "googlePlay": "Google Play"
+    },
+    "error": "Homes couldn't be loaded. Check your connection and try again.",
+    "gallery": {
+      "prev": "Previous photo",
+      "next": "Next photo",
+      "count": "Photo {{n}} of {{total}}"
+    },
+    "property": {
+      "contactTitle": "Interested in this home?",
+      "whatsapp": "WhatsApp",
+      "email": "Email",
+      "noContact": "Message the owner from the Shtëpia.ime app.",
+      "openMap": "Open in map",
+      "gone": "This home is no longer listed.",
+      "back": "Back to search",
+      "floorOf": "{{floor}} of {{total}}"
+    }
   }
 }

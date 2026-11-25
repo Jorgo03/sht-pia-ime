@@ -1348,5 +1348,59 @@
       "contact": "Contact"
     },
     "agentsOnly": "Cette page est réservée aux agents."
+  },
+  "web": {
+    "skip": "Aller au contenu",
+    "nav": {
+      "buy": "Acheter",
+      "rent": "Louer",
+      "app": "Télécharger l'app"
+    },
+    "search": {
+      "location": "Lieu",
+      "anyCity": "Partout en Albanie",
+      "any": "Indifférent",
+      "area": "Surface",
+      "areaMin": "{{n}}+ m²",
+      "rooms": "Chambres",
+      "roomsMin": "{{n}}+",
+      "priceUpTo": "Jusqu'à {{price}}",
+      "submit": "Rechercher",
+      "all": "Tous"
+    },
+    "seeAll": "Voir tous les biens",
+    "cities": {
+      "title": "Chercher par ville"
+    },
+    "agents": {
+      "title": "Agents et agences",
+      "body": "Des professionnels locaux avec des biens publiés en ce moment sur Shtëpia.ime.",
+      "empty": "Aucune agence n'a encore d'annonces en ligne. Soyez la première.",
+      "joinTitle": "Vous êtes agent ou agence ?",
+      "joinBody": "Publiez vos biens gratuitement et touchez des acheteurs en Albanie et à l'étranger, dans leur langue."
+    },
+    "app": {
+      "title": "Votre prochain logement, dans la poche",
+      "body": "Enregistrez des biens, soyez averti quand un bien correspondant paraît et écrivez aux agents depuis votre téléphone.",
+      "soon": "Bientôt sur l'App Store et Google Play.",
+      "appStore": "App Store",
+      "googlePlay": "Google Play"
+    },
+    "error": "Impossible de charger les biens. Vérifiez votre connexion et réessayez.",
+    "gallery": {
+      "prev": "Photo précédente",
+      "next": "Photo suivante",
+      "count": "Photo {{n}} sur {{total}}"
+    },
+    "property": {
+      "contactTitle": "Ce bien vous intéresse ?",
+      "whatsapp": "WhatsApp",
+      "email": "E-mail",
+      "noContact": "Écrivez au propriétaire depuis l'app Shtëpia.ime.",
+      "openMap": "Ouvrir sur la carte",
+      "gone": "Ce bien n'est plus en ligne.",
+      "back": "Retour à la recherche",
+      "floorOf": "{{floor}} sur {{total}}"
+    }
   }
 }

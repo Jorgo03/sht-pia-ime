@@ -1348,5 +1348,59 @@
       "contact": "Contatti"
     },
     "agentsOnly": "Questa pagina è solo per gli agenti."
+  },
+  "web": {
+    "skip": "Vai al contenuto",
+    "nav": {
+      "buy": "Compra",
+      "rent": "Affitta",
+      "app": "Scarica l'app"
+    },
+    "search": {
+      "location": "Località",
+      "anyCity": "Ovunque in Albania",
+      "any": "Qualsiasi",
+      "area": "Superficie",
+      "areaMin": "{{n}}+ m²",
+      "rooms": "Camere da letto",
+      "roomsMin": "{{n}}+",
+      "priceUpTo": "Fino a {{price}}",
+      "submit": "Cerca",
+      "all": "Tutti"
+    },
+    "seeAll": "Vedi tutti gli immobili",
+    "cities": {
+      "title": "Cerca per città"
+    },
+    "agents": {
+      "title": "Agenti e agenzie",
+      "body": "Professionisti locali con immobili pubblicati ora su Shtëpia.ime.",
+      "empty": "Nessuna agenzia ha ancora annunci online. Sii la prima.",
+      "joinTitle": "Sei un agente o un'agenzia?",
+      "joinBody": "Pubblica i tuoi immobili gratis e raggiungi acquirenti in Albania e all’estero, nella loro lingua."
+    },
+    "app": {
+      "title": "La tua prossima casa, in tasca",
+      "body": "Salva gli immobili, ricevi un avviso quando esce quello giusto e scrivi agli agenti dal telefono.",
+      "soon": "Presto su App Store e Google Play.",
+      "appStore": "App Store",
+      "googlePlay": "Google Play"
+    },
+    "error": "Impossibile caricare gli immobili. Controlla la connessione e riprova.",
+    "gallery": {
+      "prev": "Foto precedente",
+      "next": "Foto successiva",
+      "count": "Foto {{n}} di {{total}}"
+    },
+    "property": {
+      "contactTitle": "Ti interessa questo immobile?",
+      "whatsapp": "WhatsApp",
+      "email": "Email",
+      "noContact": "Scrivi al proprietario dall'app Shtëpia.ime.",
+      "openMap": "Apri sulla mappa",
+      "gone": "Questo immobile non è più in vendita o in affitto.",
+      "back": "Torna alla ricerca",
+      "floorOf": "{{floor}} di {{total}}"
+    }
   }
 }

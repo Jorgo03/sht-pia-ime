@@ -1358,5 +1358,59 @@
       "contact": "Kontakt"
     },
     "agentsOnly": "Ta strona jest tylko dla agentów."
+  },
+  "web": {
+    "skip": "Przejdź do treści",
+    "nav": {
+      "buy": "Kup",
+      "rent": "Wynajmij",
+      "app": "Pobierz aplikację"
+    },
+    "search": {
+      "location": "Lokalizacja",
+      "anyCity": "Cała Albania",
+      "any": "Dowolnie",
+      "area": "Powierzchnia",
+      "areaMin": "{{n}}+ m²",
+      "rooms": "Sypialnie",
+      "roomsMin": "{{n}}+",
+      "priceUpTo": "Do {{price}}",
+      "submit": "Szukaj",
+      "all": "Wszystkie"
+    },
+    "seeAll": "Zobacz wszystkie nieruchomości",
+    "cities": {
+      "title": "Szukaj według miasta"
+    },
+    "agents": {
+      "title": "Agenci i agencje",
+      "body": "Lokalni profesjonaliści z nieruchomościami opublikowanymi teraz w Shtëpia.ime.",
+      "empty": "Żadna agencja nie ma jeszcze ogłoszeń online. Bądź pierwsza.",
+      "joinTitle": "Jesteś agentem lub agencją?",
+      "joinBody": "Publikuj nieruchomości za darmo i docieraj do kupujących w Albanii i za granicą, w ich własnym języku."
+    },
+    "app": {
+      "title": "Twój następny dom, w kieszeni",
+      "body": "Zapisuj nieruchomości, dostawaj powiadomienie, gdy pojawi się pasująca, i pisz do agentów z telefonu.",
+      "soon": "Wkrótce w App Store i Google Play.",
+      "appStore": "App Store",
+      "googlePlay": "Google Play"
+    },
+    "error": "Nie udało się wczytać nieruchomości. Sprawdź połączenie i spróbuj ponownie.",
+    "gallery": {
+      "prev": "Poprzednie zdjęcie",
+      "next": "Następne zdjęcie",
+      "count": "Zdjęcie {{n}} z {{total}}"
+    },
+    "property": {
+      "contactTitle": "Interesuje Cię ta nieruchomość?",
+      "whatsapp": "WhatsApp",
+      "email": "E-mail",
+      "noContact": "Napisz do właściciela w aplikacji Shtëpia.ime.",
+      "openMap": "Otwórz na mapie",
+      "gone": "Ta nieruchomość nie jest już ogłaszana.",
+      "back": "Wróć do wyszukiwania",
+      "floorOf": "{{floor}} z {{total}}"
+    }
   }
 }

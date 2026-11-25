@@ -1,13 +1,14 @@
 #!/usr/bin/env node
 // Builds the website (website/, DECISIONS.md W10) into dist/ for Vercel.
 //
-// The site itself is empty until the new design arrives, but the live address
-// keeps the jobs the phone apps rely on:
+// Vite builds the site (website/vite.config.mjs), then this adds what the
+// live address does for the phone apps:
 //   - /privacy, /terms, /cookies: the legal pages the apps link to, rendered
 //     from src/features/legal/content/ (the same texts the apps show);
 //   - public/ (icons, /.well-known/ app links);
 //   - /api/auth-relay lives in the root api/ folder and is served by Vercel
 //     on its own, whatever this build writes.
+import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -79,11 +80,11 @@ ${renderDoc(en[slug], en.contact)}
 `;
 }
 
-fs.rmSync(out, { recursive: true, force: true });
-fs.cpSync(path.join(root, 'public'), out, { recursive: true });
-fs.cpSync(path.join(root, 'website'), out, { recursive: true, filter: (src) => !src.endsWith('README.md') });
+execFileSync(process.execPath, [path.join(root, 'node_modules', 'vite', 'bin', 'vite.js'), 'build', '--config', path.join(root, 'website', 'vite.config.mjs'), '--outDir', out], { stdio: 'inherit' });
+// Icons and /.well-known; never over a file the site build wrote.
+fs.cpSync(path.join(root, 'public'), out, { recursive: true, force: false });
 for (const p of PAGES) {
   fs.mkdirSync(path.join(out, p.slug), { recursive: true });
   fs.writeFileSync(path.join(out, p.slug, 'index.html'), page(p));
 }
-console.log(`build-website: wrote ${path.relative(root, out)} (home + ${PAGES.map((p) => p.slug).join(', ')})`);
+console.log(`build-website: wrote ${path.relative(root, out)} (site + ${PAGES.map((p) => p.slug).join(', ')})`);

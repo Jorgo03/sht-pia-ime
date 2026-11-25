@@ -1338,5 +1338,59 @@
       "contact": "İletişim"
     },
     "agentsOnly": "Bu sayfa yalnızca emlakçılar içindir."
+  },
+  "web": {
+    "skip": "İçeriğe geç",
+    "nav": {
+      "buy": "Satılık",
+      "rent": "Kiralık",
+      "app": "Uygulamayı indir"
+    },
+    "search": {
+      "location": "Konum",
+      "anyCity": "Arnavutluk'un her yeri",
+      "any": "Fark etmez",
+      "area": "Alan",
+      "areaMin": "{{n}}+ m²",
+      "rooms": "Yatak odası",
+      "roomsMin": "{{n}}+",
+      "priceUpTo": "{{price}} ve altı",
+      "submit": "Ara",
+      "all": "Tümü"
+    },
+    "seeAll": "Tüm evleri gör",
+    "cities": {
+      "title": "Şehre göre ara"
+    },
+    "agents": {
+      "title": "Emlakçılar ve ofisler",
+      "body": "Şu anda Shtëpia.ime'de ilanı olan yerel profesyoneller.",
+      "empty": "Henüz hiçbir ofisin çevrimiçi ilanı yok. İlk siz olun.",
+      "joinTitle": "Emlakçı ya da emlak ofisi misiniz?",
+      "joinBody": "Evlerinizi ücretsiz yayınlayın, Arnavutluk'taki ve yurt dışındaki alıcılara kendi dillerinde ulaşın."
+    },
+    "app": {
+      "title": "Bir sonraki eviniz cebinizde",
+      "body": "Evleri kaydedin, uygun bir ilan çıktığında bildirim alın ve emlakçılara telefonunuzdan yazın.",
+      "soon": "Yakında App Store ve Google Play'de.",
+      "appStore": "App Store",
+      "googlePlay": "Google Play"
+    },
+    "error": "Evler yüklenemedi. Bağlantınızı kontrol edip tekrar deneyin.",
+    "gallery": {
+      "prev": "Önceki fotoğraf",
+      "next": "Sonraki fotoğraf",
+      "count": "Fotoğraf {{n}} / {{total}}"
+    },
+    "property": {
+      "contactTitle": "Bu ev ilginizi çekti mi?",
+      "whatsapp": "WhatsApp",
+      "email": "E-posta",
+      "noContact": "Ev sahibine Shtëpia.ime uygulamasından yazın.",
+      "openMap": "Haritada aç",
+      "gone": "Bu ev artık ilanda değil.",
+      "back": "Aramaya dön",
+      "floorOf": "{{floor}} / {{total}}"
+    }
   }
 }

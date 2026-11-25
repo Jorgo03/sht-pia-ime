@@ -1338,5 +1338,59 @@
       "contact": "Kontakt"
     },
     "agentsOnly": "Diese Seite ist nur für Makler."
+  },
+  "web": {
+    "skip": "Zum Inhalt springen",
+    "nav": {
+      "buy": "Kaufen",
+      "rent": "Mieten",
+      "app": "App holen"
+    },
+    "search": {
+      "location": "Ort",
+      "anyCity": "Überall in Albanien",
+      "any": "Beliebig",
+      "area": "Wohnfläche",
+      "areaMin": "{{n}}+ m²",
+      "rooms": "Schlafzimmer",
+      "roomsMin": "{{n}}+",
+      "priceUpTo": "Bis {{price}}",
+      "submit": "Suchen",
+      "all": "Alle"
+    },
+    "seeAll": "Alle Immobilien ansehen",
+    "cities": {
+      "title": "Nach Stadt suchen"
+    },
+    "agents": {
+      "title": "Makler und Agenturen",
+      "body": "Lokale Profis mit Immobilien, die gerade auf Shtëpia.ime inseriert sind.",
+      "empty": "Noch keine Agentur hat Inserate online. Seien Sie die erste.",
+      "joinTitle": "Sind Sie Makler oder Agentur?",
+      "joinBody": "Inserieren Sie kostenlos und erreichen Sie Käufer in Albanien und im Ausland, in ihrer eigenen Sprache."
+    },
+    "app": {
+      "title": "Ihr nächstes Zuhause, in der Tasche",
+      "body": "Immobilien merken, benachrichtigt werden, wenn etwas Passendes erscheint, und mit Maklern vom Handy aus schreiben.",
+      "soon": "Bald im App Store und bei Google Play.",
+      "appStore": "App Store",
+      "googlePlay": "Google Play"
+    },
+    "error": "Die Immobilien konnten nicht geladen werden. Prüfen Sie Ihre Verbindung und versuchen Sie es erneut.",
+    "gallery": {
+      "prev": "Vorheriges Foto",
+      "next": "Nächstes Foto",
+      "count": "Foto {{n}} von {{total}}"
+    },
+    "property": {
+      "contactTitle": "Interesse an dieser Immobilie?",
+      "whatsapp": "WhatsApp",
+      "email": "E-Mail",
+      "noContact": "Schreiben Sie dem Eigentümer in der Shtëpia.ime-App.",
+      "openMap": "Auf der Karte öffnen",
+      "gone": "Diese Immobilie ist nicht mehr inseriert.",
+      "back": "Zurück zur Suche",
+      "floorOf": "{{floor}} von {{total}}"
+    }
   }
 }

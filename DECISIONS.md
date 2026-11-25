@@ -32,6 +32,18 @@ first (it was rejected with 401 on 2026-11-04).
 
 ## ═══ WEBSITE STARTED AGAIN — 2026-11-24 ═══
 
+### W11. The new website: home, search and listing pages (DECIDED by owner, 2026-11-26)
+
+Built in `website/` (Vite + React, plain CSS, no new dependencies), inspired by a
+photo-hero reference the owner supplied but with Shtëpia.ime's own logo, colours
+and text. Owner's answers: sections Latest listings, Browse by city, Agents &
+agencies, Get the app; scope home + search + listing page; hero photo
+AI-generated; all app languages (10). Public reads only, no sign-in. Search uses
+the app's shared filter code, so both return the same homes. The app-store
+buttons show "coming soon" until store listings exist; the agents section shows
+an invitation while no listing has an agent. The page is indexable again (W10's
+`noindex` is gone). Details: `website/README.md`.
+
 ### W10. The website is erased and rebuilt as its own project (DECIDED by owner, 2026-11-24)
 
 The owner: "erase everything on website, i want to build it from the

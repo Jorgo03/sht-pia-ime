@@ -11,6 +11,8 @@
     "build": "vite build --mode production",
     "build:web-expo": "expo export -p web --clear",
     "preview": "vite preview",
+    "website:dev": "vite --config website/vite.config.mjs",
+    "website:build": "node scripts/build-website.mjs dist-website",
     "test": "node --test \"tests/**/*.test.mjs\"",
     "test:e2e": "playwright test",
     "test:e2e:expo": "playwright test -c playwright.expo.config.ts",

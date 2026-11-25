@@ -17,16 +17,8 @@
       "destination": "/api/auth-relay"
     },
     {
-      "source": "/property/:id",
-      "destination": "/"
-    },
-    {
-      "source": "/agent/:id",
-      "destination": "/"
-    },
-    {
-      "source": "/user/:id",
-      "destination": "/"
+      "source": "/((?!api/|assets/|images/|.well-known/).*)",
+      "destination": "/index.html"
     }
   ],
   "headers": [
