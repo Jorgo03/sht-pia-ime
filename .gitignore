@@ -48,3 +48,6 @@ docs/locations/cache/
 
 # Website audit screenshots (e2e-expo/site-audit.spec.ts)
 qa-screens/
+
+# Playwright MCP browser scratch files
+.playwright-mcp/
