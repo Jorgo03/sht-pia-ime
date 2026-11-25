@@ -18,11 +18,11 @@
     },
     {
       "source": "/search",
-      "destination": "/index.html"
+      "destination": "/"
     },
     {
       "source": "/property/:id",
-      "destination": "/index.html"
+      "destination": "/"
     }
   ],
   "headers": [
