@@ -46,9 +46,12 @@ these pages the top bar is the app's own (orange text wordmark, white menu;
 64px on phones, 73px with the wordmark 104px in on wide screens), the footer is
 hidden and the scroll indicator too, as in the app; the headline uses the app's
 own Newsreader font files. Checked element by element against the app's web
-build (deployment of 802c6e9) at 390x844 and 1280x860 for sign-in, sign-up and
-Email code mode: every measured box matches. The emailed-code step was not
-compared on screen (reaching it sends a real email on both).
+build (deployment of 802c6e9) with a Playwright script that answers Supabase's
+email requests itself (nothing sent): 9 states (sign-in, sign-up, agent
+sign-up, Email code, its code step, the sign-up code step, and the three reset
+steps) at 390, 768, 1024 and 1280px. Every text run, field and code box matches
+in position and size; the only reported gap is 2-3px of trailing space the
+app's pre-wrap text counts at a line break, with identical line breaks.
 
 ### W12. Website sign-in for buyers, agents and real estate offices (DECIDED by owner, 2026-11-26)
 

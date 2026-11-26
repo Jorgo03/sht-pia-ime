@@ -110,10 +110,13 @@ main:focus { outline: none; }
    wordmark at 16px from the edge and a white menu button. */
 .site-header.is-dark { background: #0b0a08; color: #fff; border-bottom: 1px solid rgba(255, 255, 255, 0.14); }
 .site-header.is-dark .topbar, .site-header.is-dark .nav-account { display: none; }
-.site-header.is-dark .nav { min-height: 63px; }
-@media (max-width: 959px) { .site-header.is-dark .nav { padding-inline: 16px; } }
-/* Wide screens: the app's web bar was 73px with the wordmark 104px in. */
-@media (min-width: 960px) { .site-header.is-dark .nav { min-height: 72px; max-width: none; padding-inline: 104px; } .a-screen { min-height: calc(100svh - 73px); } }
+/* Bar height and wordmark inset follow the app's siteGutter() and
+   Site.headerHeight(Compact) in constants/theme.ts. */
+:root { --bar-h: 64px; }
+.site-header.is-dark .nav { max-width: none; min-height: 63px; padding-inline: 16px; }
+@media (min-width: 768px) { .site-header.is-dark .nav { padding-inline: 56px; } }
+@media (min-width: 1024px) { :root { --bar-h: 73px; } .site-header.is-dark .nav { min-height: 72px; padding-inline: 80px; } }
+@media (min-width: 1280px) { .site-header.is-dark .nav { padding-inline: 104px; } }
 .site-header.is-dark .mobile-menu { background: #0b0a08; color: #fff; border-top-color: rgba(255, 255, 255, 0.14); }
 .site-header.is-dark .mobile-menu nav a { border-bottom-color: rgba(255, 255, 255, 0.14); }
 .wordmark { font: 600 22px/22px var(--font-display); letter-spacing: -0.44px; color: #ff6b00; white-space: nowrap; }
@@ -349,7 +352,7 @@ main:focus { outline: none; }
    components/ui/dusk-hero.tsx, otp-input.tsx, password-checklist.tsx), same values. */
 html.no-scrollbar { scrollbar-width: none; }
 html.no-scrollbar::-webkit-scrollbar { display: none; }
-.a-screen { position: relative; isolation: isolate; overflow: hidden; min-height: calc(100svh - 64px); display: flex; color: #fff; }
+.a-screen { position: relative; isolation: isolate; overflow: hidden; min-height: calc(100svh - var(--bar-h)); display: flex; color: #fff; }
 .dusk-hero { position: fixed; inset: 0; z-index: -1; overflow: hidden; }
 /* The sky stays put like the app's screen; the footer paints over it. */
 .dusk-sky { position: absolute; inset: 0; background: linear-gradient(180deg, #1a1520 0%, #2d1f3a 25%, #4a2848 45%, #8b4a3a 65%, #cc7040 80%, #e8944a 90%, #f0a050 100%); }
@@ -388,7 +391,7 @@ html.no-scrollbar::-webkit-scrollbar { display: none; }
 .a-field-icon { position: absolute; left: 14px; color: rgba(255, 255, 255, 0.8); pointer-events: none; }
 .a-input { flex: 1; width: 100%; padding: 13px 14px 13px 42px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1); background: rgba(255, 255, 255, 0.06); color: #f5f0e8; font: 400 14px var(--font-ui); }
 .a-input::placeholder { color: rgba(255, 255, 255, 0.8); opacity: 1; }
-.a-input:focus-visible { outline: 2px solid #ffb380; outline-offset: 1px; }
+.a-input:focus-visible { outline: auto 1px rgb(16, 16, 16); outline-offset: 0; }
 .a-input:-webkit-autofill { -webkit-text-fill-color: #f5f0e8; -webkit-box-shadow: 0 0 0 40px #3a2433 inset; caret-color: #f5f0e8; }
 .a-eye { position: absolute; right: 8px; width: 34px; height: 34px; display: grid; place-items: center; border: 0; border-radius: 8px; background: transparent; color: rgba(255, 255, 255, 0.8); }
 .a-checklist { list-style: none; margin: 0; padding: 0 4px; display: flex; flex-wrap: wrap; column-gap: 14px; row-gap: 6px; }
@@ -403,7 +406,8 @@ html.no-scrollbar::-webkit-scrollbar { display: none; }
 .a-cta:active { transform: scale(0.98); }
 .a-cta:disabled { opacity: 0.5; cursor: default; }
 .a-cta:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
-.a-link { justify-self: center; border: 0; background: none; padding: 12px 0; margin: -8px 0 -12px; font: 400 13px var(--font-ui); color: rgba(255, 255, 255, 0.9); text-align: center; }
+.a-link { justify-self: center; max-width: 100%; border: 0; background: none; padding: 12px 0; margin: -8px 0 -12px; font: 400 13px var(--font-ui); color: rgba(255, 255, 255, 0.9); text-align: left; }
+/* Like the app: a one-line link is centred, a wrapped one fills the card with its lines left-aligned. */
 .a-link strong { font-weight: 700; color: #fff; text-decoration: underline; }
 .a-link.is-muted, .a-link:disabled { color: rgba(255, 255, 255, 0.7); cursor: default; }
 .a-divider { display: flex; align-items: center; gap: 12px; font: 400 12px var(--font-ui); color: rgba(255, 255, 255, 0.9); }
@@ -426,7 +430,7 @@ html.no-scrollbar::-webkit-scrollbar { display: none; }
 .a-otp input { flex: 1; min-width: 0; max-width: 44px; height: 52px; padding: 0; border-radius: 14px; border: 1.5px solid rgba(255, 255, 255, 0.38); background: rgba(255, 255, 255, 0.12); color: #f5f0e8; font: 700 22px var(--font-ui); text-align: center; }
 .a-otp input.is-filled { border-color: #ffb380; background: rgba(255, 125, 26, 0.16); }
 .a-otp input.is-error { border-color: #ff5c5c; background: rgba(255, 92, 92, 0.14); }
-.a-otp input:focus-visible { outline: 2px solid #fff; outline-offset: 1px; }
+.a-otp input:focus-visible { outline: auto 1px rgb(16, 16, 16); outline-offset: 0; }
 .a-error { display: grid; gap: 8px; padding: 12px; border-radius: 14px; border: 1px solid rgba(255, 180, 168, 0.6); background: rgba(16, 10, 8, 0.62); }
 .a-error-row { display: flex; align-items: flex-start; gap: 8px; font: 700 14px/20px var(--font-ui); color: #fff; }
 .a-error-row svg { flex: none; margin-top: 1px; }
