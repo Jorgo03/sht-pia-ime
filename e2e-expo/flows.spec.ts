@@ -1825,7 +1825,7 @@ test.describe('AI assistant', () => {
     });
     await page.goto('/assistant');
     await ready(page);
-    await expect(page.getByRole('heading', { name: t('aiAssistant.title'), level: 1 })).toBeVisible();
+    await expect(page.getByRole('heading', { name: t('era.name'), level: 1 })).toBeVisible();
     await page.getByRole('button', { name: t('aiAssistant.starters.findApartment') }).click();
     await expect(page.getByText('Gjeta 2 apartamente në Tiranë brenda buxhetit.')).toBeVisible();
     expect(bodies[0]).toMatchObject({ messages: [{ role: 'user', content: t('aiAssistant.starters.findApartment') }], state: null, language: 'sq' });
@@ -1906,20 +1906,14 @@ test.describe('AI assistant', () => {
     expect(calls).toBe(2);
   });
 
-  test('X47 home and search lead to the assistant; a listing opens it with the question ready, not sent', async ({ page }) => {
+  // Home and Search reach Era through her button in the corner, which is on
+  // the phone apps only (components/era/era-button.tsx), not this web build.
+  test('X47 a listing opens the assistant with the question ready, not sent', async ({ page }) => {
     let calls = 0;
     await page.route('**/functions/v1/ai-assistant', (route) => {
       calls += 1;
       return json(route, answer());
     });
-    await page.goto('/');
-    await ready(page);
-    await page.getByRole('button', { name: t('aiAssistant.entry') }).click();
-    await expect(page).toHaveURL(/\/assistant$/);
-    await page.goto('/explore');
-    await ready(page);
-    await page.getByRole('button', { name: t('aiAssistant.title') }).click();
-    await expect(page).toHaveURL(/\/assistant$/);
     await page.goto(`/property/${LISTINGS[0].id}`);
     await ready(page);
     await page.getByRole('button', { name: t('assistant.title') }).click();

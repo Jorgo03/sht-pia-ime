@@ -15,9 +15,20 @@ A darker fill (`#c24e00` → `#a84300`, white 4.8:1) was built and passed axe
 (ba2d0c2). The brand orange stays; these remain the only known axe failures.
 To revisit, `git revert ba2d0c2` brings the darker fill back.
 
-### C2. AI chat parked (DECIDED by owner, 2026-11-04)
+### C2. AI chat back, as "Era" (DECIDED by owner, 2026-11-26; parked 2026-11-04)
 
-The owner wants AI chat later, not now. Hidden behind `AI_CHAT_ENABLED = false`
+**Current (2026-11-26):** the owner turned AI chat on, first on the website
+("turn both on"), then in the phone apps ("put Era in the phone app too").
+The assistant is now **Era**, with a drawn portrait: a button in the
+bottom-right corner (website: every page, `website/src/features/era/`; phone
+apps: the tab screens above the tab bar, `components/era/era-button.tsx`),
+the `/assistant` screen, and the chat on each listing. `AI_CHAT_ENABLED = true`
+in `constants/features.ts` (phone apps) and `website/src/lib/features.js`
+(website). The old Home "Pyet asistentin AI" entry and Search ✦ button were
+replaced by Era's button. **Still unchecked:** whether `ANTHROPIC_API_KEY` was
+replaced after the 401 below; one real question to Era confirms it.
+
+History (2026-11-04): the owner wanted AI chat later, not now. Hidden behind `AI_CHAT_ENABLED = false`
 in `constants/features.ts`: the Home "Pyet asistentin AI" entry, the Search ✦
 button, the `/assistant` screen (redirects Home) and the chat on each listing.
 The Vite site's listing chat is off too (`aiAssistant: false` in `src/lib/flags.js`).

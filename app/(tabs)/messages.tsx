@@ -21,6 +21,7 @@ import { formatRelativeTime, getLocalizedText } from '@/lib/format';
 import { loadBlockedIds } from '@/src/features/safety/lib/safety';
 import { useReadableColumn } from '@/hooks/use-responsive';
 import { debugWarn } from '@/lib/debug';
+import { EraButton } from '@/components/era/era-button';
 
 interface Conversation {
   id: string;
@@ -337,6 +338,7 @@ export function MessagesInbox({ embedded = false, activeId }: { embedded?: boole
           />
         )}
       </SafeAreaView>
+      <EraButton />
     </GradientBackground>
   );
 }

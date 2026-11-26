@@ -13,7 +13,6 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import { useRouter, type Href } from 'expo-router';
 
 import { useTabBarClearance } from '@/components/liquid-tab-bar';
 import { AppHeader } from '@/components/ui/app-header';
@@ -33,12 +32,11 @@ import { useTheme } from '@/contexts/theme-context';
 import { Property } from '@/data/types';
 import { useInfinitePropertiesQuery, usePrefetchListingTabs, usePropertiesCountQuery } from '@/hooks/use-property-queries';
 import { useReadableColumn, useResponsive } from '@/hooks/use-responsive';
-import { AI_CHAT_ENABLED } from '@/constants/features';
 import { IS_WEB } from '@/constants/web-frame';
+import { EraButton } from '@/components/era/era-button';
 
 export default function ExploreScreen() {
   const { t } = useTranslation();
-  const router = useRouter();
   const { filters, queryFilters, setFilter, reset, activeCount } = useFilters();
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
@@ -274,19 +272,6 @@ export default function ExploreScreen() {
             <MaterialIcons name="close" size={16} color={colors.textSecondary} />
           </Pressable>
         )}
-        {/* Describing the home in words is the assistant's job: it sits at
-            the end of the search field, which fits any width (a third round
-            button beside the title ran off a Fold's 280px cover screen). */}
-        {AI_CHAT_ENABLED && (
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel={t('aiAssistant.title')}
-            onPress={() => router.push('/assistant' as Href)}
-            hitSlop={10}
-            style={styles.assistantButton}>
-            <MaterialIcons name="auto-awesome" size={18} color={colors.accent} />
-          </Pressable>
-        )}
       </View>
 
       <FilterTabs
@@ -456,6 +441,7 @@ export default function ExploreScreen() {
         />
         <KeyboardDoneBar />
       </SafeAreaView>
+      {viewMode === 'list' && <EraButton />}
     </GradientBackground>
   );
 }
@@ -568,15 +554,6 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
     borderRadius: 14,
-  },
-  assistantButton: {
-    width: 32,
-    height: 32,
-    marginVertical: -6,
-    borderRadius: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.accentTint,
   },
   searchInput: {
     flex: 1,

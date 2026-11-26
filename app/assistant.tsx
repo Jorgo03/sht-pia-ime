@@ -19,6 +19,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ComparisonTable } from '@/components/assistant/comparison-table';
+import { EraAvatar } from '@/components/era/era-avatar';
 import { AI_CHAT_ENABLED } from '@/constants/features';
 import { PropertyRow } from '@/components/property/property-row';
 import { AppHeader } from '@/components/ui/app-header';
@@ -177,12 +178,13 @@ function AssistantScreen() {
       <SafeAreaView style={[styles.container, readable]} edges={['top', 'bottom']}>
         <AppHeader onBack={() => (router.canGoBack() ? router.back() : router.replace('/'))} />
         <View style={styles.titleRow}>
+          <EraAvatar size={48} />
           <View style={styles.titleText}>
             <Text style={styles.title} accessibilityRole="header">
-              {t('aiAssistant.title')}
+              {t('era.name')}
             </Text>
             <Text style={styles.subtitle} numberOfLines={2}>
-              {t('aiAssistant.subtitle')}
+              {t('era.role')}
             </Text>
           </View>
           {!empty && (
@@ -205,7 +207,7 @@ function AssistantScreen() {
             contentContainerStyle={styles.scroll}
             keyboardShouldPersistTaps="handled">
             <Bubble role="assistant" styles={styles}>
-              <Text style={styles.bubbleText}>{t('aiAssistant.intro')}</Text>
+              <Text style={styles.bubbleText}>{t('era.intro')}</Text>
             </Bubble>
 
             {empty && restored && (
@@ -301,7 +303,7 @@ function Bubble({ role, styles, children }: { role: 'user' | 'assistant'; styles
   return (
     <View
       style={[styles.bubble, role === 'user' && styles.bubbleMine]}
-      accessibilityLabel={role === 'user' ? t('aiAssistant.you') : t('aiAssistant.title')}>
+      accessibilityLabel={role === 'user' ? t('aiAssistant.you') : t('era.name')}>
       {children}
     </View>
   );

@@ -64,6 +64,7 @@ import { PROFILE_LIMITS, type ProfileFields } from '@/src/features/auth/lib/prof
 import { useUnreadMessages } from '@/hooks/use-unread-messages';
 import { useReadableColumn } from '@/hooks/use-responsive';
 import { APPLE_SIGN_IN_ENABLED } from '@/src/features/auth/lib/oauthOptions';
+import { EraButton } from '@/components/era/era-button';
 
 type Role = 'buyer' | 'agent';
 
@@ -927,6 +928,7 @@ export default function ProfileScreen() {
             </View>
           </ScrollView>
         </SafeAreaView>
+        <EraButton />
 
         {notificationsOpen && (
           // Keyed by account: another person never sees, or saves over, the previous one's choices.

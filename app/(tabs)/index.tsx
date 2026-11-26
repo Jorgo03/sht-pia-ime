@@ -22,8 +22,6 @@ import { Chip } from '@/components/ui/chip';
 import { GradientBackground } from '@/components/ui/gradient-background';
 import { RiseIn } from '@/components/ui/motion';
 import { AppHeader } from '@/components/ui/app-header';
-import { AssistantEntry } from '@/components/assistant/assistant-entry';
-import { AI_CHAT_ENABLED } from '@/constants/features';
 import { SearchHeader } from '@/components/ui/search-header';
 import { SkeletonCard } from '@/components/ui/skeleton-card';
 import { Fonts, InlineTarget, type AtticoPalette } from '@/constants/theme';
@@ -40,6 +38,7 @@ import {
 import { useRecentlyViewed } from '@/hooks/use-recently-viewed';
 import { type Property } from '@/data/types';
 import { IS_WEB } from '@/constants/web-frame';
+import { EraButton } from '@/components/era/era-button';
 
 // Mirrors web's Home.jsx exactly: one query, sorted newest-first (the
 // default sort), featured = properties[0], matched = properties.slice(1, 7)
@@ -138,7 +137,6 @@ export default function HomeScreen() {
       <SearchHeader
         onSearchPress={() => router.push('/(tabs)/explore' as Href)}
       />
-      {AI_CHAT_ENABLED && <AssistantEntry />}
     </>
   );
 
@@ -351,6 +349,7 @@ export default function HomeScreen() {
           )}
         </ScrollView>
       </SafeAreaView>
+      <EraButton />
     </GradientBackground>
   );
 }
