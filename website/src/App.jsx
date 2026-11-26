@@ -27,6 +27,7 @@ const Leads = lazy(() => import('./pages/Leads'))
 const Performance = lazy(() => import('./pages/Performance'))
 const ImportListings = lazy(() => import('./pages/ImportListings'))
 const BlockedUsers = lazy(() => import('./pages/BlockedUsers'))
+const Moderation = lazy(() => import('./pages/Moderation'))
 const NewListing = lazy(() => import('./listing/NewListing'))
 import RequireAuth from './auth/RequireAuth'
 
@@ -83,8 +84,10 @@ export default function App() {
           <Route path="/leads" element={<Leads />} />
           <Route path="/performance" element={<Performance />} />
           <Route path="/blocked-users" element={<BlockedUsers />} />
+          <Route path="/moderation" element={<Moderation />} />
           {/* The old website's addresses for the same pages. */}
           <Route path="/new-listing" element={<Navigate to="/listing/new" replace />} />
+          <Route path="/listing/create" element={<Navigate to="/listing/new" replace />} />
           <Route path="/my-listings/:id/edit" element={<OldEdit />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

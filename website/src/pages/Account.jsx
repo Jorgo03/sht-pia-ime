@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
 import { Link, Navigate, useLocation } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
-import { BarChart3, Ban, Bell, BriefcaseBusiness, CalendarClock, Heart, Home, LayoutDashboard, MessageCircle, Plus, Search, Upload, Users } from 'lucide-react'
+import { BarChart3, Ban, Bell, BriefcaseBusiness, CalendarClock, Heart, Home, LayoutDashboard, MessageCircle, Plus, Search, ShieldCheck, Upload, Users } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { isModerator } from '@/src/features/moderation/lib/moderation.js'
 import { profilePatch, PROFILE_LIMITS, saveProfile } from '@/src/features/auth/lib/profileForm.js'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../auth/AuthContext'
@@ -37,6 +38,8 @@ export default function Account() {
   const { session, user, profile, ready, refreshProfile } = useAuth()
   const isAgent = profile?.role === 'agent'
   const stats = useStats(user, isAgent)
+  // Only people in public.moderators see the link, as in the app's Profile.
+  const { data: canModerate } = useQuery({ queryKey: ['is-moderator', user?.id], enabled: !!user, queryFn: () => isModerator(supabase) })
   const [form, setForm] = useState(null)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState(null)
@@ -78,6 +81,7 @@ export default function Account() {
     [Home, t('listing.myListings'), '/my-listings'],
     [Plus, t('listing.newListing'), '/listing/new'],
     [Ban, t('safety.blockedUsers'), '/blocked-users'],
+    ...(canModerate ? [[ShieldCheck, t('moderation.title'), '/moderation']] : []),
   ]
   const agentLinks = [
     [LayoutDashboard, t('agentDashboard.title'), '/agent-dashboard'],

@@ -131,6 +131,14 @@
     {
       "source": "/blocked-users",
       "destination": "/"
+    },
+    {
+      "source": "/moderation",
+      "destination": "/"
+    },
+    {
+      "source": "/listing/create",
+      "destination": "/"
     }
   ],
   "headers": [

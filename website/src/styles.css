@@ -769,3 +769,12 @@ button.stat { cursor: pointer; font: inherit; }
   .search-map-list { max-height: none; }
 }
 .menu-selects { display: flex; gap: var(--s4); flex-wrap: wrap; align-items: center; }
+
+/* Moderation */
+.mod-list { display: grid; gap: var(--s4); margin-top: var(--s5); }
+.mod-card { display: grid; gap: var(--s3); margin: 0; }
+.mod-head { display: flex; justify-content: space-between; align-items: baseline; gap: var(--s3); flex-wrap: wrap; }
+.mod-head .panel-title { margin: 0; }
+.mod-target { display: flex; align-items: center; gap: var(--s2); flex-wrap: wrap; font-weight: 600; }
+.mod-target .pill { margin-left: 0; }
+.mod-details { white-space: pre-wrap; overflow-wrap: anywhere; }
