@@ -214,7 +214,7 @@ export default function ProfileScreen() {
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState(false);
-  // "Download my data" (privacy policy §8): one JSON file of the person's own rows.
+  // "Download my data" (privacy policy §8): an Excel report of the person's own rows.
   const [exporting, setExporting] = useState(false);
   const [exportError, setExportError] = useState(false);
 
@@ -223,7 +223,7 @@ export default function ProfileScreen() {
     setExporting(true);
     setExportError(false);
     try {
-      await deliverMyData(await collectMyData(user.id));
+      await deliverMyData(await collectMyData(user.id), user, t);
     } catch {
       setExportError(true);
     } finally {

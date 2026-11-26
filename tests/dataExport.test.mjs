@@ -1,6 +1,6 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { EXPORT_TABLES, exportDocument, exportFileName, ownerFilter, stripColumns } from '../lib/data-export-plan.js'
+import { EXPORT_TABLES, ownerFilter, stripColumns } from '../lib/data-export-plan.js'
 
 // "Download my data" (privacy policy §8: access and portability).
 
@@ -20,13 +20,4 @@ test('secrets are not exported', () => {
 
 test('the owner filter matches any of the columns', () => {
   assert.equal(ownerFilter(['client_id', 'agent_id'], UID), `client_id.eq.${UID},agent_id.eq.${UID}`)
-})
-
-test('the document is dated JSON with the sections', () => {
-  const now = new Date('2026-11-16T10:00:00Z')
-  const doc = JSON.parse(exportDocument(UID, { favorites: [{ id: 1 }] }, now))
-  assert.equal(doc.user_id, UID)
-  assert.equal(doc.exported_at, '2026-11-16T10:00:00.000Z')
-  assert.deepEqual(doc.favorites, [{ id: 1 }])
-  assert.equal(exportFileName(now), 'shtepia-ime-data-2026-11-16.json')
 })
