@@ -1479,6 +1479,7 @@
     "role": "Yapay zekâ emlak asistanınız",
     "intro": "Merhaba, ben Era! Ne aradığınızı söyleyin; Shtëpia.ime’de ev bulayım, karşılaştırayım ya da sitenin nasıl çalıştığını anlatayım.",
     "cta": "Era ile sohbet et",
-    "openFull": "Tam ekranda aç"
+    "openFull": "Tam ekranda aç",
+    "dragHint": "Sohbeti açmak için iki kez dokunun. Taşımak için basılı tutup sürükleyin."
   }
 }

@@ -1479,6 +1479,7 @@
     "role": "Asistentja juaj AI për prona",
     "intro": "Përshëndetje, jam Era! Më thuaj çfarë po kërkon dhe do të gjej prona në Shtëpia.ime, t’i krahasoj ose të të shpjegoj si funksionon faqja.",
     "cta": "Bisedo me Erën",
-    "openFull": "Hap në ekran të plotë"
+    "openFull": "Hap në ekran të plotë",
+    "dragHint": "Prek dy herë për të hapur bisedën. Mbaje dhe tërhiqe për ta lëvizur."
   }
 }

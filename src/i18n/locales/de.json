@@ -1479,6 +1479,7 @@
     "role": "Ihre KI-Immobilienassistentin",
     "intro": "Hallo, ich bin Era! Sagen Sie mir, was Sie suchen, und ich finde Immobilien auf Shtëpia.ime, vergleiche sie oder erkläre, wie die Seite funktioniert.",
     "cta": "Mit Era chatten",
-    "openFull": "Im Vollbild öffnen"
+    "openFull": "Im Vollbild öffnen",
+    "dragHint": "Doppeltippen, um den Chat zu öffnen. Halten und ziehen, um sie zu verschieben."
   }
 }

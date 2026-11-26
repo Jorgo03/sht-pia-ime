@@ -1499,6 +1499,7 @@
     "role": "Twoja asystentka AI ds. nieruchomości",
     "intro": "Cześć, jestem Era! Powiedz, czego szukasz, a znajdę nieruchomości na Shtëpia.ime, porównam je lub wyjaśnię, jak działa serwis.",
     "cta": "Porozmawiaj z Erą",
-    "openFull": "Otwórz na pełnym ekranie"
+    "openFull": "Otwórz na pełnym ekranie",
+    "dragHint": "Stuknij dwukrotnie, aby otworzyć czat. Przytrzymaj i przeciągnij, aby ją przesunąć."
   }
 }

@@ -1489,6 +1489,7 @@
     "role": "La tua assistente AI per la casa",
     "intro": "Ciao, sono Era! Dimmi cosa cerchi e troverò immobili su Shtëpia.ime, li confronterò o ti spiegherò come funziona il sito.",
     "cta": "Chatta con Era",
-    "openFull": "Apri a schermo intero"
+    "openFull": "Apri a schermo intero",
+    "dragHint": "Tocca due volte per aprire la chat. Tieni premuto e trascina per spostarla."
   }
 }

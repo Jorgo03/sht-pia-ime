@@ -1479,6 +1479,7 @@
     "role": "Your AI property assistant",
     "intro": "Hi, I’m Era! Tell me what you’re looking for and I’ll find homes on Shtëpia.ime, compare them, or explain how the site works.",
     "cta": "Chat with Era",
-    "openFull": "Open full screen"
+    "openFull": "Open full screen",
+    "dragHint": "Double-tap to open the chat. Hold and drag to move her."
   }
 }
