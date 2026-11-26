@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { AMENITIES } from '@/src/features/properties/lib/amenities.js'
 import { normalizeRef, zonesFor } from '@/src/features/properties/lib/searchFilters.js'
+import Select from './Select'
 
 // The app's filter sheet (components/property/filter-sheet.tsx) for the web:
 // neighbourhood, price range, bedrooms, bathrooms, surface range, amenities
@@ -50,10 +51,10 @@ export default function MoreFilters({ open, onClose, params, onApply }) {
         {zones.length > 0 && (
           <label className="field">
             <span>{t('search.zone')}</span>
-            <select className="input" value={f.zone ?? ''} onChange={set('zone')}>
+            <Select className="input" value={f.zone ?? ''} onChange={set('zone')}>
               <option value="">{t('search.anyZone')}</option>
               {zones.map((z) => <option key={z.name ?? z} value={z.name ?? z}>{z.name ?? z}</option>)}
-            </select>
+            </Select>
           </label>
         )}
         <fieldset className="range">
@@ -64,17 +65,17 @@ export default function MoreFilters({ open, onClose, params, onApply }) {
         <div className="form-grid">
           <label className="field">
             <span>{t('search.bedrooms')}</span>
-            <select className="input" value={f.beds ?? ''} onChange={set('beds')}>
+            <Select className="input" value={f.beds ?? ''} onChange={set('beds')}>
               <option value="">{t('search.anyBeds')}</option>
               {[1, 2, 3, 4, 5].map((n) => <option key={n} value={n}>{n}+</option>)}
-            </select>
+            </Select>
           </label>
           <label className="field">
             <span>{t('search.bathrooms')}</span>
-            <select className="input" value={f.baths ?? ''} onChange={set('baths')}>
+            <Select className="input" value={f.baths ?? ''} onChange={set('baths')}>
               <option value="">{t('search.anyBaths')}</option>
               {[1, 2, 3, 4].map((n) => <option key={n} value={n}>{n}+</option>)}
-            </select>
+            </Select>
           </label>
         </div>
         <fieldset className="range">

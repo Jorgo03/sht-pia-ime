@@ -21,6 +21,7 @@ import { isValidPhone } from '@/src/features/auth/lib/profileForm.js'
 import { uploadPath } from '@/src/lib/uploadNames.js'
 import './map.css'
 import './new-listing.css'
+import Select from '../components/Select'
 
 const TIRANA_CENTER = [41.3275, 19.8187]
 
@@ -626,9 +627,9 @@ export default function NewListing() {
             </div>
             <div className="nl-field">
               <label>{t('search.propertyType')}</label>
-              <select value={form.property_type} onChange={e => update('property_type', e.target.value)}>
+              <Select value={form.property_type} onChange={e => update('property_type', e.target.value)}>
                 {PROPERTY_TYPES.map(pt => <option key={pt} value={pt}>{t(`search.${pt}`)}</option>)}
-              </select>
+              </Select>
             </div>
             <div className="nl-field">
               <label>{t('listing.title')}</label>
@@ -693,18 +694,18 @@ export default function NewListing() {
           <>
             <div className="nl-field">
               <label>{t('listing.city')}</label>
-              <select value={form.city} onChange={e => selectCity(e.target.value)}>
+              <Select value={form.city} onChange={e => selectCity(e.target.value)}>
                 {CITIES.map(c => <option key={c} value={c}>{cityLabel(c)}</option>)}
-              </select>
+              </Select>
               {errors.city && <span className="nl-error">{errors.city}</span>}
             </div>
             {zonesFor(form.city).length > 0 && (
               <div className="nl-field">
                 <label htmlFor="nl-zone">{t('listing.zone')}</label>
-                <select id="nl-zone" value={form.zone} onChange={e => update('zone', e.target.value)}>
+                <Select id="nl-zone" value={form.zone} onChange={e => update('zone', e.target.value)}>
                   <option value="">{t('listing.zoneNone')}</option>
                   {zonesFor(form.city).map(z => <option key={z} value={z}>{z}</option>)}
-                </select>
+                </Select>
               </div>
             )}
             <div className="nl-field">
@@ -792,11 +793,11 @@ export default function NewListing() {
               </div>
               <div className="nl-field" style={{ flex: 1 }}>
                 <label>{t('listing.currency')}</label>
-                <select value={form.currency} onChange={e => update('currency', e.target.value)}>
+                <Select value={form.currency} onChange={e => update('currency', e.target.value)}>
                   <option value="EUR">EUR</option>
                   <option value="ALL">ALL</option>
                   <option value="USD">USD</option>
-                </select>
+                </Select>
               </div>
             </div>
             <div className="nl-field">

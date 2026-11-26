@@ -8,6 +8,7 @@ import { formatDate } from '@/src/lib/format.js'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../auth/AuthContext'
 import { ErrorState } from '../components/States'
+import Select from '../components/Select'
 
 // The agent's private performance report, as in the app
 // (app/performance/index.tsx, hooks/use-performance-report.ts): the
@@ -135,9 +136,9 @@ export default function Performance() {
       <div className="perf-period">
         <label className="field">
           <span>{t('performance.period')}</span>
-          <select className="input" value={period} onChange={(e) => setPeriod(e.target.value)}>
+          <Select className="input" value={period} onChange={(e) => setPeriod(e.target.value)}>
             {PERIODS.map((p) => <option key={p} value={p}>{t(`performance.periods.${p}`)}</option>)}
-          </select>
+          </Select>
         </label>
         {period === 'custom' && (
           <>

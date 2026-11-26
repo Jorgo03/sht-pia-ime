@@ -10,6 +10,7 @@ import MoreFilters from '../components/MoreFilters'
 import SaveSearchButton from '../components/SaveSearchButton'
 import { AI_CHAT_ENABLED } from '../lib/features'
 import { filtersFromParams, getProperties, getPropertiesCount, PAGE_SIZE } from '../lib/api'
+import Select from '../components/Select'
 
 // Leaflet only loads when someone opens the map.
 const SearchMap = lazy(() => import('../components/SearchMap'))
@@ -84,13 +85,13 @@ export default function Search() {
             {!onMap && (
               <label className="sort">
                 <span>{t('search.sortLabel')}</span>
-                <select value={filters.sort} onChange={(e) => setSort(e.target.value)}>
+                <Select value={filters.sort} onChange={(e) => setSort(e.target.value)}>
                   {['newest', 'price_asc', 'price_desc'].map((s) => (
                     <option key={s} value={s}>
                       {t(`search.sort.${s}`)}
                     </option>
                   ))}
-                </select>
+                </Select>
               </label>
             )}
           </div>

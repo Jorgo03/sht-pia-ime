@@ -212,7 +212,7 @@
 }
 
 .nl-field input,
-.nl-field select,
+.nl-field .sel-trigger,
 .nl-field textarea {
   padding: 12px 14px;
   border-radius: var(--r-md);
@@ -226,7 +226,7 @@
 }
 
 .nl-field input:focus,
-.nl-field select:focus,
+.nl-field .sel-trigger:focus,
 .nl-field textarea:focus {
   border-color: var(--fho-orange-1);
 }
@@ -246,7 +246,7 @@
 /* Flex items default to their content width; inputs' is ~180px, so two in a
    row overflowed below ~390 wide. */
 .nl-field input,
-.nl-field select,
+.nl-field .sel-trigger,
 .nl-field textarea { min-width: 0; }
 
 /* Big tappable cards for listing type */
@@ -625,3 +625,5 @@
 .rf-context { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; color: var(--muted); }
 .rf-empty { padding: 12px; font-size: 13px; color: var(--muted); }
 .new-listing-page .link-btn { border: 0; background: none; padding: 8px 0; font-weight: 700; cursor: pointer; }
+
+.nl-field .sel-trigger { display: flex; width: 100%; cursor: pointer; text-align: left; }

@@ -5,6 +5,7 @@ import { Coins } from 'lucide-react'
 import { convertAmount, DISPLAY_CURRENCIES, isDisplayCurrency, ratesMap, roundConverted } from '@/lib/currency.js'
 import { formatPrice } from '@/src/lib/format.js'
 import { supabase } from '../lib/supabase'
+import Select from '../components/Select'
 
 // "Show prices in", as in the app (contexts/currency-context.tsx): every
 // listing price in the visitor's chosen currency at the daily rate from
@@ -73,10 +74,10 @@ export function CurrencySelect({ className = '' }) {
   return (
     <label className={`lang-select ${className}`}>
       <Coins size={16} aria-hidden="true" />
-      <select aria-label={t('currency.title')} value={currency ?? ''} onChange={(e) => setCurrency(e.target.value || null)}>
+      <Select aria-label={t('currency.title')} value={currency ?? ''} onChange={(e) => setCurrency(e.target.value || null)}>
         <option value="">{t('currency.asListedShort')}</option>
         {DISPLAY_CURRENCIES.map((c) => <option key={c} value={c}>{c}</option>)}
-      </select>
+      </Select>
     </label>
   )
 }

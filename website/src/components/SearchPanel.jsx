@@ -4,6 +4,7 @@ import { BedDouble, Building2, Euro, MapPin, Ruler, Search as SearchIcon } from 
 import { useTranslation } from 'react-i18next'
 import { CITIES } from '@/src/features/properties/data/locations.js'
 import { cityName, formatPrice, PROPERTY_TYPES } from '../lib/format'
+import Select from './Select'
 
 const PRICES = {
   sale: [50000, 100000, 150000, 200000, 300000, 500000, 1000000],
@@ -31,9 +32,9 @@ function Field({ icon: Icon, label, value, onChange, children }) {
         <Icon size={15} aria-hidden="true" />
         {label}
       </span>
-      <select value={value} onChange={(e) => onChange(e.target.value)}>
+      <Select value={value} onChange={(e) => onChange(e.target.value)}>
         {children}
-      </select>
+      </Select>
     </label>
   )
 }

@@ -8,6 +8,7 @@ import { supabase } from '../lib/supabase'
 import { useAuth } from '../auth/AuthContext'
 import { EmptyState, ErrorState } from '../components/States'
 import { telUrl, whatsappUrl } from '../lib/format'
+import Select from '../components/Select'
 
 const PAGE = 30
 const EMPTY = { name: '', phone: '', email: '', notes: '', status: 'new' }
@@ -146,9 +147,9 @@ export default function Leads() {
               <li key={l.id} className="viewing">
                 <div className="viewing-top">
                   <strong>{l.name}</strong>
-                  <select className="status-select" value={l.status} onChange={(e) => setLeadStatus(l, e.target.value)} aria-label={t('leads.statusLabel')}>
+                  <Select className="status-select" value={l.status} onChange={(e) => setLeadStatus(l, e.target.value)} aria-label={t('leads.statusLabel')}>
                     {LEAD_STATUSES.map((s) => <option key={s} value={s}>{t(`leads.status.${s}`)}</option>)}
-                  </select>
+                  </Select>
                 </div>
                 <p className="muted small">{[l.phone, l.email].filter(Boolean).join(' · ')}</p>
                 {l.notes && <p className="viewing-notes">{l.notes}</p>}
@@ -173,9 +174,9 @@ export default function Leads() {
           <label className="field"><span>{t('leads.phone')}</span><input className="input" type="tel" value={form.phone} onChange={set('phone')} maxLength={LEAD_LIMITS.phone} /></label>
           <label className="field"><span>{t('leads.email')}</span><input className="input" type="email" value={form.email} onChange={set('email')} maxLength={LEAD_LIMITS.email} /></label>
           <label className="field"><span>{t('leads.statusLabel')}</span>
-            <select className="input" value={form.status} onChange={set('status')}>
+            <Select className="input" value={form.status} onChange={set('status')}>
               {LEAD_STATUSES.map((s) => <option key={s} value={s}>{t(`leads.status.${s}`)}</option>)}
-            </select>
+            </Select>
           </label>
           <label className="field"><span>{t('leads.notes')}</span><textarea className="textarea" rows={3} value={form.notes} onChange={set('notes')} maxLength={LEAD_LIMITS.notes} placeholder={t('leads.notesHint')} /></label>
           {formError && <p className="form-error" role="alert">{formError}</p>}
