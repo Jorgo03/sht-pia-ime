@@ -1,6 +1,7 @@
-import { Directory, File, Paths } from 'expo-file-system';
+import { File, Paths } from 'expo-file-system';
+import * as Sharing from 'expo-sharing';
 import type { TFunction } from 'i18next';
-import { Platform, Share } from 'react-native';
+import { Platform } from 'react-native';
 
 import { supabase } from '@/lib/supabase';
 import { EXPORT_TABLES, MAX_ROWS, PAGE, ownerFilter, stripColumns } from '@/lib/data-export-plan';
@@ -51,9 +52,8 @@ export async function collectMyData(userId: string): Promise<{ sections: Record<
 
 /**
  * The person's data as an Excel report (lib/data-report.js). Web: downloads
- * it. iPhone: the share sheet with the file (Save to Files, Mail…). Android:
- * the system folder picker, and the file is saved there. Returns false when
- * the person closed the picker without choosing a folder.
+ * it. Phones: the system share sheet with the file (save to Files or Drive,
+ * email it, open it in Excel or Google Sheets…).
  */
 export async function deliverMyData(
   data: { sections: Record<string, Row[]>; titles: Record<string, string> },
@@ -75,21 +75,11 @@ export async function deliverMyData(
     return true;
   }
 
-  if (Platform.OS === 'android') {
-    let folder: Directory;
-    try {
-      folder = await Directory.pickDirectoryAsync();
-    } catch {
-      return false; // picker closed
-    }
-    const file = folder.createFile(name, XLSX_TYPE);
-    await file.write(bytes);
-    return true;
-  }
-
+  // Written to the app's cache, then handed to the system share sheet.
   const file = new File(Paths.cache, name);
   file.create({ overwrite: true });
   await file.write(bytes);
-  await Share.share({ url: file.uri, title: name });
+  if (!(await Sharing.isAvailableAsync())) throw new Error('sharing unavailable');
+  await Sharing.shareAsync(file.uri, { mimeType: XLSX_TYPE, UTI: 'org.openxmlformats.spreadsheetml.sheet', dialogTitle: name });
   return true;
 }
