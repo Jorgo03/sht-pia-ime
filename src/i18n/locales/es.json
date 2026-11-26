@@ -1483,5 +1483,12 @@
       "content_reports": "Denuncias",
       "user_blocks": "Usuarios bloqueados"
     }
+  },
+  "era": {
+    "name": "Era",
+    "role": "Tu asistente de IA inmobiliaria",
+    "intro": "¡Hola, soy Era! Dime qué buscas y encontraré viviendas en Shtëpia.ime, las compararé o te explicaré cómo funciona la web.",
+    "cta": "Habla con Era",
+    "openFull": "Abrir a pantalla completa"
   }
 }

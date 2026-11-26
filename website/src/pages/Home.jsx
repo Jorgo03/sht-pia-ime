@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
-import { ArrowRight, Sparkles } from 'lucide-react'
+import { ArrowRight } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { initialsOf } from '@/src/features/properties/lib/discovery.js'
 import SearchPanel from '../components/SearchPanel'
@@ -11,7 +11,6 @@ import { ErrorState } from '../components/States'
 import { getAgentDirectory, getCityTiles, getProperties, getPropertiesByIds } from '../lib/api'
 import { recentlyViewedIds } from '../features/listing'
 import { cityName } from '../lib/format'
-import { AI_CHAT_ENABLED } from '../lib/features'
 
 function Hero() {
   const { t } = useTranslation()
@@ -30,16 +29,6 @@ function Hero() {
         <HeroTypewriter />
         <p className="hero-lead">{t('site.hero.lead')}</p>
         <SearchPanel />
-        {AI_CHAT_ENABLED && (
-          <Link to="/assistant" className="ai-entry">
-            <Sparkles size={18} aria-hidden="true" />
-            <span>
-              <strong>{t('aiAssistant.entry')}</strong>
-              <span>{t('aiAssistant.entryHint')}</span>
-            </span>
-            <ArrowRight size={18} aria-hidden="true" />
-          </Link>
-        )}
       </div>
     </section>
   )

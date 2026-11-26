@@ -802,12 +802,6 @@ button.stat { cursor: pointer; font: inherit; }
 .mod-details { white-space: pre-wrap; overflow-wrap: anywhere; }
 
 /* AI assistant (app/assistant.tsx) and the listing chat */
-.ai-entry { display: inline-flex; align-items: center; gap: var(--s3); margin-top: var(--s4); min-height: 52px; padding: var(--s2) var(--s4); border-radius: var(--r-pill); background: rgb(255 255 255 / 0.14); border: 1px solid rgb(255 255 255 / 0.35); color: #fff; text-decoration: none; text-align: left; backdrop-filter: blur(8px); max-width: 100%; transition: background 0.2s var(--ease); }
-.ai-entry:hover { background: rgb(255 255 255 / 0.22); }
-.ai-entry:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
-.ai-entry > span { display: grid; min-width: 0; }
-.ai-entry strong { font-size: 15px; }
-.ai-entry > span > span { font-size: 13px; opacity: 0.9; }
 .assistant-head { display: flex; justify-content: space-between; align-items: flex-start; gap: var(--s4); flex-wrap: wrap; margin-bottom: var(--s5); }
 .assistant-head .muted { margin-top: var(--s1); }
 .chat { display: grid; gap: var(--s3); align-content: start; }
@@ -861,3 +855,78 @@ button.stat { cursor: pointer; font: inherit; }
 .plan-features svg { color: #1f7a45; flex: none; margin-top: 3px; }
 @media (prefers-reduced-motion: reduce) { .dot-pulse, .plan.is-skeleton { animation: none; } }
 .pricing .form-note, .pricing .form-error { margin-bottom: var(--s4); }
+
+/* Era, the assistant (features/era): a button in the bottom-right corner of
+   every page and the chat window above it. Phone: the window is the whole
+   screen. Sizes use the safe areas so nothing sits under a notch or home bar. */
+.era-avatar { display: block; flex: none; border-radius: 50%; }
+.era-who { display: flex; align-items: center; gap: var(--s3); min-width: 0; }
+.era-role { font-size: 14px; }
+.era-actions { display: flex; align-items: center; gap: var(--s1); }
+.assistant-head .era-actions .btn { gap: 6px; }
+
+.era-launcher {
+  position: fixed; z-index: 900;
+  right: max(16px, env(safe-area-inset-right)); bottom: max(16px, env(safe-area-inset-bottom));
+  display: flex; align-items: center; gap: var(--s3);
+  padding: 4px; border: 0; border-radius: var(--r-pill);
+  background: var(--paper); color: var(--ink); box-shadow: 0 8px 28px rgb(0 0 0 / 0.18), 0 0 0 1px var(--line);
+  cursor: pointer; transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease);
+}
+.era-launcher:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgb(0 0 0 / 0.22), 0 0 0 1px var(--line); }
+.era-launcher:focus-visible { outline: 3px solid var(--door); outline-offset: 3px; }
+.era-launcher-face { position: relative; display: block; }
+.era-online { position: absolute; right: 1px; bottom: 2px; width: 13px; height: 13px; border-radius: 50%; background: #22a55a; border: 2.5px solid var(--paper); }
+.era-launcher-text { display: none; padding-right: var(--s4); text-align: left; line-height: 1.2; }
+.era-launcher-text strong { display: block; font-size: 15px; }
+.era-launcher-text small { display: block; font-size: 13px; color: var(--muted); }
+@media (min-width: 768px) {
+  .era-launcher { right: max(24px, env(safe-area-inset-right)); bottom: max(24px, env(safe-area-inset-bottom)); }
+  .era-launcher-text { display: block; }
+  .era-launcher.is-open .era-launcher-text { display: none; }
+}
+
+.era-panel {
+  position: fixed; z-index: 901; display: flex; flex-direction: column; overflow: hidden;
+  right: max(24px, env(safe-area-inset-right)); bottom: calc(max(24px, env(safe-area-inset-bottom)) + 72px);
+  width: min(400px, calc(100vw - 48px)); height: min(640px, calc(100dvh - 140px));
+  background: var(--paper); color: var(--ink); border: 1px solid var(--line); border-radius: var(--r-l);
+  box-shadow: 0 24px 64px rgb(0 0 0 / 0.22);
+  transform-origin: bottom right; animation: era-in 0.22s var(--ease);
+}
+.era-panel[hidden] { display: none; }
+@keyframes era-in { from { opacity: 0; transform: translateY(12px) scale(0.97); } }
+.era-loading { display: grid; place-items: center; height: 100%; animation: pulse 1.4s ease-in-out infinite; }
+.era-panel-body { display: flex; flex-direction: column; height: 100%; min-height: 0; }
+.era-head { display: flex; align-items: center; justify-content: space-between; gap: var(--s2); padding: var(--s3) var(--s3) var(--s3) var(--s4); border-bottom: 1px solid var(--line); background: linear-gradient(180deg, color-mix(in srgb, #ff7d1a 9%, var(--paper)), var(--paper)); }
+.era-name { font-family: var(--font-display); font-weight: 600; font-size: 22px; line-height: 1.1; }
+.era-head .era-role { font-size: 13px; }
+.era-head .nav-icon { width: 40px; height: 40px; color: var(--ink); }
+.era-panel .chat { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: var(--s4); }
+.era-panel .bubble { max-width: 92%; font-size: 15px; }
+.era-panel .grid-2 { grid-template-columns: 1fr; }
+.era-panel .starter { min-height: 44px; font-size: 14px; }
+.era-panel .composer { position: static; margin: 0; padding: var(--s3) var(--s4); }
+.era-panel .disclaimer { padding: 0 var(--s4) var(--s3); font-size: 11.5px; }
+
+/* Phones: the chat is the whole screen, the button waits underneath. */
+@media (max-width: 599px) {
+  .era-panel {
+    inset: 0; width: 100%; height: 100dvh; border: 0; border-radius: 0;
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    animation-name: era-up;
+  }
+  .era-launcher.is-open { display: none; }
+}
+@keyframes era-up { from { transform: translateY(24px); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .era-panel { animation: none; } .era-launcher { transition: none; } }
+/* In Era's window a listing is a compact row: photo on the left, details on the right. */
+.era-panel .card { flex-direction: row; }
+.era-panel .card-media { flex: none; width: 112px; aspect-ratio: auto; }
+.era-panel .card-media .badge, .era-panel .card-media .fav-btn { display: none; }
+.era-panel .card-body { gap: 2px; padding: var(--s3); min-width: 0; }
+.era-panel .card-price { font-size: 17px; }
+.era-panel .card-title { font-size: 14.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.era-panel .card-place { font-size: 13px; }
+.era-panel .card-facts { gap: var(--s3); margin-top: var(--s1); padding-top: var(--s2); font-size: 13px; }
+.era-panel .grid-2 { gap: var(--s2); }

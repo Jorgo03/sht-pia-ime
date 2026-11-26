@@ -1483,5 +1483,12 @@
       "content_reports": "Signalements",
       "user_blocks": "Utilisateurs bloqués"
     }
+  },
+  "era": {
+    "name": "Era",
+    "role": "Votre assistante IA immobilière",
+    "intro": "Bonjour, je suis Era ! Dites-moi ce que vous cherchez : je trouve des biens sur Shtëpia.ime, je les compare ou je vous explique le site.",
+    "cta": "Discuter avec Era",
+    "openFull": "Ouvrir en plein écran"
   }
 }

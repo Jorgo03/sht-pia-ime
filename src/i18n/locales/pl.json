@@ -1493,5 +1493,12 @@
       "content_reports": "Zgłoszenia",
       "user_blocks": "Zablokowani użytkownicy"
     }
+  },
+  "era": {
+    "name": "Era",
+    "role": "Twoja asystentka AI ds. nieruchomości",
+    "intro": "Cześć, jestem Era! Powiedz, czego szukasz, a znajdę nieruchomości na Shtëpia.ime, porównam je lub wyjaśnię, jak działa serwis.",
+    "cta": "Porozmawiaj z Erą",
+    "openFull": "Otwórz na pełnym ekranie"
   }
 }

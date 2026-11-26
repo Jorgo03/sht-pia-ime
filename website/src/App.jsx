@@ -3,6 +3,7 @@ import { Navigate, Route, Routes, useLocation, useParams } from 'react-router-do
 import { useTranslation } from 'react-i18next'
 import Header from './components/Header'
 import Footer from './components/Footer'
+import EraLauncher from './features/era/EraLauncher'
 import Home from './pages/Home'
 import Search from './pages/Search'
 import Property from './pages/Property'
@@ -99,6 +100,7 @@ export default function App() {
       </main>
       {/* Like the app, the sign-in screen has no footer: its card carries the legal links. */}
       {!AUTH_PATHS.includes(pathname) && <Footer />}
+      <EraLauncher />
     </>
   )
 }

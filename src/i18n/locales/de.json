@@ -1473,5 +1473,12 @@
       "content_reports": "Meldungen",
       "user_blocks": "Blockierte Nutzer"
     }
+  },
+  "era": {
+    "name": "Era",
+    "role": "Ihre KI-Immobilienassistentin",
+    "intro": "Hallo, ich bin Era! Sagen Sie mir, was Sie suchen, und ich finde Immobilien auf Shtëpia.ime, vergleiche sie oder erkläre, wie die Seite funktioniert.",
+    "cta": "Mit Era chatten",
+    "openFull": "Im Vollbild öffnen"
   }
 }

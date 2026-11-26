@@ -1473,5 +1473,12 @@
       "content_reports": "Reports",
       "user_blocks": "Blocked users"
     }
+  },
+  "era": {
+    "name": "Era",
+    "role": "Your AI property assistant",
+    "intro": "Hi, I’m Era! Tell me what you’re looking for and I’ll find homes on Shtëpia.ime, compare them, or explain how the site works.",
+    "cta": "Chat with Era",
+    "openFull": "Open full screen"
   }
 }

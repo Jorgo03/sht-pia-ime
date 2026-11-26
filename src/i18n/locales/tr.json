@@ -1473,5 +1473,12 @@
       "content_reports": "Şikâyetler",
       "user_blocks": "Engellenen kullanıcılar"
     }
+  },
+  "era": {
+    "name": "Era",
+    "role": "Yapay zekâ emlak asistanınız",
+    "intro": "Merhaba, ben Era! Ne aradığınızı söyleyin; Shtëpia.ime’de ev bulayım, karşılaştırayım ya da sitenin nasıl çalıştığını anlatayım.",
+    "cta": "Era ile sohbet et",
+    "openFull": "Tam ekranda aç"
   }
 }
