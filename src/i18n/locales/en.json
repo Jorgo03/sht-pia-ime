@@ -1397,11 +1397,7 @@
     },
     "account": {
       "title": "My account",
-      "saved": "Your changes are saved.",
-      "agentTitle": "Your listings",
-      "agentBody": "Publishing and managing listings, messages and viewings happen in the Shtëpia.ime app for now, with this same account.",
-      "clientTitle": "Find your home",
-      "clientBody": "Search homes here. In the app, with this same account, you can save homes and message agents."
+      "saved": "Your changes are saved."
     },
     "fav": {
       "add": "Save to favorites",

@@ -1397,11 +1397,7 @@
     },
     "account": {
       "title": "Hesabım",
-      "saved": "Değişiklikler kaydedildi.",
-      "agentTitle": "İlanlarınız",
-      "agentBody": "Şimdilik ilanlar, mesajlar ve gösterimler aynı hesapla Shtëpia.ime uygulamasında yönetiliyor.",
-      "clientTitle": "Evinizi bulun",
-      "clientBody": "Burada arayın. Uygulamada aynı hesapla evleri kaydedip emlakçılara yazabilirsiniz."
+      "saved": "Değişiklikler kaydedildi."
     },
     "fav": {
       "add": "Favorilere ekle",

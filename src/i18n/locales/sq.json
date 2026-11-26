@@ -1397,11 +1397,7 @@
     },
     "account": {
       "title": "Llogaria ime",
-      "saved": "Ndryshimet u ruajtën.",
-      "agentTitle": "Shpalljet e tua",
-      "agentBody": "Publikimi dhe menaxhimi i shpalljeve, mesazhet dhe vizitat bëhen tani në aplikacionin Shtëpia.ime, me të njëjtën llogari.",
-      "clientTitle": "Gjej shtëpinë tënde",
-      "clientBody": "Kërko shtëpi këtu. Në aplikacion, me të njëjtën llogari, ruan shtëpitë dhe u shkruan agjentëve."
+      "saved": "Ndryshimet u ruajtën."
     },
     "fav": {
       "add": "Ruaje te të preferuarat",

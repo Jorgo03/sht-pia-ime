@@ -1407,11 +1407,7 @@
     },
     "account": {
       "title": "Il mio account",
-      "saved": "Modifiche salvate.",
-      "agentTitle": "I tuoi annunci",
-      "agentBody": "Per ora annunci, messaggi e visite si gestiscono nell'app Shtëpia.ime, con lo stesso account.",
-      "clientTitle": "Trova la tua casa",
-      "clientBody": "Cerca qui. Nell'app, con lo stesso account, salvi gli immobili e scrivi agli agenti."
+      "saved": "Modifiche salvate."
     },
     "fav": {
       "add": "Salva nei preferiti",

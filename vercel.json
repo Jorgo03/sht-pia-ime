@@ -127,6 +127,10 @@
     {
       "source": "/performance",
       "destination": "/"
+    },
+    {
+      "source": "/blocked-users",
+      "destination": "/"
     }
   ],
   "headers": [

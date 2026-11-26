@@ -1397,11 +1397,7 @@
     },
     "account": {
       "title": "Mein Konto",
-      "saved": "Ihre Änderungen sind gespeichert.",
-      "agentTitle": "Ihre Inserate",
-      "agentBody": "Inserate, Nachrichten und Besichtigungen verwalten Sie vorerst in der Shtëpia.ime-App, mit demselben Konto.",
-      "clientTitle": "Finden Sie Ihr Zuhause",
-      "clientBody": "Suchen Sie hier. In der App merken Sie sich mit demselben Konto Immobilien und schreiben Maklern."
+      "saved": "Ihre Änderungen sind gespeichert."
     },
     "fav": {
       "add": "Zu Favoriten hinzufügen",
