@@ -7,6 +7,7 @@ import './styles.css'
 import App from './App'
 import { AuthProvider } from './auth/AuthContext'
 import { FavoritesProvider } from './features/favorites'
+import { CurrencyProvider } from './features/currency'
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { staleTime: 60_000, retry: 1, refetchOnWindowFocus: false } },
@@ -17,9 +18,11 @@ createRoot(document.getElementById('root')).render(
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <FavoritesProvider>
+          <CurrencyProvider>
           <BrowserRouter>
             <App />
           </BrowserRouter>
+          </CurrencyProvider>
         </FavoritesProvider>
       </AuthProvider>
     </QueryClientProvider>

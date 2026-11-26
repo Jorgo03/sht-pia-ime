@@ -74,7 +74,10 @@ export default function ImportListings() {
     const owned = good.map((r) => ({ ...r.columns, owner_id: user.id, agent_id: user.id, owner_type: 'agent', status: 'active' }))
     for (const group of batches(owned)) {
       if (await insertAll(group)) ok += group.length
-      else for (const item of group) (await insertAll([item])) ? (ok += 1) : (failed += 1)
+      else for (const item of group) {
+        if (await insertAll([item])) ok += 1
+        else failed += 1
+      }
       setProgress({ done: ok + failed, total: good.length })
     }
     publishing.current = false

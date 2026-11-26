@@ -742,3 +742,30 @@ button.stat { cursor: pointer; font: inherit; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 }
+
+/* Search: filters, saved search, map (batch 5) */
+.results-tools { display: flex; align-items: center; gap: var(--s2); flex-wrap: wrap; font-weight: 600; }
+.btn.is-active { border-color: var(--door); }
+.count-badge { display: inline-grid; place-items: center; min-width: 20px; height: 20px; padding: 0 6px; border-radius: var(--r-pill); background: var(--door); color: #fff; font-size: 12px; font-weight: 700; }
+.save-search { display: flex; align-items: center; gap: var(--s3); flex-wrap: wrap; margin: calc(-1 * var(--s3)) 0 var(--s4); }
+.link-btn { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; border: 0; background: none; padding: 0; color: var(--door-text, var(--door)); font: 700 14px var(--font-ui); cursor: pointer; }
+.link-btn:disabled { opacity: 0.6; cursor: default; }
+.link-btn:focus-visible { outline: 3px solid var(--door); outline-offset: 2px; border-radius: 4px; }
+.dialog-wide { width: min(640px, calc(100vw - 32px)); max-height: calc(100dvh - 32px); }
+.range { border: 0; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: var(--s3); }
+.range legend, .chip-set legend { font-weight: 700; font-size: 14px; margin-bottom: 6px; padding: 0; }
+.chip-set { border: 0; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: var(--s2); }
+.chip-set legend { width: 100%; }
+.chip { min-height: 40px; padding: 0 var(--s4); border: 1.5px solid var(--line); border-radius: var(--r-pill); background: var(--paper); color: var(--ink); font: 600 14px var(--font-ui); cursor: pointer; }
+.chip.is-on { border-color: var(--door); background: color-mix(in srgb, var(--door) 10%, var(--paper)); }
+.chip:focus-visible { outline: 3px solid var(--door); outline-offset: 2px; }
+.search-map { display: grid; gap: var(--s5); }
+.search-map.is-skeleton { min-height: 480px; background: var(--stone); border-radius: var(--r-m); animation: pulse 1.4s ease-in-out infinite; }
+.search-map-canvas { height: min(70vh, 620px); border-radius: var(--r-m); overflow: hidden; border: 1px solid var(--line); isolation: isolate; }
+.grid-2 { grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr)); }
+@media (min-width: 1024px) {
+  .search-map { grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); align-items: start; }
+  .search-map-canvas { position: sticky; top: 88px; height: calc(100vh - 120px); }
+  .search-map-list { max-height: none; }
+}
+.menu-selects { display: flex; gap: var(--s4); flex-wrap: wrap; align-items: center; }

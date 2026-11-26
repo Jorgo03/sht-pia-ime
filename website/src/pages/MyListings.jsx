@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Link, Navigate, useLocation } from 'react-router-dom'
+import { Link, Navigate } from 'react-router-dom'
 import { BarChart3, CircleCheck, Eye, Pause, Pencil, Play, Plus, Trash2, Upload } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { closedStatusFor } from '@/src/features/listings/lib/listingForm.js'
@@ -18,7 +18,6 @@ export default function MyListings() {
   const { t, i18n } = useTranslation()
   const lang = i18n.resolvedLanguage
   const { user, profile, ready } = useAuth()
-  const { state } = useLocation()
   const [limit, setLimit] = useState(PAGE)
   const [rows, setRows] = useState([])
   const [hasMore, setHasMore] = useState(false)

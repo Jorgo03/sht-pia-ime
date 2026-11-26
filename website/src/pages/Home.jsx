@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { ArrowRight, Bell, Heart, MessageCircle } from 'lucide-react'
@@ -7,7 +7,8 @@ import { initialsOf } from '@/src/features/properties/lib/discovery.js'
 import SearchPanel from '../components/SearchPanel'
 import PropertyCard, { CardSkeleton } from '../components/PropertyCard'
 import { ErrorState } from '../components/States'
-import { getAgentDirectory, getCityTiles, getProperties } from '../lib/api'
+import { getAgentDirectory, getCityTiles, getProperties, getPropertiesByIds } from '../lib/api'
+import { recentlyViewedIds } from '../features/listing'
 import { cityName } from '../lib/format'
 import symbolWhite from '../../../assets/brand/symbol-white.svg'
 
@@ -198,6 +199,26 @@ function AppBand() {
   )
 }
 
+// The homes this visitor opened last, as on the app's Home (this browser only).
+function RecentlyViewed() {
+  const { t } = useTranslation()
+  const [ids] = useState(recentlyViewedIds)
+  const q = useQuery({ queryKey: ['recent', ids], enabled: ids.length > 0, queryFn: () => getPropertiesByIds(ids.slice(0, 6)) })
+  if (ids.length === 0 || q.isError || (q.data && q.data.length === 0)) return null
+  return (
+    <section className="section" aria-labelledby="recent-title">
+      <div className="container">
+        <SectionHead id="recent-title" title={t('common.recentlyViewed')} />
+        <div className="grid">
+          {q.isPending
+            ? Array.from({ length: Math.min(ids.length, 3) }, (_, i) => <CardSkeleton key={i} />)
+            : q.data.map((p) => <PropertyCard key={p.id} property={p} />)}
+        </div>
+      </div>
+    </section>
+  )
+}
+
 export default function Home() {
   const { t } = useTranslation()
   useEffect(() => {
@@ -206,6 +227,7 @@ export default function Home() {
   return (
     <>
       <Hero />
+      <RecentlyViewed />
       <Latest />
       <Cities />
       <Agents />

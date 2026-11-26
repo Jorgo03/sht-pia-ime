@@ -14,6 +14,7 @@ import { getProperties } from '../lib/api'
 import { useAuth } from '../auth/AuthContext'
 import { FavoriteButton } from './favorites'
 import { toggleCompare, useCompare, MAX_COMPARE } from './compare'
+import { useCurrency } from './currency'
 import ReportDialog from '../components/ReportDialog'
 import PropertyCard from '../components/PropertyCard'
 import { formatPrice, listingBadgeKey, priceOf, priceSuffixKey, telUrl, whatsappUrl } from '../lib/format'
@@ -144,6 +145,8 @@ export function ContactPanel({ p, title }) {
   const { user } = useAuth()
   const requireSignIn = useRequireSignIn()
   const compare = useCompare()
+  const { currency, formatListingPrice } = useCurrency()
+  const converted = !!currency && currency !== (p.currency || 'EUR').toUpperCase()
   const { data: row } = useQuery({ queryKey: ['publisher', p.id], queryFn: () => fetchPublisher(supabase, p.id), staleTime: 300_000, retry: 1 })
   const pub = publisherView(row ?? null, p)
   const agentId = p.agent?.id || p.agent_id || p.owner_id || null
@@ -208,9 +211,10 @@ export function ContactPanel({ p, title }) {
         <FavoriteButton property={p} />
       </div>
       <p className="contact-price">
-        {priceOf(p, lang)}
+        {formatListingPrice(p.price, p.currency)}
         {suffix && <span className="card-suffix">{t(suffix)}</span>}
       </p>
+      {converted && <p className="muted small">{t('currency.converted', { price: priceOf(p, lang) })}</p>}
       {perM2 && (
         <p className="muted">
           {formatPrice(perM2, lang, p.currency)}

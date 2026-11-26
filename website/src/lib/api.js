@@ -4,13 +4,14 @@
 import { supabase } from './supabase'
 import { HIGHLIGHT_CITIES, joinAgents, tallyAgents } from '@/src/features/properties/lib/discovery.js'
 import { applyPriceRange } from '@/src/features/properties/lib/priceRange.js'
-import { applyFreeText } from '@/src/features/properties/lib/searchFilters.js'
+import { applyFreeText, applyZoneAndRef } from '@/src/features/properties/lib/searchFilters.js'
+import { AMENITIES } from '@/src/features/properties/lib/amenities.js'
 import { propertyOrNotFound } from '@/src/features/properties/lib/propertyResult.js'
 
 export const PAGE_SIZE = 24
 
 const LIST_COLUMNS =
-  'id, agent_id, title, title_i18n, price, currency, address, city, zone, sqft, beds, baths, property_type, listing_type, image_urls, created_at'
+  'id, agent_id, title, title_i18n, price, currency, address, city, zone, sqft, beds, baths, property_type, listing_type, image_urls, latitude, longitude, created_at'
 
 const SORTS = {
   newest: { column: 'created_at', ascending: false },
@@ -30,9 +31,15 @@ export function filtersFromParams(params) {
     city: params.get('city') || undefined,
     propertyType: params.get('type') || undefined,
     listingType: deal === 'sale' || deal === 'rent' ? deal : undefined,
+    zone: params.get('zone') || undefined,
+    refCode: params.get('ref') || undefined,
     beds: num('beds'),
+    baths: num('baths'),
     minArea: num('area'),
+    maxArea: num('maxArea'),
+    minPrice: num('min'),
     maxPrice: num('max'),
+    features: (params.get('features') || '').split(',').filter((f) => AMENITIES.includes(f)),
     sort: SORTS[sort] ? sort : 'newest',
   }
 }
@@ -43,7 +50,15 @@ function applyFilters(q, f) {
   q = applyFreeText(q, f.city)
   q = applyPriceRange(q, f)
   if (f.beds != null) q = q.gte('beds', f.beds)
+  if (f.baths != null) q = q.gte('baths', f.baths)
   if (f.minArea != null) q = q.gte('sqft', f.minArea)
+  if (f.maxArea != null) q = q.lte('sqft', f.maxArea)
+  if (f.features?.length) q = q.contains('features', f.features)
+  // Zone only with its own city; a reference is exact (shared with the app).
+  q = applyZoneAndRef(q, { city: f.city, zone: f.zone, ref: f.refCode })
+  if (f.bounds) {
+    q = q.not('latitude', 'is', null).gte('latitude', f.bounds.minLat).lte('latitude', f.bounds.maxLat).gte('longitude', f.bounds.minLng).lte('longitude', f.bounds.maxLng)
+  }
   return q
 }
 
@@ -117,4 +132,23 @@ export async function getProperty(id) {
     .eq('status', 'active')
     .single()
   return propertyOrNotFound(res)
+}
+
+/** Listings with a map position inside the view, at most 200, like the app's map. */
+export async function getMapProperties(f = {}) {
+  const { data, error } = await applyFilters(
+    supabase.from('properties').select(LIST_COLUMNS).eq('status', 'active').order('created_at', { ascending: false }),
+    f,
+  ).limit(200)
+  if (error) throw error
+  return (data ?? []).filter((p) => p.latitude != null && p.longitude != null)
+}
+
+/** Active listings by id, in the order given (Recently viewed). */
+export async function getPropertiesByIds(ids) {
+  if (!ids.length) return []
+  const { data, error } = await supabase.from('properties').select(LIST_COLUMNS).in('id', ids).eq('status', 'active')
+  if (error) throw error
+  const byId = new Map((data ?? []).map((p) => [p.id, p]))
+  return ids.map((id) => byId.get(id)).filter(Boolean)
 }

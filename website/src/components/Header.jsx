@@ -4,6 +4,7 @@ import { Bell, Heart, Menu, MessageCircle, UserRound, X } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import Logo from './Logo'
 import LanguageSelect from './LanguageSelect'
+import { CurrencySelect } from '../features/currency'
 import { useAuth } from '../auth/AuthContext'
 
 export default function Header({ overHero, dark = false }) {
@@ -60,6 +61,7 @@ export default function Header({ overHero, dark = false }) {
             <Link to={session ? '/listing/new' : '/signup'}>{t('site.listHome')}</Link>
             <Link to="/#app">{t('web.nav.app')}</Link>
             <LanguageSelect />
+            <CurrencySelect />
           </div>
         </div>
       </div>
@@ -130,7 +132,10 @@ export default function Header({ overHero, dark = false }) {
           <Link to="/#app">{t('web.nav.app')}</Link>
           {!session && <Link to="/signup">{t('auth.createAccount')}</Link>}
         </nav>
-        <LanguageSelect className="is-block" />
+        <div className="menu-selects">
+          <LanguageSelect className="is-block" />
+          <CurrencySelect className="is-block" />
+        </div>
       </div>
     </header>
   )

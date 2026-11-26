@@ -6,8 +6,9 @@ import { useTranslation } from 'react-i18next'
 import { allFeatures, bestOf, pricePerM2 } from '@/src/features/properties/lib/compare.js'
 import { supabase } from '../lib/supabase'
 import { removeCompare, useCompare, MAX_COMPARE } from '../features/compare'
+import { usePrice } from '../features/currency'
 import { EmptyState, ErrorState } from '../components/States'
-import { cityName, formatPrice, priceOf, titleOf } from '../lib/format'
+import { cityName, formatPrice, titleOf } from '../lib/format'
 
 const COLUMNS = 'id, title, title_i18n, price, currency, sqft, beds, baths, floor, total_floors, year_built, property_type, listing_type, city, zone, features, image_urls'
 
@@ -17,6 +18,7 @@ export default function Compare() {
   const { t, i18n } = useTranslation()
   const lang = i18n.resolvedLanguage
   const ids = useCompare()
+  const price = usePrice()
   const q = useQuery({
     queryKey: ['compare', ids],
     enabled: ids.length > 0,
@@ -37,7 +39,7 @@ export default function Compare() {
   const none = t('aiAssistant.notSpecified')
   const mark = (home, winner, label) => (winner === home.id ? <span className="pill best">{label}</span> : null)
   const rows = [
-    ['price', t('aiAssistant.compare.price'), (h) => <>{priceOf(h, lang)} {mark(h, best.price, t('aiAssistant.compare.best.price'))}</>],
+    ['price', t('aiAssistant.compare.price'), (h) => <>{price(h.price, h.currency)} {mark(h, best.price, t('aiAssistant.compare.best.price'))}</>],
     ['perM2', t('aiAssistant.compare.pricePerM2'), (h) => {
       const v = pricePerM2(h)
       return v ? <>{formatPrice(v, lang, h.currency)} {mark(h, best.perM2, t('aiAssistant.compare.best.perM2'))}</> : none

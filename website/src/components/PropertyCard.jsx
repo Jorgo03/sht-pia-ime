@@ -3,12 +3,14 @@ import { Link } from 'react-router-dom'
 import { Bath, BedDouble, MapPin, Ruler } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { gradientFor } from '@/src/lib/format.js'
-import { cityName, listingBadgeKey, priceOf, priceSuffixKey, titleOf } from '../lib/format'
+import { cityName, listingBadgeKey, priceSuffixKey, titleOf } from '../lib/format'
 import { FavoriteButton } from '../features/favorites'
+import { usePrice } from '../features/currency'
 
 function PropertyCard({ property: p }) {
   const { t, i18n } = useTranslation()
   const lang = i18n.resolvedLanguage
+  const price = usePrice()
   const photo = p.image_urls?.[0]
   const suffix = priceSuffixKey(p.listing_type)
   const place = [p.zone, cityName(p.city, lang)].filter(Boolean).join(', ')
@@ -22,7 +24,7 @@ function PropertyCard({ property: p }) {
       </div>
       <div className="card-body">
         <p className="card-price">
-          {priceOf(p, lang)}
+          {price(p.price, p.currency)}
           {suffix && <span className="card-suffix">{t(suffix)}</span>}
         </p>
         <h3 className="card-title">
