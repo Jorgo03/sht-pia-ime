@@ -17,14 +17,6 @@ const throttle = createLoginThrottle({
   save: (raw) => storage.setItem(THROTTLE_STORAGE_KEY, raw),
 })
 
-/**
- * The three kinds of account the website offers, on the two roles the
- * database has: a real estate office is an agent account whose agency name
- * is required, so it is listed under the office's name.
- */
-export const ACCOUNT_TYPES = ['client', 'agent', 'office']
-export const roleFor = (type) => (type === 'client' ? 'buyer' : 'agent')
-
 const PROFILE_COLUMNS = 'id, full_name, role, agency_name, phone, avatar_url'
 
 async function loadProfile(id) {
@@ -83,22 +75,13 @@ export function AuthProvider({ children }) {
     return { error }
   }, [])
 
-  const signUp = useCallback(async ({ email, password, type, fullName, agencyName, language }) => {
-    const role = roleFor(type)
+  // role is 'buyer' or 'agent', as in the app; an agent's office name is
+  // required by the form and stored as agency_name by the signup trigger.
+  const signUp = useCallback(async ({ email, password, role, fullName, agencyName, language }) => {
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
-      options: {
-        data: {
-          role,
-          full_name: fullName || undefined,
-          agency_name: role === 'agent' ? agencyName || undefined : undefined,
-          preferred_language: isLanguage(language) ? language : undefined,
-          // Kept on the account (the trigger ignores it) so an office and an
-          // agent who named their agency are still told apart.
-          account_type: type,
-        },
-      },
+      options: { data: signupData({ role, fullName, agencyName, language }) },
     })
     if (!error && isExistingAccount(data)) return { error: existingAccountError(), needsConfirmation: false }
     return { error, needsConfirmation: !error && !data?.session }
@@ -124,10 +107,21 @@ export function AuthProvider({ children }) {
     return { error }
   }, [])
 
-  const signInWithGoogle = useCallback(async () => {
+  // The app's "Email code": a 6-digit code instead of a password. On the
+  // sign-up form it also carries the chosen role and names, so a new account
+  // starts as what the person picked.
+  const sendEmailCode = useCallback(async (email, profile) => {
+    const { error } = await supabase.auth.signInWithOtp({
+      email,
+      options: profile ? { data: signupData(profile) } : undefined,
+    })
+    return { error }
+  }, [])
+
+  const signInWithProvider = useCallback(async (provider) => {
     const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: { redirectTo: `${window.location.origin}/account`, queryParams: oauthQueryParams('google') },
+      provider,
+      options: { redirectTo: `${window.location.origin}/account`, queryParams: oauthQueryParams(provider) },
     })
     return { error }
   }, [])
@@ -144,8 +138,8 @@ export function AuthProvider({ children }) {
   }, [session])
 
   const value = useMemo(
-    () => ({ session, user: session?.user ?? null, profile, ready, signIn, signUp, verifyCode, resendSignupCode, sendResetCode, updatePassword, signInWithGoogle, signOut, refreshProfile }),
-    [session, profile, ready, signIn, signUp, verifyCode, resendSignupCode, sendResetCode, updatePassword, signInWithGoogle, signOut, refreshProfile],
+    () => ({ session, user: session?.user ?? null, profile, ready, signIn, signUp, verifyCode, resendSignupCode, sendResetCode, updatePassword, sendEmailCode, signInWithProvider, signOut, refreshProfile }),
+    [session, profile, ready, signIn, signUp, verifyCode, resendSignupCode, sendResetCode, updatePassword, sendEmailCode, signInWithProvider, signOut, refreshProfile],
   )
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
@@ -156,8 +150,12 @@ export function useAuth() {
   return ctx
 }
 
-/** "client" | "agent" | "office": the role decides, the sign-up choice refines it. */
-export function accountTypeOf(user, profile) {
-  if (profile?.role !== 'agent') return 'client'
-  return user?.user_metadata?.account_type === 'office' ? 'office' : 'agent'
+/** What the handle_new_user trigger reads from a new account's metadata. */
+function signupData({ role, fullName, agencyName, language }) {
+  return {
+    role: role === 'agent' ? 'agent' : 'buyer',
+    full_name: fullName || undefined,
+    agency_name: role === 'agent' ? agencyName || undefined : undefined,
+    preferred_language: isLanguage(language) ? language : undefined,
+  }
 }

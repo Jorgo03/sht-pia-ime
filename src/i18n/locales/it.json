@@ -1403,23 +1403,7 @@
       "floorOf": "{{floor}} di {{total}}"
     },
     "auth": {
-      "signInLead": "Accedi per salvare gli immobili e scrivere agli agenti.",
-      "signUpLead": "Un solo account per acquirenti, agenti e agenzie immobiliari.",
-      "accountType": "Tipo di account",
-      "type": {
-        "client": "Acquirente o inquilino",
-        "agent": "Agente",
-        "office": "Agenzia immobiliare"
-      },
-      "typeHint": {
-        "client": "Cerca, salva immobili e contatta gli agenti.",
-        "agent": "Pubblica e gestisci immobili come agente.",
-        "office": "Gli annunci dell'agenzia con il suo nome."
-      },
-      "officeRequired": "Inserisci il nome dell'agenzia.",
-      "agencyOptional": "Agenzia (facoltativo)",
-      "officeHint": "Compare negli annunci e nell'elenco delle agenzie.",
-      "agree": "Creando l'account accetti:"
+      "accountType": "Tipo di account"
     },
     "account": {
       "title": "Il mio account",

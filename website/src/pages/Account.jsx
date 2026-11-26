@@ -1,13 +1,11 @@
 import { useEffect, useState } from 'react'
 import { Link, Navigate, useLocation } from 'react-router-dom'
-import { Building2, Home, LogOut, Smartphone, UserRound } from 'lucide-react'
+import { BriefcaseBusiness, Home, LogOut, Smartphone } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { profilePatch, PROFILE_LIMITS, saveProfile } from '@/src/features/auth/lib/profileForm.js'
 import { supabase } from '../lib/supabase'
-import { accountTypeOf, useAuth } from '../auth/AuthContext'
+import { useAuth } from '../auth/AuthContext'
 import { FormError, TextField } from '../auth/Fields'
-
-const ICONS = { client: Home, agent: UserRound, office: Building2 }
 
 export default function Account() {
   const { t } = useTranslation()
@@ -25,9 +23,8 @@ export default function Account() {
   if (!ready) return <div className="page container section" aria-busy="true" />
   if (!session) return <Navigate to="/login?next=/account" replace />
 
-  const type = accountTypeOf(user, profile)
   const isAgent = profile?.role === 'agent'
-  const Icon = ICONS[type]
+  const Icon = isAgent ? BriefcaseBusiness : Home
   const values = form ?? { full_name: profile?.full_name ?? '', agency_name: profile?.agency_name ?? '', phone: profile?.phone ?? '' }
   const set = (key) => (e) => setForm({ ...values, [key]: e.target.value })
 
@@ -35,7 +32,8 @@ export default function Account() {
     e.preventDefault()
     if (busy) return
     setNotice(null)
-    if (type === 'office' && !values.agency_name.trim()) return setError(t('web.auth.officeRequired'))
+    // As in the app, an agent's account always has its office.
+    if (isAgent && values.agency_name.trim().length < 2) return setError(t('errors.officeRequired'))
     const { patch, error: problem } = profilePatch(profile, values, { isAgent })
     if (problem) return setError(t(`profile.edit.${problem}`))
     setBusy(true)
@@ -57,17 +55,17 @@ export default function Account() {
         </div>
         <span className="account-type">
           <Icon size={16} aria-hidden="true" />
-          {t(`web.auth.type.${type}`)}
+          {isAgent ? t('auth.roleAgent') : t('auth.roleClient')}
         </span>
       </header>
 
       <div className="account-grid">
-        <form className="auth-form account-card" onSubmit={save} noValidate>
+        <form className="account-card" onSubmit={save} noValidate>
           <h2>{t('profile.edit.title')}</h2>
           <TextField label={t('auth.fullName')} autoComplete="name" value={values.full_name} onChange={set('full_name')} maxLength={PROFILE_LIMITS.full_name} />
           {isAgent && (
             <TextField
-              label={type === 'office' ? t('auth.officeName') : t('web.auth.agencyOptional')}
+              label={t('auth.officeName')}
               autoComplete="organization"
               value={values.agency_name}
               onChange={set('agency_name')}

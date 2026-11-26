@@ -1403,23 +1403,7 @@
       "floorOf": "{{floor}} de {{total}}"
     },
     "auth": {
-      "signInLead": "Inicia sesión para guardar viviendas y hablar con agentes.",
-      "signUpLead": "Una cuenta para compradores, agentes e inmobiliarias.",
-      "accountType": "Tipo de cuenta",
-      "type": {
-        "client": "Comprador o inquilino",
-        "agent": "Agente",
-        "office": "Inmobiliaria"
-      },
-      "typeHint": {
-        "client": "Busca, guarda viviendas y contacta con agentes.",
-        "agent": "Publica y gestiona viviendas como agente.",
-        "office": "Los anuncios de tu oficina con su nombre."
-      },
-      "officeRequired": "Escribe el nombre de tu oficina.",
-      "agencyOptional": "Agencia (opcional)",
-      "officeHint": "Aparece en tus anuncios y en la lista de agencias.",
-      "agree": "Al crear la cuenta aceptas:"
+      "accountType": "Tipo de cuenta"
     },
     "account": {
       "title": "Mi cuenta",

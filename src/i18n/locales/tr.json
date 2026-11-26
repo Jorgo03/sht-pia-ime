@@ -1393,23 +1393,7 @@
       "floorOf": "{{floor}} / {{total}}"
     },
     "auth": {
-      "signInLead": "Evleri kaydetmek ve emlakçılarla konuşmak için giriş yapın.",
-      "signUpLead": "Alıcılar, emlakçılar ve emlak ofisleri için tek hesap.",
-      "accountType": "Hesap türü",
-      "type": {
-        "client": "Alıcı veya kiracı",
-        "agent": "Emlakçı",
-        "office": "Emlak ofisi"
-      },
-      "typeHint": {
-        "client": "Arayın, evleri kaydedin ve emlakçılarla iletişime geçin.",
-        "agent": "Emlakçı olarak ilan verin ve yönetin.",
-        "office": "Ofisinizin ilanları kendi adıyla."
-      },
-      "officeRequired": "Ofisinizin adını yazın.",
-      "agencyOptional": "Ofis (isteğe bağlı)",
-      "officeHint": "İlanlarınızda ve ofis listesinde görünür.",
-      "agree": "Hesap oluşturarak şunları kabul edersiniz:"
+      "accountType": "Hesap türü"
     },
     "account": {
       "title": "Hesabım",

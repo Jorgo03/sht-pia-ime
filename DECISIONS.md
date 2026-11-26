@@ -32,6 +32,19 @@ first (it was rejected with 401 on 2026-11-04).
 
 ## ═══ WEBSITE STARTED AGAIN — 2026-11-24 ═══
 
+### W13. Website sign-in looks exactly like the app's (DECIDED by owner, 2026-11-26)
+
+Owner: "the login page i want it just as it is on my app with all details,
+because it is perfect there, make it to look identically". The website's
+/login, /signup and /forgot-password are now one screen
+(`website/src/auth/AuthScreen.jsx`) rebuilt from the app's signed-out Profile
+screen with its exact values (dusk sky + skyline, 600px card on desktop, fonts,
+colours, icons, Client/Agent switch, Google/LinkedIn/Email code, emailed codes,
+error panel with its suggestions). This replaces W12's three account-type cards:
+like the app, an office is an Agent account whose Office Name is required. The
+site header turns dark on these pages, like the app's top bar; it keeps the logo
+lockup (dark version) where the app shows its text wordmark.
+
 ### W12. Website sign-in for buyers, agents and real estate offices (DECIDED by owner, 2026-11-26)
 
 Owner: "add the login page because the app will be used by users, real estate

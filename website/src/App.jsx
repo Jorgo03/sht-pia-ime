@@ -7,10 +7,10 @@ import Home from './pages/Home'
 import Search from './pages/Search'
 import Property from './pages/Property'
 import NotFound from './pages/NotFound'
-import Login from './pages/Login'
-import Signup from './pages/Signup'
-import ForgotPassword from './pages/ForgotPassword'
+import AuthScreen from './auth/AuthScreen'
 import Account from './pages/Account'
+
+const AUTH_PATHS = ['/login', '/signup', '/forgot-password']
 
 export default function App() {
   const { pathname, hash } = useLocation()
@@ -25,15 +25,15 @@ export default function App() {
   return (
     <>
       <a className="skip-link" href="#main">{t('web.skip')}</a>
-      <Header overHero={pathname === '/'} />
+      <Header overHero={pathname === '/'} dark={AUTH_PATHS.includes(pathname)} />
       <main id="main" tabIndex={-1}>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/search" element={<Search />} />
           <Route path="/property/:id" element={<Property />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/login" element={<AuthScreen key="signin" start="signin" />} />
+          <Route path="/signup" element={<AuthScreen key="signup" start="signup" />} />
+          <Route path="/forgot-password" element={<AuthScreen key="recover" start="recover" />} />
           <Route path="/account" element={<Account />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

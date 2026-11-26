@@ -6,7 +6,7 @@ import Logo from './Logo'
 import LanguageSelect from './LanguageSelect'
 import { useAuth } from '../auth/AuthContext'
 
-export default function Header({ overHero }) {
+export default function Header({ overHero, dark = false }) {
   const { t } = useTranslation()
   const { session, profile } = useAuth()
   const { pathname, search } = useLocation()
@@ -50,7 +50,7 @@ export default function Header({ overHero }) {
     : { to: '/login', label: t('common.signIn') }
 
   return (
-    <header className={`site-header ${overHero ? 'is-overlay' : ''} ${light ? 'is-light' : 'is-solid'}`}>
+    <header className={`site-header ${overHero ? 'is-overlay' : ''} ${light ? 'is-light' : 'is-solid'} ${dark ? 'is-dark' : ''}`}>
       <div className="topbar">
         <div className="container topbar-inner">
           <p>{t('site.footer.tagline')}</p>

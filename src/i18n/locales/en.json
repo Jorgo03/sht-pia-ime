@@ -1393,23 +1393,7 @@
       "floorOf": "{{floor}} of {{total}}"
     },
     "auth": {
-      "signInLead": "Sign in to save homes and talk to agents.",
-      "signUpLead": "One account for buyers, agents and real estate offices.",
-      "accountType": "Account type",
-      "type": {
-        "client": "Buyer or renter",
-        "agent": "Agent",
-        "office": "Real estate office"
-      },
-      "typeHint": {
-        "client": "Search, save homes and contact agents.",
-        "agent": "List and manage homes as an agent.",
-        "office": "Your office's listings under its own name."
-      },
-      "officeRequired": "Enter your office's name.",
-      "agencyOptional": "Agency (optional)",
-      "officeHint": "Shown on your listings and in the agencies list.",
-      "agree": "By creating an account you accept:"
+      "accountType": "Account type"
     },
     "account": {
       "title": "My account",

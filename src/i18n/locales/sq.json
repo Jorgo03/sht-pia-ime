@@ -1393,23 +1393,7 @@
       "floorOf": "{{floor}} nga {{total}}"
     },
     "auth": {
-      "signInLead": "Hyr për të ruajtur shtëpitë dhe për të folur me agjentët.",
-      "signUpLead": "Një llogari për blerës, agjentë dhe zyra imobiliare.",
-      "accountType": "Lloji i llogarisë",
-      "type": {
-        "client": "Blerës ose qiramarrës",
-        "agent": "Agjent",
-        "office": "Zyrë imobiliare"
-      },
-      "typeHint": {
-        "client": "Kërko, ruaj shtëpi dhe kontakto agjentët.",
-        "agent": "Publiko dhe menaxho shtëpi si agjent.",
-        "office": "Shpalljet e zyrës nën emrin e saj."
-      },
-      "officeRequired": "Shkruaj emrin e zyrës.",
-      "agencyOptional": "Agjencia (opsionale)",
-      "officeHint": "Shfaqet te shpalljet dhe në listën e agjencive.",
-      "agree": "Duke krijuar llogarinë pranon:"
+      "accountType": "Lloji i llogarisë"
     },
     "account": {
       "title": "Llogaria ime",

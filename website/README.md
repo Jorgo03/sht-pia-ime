@@ -14,14 +14,12 @@ with the public anon key and the same accounts.
 - `/property/<id>`: photos, facts, description, features, contact (call,
   WhatsApp, email). Also where the phone app's shared links land.
 - `/login`, `/signup`, `/forgot-password`, `/account`: sign-in on the same
-  accounts as the phone app (W12). Sign-up offers three account types on the
-  database's two roles: buyer/renter (`buyer`), agent (`agent`, agency
-  optional) and real estate office (`agent` with the office name required;
-  `account_type: 'office'` is kept in the user's metadata). Same password
-  rules, error messages and sign-in throttle as the app; an emailed 6-digit
-  code confirms new accounts when "Confirm email" is on, and resets passwords.
-  Google sign-in shows only when the provider is on, and only for buyers
-  (a Google sign-up cannot carry the agent role).
+  accounts as the phone app, and drawn like it (W13): `website/src/auth/AuthScreen.jsx`
+  is the app's signed-out Profile screen (`app/(tabs)/profile.tsx`) for the web,
+  with the dusk sky and skyline, the three-line headline, the glass card, the
+  Client/Agent switch (an agent's Office Name is required, as in the app),
+  Google, LinkedIn and Email code, the emailed 6-digit codes and the password
+  reset, with the app's values and wording. Change the two together.
 - `/privacy`, `/terms`, `/cookies`: static pages written by the build.
 
 ## How it fits together

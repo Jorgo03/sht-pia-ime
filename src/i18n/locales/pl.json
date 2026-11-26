@@ -1413,23 +1413,7 @@
       "floorOf": "{{floor}} z {{total}}"
     },
     "auth": {
-      "signInLead": "Zaloguj się, aby zapisywać nieruchomości i pisać do agentów.",
-      "signUpLead": "Jedno konto dla kupujących, agentów i biur nieruchomości.",
-      "accountType": "Rodzaj konta",
-      "type": {
-        "client": "Kupujący lub najemca",
-        "agent": "Agent",
-        "office": "Biuro nieruchomości"
-      },
-      "typeHint": {
-        "client": "Szukaj, zapisuj nieruchomości i kontaktuj się z agentami.",
-        "agent": "Publikuj i zarządzaj ofertami jako agent.",
-        "office": "Oferty biura pod jego nazwą."
-      },
-      "officeRequired": "Podaj nazwę biura.",
-      "agencyOptional": "Agencja (opcjonalnie)",
-      "officeHint": "Widoczna przy ofertach i na liście agencji.",
-      "agree": "Zakładając konto, akceptujesz:"
+      "accountType": "Rodzaj konta"
     },
     "account": {
       "title": "Moje konto",
