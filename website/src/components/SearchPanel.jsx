@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useLayoutEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { BedDouble, Building2, Euro, MapPin, Ruler, Search as SearchIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
@@ -57,12 +57,38 @@ export default function SearchPanel({ initial, variant = 'hero' }) {
     navigate(`/search${params.size ? `?${params}` : ''}`)
   }
 
+  // The glass pill slides under the chosen option. Placed from the DOM, not
+  // state, and re-placed when the labels change width (another language).
+  const dealRef = useRef(null)
+  const thumbRef = useRef(null)
+  useLayoutEffect(() => {
+    const box = dealRef.current
+    const thumb = thumbRef.current
+    if (!box || !thumb) return
+    const place = () => {
+      const on = box.querySelector('label.is-on')
+      if (!on) return
+      thumb.style.width = `${on.offsetWidth}px`
+      thumb.style.transform = `translateX(${on.offsetLeft}px)`
+    }
+    place()
+    // Only animate moves after the first placement.
+    const id = requestAnimationFrame(() => thumb.classList.add('is-ready'))
+    const ro = new ResizeObserver(place)
+    ro.observe(box)
+    return () => {
+      cancelAnimationFrame(id)
+      ro.disconnect()
+    }
+  }, [f.deal, lang])
+
   const prices = PRICES[f.deal === 'rent' ? 'rent' : 'sale']
   const cities = [...CITIES].sort((a, b) => cityName(a.city, lang).localeCompare(cityName(b.city, lang), lang))
 
   return (
     <form className={`search-panel is-${variant}`} onSubmit={submit} role="search">
-      <div className="sp-deal" role="radiogroup" aria-label={t('search.listingType')}>
+      <div ref={dealRef} className="sp-deal" role="radiogroup" aria-label={t('search.listingType')}>
+        <span ref={thumbRef} className="sp-thumb" aria-hidden="true" />
         {[
           ['', t('web.search.all')],
           ['sale', t('detail.forSale')],
