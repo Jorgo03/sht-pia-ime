@@ -41,9 +41,14 @@ because it is perfect there, make it to look identically". The website's
 screen with its exact values (dusk sky + skyline, 600px card on desktop, fonts,
 colours, icons, Client/Agent switch, Google/LinkedIn/Email code, emailed codes,
 error panel with its suggestions). This replaces W12's three account-type cards:
-like the app, an office is an Agent account whose Office Name is required. The
-site header turns dark on these pages, like the app's top bar; it keeps the logo
-lockup (dark version) where the app shows its text wordmark.
+like the app, an office is an Agent account whose Office Name is required. On
+these pages the top bar is the app's own (orange text wordmark, white menu;
+64px on phones, 73px with the wordmark 104px in on wide screens), the footer is
+hidden and the scroll indicator too, as in the app; the headline uses the app's
+own Newsreader font files. Checked element by element against the app's web
+build (deployment of 802c6e9) at 390x844 and 1280x860 for sign-in, sign-up and
+Email code mode: every measured box matches. The emailed-code step was not
+compared on screen (reaching it sends a real email on both).
 
 ### W12. Website sign-in for buyers, agents and real estate offices (DECIDED by owner, 2026-11-26)
 

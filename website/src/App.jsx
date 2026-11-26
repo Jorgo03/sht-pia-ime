@@ -38,7 +38,8 @@ export default function App() {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
-      <Footer />
+      {/* Like the app, the sign-in screen has no footer: its card carries the legal links. */}
+      {!AUTH_PATHS.includes(pathname) && <Footer />}
     </>
   )
 }

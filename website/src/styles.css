@@ -2,6 +2,12 @@
    from assets/brand/logo-guide.md; Newsreader (the logo's face) for headings,
    Manrope for everything else. Orange carries ink text (6.1:1), never white. */
 
+/* Newsreader: the app's own font files (@expo-google-fonts/newsreader), so
+   headlines and the wordmark are drawn exactly as in the app. */
+@font-face { font-family: 'Newsreader'; font-weight: 500; font-style: normal; font-display: swap; src: url('@/node_modules/@expo-google-fonts/newsreader/500Medium/Newsreader_500Medium.ttf') format('truetype'); }
+@font-face { font-family: 'Newsreader'; font-weight: 500; font-style: italic; font-display: swap; src: url('@/node_modules/@expo-google-fonts/newsreader/500Medium_Italic/Newsreader_500Medium_Italic.ttf') format('truetype'); }
+@font-face { font-family: 'Newsreader'; font-weight: 600; font-style: normal; font-display: swap; src: url('@/node_modules/@expo-google-fonts/newsreader/600SemiBold/Newsreader_600SemiBold.ttf') format('truetype'); }
+
 :root {
   --paper: #ffffff;
   --stone: #f1f1ee;
@@ -99,10 +105,19 @@ main:focus { outline: none; }
 .site-header.is-overlay { position: fixed; inset: 0 0 auto 0; }
 .site-header.is-solid { background: var(--paper); border-bottom: 1px solid var(--line); }
 .site-header.is-light { color: #fff; --logo-door: #fff; --logo-name: #fff; }
-/* Over the sign-in sky, like the app's dark top bar: the logo's dark version. */
-.site-header.is-dark { background: #0e0b09; color: #fff; border-bottom-color: rgb(255 255 255 / 0.08); --logo-door: #ff5f1f; --logo-name: #fff; }
-.site-header.is-dark .mobile-menu { background: #0e0b09; color: #fff; border-top-color: rgb(255 255 255 / 0.08); }
-.site-header.is-dark .mobile-menu nav a { border-bottom-color: rgb(255 255 255 / 0.08); }
+/* Sign-in pages: the app's top bar (components/ui/app-header.tsx, measured on
+   the app's web build): 64px, near-black, a faint rule, the orange text
+   wordmark at 16px from the edge and a white menu button. */
+.site-header.is-dark { background: #0b0a08; color: #fff; border-bottom: 1px solid rgba(255, 255, 255, 0.14); }
+.site-header.is-dark .topbar, .site-header.is-dark .nav-account { display: none; }
+.site-header.is-dark .nav { min-height: 63px; }
+@media (max-width: 959px) { .site-header.is-dark .nav { padding-inline: 16px; } }
+/* Wide screens: the app's web bar was 73px with the wordmark 104px in. */
+@media (min-width: 960px) { .site-header.is-dark .nav { min-height: 72px; max-width: none; padding-inline: 104px; } .a-screen { min-height: calc(100svh - 73px); } }
+.site-header.is-dark .mobile-menu { background: #0b0a08; color: #fff; border-top-color: rgba(255, 255, 255, 0.14); }
+.site-header.is-dark .mobile-menu nav a { border-bottom-color: rgba(255, 255, 255, 0.14); }
+.wordmark { font: 600 22px/22px var(--font-display); letter-spacing: -0.44px; color: #ff6b00; white-space: nowrap; }
+.wordmark span { font-weight: 500; }
 .topbar { display: none; font-size: 13px; border-bottom: 1px solid color-mix(in srgb, currentColor 16%, transparent); }
 .topbar-inner { display: flex; align-items: center; justify-content: space-between; min-height: 38px; gap: var(--s4); }
 .topbar p { opacity: 0.85; }
@@ -110,7 +125,7 @@ main:focus { outline: none; }
 .topbar-end a { text-decoration: none; font-weight: 600; }
 .topbar-end a:hover { text-decoration: underline; text-underline-offset: 3px; }
 .nav { display: flex; align-items: center; gap: var(--s5); min-height: 68px; }
-.nav-logo { display: flex; margin-right: auto; border-radius: 4px; }
+.nav-logo { display: flex; margin-right: auto; border-radius: 4px; text-decoration: none; }
 .logo { display: block; line-height: 0; }
 .logo svg { height: 34px; width: auto; }
 .nav-links { display: none; gap: var(--s6); }
@@ -332,8 +347,9 @@ main:focus { outline: none; }
 .form-note a { margin-left: 4px; }
 /* Sign-in screen: the app's signed-out Profile screen (app/(tabs)/profile.tsx,
    components/ui/dusk-hero.tsx, otp-input.tsx, password-checklist.tsx), same values. */
-.a-screen { position: relative; isolation: isolate; overflow: hidden; min-height: calc(100svh - 68px); display: flex; color: #fff; }
-@media (min-width: 960px) { .a-screen { min-height: calc(100svh - 107px); } }
+html.no-scrollbar { scrollbar-width: none; }
+html.no-scrollbar::-webkit-scrollbar { display: none; }
+.a-screen { position: relative; isolation: isolate; overflow: hidden; min-height: calc(100svh - 64px); display: flex; color: #fff; }
 .dusk-hero { position: fixed; inset: 0; z-index: -1; overflow: hidden; }
 /* The sky stays put like the app's screen; the footer paints over it. */
 .dusk-sky { position: absolute; inset: 0; background: linear-gradient(180deg, #1a1520 0%, #2d1f3a 25%, #4a2848 45%, #8b4a3a 65%, #cc7040 80%, #e8944a 90%, #f0a050 100%); }
@@ -352,7 +368,7 @@ main:focus { outline: none; }
   .building { background: #0e0c14; }
   .building .win:nth-child(odd) { background: rgba(255, 200, 100, 0.45); }
 }
-.a-col { width: 100%; max-width: 640px; margin: 0 auto; padding: 40px 20px 110px; display: flex; flex-direction: column; justify-content: center; }
+.a-col { width: 100%; max-width: 640px; margin: 0 auto; padding: 40px 20px 36px; display: flex; flex-direction: column; justify-content: center; }
 .a-hero { margin-bottom: 20px; }
 .a-kicker { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; font: 500 12px/1.3 'JetBrains Mono', ui-monospace, monospace; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255, 255, 255, 0.9); }
 .a-kicker-dash { width: 14px; height: 1px; background: #ffb380; }
@@ -380,7 +396,9 @@ main:focus { outline: none; }
 .a-checklist li.is-met { font-weight: 600; color: #fff; }
 .a-checklist li.is-met svg { color: #7ee2a8; }
 .a-access { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 0 4px; font: 400 13px var(--font-ui); color: rgba(255, 235, 210, 0.95); }
-.a-access button { flex: none; border: 0; background: none; padding: 8px 0; font: 700 13px var(--font-ui); color: #fff; text-decoration: underline; }
+.a-access button { position: relative; flex: none; border: 0; background: none; padding: 0; font: 700 13px var(--font-ui); color: #fff; text-decoration: underline; }
+/* The app's hitSlop: a bigger target without moving the row. */
+.a-access button::after { content: ''; position: absolute; inset: -8px; }
 .a-cta { width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 15px 0; border: 0; border-radius: 999px; background: linear-gradient(180deg, #ff6b00, #e85d00); font: 700 15px var(--font-ui); color: #fff; transition: transform 160ms var(--ease); }
 .a-cta:active { transform: scale(0.98); }
 .a-cta:disabled { opacity: 0.5; cursor: default; }

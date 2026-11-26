@@ -186,6 +186,12 @@ export default function AuthScreen({ start = 'signin' }) {
 
   const emailFirst = useEmailCode && !isSignUp
 
+  // The app's screen scrolls with its indicator hidden; the page does the same.
+  useEffect(() => {
+    document.documentElement.classList.add('no-scrollbar')
+    return () => document.documentElement.classList.remove('no-scrollbar')
+  }, [])
+
   useEffect(() => {
     document.title = `${isSignUp ? t('auth.createAccount') : t('auth.signInTitle')} | ${t('common.appName')}`
   }, [isSignUp, t])

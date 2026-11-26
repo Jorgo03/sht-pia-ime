@@ -63,7 +63,14 @@ export default function Header({ overHero, dark = false }) {
       </div>
       <div className="container nav">
         <Link to="/" className="nav-logo" aria-label={t('common.appName')}>
-          <Logo />
+          {/* The app's top bar shows its text wordmark (components/ui/app-header.tsx). */}
+          {dark ? (
+            <span className="wordmark">
+              Shtëpia<span>.ime</span>
+            </span>
+          ) : (
+            <Logo />
+          )}
         </Link>
         <nav aria-label={t('site.menu')} className="nav-links">
           {links.map((l) => (
@@ -85,7 +92,7 @@ export default function Header({ overHero, dark = false }) {
           aria-label={open ? t('common.close') : t('site.menu')}
           onClick={() => setOpen((o) => !o)}
         >
-          {open ? <X size={22} aria-hidden="true" /> : <Menu size={22} aria-hidden="true" />}
+          {open ? <X size={dark ? 26 : 22} aria-hidden="true" /> : <Menu size={dark ? 26 : 22} aria-hidden="true" />}
         </button>
       </div>
       <div id="mobile-menu" ref={panel} className="mobile-menu" hidden={!open}>
