@@ -5,6 +5,7 @@ import { ArrowRight, Sparkles } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { initialsOf } from '@/src/features/properties/lib/discovery.js'
 import SearchPanel from '../components/SearchPanel'
+import HeroTypewriter from '../components/HeroTypewriter'
 import PropertyCard, { CardSkeleton } from '../components/PropertyCard'
 import { ErrorState } from '../components/States'
 import { getAgentDirectory, getCityTiles, getProperties, getPropertiesByIds } from '../lib/api'
@@ -26,9 +27,7 @@ function Hero() {
       />
       <div className="hero-shade" />
       <div className="container hero-inner">
-        <h1 id="hero-title">
-          <span>{t('site.hero.title')}</span> <span>{t('site.hero.titleEm')}</span>
-        </h1>
+        <HeroTypewriter />
         <p className="hero-lead">{t('site.hero.lead')}</p>
         <SearchPanel />
         {AI_CHAT_ENABLED && (

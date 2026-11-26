@@ -6,6 +6,7 @@
    headlines and the wordmark are drawn exactly as in the app. */
 @font-face { font-family: 'Newsreader'; font-weight: 500; font-style: normal; font-display: swap; src: url('@/node_modules/@expo-google-fonts/newsreader/500Medium/Newsreader_500Medium.ttf') format('truetype'); }
 @font-face { font-family: 'Newsreader'; font-weight: 500; font-style: italic; font-display: swap; src: url('@/node_modules/@expo-google-fonts/newsreader/500Medium_Italic/Newsreader_500Medium_Italic.ttf') format('truetype'); }
+@font-face { font-family: 'Newsreader'; font-weight: 600; font-style: italic; font-display: swap; src: url('@/node_modules/@expo-google-fonts/newsreader/600SemiBold_Italic/Newsreader_600SemiBold_Italic.ttf') format('truetype'); }
 @font-face { font-family: 'Newsreader'; font-weight: 600; font-style: normal; font-display: swap; src: url('@/node_modules/@expo-google-fonts/newsreader/600SemiBold/Newsreader_600SemiBold.ttf') format('truetype'); }
 
 :root {
@@ -201,7 +202,15 @@ main:focus { outline: none; }
   font-size: clamp(38px, 6.4vw, 80px); line-height: 1.04; text-wrap: balance;
   text-shadow: 0 2px 24px rgb(0 0 0 / 0.25);
 }
-.hero h1 span { display: block; }
+/* The typing headline (components/HeroTypewriter.jsx): every phrase sits in
+   the same grid cell, hidden, so the box keeps the tallest one's height. */
+.hero-type-stack { display: grid; }
+.hero-type-stack > span { grid-area: 1 / 1; display: grid; align-content: center; }
+.hero-type-stack > span > * { display: block; }
+.hero-type-reserve { visibility: hidden; }
+.hero-type em { font-style: italic; color: #ff8a3d; }
+.hero-cursor { margin-left: 0.04em; font-weight: 400; color: #ff8a3d; }
+.hero-cursor.is-off { opacity: 0; }
 .hero-lead { max-width: 58ch; margin: var(--s5) auto var(--s6); font-size: clamp(16px, 1.6vw, 18px); opacity: 0.94; text-wrap: pretty; }
 
 /* Search panel */
