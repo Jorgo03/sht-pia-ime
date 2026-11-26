@@ -477,3 +477,6 @@
 .nl-preview-card .card-media { display: grid; place-items: center; background: var(--stone); }
 .nl-preview-empty { color: var(--muted); }
 .nl-preview-card .card-title { overflow-wrap: anywhere; }
+
+/* Text boxes keep one size: no drag handle, long text scrolls inside. */
+.nl-field textarea { resize: none; height: 160px; overflow-y: auto; }
