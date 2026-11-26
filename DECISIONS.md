@@ -50,8 +50,8 @@ build (deployment of 802c6e9) with a Playwright script that answers Supabase's
 email requests itself (nothing sent): 9 states (sign-in, sign-up, agent
 sign-up, Email code, its code step, the sign-up code step, and the three reset
 steps) at 390, 768, 1024 and 1280px. Every text run, field and code box matches
-in position and size; the only reported gap is 2-3px of trailing space the
-app's pre-wrap text counts at a line break, with identical line breaks.
+in position and size, with zero differences reported (the sign-in text wraps
+with pre-wrap like React Native Web's <Text>, so line ends measure the same).
 
 ### W12. Website sign-in for buyers, agents and real estate offices (DECIDED by owner, 2026-11-26)
 
