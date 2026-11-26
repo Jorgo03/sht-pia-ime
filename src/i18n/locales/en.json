@@ -1409,7 +1409,7 @@
     },
     "listing": {
       "openChat": "Message sent. Open the conversation",
-      "openCompare": "Compare ({{count}})"
+      "openCompare": "Compare ({{n}})"
     }
   }
 }

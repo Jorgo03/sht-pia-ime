@@ -1429,7 +1429,7 @@
     },
     "listing": {
       "openChat": "Wiadomość wysłana. Otwórz rozmowę",
-      "openCompare": "Porównaj ({{count}})"
+      "openCompare": "Porównaj ({{n}})"
     }
   }
 }

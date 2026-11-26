@@ -1409,7 +1409,7 @@
     },
     "listing": {
       "openChat": "Nachricht gesendet. Unterhaltung öffnen",
-      "openCompare": "Vergleichen ({{count}})"
+      "openCompare": "Vergleichen ({{n}})"
     }
   }
 }

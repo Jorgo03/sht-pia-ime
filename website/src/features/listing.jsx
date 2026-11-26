@@ -287,7 +287,7 @@ export function ContactPanel({ p, title }) {
           {inCompare ? t('compare.added') : t('compare.add')}
         </button>
         {inCompare && compare.length > 0 && (
-          <Link to="/compare" className="tool">{t('web.listing.openCompare', { count: compare.length })}</Link>
+          <Link to="/compare" className="tool">{t('web.listing.openCompare', { n: compare.length })}</Link>
         )}
         <button type="button" className="tool" onClick={() => (user ? setReportOpen(true) : requireSignIn())}>
           <Flag size={16} aria-hidden="true" />

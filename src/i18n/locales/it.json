@@ -1419,7 +1419,7 @@
     },
     "listing": {
       "openChat": "Messaggio inviato. Apri la conversazione",
-      "openCompare": "Confronta ({{count}})"
+      "openCompare": "Confronta ({{n}})"
     }
   }
 }

@@ -1409,7 +1409,7 @@
     },
     "listing": {
       "openChat": "Mesazhi u dërgua. Hape bisedën",
-      "openCompare": "Krahaso ({{count}})"
+      "openCompare": "Krahaso ({{n}})"
     }
   }
 }
