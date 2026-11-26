@@ -1419,5 +1419,55 @@
       "openChat": "Message envoyé. Ouvrir la conversation",
       "openCompare": "Comparer ({{n}})"
     }
+  },
+  "dataExport": {
+    "sheetSummary": "Résumé",
+    "sheetJourney": "Parcours",
+    "field": "Champ",
+    "value": "Valeur",
+    "name": "Nom",
+    "email": "E-mail",
+    "accountType": "Type de compte",
+    "memberSince": "Membre depuis",
+    "exportedOn": "Exporté le",
+    "userId": "ID utilisateur",
+    "section": "Section",
+    "records": "Enregistrements",
+    "date": "Date",
+    "activity": "Activité",
+    "details": "Détails",
+    "status": "Statut",
+    "none": "Rien pour l’instant.",
+    "events": {
+      "joined": "A rejoint Shtëpia.ime",
+      "listed": "A publié une annonce",
+      "saved": "A enregistré un bien",
+      "savedSearch": "A enregistré une recherche",
+      "wanted": "A publié une recherche de logement",
+      "viewingRequested": "A demandé une visite",
+      "viewingAsAgent": "Visite avec un client",
+      "conversation": "A commencé une conversation",
+      "messageSent": "A envoyé un message",
+      "messageReceived": "A reçu un message",
+      "lead": "A ajouté un prospect",
+      "notification": "Notification",
+      "report": "A signalé un contenu",
+      "blocked": "A bloqué un utilisateur"
+    },
+    "sections": {
+      "profiles": "Profil",
+      "properties": "Annonces",
+      "favorites": "Biens enregistrés",
+      "saved_searches": "Recherches enregistrées",
+      "wanted_homes": "Logements recherchés",
+      "viewings": "Visites",
+      "conversations": "Conversations",
+      "messages": "Messages",
+      "leads": "Prospects",
+      "notifications": "Notifications",
+      "notification_preferences": "Réglages des notifications",
+      "content_reports": "Signalements",
+      "user_blocks": "Utilisateurs bloqués"
+    }
   }
 }

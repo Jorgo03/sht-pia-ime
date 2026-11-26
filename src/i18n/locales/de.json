@@ -1409,5 +1409,55 @@
       "openChat": "Nachricht gesendet. Unterhaltung öffnen",
       "openCompare": "Vergleichen ({{n}})"
     }
+  },
+  "dataExport": {
+    "sheetSummary": "Übersicht",
+    "sheetJourney": "Verlauf",
+    "field": "Feld",
+    "value": "Wert",
+    "name": "Name",
+    "email": "E-Mail",
+    "accountType": "Kontotyp",
+    "memberSince": "Mitglied seit",
+    "exportedOn": "Exportiert am",
+    "userId": "Benutzer-ID",
+    "section": "Bereich",
+    "records": "Einträge",
+    "date": "Datum",
+    "activity": "Aktivität",
+    "details": "Details",
+    "status": "Status",
+    "none": "Noch nichts vorhanden.",
+    "events": {
+      "joined": "Bei Shtëpia.ime registriert",
+      "listed": "Inserat veröffentlicht",
+      "saved": "Immobilie gemerkt",
+      "savedSearch": "Suche gespeichert",
+      "wanted": "Wohnungsgesuch veröffentlicht",
+      "viewingRequested": "Besichtigung angefragt",
+      "viewingAsAgent": "Besichtigung mit Kunde",
+      "conversation": "Unterhaltung begonnen",
+      "messageSent": "Nachricht gesendet",
+      "messageReceived": "Nachricht erhalten",
+      "lead": "Interessent hinzugefügt",
+      "notification": "Benachrichtigung",
+      "report": "Inhalt gemeldet",
+      "blocked": "Nutzer blockiert"
+    },
+    "sections": {
+      "profiles": "Profil",
+      "properties": "Inserate",
+      "favorites": "Gemerkte Immobilien",
+      "saved_searches": "Gespeicherte Suchen",
+      "wanted_homes": "Wohnungsgesuche",
+      "viewings": "Besichtigungen",
+      "conversations": "Unterhaltungen",
+      "messages": "Nachrichten",
+      "leads": "Interessenten",
+      "notifications": "Benachrichtigungen",
+      "notification_preferences": "Benachrichtigungseinstellungen",
+      "content_reports": "Meldungen",
+      "user_blocks": "Blockierte Nutzer"
+    }
   }
 }

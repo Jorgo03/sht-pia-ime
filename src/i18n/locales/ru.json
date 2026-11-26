@@ -1429,5 +1429,55 @@
       "openChat": "Сообщение отправлено. Открыть переписку",
       "openCompare": "Сравнить ({{n}})"
     }
+  },
+  "dataExport": {
+    "sheetSummary": "Сводка",
+    "sheetJourney": "История",
+    "field": "Поле",
+    "value": "Значение",
+    "name": "Имя",
+    "email": "Эл. почта",
+    "accountType": "Тип аккаунта",
+    "memberSince": "Участник с",
+    "exportedOn": "Выгружено",
+    "userId": "ID пользователя",
+    "section": "Раздел",
+    "records": "Записей",
+    "date": "Дата",
+    "activity": "Действие",
+    "details": "Подробности",
+    "status": "Статус",
+    "none": "Пока ничего нет.",
+    "events": {
+      "joined": "Регистрация в Shtëpia.ime",
+      "listed": "Опубликовал объявление",
+      "saved": "Сохранил объект",
+      "savedSearch": "Сохранил поиск",
+      "wanted": "Опубликовал запрос на жильё",
+      "viewingRequested": "Запросил просмотр",
+      "viewingAsAgent": "Просмотр с клиентом",
+      "conversation": "Начал переписку",
+      "messageSent": "Отправил сообщение",
+      "messageReceived": "Получил сообщение",
+      "lead": "Добавил лид",
+      "notification": "Уведомление",
+      "report": "Пожаловался на контент",
+      "blocked": "Заблокировал пользователя"
+    },
+    "sections": {
+      "profiles": "Профиль",
+      "properties": "Объявления",
+      "favorites": "Сохранённые объекты",
+      "saved_searches": "Сохранённые поиски",
+      "wanted_homes": "Запросы на жильё",
+      "viewings": "Просмотры",
+      "conversations": "Переписки",
+      "messages": "Сообщения",
+      "leads": "Лиды",
+      "notifications": "Уведомления",
+      "notification_preferences": "Настройки уведомлений",
+      "content_reports": "Жалобы",
+      "user_blocks": "Заблокированные"
+    }
   }
 }

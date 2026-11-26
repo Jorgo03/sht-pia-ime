@@ -1409,5 +1409,55 @@
       "openChat": "Το μήνυμα στάλθηκε. Άνοιγμα συνομιλίας",
       "openCompare": "Σύγκριση ({{n}})"
     }
+  },
+  "dataExport": {
+    "sheetSummary": "Σύνοψη",
+    "sheetJourney": "Διαδρομή",
+    "field": "Πεδίο",
+    "value": "Τιμή",
+    "name": "Όνομα",
+    "email": "Email",
+    "accountType": "Τύπος λογαριασμού",
+    "memberSince": "Μέλος από",
+    "exportedOn": "Εξαγωγή στις",
+    "userId": "ID χρήστη",
+    "section": "Ενότητα",
+    "records": "Εγγραφές",
+    "date": "Ημερομηνία",
+    "activity": "Δραστηριότητα",
+    "details": "Λεπτομέρειες",
+    "status": "Κατάσταση",
+    "none": "Τίποτα ακόμη.",
+    "events": {
+      "joined": "Εγγραφή στο Shtëpia.ime",
+      "listed": "Δημοσίευσε αγγελία",
+      "saved": "Αποθήκευσε ακίνητο",
+      "savedSearch": "Αποθήκευσε αναζήτηση",
+      "wanted": "Δημοσίευσε ζήτηση κατοικίας",
+      "viewingRequested": "Ζήτησε επίσκεψη",
+      "viewingAsAgent": "Επίσκεψη με πελάτη",
+      "conversation": "Ξεκίνησε συνομιλία",
+      "messageSent": "Έστειλε μήνυμα",
+      "messageReceived": "Έλαβε μήνυμα",
+      "lead": "Πρόσθεσε υποψήφιο πελάτη",
+      "notification": "Ειδοποίηση",
+      "report": "Ανέφερε περιεχόμενο",
+      "blocked": "Μπλόκαρε χρήστη"
+    },
+    "sections": {
+      "profiles": "Προφίλ",
+      "properties": "Αγγελίες",
+      "favorites": "Αποθηκευμένα ακίνητα",
+      "saved_searches": "Αποθηκευμένες αναζητήσεις",
+      "wanted_homes": "Ζητούμενες κατοικίες",
+      "viewings": "Επισκέψεις",
+      "conversations": "Συνομιλίες",
+      "messages": "Μηνύματα",
+      "leads": "Υποψήφιοι πελάτες",
+      "notifications": "Ειδοποιήσεις",
+      "notification_preferences": "Ρυθμίσεις ειδοποιήσεων",
+      "content_reports": "Αναφορές",
+      "user_blocks": "Αποκλεισμένοι χρήστες"
+    }
   }
 }

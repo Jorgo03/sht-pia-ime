@@ -1409,5 +1409,55 @@
       "openChat": "Mesazhi u dërgua. Hape bisedën",
       "openCompare": "Krahaso ({{n}})"
     }
+  },
+  "dataExport": {
+    "sheetSummary": "Përmbledhje",
+    "sheetJourney": "Udhëtimi",
+    "field": "Fusha",
+    "value": "Vlera",
+    "name": "Emri",
+    "email": "Email",
+    "accountType": "Lloji i llogarisë",
+    "memberSince": "Anëtar që nga",
+    "exportedOn": "Eksportuar më",
+    "userId": "ID e përdoruesit",
+    "section": "Seksioni",
+    "records": "Regjistrime",
+    "date": "Data",
+    "activity": "Veprimi",
+    "details": "Detaje",
+    "status": "Statusi",
+    "none": "Asgjë ende.",
+    "events": {
+      "joined": "U regjistrua në Shtëpia.ime",
+      "listed": "Publikoi një pronë",
+      "saved": "Ruajti një pronë",
+      "savedSearch": "Ruajti një kërkim",
+      "wanted": "Publikoi një shtëpi të kërkuar",
+      "viewingRequested": "Kërkoi një vizitë",
+      "viewingAsAgent": "Vizitë me një klient",
+      "conversation": "Nisi një bisedë",
+      "messageSent": "Dërgoi një mesazh",
+      "messageReceived": "Mori një mesazh",
+      "lead": "Shtoi një klient potencial",
+      "notification": "Njoftim",
+      "report": "Raportoi përmbajtje",
+      "blocked": "Bllokoi një përdorues"
+    },
+    "sections": {
+      "profiles": "Profili",
+      "properties": "Pronat",
+      "favorites": "Pronat e ruajtura",
+      "saved_searches": "Kërkimet e ruajtura",
+      "wanted_homes": "Shtëpi të kërkuara",
+      "viewings": "Vizitat",
+      "conversations": "Bisedat",
+      "messages": "Mesazhet",
+      "leads": "Klientët potencialë",
+      "notifications": "Njoftimet",
+      "notification_preferences": "Cilësimet e njoftimeve",
+      "content_reports": "Raportimet",
+      "user_blocks": "Përdoruesit e bllokuar"
+    }
   }
 }

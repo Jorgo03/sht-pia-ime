@@ -5,7 +5,9 @@ import { changePassword, hasPasswordSignIn, newPasswordError, providerLabels } f
 import { avatarSourceError, removeAvatar, saveAvatar } from '@/src/features/auth/lib/avatar.js'
 import { resizeToSquareJpeg } from '@/src/features/auth/lib/resizeAvatar.js'
 import { readPreferences, savePreferences } from '@/src/features/notifications/lib/preferences.js'
-import { EXPORT_TABLES, MAX_ROWS, PAGE, exportDocument, exportFileName, ownerFilter, stripColumns } from '@/lib/data-export-plan.js'
+import { EXPORT_TABLES, MAX_ROWS, PAGE, ownerFilter, stripColumns } from '@/lib/data-export-plan.js'
+import { buildReport, reportFileName } from '@/lib/data-report.js'
+import { XLSX_TYPE } from '@/lib/xlsx.js'
 import { profileInitials } from '@/src/features/profiles/lib/publicProfile.js'
 import { friendlyError } from '@/src/lib/authErrors.js'
 import { supabase } from '../lib/supabase'
@@ -149,7 +151,7 @@ export function NotificationSettings() {
   )
 }
 
-/** Download my data (GDPR): every row of mine as one JSON file. */
+/** Download my data (GDPR): every row of mine, as an Excel report (lib/data-report.js). */
 async function collectMyData(userId) {
   const readAll = async (table, filter, omit) => {
     const rows = []
@@ -166,7 +168,15 @@ async function collectMyData(userId) {
   const ids = (sections.conversations ?? []).map((c) => String(c.id))
   sections.messages = []
   for (let i = 0; i < ids.length; i += 50) sections.messages.push(...(await readAll('messages', (q) => q.in('conversation_id', ids.slice(i, i + 50)).order('created_at'))))
-  return exportDocument(userId, sections)
+  // Titles of other people's listings the journey mentions (saved, viewed, asked about).
+  const own = new Set((sections.properties ?? []).map((p) => p.id))
+  const wanted = [...new Set([...(sections.favorites ?? []), ...(sections.viewings ?? []), ...(sections.conversations ?? [])].map((r) => r.property_id).filter((id) => id && !own.has(id)))]
+  const titles = {}
+  for (let i = 0; i < wanted.length; i += 100) {
+    const { data } = await supabase.from('properties').select('id, title').in('id', wanted.slice(i, i + 100))
+    for (const p of data ?? []) titles[p.id] = p.title
+  }
+  return { sections, titles }
 }
 
 export function AccountActions() {
@@ -183,11 +193,12 @@ export function AccountActions() {
     setExporting(true)
     setExportFailed(false)
     try {
-      const json = await collectMyData(user.id)
-      const url = URL.createObjectURL(new Blob([json], { type: 'application/json' }))
+      const { sections, titles } = await collectMyData(user.id)
+      const file = buildReport({ userId: user.id, email: user.email, sections, titles, t })
+      const url = URL.createObjectURL(new Blob([file], { type: XLSX_TYPE }))
       const a = document.createElement('a')
       a.href = url
-      a.download = exportFileName()
+      a.download = reportFileName()
       document.body.appendChild(a)
       a.click()
       a.remove()

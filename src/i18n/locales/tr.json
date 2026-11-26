@@ -1409,5 +1409,55 @@
       "openChat": "Mesaj gönderildi. Sohbeti aç",
       "openCompare": "Karşılaştır ({{n}})"
     }
+  },
+  "dataExport": {
+    "sheetSummary": "Özet",
+    "sheetJourney": "Yolculuk",
+    "field": "Alan",
+    "value": "Değer",
+    "name": "Ad",
+    "email": "E-posta",
+    "accountType": "Hesap türü",
+    "memberSince": "Üyelik tarihi",
+    "exportedOn": "Dışa aktarma tarihi",
+    "userId": "Kullanıcı kimliği",
+    "section": "Bölüm",
+    "records": "Kayıt",
+    "date": "Tarih",
+    "activity": "Etkinlik",
+    "details": "Ayrıntılar",
+    "status": "Durum",
+    "none": "Henüz bir şey yok.",
+    "events": {
+      "joined": "Shtëpia.ime’ye katıldı",
+      "listed": "İlan yayınladı",
+      "saved": "Bir evi kaydetti",
+      "savedSearch": "Bir aramayı kaydetti",
+      "wanted": "Aranan ev ilanı verdi",
+      "viewingRequested": "Gezme talep etti",
+      "viewingAsAgent": "Müşteriyle gezme",
+      "conversation": "Sohbet başlattı",
+      "messageSent": "Mesaj gönderdi",
+      "messageReceived": "Mesaj aldı",
+      "lead": "Potansiyel müşteri ekledi",
+      "notification": "Bildirim",
+      "report": "İçerik bildirdi",
+      "blocked": "Bir kullanıcıyı engelledi"
+    },
+    "sections": {
+      "profiles": "Profil",
+      "properties": "İlanlar",
+      "favorites": "Kaydedilen evler",
+      "saved_searches": "Kaydedilen aramalar",
+      "wanted_homes": "Aranan evler",
+      "viewings": "Gezmeler",
+      "conversations": "Sohbetler",
+      "messages": "Mesajlar",
+      "leads": "Potansiyel müşteriler",
+      "notifications": "Bildirimler",
+      "notification_preferences": "Bildirim ayarları",
+      "content_reports": "Şikâyetler",
+      "user_blocks": "Engellenen kullanıcılar"
+    }
   }
 }

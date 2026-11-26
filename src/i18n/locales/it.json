@@ -1419,5 +1419,55 @@
       "openChat": "Messaggio inviato. Apri la conversazione",
       "openCompare": "Confronta ({{n}})"
     }
+  },
+  "dataExport": {
+    "sheetSummary": "Riepilogo",
+    "sheetJourney": "Percorso",
+    "field": "Campo",
+    "value": "Valore",
+    "name": "Nome",
+    "email": "Email",
+    "accountType": "Tipo di account",
+    "memberSince": "Membro dal",
+    "exportedOn": "Esportato il",
+    "userId": "ID utente",
+    "section": "Sezione",
+    "records": "Record",
+    "date": "Data",
+    "activity": "Attività",
+    "details": "Dettagli",
+    "status": "Stato",
+    "none": "Ancora niente.",
+    "events": {
+      "joined": "Iscritto a Shtëpia.ime",
+      "listed": "Ha pubblicato un annuncio",
+      "saved": "Ha salvato un immobile",
+      "savedSearch": "Ha salvato una ricerca",
+      "wanted": "Ha pubblicato una richiesta di casa",
+      "viewingRequested": "Ha richiesto una visita",
+      "viewingAsAgent": "Visita con un cliente",
+      "conversation": "Ha avviato una conversazione",
+      "messageSent": "Ha inviato un messaggio",
+      "messageReceived": "Ha ricevuto un messaggio",
+      "lead": "Ha aggiunto un contatto",
+      "notification": "Notifica",
+      "report": "Ha segnalato un contenuto",
+      "blocked": "Ha bloccato un utente"
+    },
+    "sections": {
+      "profiles": "Profilo",
+      "properties": "Annunci",
+      "favorites": "Immobili salvati",
+      "saved_searches": "Ricerche salvate",
+      "wanted_homes": "Case cercate",
+      "viewings": "Visite",
+      "conversations": "Conversazioni",
+      "messages": "Messaggi",
+      "leads": "Contatti",
+      "notifications": "Notifiche",
+      "notification_preferences": "Impostazioni notifiche",
+      "content_reports": "Segnalazioni",
+      "user_blocks": "Utenti bloccati"
+    }
   }
 }

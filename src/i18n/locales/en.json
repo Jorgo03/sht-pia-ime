@@ -1409,5 +1409,55 @@
       "openChat": "Message sent. Open the conversation",
       "openCompare": "Compare ({{n}})"
     }
+  },
+  "dataExport": {
+    "sheetSummary": "Summary",
+    "sheetJourney": "Journey",
+    "field": "Field",
+    "value": "Value",
+    "name": "Name",
+    "email": "Email",
+    "accountType": "Account type",
+    "memberSince": "Member since",
+    "exportedOn": "Exported on",
+    "userId": "User ID",
+    "section": "Section",
+    "records": "Records",
+    "date": "Date",
+    "activity": "Activity",
+    "details": "Details",
+    "status": "Status",
+    "none": "Nothing here yet.",
+    "events": {
+      "joined": "Joined Shtëpia.ime",
+      "listed": "Published a listing",
+      "saved": "Saved a home",
+      "savedSearch": "Saved a search",
+      "wanted": "Posted a home wanted",
+      "viewingRequested": "Requested a viewing",
+      "viewingAsAgent": "Viewing with a client",
+      "conversation": "Started a conversation",
+      "messageSent": "Sent a message",
+      "messageReceived": "Received a message",
+      "lead": "Added a lead",
+      "notification": "Notification",
+      "report": "Reported content",
+      "blocked": "Blocked a user"
+    },
+    "sections": {
+      "profiles": "Profile",
+      "properties": "Listings",
+      "favorites": "Saved homes",
+      "saved_searches": "Saved searches",
+      "wanted_homes": "Homes wanted",
+      "viewings": "Viewings",
+      "conversations": "Conversations",
+      "messages": "Messages",
+      "leads": "Leads",
+      "notifications": "Notifications",
+      "notification_preferences": "Notification settings",
+      "content_reports": "Reports",
+      "user_blocks": "Blocked users"
+    }
   }
 }
