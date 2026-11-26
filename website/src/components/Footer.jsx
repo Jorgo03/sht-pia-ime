@@ -19,7 +19,10 @@ export default function Footer() {
           <h2>{t('site.footer.explore')}</h2>
           <Link to="/search?deal=sale">{t('web.nav.buy')}</Link>
           <Link to="/search?deal=rent">{t('web.nav.rent')}</Link>
-          <Link to="/#agents">{t('site.nav.agencies')}</Link>
+          <Link to="/agents">{t('site.nav.agencies')}</Link>
+          <Link to="/wanted">{t('wanted.boardPre')} {t('wanted.boardEm')}</Link>
+          <Link to="/compare">{t('compare.headlinePre')} {t('compare.headlineEm')}</Link>
+          <Link to="/guide">{t('legal.buyingGuide')}</Link>
           <Link to="/#app">{t('web.nav.app')}</Link>
         </nav>
         <nav aria-label={t('site.footer.legal')}>

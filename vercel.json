@@ -59,6 +59,34 @@
     {
       "source": "/compare",
       "destination": "/"
+    },
+    {
+      "source": "/saved-searches",
+      "destination": "/"
+    },
+    {
+      "source": "/wanted",
+      "destination": "/"
+    },
+    {
+      "source": "/agents",
+      "destination": "/"
+    },
+    {
+      "source": "/agent/:id",
+      "destination": "/"
+    },
+    {
+      "source": "/user/:id",
+      "destination": "/"
+    },
+    {
+      "source": "/notifications",
+      "destination": "/"
+    },
+    {
+      "source": "/guide",
+      "destination": "/"
     }
   ],
   "headers": [

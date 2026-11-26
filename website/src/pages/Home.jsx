@@ -130,7 +130,8 @@ function Agents() {
           ) : (
             <ul className="agent-list">
               {q.data.slice(0, 6).map((a) => (
-                <li key={a.id} className="agent">
+                <li key={a.id}>
+                  <Link to={`/agent/${a.id}`} className="agent">
                   {a.avatar ? (
                     <img src={a.avatar} alt="" loading="lazy" decoding="async" />
                   ) : (
@@ -143,6 +144,7 @@ function Agents() {
                     {a.subtitle && <p className="agent-sub">{a.subtitle}</p>}
                     <p className="agent-sub">{t('search.results', { count: a.listings })}</p>
                   </div>
+                  </Link>
                 </li>
               ))}
             </ul>

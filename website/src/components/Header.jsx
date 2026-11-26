@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, NavLink, useLocation } from 'react-router-dom'
-import { Heart, Menu, MessageCircle, UserRound, X } from 'lucide-react'
+import { Bell, Heart, Menu, MessageCircle, UserRound, X } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import Logo from './Logo'
 import LanguageSelect from './LanguageSelect'
@@ -42,7 +42,8 @@ export default function Header({ overHero, dark = false }) {
   const links = [
     { to: '/search?deal=sale', label: t('web.nav.buy'), active: pathname === '/search' && deal === 'sale' },
     { to: '/search?deal=rent', label: t('web.nav.rent'), active: pathname === '/search' && deal === 'rent' },
-    { to: '/#agents', label: t('site.nav.agencies'), active: false },
+    { to: '/agents', label: t('site.nav.agencies'), active: pathname === '/agents' },
+    { to: '/wanted', label: t('wanted.boardPre') + ' ' + t('wanted.boardEm'), active: pathname === '/wanted' },
   ]
   const light = overHero && !scrolled && !open
   const account = session
@@ -80,6 +81,11 @@ export default function Header({ overHero, dark = false }) {
           ))}
         </nav>
         {session && (
+          <Link to="/notifications" className="nav-icon" aria-label={t('notifications.headlinePre') + ' ' + t('notifications.headlineEm')} aria-current={pathname === '/notifications' ? 'page' : undefined}>
+            <Bell size={20} aria-hidden="true" />
+          </Link>
+        )}
+        {session && (
           <Link to="/messages" className="nav-icon" aria-label={t('common.messages')} aria-current={pathname.startsWith('/messages') ? 'page' : undefined}>
             <MessageCircle size={20} aria-hidden="true" />
           </Link>
@@ -113,6 +119,10 @@ export default function Header({ overHero, dark = false }) {
           <Link to="/favorites">{t('favourites.title')}</Link>
           {session && <Link to="/messages">{t('common.messages')}</Link>}
           {session && <Link to="/viewings">{t('viewings.title')}</Link>}
+          {session && <Link to="/saved-searches">{t('saved.headlinePre')} {t('saved.headlineEm')}</Link>}
+          {session && <Link to="/notifications">{t('notifications.headlinePre')} {t('notifications.headlineEm')}</Link>}
+          <Link to="/compare">{t('compare.headlinePre')} {t('compare.headlineEm')}</Link>
+          <Link to="/guide">{t('legal.buyingGuide')}</Link>
           <Link to="/#app">{t('web.nav.app')}</Link>
           {!session && <Link to="/signup">{t('auth.createAccount')}</Link>}
         </nav>

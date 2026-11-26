@@ -551,7 +551,51 @@ html.no-scrollbar::-webkit-scrollbar { display: none; }
 .compare-features { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; font-size: 14px; }
 .compare-features .no { color: var(--muted); }
 
+/* Forms, tabs and lists for the account pages */
+.input { width: 100%; min-height: 48px; padding: 0 var(--s4); border: 1.5px solid var(--line); border-radius: var(--r-s); background: var(--paper); color: var(--ink); font: 400 16px var(--font-ui); }
+.input:focus-visible { outline: 3px solid var(--door); outline-offset: 1px; }
+.field { display: grid; gap: 6px; }
+.panel { padding: var(--s5); border: 1px solid var(--line); border-radius: var(--r-l); margin-bottom: var(--s5); }
+.form-grid { display: grid; gap: var(--s4); grid-template-columns: 1fr; }
+@media (min-width: 640px) { .form-grid { grid-template-columns: 1fr 1fr; } .span-2 { grid-column: 1 / -1; } }
+.tabs { display: flex; gap: var(--s1); padding: var(--s1); border-radius: var(--r-pill); background: var(--stone); margin-bottom: var(--s5); width: max-content; max-width: 100%; overflow-x: auto; }
+.tabs button { min-height: 40px; padding: 0 var(--s4); border: 0; border-radius: var(--r-pill); background: transparent; font-weight: 700; font-size: 14px; color: var(--muted); white-space: nowrap; }
+.tabs button.is-on { background: var(--paper); color: var(--ink); box-shadow: 0 1px 3px rgb(0 0 0 / 0.08); }
+.seg { display: inline-flex; gap: var(--s1); padding: var(--s1); border-radius: var(--r-pill); background: var(--stone); align-self: end; }
+.seg label { position: relative; min-height: 40px; display: inline-flex; align-items: center; padding: 0 var(--s4); border-radius: var(--r-pill); font-weight: 700; font-size: 14px; cursor: pointer; }
+.seg label.is-on { background: var(--paper); box-shadow: 0 1px 3px rgb(0 0 0 / 0.08); }
+.seg input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; }
+.seg label:has(input:focus-visible) { outline: 3px solid var(--door); outline-offset: 2px; }
+.search-input { display: flex; align-items: center; gap: var(--s2); max-width: 480px; min-height: 48px; padding: 0 var(--s4); border: 1.5px solid var(--line); border-radius: var(--r-pill); margin-bottom: var(--s5); color: var(--muted); }
+.search-input input { flex: 1; border: 0; background: transparent; color: var(--ink); font: 400 16px var(--font-ui); min-height: 44px; }
+.search-input input:focus { outline: none; }
+.search-input:focus-within { border-color: var(--ink); }
+a.agent { text-decoration: none; }
+a.agent:hover { border-color: var(--ink); }
+.agent-list > li { list-style: none; }
+
+/* Public profile */
+.profile-head { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s5); margin-bottom: var(--s6); }
+.profile-head > div:nth-child(2) { flex: 1; min-width: 220px; display: grid; gap: 4px; }
+.profile-avatar { width: 88px; height: 88px; border-radius: 50%; object-fit: cover; font-size: 28px; }
+.section-title { font-family: var(--font-display); font-weight: 600; font-size: 26px; margin-bottom: var(--s4); }
+
+/* Notifications */
+.notif { display: flex; align-items: center; gap: var(--s3); padding: var(--s3); border: 1px solid var(--line); border-radius: var(--r-m); }
+.notif.is-unread { border-color: var(--door); }
+.notif-main { flex: 1; display: flex; align-items: flex-start; gap: var(--s3); border: 0; background: none; text-align: left; color: var(--ink); padding: var(--s1) 0; min-width: 0; }
+.notif-main > span { flex: 1; display: grid; gap: 2px; min-width: 0; }
+.notif-main time { font-size: 13px; color: var(--muted); flex: none; }
+.notif-main svg { flex: none; margin-top: 2px; color: var(--door-text); }
+
+/* Long text pages (guide) */
+.prose { display: grid; gap: var(--s3); }
+.prose h2 { font-family: var(--font-display); font-weight: 600; font-size: 24px; margin-top: var(--s5); }
+.prose ul { margin: 0; padding-left: 1.2em; display: grid; gap: var(--s2); }
+.prose p { max-width: 70ch; }
+
 /* Account */
+
 
 .account-head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: var(--s4); margin-bottom: var(--s6); }
 .account-email { color: var(--muted); margin-top: var(--s2); overflow-wrap: anywhere; }

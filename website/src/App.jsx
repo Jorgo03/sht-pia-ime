@@ -14,6 +14,12 @@ import Messages from './pages/Messages'
 import Thread from './pages/Thread'
 import Viewings from './pages/Viewings'
 import Compare from './pages/Compare'
+import SavedSearches from './pages/SavedSearches'
+import Wanted from './pages/Wanted'
+import Agents from './pages/Agents'
+import PublicProfile from './pages/PublicProfile'
+import Notifications from './pages/Notifications'
+import Guide from './pages/Guide'
 
 const AUTH_PATHS = ['/login', '/signup', '/forgot-password']
 
@@ -45,6 +51,13 @@ export default function App() {
           <Route path="/messages/:id" element={<Thread />} />
           <Route path="/viewings" element={<Viewings />} />
           <Route path="/compare" element={<Compare />} />
+          <Route path="/saved-searches" element={<SavedSearches />} />
+          <Route path="/wanted" element={<Wanted />} />
+          <Route path="/agents" element={<Agents />} />
+          <Route path="/agent/:id" element={<PublicProfile />} />
+          <Route path="/user/:id" element={<PublicProfile />} />
+          <Route path="/notifications" element={<Notifications />} />
+          <Route path="/guide" element={<Guide />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
