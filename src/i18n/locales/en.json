@@ -1402,6 +1402,14 @@
       "agentBody": "Publishing and managing listings, messages and viewings happen in the Shtëpia.ime app for now, with this same account.",
       "clientTitle": "Find your home",
       "clientBody": "Search homes here. In the app, with this same account, you can save homes and message agents."
+    },
+    "fav": {
+      "add": "Save to favorites",
+      "remove": "Remove from favorites"
+    },
+    "listing": {
+      "openChat": "Message sent. Open the conversation",
+      "openCompare": "Compare ({{count}})"
     }
   }
 }

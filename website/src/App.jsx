@@ -9,6 +9,11 @@ import Property from './pages/Property'
 import NotFound from './pages/NotFound'
 import AuthScreen from './auth/AuthScreen'
 import Account from './pages/Account'
+import Favorites from './pages/Favorites'
+import Messages from './pages/Messages'
+import Thread from './pages/Thread'
+import Viewings from './pages/Viewings'
+import Compare from './pages/Compare'
 
 const AUTH_PATHS = ['/login', '/signup', '/forgot-password']
 
@@ -35,6 +40,11 @@ export default function App() {
           <Route path="/signup" element={<AuthScreen key="signup" start="signup" />} />
           <Route path="/forgot-password" element={<AuthScreen key="recover" start="recover" />} />
           <Route path="/account" element={<Account />} />
+          <Route path="/favorites" element={<Favorites />} />
+          <Route path="/messages" element={<Messages />} />
+          <Route path="/messages/:id" element={<Thread />} />
+          <Route path="/viewings" element={<Viewings />} />
+          <Route path="/compare" element={<Compare />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>

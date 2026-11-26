@@ -1402,6 +1402,14 @@
       "agentBody": "Publikimi dhe menaxhimi i shpalljeve, mesazhet dhe vizitat bëhen tani në aplikacionin Shtëpia.ime, me të njëjtën llogari.",
       "clientTitle": "Gjej shtëpinë tënde",
       "clientBody": "Kërko shtëpi këtu. Në aplikacion, me të njëjtën llogari, ruan shtëpitë dhe u shkruan agjentëve."
+    },
+    "fav": {
+      "add": "Ruaje te të preferuarat",
+      "remove": "Hiqe nga të preferuarat"
+    },
+    "listing": {
+      "openChat": "Mesazhi u dërgua. Hape bisedën",
+      "openCompare": "Krahaso ({{count}})"
     }
   }
 }

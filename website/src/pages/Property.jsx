@@ -1,14 +1,17 @@
-import { useEffect, useState } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
-import { ArrowLeft, Bath, BedDouble, Building, CalendarDays, ChevronLeft, ChevronRight, Mail, MapPin, MessageCircle, Phone, Ruler } from 'lucide-react'
+import { ArrowLeft, Bath, BedDouble, Building, CalendarDays, ChevronLeft, ChevronRight, MapPin, Ruler } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { gradientFor } from '@/src/lib/format.js'
 import { formatRef } from '@/src/features/properties/lib/searchFilters.js'
 import { ErrorState } from '../components/States'
 import NotFound from './NotFound'
 import { getProperty } from '../lib/api'
-import { cityName, getLocalizedText, listingBadgeKey, priceOf, priceSuffixKey, telUrl, titleOf, whatsappUrl } from '../lib/format'
+import { addRecentlyViewed, ContactPanel, logActivity, PriceHistory, SimilarHomes } from '../features/listing'
+
+const LocationMap = lazy(() => import('../components/LocationMap'))
+import { cityName, getLocalizedText, titleOf } from '../lib/format'
 
 function Gallery({ photos, title, id }) {
   const { t } = useTranslation()
@@ -58,46 +61,6 @@ function Gallery({ photos, title, id }) {
   )
 }
 
-function Contact({ p, title }) {
-  const { t, i18n } = useTranslation()
-  const lang = i18n.resolvedLanguage
-  const phone = p.agent?.phone || p.contact_phone
-  const suffix = priceSuffixKey(p.listing_type)
-  const who = p.agent?.agency_name || p.agent?.full_name
-  return (
-    <aside className="contact" aria-labelledby="contact-title">
-      <span className="badge is-inline">{t(listingBadgeKey(p.listing_type))}</span>
-      <p className="contact-price">
-        {priceOf(p, lang)}
-        {suffix && <span className="card-suffix">{t(suffix)}</span>}
-      </p>
-      <h2 id="contact-title">{t('web.property.contactTitle')}</h2>
-      {who && <p className="contact-who">{who}</p>}
-      <div className="contact-actions">
-        {phone && (
-          <a className="btn btn-primary" href={telUrl(phone)}>
-            <Phone size={18} aria-hidden="true" />
-            {t('property.call')}
-          </a>
-        )}
-        {phone && p.whatsapp_enabled !== false && (
-          <a className="btn btn-outline" href={whatsappUrl(phone, t('property.whatsappMessage', { title }))} target="_blank" rel="noopener noreferrer">
-            <MessageCircle size={18} aria-hidden="true" />
-            {t('web.property.whatsapp')}
-          </a>
-        )}
-        {p.contact_email && (
-          <a className="btn btn-outline" href={`mailto:${p.contact_email}`}>
-            <Mail size={18} aria-hidden="true" />
-            {t('web.property.email')}
-          </a>
-        )}
-      </div>
-      {!phone && !p.contact_email && <p className="contact-note">{t('web.property.noContact')}</p>}
-    </aside>
-  )
-}
-
 export default function Property() {
   const { id } = useParams()
   const { t, i18n } = useTranslation()
@@ -105,6 +68,12 @@ export default function Property() {
   const q = useQuery({ queryKey: ['property', id], queryFn: () => getProperty(id) })
   const p = q.data
   const title = p ? titleOf(p, lang) : ''
+
+  useEffect(() => {
+    if (!p?.id) return
+    logActivity(p.id, 'view').catch(() => {})
+    addRecentlyViewed(p.id)
+  }, [p?.id])
 
   useEffect(() => {
     if (title) document.title = `${title} | ${t('common.appName')}`
@@ -189,23 +158,34 @@ export default function Property() {
               </ul>
             </section>
           )}
+          {p.video_url && (
+            <section aria-labelledby="video-title">
+              <h2 id="video-title">{t('detail.video')}</h2>
+              <video className="video" src={p.video_url} controls preload="metadata" playsInline />
+            </section>
+          )}
           {hasMap && (
             <section aria-labelledby="map-title">
               <h2 id="map-title">{t('property.location')}</h2>
+              <Suspense fallback={<div className="map" />}>
+                <LocationMap lat={p.latitude} lng={p.longitude} label={place} />
+              </Suspense>
               <a
                 className="text-link"
-                href={`https://www.openstreetmap.org/?mlat=${p.latitude}&mlon=${p.longitude}#map=16/${p.latitude}/${p.longitude}`}
+                href={`https://www.google.com/maps/search/?api=1&query=${p.latitude},${p.longitude}`}
                 target="_blank"
                 rel="noopener noreferrer"
               >
                 <MapPin size={16} aria-hidden="true" />
-                {t('web.property.openMap')}
+                {t('map.openInMaps')}
               </a>
             </section>
           )}
+          <PriceHistory propertyId={p.id} />
         </div>
-        <Contact p={p} title={title} />
+        <ContactPanel p={p} title={title} />
       </div>
+      <SimilarHomes p={p} />
     </div>
   )
 }

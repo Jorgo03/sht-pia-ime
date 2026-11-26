@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, NavLink, useLocation } from 'react-router-dom'
-import { Menu, UserRound, X } from 'lucide-react'
+import { Heart, Menu, MessageCircle, UserRound, X } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import Logo from './Logo'
 import LanguageSelect from './LanguageSelect'
@@ -79,6 +79,14 @@ export default function Header({ overHero, dark = false }) {
             </NavLink>
           ))}
         </nav>
+        {session && (
+          <Link to="/messages" className="nav-icon" aria-label={t('common.messages')} aria-current={pathname.startsWith('/messages') ? 'page' : undefined}>
+            <MessageCircle size={20} aria-hidden="true" />
+          </Link>
+        )}
+        <Link to="/favorites" className="nav-icon" aria-label={t('favourites.title')} aria-current={pathname === '/favorites' ? 'page' : undefined}>
+          <Heart size={20} aria-hidden="true" />
+        </Link>
         <Link to={account.to} className="btn btn-outline nav-account" aria-current={pathname === account.to ? 'page' : undefined}>
           <UserRound size={16} aria-hidden="true" />
           <span className="nav-account-label">{account.label}</span>
@@ -102,6 +110,9 @@ export default function Header({ overHero, dark = false }) {
               {l.label}
             </Link>
           ))}
+          <Link to="/favorites">{t('favourites.title')}</Link>
+          {session && <Link to="/messages">{t('common.messages')}</Link>}
+          {session && <Link to="/viewings">{t('viewings.title')}</Link>}
           <Link to="/#app">{t('web.nav.app')}</Link>
           {!session && <Link to="/signup">{t('auth.createAccount')}</Link>}
         </nav>

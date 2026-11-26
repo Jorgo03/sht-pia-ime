@@ -4,6 +4,7 @@ import { Bath, BedDouble, MapPin, Ruler } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { gradientFor } from '@/src/lib/format.js'
 import { cityName, listingBadgeKey, priceOf, priceSuffixKey, titleOf } from '../lib/format'
+import { FavoriteButton } from '../features/favorites'
 
 function PropertyCard({ property: p }) {
   const { t, i18n } = useTranslation()
@@ -17,6 +18,7 @@ function PropertyCard({ property: p }) {
       <div className="card-media" style={photo ? undefined : { background: gradientFor(p.id) }}>
         {photo && <img src={photo} alt="" loading="lazy" decoding="async" />}
         <span className="badge">{t(listingBadgeKey(p.listing_type))}</span>
+        <FavoriteButton property={p} className="on-media" />
       </div>
       <div className="card-body">
         <p className="card-price">

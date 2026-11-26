@@ -1412,6 +1412,14 @@
       "agentBody": "Por ahora, anuncios, mensajes y visitas se gestionan en la app Shtëpia.ime, con esta misma cuenta.",
       "clientTitle": "Encuentra tu casa",
       "clientBody": "Busca aquí. En la app, con esta misma cuenta, guardas viviendas y escribes a los agentes."
+    },
+    "fav": {
+      "add": "Guardar en favoritos",
+      "remove": "Quitar de favoritos"
+    },
+    "listing": {
+      "openChat": "Mensaje enviado. Abrir la conversación",
+      "openCompare": "Comparar ({{count}})"
     }
   }
 }

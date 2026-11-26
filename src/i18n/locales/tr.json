@@ -1402,6 +1402,14 @@
       "agentBody": "Şimdilik ilanlar, mesajlar ve gösterimler aynı hesapla Shtëpia.ime uygulamasında yönetiliyor.",
       "clientTitle": "Evinizi bulun",
       "clientBody": "Burada arayın. Uygulamada aynı hesapla evleri kaydedip emlakçılara yazabilirsiniz."
+    },
+    "fav": {
+      "add": "Favorilere ekle",
+      "remove": "Favorilerden çıkar"
+    },
+    "listing": {
+      "openChat": "Mesaj gönderildi. Sohbeti aç",
+      "openCompare": "Karşılaştır ({{count}})"
     }
   }
 }

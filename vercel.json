@@ -39,6 +39,26 @@
     {
       "source": "/account",
       "destination": "/"
+    },
+    {
+      "source": "/favorites",
+      "destination": "/"
+    },
+    {
+      "source": "/messages",
+      "destination": "/"
+    },
+    {
+      "source": "/messages/:id",
+      "destination": "/"
+    },
+    {
+      "source": "/viewings",
+      "destination": "/"
+    },
+    {
+      "source": "/compare",
+      "destination": "/"
     }
   ],
   "headers": [

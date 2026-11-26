@@ -6,6 +6,7 @@ import './i18n'
 import './styles.css'
 import App from './App'
 import { AuthProvider } from './auth/AuthContext'
+import { FavoritesProvider } from './features/favorites'
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { staleTime: 60_000, retry: 1, refetchOnWindowFocus: false } },
@@ -15,9 +16,11 @@ createRoot(document.getElementById('root')).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
+        <FavoritesProvider>
+          <BrowserRouter>
+            <App />
+          </BrowserRouter>
+        </FavoritesProvider>
       </AuthProvider>
     </QueryClientProvider>
   </StrictMode>,

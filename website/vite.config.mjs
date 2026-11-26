@@ -20,6 +20,9 @@ export default defineConfig({
     alias: { '@': path.join(here, '..') },
   },
   server: { port: 5180 },
+  // Pre-bundled up front so the dev server never re-optimises mid-visit
+  // (which loads a second copy of React).
+  optimizeDeps: { include: ['react-leaflet', 'leaflet'] },
   build: {
     emptyOutDir: true,
     sourcemap: false,

@@ -1422,6 +1422,14 @@
       "agentBody": "Na razie oferty, wiadomości i oglądania obsługujesz w aplikacji Shtëpia.ime, na tym samym koncie.",
       "clientTitle": "Znajdź swój dom",
       "clientBody": "Szukaj tutaj. W aplikacji, na tym samym koncie, zapisujesz oferty i piszesz do agentów."
+    },
+    "fav": {
+      "add": "Dodaj do ulubionych",
+      "remove": "Usuń z ulubionych"
+    },
+    "listing": {
+      "openChat": "Wiadomość wysłana. Otwórz rozmowę",
+      "openCompare": "Porównaj ({{count}})"
     }
   }
 }
