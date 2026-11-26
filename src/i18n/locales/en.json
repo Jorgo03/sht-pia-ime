@@ -607,7 +607,21 @@
     "actionSold": "Sold",
     "actionRented": "Rented",
     "pinOutsideAlbania": "The pin is outside Albania. Place it where the property is.",
-    "pinOutsideCity": "The pin is outside the {{city}} municipality. Move it, or choose the right city."
+    "pinOutsideCity": "The pin is outside the {{city}} municipality. Move it, or choose the right city.",
+    "wizard": {
+      "stepOf": "Step {{n}} of {{total}}",
+      "continueTo": "Continue: {{step}}",
+      "preview": "Preview",
+      "previewHint": "This is how your listing will look in search results.",
+      "untitled": "Your listing title",
+      "hint": {
+        "basics": "Type, title and description",
+        "location": "City, zone, address and map pin",
+        "details": "Price, size, rooms and features",
+        "media": "Photos and video",
+        "publish": "How buyers reach you"
+      }
+    }
   },
   "dashboard": {
     "title": "Property Dashboard",

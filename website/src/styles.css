@@ -149,6 +149,8 @@ main:focus { outline: none; }
 .topbar-end a { text-decoration: none; font-weight: 600; }
 .topbar-end a:hover { text-decoration: underline; text-underline-offset: 3px; }
 .nav { display: flex; align-items: center; gap: var(--s5); min-height: 68px; }
+/* Narrow phones: the bell lives in the menu instead, so the bar fits. */
+@media (max-width: 419px) { .nav { gap: var(--s2); } .nav .nav-bell { display: none; } }
 .nav-logo { display: flex; margin-right: auto; border-radius: 4px; text-decoration: none; }
 .logo { display: block; line-height: 0; }
 .logo svg { height: 34px; width: auto; }
@@ -326,7 +328,7 @@ main:focus { outline: none; }
 .site-footer { position: relative; z-index: 1; background: #141414; color: #fff; --logo-door: #ff5f1f; --logo-name: #fff; padding-top: var(--s7); }
 .footer-grid { display: grid; gap: var(--s6); }
 @media (min-width: 768px) { .footer-grid { grid-template-columns: 2fr 1fr 1fr; } }
-.footer-brand { display: grid; gap: var(--s4); justify-items: start; }
+.footer-brand { display: grid; gap: var(--s4); justify-items: start; align-content: start; }
 .footer-brand p { opacity: 0.75; max-width: 36ch; }
 .site-footer nav { display: grid; gap: var(--s2); align-content: start; }
 .site-footer h2 { font-family: var(--font-ui); font-size: 14px; font-weight: 700; opacity: 0.6; margin-bottom: var(--s1); }

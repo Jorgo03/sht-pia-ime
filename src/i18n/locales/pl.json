@@ -573,7 +573,21 @@
     "actionSold": "Sprzedane",
     "actionRented": "Wynajęte",
     "pinOutsideAlbania": "Pinezka jest poza Albanią. Umieść ją tam, gdzie jest nieruchomość.",
-    "pinOutsideCity": "Pinezka jest poza gminą {{city}}. Przesuń ją albo wybierz właściwe miasto."
+    "pinOutsideCity": "Pinezka jest poza gminą {{city}}. Przesuń ją albo wybierz właściwe miasto.",
+    "wizard": {
+      "stepOf": "Krok {{n}} z {{total}}",
+      "continueTo": "Dalej: {{step}}",
+      "preview": "Podgląd",
+      "previewHint": "Tak Twoje ogłoszenie będzie wyglądać w wynikach wyszukiwania.",
+      "untitled": "Tytuł Twojego ogłoszenia",
+      "hint": {
+        "basics": "Rodzaj, tytuł i opis",
+        "location": "Miasto, dzielnica, adres i punkt na mapie",
+        "details": "Cena, powierzchnia, pokoje i udogodnienia",
+        "media": "Zdjęcia i wideo",
+        "publish": "Jak kupujący się z Tobą skontaktują"
+      }
+    }
   },
   "dashboard": {
     "title": "Dashboard nieruchomości",

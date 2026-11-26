@@ -607,7 +607,21 @@
     "actionSold": "Satıldı",
     "actionRented": "Kiralandı",
     "pinOutsideAlbania": "İşaretçi Arnavutluk dışında. Mülkün bulunduğu yere yerleştirin.",
-    "pinOutsideCity": "İşaretçi {{city}} belediyesi dışında. Taşıyın veya doğru şehri seçin."
+    "pinOutsideCity": "İşaretçi {{city}} belediyesi dışında. Taşıyın veya doğru şehri seçin.",
+    "wizard": {
+      "stepOf": "Adım {{n}} / {{total}}",
+      "continueTo": "Devam: {{step}}",
+      "preview": "Önizleme",
+      "previewHint": "İlanınız arama sonuçlarında böyle görünecek.",
+      "untitled": "İlanınızın başlığı",
+      "hint": {
+        "basics": "Tür, başlık ve açıklama",
+        "location": "Şehir, semt, adres ve harita noktası",
+        "details": "Fiyat, alan, odalar ve özellikler",
+        "media": "Fotoğraflar ve video",
+        "publish": "Alıcılar size nasıl ulaşır"
+      }
+    }
   },
   "dashboard": {
     "title": "Mülk paneli",

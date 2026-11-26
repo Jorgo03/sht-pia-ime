@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-leaflet'
-import { ArrowLeft, ArrowRight, Upload, X, Film, Check, Move } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Bath, BedDouble, Check, Film, Image as ImageIcon, MapPin, Move, Ruler, Upload, X } from 'lucide-react'
 import { useAuth } from '../auth/legacyAuth'
 import { supabase } from '../lib/supabase'
 import { isEnabled } from '@/src/lib/flags.js'
@@ -22,6 +22,7 @@ import { uploadPath } from '@/src/lib/uploadNames.js'
 import './map.css'
 import './new-listing.css'
 import Select from '../components/Select'
+import { formatPrice } from '@/src/lib/format.js'
 
 const TIRANA_CENTER = [41.3275, 19.8187]
 
@@ -223,6 +224,17 @@ export default function NewListing() {
   // Editing never reads or overwrites the new-listing draft.
   const [draft] = useState(() => (isEdit ? null : loadDraft(user?.id)))
   const [step, setStep] = useState(Math.min(draft?.step ?? 0, MEDIA_STEP))
+  // A new step starts at its top, not wherever the last one was scrolled to.
+  const topRef = useRef(null)
+  const firstStep = useRef(true)
+  useEffect(() => {
+    if (firstStep.current) {
+      firstStep.current = false
+      return
+    }
+    const top = topRef.current
+    if (top && top.getBoundingClientRect().top < 0) top.scrollIntoView({ block: 'start', behavior: 'smooth' })
+  }, [step])
   const [submitting, setSubmitting] = useState(false)
   const [errors, setErrors] = useState({})
   const [draftRestored, setDraftRestored] = useState(Boolean(draft))
@@ -571,12 +583,19 @@ export default function NewListing() {
     )
   }
 
+  const stepName = (i) => t(`listing.step.${STEPS[i]}`)
+  const last = step === STEPS.length - 1
+
   return (
-    <div className="page new-listing-page">
-      <div className="nl-header">
-        <button onClick={() => (step > 0 ? prev() : navigate(-1))} className="nl-back" aria-label={t('common.back')}><ArrowLeft size={18} /></button>
-        <h1 className="page-title" style={{ margin: 0 }}>{isEdit ? t('listing.editListing') : t('listing.newListing')}</h1>
-      </div>
+    <div className="page container section-tight new-listing-page">
+      <header className="nl-head" ref={topRef}>
+        <button type="button" onClick={() => navigate(-1)} className="text-link nl-leave">
+          <ArrowLeft size={16} aria-hidden="true" />
+          {t('common.back')}
+        </button>
+        <h1 className="page-title">{isEdit ? t('listing.editListing') : t('listing.newListing')}</h1>
+        <p className="muted">{t('listing.wizard.stepOf', { n: step + 1, total: STEPS.length })} · {stepName(step)}</p>
+      </header>
 
       {draftRestored && (
         <div role="status" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, margin: '0 0 12px', padding: '10px 14px', background: 'var(--fho-orange-tint)', border: '1px solid var(--fho-orange-soft)', borderRadius: 'var(--r-md)', fontSize: 13, color: 'var(--fho-text)' }}>
@@ -585,33 +604,43 @@ export default function NewListing() {
         </div>
       )}
 
-      <div className="nl-progress" role="list" aria-label={t('listing.newListing')}>
-        {STEPS.map((s, i) => {
-          // Jumping back to a completed step is safe (its data is already
-          // validated); jumping forward would skip validation on the steps
-          // in between, so only i < step is reachable this way.
-          const clickable = i < step
-          const completed = i < step
-          const current = i === step
-          return (
-            <div key={s} className="nl-step-item" role="listitem">
-              <button
-                type="button"
-                className={`nl-step ${completed ? 'completed' : ''} ${current ? 'current' : ''} ${clickable ? 'nl-step--clickable' : ''}`}
-                onClick={clickable ? () => setStep(i) : undefined}
-                tabIndex={clickable ? 0 : -1}
-                aria-disabled={!clickable}
-                aria-current={current ? 'step' : undefined}
-              >
-                <span className="nl-step-dot">{completed ? <Check size={13} strokeWidth={3} /> : i + 1}</span>
-                <span className="nl-step-label">{t(`listing.step.${s}`)}</span>
-              </button>
-              {i < STEPS.length - 1 && <span className={`nl-step-line ${i < step ? 'filled' : ''}`} />}
-            </div>
-          )
-        })}
-      </div>
+      <div className="nl-layout">
+        <nav className="nl-rail" aria-label={t('listing.newListing')}>
+          <div className="nl-meter" role="progressbar" aria-valuemin={1} aria-valuemax={STEPS.length} aria-valuenow={step + 1} aria-valuetext={t('listing.wizard.stepOf', { n: step + 1, total: STEPS.length })}>
+            <span style={{ width: `${((step + 1) / STEPS.length) * 100}%` }} />
+          </div>
+          <ol className="nl-steps">
+            {STEPS.map((s, i) => {
+              // Jumping back to a completed step is safe (its data is already
+              // validated); jumping forward would skip validation on the steps
+              // in between, so only i < step is reachable this way.
+              const done = i < step
+              const current = i === step
+              return (
+                <li key={s}>
+                  <button
+                    type="button"
+                    className={`nl-step${done ? ' is-done' : ''}${current ? ' is-current' : ''}`}
+                    onClick={done ? () => setStep(i) : undefined}
+                    disabled={!done}
+                    aria-current={current ? 'step' : undefined}
+                  >
+                    <span className="nl-step-dot">{done ? <Check size={14} strokeWidth={3} aria-hidden="true" /> : i + 1}</span>
+                    <span className="nl-step-text">
+                      <strong>{stepName(i)}</strong>
+                      <small>{t(`listing.wizard.hint.${s}`)}</small>
+                    </span>
+                  </button>
+                </li>
+              )
+            })}
+          </ol>
+        </nav>
 
+        <div className="nl-main">
+      <section className="nl-card" aria-labelledby="nl-step-title">
+        <h2 id="nl-step-title" className="nl-card-title">{stepName(step)}</h2>
+        <p className="muted nl-card-hint">{t(`listing.wizard.hint.${STEPS[step]}`)}</p>
       <div className="nl-form">
         {step === 0 && (
           <>
@@ -921,53 +950,82 @@ export default function NewListing() {
           </>
         )}
       </div>
+      </section>
 
-      {step < STEPS.length - 1 ? (
-        // Mid-wizard steps: lightweight floating pair instead of a docked
-        // bar. bottom-24 clears .liquid-nav (18px gap + 62px height = 80px,
-        // +16px breathing room). The app-shell is a centered max-w-480
-        // column, not the full viewport (same as .liquid-nav/.nl-actions
-        // below) — so this positions the same way: a full-width fixed strip
-        // centered via left-1/2/-translate-x-1/2, pointer-events-none so
-        // its empty space never blocks clicks, with the actual buttons
-        // (pointer-events-auto) pushed to its right edge via justify-end.
-        // A plain `right-5` here would anchor to the raw viewport instead
-        // and drift away from the nav on anything wider than ~480px.
-        <div className="nl-fab-wrap">
-          <div className="nl-fab-row">
-            {step > 0 && (
-              <button
-                onClick={prev}
-                aria-label={t('listing.back')}
-                title={t('listing.back')}
-                className="nl-fab nl-fab-secondary"
-              >
-                <ArrowLeft size={20} />
+          {/* Stays at the bottom of the screen while the form scrolls, and
+              stops where the form ends, so it never covers the footer. */}
+          <div className="nl-bar">
+            {step > 0 ? (
+              <button type="button" className="btn btn-outline" onClick={prev} aria-label={t('listing.back')}>
+                <ArrowLeft size={16} aria-hidden="true" />
+                <span className="nl-bar-label">{t('listing.back')}</span>
               </button>
-            )}
-            <button
-              onClick={next}
-              aria-label={t('listing.next')}
-              title={t('listing.next')}
-              className="nl-fab nl-fab-primary"
-            >
-              <ArrowRight size={24} />
-            </button>
+            ) : <span />}
+            <span className="nl-bar-count" aria-hidden="true">{step + 1} / {STEPS.length}</span>
+            <div className="nl-bar-end">
+              {last && !isEdit && (
+                <button type="button" className="btn btn-outline" onClick={() => submit(true)} disabled={submitting}>{t('listing.saveDraft')}</button>
+              )}
+              {last ? (
+                <button type="button" className="btn btn-primary" onClick={() => submit(false)} disabled={submitting}>
+                  {submitting ? t('common.loading') : isEdit ? t('listing.saveChanges') : t('listing.publish')}
+                </button>
+              ) : (
+                <button type="button" className="btn btn-primary" onClick={next}>
+                  <span className="nl-bar-label">{t('listing.wizard.continueTo', { step: stepName(step + 1) })}</span>
+                  <span className="nl-bar-short">{t('listing.next')}</span>
+                  <ArrowRight size={16} aria-hidden="true" />
+                </button>
+              )}
+            </div>
           </div>
         </div>
-      ) : (
-        // Final (Publish) step keeps the fuller docked bar — a submission
-        // deserves a clearer, paired Save Draft / Publish affordance rather
-        // than a small anonymous corner button.
-        <div className="nl-actions">
-          <button className="nl-btn nl-btn-secondary" onClick={prev} aria-label={t('listing.back')}><ArrowLeft size={16} /> <span className="nl-btn-label">{t('listing.back')}</span></button>
-          <div style={{ flex: 1 }} />
-          {!isEdit && <button className="nl-btn nl-btn-secondary" onClick={() => submit(true)} disabled={submitting}>{t('listing.saveDraft')}</button>}
-          <button className="nl-btn nl-btn-primary" onClick={() => submit(false)} disabled={submitting}>
-            {submitting ? t('common.loading') : isEdit ? t('listing.saveChanges') : t('listing.publish')}
-          </button>
-        </div>
-      )}
+
+        <aside className="nl-preview" aria-label={t('listing.wizard.preview')}>
+          <p className="eyebrow">{t('listing.wizard.preview')}</p>
+          <ListingPreview form={form} photo={images[0]?.preview} />
+          <p className="muted small">{t('listing.wizard.previewHint')}</p>
+        </aside>
+      </div>
     </div>
+  )
+}
+
+// How the listing will look in search results, from what is typed so far.
+function ListingPreview({ form, photo }) {
+  const { t, i18n } = useTranslation()
+  const lang = i18n.resolvedLanguage
+  const title = form.title_i18n?.[lang] || form.title_i18n?.sq || Object.values(form.title_i18n ?? {}).find(Boolean)
+  const price = Number(form.price)
+  const place = [form.zone, form.city ? cityLabel(form.city) : ''].filter(Boolean).join(', ')
+  const facts = [
+    form.beds !== '' && [BedDouble, form.beds],
+    form.baths !== '' && [Bath, form.baths],
+    form.sqft !== '' && [Ruler, `${form.sqft} ${t('property.sqft')}`],
+  ].filter(Boolean)
+  return (
+    <article className="card nl-preview-card">
+      <div className="card-media">
+        {photo ? <img src={photo} alt="" /> : <span className="nl-preview-empty"><ImageIcon size={28} aria-hidden="true" /></span>}
+        <span className="badge">{t(form.listing_type === 'rent' ? 'detail.forRent' : 'detail.forSale')}</span>
+      </div>
+      <div className="card-body">
+        <p className="card-price">{price > 0 ? formatPrice(price, lang, form.currency) : '—'}</p>
+        <h3 className={`card-title${title ? '' : ' muted'}`}>{title || t('listing.wizard.untitled')}</h3>
+        {place && (
+          <p className="card-place">
+            <MapPin size={14} aria-hidden="true" />
+            {place}
+          </p>
+        )}
+        {facts.length > 0 && (
+          <ul className="card-facts">
+            {facts.map(([Icon, value], i) => (
+              <li key={i}><Icon size={16} aria-hidden="true" />{value}</li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </article>
   )
 }

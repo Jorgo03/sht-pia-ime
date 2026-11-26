@@ -555,7 +555,21 @@
     "actionSold": "Verkauft",
     "actionRented": "Vermietet",
     "pinOutsideAlbania": "Die Markierung liegt außerhalb Albaniens. Setze sie dorthin, wo die Immobilie liegt.",
-    "pinOutsideCity": "Die Markierung liegt außerhalb der Gemeinde {{city}}. Verschiebe sie oder wähle die richtige Stadt."
+    "pinOutsideCity": "Die Markierung liegt außerhalb der Gemeinde {{city}}. Verschiebe sie oder wähle die richtige Stadt.",
+    "wizard": {
+      "stepOf": "Schritt {{n}} von {{total}}",
+      "continueTo": "Weiter: {{step}}",
+      "preview": "Vorschau",
+      "previewHint": "So erscheint Ihr Inserat in den Suchergebnissen.",
+      "untitled": "Titel Ihres Inserats",
+      "hint": {
+        "basics": "Art, Titel und Beschreibung",
+        "location": "Stadt, Viertel, Adresse und Kartenpunkt",
+        "details": "Preis, Fläche, Zimmer und Ausstattung",
+        "media": "Fotos und Video",
+        "publish": "Wie Käufer Sie erreichen"
+      }
+    }
   },
   "dashboard": {
     "title": "Immobilien-Dashboard",

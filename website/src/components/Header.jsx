@@ -84,7 +84,7 @@ export default function Header({ overHero, dark = false }) {
           ))}
         </nav>
         {session && (
-          <Link to="/notifications" className="nav-icon" aria-label={t('notifications.headlinePre') + ' ' + t('notifications.headlineEm')} aria-current={pathname === '/notifications' ? 'page' : undefined}>
+          <Link to="/notifications" className="nav-icon nav-bell" aria-label={t('notifications.headlinePre') + ' ' + t('notifications.headlineEm')} aria-current={pathname === '/notifications' ? 'page' : undefined}>
             <Bell size={20} aria-hidden="true" />
           </Link>
         )}

@@ -564,7 +564,21 @@
     "actionSold": "Vendu",
     "actionRented": "Loué",
     "pinOutsideAlbania": "Le repère est hors d’Albanie. Placez-le là où se trouve le bien.",
-    "pinOutsideCity": "Le repère est hors de la commune de {{city}}. Déplacez-le ou choisissez la bonne ville."
+    "pinOutsideCity": "Le repère est hors de la commune de {{city}}. Déplacez-le ou choisissez la bonne ville.",
+    "wizard": {
+      "stepOf": "Étape {{n}} sur {{total}}",
+      "continueTo": "Continuer : {{step}}",
+      "preview": "Aperçu",
+      "previewHint": "Voici comment votre annonce apparaîtra dans les résultats.",
+      "untitled": "Le titre de votre annonce",
+      "hint": {
+        "basics": "Type, titre et description",
+        "location": "Ville, quartier, adresse et point sur la carte",
+        "details": "Prix, surface, pièces et équipements",
+        "media": "Photos et vidéo",
+        "publish": "Comment les acheteurs vous joignent"
+      }
+    }
   },
   "dashboard": {
     "title": "Tableau de bord du bien",

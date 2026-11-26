@@ -607,7 +607,21 @@
     "actionSold": "Shitur",
     "actionRented": "Me qira",
     "pinOutsideAlbania": "Pika është jashtë Shqipërisë. Vendose aty ku ndodhet prona.",
-    "pinOutsideCity": "Pika është jashtë bashkisë {{city}}. Lëvize, ose zgjidh qytetin e duhur."
+    "pinOutsideCity": "Pika është jashtë bashkisë {{city}}. Lëvize, ose zgjidh qytetin e duhur.",
+    "wizard": {
+      "stepOf": "Hapi {{n}} nga {{total}}",
+      "continueTo": "Vazhdo: {{step}}",
+      "preview": "Pamja paraprake",
+      "previewHint": "Kështu do të duket prona juaj në rezultatet e kërkimit.",
+      "untitled": "Titulli i pronës suaj",
+      "hint": {
+        "basics": "Lloji, titulli dhe përshkrimi",
+        "location": "Qyteti, lagjja, adresa dhe pika në hartë",
+        "details": "Çmimi, sipërfaqja, dhomat dhe karakteristikat",
+        "media": "Fotot dhe videoja",
+        "publish": "Si ju kontaktojnë blerësit"
+      }
+    }
   },
   "dashboard": {
     "title": "Paneli i pronës",

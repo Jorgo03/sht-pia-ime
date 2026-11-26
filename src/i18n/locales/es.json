@@ -564,7 +564,21 @@
     "actionSold": "Vendido",
     "actionRented": "Alquilado",
     "pinOutsideAlbania": "El marcador está fuera de Albania. Colócalo donde está la propiedad.",
-    "pinOutsideCity": "El marcador está fuera del municipio de {{city}}. Muévelo o elige la ciudad correcta."
+    "pinOutsideCity": "El marcador está fuera del municipio de {{city}}. Muévelo o elige la ciudad correcta.",
+    "wizard": {
+      "stepOf": "Paso {{n}} de {{total}}",
+      "continueTo": "Continuar: {{step}}",
+      "preview": "Vista previa",
+      "previewHint": "Así se verá tu anuncio en los resultados de búsqueda.",
+      "untitled": "El título de tu anuncio",
+      "hint": {
+        "basics": "Tipo, título y descripción",
+        "location": "Ciudad, zona, dirección y punto en el mapa",
+        "details": "Precio, superficie, habitaciones y características",
+        "media": "Fotos y vídeo",
+        "publish": "Cómo te contactan los compradores"
+      }
+    }
   },
   "dashboard": {
     "title": "Dashboard de propiedad",

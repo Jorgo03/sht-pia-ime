@@ -564,7 +564,21 @@
     "actionSold": "Venduto",
     "actionRented": "Affittato",
     "pinOutsideAlbania": "Il segnaposto è fuori dall’Albania. Mettilo dove si trova l’immobile.",
-    "pinOutsideCity": "Il segnaposto è fuori dal comune di {{city}}. Spostalo o scegli la città giusta."
+    "pinOutsideCity": "Il segnaposto è fuori dal comune di {{city}}. Spostalo o scegli la città giusta.",
+    "wizard": {
+      "stepOf": "Passo {{n}} di {{total}}",
+      "continueTo": "Continua: {{step}}",
+      "preview": "Anteprima",
+      "previewHint": "Così apparirà il tuo annuncio nei risultati di ricerca.",
+      "untitled": "Il titolo del tuo annuncio",
+      "hint": {
+        "basics": "Tipo, titolo e descrizione",
+        "location": "Città, zona, indirizzo e punto sulla mappa",
+        "details": "Prezzo, superficie, stanze e caratteristiche",
+        "media": "Foto e video",
+        "publish": "Come ti contattano gli acquirenti"
+      }
+    }
   },
   "dashboard": {
     "title": "Dashboard immobile",

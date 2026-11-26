@@ -1,174 +1,3 @@
-.new-listing-page {
-  max-width: 600px;
-  margin: 0 auto;
-  /* .nl-actions is a fixed footer sitting ABOVE the fixed bottom nav (see
-   * its rule below) — this has to clear both, not just the old footer. */
-  padding-bottom: 200px;
-}
-
-/* Header */
-
-.nl-header {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  margin-bottom: 12px;
-}
-
-.nl-close {
-  width: 38px;
-  height: 38px;
-  border-radius: var(--r-sm);
-  border: 1px solid var(--fho-border);
-  background: var(--fho-surface-2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  color: var(--fho-text);
-  flex-shrink: 0;
-}
-
-.nl-back {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  border: 1px solid var(--fho-border);
-  background: var(--fho-surface);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  color: var(--fho-text);
-}
-
-.nl-step-counter {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--fho-text-muted);
-}
-
-.nl-step-name {
-  font-family: var(--font-serif);
-  font-size: 20px;
-  font-weight: 500;
-  color: var(--fho-text);
-  margin-left: auto;
-}
-
-/* Step indicator — dot-and-line track: completed steps get a checkmark and
- * a filled connecting line, the current step is emphasized with a glow,
- * future steps stay outlined/muted. Horizontal-scroll fallback stays as a
- * safety net, but at 5 steps with only the current label shown it fits
- * comfortably down to the smallest supported phone width. */
-
-.nl-progress {
-  display: flex;
-  align-items: center;
-  margin-bottom: 24px;
-  overflow-x: auto;
-  scrollbar-width: thin; /* Firefox */
-  scrollbar-color: var(--fho-border-strong) transparent;
-}
-
-.nl-progress::-webkit-scrollbar {
-  height: 4px;
-}
-
-.nl-progress::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.nl-progress::-webkit-scrollbar-thumb {
-  background: var(--fho-border-strong);
-  border-radius: 999px;
-}
-
-.nl-progress::-webkit-scrollbar-thumb:hover {
-  background: var(--fho-orange-1);
-}
-
-.nl-step-item {
-  display: flex;
-  align-items: center;
-  flex: 0 0 auto;
-}
-
-.nl-step-line {
-  width: 18px;
-  height: 2px;
-  margin: 0 2px;
-  flex-shrink: 0;
-  background: var(--fho-border);
-  transition: background 250ms var(--ease-out);
-}
-
-.nl-step-line.filled {
-  background: linear-gradient(90deg, var(--fho-orange-1), var(--fho-orange-2));
-}
-
-.nl-step {
-  appearance: none;
-  -webkit-appearance: none;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 6px;
-  border-radius: var(--r-pill);
-  font-size: 12px;
-  font-weight: 500;
-  font-family: var(--font-sans);
-  color: var(--fho-text-muted);
-  background: transparent;
-  border: none;
-  white-space: nowrap;
-  cursor: default;
-  transition: all 150ms var(--ease-out);
-}
-
-/* Native `disabled` is deliberately not used (see NewListing.jsx) so
- * completed/current steps stay fully visible instead of looking dimmed. */
-.nl-step--clickable { cursor: pointer; }
-.nl-step--clickable:hover .nl-step-dot { border-color: var(--fho-orange-1); }
-
-.nl-step-dot {
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  font-size: 11px;
-  font-weight: 700;
-  border: 1.5px solid var(--fho-border);
-  background: var(--fho-surface);
-  color: var(--fho-text-muted);
-  transition: all 250ms var(--ease-out);
-}
-
-.nl-step.completed { color: var(--fho-text); }
-.nl-step.completed .nl-step-dot {
-  background: linear-gradient(135deg, var(--fho-orange-1), var(--fho-orange-2));
-  border-color: transparent;
-  color: #fff;
-}
-
-.nl-step.current { color: var(--fho-text); }
-.nl-step.current .nl-step-dot {
-  background: linear-gradient(135deg, var(--fho-orange-1), var(--fho-orange-2));
-  border-color: transparent;
-  color: #fff;
-  transform: scale(1.15);
-  box-shadow: 0 0 0 4px var(--fho-orange-tint);
-}
-
-.nl-step-label { display: none; font-weight: 600; }
-.nl-step.current .nl-step-label { display: inline; }
-@media (min-width: 560px) { .nl-step-label { display: inline; font-weight: 500; } }
-
 /* Section label */
 
 .nl-section-label {
@@ -510,38 +339,6 @@
   font-size: 12px;
 }
 
-/* Actions (sticky footer) */
-
-.nl-actions {
-  position: fixed;
-  /* .liquid-nav sits at bottom:18px, height:62px (z-index:50) — bottom:0
-   * here put this fixed footer directly underneath it, with the nav's
-   * higher stacking order covering the Next button. 18+62=80px clears the
-   * nav's footprint; +16px gives it breathing room above the pill. */
-  bottom: 96px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 100%;
-  max-width: 480px;
-  display: flex;
-  /* Back + Save draft + Publish need ~330px; at 280-320 (or in German) they
-     wrap instead of running past the edge. */
-  flex-wrap: wrap;
-  gap: 10px;
-  padding: 16px 20px;
-  background: var(--fho-surface);
-  border: 1px solid var(--fho-border);
-  border-radius: var(--r-lg);
-  box-shadow: var(--fho-card-shadow);
-  z-index: 30;
-}
-
-@media (max-width: 359px) {
-  .nl-actions { padding: 12px 16px; }
-  .nl-actions .nl-btn { padding: 12px 14px; }
-  .nl-btn-label { display: none; }
-}
-
 .nl-btn {
   display: flex;
   align-items: center;
@@ -572,7 +369,7 @@
 
 /* Website additions: the old site's variable names on the website's tokens,
    and the utility classes the form used (the website has no Tailwind). */
-.new-listing-page, .rf-list, .nl-fab-wrap {
+.new-listing-page, .rf-list {
   --fho-orange-1: #ff6b00;
   --fho-orange-2: #e85d00;
   --fho-orange-soft: #ffb380;
@@ -596,7 +393,7 @@
   --r-md: var(--r-m);
   --r-lg: var(--r-l);
 }
-.new-listing-page { padding: var(--s6) var(--gutter) 140px; }
+
 .relative { position: relative; }
 .w-full { width: 100%; }
 .pr-10 { padding-right: 40px; }
@@ -608,13 +405,6 @@
 .nl-note { display: block; margin-top: 8px; font-size: 12px; line-height: 1.6; color: var(--muted); }
 .nl-mono { margin-top: 4px; font-family: 'JetBrains Mono', ui-monospace, monospace; }
 .nl-map-hint { pointer-events: none; position: absolute; bottom: 8px; left: 8px; z-index: 500; display: flex; align-items: center; gap: 6px; border-radius: 999px; border: 1px solid var(--line); background: var(--paper); padding: 6px 10px; font-size: 11px; font-weight: 600; color: var(--ink); }
-.nl-fab-wrap { pointer-events: none; position: fixed; bottom: 96px; left: 50%; z-index: 50; width: 100%; max-width: 480px; transform: translateX(-50%); padding: 0 20px; }
-.nl-fab-row { display: flex; align-items: center; justify-content: flex-end; gap: 12px; }
-.nl-fab { pointer-events: auto; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: transform 160ms var(--ease); }
-.nl-fab:hover { transform: scale(1.05); }
-.nl-fab:active { transform: scale(0.95); }
-.nl-fab-secondary { width: 48px; height: 48px; border: 1px solid color-mix(in srgb, var(--ink) 30%, var(--line)); background: var(--paper); color: var(--ink); box-shadow: var(--shadow); }
-.nl-fab-primary { width: 58px; height: 58px; border: 0; background: linear-gradient(135deg, #ff6b00, #e85d00); color: #fff; box-shadow: 0 6px 18px rgb(255 107 0 / 0.3); }
 .rf-spin { pointer-events: none; position: absolute; right: 12px; top: 50%; margin-top: -8px; color: var(--fho-orange-2); }
 .rf-list { position: absolute; left: 0; right: 0; top: 100%; z-index: 1000; margin: 6px 0 0; max-height: 192px; list-style: none; overflow-y: auto; border-radius: var(--r-m); border: 1px solid var(--line); background: var(--paper); padding: 0; box-shadow: var(--shadow); }
 .rf-item { display: flex; width: 100%; align-items: center; gap: 10px; border: 0; border-bottom: 1px solid var(--line); background: transparent; padding: 10px 12px; text-align: left; color: var(--ink); }
@@ -627,3 +417,63 @@
 .new-listing-page .link-btn { border: 0; background: none; padding: 8px 0; font-weight: 700; cursor: pointer; }
 
 .nl-field .sel-trigger { display: flex; width: 100%; cursor: pointer; text-align: left; }
+
+/* Website layout: steps on the left, the form on a card, a live preview on
+   the right, and an action bar that stays on screen while the form scrolls. */
+.new-listing-page { padding-bottom: var(--s7); }
+.nl-head { margin-bottom: var(--s5); }
+.nl-head .muted { margin-top: var(--s1); }
+.nl-leave { display: inline-flex; align-items: center; gap: 6px; margin-bottom: var(--s3); border: 0; background: none; padding: 0; cursor: pointer; font-weight: 600; }
+.nl-layout { display: grid; gap: var(--s5); align-items: start; }
+@media (min-width: 900px) { .nl-layout { grid-template-columns: 240px minmax(0, 1fr); gap: var(--s6); } }
+@media (min-width: 1240px) { .nl-layout { grid-template-columns: 240px minmax(0, 1fr) 300px; } }
+
+.nl-meter { height: 6px; border-radius: var(--r-pill); background: var(--stone); overflow: hidden; }
+.nl-meter span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #ff7d1a, #e85d00); transition: width 0.35s var(--ease); }
+.nl-steps { display: none; list-style: none; margin: var(--s4) 0 0; padding: 0; gap: 2px; }
+@media (min-width: 900px) {
+  .nl-rail { position: sticky; top: calc(var(--bar-h) + 24px); }
+  .nl-steps { display: grid; }
+}
+.nl-step { display: flex; align-items: center; gap: var(--s3); width: 100%; padding: 10px 12px; border: 0; border-radius: var(--r-m); background: none; color: var(--muted); text-align: left; font: inherit; cursor: default; transition: background 0.2s var(--ease); }
+.nl-step.is-current { background: var(--stone); color: var(--ink); }
+.nl-step.is-done { color: var(--ink); cursor: pointer; }
+.nl-step.is-done:hover { background: var(--stone); }
+.nl-step:focus-visible { outline: 3px solid var(--door); outline-offset: 1px; }
+.nl-step-dot { display: grid; place-items: center; flex: none; width: 30px; height: 30px; border-radius: 50%; border: 1.5px solid var(--line); font-size: 13px; font-weight: 700; background: var(--paper); }
+.nl-step.is-current .nl-step-dot { border-color: transparent; background: linear-gradient(135deg, #ff7d1a, #e85d00); color: #fff; box-shadow: 0 0 0 4px color-mix(in srgb, #ff7d1a 18%, transparent); }
+.nl-step.is-done .nl-step-dot { border-color: transparent; background: color-mix(in srgb, #ff7d1a 14%, var(--paper)); color: var(--door-text); }
+.nl-step-text { display: grid; min-width: 0; }
+.nl-step-text strong { font-size: 15px; }
+.nl-step-text small { font-size: 12.5px; color: var(--muted); line-height: 1.35; }
+
+.nl-main { min-width: 0; }
+.nl-card { padding: var(--s5); border: 1px solid var(--line); border-radius: var(--r-l); background: var(--paper); }
+@media (min-width: 900px) { .nl-card { padding: var(--s6); } }
+.nl-card-title { font-family: var(--font-display); font-weight: 600; font-size: 28px; line-height: 1.15; }
+.nl-card-hint { margin: var(--s1) 0 var(--s5); }
+
+.nl-bar {
+  position: sticky; bottom: max(12px, env(safe-area-inset-bottom)); z-index: 20;
+  display: flex; align-items: center; justify-content: space-between; gap: var(--s3);
+  margin-top: var(--s4); padding: var(--s2) var(--s3);
+  border: 1px solid var(--line); border-radius: var(--r-l);
+  background: color-mix(in srgb, var(--paper) 88%, transparent);
+  backdrop-filter: blur(14px) saturate(1.4); -webkit-backdrop-filter: blur(14px) saturate(1.4);
+  box-shadow: 0 -2px 24px rgb(0 0 0 / 0.08);
+}
+.nl-bar .btn { min-height: 48px; }
+.nl-bar-count { font: 500 13px 'JetBrains Mono', ui-monospace, monospace; color: var(--muted); }
+.nl-bar-end { display: flex; gap: var(--s2); flex-wrap: wrap; justify-content: flex-end; }
+.nl-bar-short { display: none; }
+@media (max-width: 599px) {
+  .nl-bar-label { display: none; }
+  .nl-bar-short { display: inline; }
+  .nl-bar .btn { padding-inline: var(--s4); }
+}
+
+.nl-preview { display: none; }
+@media (min-width: 1240px) { .nl-preview { display: grid; gap: var(--s3); position: sticky; top: calc(var(--bar-h) + 24px); } }
+.nl-preview-card .card-media { display: grid; place-items: center; background: var(--stone); }
+.nl-preview-empty { color: var(--muted); }
+.nl-preview-card .card-title { overflow-wrap: anywhere; }
