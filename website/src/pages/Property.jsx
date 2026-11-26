@@ -7,6 +7,8 @@ import { gradientFor } from '@/src/lib/format.js'
 import { formatRef } from '@/src/features/properties/lib/searchFilters.js'
 import { ErrorState } from '../components/States'
 import NotFound from './NotFound'
+import ListingAssistant from '../components/ListingAssistant'
+import { AI_CHAT_ENABLED } from '../lib/features'
 import { getProperty } from '../lib/api'
 import { addRecentlyViewed, ContactPanel, logActivity, PriceHistory, SimilarHomes } from '../features/listing'
 
@@ -142,6 +144,7 @@ export default function Property() {
               ))}
             </dl>
           )}
+          {AI_CHAT_ENABLED && p.status === 'active' && <ListingAssistant key={p.id} property={p} />}
           {description && (
             <section aria-labelledby="desc-title">
               <h2 id="desc-title">{t('listing.description')}</h2>

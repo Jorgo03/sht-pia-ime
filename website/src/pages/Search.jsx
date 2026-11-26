@@ -1,13 +1,14 @@
 import { lazy, Suspense, useEffect, useMemo, useState } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
-import { List, Map as MapIcon, SlidersHorizontal } from 'lucide-react'
+import { List, Map as MapIcon, SlidersHorizontal, Sparkles } from 'lucide-react'
 import SearchPanel, { fieldsFrom } from '../components/SearchPanel'
 import PropertyCard, { CardSkeleton } from '../components/PropertyCard'
 import { EmptyState, ErrorState } from '../components/States'
 import MoreFilters from '../components/MoreFilters'
 import SaveSearchButton from '../components/SaveSearchButton'
+import { AI_CHAT_ENABLED } from '../lib/features'
 import { filtersFromParams, getProperties, getPropertiesCount, PAGE_SIZE } from '../lib/api'
 
 // Leaflet only loads when someone opens the map.
@@ -70,6 +71,12 @@ export default function Search() {
               {t('search.filtersTitle')}
               {active > 0 && <span className="count-badge">{active}</span>}
             </button>
+            {AI_CHAT_ENABLED && (
+              <Link to="/assistant" className="btn btn-outline btn-sm">
+                <Sparkles size={16} aria-hidden="true" />
+                {t('aiAssistant.title')}
+              </Link>
+            )}
             <button type="button" className="btn btn-outline btn-sm" onClick={() => setView(!onMap)}>
               {onMap ? <List size={16} aria-hidden="true" /> : <MapIcon size={16} aria-hidden="true" />}
               {onMap ? t('search.listView') : t('search.mapView')}

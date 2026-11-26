@@ -23,6 +23,8 @@ export default function Footer() {
           <Link to="/wanted">{t('wanted.boardPre')} {t('wanted.boardEm')}</Link>
           <Link to="/compare">{t('compare.headlinePre')} {t('compare.headlineEm')}</Link>
           <Link to="/guide">{t('legal.buyingGuide')}</Link>
+          <Link to="/assistant">{t('aiAssistant.title')}</Link>
+          <Link to="/pricing">{t('pricing.title')}</Link>
           <Link to="/#app">{t('web.nav.app')}</Link>
         </nav>
         <nav aria-label={t('site.footer.legal')}>

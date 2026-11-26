@@ -139,6 +139,14 @@
     {
       "source": "/listing/create",
       "destination": "/"
+    },
+    {
+      "source": "/assistant",
+      "destination": "/"
+    },
+    {
+      "source": "/pricing",
+      "destination": "/"
     }
   ],
   "headers": [

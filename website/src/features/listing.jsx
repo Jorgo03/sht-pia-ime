@@ -205,7 +205,7 @@ export function ContactPanel({ p, title }) {
   const profileLink = agentId ? `/${pub.kind === 'agent' ? 'agent' : 'user'}/${agentId}` : null
 
   return (
-    <aside className="contact" aria-labelledby="contact-title">
+    <aside id="contact" className="contact" aria-labelledby="contact-title">
       <div className="contact-top">
         <span className="badge is-inline">{t(listingBadgeKey(p.listing_type))}</span>
         <FavoriteButton property={p} />
