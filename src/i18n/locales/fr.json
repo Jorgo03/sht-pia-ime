@@ -1384,7 +1384,9 @@
       "body": "Enregistrez des biens, soyez averti quand un bien correspondant paraît et écrivez aux agents depuis votre téléphone.",
       "soon": "Bientôt sur l'App Store et Google Play.",
       "appStore": "App Store",
-      "googlePlay": "Google Play"
+      "googlePlay": "Google Play",
+      "downloadOn": "Télécharger dans l’",
+      "getItOn": "DISPONIBLE SUR"
     },
     "error": "Impossible de charger les biens. Vérifiez votre connexion et réessayez.",
     "gallery": {

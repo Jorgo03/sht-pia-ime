@@ -1374,7 +1374,9 @@
       "body": "Save homes, get a message when a match is listed, and chat with agents from your phone.",
       "soon": "Coming soon to the App Store and Google Play.",
       "appStore": "App Store",
-      "googlePlay": "Google Play"
+      "googlePlay": "Google Play",
+      "downloadOn": "Download on the",
+      "getItOn": "GET IT ON"
     },
     "error": "Homes couldn't be loaded. Check your connection and try again.",
     "gallery": {

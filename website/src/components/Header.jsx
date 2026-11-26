@@ -59,7 +59,7 @@ export default function Header({ overHero, dark = false }) {
           <p>{t('site.footer.tagline')}</p>
           <div className="topbar-end">
             <Link to={session ? '/listing/new' : '/signup'}>{t('site.listHome')}</Link>
-            <Link to="/#app">{t('web.nav.app')}</Link>
+            <Link to={{ hash: '#app' }}>{t('web.nav.app')}</Link>
             <LanguageSelect />
             <CurrencySelect />
           </div>
@@ -129,7 +129,7 @@ export default function Header({ overHero, dark = false }) {
           {session && <Link to="/notifications">{t('notifications.headlinePre')} {t('notifications.headlineEm')}</Link>}
           <Link to="/compare">{t('compare.headlinePre')} {t('compare.headlineEm')}</Link>
           <Link to="/guide">{t('legal.buyingGuide')}</Link>
-          <Link to="/#app">{t('web.nav.app')}</Link>
+          <Link to={{ hash: '#app' }}>{t('web.nav.app')}</Link>
           {!session && <Link to="/signup">{t('auth.createAccount')}</Link>}
         </nav>
         <div className="menu-selects">

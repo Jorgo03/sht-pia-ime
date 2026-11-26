@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import Logo from './Logo'
 import LanguageSelect from './LanguageSelect'
+import StoreBadges from './StoreBadges'
 
 export default function Footer() {
   const { t } = useTranslation()
@@ -25,7 +26,7 @@ export default function Footer() {
           <Link to="/guide">{t('legal.buyingGuide')}</Link>
           <Link to="/assistant">{t('aiAssistant.title')}</Link>
           <Link to="/pricing">{t('pricing.title')}</Link>
-          <Link to="/#app">{t('web.nav.app')}</Link>
+          <Link to={{ hash: '#app' }}>{t('web.nav.app')}</Link>
         </nav>
         <nav aria-label={t('site.footer.legal')}>
           <h2>{t('site.footer.legal')}</h2>
@@ -37,6 +38,7 @@ export default function Footer() {
       </div>
       <div className="container footer-base">
         <p>{t('site.footer.copyright', { year: new Date().getFullYear() })}</p>
+        <StoreBadges />
       </div>
     </footer>
   )

@@ -1384,7 +1384,9 @@
       "body": "Guarda viviendas, recibe un aviso cuando se publique una que encaje y escribe a los agentes desde el móvil.",
       "soon": "Muy pronto en App Store y Google Play.",
       "appStore": "App Store",
-      "googlePlay": "Google Play"
+      "googlePlay": "Google Play",
+      "downloadOn": "Descárgalo en el",
+      "getItOn": "DISPONIBLE EN"
     },
     "error": "No se pudieron cargar las viviendas. Revisa tu conexión e inténtalo de nuevo.",
     "gallery": {

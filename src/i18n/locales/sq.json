@@ -1374,7 +1374,9 @@
       "body": "Ruaj shtëpitë, merr njoftim kur del një shtëpi që të përshtatet dhe shkruaju agjentëve nga telefoni.",
       "soon": "Së shpejti në App Store dhe Google Play.",
       "appStore": "App Store",
-      "googlePlay": "Google Play"
+      "googlePlay": "Google Play",
+      "downloadOn": "Shkarko nga",
+      "getItOn": "MERRE NË"
     },
     "error": "Shtëpitë nuk u ngarkuan. Kontrollo lidhjen dhe provo përsëri.",
     "gallery": {

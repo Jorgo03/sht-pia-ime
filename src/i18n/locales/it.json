@@ -1384,7 +1384,9 @@
       "body": "Salva gli immobili, ricevi un avviso quando esce quello giusto e scrivi agli agenti dal telefono.",
       "soon": "Presto su App Store e Google Play.",
       "appStore": "App Store",
-      "googlePlay": "Google Play"
+      "googlePlay": "Google Play",
+      "downloadOn": "Scarica su",
+      "getItOn": "DISPONIBILE SU"
     },
     "error": "Impossibile caricare gli immobili. Controlla la connessione e riprova.",
     "gallery": {

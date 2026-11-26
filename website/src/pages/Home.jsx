@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
-import { ArrowRight, Bell, Heart, MessageCircle, Sparkles } from 'lucide-react'
+import { ArrowRight, Sparkles } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { initialsOf } from '@/src/features/properties/lib/discovery.js'
 import SearchPanel from '../components/SearchPanel'
@@ -11,7 +11,6 @@ import { getAgentDirectory, getCityTiles, getProperties, getPropertiesByIds } fr
 import { recentlyViewedIds } from '../features/listing'
 import { cityName } from '../lib/format'
 import { AI_CHAT_ENABLED } from '../lib/features'
-import symbolWhite from '../../../assets/brand/symbol-white.svg'
 
 function Hero() {
   const { t } = useTranslation()
@@ -165,46 +164,10 @@ function Agents() {
         <aside className="join" aria-labelledby="join-title">
           <h3 id="join-title">{t('web.agents.joinTitle')}</h3>
           <p>{t('web.agents.joinBody')}</p>
-          <Link to="/#app" className="btn btn-primary">
+          <Link to={{ hash: '#app' }} className="btn btn-primary">
             {t('web.nav.app')}
           </Link>
         </aside>
-      </div>
-    </section>
-  )
-}
-
-function AppBand() {
-  const { t } = useTranslation()
-  const perks = [
-    [Heart, t('favourites.emptyDescription')],
-    [Bell, t('site.services.wanted.body')],
-    [MessageCircle, t('site.services.chat.body')],
-  ]
-  return (
-    <section id="app" className="app-band" aria-labelledby="app-title">
-      <div className="container app-inner">
-        <div>
-          <h2 id="app-title">{t('web.app.title')}</h2>
-          <p className="app-lead">{t('web.app.body')}</p>
-          <ul className="perks">
-            {perks.map(([Icon, text]) => (
-              <li key={text}>
-                <Icon size={18} aria-hidden="true" />
-                {text}
-              </li>
-            ))}
-          </ul>
-          <div className="stores">
-            {/* No store listing yet: shown as coming soon, never as a dead link. */}
-            <span className="store" aria-disabled="true">{t('web.app.appStore')}</span>
-            <span className="store" aria-disabled="true">{t('web.app.googlePlay')}</span>
-          </div>
-          <p className="app-soon">{t('web.app.soon')}</p>
-        </div>
-        <div className="app-mark" aria-hidden="true">
-          <img src={symbolWhite} alt="" />
-        </div>
       </div>
     </section>
   )
@@ -242,7 +205,6 @@ export default function Home() {
       <Latest />
       <Cities />
       <Agents />
-      <AppBand />
     </>
   )
 }

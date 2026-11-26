@@ -1394,7 +1394,9 @@
       "body": "Zapisuj nieruchomości, dostawaj powiadomienie, gdy pojawi się pasująca, i pisz do agentów z telefonu.",
       "soon": "Wkrótce w App Store i Google Play.",
       "appStore": "App Store",
-      "googlePlay": "Google Play"
+      "googlePlay": "Google Play",
+      "downloadOn": "Pobierz z",
+      "getItOn": "POBIERZ Z"
     },
     "error": "Nie udało się wczytać nieruchomości. Sprawdź połączenie i spróbuj ponownie.",
     "gallery": {

@@ -1394,7 +1394,9 @@
       "body": "Сохраняйте объекты, получайте уведомление о подходящих новых и пишите агентам с телефона.",
       "soon": "Скоро в App Store и Google Play.",
       "appStore": "App Store",
-      "googlePlay": "Google Play"
+      "googlePlay": "Google Play",
+      "downloadOn": "Загрузите в",
+      "getItOn": "ДОСТУПНО В"
     },
     "error": "Не удалось загрузить объекты. Проверьте подключение и попробуйте снова.",
     "gallery": {

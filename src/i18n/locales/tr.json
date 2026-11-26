@@ -1374,7 +1374,9 @@
       "body": "Evleri kaydedin, uygun bir ilan çıktığında bildirim alın ve emlakçılara telefonunuzdan yazın.",
       "soon": "Yakında App Store ve Google Play'de.",
       "appStore": "App Store",
-      "googlePlay": "Google Play"
+      "googlePlay": "Google Play",
+      "downloadOn": "Hemen indirin",
+      "getItOn": "HEMEN EDİNİN"
     },
     "error": "Evler yüklenemedi. Bağlantınızı kontrol edip tekrar deneyin.",
     "gallery": {

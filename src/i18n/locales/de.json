@@ -1374,7 +1374,9 @@
       "body": "Immobilien merken, benachrichtigt werden, wenn etwas Passendes erscheint, und mit Maklern vom Handy aus schreiben.",
       "soon": "Bald im App Store und bei Google Play.",
       "appStore": "App Store",
-      "googlePlay": "Google Play"
+      "googlePlay": "Google Play",
+      "downloadOn": "Laden im",
+      "getItOn": "JETZT BEI"
     },
     "error": "Die Immobilien konnten nicht geladen werden. Prüfen Sie Ihre Verbindung und versuchen Sie es erneut.",
     "gallery": {
