@@ -87,6 +87,46 @@
     {
       "source": "/guide",
       "destination": "/"
+    },
+    {
+      "source": "/my-listings",
+      "destination": "/"
+    },
+    {
+      "source": "/my-listings/:id/edit",
+      "destination": "/"
+    },
+    {
+      "source": "/new-listing",
+      "destination": "/"
+    },
+    {
+      "source": "/listing/new",
+      "destination": "/"
+    },
+    {
+      "source": "/listing/import",
+      "destination": "/"
+    },
+    {
+      "source": "/listing/:id/edit",
+      "destination": "/"
+    },
+    {
+      "source": "/listing/:id/analytics",
+      "destination": "/"
+    },
+    {
+      "source": "/agent-dashboard",
+      "destination": "/"
+    },
+    {
+      "source": "/leads",
+      "destination": "/"
+    },
+    {
+      "source": "/performance",
+      "destination": "/"
     }
   ],
   "headers": [

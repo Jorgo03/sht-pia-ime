@@ -1,0 +1,100 @@
+import { useEffect, useMemo, useState } from 'react'
+import { Link, Navigate, useParams } from 'react-router-dom'
+import { useQuery } from '@tanstack/react-query'
+import { ArrowLeft } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
+import { supabase } from '../lib/supabase'
+import { useAuth } from '../auth/AuthContext'
+import { ErrorState } from '../components/States'
+
+const DAYS = 30
+const TYPES = ['view', 'call', 'message', 'meeting', 'favourite']
+
+// One listing's activity over 30 days, as in the app
+// (app/listing/[id]/analytics.tsx): totals per kind, a daily chart for the
+// chosen kind, and the most recent events.
+export default function ListingStats() {
+  const { id } = useParams()
+  const { t, i18n } = useTranslation()
+  const lang = i18n.resolvedLanguage
+  const { user, ready } = useAuth()
+  const [metric, setMetric] = useState('view')
+  const [now] = useState(() => Date.now())
+  const q = useQuery({
+    queryKey: ['activity', id],
+    enabled: !!user,
+    queryFn: async () => {
+      const since = new Date(Date.now() - DAYS * 864e5).toISOString()
+      const { data, error } = await supabase.from('property_activity').select('id, type, created_at').eq('property_id', id).gte('created_at', since).order('created_at', { ascending: false }).limit(500)
+      if (error) throw error
+      return data ?? []
+    },
+  })
+  const activity = useMemo(() => q.data ?? [], [q.data])
+  const counts = useMemo(() => Object.fromEntries(TYPES.map((k) => [k, activity.filter((a) => a.type === k).length])), [activity])
+  const days = useMemo(() => {
+    const list = []
+    for (let i = DAYS - 1; i >= 0; i--) {
+      const key = new Date(now - i * 864e5).toISOString().slice(0, 10)
+      list.push({ key, count: activity.filter((a) => a.type === metric && a.created_at.slice(0, 10) === key).length })
+    }
+    return list
+  }, [activity, metric, now])
+  const max = Math.max(1, ...days.map((d) => d.count))
+
+  useEffect(() => {
+    document.title = `${t('dashboard.title')} | ${t('common.appName')}`
+  }, [t])
+
+  if (ready && !user) return <Navigate to={`/login?next=/listing/${id}/analytics`} replace />
+
+  return (
+    <div className="page container section narrow">
+      <Link to="/my-listings" className="text-link back-link">
+        <ArrowLeft size={16} aria-hidden="true" />
+        {t('listing.myListings')}
+      </Link>
+      <h1 className="page-title">{t('dashboard.title')}</h1>
+      {q.isError ? (
+        <ErrorState onRetry={() => q.refetch()} />
+      ) : (
+        <>
+          <div className="stat-grid" role="radiogroup" aria-label={t('dashboard.title')}>
+            {TYPES.map((k) => (
+              <button key={k} type="button" role="radio" aria-checked={metric === k} className={`stat ${metric === k ? 'is-on' : ''}`} onClick={() => setMetric(k)}>
+                <strong>{q.isPending ? '–' : counts[k]}</strong>
+                <span>{t(`dashboard.${k}s`)}</span>
+              </button>
+            ))}
+          </div>
+          <section className="panel" aria-labelledby="chart-title">
+            <h2 id="chart-title" className="small strong">{t(`dashboard.${metric}s`)} · {DAYS}d</h2>
+            <ol className="bars">
+              {days.map((d) => (
+                <li key={d.key} title={`${d.key}: ${d.count}`}>
+                  <span className="bar" style={{ height: `${(d.count / max) * 100}%` }} />
+                  <span className="visually-hidden">{d.key}: {d.count}</span>
+                </li>
+              ))}
+            </ol>
+          </section>
+          <section className="panel" aria-labelledby="recent-title">
+            <h2 id="recent-title" className="small strong">{t('dashboard.recentActivity')}</h2>
+            {activity.length === 0 ? (
+              <p className="muted">{q.isPending ? t('common.loading') : t('dashboard.noActivity')}</p>
+            ) : (
+              <ul className="activity">
+                {activity.slice(0, 50).map((a) => (
+                  <li key={a.id}>
+                    <span>{t(`dashboard.${a.type}s`)}</span>
+                    <time dateTime={a.created_at}>{new Date(a.created_at).toLocaleString(lang, { dateStyle: 'medium', timeStyle: 'short' })}</time>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+        </>
+      )}
+    </div>
+  )
+}

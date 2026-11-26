@@ -9,6 +9,7 @@ import { useAuth } from '../auth/AuthContext'
 export default function Header({ overHero, dark = false }) {
   const { t } = useTranslation()
   const { session, profile } = useAuth()
+  const isAgent = profile?.role === 'agent'
   const { pathname, search } = useLocation()
   const [scrolled, setScrolled] = useState(false)
   const [open, setOpen] = useState(false)
@@ -56,7 +57,7 @@ export default function Header({ overHero, dark = false }) {
         <div className="container topbar-inner">
           <p>{t('site.footer.tagline')}</p>
           <div className="topbar-end">
-            <Link to={session ? '/account' : '/signup'}>{t('site.listHome')}</Link>
+            <Link to={session ? '/listing/new' : '/signup'}>{t('site.listHome')}</Link>
             <Link to="/#app">{t('web.nav.app')}</Link>
             <LanguageSelect />
           </div>
@@ -118,6 +119,9 @@ export default function Header({ overHero, dark = false }) {
           ))}
           <Link to="/favorites">{t('favourites.title')}</Link>
           {session && <Link to="/messages">{t('common.messages')}</Link>}
+          {isAgent && <Link to="/agent-dashboard">{t('agentDashboard.title')}</Link>}
+          {session && <Link to="/my-listings">{t('listing.myListings')}</Link>}
+          {isAgent && <Link to="/leads">{t('leads.headlinePre')} {t('leads.headlineEm')}</Link>}
           {session && <Link to="/viewings">{t('viewings.title')}</Link>}
           {session && <Link to="/saved-searches">{t('saved.headlinePre')} {t('saved.headlineEm')}</Link>}
           {session && <Link to="/notifications">{t('notifications.headlinePre')} {t('notifications.headlineEm')}</Link>}

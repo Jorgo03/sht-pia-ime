@@ -1,0 +1,627 @@
+.new-listing-page {
+  max-width: 600px;
+  margin: 0 auto;
+  /* .nl-actions is a fixed footer sitting ABOVE the fixed bottom nav (see
+   * its rule below) — this has to clear both, not just the old footer. */
+  padding-bottom: 200px;
+}
+
+/* Header */
+
+.nl-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 12px;
+}
+
+.nl-close {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--fho-border);
+  background: var(--fho-surface-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--fho-text);
+  flex-shrink: 0;
+}
+
+.nl-back {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid var(--fho-border);
+  background: var(--fho-surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--fho-text);
+}
+
+.nl-step-counter {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--fho-text-muted);
+}
+
+.nl-step-name {
+  font-family: var(--font-serif);
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--fho-text);
+  margin-left: auto;
+}
+
+/* Step indicator — dot-and-line track: completed steps get a checkmark and
+ * a filled connecting line, the current step is emphasized with a glow,
+ * future steps stay outlined/muted. Horizontal-scroll fallback stays as a
+ * safety net, but at 5 steps with only the current label shown it fits
+ * comfortably down to the smallest supported phone width. */
+
+.nl-progress {
+  display: flex;
+  align-items: center;
+  margin-bottom: 24px;
+  overflow-x: auto;
+  scrollbar-width: thin; /* Firefox */
+  scrollbar-color: var(--fho-border-strong) transparent;
+}
+
+.nl-progress::-webkit-scrollbar {
+  height: 4px;
+}
+
+.nl-progress::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.nl-progress::-webkit-scrollbar-thumb {
+  background: var(--fho-border-strong);
+  border-radius: 999px;
+}
+
+.nl-progress::-webkit-scrollbar-thumb:hover {
+  background: var(--fho-orange-1);
+}
+
+.nl-step-item {
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+}
+
+.nl-step-line {
+  width: 18px;
+  height: 2px;
+  margin: 0 2px;
+  flex-shrink: 0;
+  background: var(--fho-border);
+  transition: background 250ms var(--ease-out);
+}
+
+.nl-step-line.filled {
+  background: linear-gradient(90deg, var(--fho-orange-1), var(--fho-orange-2));
+}
+
+.nl-step {
+  appearance: none;
+  -webkit-appearance: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 6px;
+  border-radius: var(--r-pill);
+  font-size: 12px;
+  font-weight: 500;
+  font-family: var(--font-sans);
+  color: var(--fho-text-muted);
+  background: transparent;
+  border: none;
+  white-space: nowrap;
+  cursor: default;
+  transition: all 150ms var(--ease-out);
+}
+
+/* Native `disabled` is deliberately not used (see NewListing.jsx) so
+ * completed/current steps stay fully visible instead of looking dimmed. */
+.nl-step--clickable { cursor: pointer; }
+.nl-step--clickable:hover .nl-step-dot { border-color: var(--fho-orange-1); }
+
+.nl-step-dot {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 11px;
+  font-weight: 700;
+  border: 1.5px solid var(--fho-border);
+  background: var(--fho-surface);
+  color: var(--fho-text-muted);
+  transition: all 250ms var(--ease-out);
+}
+
+.nl-step.completed { color: var(--fho-text); }
+.nl-step.completed .nl-step-dot {
+  background: linear-gradient(135deg, var(--fho-orange-1), var(--fho-orange-2));
+  border-color: transparent;
+  color: #fff;
+}
+
+.nl-step.current { color: var(--fho-text); }
+.nl-step.current .nl-step-dot {
+  background: linear-gradient(135deg, var(--fho-orange-1), var(--fho-orange-2));
+  border-color: transparent;
+  color: #fff;
+  transform: scale(1.15);
+  box-shadow: 0 0 0 4px var(--fho-orange-tint);
+}
+
+.nl-step-label { display: none; font-weight: 600; }
+.nl-step.current .nl-step-label { display: inline; }
+@media (min-width: 560px) { .nl-step-label { display: inline; font-weight: 500; } }
+
+/* Section label */
+
+.nl-section-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--fho-text-muted);
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.nl-section-label::before {
+  content: '';
+  width: 14px;
+  height: 1px;
+  background: var(--fho-orange-1);
+}
+
+/* Form */
+
+.nl-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.nl-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.nl-field label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--fho-text);
+  font-family: var(--font-sans);
+}
+
+.nl-field input,
+.nl-field select,
+.nl-field textarea {
+  padding: 12px 14px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--fho-border);
+  background: var(--fho-surface-2);
+  color: var(--fho-text);
+  font-size: 14px;
+  font-family: var(--font-sans);
+  outline: none;
+  transition: border-color 150ms;
+}
+
+.nl-field input:focus,
+.nl-field select:focus,
+.nl-field textarea:focus {
+  border-color: var(--fho-orange-1);
+}
+
+.nl-field input::placeholder,
+.nl-field textarea::placeholder {
+  color: var(--fho-text-faint);
+}
+
+.nl-row {
+  display: flex;
+  gap: 12px;
+}
+
+.nl-row .nl-field { flex: 1; min-width: 0; }
+
+/* Flex items default to their content width; inputs' is ~180px, so two in a
+   row overflowed below ~390 wide. */
+.nl-field input,
+.nl-field select,
+.nl-field textarea { min-width: 0; }
+
+/* Big tappable cards for listing type */
+
+.nl-type-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.nl-type-card {
+  padding: 20px 16px;
+  border-radius: var(--r-lg);
+  border: 1.5px solid var(--fho-border);
+  background: var(--fho-surface-2);
+  text-align: center;
+  cursor: pointer;
+  transition: all 150ms var(--ease-out);
+  font-family: var(--font-sans);
+}
+
+.nl-type-card.active {
+  border-color: var(--fho-orange-1);
+  background: var(--fho-orange-tint);
+}
+
+.nl-type-card__title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--fho-text);
+  margin-bottom: 4px;
+}
+
+.nl-type-card__sub {
+  font-size: 12px;
+  color: var(--fho-text-muted);
+}
+
+/* Radio group */
+
+.nl-radio-group {
+  display: flex;
+  gap: 8px;
+}
+
+.nl-radio {
+  flex: 1;
+  padding: 10px;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--fho-border);
+  background: var(--fho-surface);
+  color: var(--fho-text);
+  font-size: 13px;
+  font-weight: 500;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  text-align: center;
+  transition: all 150ms var(--ease-out);
+}
+
+.nl-radio.active {
+  background: linear-gradient(135deg, var(--fho-orange-1), var(--fho-orange-2));
+  color: white;
+  border-color: transparent;
+}
+
+/* Language tabs */
+
+.nl-lang-tabs {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.nl-lang-tab {
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--fho-border);
+  background: transparent;
+  color: var(--fho-text-muted);
+  font-size: 11px;
+  font-weight: 600;
+  font-family: var(--font-mono);
+  cursor: pointer;
+  transition: all 150ms;
+}
+
+.nl-lang-tab.active {
+  background: var(--fho-orange-2);
+  color: white;
+  border-color: transparent;
+}
+
+/* A language that already holds text, so the agent can see at a glance which
+   of the eight are filled without clicking through them. */
+.nl-lang-tab.filled {
+  border-color: var(--fho-orange-soft);
+}
+
+.nl-lang-tab:disabled {
+  cursor: default;
+  opacity: 0.7;
+}
+
+/* Translation bar — the language tabs plus the one status line under them. */
+
+.nl-translation-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.nl-translation-status {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--fho-text-muted);
+  /* Reserves the row's height whether or not it has content, so the input
+     below does not jump as the status appears and clears. */
+  min-height: 18px;
+}
+
+/* Same red as .nl-error above — this file has no error custom property. */
+.nl-translation-status--error {
+  color: #e74c3c;
+}
+
+.nl-translation-action {
+  padding: 0;
+  border: none;
+  background: none;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--fho-orange-text);
+  cursor: pointer;
+}
+
+.nl-translation-action:hover {
+  text-decoration: underline;
+}
+
+/* Chips */
+
+.nl-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.nl-chip {
+  padding: 8px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--fho-border);
+  background: var(--fho-surface-2);
+  color: var(--fho-text);
+  font-size: 13px;
+  font-weight: 500;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 150ms var(--ease-out);
+}
+
+.nl-chip::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--fho-border-strong);
+  transition: background 150ms;
+}
+
+.nl-chip.active {
+  background: var(--fho-orange-tint);
+  border-color: var(--fho-orange-1);
+  color: var(--fho-orange-text);
+}
+
+.nl-chip.active::before {
+  background: var(--fho-orange-1);
+}
+
+/* Upload */
+
+.nl-upload-zone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 32px;
+  border: 2px dashed var(--fho-border);
+  border-radius: var(--r-lg);
+  cursor: pointer;
+  color: var(--fho-text-muted);
+  font-size: 13px;
+  transition: border-color 150ms;
+}
+
+.nl-upload-zone:hover { border-color: var(--fho-orange-1); }
+
+.nl-image-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.nl-image-thumb {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  border-radius: var(--r-sm);
+  overflow: hidden;
+  border: 1px solid var(--fho-border);
+}
+
+.nl-image-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.nl-cover-badge {
+  position: absolute;
+  bottom: 4px;
+  left: 4px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: var(--fho-orange-2);
+  color: white;
+  font-size: 9px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+}
+
+.nl-image-remove {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0,0,0,0.6);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+/* Error */
+
+.nl-error {
+  color: #e74c3c;
+  font-size: 12px;
+}
+
+/* Actions (sticky footer) */
+
+.nl-actions {
+  position: fixed;
+  /* .liquid-nav sits at bottom:18px, height:62px (z-index:50) — bottom:0
+   * here put this fixed footer directly underneath it, with the nav's
+   * higher stacking order covering the Next button. 18+62=80px clears the
+   * nav's footprint; +16px gives it breathing room above the pill. */
+  bottom: 96px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  /* Back + Save draft + Publish need ~330px; at 280-320 (or in German) they
+     wrap instead of running past the edge. */
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 16px 20px;
+  background: var(--fho-surface);
+  border: 1px solid var(--fho-border);
+  border-radius: var(--r-lg);
+  box-shadow: var(--fho-card-shadow);
+  z-index: 30;
+}
+
+@media (max-width: 359px) {
+  .nl-actions { padding: 12px 16px; }
+  .nl-actions .nl-btn { padding: 12px 14px; }
+  .nl-btn-label { display: none; }
+}
+
+.nl-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 20px;
+  border-radius: var(--r-pill);
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  transition: all 150ms var(--ease-out);
+}
+
+.nl-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.nl-btn-primary {
+  background: linear-gradient(135deg, var(--fho-orange-1), var(--fho-orange-2));
+  color: white;
+  box-shadow: var(--fho-cta-shadow);
+}
+
+.nl-btn-secondary {
+  background: transparent;
+  border: 1px solid var(--fho-border-strong);
+  color: var(--fho-text);
+}
+
+/* Website additions: the old site's variable names on the website's tokens,
+   and the utility classes the form used (the website has no Tailwind). */
+.new-listing-page, .rf-list, .nl-fab-wrap {
+  --fho-orange-1: #ff6b00;
+  --fho-orange-2: #e85d00;
+  --fho-orange-soft: #ffb380;
+  --fho-orange-text: var(--door-text);
+  --fho-orange-tint: color-mix(in srgb, #ff6b00 10%, var(--paper));
+  --fho-border: var(--line);
+  --fho-border-strong: color-mix(in srgb, var(--ink) 30%, var(--line));
+  --fho-text: var(--ink);
+  --fho-text-muted: var(--muted);
+  --fho-text-faint: var(--muted);
+  --fho-surface: var(--paper);
+  --fho-surface-2: var(--stone);
+  --fho-bg: var(--paper);
+  --fho-card-shadow: var(--shadow);
+  --fho-cta-shadow: 0 6px 18px rgb(255 107 0 / 0.3);
+  --font-sans: var(--font-ui);
+  --font-serif: var(--font-display);
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --ease-out: var(--ease);
+  --r-sm: var(--r-s);
+  --r-md: var(--r-m);
+  --r-lg: var(--r-l);
+}
+.new-listing-page { padding: var(--s6) var(--gutter) 140px; }
+.relative { position: relative; }
+.w-full { width: 100%; }
+.pr-10 { padding-right: 40px; }
+.min-w-0 { min-width: 0; }
+.animate-spin { animation: nl-spin 1s linear infinite; }
+@keyframes nl-spin { to { transform: rotate(360deg); } }
+.nl-mt { margin-top: 12px; }
+.nl-accent { color: var(--fho-orange-2); }
+.nl-note { display: block; margin-top: 8px; font-size: 12px; line-height: 1.6; color: var(--muted); }
+.nl-mono { margin-top: 4px; font-family: 'JetBrains Mono', ui-monospace, monospace; }
+.nl-map-hint { pointer-events: none; position: absolute; bottom: 8px; left: 8px; z-index: 500; display: flex; align-items: center; gap: 6px; border-radius: 999px; border: 1px solid var(--line); background: var(--paper); padding: 6px 10px; font-size: 11px; font-weight: 600; color: var(--ink); }
+.nl-fab-wrap { pointer-events: none; position: fixed; bottom: 96px; left: 50%; z-index: 50; width: 100%; max-width: 480px; transform: translateX(-50%); padding: 0 20px; }
+.nl-fab-row { display: flex; align-items: center; justify-content: flex-end; gap: 12px; }
+.nl-fab { pointer-events: auto; display: flex; align-items: center; justify-content: center; border-radius: 50%; transition: transform 160ms var(--ease); }
+.nl-fab:hover { transform: scale(1.05); }
+.nl-fab:active { transform: scale(0.95); }
+.nl-fab-secondary { width: 48px; height: 48px; border: 1px solid color-mix(in srgb, var(--ink) 30%, var(--line)); background: var(--paper); color: var(--ink); box-shadow: var(--shadow); }
+.nl-fab-primary { width: 58px; height: 58px; border: 0; background: linear-gradient(135deg, #ff6b00, #e85d00); color: #fff; box-shadow: 0 6px 18px rgb(255 107 0 / 0.3); }
+.rf-spin { pointer-events: none; position: absolute; right: 12px; top: 50%; margin-top: -8px; color: var(--fho-orange-2); }
+.rf-list { position: absolute; left: 0; right: 0; top: 100%; z-index: 1000; margin: 6px 0 0; max-height: 192px; list-style: none; overflow-y: auto; border-radius: var(--r-m); border: 1px solid var(--line); background: var(--paper); padding: 0; box-shadow: var(--shadow); }
+.rf-item { display: flex; width: 100%; align-items: center; gap: 10px; border: 0; border-bottom: 1px solid var(--line); background: transparent; padding: 10px 12px; text-align: left; color: var(--ink); }
+.rf-list li:last-child .rf-item { border-bottom: 0; }
+.rf-item:hover { background: var(--stone); }
+.rf-pin { flex-shrink: 0; color: var(--fho-orange-2); }
+.rf-name { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 14px; font-weight: 600; }
+.rf-context { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; color: var(--muted); }
+.rf-empty { padding: 12px; font-size: 13px; color: var(--muted); }
+.new-listing-page .link-btn { border: 0; background: none; padding: 8px 0; font-weight: 700; cursor: pointer; }

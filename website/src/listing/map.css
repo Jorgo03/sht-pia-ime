@@ -1,0 +1,236 @@
+.view-toggle {
+  display: flex;
+  gap: 4px;
+  padding: 3px;
+  background: var(--fho-surface);
+  border: 0.5px solid var(--fho-border);
+  border-radius: var(--r-sm);
+  margin-bottom: 12px;
+  width: fit-content;
+}
+
+.view-toggle button {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 14px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--fho-text-muted);
+  font-size: 13px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.view-toggle button.active {
+  background: linear-gradient(135deg, var(--fho-orange-1), var(--fho-orange-2));
+  color: #fff;
+}
+
+.map-wrapper {
+  border-radius: var(--r-md);
+  overflow: hidden;
+  border: 0.5px solid var(--fho-border);
+  box-shadow: var(--fho-card-shadow);
+  /* Follows the screen height (360x380 Flip cover, landscape): never taller
+     than the space between the header and the nav. The column is 480 wide
+     at every width, so the 350 cap holds on desktop too. */
+  height: 350px;
+  height: clamp(240px, calc(100svh - 200px), 350px);
+  position: relative;
+}
+
+
+/* Leaflet positions .leaflet-container but leaves it at z-index:auto, so it
+   creates no stacking context and its children escape into the root one —
+   panes at 400, controls at 1000 — painting over .liquid-nav (z-index:50).
+   Giving the container a z-index creates the stacking context, scoping those
+   values to the map. Unscoped on purpose: this is Leaflet's behaviour, not
+   .map-wrapper's, so any future map mount is covered too. */
+.leaflet-container {
+  z-index: 0;
+}
+
+.map-wrapper .leaflet-container {
+  height: 100%;
+  width: 100%;
+  background: var(--fho-bg);
+}
+
+/* Leaflet's default marker shadow/border don't apply to divIcons, and the
+   wrapper itself carries no size (see getPriceMarkerIcon) — reset both so
+   only .price-marker's own box is visible. */
+.price-marker-icon {
+  background: transparent;
+  border: none;
+}
+
+.price-marker {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  padding: 4px 9px;
+  border-radius: var(--r-pill);
+  border: 1.5px solid #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  color: #fff;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
+  text-shadow: 0 1px 1px rgba(0,0,0,0.25);
+  cursor: pointer;
+}
+
+.county-marker-icon {
+  background: transparent;
+  border: none;
+}
+
+.county-marker {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  background: var(--fho-orange-1);
+  box-shadow: 0 3px 10px rgba(0,0,0,0.35);
+  color: #fff;
+  font-family: var(--font-sans);
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.map-popup {
+  min-width: 180px;
+}
+
+.map-popup-image {
+  width: 100%;
+  height: 90px;
+  border-radius: 6px;
+  object-fit: cover;
+  margin-bottom: 6px;
+}
+
+.map-popup-gradient {
+  width: 100%;
+  height: 90px;
+  border-radius: 6px;
+  margin-bottom: 6px;
+}
+
+.map-popup-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #0a0a0a;
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.map-popup-price {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--fho-orange-text);
+  margin-bottom: 2px;
+}
+
+.map-popup-type {
+  font-size: 11px;
+  color: #777;
+  text-transform: capitalize;
+  margin-bottom: 6px;
+}
+
+.map-popup-btn {
+  display: block;
+  width: 100%;
+  padding: 6px 0;
+  border: none;
+  border-radius: 6px;
+  background: linear-gradient(135deg, var(--fho-orange-1), var(--fho-orange-2));
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+}
+
+.locate-btn {
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+  z-index: 1000;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 0.5px solid var(--fho-border);
+  background: var(--fho-surface);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--fho-text);
+  transition: background 0.2s;
+}
+
+.locate-btn:hover {
+  background: var(--fho-bg);
+}
+
+.locate-btn.loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.map-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 8px;
+  padding: 8px 0;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  color: var(--fho-text-muted);
+  font-weight: 500;
+}
+
+.legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(0,0,0,0.15);
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: 10px !important;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12) !important;
+  padding: 0 !important;
+}
+
+.leaflet-popup-content {
+  margin: 10px !important;
+  font-family: var(--font-sans) !important;
+}
+
+.leaflet-popup-tip {
+  box-shadow: none !important;
+}
