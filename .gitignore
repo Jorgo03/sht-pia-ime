@@ -52,3 +52,5 @@ qa-screens/
 
 # Playwright MCP browser scratch files
 .playwright-mcp/
+dist-e2e-website/
+playwright-report-website/

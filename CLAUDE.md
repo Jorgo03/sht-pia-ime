@@ -37,6 +37,7 @@ Each app has its own Supabase client singleton (`src/lib/supabase.js` for web, `
 Web:
 - `npm run dev` — Vite dev server, http://localhost:5173
 - `npm run build` — production build to `dist/` (the Vite site, still production)
+- `npm run test:e2e:website` — Playwright suite for the website in `website/` (`e2e-website/`, `playwright.website.config.ts`): every page signed out and signed in as the fixtures' agent, at phone and desktop width, with the same fake backend and failure rules as `test:e2e`, plus axe; served like the root `vercel.json` by `scripts/website/serve.cjs`
 - `npm run test:e2e:expo` — Playwright suite for the website built from the Expo app (`e2e-expo/`, `playwright.expo.config.ts`): exports, runs the post-build step, serves it like `deploy/expo-web/vercel.json`; same fake backend and failure rules as `test:e2e`
 - `npm run build:web-expo` then `node scripts/expo-web-postbuild.mjs <dir>` — the website built from the Expo app (`expo export -p web`), plus per-listing SEO pages, sitemap and robots; see `deploy/expo-web/README.md`
 - `npm test` — Node's built-in test runner over `tests/**/*.test.mjs`; run a single file with `npm test -- tests/aiSchemas.test.mjs`

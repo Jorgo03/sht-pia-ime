@@ -658,7 +658,7 @@ export default function NewListing() {
 
       <div className="nl-layout">
         <nav className="nl-rail" aria-label={t('listing.newListing')}>
-          <div className="nl-meter" role="progressbar" aria-valuemin={1} aria-valuemax={STEPS.length} aria-valuenow={step + 1} aria-valuetext={t('listing.wizard.stepOf', { n: step + 1, total: STEPS.length })}>
+          <div className="nl-meter" role="progressbar" aria-label={t('listing.newListing')} aria-valuemin={1} aria-valuemax={STEPS.length} aria-valuenow={step + 1} aria-valuetext={t('listing.wizard.stepOf', { n: step + 1, total: STEPS.length })}>
             <span style={{ width: `${((step + 1) / STEPS.length) * 100}%` }} />
           </div>
           <ol className="nl-steps">

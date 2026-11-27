@@ -100,7 +100,7 @@ export default function MyListings() {
               const closable = p.status === 'active' || p.status === 'paused'
               return (
                 <li key={p.id} className="my-listing">
-                  <Link to={`/property/${p.id}`} className="my-listing-photo" style={photo ? undefined : { background: gradientFor(p.id) }}>
+                  <Link to={`/property/${p.id}`} className="my-listing-photo" tabIndex={-1} aria-hidden="true" style={photo ? undefined : { background: gradientFor(p.id) }}>
                     {photo && <img src={photo} alt="" loading="lazy" decoding="async" />}
                   </Link>
                   <div className="my-listing-body">

@@ -10,7 +10,7 @@ const icon = L.icon({ iconUrl: markerIcon, iconRetinaUrl: markerIcon2x, shadowUr
 
 export default function LocationMap({ lat, lng, label }) {
   return (
-    <div className="map" role="img" aria-label={label}>
+    <div className="map" role="region" aria-label={label}>
       <MapContainer center={[lat, lng]} zoom={15} scrollWheelZoom={false} style={{ height: '100%', width: '100%' }}>
         <TileLayer attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>' url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
         <Marker position={[lat, lng]} icon={icon} />
