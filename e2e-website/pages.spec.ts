@@ -70,3 +70,24 @@ test.describe('listing form on a phone', () => {
     }
   });
 });
+
+test.describe('the logo and a way home', () => {
+  for (const path of ['/', '/search', '/login', '/signup', '/forgot-password']) {
+    test(`${path} shows the logo, door and name, linking home`, async ({ page }) => {
+      await page.goto(path);
+      const logo = page.locator('header .nav-logo');
+      await expect(logo).toHaveAttribute('href', '/');
+      await expect(logo.locator('svg')).toBeVisible();
+      const box = (await logo.locator('svg').boundingBox())!;
+      expect(box.width).toBeGreaterThan(100); // the lockup, not the door alone
+    });
+  }
+
+  test('sign-in has a home link that leads to the home page', async ({ page }) => {
+    // Opened directly: there is no browser history to go back to.
+    await page.goto('/login');
+    await page.locator('.a-home').click();
+    await expect(page).toHaveURL(/\/$/);
+    await expect(page.locator('h1').first()).toBeVisible();
+  });
+});

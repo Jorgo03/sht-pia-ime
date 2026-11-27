@@ -139,5 +139,5 @@ jobs:
           name: playwright-report-website
           path: |
             playwright-report-website/
-            test-results/
+            test-results-website/
           retention-days: 14

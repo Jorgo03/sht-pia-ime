@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
-import { Navigate, useNavigate, useSearchParams } from 'react-router-dom'
+import { Link, Navigate, useNavigate, useSearchParams } from 'react-router-dom'
+import { ArrowLeft } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { EMAIL_RE, friendlyError, retryAfterSeconds } from '@/src/lib/authErrors.js'
 import { passwordChecks, passwordStrengthError } from '@/src/features/auth/lib/password.js'
@@ -715,6 +716,12 @@ export default function AuthScreen({ start = 'signin' }) {
     <div className="a-screen">
       <DuskHero />
       <div className="a-col">
+        {/* A plain way out: someone sent here from a signed-in page, or who
+            opened this address directly, has no browser history to go back to. */}
+        <Link to="/" className="a-home">
+          <ArrowLeft size={16} aria-hidden="true" />
+          {t('common.home')}
+        </Link>
         <div className="a-hero">
           <p className="a-kicker">
             <span className="a-kicker-dash" aria-hidden="true" />

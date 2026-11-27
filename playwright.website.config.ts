@@ -10,6 +10,8 @@ const PORT = 4175;
 
 export default defineConfig({
   testDir: './e2e-website',
+  // Its own folder: another suite running at the same time empties test-results/.
+  outputDir: 'test-results-website',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: 0,

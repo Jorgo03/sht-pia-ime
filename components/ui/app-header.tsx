@@ -17,6 +17,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { NotificationBell } from '@/components/notifications/notification-bell';
+import { BrandMark } from '@/components/ui/brand-mark';
 import { ThemeToggleButton } from '@/components/ui/theme-toggle-button';
 import { Fonts, Radii, Shadows, type AtticoPalette } from '@/constants/theme';
 import { IS_WEB, WEB_MAX_WIDTH } from '@/constants/web-frame';
@@ -267,12 +268,15 @@ export function AppHeader({
           /* `.header-brand`: serif 22/600 in orange, with `.ime` a lighter
              weight. These are static per-weight files, so the pair is
              Newsreader 600 + 500 rather than one family at two weights. */
-          <Text
-            style={styles.brand}
-            accessibilityRole={site ? 'link' : undefined}
-            onPress={site ? () => router.push('/' as Href) : undefined}>
-            Shtëpia<Text style={styles.brandIme}>.ime</Text>
-          </Text>
+          <View style={styles.brandRow}>
+            <BrandMark color={colors.accent} />
+            <Text
+              style={styles.brand}
+              accessibilityRole={site ? 'link' : undefined}
+              onPress={site ? () => router.push('/' as Href) : undefined}>
+              Shtëpia<Text style={styles.brandIme}>.ime</Text>
+            </Text>
+          </View>
         ) : null}
       </View>
 
@@ -290,9 +294,12 @@ export function AppHeader({
           pointerEvents="none"
           accessibilityElementsHidden={!brandFits}
           importantForAccessibility={brandFits ? 'auto' : 'no-hide-descendants'}>
-          <Text style={styles.brand} numberOfLines={1} onLayout={track('brand')}>
-            Shtëpia<Text style={styles.brandIme}>.ime</Text>
-          </Text>
+          <View style={styles.brandRow} onLayout={track('brand')}>
+            <BrandMark color={colors.accent} />
+            <Text style={styles.brand} numberOfLines={1}>
+              Shtëpia<Text style={styles.brandIme}>.ime</Text>
+            </Text>
+          </View>
         </View>
       )}
 
@@ -526,6 +533,12 @@ const createStyles = (
       height: 34,
       alignItems: 'center',
       justifyContent: 'center',
+    },
+    // The door symbol, then the wordmark (the logo's horizontal lockup).
+    brandRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 6,
     },
     brand: {
       fontFamily: Fonts?.serifSemiBold,

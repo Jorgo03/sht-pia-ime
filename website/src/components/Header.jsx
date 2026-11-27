@@ -67,14 +67,9 @@ export default function Header({ overHero, dark = false }) {
       </div>
       <div className="container nav">
         <Link to="/" className="nav-logo" aria-label={t('common.appName')}>
-          {/* The app's top bar shows its text wordmark (components/ui/app-header.tsx). */}
-          {dark ? (
-            <span className="wordmark">
-              Shtëpia<span>.ime</span>
-            </span>
-          ) : (
-            <Logo />
-          )}
+          {/* The logo, door and name, on every page (on the dark sign-in bar
+              the name turns white, the door stays orange). */}
+          <Logo />
         </Link>
         <nav aria-label={t('site.menu')} className="nav-links">
           {links.map((l) => (

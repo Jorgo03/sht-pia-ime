@@ -130,7 +130,7 @@ main:focus { outline: none; }
 /* Sign-in pages: the app's top bar (components/ui/app-header.tsx, measured on
    the app's web build): 64px, near-black, a faint rule, the orange text
    wordmark at 16px from the edge and a white menu button. */
-.site-header.is-dark { background: #0b0a08; color: #fff; border-bottom: 1px solid rgba(255, 255, 255, 0.14); }
+.site-header.is-dark { --logo-door: #ff5f1f; --logo-name: #fff; background: #0b0a08; color: #fff; border-bottom: 1px solid rgba(255, 255, 255, 0.14); }
 .site-header.is-dark .topbar, .site-header.is-dark .nav-account { display: none; }
 /* Bar height and wordmark inset follow the app's siteGutter() and
    Site.headerHeight(Compact) in constants/theme.ts. */
@@ -141,8 +141,6 @@ main:focus { outline: none; }
 @media (min-width: 1280px) { .site-header.is-dark .nav { padding-inline: 104px; } }
 .site-header.is-dark .mobile-menu { background: #0b0a08; color: #fff; border-top-color: rgba(255, 255, 255, 0.14); }
 .site-header.is-dark .mobile-menu nav a { border-bottom-color: rgba(255, 255, 255, 0.14); }
-.wordmark { font: 600 22px/22px var(--font-display); letter-spacing: -0.44px; color: #ff6b00; white-space: nowrap; }
-.wordmark span { font-weight: 500; }
 .topbar { display: none; font-size: 13px; border-bottom: 1px solid color-mix(in srgb, currentColor 16%, transparent); }
 .topbar-inner { display: flex; align-items: center; justify-content: space-between; min-height: 38px; gap: var(--s4); }
 .topbar p { opacity: 0.85; }
@@ -398,6 +396,9 @@ html.no-scrollbar::-webkit-scrollbar { display: none; }
 .a-screen p, .a-screen h1, .a-screen h2, .a-screen span, .a-screen button, .a-screen a, .a-screen li { white-space: pre-wrap; overflow-wrap: break-word; }
 .a-col { width: 100%; max-width: 640px; margin: 0 auto; padding: 40px 20px 36px; display: flex; flex-direction: column; justify-content: center; }
 .a-hero { margin-bottom: 20px; }
+.a-home { align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; min-height: 40px; margin-bottom: 20px; padding: 0 14px 0 10px; border: 1px solid rgba(255, 255, 255, 0.28); border-radius: 999px; background: rgba(255, 255, 255, 0.08); color: #fff; font: 600 14px var(--font-ui); text-decoration: none; transition: background 160ms var(--ease); }
+.a-home:hover { background: rgba(255, 255, 255, 0.16); }
+.a-home:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
 .a-kicker { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; font: 500 12px/1.3 'JetBrains Mono', ui-monospace, monospace; letter-spacing: 1.5px; text-transform: uppercase; color: rgba(255, 255, 255, 0.9); }
 .a-kicker-dash { width: 14px; height: 1px; background: #ffb380; }
 .a-headline { font: 500 48px/47px var(--font-display); letter-spacing: -1.44px; color: #f5f0e8; }
@@ -405,7 +406,8 @@ html.no-scrollbar::-webkit-scrollbar { display: none; }
 .a-headline .a-em { font-style: italic; color: #ffb380; }
 :lang(ru) .a-headline, :lang(el) .a-headline, :lang(ru) .a-title, :lang(el) .a-title { font-family: var(--font-ui); }
 :lang(ru) .a-headline .a-em, :lang(el) .a-headline .a-em { font-style: normal; }
-.a-glass { background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 24px; padding: 20px; display: grid; gap: 12px; }
+/* Frosted, so the skyline behind it never reads through the buttons. */
+.a-glass { background: rgba(20, 14, 24, 0.32); -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 24px; padding: 20px; display: grid; gap: 12px; }
 .a-stack { display: grid; gap: 12px; }
 .a-roles { display: flex; background: rgba(255, 255, 255, 0.08); border-radius: 999px; padding: 3px; }
 .a-roles button { flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 10px 0; border: 0; border-radius: 999px; background: transparent; font: 600 14px var(--font-ui); color: rgba(255, 255, 255, 0.9); transition: background-color 160ms var(--ease); }

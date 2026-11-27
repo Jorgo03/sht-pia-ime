@@ -54,3 +54,4 @@ qa-screens/
 .playwright-mcp/
 dist-e2e-website/
 playwright-report-website/
+test-results-website/
