@@ -144,11 +144,15 @@ export async function getAgentDirectory() {
  * only to its owner, its agent and moderators, so they can still open it.
  */
 export async function getProperty(id) {
+  // Not a listing id at all (an old or mistyped link): not found, without a
+  // request the database would refuse.
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(id))) return null
+  // maybeSingle: a listing that is gone is an empty answer, not a 406 error.
   const res = await supabase
     .from('properties')
     .select('*, agent:profiles(id, full_name, phone, agency_name, avatar_url)')
     .eq('id', id)
-    .single()
+    .maybeSingle()
   // Not a listing id at all (an old or mistyped link): not found, not an error.
   if (res.error?.code === '22P02') return null
   return propertyOrNotFound(res)

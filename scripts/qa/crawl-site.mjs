@@ -9,7 +9,7 @@ if (!base) { console.error('usage: node scripts/qa/crawl-site.mjs <base-url>'); 
 const ROUTES = ['/', '/search', '/search?deal=rent', '/agents', '/wanted', '/guide', '/pricing', '/login', '/signup',
   '/forgot-password', '/favorites', '/compare', '/account', '/messages', '/viewings', '/saved-searches', '/notifications',
   '/my-listings', '/listing/new', '/agent-dashboard', '/leads', '/performance', '/blocked-users', '/moderation',
-  '/assistant', '/listing/import', '/privacy', '/terms', '/cookies', '/no-such-page', '/property/00000000-0000-0000-0000-000000000000'];
+  '/assistant', '/listing/import', '/privacy', '/terms', '/cookies', '/no-such-page', '/property/00000000-0000-0000-0000-000000000000', '/property/not-a-uuid', '/?lang=en', '/property/0babdc62-fa02-4a10-b1da-c91f59105400'];
 const WIDTHS = [[1440, 900], [390, 844]];
 const browser = await chromium.launch({ executablePath: process.env.PW_CHROMIUM_PATH || undefined });
 const report = [];
