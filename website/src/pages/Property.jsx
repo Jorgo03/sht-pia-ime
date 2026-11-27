@@ -11,7 +11,8 @@ import ListingAssistant from '../components/ListingAssistant'
 import { AI_CHAT_ENABLED } from '../lib/features'
 import { getProperty } from '../lib/api'
 import { addRecentlyViewed, ContactPanel, logActivity, PriceHistory, SimilarHomes } from '../features/listing'
-import { cityName, getLocalizedText, titleOf } from '../lib/format'
+import { cityName, getLocalizedText, listingBadgeKey, priceSuffixKey, titleOf } from '../lib/format'
+import { useCurrency } from '../features/currency'
 
 const LocationMap = lazy(() => import('../components/LocationMap'))
 
@@ -68,6 +69,7 @@ export default function Property() {
   const { id } = useParams()
   const { t, i18n } = useTranslation()
   const lang = i18n.resolvedLanguage
+  const { formatListingPrice } = useCurrency()
   const q = useQuery({ queryKey: ['property', id], queryFn: () => getProperty(id) })
   const p = q.data
   const title = p ? titleOf(p, lang) : ''
@@ -135,6 +137,15 @@ export default function Property() {
                 {place}
               </p>
             )}
+            {/* Phones: the price right under the title (the side panel, with
+                the same price, comes after the listing there). */}
+            <p className="property-head-price">
+              <span className="badge is-inline">{t(listingBadgeKey(p.listing_type))}</span>
+              <span className="contact-price">
+                {formatListingPrice(p.price, p.currency)}
+                {priceSuffixKey(p.listing_type) && <span className="card-suffix">{t(priceSuffixKey(p.listing_type))}</span>}
+              </span>
+            </p>
             {p.ref_code && (
               <p className="property-ref">
                 {t('detail.reference')} {formatRef(p.ref_code)}

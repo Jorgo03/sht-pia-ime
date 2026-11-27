@@ -2,7 +2,7 @@
 // the phone app (data/properties.ts), through the same shared helpers, so a
 // search here and in the app return the same homes.
 import { supabase } from './supabase'
-import { HIGHLIGHT_CITIES, joinAgents, tallyAgents } from '@/src/features/properties/lib/discovery.js'
+import { HIGHLIGHT_CITIES, joinAgents, rankCityTiles, tallyAgents } from '@/src/features/properties/lib/discovery.js'
 import { applyPriceRange } from '@/src/features/properties/lib/priceRange.js'
 import { applyFreeText, applyZoneAndRef } from '@/src/features/properties/lib/searchFilters.js'
 import { AMENITIES } from '@/src/features/properties/lib/amenities.js'
@@ -87,8 +87,9 @@ export async function getPropertiesCount(f = {}) {
 }
 
 /** Every highlighted city with its live count and newest photo, in the list's order. */
+// Like the app's Home: only cities that have homes, the busiest first.
 export async function getCityTiles() {
-  return Promise.all(
+  const tiles = await Promise.all(
     HIGHLIGHT_CITIES.map(async (city) => {
       const { data, count, error } = await applyFreeText(
         supabase
@@ -102,6 +103,7 @@ export async function getCityTiles() {
       return { city, count: count ?? 0, photo: data?.[0]?.image_urls?.[0] ?? null }
     }),
   )
+  return rankCityTiles(tiles)
 }
 
 /** Agents and agencies with live listings (profiles.role is not public). */

@@ -48,7 +48,7 @@ function SectionHead({ id, title, lead, action }) {
 
 function Latest() {
   const { t } = useTranslation()
-  const q = useQuery({ queryKey: ['latest'], queryFn: () => getProperties({}, 0, 6) })
+  const q = useQuery({ queryKey: ['latest'], queryFn: () => getProperties({}, 0, 8) })
   return (
     <section className="section" aria-labelledby="latest-title">
       <div className="container">
@@ -80,6 +80,8 @@ function Cities() {
   const { t, i18n } = useTranslation()
   const lang = i18n.resolvedLanguage
   const q = useQuery({ queryKey: ['cities'], queryFn: getCityTiles })
+  // No city has homes yet: no section of empty tiles.
+  if (q.isSuccess && q.data.length === 0) return null
   return (
     <section className="section is-stone" aria-labelledby="cities-title">
       <div className="container">
@@ -111,10 +113,13 @@ function Cities() {
 function Agents() {
   const { t } = useTranslation()
   const q = useQuery({ queryKey: ['agents'], queryFn: getAgentDirectory })
+  // Before the first agency joins: the invitation alone, full width, instead
+  // of an empty list beside it.
+  const none = q.isSuccess && q.data.length === 0
   return (
-    <section id="agents" className="section" aria-labelledby="agents-title">
-      <div className="container agents">
-        <div>
+    <section id="agents" className="section" aria-labelledby={none ? 'join-title' : 'agents-title'}>
+      <div className={`container agents${none ? ' is-empty' : ''}`}>
+        {!none && <div>
           <SectionHead id="agents-title" title={t('web.agents.title')} lead={t('web.agents.body')} />
           {q.isError ? (
             <ErrorState onRetry={() => q.refetch()} />
@@ -125,7 +130,7 @@ function Agents() {
               ))}
             </ul>
           ) : q.data.length === 0 ? (
-            <p className="agents-empty">{t('web.agents.empty')}</p>
+            null
           ) : (
             <ul className="agent-list">
               {q.data.slice(0, 6).map((a) => (
@@ -148,7 +153,7 @@ function Agents() {
               ))}
             </ul>
           )}
-        </div>
+        </div>}
         <aside className="join" aria-labelledby="join-title">
           <h3 id="join-title">{t('web.agents.joinTitle')}</h3>
           <p>{t('web.agents.joinBody')}</p>

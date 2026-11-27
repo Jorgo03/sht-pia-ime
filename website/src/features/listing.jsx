@@ -208,6 +208,35 @@ export function ContactPanel({ p, title }) {
 
   return (
     <aside id="contact" className="contact" aria-labelledby="contact-title">
+      {/* Phones and tablets: the price and the quickest contact stay on screen
+          while the visitor reads (the full panel follows the listing). */}
+      <div className="contact-bar">
+        <p className="contact-bar-price">
+          {formatListingPrice(p.price, p.currency)}
+          {suffix && <span className="card-suffix">{t(suffix)}</span>}
+        </p>
+        <div className="contact-bar-actions">
+          {phone ? (
+            <>
+              {p.whatsapp_enabled !== false && (
+                <a className="btn btn-outline" href={whatsappUrl(phone, t('property.whatsappMessage', { title }))} target="_blank" rel="noopener noreferrer" onClick={() => logActivity(p.id, 'message')} aria-label={t('web.property.whatsapp')}>
+                  <MessageCircle size={18} aria-hidden="true" />
+                  <span className="contact-bar-label">{t('web.property.whatsapp')}</span>
+                </a>
+              )}
+              <a className="btn btn-primary" href={telUrl(phone)} onClick={() => logActivity(p.id, 'call')}>
+                <Phone size={18} aria-hidden="true" />
+                {t('property.call')}
+              </a>
+            </>
+          ) : (
+            <a className="btn btn-primary" href="#contact">
+              <Send size={16} aria-hidden="true" />
+              {t('web.property.contactTitle')}
+            </a>
+          )}
+        </div>
+      </div>
       <div className="contact-top">
         <span className="badge is-inline">{t(listingBadgeKey(p.listing_type))}</span>
         <FavoriteButton property={p} />

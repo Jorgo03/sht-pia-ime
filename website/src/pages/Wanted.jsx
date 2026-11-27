@@ -47,7 +47,7 @@ export default function Wanted() {
   }
 
   return (
-    <div className="page container section narrow">
+    <div className="page container section">
       <div className="section-head">
         <div>
           <h1 className="page-title">{t('wanted.boardPre')} {t('wanted.boardEm')}</h1>
@@ -60,6 +60,17 @@ export default function Wanted() {
           </Link>
         )}
       </div>
+      {/* Visitors and buyers: how the board works, as in the app (wanted.step1-3). */}
+      {!isAgent && (
+        <ol className="how-steps">
+          {['step1', 'step2', 'step3'].map((k, i) => (
+            <li key={k}>
+              <span className="how-num" aria-hidden="true">{i + 1}</span>
+              <p>{t(`wanted.${k}`)}</p>
+            </li>
+          ))}
+        </ol>
+      )}
       {isAgent &&
         (board.isError ? (
           <ErrorState onRetry={() => board.refetch()} />
