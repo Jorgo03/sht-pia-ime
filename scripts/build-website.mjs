@@ -12,6 +12,7 @@ import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { PRIVATE_PAGES, PUBLIC_PAGES, applyHead, isUuid, listingHead, robotsTxt, siteUrl, sitemapXml } from './website/seo.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const out = path.join(root, process.argv[2] || 'dist');
@@ -53,12 +54,14 @@ function page({ slug, sq: titleSq, en: titleEn }) {
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>${esc(titleSq)} | Shtëpia.ime</title>
+<meta name="description" content="${esc(`${titleSq} · ${titleEn} | Shtëpia.ime`)}" />
 <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
 <style>
   body { margin: 0; font: 16px/1.6 system-ui, -apple-system, "Segoe UI", sans-serif; color: #1a1714; background: #fff; }
   main { max-width: 720px; margin: 0 auto; padding: 48px 20px 80px; }
   h1 { font-size: 32px; line-height: 1.2; margin: 0 0 8px; }
   h2 { font-size: 20px; margin: 32px 0 8px; }
+  h2.doc-title { font-size: 32px; line-height: 1.2; margin: 0 0 8px; }
   .updated { color: #6b6158; font-size: 14px; }
   hr { border: 0; border-top: 1px solid #e5ded5; margin: 56px 0; }
   a { color: #b84a00; }
@@ -70,7 +73,7 @@ function page({ slug, sq: titleSq, en: titleEn }) {
 <p class="updated">Përditësuar më ${esc(en.UPDATED)}</p>
 ${renderDoc(sq[slug], sq.contact)}
 <hr />
-<h1 lang="en">${esc(titleEn)}</h1>
+<h2 lang="en" class="doc-title">${esc(titleEn)}</h2>
 <div lang="en">
 ${renderDoc(en[slug], en.contact)}
 </div>
@@ -87,4 +90,59 @@ for (const p of PAGES) {
   fs.mkdirSync(path.join(out, p.slug), { recursive: true });
   fs.writeFileSync(path.join(out, p.slug, 'index.html'), page(p));
 }
-console.log(`build-website: wrote ${path.relative(root, out)} (site + ${PAGES.map((p) => p.slug).join(', ')})`);
+
+// What search engines and link previews read before any JavaScript runs:
+// each public page's own title, a page per live listing with its title,
+// text and photo, "noindex" on signed-in pages, a real 404, robots.txt and
+// a sitemap. Vercel serves a file before the vercel.json rewrites, so these
+// replace the shared index.html only where one exists. Public, RLS-filtered
+// data only, read with the anon key like any visitor; if the database
+// cannot be reached the listing pages are skipped and the build still works.
+const site = siteUrl(process.env);
+const locale = JSON.parse(fs.readFileSync(path.join(root, 'src', 'i18n', 'locales', 'sq.json'), 'utf8'));
+const description = locale.seo.siteDescription;
+const shell = fs.readFileSync(path.join(out, 'index.html'), 'utf8');
+const write = (rel, html) => {
+  fs.mkdirSync(path.dirname(path.join(out, rel)), { recursive: true });
+  fs.writeFileSync(path.join(out, rel), html);
+};
+for (const p of PUBLIC_PAGES) {
+  write(p.file, applyHead(shell, { title: p.title(locale), description, // index.html is also the fallback for every address without its own file
+  // (vercel.json rewrites), so it names no canonical address of its own.
+  url: site && p.path !== '/' ? `${site}${p.path}` : null, image: site ? `${site}/og-image.png` : null }));
+}
+for (const p of PRIVATE_PAGES) write(`${p}.html`, applyHead(shell, { title: locale.seo.siteTitle, description, noindex: true }));
+write('404.html', applyHead(shell, { title: locale.seo.siteTitle, description, noindex: true }));
+
+async function activeListings() {
+  const base = (process.env.EXPO_PUBLIC_SUPABASE_URL || process.env.VITE_SUPABASE_URL || '').trim().replace(/\/+$/, '');
+  const key = (process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY || '').trim();
+  if (!base.startsWith('https://') || !key) throw new Error('Supabase URL / anon key not set');
+  const rows = [];
+  // A response holds at most 1000 rows, so page through.
+  for (let offset = 0; offset < 50000; offset += 1000) {
+    const res = await fetch(
+      `${base}/rest/v1/properties?select=id,owner_id,title,title_i18n,description,description_i18n,city,image_urls,updated_at&status=eq.active&order=updated_at.desc&limit=1000&offset=${offset}`,
+      { headers: { apikey: key }, signal: AbortSignal.timeout(10000) },
+    );
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const batch = await res.json();
+    rows.push(...batch);
+    if (batch.length < 1000) break;
+  }
+  return rows.filter((r) => isUuid(r.id));
+}
+let listings = [];
+if (site) {
+  try {
+    listings = await activeListings();
+  } catch (e) {
+    console.warn(`build-website: listing pages skipped (${e.message})`);
+  }
+  for (const row of listings) write(`property/${row.id}.html`, applyHead(shell, listingHead(row, { site, fallbackDescription: description })));
+  fs.writeFileSync(path.join(out, 'sitemap.xml'), sitemapXml(site, listings));
+} else {
+  console.warn('build-website: no site address (SITE_URL / VERCEL_PROJECT_PRODUCTION_URL); listing pages and sitemap skipped');
+}
+fs.writeFileSync(path.join(out, 'robots.txt'), robotsTxt(site));
+console.log(`build-website: wrote ${path.relative(root, out)} (site + ${PAGES.map((p) => p.slug).join(', ')}, ${PUBLIC_PAGES.length} public and ${PRIVATE_PAGES.length} private heads, ${listings.length} listing pages, 404, robots${site ? ', sitemap' : ''})`);

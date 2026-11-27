@@ -21,6 +21,14 @@ with the public anon key and the same accounts.
   Google, LinkedIn and Email code, the emailed 6-digit codes and the password
   reset, with the app's values and wording. Change the two together.
 - `/privacy`, `/terms`, `/cookies`: static pages written by the build.
+- Written by the build for search engines and link previews
+  (`scripts/website/seo.mjs`, tested in `tests/websiteSeo.test.mjs`): each
+  public page's own title, one `property/<id>.html` per live listing with its
+  title, text and first photo (new listings use the shared page until the
+  next deploy), `noindex` on sign-in and signed-in pages, `404.html`,
+  `robots.txt` and `sitemap.xml`. The site address is `SITE_URL`, else
+  Vercel's production domain; a local build without one skips the listing
+  pages and the sitemap.
 
 ## How it fits together
 
