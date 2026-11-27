@@ -1483,6 +1483,55 @@
     "intro": "Hallo, ich bin Era! Sagen Sie mir, was Sie suchen, und ich finde Immobilien auf Shtëpia.ime, vergleiche sie oder erkläre, wie die Seite funktioniert.",
     "cta": "Mit Era chatten",
     "openFull": "Im Vollbild öffnen",
-    "dragHint": "Doppeltippen, um den Chat zu öffnen. Halten und ziehen, um sie zu verschieben."
+    "dragHint": "Doppeltippen, um den Chat zu öffnen. Halten und ziehen, um sie zu verschieben.",
+    "local": {
+      "counting": "Ich zähle gerade.",
+      "result": "Ergebnis: {{total}} {{what}}.",
+      "none": "Im Moment gibt es keine {{what}}. Probiere eine andere Stadt, entferne einen Filter oder speichere die Suche unter Suchen, dann melden wir uns bei einem neuen Angebot.",
+      "firstOnes": "Hier sind die ersten {{shown}}. Schreib „mehr“ für den Rest.",
+      "page": "Ich zeige {{from}}–{{to}} von {{total}}.",
+      "noMore": "Das waren alle. Versuch eine andere Suche.",
+      "inCity": "in {{city}}",
+      "for": {
+        "sale": "zum Kauf",
+        "rent": "zur Miete",
+        "daily_rent": "zur Tagesmiete"
+      },
+      "noun": {
+        "property_one": "Immobilie",
+        "apartment_one": "Wohnung",
+        "house_one": "Haus",
+        "villa_one": "Villa",
+        "land_one": "Grundstück",
+        "commercial_one": "Gewerbefläche",
+        "office_one": "Büro",
+        "garage_one": "Garage",
+        "property_other": "Immobilien",
+        "apartment_other": "Wohnungen",
+        "house_other": "Häuser",
+        "villa_other": "Villen",
+        "land_other": "Grundstücke",
+        "commercial_other": "Gewerbeflächen",
+        "office_other": "Büros",
+        "garage_other": "Garagen"
+      },
+      "topic": {
+        "greeting": "Hallo! Ich bin Era. Sag mir, was du suchst, z. B. „Wohnungen zum Kauf in Durrës bis 120.000 €“, und ich finde sie sofort.",
+        "thanks": "Gern geschehen! Schreib mir, wenn du etwas anderes suchst.",
+        "publish": "Inserieren ist kostenlos. Öffne „Immobilie hinzufügen“, gib Art, Lage, Preis und Fläche an, füge Fotos hinzu und veröffentliche. Deine Inserate findest du unter „Meine Inserate“.",
+        "pricing": "Immobilien zu inserieren ist kostenlos. Hervorhebungen und Agenturpläne sind optional.",
+        "favorites": "Tippe auf das Herz einer Immobilie, um sie zu speichern. Alle findest du unter „Favoriten“.",
+        "saved": "Lege unter Suchen deine Filter fest und tippe auf „Diese Suche speichern“. Wir benachrichtigen dich bei jedem passenden neuen Angebot.",
+        "viewings": "Öffne die Immobilie und frage eine Besichtigung an. Anfragen und Termine findest du unter „Besichtigungen“.",
+        "agent": "Öffne die Immobilie, die dir gefällt: Dort kannst du den Makler anrufen, ihm auf WhatsApp schreiben oder in Shtëpia.ime eine Nachricht senden.",
+        "messages": "Deine Gespräche mit Maklern und Eigentümern findest du unter „Nachrichten“.",
+        "account": "Unter „Profil“ änderst du Daten, Sprache und Benachrichtigungen, lädst deine Daten herunter oder löschst dein Konto.",
+        "privacy": "Wie wir deine Daten speichern und nutzen, steht in der Datenschutzerklärung.",
+        "compare": "Füge Immobilien auf ihrer Seite zum Vergleich hinzu und sieh sie nebeneinander: Preis, Fläche, Zimmer und Etage.",
+        "budget": "Nenne mir dein Budget und wo du suchst, z. B. „bis 100.000 € in Tirana“ oder „Miete bis 500 € in Durrës“.",
+        "howItWorks": "Shtëpia.ime verbindet Käufer und Mieter mit Maklern und Eigentümern in ganz Albanien. Suche nach Stadt, Preis und Art, speichere die Häuser, die dir gefallen, und kontaktiere den Anbieter direkt. Inserieren ist kostenlos.",
+        "help": "Ich finde Immobilien, wenn du mir Art, Stadt und Kauf oder Miete nennst, z. B. „2-Zimmer-Wohnung zur Miete in Tirana bis 600 €“. Ich erkläre dir auch, wie du inserierst, speicherst oder einen Makler kontaktierst."
+      }
+    }
   }
 }

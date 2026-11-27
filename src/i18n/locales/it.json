@@ -1493,6 +1493,63 @@
     "intro": "Ciao, sono Era! Dimmi cosa cerchi e troverò immobili su Shtëpia.ime, li confronterò o ti spiegherò come funziona il sito.",
     "cta": "Chatta con Era",
     "openFull": "Apri a schermo intero",
-    "dragHint": "Tocca due volte per aprire la chat. Tieni premuto e trascina per spostarla."
+    "dragHint": "Tocca due volte per aprire la chat. Tieni premuto e trascina per spostarla.",
+    "local": {
+      "counting": "Sto contando.",
+      "result": "Risultato: {{total}} {{what}}.",
+      "none": "Al momento non ci sono {{what}}. Prova un’altra città, togli un filtro o salva la ricerca in Cerca e ti avviseremo quando ne arriva uno nuovo.",
+      "firstOnes": "Ecco i primi {{shown}}. Scrivi “altri” per vedere il resto.",
+      "page": "Mostro {{from}}–{{to}} di {{total}}.",
+      "noMore": "Erano tutti. Prova un’altra ricerca.",
+      "inCity": "a {{city}}",
+      "for": {
+        "sale": "in vendita",
+        "rent": "in affitto",
+        "daily_rent": "in affitto giornaliero"
+      },
+      "noun": {
+        "property_one": "immobile",
+        "apartment_one": "appartamento",
+        "house_one": "casa",
+        "villa_one": "villa",
+        "land_one": "terreno",
+        "commercial_one": "locale commerciale",
+        "office_one": "ufficio",
+        "garage_one": "garage",
+        "property_many": "immobili",
+        "apartment_many": "appartamenti",
+        "house_many": "case",
+        "villa_many": "ville",
+        "land_many": "terreni",
+        "commercial_many": "locali commerciali",
+        "office_many": "uffici",
+        "garage_many": "garage",
+        "property_other": "immobili",
+        "apartment_other": "appartamenti",
+        "house_other": "case",
+        "villa_other": "ville",
+        "land_other": "terreni",
+        "commercial_other": "locali commerciali",
+        "office_other": "uffici",
+        "garage_other": "garage"
+      },
+      "topic": {
+        "greeting": "Ciao! Sono Era. Dimmi cosa cerchi, ad es. “appartamenti in vendita a Durrës fino a 120.000 €”, e li trovo subito.",
+        "thanks": "Di nulla! Scrivimi se vuoi cercare altro.",
+        "publish": "Pubblicare è gratis. Apri “Aggiungi immobile”, inserisci tipo, posizione, prezzo e superficie, aggiungi le foto e pubblica. I tuoi annunci sono in “I miei annunci”.",
+        "pricing": "Pubblicare immobili è gratis. La promozione di un annuncio e i piani per agenzie sono facoltativi.",
+        "favorites": "Tocca il cuore su un immobile per salvarlo. Li trovi tutti in “Preferiti”.",
+        "saved": "In Cerca imposta i filtri e tocca “Salva questa ricerca”. Ti avvisiamo ogni volta che esce un immobile adatto.",
+        "viewings": "Apri l’immobile e richiedi una visita. Richieste e appuntamenti sono in “Visite”.",
+        "agent": "Apri l’immobile che ti piace: da lì puoi chiamare l’agente, scrivergli su WhatsApp o mandargli un messaggio in Shtëpia.ime.",
+        "messages": "Le conversazioni con agenti e proprietari sono in “Messaggi”.",
+        "account": "In “Profilo” cambi dati, lingua e notifiche, scarichi i tuoi dati o elimini l’account.",
+        "privacy": "Come conserviamo e usiamo i tuoi dati è spiegato nell’Informativa sulla privacy.",
+        "compare": "Aggiungi immobili al Confronto dalla pagina di ciascuno e vedili affiancati: prezzo, superficie, stanze e piano.",
+        "budget": "Dimmi il budget e dove cerchi, ad es. “fino a 100.000 € a Tirana” o “affitto fino a 500 € a Durrës”.",
+        "howItWorks": "Shtëpia.ime mette in contatto chi compra o affitta con agenti e proprietari in tutta l’Albania. Cerca per città, prezzo e tipo, salva le case che ti piacciono e contatta direttamente il venditore. Pubblicare è gratis.",
+        "help": "Posso trovarti immobili se mi dici il tipo, la città e se è in vendita o in affitto, ad es. “bilocale in affitto a Tirana fino a 600 €”. Posso anche spiegarti come pubblicare, salvare o contattare un agente."
+      }
+    }
   }
 }

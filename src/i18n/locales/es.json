@@ -1493,6 +1493,63 @@
     "intro": "¡Hola, soy Era! Dime qué buscas y encontraré viviendas en Shtëpia.ime, las compararé o te explicaré cómo funciona la web.",
     "cta": "Habla con Era",
     "openFull": "Abrir a pantalla completa",
-    "dragHint": "Toca dos veces para abrir el chat. Mantén pulsado y arrastra para moverla."
+    "dragHint": "Toca dos veces para abrir el chat. Mantén pulsado y arrastra para moverla.",
+    "local": {
+      "counting": "Contando ahora.",
+      "result": "Resultado: {{total}} {{what}}.",
+      "none": "Ahora mismo no hay {{what}}. Prueba otra ciudad, quita un filtro o guarda la búsqueda en Buscar y te avisaremos cuando aparezca uno nuevo.",
+      "firstOnes": "Aquí están los primeros {{shown}}. Escribe «más» para ver el resto.",
+      "page": "Mostrando {{from}}–{{to}} de {{total}}.",
+      "noMore": "Eso era todo. Prueba otra búsqueda.",
+      "inCity": "en {{city}}",
+      "for": {
+        "sale": "en venta",
+        "rent": "en alquiler",
+        "daily_rent": "en alquiler por días"
+      },
+      "noun": {
+        "property_one": "inmueble",
+        "apartment_one": "apartamento",
+        "house_one": "casa",
+        "villa_one": "villa",
+        "land_one": "terreno",
+        "commercial_one": "local comercial",
+        "office_one": "oficina",
+        "garage_one": "garaje",
+        "property_many": "inmuebles",
+        "apartment_many": "apartamentos",
+        "house_many": "casas",
+        "villa_many": "villas",
+        "land_many": "terrenos",
+        "commercial_many": "locales comerciales",
+        "office_many": "oficinas",
+        "garage_many": "garajes",
+        "property_other": "inmuebles",
+        "apartment_other": "apartamentos",
+        "house_other": "casas",
+        "villa_other": "villas",
+        "land_other": "terrenos",
+        "commercial_other": "locales comerciales",
+        "office_other": "oficinas",
+        "garage_other": "garajes"
+      },
+      "topic": {
+        "greeting": "¡Hola! Soy Era. Dime qué buscas, p. ej. «apartamentos en venta en Durrës hasta 120.000 €», y los encuentro enseguida.",
+        "thanks": "¡De nada! Escríbeme si quieres buscar otra cosa.",
+        "publish": "Publicar es gratis. Abre «Añadir inmueble», indica tipo, ubicación, precio y superficie, añade fotos y publica. Tus anuncios están en «Mis anuncios».",
+        "pricing": "Publicar inmuebles es gratis. Destacar un anuncio y los planes para agencias son opcionales.",
+        "favorites": "Toca el corazón de un inmueble para guardarlo. Los encontrarás todos en «Favoritos».",
+        "saved": "En Buscar, elige los filtros y toca «Guardar esta búsqueda». Te avisamos cada vez que se publique uno que encaje.",
+        "viewings": "Abre el inmueble y solicita una visita. Tus solicitudes y citas están en «Visitas».",
+        "agent": "Abre el inmueble que te guste: desde ahí puedes llamar al agente, escribirle por WhatsApp o enviarle un mensaje en Shtëpia.ime.",
+        "messages": "Tus conversaciones con agentes y propietarios están en «Mensajes».",
+        "account": "En «Perfil» cambias tus datos, el idioma y las notificaciones, descargas tus datos o eliminas tu cuenta.",
+        "privacy": "Cómo guardamos y usamos tus datos se explica en la Política de privacidad.",
+        "compare": "Añade inmuebles a Comparar desde la página de cada uno y míralos lado a lado: precio, superficie, habitaciones y planta.",
+        "budget": "Dime tu presupuesto y dónde buscas, p. ej. «hasta 100.000 € en Tirana» o «alquiler hasta 500 € en Durrës».",
+        "howItWorks": "Shtëpia.ime conecta a compradores e inquilinos con agentes y propietarios en toda Albania. Busca por ciudad, precio y tipo, guarda las casas que te gusten y contacta directamente con el vendedor. Publicar es gratis.",
+        "help": "Puedo encontrarte inmuebles si me dices el tipo, la ciudad y si es venta o alquiler, p. ej. «piso de 2 habitaciones en alquiler en Tirana hasta 600 €». También puedo explicarte cómo publicar, guardar o contactar con un agente."
+      }
+    }
   }
 }

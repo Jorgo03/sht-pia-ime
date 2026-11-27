@@ -1,5 +1,10 @@
 # The Shtëpia.ime AI assistant
 
+> **2026-11-28: Era no longer calls a paid AI model** (DECISIONS.md C2). Both
+> chats answer with `src/features/assistant/lib/era.js`: plain rules read the
+> question and the listings are counted straight from the database. The
+> `ai-assistant` Edge Function below is kept but not called.
+
 > **Parked 2026-11-04** (DECISIONS.md C2): both chats are hidden behind
 > `AI_CHAT_ENABLED` in `constants/features.ts`. Everything below still describes
 > the code as it is, ready to switch back on.

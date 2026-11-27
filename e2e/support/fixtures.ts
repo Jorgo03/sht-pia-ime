@@ -39,6 +39,7 @@ function listing(n: number, fields: Partial<Listing>): Listing {
     listing_type: 'sale',
     image_urls: [img(n), img(n + 100)],
     status: 'active',
+    moderation_hold: false,
     created_at: `2026-10-${String(10 - (n % 9)).padStart(2, '0')}T10:00:00+00:00`,
     updated_at: '2026-10-10T10:00:00+00:00',
     title_i18n: null,

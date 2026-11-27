@@ -1483,6 +1483,55 @@
     "intro": "Hi, I’m Era! Tell me what you’re looking for and I’ll find homes on Shtëpia.ime, compare them, or explain how the site works.",
     "cta": "Chat with Era",
     "openFull": "Open full screen",
-    "dragHint": "Double-tap to open the chat. Hold and drag to move her."
+    "dragHint": "Double-tap to open the chat. Hold and drag to move her.",
+    "local": {
+      "counting": "Counting now.",
+      "result": "Result: {{total}} {{what}}.",
+      "none": "There are no {{what}} right now. Try another city, remove a filter, or save the search in Search and we will tell you when a new one appears.",
+      "firstOnes": "Here are the first {{shown}}. Type “more” for the rest.",
+      "page": "Showing {{from}}–{{to}} of {{total}}.",
+      "noMore": "That was all of them. Try another search.",
+      "inCity": "in {{city}}",
+      "for": {
+        "sale": "for sale",
+        "rent": "for rent",
+        "daily_rent": "for daily rent"
+      },
+      "noun": {
+        "property_one": "property",
+        "apartment_one": "apartment",
+        "house_one": "house",
+        "villa_one": "villa",
+        "land_one": "plot of land",
+        "commercial_one": "commercial space",
+        "office_one": "office",
+        "garage_one": "garage",
+        "property_other": "properties",
+        "apartment_other": "apartments",
+        "house_other": "houses",
+        "villa_other": "villas",
+        "land_other": "plots of land",
+        "commercial_other": "commercial spaces",
+        "office_other": "offices",
+        "garage_other": "garages"
+      },
+      "topic": {
+        "greeting": "Hi! I am Era. Tell me what you are looking for, e.g. “apartments for sale in Durrës up to €120,000”, and I will find them right away.",
+        "thanks": "You are welcome! Write to me if you want to look for something else.",
+        "publish": "Publishing is free. Open “Add property”, fill in the type, location, price and area, add photos and publish. Your listings are under “My listings”.",
+        "pricing": "Publishing properties is free. Promoting a listing and agency plans are optional.",
+        "favorites": "Tap the heart on a property to save it. You will find them all under “Favorites”.",
+        "saved": "In Search, set your filters and tap “Save this search”. We will notify you whenever a matching property is published.",
+        "viewings": "Open the property and request a viewing. Your requests and appointments are under “Viewings”.",
+        "agent": "Open the property you like: from there you can call the agent, write on WhatsApp or send a message inside Shtëpia.ime.",
+        "messages": "Your conversations with agents and owners are under “Messages”.",
+        "account": "In “Profile” you can change your details, language and notifications, download your data or delete your account.",
+        "privacy": "How we store and use your data is explained in the Privacy Policy.",
+        "compare": "Add properties to Compare from each property’s page and see them side by side: price, area, rooms and floor.",
+        "budget": "Tell me your budget and where you are looking, e.g. “up to €100,000 in Tirana” or “rent up to €500 in Durrës”.",
+        "howItWorks": "Shtëpia.ime connects buyers and renters with agents and owners across Albania. Search by city, price and type, save the homes you like and contact the seller directly. Publishing is free.",
+        "help": "I can find properties if you tell me the type, the city and whether it is for sale or rent, e.g. “2+1 for rent in Tirana up to €600”. I can also explain how to publish, save or contact an agent."
+      }
+    }
   }
 }

@@ -25,8 +25,23 @@ apps: the tab screens above the tab bar, `components/era/era-button.tsx`),
 the `/assistant` screen, and the chat on each listing. `AI_CHAT_ENABLED = true`
 in `constants/features.ts` (phone apps) and `website/src/lib/features.js`
 (website). The old Home "Pyet asistentin AI" entry and Search ✦ button were
-replaced by Era's button. **Still unchecked:** whether `ANTHROPIC_API_KEY` was
-replaced after the 401 below; one real question to Era confirms it.
+replaced by Era's button.
+
+**2026-11-28, Era without a paid AI model (owner):** the Anthropic key was
+rejected (401) and the owner does not want a paid API. Era now reads the
+question with plain rules (type, sale/rent/daily, city, budget, rooms, area,
+amenities, order; 10 languages) and counts the listings straight from the
+database: "Po llogaris tani. Rezultati: 10 apartamente në shitje në Durrës."
+with the listings under it, "më shumë" for the next 12, "po me ashensor?" to
+narrow the last search, and fixed answers about the app (publishing,
+favourites, saved searches, viewings, contacting an agent, account, privacy).
+Code: `src/features/assistant/lib/era.js` (shared by
+`website/src/features/era/EraChat.jsx` and `lib/assistant.ts`), tests
+`tests/era.test.mjs`, e2e X43–X47. It reuses the checked filters in
+`supabase/functions/ai-assistant/logic.js`; the `ai-assistant` Edge Function
+is no longer called. Not covered: comparisons as a table (Era points to
+Compare instead). The per-listing assistant (`ai-listing-assistant`) still
+needs a working Anthropic key.
 
 History (2026-11-04): the owner wanted AI chat later, not now. Hidden behind `AI_CHAT_ENABLED = false`
 in `constants/features.ts`: the Home "Pyet asistentin AI" entry, the Search ✦

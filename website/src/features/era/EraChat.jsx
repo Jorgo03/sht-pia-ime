@@ -2,7 +2,8 @@ import { memo, useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowRight, Maximize2, MessageSquarePlus, RefreshCw, Send, Sparkles, X } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { MAX_QUESTION_CHARS, fromStored, historyFor, storageKey, toStored } from '@/src/features/assistant/lib/conversation.js'
+import { MAX_QUESTION_CHARS, fromStored, storageKey, toStored } from '@/src/features/assistant/lib/conversation.js'
+import { askEra } from '@/src/features/assistant/lib/era.js'
 import { formatPrice } from '@/src/lib/format.js'
 import { supabase } from '../../lib/supabase'
 import { useAuth } from '../../auth/AuthContext'
@@ -11,9 +12,8 @@ import EraAvatar from './EraAvatar'
 
 // The app's assistant (app/assistant.tsx, docs/AI_ASSISTANT.md) for the web:
 // ask for homes in plain words, get real listings back, compare them, or ask
-// how the site works. Every listing, price and comparison comes from the
-// database on the server (the ai-assistant Edge Function); this page only
-// shows them. The conversation stays in this browser for 30 days, per account.
+// how the site works. Every listing and count comes straight from the
+// database (src/features/assistant/lib/era.js, no paid AI model). The conversation stays in this browser for 30 days, per account.
 
 const STARTERS = ['findApartment', 'byBudget', 'compare', 'howItWorks', 'publish']
 
@@ -40,36 +40,12 @@ const write = (key, value) => {
   }
 }
 
-async function classify(error) {
-  const context = error?.context
-  if (!context || typeof context.json !== 'function') return 'network'
+// Era answers without a paid AI model (src/features/assistant/lib/era.js):
+// she reads the question, counts the matching listings from the database and
+// shows them. A failed read is a network problem, offered as a retry.
+async function askAssistant({ question, state, t, propertyId }) {
   try {
-    const body = await context.json()
-    if (body?.error === 'rate_limited') return 'rate_limited'
-    if (body?.error === 'refused') return 'refused'
-    return 'unavailable'
-  } catch {
-    return 'unavailable'
-  }
-}
-
-async function askAssistant({ messages, question, state, language, propertyId }) {
-  try {
-    const { data, error } = await supabase.functions.invoke('ai-assistant', {
-      body: { messages: historyFor(messages, question), state, language, property_id: propertyId ?? null },
-    })
-    if (error) return { ok: false, error: await classify(error) }
-    if (typeof data?.reply !== 'string') return { ok: false, error: 'unavailable' }
-    return {
-      ok: true,
-      answer: {
-        reply: data.reply,
-        cards: Array.isArray(data.cards) ? data.cards : [],
-        comparison: data.comparison && Array.isArray(data.comparison.items) ? data.comparison : null,
-        screens: Array.isArray(data.screens) ? data.screens : [],
-        state: data.state ?? null,
-      },
-    }
+    return { ok: true, answer: await askEra({ db: supabase, question, state, t, propertyId }) }
   } catch {
     return { ok: false, error: 'network' }
   }
@@ -81,7 +57,7 @@ async function askAssistant({ messages, question, state, language, propertyId })
  * Both read and write the same saved conversation.
  */
 export default function EraChat({ variant = 'page', propertyId = null, initialText = '', onClose, inputRef }) {
-  const { t, i18n } = useTranslation()
+  const { t } = useTranslation()
   const { user, ready } = useAuth()
   const key = storageKey(user?.id)
   const panel = variant === 'panel'
@@ -127,10 +103,10 @@ export default function EraChat({ variant = 'page', propertyId = null, initialTe
     if (messages.length || sending) endRef.current?.scrollIntoView({ block: 'end', behavior: 'smooth' })
   }, [messages.length, sending])
 
-  const ask = async (question, before) => {
+  const ask = async (question) => {
     const askedFor = key
     setSending(true)
-    const result = await askAssistant({ messages: before, question, state, language: i18n.resolvedLanguage, propertyId })
+    const result = await askAssistant({ question, state, t, propertyId })
     setSending(false)
     if (keyRef.current !== askedFor) return
     if (result.ok) {

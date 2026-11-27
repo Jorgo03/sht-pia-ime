@@ -1797,130 +1797,97 @@ test.describe('signed in: CRM', () => {
   });
 });
 
-// The Shtëpia.ime assistant (docs/AI_ASSISTANT.md). The ai-assistant function
-// is answered here, so these check the screen: what it sends, and that cards,
-// tables and buttons come only from the server's answer.
+// Era, the assistant (docs/AI_ASSISTANT.md), without a paid AI model: she
+// reads the question, counts the matching listings in the (fake) database and
+// shows them; help questions get a fixed answer with buttons to the screen.
 test.describe('AI assistant', () => {
   test.skip(!AI_CHAT_ENABLED, 'AI chat is parked (constants/features.ts)');
-  const card = (l: (typeof LISTINGS)[number]) => ({
-    id: l.id, title: l.title, title_i18n: null, price: l.price, currency: l.currency, listing_type: l.listing_type,
-    property_type: l.property_type, city: l.city, zone: null, address: l.address, sqft: l.sqft, beds: l.beds, baths: l.baths,
-    floor: 3, total_floors: 8, features: ['elevator'], image_urls: (l.image_urls as string[]).slice(0, 1), ref_code: null,
-    created_at: l.created_at, status: 'active',
-  });
-  const answer = (over: Record<string, unknown> = {}) => ({
-    reply: 'Gjeta 2 apartamente në Tiranë brenda buxhetit.',
-    cards: [card(LISTINGS[0]), card(LISTINGS[1])],
-    comparison: null,
-    screens: [],
-    state: { criteria: { city: 'Tiranë', max_price_eur: 150000, min_beds: 2 }, result_ids: [LISTINGS[0].id, LISTINGS[1].id], seen_ids: [] },
-    ...over,
-  });
+  const sq = (key: string, values: Record<string, string | number> = {}) =>
+    Object.entries(values).reduce((s, [k, v]) => s.replaceAll(`{{${k}}}`, String(v)), t(key));
+  const active = (l: (typeof LISTINGS)[number]) => l.status === 'active' && l.moderation_hold === false;
+  const inDurres = LISTINGS.filter((l) => active(l) && l.property_type === 'apartment' && l.city === 'Durrës');
+  const noun = (count: number) => t(`era.local.noun.apartment_${count === 1 ? 'one' : 'other'}`);
+  const where = () => sq('era.local.inCity', { city: 'Durrës' });
+  const result = (count: number) => `${t('era.local.counting')} ${sq('era.local.result', { total: count, what: `${noun(count)} ${where()}` })}`;
 
-  test('X43 a starter question gets an answer with real listing cards that open the listing', async ({ page }) => {
-    const bodies: Record<string, unknown>[] = [];
-    await page.route('**/functions/v1/ai-assistant', (route) => {
-      bodies.push(route.request().postDataJSON());
-      return json(route, answer());
-    });
+  test('X43 a question gets the count and the matching listings, which open the listing', async ({ page }) => {
+    let ai = 0;
+    await page.route('**/functions/v1/ai-assistant', (route) => { ai += 1; return route.abort(); });
     await page.goto('/assistant');
     await ready(page);
     await expect(page.getByRole('heading', { name: t('era.name'), level: 1 })).toBeVisible();
-    await page.getByRole('button', { name: t('aiAssistant.starters.findApartment') }).click();
-    await expect(page.getByText('Gjeta 2 apartamente në Tiranë brenda buxhetit.')).toBeVisible();
-    expect(bodies[0]).toMatchObject({ messages: [{ role: 'user', content: t('aiAssistant.starters.findApartment') }], state: null, language: 'sq' });
-    for (const l of [LISTINGS[0], LISTINGS[1]]) {
-      await expect(page.getByRole('link', { name: new RegExp(escape(l.title as string)) }).first()).toBeVisible();
-    }
-    await page.getByRole('link', { name: new RegExp(escape(LISTINGS[1].title as string)) }).first().click();
-    await expect(page).toHaveURL(new RegExp(`/property/${LISTINGS[1].id}$`));
+    const box = page.getByRole('textbox', { name: t('aiAssistant.placeholder') });
+    await box.fill('Më gjej të gjitha apartamentet në Durrës');
+    await page.getByRole('button', { name: t('common.send') }).click();
+    await expect(page.getByText(result(inDurres.length))).toBeVisible();
+    const first = inDurres[0];
+    await page.getByRole('link', { name: new RegExp(escape(first.title as string)) }).first().click();
+    await expect(page).toHaveURL(new RegExp(`/property/${first.id}$`));
+    expect(ai).toBe(0);
   });
 
-  test('X44 a follow-up sends the earlier answer and the search state back; new chat clears both', async ({ page }) => {
-    const bodies: { messages: { role: string; content: string }[]; state: unknown }[] = [];
-    await page.route('**/functions/v1/ai-assistant', (route) => {
-      bodies.push(route.request().postDataJSON());
-      return json(route, bodies.length === 1 ? answer() : answer({ reply: 'Me ashensor mbetet një.', cards: [card(LISTINGS[0])] }));
-    });
+  test('X44 a follow-up keeps the search and narrows it; the chat survives a reload until a new chat', async ({ page }) => {
     await page.goto('/assistant');
     await ready(page);
     const box = page.getByRole('textbox', { name: t('aiAssistant.placeholder') });
-    await box.fill('Dua një apartament 2+1 në Tiranë deri në 150 mijë euro.');
-    await page.getByRole('button', { name: t('common.send') }).click();
-    await expect(page.getByText('Gjeta 2 apartamente në Tiranë brenda buxhetit.')).toBeVisible();
-    await box.fill('Po me ashensor?');
+    await box.fill('apartamente në Durrës');
     await box.press('Enter');
-    await expect(page.getByText('Me ashensor mbetet një.')).toBeVisible();
-    expect(bodies[1].messages.map((m) => m.role)).toEqual(['user', 'assistant', 'user']);
-    expect(bodies[1].state).toEqual(answer().state);
+    await expect(page.getByText(result(inDurres.length))).toBeVisible();
+    await box.fill('po me pishinë?');
+    await box.press('Enter');
+    // No fixture apartment in Durrës has a pool: the search kept the city and type.
+    await expect(page.getByText(new RegExp(escape(sq('era.local.none', { what: `${noun(0)} ${where()}` }))))).toBeVisible();
 
-    // The conversation survives a reload on this device…
     await page.reload();
     await ready(page);
-    await expect(page.getByText('Me ashensor mbetet një.')).toBeVisible();
-    // …until a new chat starts.
+    await expect(page.getByText(result(inDurres.length))).toBeVisible();
     await page.getByRole('button', { name: t('aiAssistant.newChat') }).click();
-    await expect(page.getByText('Me ashensor mbetet një.')).toHaveCount(0);
+    await expect(page.getByText(result(inDurres.length))).toHaveCount(0);
     await expect(page.getByRole('button', { name: t('aiAssistant.starters.compare') })).toBeVisible();
   });
 
-  test('X45 a comparison is a table from the server, with "not specified" for missing values and screen buttons', async ({ page }) => {
-    await page.route('**/functions/v1/ai-assistant', (route) =>
-      json(route, answer({
-        reply: 'E dyta ka çmimin më të ulët për m².',
-        cards: [],
-        comparison: {
-          mixed_currencies: false,
-          items: [
-            { id: LISTINGS[0].id, title: LISTINGS[0].title, price: 150000, currency: 'EUR', price_eur_approx: 150000, area_m2: 100, price_per_m2: 1500, price_per_m2_eur_approx: 1500, bedrooms: 2, bathrooms: 1, floor: 3, building_floors: 8, city: 'Tiranë', zone: 'Blloku', features: ['elevator'], status: 'active' },
-            { id: LISTINGS[1].id, title: LISTINGS[1].title, price: 120000, currency: 'EUR', price_eur_approx: 120000, area_m2: null, price_per_m2: null, price_per_m2_eur_approx: null, bedrooms: 2, bathrooms: null, floor: null, building_floors: null, city: 'Tiranë', zone: null, features: [], status: 'active' },
-          ],
-          best: { lowest_price: LISTINGS[1].id, largest_area: null, lowest_price_per_m2: null, most_bedrooms: null },
-        },
-        screens: [{ key: 'explore', route: '/explore' }],
-      })),
-    );
+  test('X45 a question about the app gets the answer from Era and buttons to the right screen', async ({ page }) => {
     await page.goto('/assistant');
     await ready(page);
-    await page.getByRole('button', { name: t('aiAssistant.starters.compare') }).click();
-    await expect(page.getByText(t('aiAssistant.compare.pricePerM2'), { exact: true })).toBeVisible();
-    await expect(page.getByText(t('aiAssistant.compare.best.price'), { exact: true })).toBeVisible();
-    await expect(page.getByText(t('aiAssistant.notSpecified')).first()).toBeVisible();
+    await page.getByRole('button', { name: t('aiAssistant.starters.howItWorks') }).click();
+    await expect(page.getByText(t('era.local.topic.howItWorks'))).toBeVisible();
     await page.getByRole('button', { name: t('aiAssistant.screens.explore') }).click();
     await expect(page).toHaveURL(/\/explore$/);
   });
 
-  test('X46 when the assistant is down the chat says so, and retry asks the same question again', async ({ page }) => {
-    let calls = 0;
-    await page.route('**/functions/v1/ai-assistant', (route) => {
-      calls += 1;
-      return calls === 1 ? json(route, { error: 'ai_unavailable' }, 503) : json(route, answer());
+  test.describe('when reading fails', () => {
+    test.use({ allowConsoleErrors: [/net::ERR_FAILED/] });
+    test('X46 when the listings cannot be read the chat says so, and retry asks the same question again', async ({ page }) => {
+      // supabase-js retries a failed read by itself, with a growing wait, so the
+      // line stays down until the error shows.
+      let down = true;
+      await page.route('**/rest/v1/properties**', (route) => {
+        if (down && decodeURIComponent(route.request().url()).includes('Durr')) return route.abort();
+        return route.fallback();
+      });
+      await page.goto('/assistant');
+      await ready(page);
+      const box = page.getByRole('textbox', { name: t('aiAssistant.placeholder') });
+      await box.fill('apartamente në Durrës');
+      await box.press('Enter');
+      await expect(page.getByText(t('aiAssistant.error.network'))).toBeVisible({ timeout: 30_000 });
+      down = false;
+      await page.getByRole('button', { name: t('common.retry') }).click();
+      await expect(page.getByText(result(inDurres.length))).toBeVisible();
+      await expect(page.getByText(t('aiAssistant.error.network'))).toHaveCount(0);
     });
-    await page.goto('/assistant');
-    await ready(page);
-    await page.getByRole('button', { name: t('aiAssistant.starters.howItWorks') }).click();
-    await expect(page.getByText(t('aiAssistant.error.unavailable'))).toBeVisible();
-    await page.getByRole('button', { name: t('common.retry') }).click();
-    await expect(page.getByText('Gjeta 2 apartamente në Tiranë brenda buxhetit.')).toBeVisible();
-    await expect(page.getByText(t('aiAssistant.error.unavailable'))).toHaveCount(0);
-    expect(calls).toBe(2);
   });
 
   // Home and Search reach Era through her button in the corner, which is on
   // the phone apps only (components/era/era-button.tsx), not this web build.
   test('X47 a listing opens the assistant with the question ready, not sent', async ({ page }) => {
-    let calls = 0;
-    await page.route('**/functions/v1/ai-assistant', (route) => {
-      calls += 1;
-      return json(route, answer());
-    });
     await page.goto(`/property/${LISTINGS[0].id}`);
     await ready(page);
     await page.getByRole('button', { name: t('assistant.title') }).click();
     await page.getByRole('button', { name: t('aiAssistant.alternatives') }).click();
     await expect(page).toHaveURL(new RegExp(`/assistant\\?property=${LISTINGS[0].id}`));
     await expect(page.getByRole('textbox', { name: t('aiAssistant.placeholder') })).toHaveValue(t('aiAssistant.alternativesQuestion'));
-    expect(calls).toBe(0);
+    await expect(page.getByText(t('era.local.counting'))).toHaveCount(0);
   });
 });
 

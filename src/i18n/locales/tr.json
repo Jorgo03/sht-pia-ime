@@ -1483,6 +1483,55 @@
     "intro": "Merhaba, ben Era! Ne aradığınızı söyleyin; Shtëpia.ime’de ev bulayım, karşılaştırayım ya da sitenin nasıl çalıştığını anlatayım.",
     "cta": "Era ile sohbet et",
     "openFull": "Tam ekranda aç",
-    "dragHint": "Sohbeti açmak için iki kez dokunun. Taşımak için basılı tutup sürükleyin."
+    "dragHint": "Sohbeti açmak için iki kez dokunun. Taşımak için basılı tutup sürükleyin.",
+    "local": {
+      "counting": "Şimdi sayıyorum.",
+      "result": "Sonuç: {{total}} {{what}}.",
+      "none": "Şu anda {{what}} yok. Başka bir şehir deneyin, bir filtreyi kaldırın ya da aramayı Ara bölümünde kaydedin; yenisi çıkınca haber verelim.",
+      "firstOnes": "İşte ilk {{shown}} tanesi. Gerisi için “daha” yazın.",
+      "page": "{{total}} sonuçtan {{from}}–{{to}} gösteriliyor.",
+      "noMore": "Hepsi bu kadardı. Başka bir arama deneyin.",
+      "inCity": "{{city}} şehrinde",
+      "for": {
+        "sale": "satılık",
+        "rent": "kiralık",
+        "daily_rent": "günlük kiralık"
+      },
+      "noun": {
+        "property_one": "mülk",
+        "apartment_one": "daire",
+        "house_one": "ev",
+        "villa_one": "villa",
+        "land_one": "arsa",
+        "commercial_one": "ticari alan",
+        "office_one": "ofis",
+        "garage_one": "garaj",
+        "property_other": "mülk",
+        "apartment_other": "daire",
+        "house_other": "ev",
+        "villa_other": "villa",
+        "land_other": "arsa",
+        "commercial_other": "ticari alan",
+        "office_other": "ofis",
+        "garage_other": "garaj"
+      },
+      "topic": {
+        "greeting": "Merhaba! Ben Era. Ne aradığınızı söyleyin, örneğin “Durrës’te 120.000 €’ya kadar satılık daireler”, hemen bulayım.",
+        "thanks": "Rica ederim! Başka bir şey aramak isterseniz yazın.",
+        "publish": "İlan vermek ücretsiz. “Mülk ekle”yi açın, türü, konumu, fiyatı ve alanı girin, fotoğraf ekleyin ve yayınlayın. İlanlarınız “İlanlarım” bölümünde.",
+        "pricing": "Mülk ilanı vermek ücretsiz. İlan öne çıkarma ve ajans planları isteğe bağlıdır.",
+        "favorites": "Kaydetmek için mülkteki kalbe dokunun. Hepsi “Favoriler” bölümünde.",
+        "saved": "Ara bölümünde filtreleri seçip “Bu aramayı kaydet”e dokunun. Uygun her yeni mülkte size haber veririz.",
+        "viewings": "Mülkü açın ve görüntüleme isteyin. İstekleriniz ve randevularınız “Görüntülemeler” bölümünde.",
+        "agent": "Beğendiğiniz mülkü açın: oradan emlakçıyı arayabilir, WhatsApp’tan yazabilir veya Shtëpia.ime içinden mesaj gönderebilirsiniz.",
+        "messages": "Emlakçılar ve mülk sahipleriyle yazışmalarınız “Mesajlar” bölümünde.",
+        "account": "“Profil” bölümünde bilgilerinizi, dili ve bildirimleri değiştirebilir, verilerinizi indirebilir veya hesabınızı silebilirsiniz.",
+        "privacy": "Verilerinizi nasıl sakladığımız ve kullandığımız Gizlilik Politikası’nda açıklanır.",
+        "compare": "Mülkleri kendi sayfalarından karşılaştırmaya ekleyin ve yan yana görün: fiyat, alan, oda ve kat.",
+        "budget": "Bütçenizi ve nerede aradığınızı söyleyin, örneğin “Tiran’da 100.000 €’ya kadar” veya “Durrës’te 500 €’ya kadar kiralık”.",
+        "howItWorks": "Shtëpia.ime, alıcı ve kiracıları Arnavutluk genelindeki emlakçılar ve mülk sahipleriyle buluşturur. Şehre, fiyata ve türe göre arayın, beğendiklerinizi kaydedin ve satıcıyla doğrudan iletişime geçin. İlan vermek ücretsiz.",
+        "help": "Türü, şehri ve satılık mı kiralık mı olduğunu söylerseniz mülk bulabilirim, örneğin “Tiran’da 600 €’ya kadar kiralık 2+1”. İlan vermeyi, kaydetmeyi veya emlakçıyla iletişimi de anlatabilirim."
+      }
+    }
   }
 }

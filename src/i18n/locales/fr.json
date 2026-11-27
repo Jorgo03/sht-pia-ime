@@ -1493,6 +1493,63 @@
     "intro": "Bonjour, je suis Era ! Dites-moi ce que vous cherchez : je trouve des biens sur Shtëpia.ime, je les compare ou je vous explique le site.",
     "cta": "Discuter avec Era",
     "openFull": "Ouvrir en plein écran",
-    "dragHint": "Touchez deux fois pour ouvrir la discussion. Maintenez et faites glisser pour la déplacer."
+    "dragHint": "Touchez deux fois pour ouvrir la discussion. Maintenez et faites glisser pour la déplacer.",
+    "local": {
+      "counting": "Je compte.",
+      "result": "Résultat : {{total}} {{what}}.",
+      "none": "Aucun résultat pour le moment : {{what}}. Essayez une autre ville, retirez un filtre ou enregistrez la recherche dans Rechercher et nous vous préviendrons dès qu’il y en a une nouvelle.",
+      "firstOnes": "Voici les {{shown}} premiers. Écrivez « plus » pour la suite.",
+      "page": "J’affiche {{from}}–{{to}} sur {{total}}.",
+      "noMore": "C’était tout. Essayez une autre recherche.",
+      "inCity": "à {{city}}",
+      "for": {
+        "sale": "à vendre",
+        "rent": "à louer",
+        "daily_rent": "à louer à la journée"
+      },
+      "noun": {
+        "property_one": "bien",
+        "apartment_one": "appartement",
+        "house_one": "maison",
+        "villa_one": "villa",
+        "land_one": "terrain",
+        "commercial_one": "local commercial",
+        "office_one": "bureau",
+        "garage_one": "garage",
+        "property_many": "biens",
+        "apartment_many": "appartements",
+        "house_many": "maisons",
+        "villa_many": "villas",
+        "land_many": "terrains",
+        "commercial_many": "locaux commerciaux",
+        "office_many": "bureaux",
+        "garage_many": "garages",
+        "property_other": "biens",
+        "apartment_other": "appartements",
+        "house_other": "maisons",
+        "villa_other": "villas",
+        "land_other": "terrains",
+        "commercial_other": "locaux commerciaux",
+        "office_other": "bureaux",
+        "garage_other": "garages"
+      },
+      "topic": {
+        "greeting": "Bonjour ! Je suis Era. Dites-moi ce que vous cherchez, par ex. « appartements à vendre à Durrës jusqu’à 120 000 € », et je les trouve tout de suite.",
+        "thanks": "Avec plaisir ! Écrivez-moi si vous cherchez autre chose.",
+        "publish": "Publier est gratuit. Ouvrez « Ajouter un bien », indiquez le type, l’emplacement, le prix et la surface, ajoutez des photos et publiez. Vos annonces sont dans « Mes annonces ».",
+        "pricing": "Publier des biens est gratuit. La mise en avant d’une annonce et les offres agences sont facultatives.",
+        "favorites": "Touchez le cœur d’un bien pour l’enregistrer. Vous les retrouvez tous dans « Favoris ».",
+        "saved": "Dans Rechercher, réglez vos filtres et touchez « Enregistrer cette recherche ». Nous vous prévenons à chaque nouveau bien correspondant.",
+        "viewings": "Ouvrez le bien et demandez une visite. Vos demandes et rendez-vous sont dans « Visites ».",
+        "agent": "Ouvrez le bien qui vous plaît : vous pouvez appeler l’agent, lui écrire sur WhatsApp ou lui envoyer un message dans Shtëpia.ime.",
+        "messages": "Vos conversations avec les agents et propriétaires sont dans « Messages ».",
+        "account": "Dans « Profil », vous modifiez vos informations, la langue et les notifications, téléchargez vos données ou supprimez votre compte.",
+        "privacy": "La manière dont nous conservons et utilisons vos données est expliquée dans la Politique de confidentialité.",
+        "compare": "Ajoutez des biens à la comparaison depuis leur page et voyez-les côte à côte : prix, surface, pièces et étage.",
+        "budget": "Donnez-moi votre budget et où vous cherchez, par ex. « jusqu’à 100 000 € à Tirana » ou « location jusqu’à 500 € à Durrës ».",
+        "howItWorks": "Shtëpia.ime met en relation acheteurs et locataires avec des agents et propriétaires dans toute l’Albanie. Cherchez par ville, prix et type, enregistrez les biens qui vous plaisent et contactez directement le vendeur. Publier est gratuit.",
+        "help": "Je peux trouver des biens si vous me donnez le type, la ville et s’il s’agit d’une vente ou d’une location, par ex. « 2 pièces à louer à Tirana jusqu’à 600 € ». Je peux aussi expliquer comment publier, enregistrer ou contacter un agent."
+      }
+    }
   }
 }

@@ -38,7 +38,6 @@ import {
   type Comparison,
   type ScreenKey,
 } from '@/lib/assistant';
-import type { LangCode } from '@/lib/translate';
 import { MAX_QUESTION_CHARS, fromStored, storageKey, toStored } from '@/src/features/assistant/lib/conversation';
 
 interface ChatMessage {
@@ -73,7 +72,7 @@ export default function AssistantRoute() {
 
 function AssistantScreen() {
   const router = useRouter();
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const { user } = useAuth();
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
@@ -119,15 +118,9 @@ function AssistantScreen() {
   }, [messages.length, sending]);
 
   const ask = useCallback(
-    async (question: string, before: ChatMessage[]) => {
+    async (question: string) => {
       setSending(true);
-      const result = await askAssistant({
-        messages: before,
-        question,
-        state,
-        language: i18n.language as LangCode,
-        propertyId,
-      });
+      const result = await askAssistant({ question, state, t, propertyId });
       setSending(false);
       if (result.ok) {
         const a = result.answer;
@@ -140,16 +133,15 @@ function AssistantScreen() {
         setMessages((prev) => [...prev, { id: nextId(), role: 'assistant', content: '', failed: result.error }]);
       }
     },
-    [i18n.language, propertyId, state],
+    [t, propertyId, state],
   );
 
   const send = (raw?: string) => {
     const question = (raw ?? text).trim().slice(0, MAX_QUESTION_CHARS);
     if (!question || sending) return;
-    const before = messages;
-    setMessages([...before, { id: nextId(), role: 'user', content: question }]);
+    setMessages([...messages, { id: nextId(), role: 'user', content: question }]);
     setText('');
-    void ask(question, before);
+    void ask(question);
   };
 
   /** Asks the failed question again, in place of the failed answer. */
@@ -158,9 +150,8 @@ function AssistantScreen() {
     const index = messages.findIndex((m) => m.id === failedId);
     const question = messages[index - 1];
     if (index < 1 || question?.role !== 'user') return;
-    const before = messages.slice(0, index - 1);
     setMessages(messages.slice(0, index));
-    void ask(question.content, before);
+    void ask(question.content);
   };
 
   const newChat = () => {

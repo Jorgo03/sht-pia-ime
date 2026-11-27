@@ -1483,6 +1483,55 @@
     "intro": "Përshëndetje, jam Era! Më thuaj çfarë po kërkon dhe do të gjej prona në Shtëpia.ime, t’i krahasoj ose të të shpjegoj si funksionon faqja.",
     "cta": "Bisedo me Erën",
     "openFull": "Hap në ekran të plotë",
-    "dragHint": "Prek dy herë për të hapur bisedën. Mbaje dhe tërhiqe për ta lëvizur."
+    "dragHint": "Prek dy herë për të hapur bisedën. Mbaje dhe tërhiqe për ta lëvizur.",
+    "local": {
+      "counting": "Po llogaris tani.",
+      "result": "Rezultati: {{total}} {{what}}.",
+      "none": "Për momentin nuk ka {{what}}. Provo një qytet tjetër, hiq ndonjë filtër ose ruaje kërkimin te Kërko që të të njoftojmë kur shfaqet një e re.",
+      "firstOnes": "Më poshtë janë {{shown}} të parat. Shkruaj “më shumë” për të tjerat.",
+      "page": "Po të tregoj {{from}}–{{to}} nga {{total}}.",
+      "noMore": "Këto ishin të gjitha. Provo një kërkim tjetër.",
+      "inCity": "në {{city}}",
+      "for": {
+        "sale": "në shitje",
+        "rent": "me qira",
+        "daily_rent": "me qira ditore"
+      },
+      "noun": {
+        "property_one": "pronë",
+        "apartment_one": "apartament",
+        "house_one": "shtëpi",
+        "villa_one": "vilë",
+        "land_one": "tokë",
+        "commercial_one": "ambient komercial",
+        "office_one": "zyrë",
+        "garage_one": "garazh",
+        "property_other": "prona",
+        "apartment_other": "apartamente",
+        "house_other": "shtëpi",
+        "villa_other": "vila",
+        "land_other": "toka",
+        "commercial_other": "ambiente komerciale",
+        "office_other": "zyra",
+        "garage_other": "garazhe"
+      },
+      "topic": {
+        "greeting": "Përshëndetje! Unë jam Era. Më thuaj çfarë kërkon, p.sh. “apartamente në shitje në Durrës deri 120 mijë €”, dhe po t’i gjej menjëherë.",
+        "thanks": "Me kënaqësi! Nëse do të kërkosh diçka tjetër, më shkruaj.",
+        "publish": "Publikimi është falas. Hap “Shto pronë”, plotëso llojin, vendndodhjen, çmimin dhe sipërfaqen, shto foto dhe publikoje. Shpalljet e tua i gjen te “Pronat e mia”.",
+        "pricing": "Publikimi i pronave është falas. Promovimi i një shpalljeje ose planet për agjencitë janë opsionale.",
+        "favorites": "Prek zemrën në një pronë për ta ruajtur. Të gjitha i gjen te “Të preferuarat”.",
+        "saved": "Te Kërko vendos filtrat dhe prek “Ruaj këtë kërkim”. Të njoftojmë sa herë del një pronë e re që përputhet.",
+        "viewings": "Hap pronën dhe kërko një vizitë. Kërkesat dhe takimet e tua janë te “Vizitat”.",
+        "agent": "Hap pronën që të pëlqen: aty mund ta telefonosh agjentin, t’i shkruash në WhatsApp ose t’i dërgosh mesazh brenda Shtëpia.ime.",
+        "messages": "Bisedat me agjentët dhe pronarët janë te “Mesazhet”.",
+        "account": "Te “Profili” ndryshon të dhënat, gjuhën dhe njoftimet, shkarkon të dhënat e tua ose fshin llogarinë.",
+        "privacy": "Si i ruajmë dhe i përdorim të dhënat e tua shpjegohet te Politika e Privatësisë.",
+        "compare": "Shto prona te Krahasimi nga faqja e secilës pronë dhe i sheh krah për krah: çmim, sipërfaqe, dhoma dhe kat.",
+        "budget": "Më thuaj buxhetin dhe ku kërkon, p.sh. “deri në 100 mijë € në Tiranë” ose “qira deri 500 € në Durrës”.",
+        "howItWorks": "Shtëpia.ime lidh blerësit dhe qiramarrësit me agjentët dhe pronarët në gjithë Shqipërinë. Kërko sipas qytetit, çmimit dhe llojit, ruaj pronat që të pëlqejnë dhe kontakto direkt shitësin. Pronat i publikon falas.",
+        "help": "Mund të të gjej prona nëse më thua llojin, qytetin dhe nëse është shitje apo qira, p.sh. “2+1 me qira në Tiranë deri 600 €”. Mund të të shpjegoj edhe si të publikosh, të ruash ose të kontaktosh një agjent."
+      }
+    }
   }
 }

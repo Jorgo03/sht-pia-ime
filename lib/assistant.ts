@@ -1,12 +1,8 @@
 import { supabase } from '@/lib/supabase';
-import { historyFor } from '@/src/features/assistant/lib/conversation';
-
-import { LangCode } from './translate';
+import { askEra } from '@/src/features/assistant/lib/era';
 
 /**
- * Client wrapper around the ai-assistant Edge Function (docs/AI_ASSISTANT.md).
- * The Anthropic key and every database read stay on the server; the app only
- * sends the conversation's text turns and the state the server handed back.
+ * Era, the assistant (docs/AI_ASSISTANT.md): the shapes both chats show.
  */
 
 /** A listing as the server shows it: public fields, read from the database. */
@@ -80,48 +76,25 @@ export interface AssistantAnswer {
 
 export type AssistantError = 'rate_limited' | 'refused' | 'unavailable' | 'network';
 
-async function classify(error: unknown): Promise<AssistantError> {
-  const context = (error as { context?: Response })?.context;
-  if (!context || typeof context.json !== 'function') return 'network';
-  try {
-    const body = await context.json();
-    if (body?.error === 'rate_limited') return 'rate_limited';
-    if (body?.error === 'refused') return 'refused';
-    return 'unavailable';
-  } catch {
-    return 'unavailable';
-  }
-}
-
+/**
+ * Era's answer, without a paid AI model: src/features/assistant/lib/era.js
+ * reads the question and counts the matching listings straight from the
+ * database (RLS applies, as for Search). A failed read is offered as a retry.
+ */
 export async function askAssistant({
-  messages,
   question,
   state,
-  language,
+  t,
   propertyId,
 }: {
-  messages: readonly { role: string; content?: string; failed?: unknown }[];
   question: string;
   state: AssistantState;
-  language: LangCode;
+  t: (key: string, options?: Record<string, unknown>) => string;
   propertyId?: string | null;
 }): Promise<{ ok: true; answer: AssistantAnswer } | { ok: false; error: AssistantError }> {
   try {
-    const { data, error } = await supabase.functions.invoke('ai-assistant', {
-      body: { messages: historyFor(messages, question), state, language, property_id: propertyId ?? null },
-    });
-    if (error) return { ok: false, error: await classify(error) };
-    if (typeof data?.reply !== 'string') return { ok: false, error: 'unavailable' };
-    return {
-      ok: true,
-      answer: {
-        reply: data.reply,
-        cards: Array.isArray(data.cards) ? data.cards : [],
-        comparison: data.comparison && Array.isArray(data.comparison.items) ? data.comparison : null,
-        screens: Array.isArray(data.screens) ? data.screens : [],
-        state: data.state ?? null,
-      },
-    };
+    const answer = await askEra({ db: supabase, question, state, t, propertyId });
+    return { ok: true, answer: { ...answer, screens: answer.screens as AssistantAnswer['screens'] } };
   } catch {
     return { ok: false, error: 'network' };
   }
