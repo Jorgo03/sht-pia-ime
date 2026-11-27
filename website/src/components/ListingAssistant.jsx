@@ -2,25 +2,12 @@ import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Send, Sparkles, X } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { assistantHistory } from '@/src/features/properties/lib/assistantHistory.js'
-import { supabase } from '../lib/supabase'
+import { answerAboutListing } from '@/src/features/properties/lib/listingAnswer.js'
 
 // The app's per-listing chat (components/property/listing-assistant.tsx):
-// answers from this one listing only, through the ai-listing-assistant Edge
-// Function. When the listing does not say, the visitor is pointed to the
-// seller rather than left with a dead end.
-async function askListing(propertyId, messages, language) {
-  try {
-    const { data, error } = await supabase.functions.invoke('ai-listing-assistant', { body: { property_id: propertyId, messages, language } })
-    if (error || !data) return null
-    const contact = data.contact === true
-    const reply = typeof data.reply === 'string' && data.reply.trim() ? data.reply : null
-    if (!reply && !contact) return null
-    return { reply, contact }
-  } catch {
-    return null
-  }
-}
+// answers from this one listing's own data (listingAnswer.js, no paid AI).
+// When the listing does not say, the visitor is pointed to the seller rather
+// than left with a dead end.
 
 // Keyed by the listing id where it is used, so another listing starts a fresh chat.
 export default function ListingAssistant({ property }) {
@@ -44,21 +31,14 @@ export default function ListingAssistant({ property }) {
     e.preventDefault()
     const content = text.trim()
     if (!content || thinking) return
-    const history = assistantHistory(messages, content)
     setMessages((prev) => [...prev, { role: 'user', content }])
     setText('')
     setThinking(true)
-    const answer = await askListing(property.id, history, i18n.resolvedLanguage)
+    // A short pause keeps the "thinking" bubble from flashing.
+    await new Promise((resolve) => setTimeout(resolve, 350))
+    const answer = answerAboutListing(content, property, t, i18n.resolvedLanguage)
     setThinking(false)
-    setMessages((prev) => [
-      ...prev,
-      {
-        role: 'assistant',
-        content: answer?.reply ?? t(answer ? 'assistant.notInListing' : 'assistant.unavailable'),
-        failed: answer == null,
-        contact: answer == null || answer.contact,
-      },
-    ])
+    setMessages((prev) => [...prev, { role: 'assistant', content: answer.reply, contact: answer.contact }])
   }
 
   if (!open) {

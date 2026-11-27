@@ -704,7 +704,34 @@
     "disclaimer": "Ответы ИИ основаны только на данных объявления — важные детали уточняйте у продавца.",
     "contactTitle": "Спросите продавца напрямую",
     "notInListing": "В объявлении об этом не сказано.",
-    "viewProfile": "Профиль"
+    "viewProfile": "Профиль",
+    "local": {
+      "price": "Цена — {{price}}.",
+      "pricePerM2": "Около {{price}} за м².",
+      "area": "Площадь — {{area}} м².",
+      "beds_one": "{{count}} спальня.",
+      "beds_few": "{{count}} спальни.",
+      "beds_many": "{{count}} спален.",
+      "beds_other": "{{count}} спальни.",
+      "baths_one": "{{count}} санузел.",
+      "baths_few": "{{count}} санузла.",
+      "baths_many": "{{count}} санузлов.",
+      "baths_other": "{{count}} санузла.",
+      "floor": "Находится на {{floor}}-м этаже.",
+      "floorOf": "Находится на {{floor}}-м этаже из {{total}}.",
+      "year": "Построено в {{year}} году.",
+      "location": "Расположение: {{where}}.",
+      "deal": "Предложение: {{what}} {{deal}}.",
+      "status": {
+        "active": "Да, объявление активно.",
+        "sold": "Этот объект продан.",
+        "rented": "Этот объект сдан в аренду.",
+        "other": "Сейчас объявление не активно."
+      },
+      "featureYes": "{{feature}}: да, это указано в объявлении.",
+      "featureUnknown": "{{feature}}: в объявлении это не указано.",
+      "fromDescription": "В описании сказано: «{{text}}»"
+    }
   },
   "viewings": {
     "title": "Просмотры",

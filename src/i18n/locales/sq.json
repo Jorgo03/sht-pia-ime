@@ -686,7 +686,30 @@
     "disclaimer": "Përgjigjet e AI bazohen vetëm në të dhënat e shpalljes — verifiko detajet e rëndësishme me shitësin.",
     "contactTitle": "Pyete drejtpërdrejt shitësin",
     "notInListing": "Shpallja nuk e përmend këtë.",
-    "viewProfile": "Profili"
+    "viewProfile": "Profili",
+    "local": {
+      "price": "Çmimi është {{price}}.",
+      "pricePerM2": "Rreth {{price}} për m².",
+      "area": "Sipërfaqja është {{area}} m².",
+      "beds_one": "Ka {{count}} dhomë gjumi.",
+      "beds_other": "Ka {{count}} dhoma gjumi.",
+      "baths_one": "Ka {{count}} tualet.",
+      "baths_other": "Ka {{count}} tualete.",
+      "floor": "Është në katin {{floor}}.",
+      "floorOf": "Është në katin {{floor}} nga {{total}}.",
+      "year": "Është ndërtuar në vitin {{year}}.",
+      "location": "Ndodhet në: {{where}}.",
+      "deal": "Shpallja: {{what}} {{deal}}.",
+      "status": {
+        "active": "Po, shpallja është aktive.",
+        "sold": "Kjo pronë është shitur.",
+        "rented": "Kjo pronë është dhënë me qira.",
+        "other": "Shpallja nuk është aktive për momentin."
+      },
+      "featureYes": "{{feature}}: po, shpallja e përmend.",
+      "featureUnknown": "{{feature}}: shpallja nuk e përmend.",
+      "fromDescription": "Në përshkrim thuhet: “{{text}}”"
+    }
   },
   "viewings": {
     "title": "Vizitat",

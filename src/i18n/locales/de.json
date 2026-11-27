@@ -686,7 +686,30 @@
     "disclaimer": "KI-Antworten basieren nur auf Inseratsdaten — wichtige Details mit dem Verkäufer klären.",
     "contactTitle": "Fragen Sie direkt beim Anbieter",
     "notInListing": "Das steht nicht im Inserat.",
-    "viewProfile": "Profil"
+    "viewProfile": "Profil",
+    "local": {
+      "price": "Der Preis beträgt {{price}}.",
+      "pricePerM2": "Etwa {{price}} pro m².",
+      "area": "Die Fläche beträgt {{area}} m².",
+      "beds_one": "Es hat {{count}} Schlafzimmer.",
+      "beds_other": "Es hat {{count}} Schlafzimmer.",
+      "baths_one": "Es hat {{count}} Bad.",
+      "baths_other": "Es hat {{count}} Bäder.",
+      "floor": "Es liegt im {{floor}}. Stock.",
+      "floorOf": "Es liegt im {{floor}}. von {{total}} Stockwerken.",
+      "year": "Es wurde {{year}} gebaut.",
+      "location": "Lage: {{where}}.",
+      "deal": "Angebot: {{what}} {{deal}}.",
+      "status": {
+        "active": "Ja, das Inserat ist aktiv.",
+        "sold": "Diese Immobilie wurde verkauft.",
+        "rented": "Diese Immobilie wurde vermietet.",
+        "other": "Das Inserat ist im Moment nicht aktiv."
+      },
+      "featureYes": "{{feature}}: ja, das Inserat nennt es.",
+      "featureUnknown": "{{feature}}: das Inserat nennt es nicht.",
+      "fromDescription": "In der Beschreibung steht: „{{text}}“"
+    }
   },
   "viewings": {
     "title": "Besichtigungen",

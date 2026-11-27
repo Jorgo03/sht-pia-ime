@@ -21,9 +21,8 @@ import { Fonts, Radii, Shadows, type AtticoPalette } from '@/constants/theme';
 import { KEYBOARD_DONE_BAR_HEIGHT, KeyboardDoneBar } from '@/components/ui/keyboard-done-bar';
 import { useTheme } from '@/contexts/theme-context';
 import { useResponsive } from '@/hooks/use-responsive';
-import { askListingAssistant, type AssistantMessage } from '@/lib/ai';
-import { assistantHistory } from '@/src/features/properties/lib/assistantHistory';
-import { type LangCode } from '@/lib/translate';
+import { type AssistantMessage } from '@/lib/ai';
+import { answerAboutListing } from '@/src/features/properties/lib/listingAnswer';
 import { type Property } from '@/data/types';
 
 /**
@@ -32,9 +31,9 @@ import { type Property } from '@/data/types';
  * design source of truth here: same flow (FAB -> floating panel, canned
  * intro bubble, "thinking" placeholder, failed replies rendered inline
  * rather than as a separate error banner), same i18n keys
- * (`assistant.*`, already translated in all 8 locales), same Edge Function
- * (ai-listing-assistant — grounded server-side in this one listing, anon
- * allowed, 30/hr rate limit).
+ * (`assistant.*`). Answers come from this one listing's own data
+ * (src/features/properties/lib/listingAnswer.js), with no paid AI model
+ * (owner, 2026-11-28); the ai-listing-assistant Edge Function is not called.
  *
  * Web gates this behind `isEnabled('aiAssistant')` (lib/flags.js); mobile has
  * no equivalent flags module, so this ships unconditionally rather than
@@ -110,30 +109,19 @@ export function ListingAssistant({
   const send = async () => {
     const content = text.trim();
     if (!content || thinking) return;
-    // What is sent is trimmed so it always starts with a question, without
-    // failed replies (shared with web); what is shown keeps every bubble
-    // and its `failed` flag.
-    const history = assistantHistory(messages, content);
     setMessages((prev) => [...prev, { role: 'user', content }]);
     setText('');
     setThinking(true);
-    // i18n.language is a plain string at the type level, but this app only
-    // ever sets it to one of the 8 supported codes via changeLanguage.
     const askedAbout = property.id;
-    const answer = await askListingAssistant(askedAbout, history, i18n.language as LangCode);
+    // Answered from this listing's own data (src/features/properties/lib/
+    // listingAnswer.js), no paid AI; the short pause keeps the "thinking"
+    // bubble from flashing.
+    await new Promise((resolve) => setTimeout(resolve, 350));
+    const answer = answerAboutListing(content, property as unknown as Record<string, unknown>, t, i18n.language);
     if (listingRef.current !== askedAbout) return;
     setThinking(false);
-    // Not in the listing, or no answer at all: either way the person is
-    // handed to the seller rather than left with a dead end.
-    setMessages((prev) => [
-      ...prev,
-      {
-        role: 'assistant',
-        content: answer?.reply ?? t(answer ? 'assistant.notInListing' : 'assistant.unavailable'),
-        failed: answer == null,
-        contact: answer == null || answer.contact,
-      },
-    ]);
+    // Anything the listing does not say hands the person to the seller.
+    setMessages((prev) => [...prev, { role: 'assistant', content: answer.reply, contact: answer.contact }]);
   };
 
   if (!open) {

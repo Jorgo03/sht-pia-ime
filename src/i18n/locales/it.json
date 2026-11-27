@@ -695,7 +695,32 @@
     "disclaimer": "Le risposte dell'IA si basano solo sui dati dell'annuncio — verifica i dettagli importanti con il venditore.",
     "contactTitle": "Chiedi direttamente al venditore",
     "notInListing": "L’annuncio non lo dice.",
-    "viewProfile": "Profilo"
+    "viewProfile": "Profilo",
+    "local": {
+      "price": "Il prezzo è {{price}}.",
+      "pricePerM2": "Circa {{price}} al m².",
+      "area": "La superficie è di {{area}} m².",
+      "beds_one": "Ha {{count}} camera da letto.",
+      "beds_many": "Ha {{count}} camere da letto.",
+      "beds_other": "Ha {{count}} camere da letto.",
+      "baths_one": "Ha {{count}} bagno.",
+      "baths_many": "Ha {{count}} bagni.",
+      "baths_other": "Ha {{count}} bagni.",
+      "floor": "È al piano {{floor}}.",
+      "floorOf": "È al piano {{floor}} di {{total}}.",
+      "year": "È stato costruito nel {{year}}.",
+      "location": "Si trova in: {{where}}.",
+      "deal": "Annuncio: {{what}} {{deal}}.",
+      "status": {
+        "active": "Sì, l’annuncio è attivo.",
+        "sold": "Questo immobile è stato venduto.",
+        "rented": "Questo immobile è stato affittato.",
+        "other": "L’annuncio al momento non è attivo."
+      },
+      "featureYes": "{{feature}}: sì, l’annuncio lo indica.",
+      "featureUnknown": "{{feature}}: l’annuncio non lo indica.",
+      "fromDescription": "Nella descrizione si legge: “{{text}}”"
+    }
   },
   "viewings": {
     "title": "Visite",

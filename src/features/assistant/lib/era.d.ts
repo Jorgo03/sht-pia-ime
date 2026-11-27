@@ -7,6 +7,7 @@ export type EraRead =
   | { kind: 'more' }
   | { kind: 'topic'; topic: string };
 export function readQuestion(question: string): EraRead;
+export const FEATURE_STEMS: [string, string[]][];
 export interface EraAnswer {
   reply: string;
   cards: any[];

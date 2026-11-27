@@ -40,8 +40,12 @@ Code: `src/features/assistant/lib/era.js` (shared by
 `tests/era.test.mjs`, e2e X43–X47. It reuses the checked filters in
 `supabase/functions/ai-assistant/logic.js`; the `ai-assistant` Edge Function
 is no longer called. Not covered: comparisons as a table (Era points to
-Compare instead). The per-listing assistant (`ai-listing-assistant`) still
-needs a working Anthropic key.
+Compare instead). The per-listing assistant followed the same day: it answers
+from the listing's own fields (price, area, rooms, bathrooms, floor, year,
+location, sale/rent, amenities, status) and from description sentences that
+mention what was asked; anything else shows the seller's contact
+(`src/features/properties/lib/listingAnswer.js`, `tests/listingAnswer.test.mjs`,
+e2e X50–X51). Neither Edge Function is called any more.
 
 History (2026-11-04): the owner wanted AI chat later, not now. Hidden behind `AI_CHAT_ENABLED = false`
 in `constants/features.ts`: the Home "Pyet asistentin AI" entry, the Search ✦

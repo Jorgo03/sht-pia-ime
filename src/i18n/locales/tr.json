@@ -686,7 +686,30 @@
     "disclaimer": "Yapay zekâ yanıtları yalnızca ilan verilerine dayanır — önemli ayrıntıları satıcıyla doğrulayın.",
     "contactTitle": "Doğrudan satıcıya sorun",
     "notInListing": "İlanda belirtilmemiş.",
-    "viewProfile": "Profil"
+    "viewProfile": "Profil",
+    "local": {
+      "price": "Fiyatı {{price}}.",
+      "pricePerM2": "m² başına yaklaşık {{price}}.",
+      "area": "Alanı {{area}} m².",
+      "beds_one": "{{count}} yatak odası var.",
+      "beds_other": "{{count}} yatak odası var.",
+      "baths_one": "{{count}} banyo var.",
+      "baths_other": "{{count}} banyo var.",
+      "floor": "{{floor}}. katta.",
+      "floorOf": "{{total}} katlı binanın {{floor}}. katında.",
+      "year": "{{year}} yılında yapıldı.",
+      "location": "Konumu: {{where}}.",
+      "deal": "{{deal}} {{what}}.",
+      "status": {
+        "active": "Evet, ilan aktif.",
+        "sold": "Bu mülk satıldı.",
+        "rented": "Bu mülk kiralandı.",
+        "other": "İlan şu anda aktif değil."
+      },
+      "featureYes": "{{feature}}: evet, ilanda belirtiliyor.",
+      "featureUnknown": "{{feature}}: ilanda belirtilmiyor.",
+      "fromDescription": "Açıklamada şöyle yazıyor: “{{text}}”"
+    }
   },
   "viewings": {
     "title": "Ziyaretler",

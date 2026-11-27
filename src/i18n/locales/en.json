@@ -686,7 +686,30 @@
     "disclaimer": "AI answers are based only on listing data — verify important details with the seller.",
     "contactTitle": "Ask the seller directly",
     "notInListing": "The listing doesn’t say.",
-    "viewProfile": "Profile"
+    "viewProfile": "Profile",
+    "local": {
+      "price": "The price is {{price}}.",
+      "pricePerM2": "About {{price}} per m².",
+      "area": "The area is {{area}} m².",
+      "beds_one": "It has {{count}} bedroom.",
+      "beds_other": "It has {{count}} bedrooms.",
+      "baths_one": "It has {{count}} bathroom.",
+      "baths_other": "It has {{count}} bathrooms.",
+      "floor": "It is on floor {{floor}}.",
+      "floorOf": "It is on floor {{floor}} of {{total}}.",
+      "year": "It was built in {{year}}.",
+      "location": "It is located at: {{where}}.",
+      "deal": "This listing: {{what}} {{deal}}.",
+      "status": {
+        "active": "Yes, the listing is active.",
+        "sold": "This property has been sold.",
+        "rented": "This property has been rented.",
+        "other": "The listing is not active at the moment."
+      },
+      "featureYes": "{{feature}}: yes, the listing mentions it.",
+      "featureUnknown": "{{feature}}: the listing does not mention it.",
+      "fromDescription": "The description says: “{{text}}”"
+    }
   },
   "viewings": {
     "title": "Viewings",

@@ -46,7 +46,7 @@ const DAILY = /\b(ditore|per dite|per nate|nate|daily|per night|nightly|giornali
 const RENT_STEMS = ['qira', 'qera', 'rent', 'affitt', 'miet', 'louer', 'alquil', 'arriend', 'wynaj', 'аренд', 'снять', 'kiral', 'ενοικ']
 const SALE_STEMS = ['shitj', 'shitet', 'blej', 'bleje', 'blerj', 'sale', 'buy', 'vendita', 'compra', 'kauf', 'vente', 'achet', 'venta', 'sprzeda', 'kupi', 'продаж', 'купит', 'satil', 'πωλ', 'αγορ']
 
-const FEATURE_STEMS = [
+export const FEATURE_STEMS = [
   ['balcony', ['ballkon', 'balcon', 'balkon', 'балкон']],
   ['parking', ['parkim', 'parking', 'parchegg', 'parkplatz', 'stellplatz', 'aparcam', 'парков', 'otopark']],
   ['elevator', ['ashensor', 'elevator', 'lift', 'ascensor', 'ascenseur', 'aufzug', 'fahrstuhl', 'winda', 'лифт', 'asansor']],

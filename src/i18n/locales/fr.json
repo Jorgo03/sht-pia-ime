@@ -695,7 +695,32 @@
     "disclaimer": "Les réponses de l'IA reposent uniquement sur les données de l'annonce — vérifiez les détails importants avec le vendeur.",
     "contactTitle": "Demandez directement au vendeur",
     "notInListing": "L’annonce ne le précise pas.",
-    "viewProfile": "Profil"
+    "viewProfile": "Profil",
+    "local": {
+      "price": "Le prix est de {{price}}.",
+      "pricePerM2": "Environ {{price}} le m².",
+      "area": "La surface est de {{area}} m².",
+      "beds_one": "Il compte {{count}} chambre.",
+      "beds_many": "Il compte {{count}} chambres.",
+      "beds_other": "Il compte {{count}} chambres.",
+      "baths_one": "Il compte {{count}} salle de bain.",
+      "baths_many": "Il compte {{count}} salles de bain.",
+      "baths_other": "Il compte {{count}} salles de bain.",
+      "floor": "Il est au {{floor}}ᵉ étage.",
+      "floorOf": "Il est au {{floor}}ᵉ étage sur {{total}}.",
+      "year": "Il a été construit en {{year}}.",
+      "location": "Il se trouve : {{where}}.",
+      "deal": "Annonce : {{what}} {{deal}}.",
+      "status": {
+        "active": "Oui, l’annonce est active.",
+        "sold": "Ce bien a été vendu.",
+        "rented": "Ce bien a été loué.",
+        "other": "L’annonce n’est pas active pour le moment."
+      },
+      "featureYes": "{{feature}} : oui, l’annonce le mentionne.",
+      "featureUnknown": "{{feature}} : l’annonce ne le mentionne pas.",
+      "fromDescription": "La description indique : « {{text}} »"
+    }
   },
   "viewings": {
     "title": "Visites",

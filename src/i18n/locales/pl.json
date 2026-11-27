@@ -704,7 +704,34 @@
     "disclaimer": "Odpowiedzi AI opierają się wyłącznie na danych ogłoszenia — ważne szczegóły potwierdź u sprzedawcy.",
     "contactTitle": "Zapytaj bezpośrednio sprzedawcę",
     "notInListing": "Ogłoszenie tego nie podaje.",
-    "viewProfile": "Profil"
+    "viewProfile": "Profil",
+    "local": {
+      "price": "Cena wynosi {{price}}.",
+      "pricePerM2": "Około {{price}} za m².",
+      "area": "Powierzchnia to {{area}} m².",
+      "beds_one": "Ma {{count}} sypialnię.",
+      "beds_few": "Ma {{count}} sypialnie.",
+      "beds_many": "Ma {{count}} sypialni.",
+      "beds_other": "Ma {{count}} sypialni.",
+      "baths_one": "Ma {{count}} łazienkę.",
+      "baths_few": "Ma {{count}} łazienki.",
+      "baths_many": "Ma {{count}} łazienek.",
+      "baths_other": "Ma {{count}} łazienki.",
+      "floor": "Znajduje się na {{floor}}. piętrze.",
+      "floorOf": "Znajduje się na {{floor}}. piętrze z {{total}}.",
+      "year": "Zbudowano w {{year}} r.",
+      "location": "Lokalizacja: {{where}}.",
+      "deal": "Oferta: {{what}} {{deal}}.",
+      "status": {
+        "active": "Tak, ogłoszenie jest aktywne.",
+        "sold": "Ta nieruchomość została sprzedana.",
+        "rented": "Ta nieruchomość została wynajęta.",
+        "other": "Ogłoszenie nie jest obecnie aktywne."
+      },
+      "featureYes": "{{feature}}: tak, ogłoszenie to podaje.",
+      "featureUnknown": "{{feature}}: ogłoszenie tego nie podaje.",
+      "fromDescription": "W opisie czytamy: „{{text}}”"
+    }
   },
   "viewings": {
     "title": "Wizyty",

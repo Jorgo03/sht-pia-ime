@@ -1956,38 +1956,38 @@ test.describe('listing assistant hands over to the seller', () => {
   };
   const callButton = (page: Page) => page.getByRole('button', { name: `${t('property.call')}, ${AGENT.full_name}` });
 
+  // Answered from the listing's own data (src/features/properties/lib/
+  // listingAnswer.js), with no paid AI model and no Edge Function call.
+  const fill = (key: string, values: Record<string, string | number>) =>
+    Object.entries(values).reduce((s, [k, v]) => s.replaceAll(`{{${k}}}`, String(v)), t(key));
+
   test('X50 an answer the listing lacks shows the agent with Call and WhatsApp; an answer it has does not', async ({ page }) => {
-    let turn = 0;
-    await page.route('**/functions/v1/ai-listing-assistant', (route) =>
-      route.request().method() === 'OPTIONS'
-        ? route.fulfill({ status: 204, headers: { ...CORS, 'access-control-allow-headers': '*' } })
-        : json(route, ++turn === 1
-          ? { reply: 'Shpallja nuk e thotë nëse ka parkim.', contact: true }
-          : { reply: 'Ka 2 dhoma gjumi.', contact: false }),
-    );
+    let ai = 0;
+    await page.route('**/functions/v1/ai-listing-assistant', (route) => { ai += 1; return route.abort(); });
     await page.goto(`/property/${FEATURED.id}`);
     await ready(page);
     await page.getByRole('button', { name: t('assistant.title') }).click();
 
     await ask(page, 'A ka parkim?');
-    await expect(page.getByText('Shpallja nuk e thotë nëse ka parkim.')).toBeVisible();
+    await expect(page.getByText(fill('assistant.local.featureUnknown', { feature: t('listing.feature.parking') }))).toBeVisible();
     await expect(page.getByText(t('assistant.contactTitle'))).toHaveCount(1);
     await expect(callButton(page)).toBeVisible();
     await expect(page.getByRole('button', { name: `WhatsApp, ${AGENT.full_name}` })).toBeVisible();
     await expect(page.getByRole('button', { name: `${t('assistant.viewProfile')}, ${AGENT.full_name}` })).toBeVisible();
 
+    const beds = Number(FEATURED.beds);
     await ask(page, 'Sa dhoma ka?');
-    await expect(page.getByText('Ka 2 dhoma gjumi.')).toBeVisible();
+    await expect(page.getByText(fill(`assistant.local.beds_${beds === 1 ? 'one' : 'other'}`, { count: beds }))).toBeVisible();
     await expect(page.getByText(t('assistant.contactTitle'))).toHaveCount(1);
+    expect(ai).toBe(0);
   });
 
-  test('X51 when the assistant is down the seller is still offered', async ({ page }) => {
-    // The fake backend answers every Edge Function with 503 ai_unavailable.
+  test('X51 a question the listing says nothing about offers the seller', async ({ page }) => {
     await page.goto(`/property/${FEATURED.id}`);
     await ready(page);
     await page.getByRole('button', { name: t('assistant.title') }).click();
-    await ask(page, 'A ka ashensor?');
-    await expect(page.getByText(t('assistant.unavailable'))).toBeVisible();
+    await ask(page, 'A pranohen kafshë shtëpiake?');
+    await expect(page.getByText(t('assistant.notInListing'))).toBeVisible();
     await expect(callButton(page)).toBeVisible();
   });
 });
