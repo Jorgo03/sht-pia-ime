@@ -1,5 +1,20 @@
 # Pre-Launch Audit — Shtëpia.ime (Vite web app)
 
+## ═══ PASS 41 — 2026-11-28: WEBSITE (website/) GAPS, FOUND AND FIXED ═══
+
+Live crawl of every route at 1440 and 390 (`scripts/qa/crawl-site.mjs`: page/console errors, failed requests, raw i18n keys, sideways scroll, unnamed controls, broken images, h1, links), live walks of search → listing → home → agents at 1440/768/390, and three read-only code reviews of `website/src`. About 50 findings, all FIXED (commits fedd71a..5afcd8f) except where noted:
+
+| Area | Result |
+|---|---|
+| Site | FIXED: unknown addresses got Vercel's bare 404 → `404.html` (site page, status 404); no robots.txt / sitemap → both written by the build; share previews had a relative og:image and no title/text → per-listing `property/<id>.html` with title, text, first photo, canonical; signed-in and sign-in pages now `noindex`; `?lang=xx` links honoured; legal pages one h1 + description (`scripts/website/seo.mjs`, `tests/websiteSeo.test.mjs`) |
+| Pages | FIXED: no error boundary (blank page after a deploy) → reload/retry; counts and stats shown as 0 on error; messages/viewings unbounded → 24 + Load more; listing stats capped at 500 → exact counts; notifications stuck on skeleton / lost pages; compare empty state; profile-failure retry; owners opening a non-live listing got "not found" → status pill (RLS already limits who sees it); missing/mistyped listing logged 406/400 → `maybeSingle` + id check |
+| Components | FIXED: Google/LinkedIn sign-in dropped `next`; Era panel focus/aria-modal/inert; stale data after sign-out or account switch (favourites, profile, Era reply); save-search stuck on loading; report dialog kept old state; rates-unavailable note; compare synced across tabs; agent directory paged past 1000 rows |
+| Listing form | FIXED: upload zones unreachable by keyboard; labels not tied to fields; focus rings removed; duplicate listing after leaving mid-save; >20 photos ignored silently; small touch targets; map hint and road list over the header; "Start fresh" kept the old video; PNG/GIF flattened; reduced motion; error contrast |
+| Agents page empty | NO ACTION REQUIRED: no live listing has `agent_id` set (checked read-only), so the empty state is correct |
+| Era / AI | CONFIGURATION REQUIRED (owner): the project's Anthropic key returns 401 (see earlier passes) |
+
+Verification: lint 0 errors, tsc clean, unit 650/650, website build; live after deploy: all routes 200 (unknown → 404 page), robots, sitemap (15 URLs), listing share tags, no console errors on listing edge cases.
+
 ## ═══ PASS 40 — 2026-11-06: EXPO GO COMPATIBILITY, IOS AND ANDROID (owner master mission) ═══
 
 Architecture: hybrid. The Expo app (`app/`, expo-router, SDK 58, RN 0.88) is the phone app and, through React Native Web, its own website; the Vite site (`src/`) is separate and unchanged. Shared: `src/lib`, `src/features/*/lib`, the locale files. No physical device or simulator was used: everything below is static checks, real bundle builds and the live dev server.
