@@ -1262,7 +1262,8 @@
     "title": "Fiyatları göster",
     "asListed": "İlandaki gibi",
     "asListedShort": "Orijinal",
-    "converted": "Yaklaşık, bugünkü kurla. İlan fiyatı: {{price}}"
+    "converted": "Yaklaşık, bugünkü kurla. İlan fiyatı: {{price}}",
+    "ratesUnavailable": "Döviz kurları yüklenemedi; fiyatlar ilanda belirtildiği gibi gösteriliyor."
   },
   "site": {
     "nav": {

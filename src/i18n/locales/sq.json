@@ -1262,7 +1262,8 @@
     "title": "Monedha e çmimeve",
     "asListed": "Si në njoftim",
     "asListedShort": "Origjinale",
-    "converted": "Çmim i përafërt me kursin ditor. Çmimi i njoftimit: {{price}}"
+    "converted": "Çmim i përafërt me kursin ditor. Çmimi i njoftimit: {{price}}",
+    "ratesUnavailable": "Kurset e këmbimit nuk u ngarkuan; çmimet shfaqen siç janë listuar."
   },
   "site": {
     "nav": {

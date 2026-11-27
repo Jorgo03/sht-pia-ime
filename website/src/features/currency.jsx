@@ -34,7 +34,7 @@ export function CurrencyProvider({ children }) {
       // Not remembered.
     }
   }, [])
-  const { data: rates } = useQuery({
+  const { data: rates, isError: ratesFailed } = useQuery({
     queryKey: ['exchange-rates'],
     enabled: currency !== null,
     staleTime: 6 * 3600e3,
@@ -55,7 +55,13 @@ export function CurrencyProvider({ children }) {
     },
     [currency, rates, i18n.resolvedLanguage],
   )
-  const value = useMemo(() => ({ currency, setCurrency, formatListingPrice }), [currency, setCurrency, formatListingPrice])
+  // A chosen currency whose rates could not be read: prices fall back to each
+  // listing's own currency, and the selector says so.
+  const ratesUnavailable = currency !== null && ratesFailed
+  const value = useMemo(
+    () => ({ currency, setCurrency, formatListingPrice, ratesUnavailable }),
+    [currency, setCurrency, formatListingPrice, ratesUnavailable],
+  )
   return <CurrencyContext.Provider value={value}>{children}</CurrencyContext.Provider>
 }
 
@@ -70,14 +76,20 @@ export function usePrice() {
 
 export function CurrencySelect({ className = '' }) {
   const { t } = useTranslation()
-  const { currency, setCurrency } = useCurrency()
+  const { currency, setCurrency, ratesUnavailable } = useCurrency()
   return (
-    <label className={`lang-select ${className}`}>
-      <Coins size={16} aria-hidden="true" />
-      <Select aria-label={t('currency.title')} value={currency ?? ''} onChange={(e) => setCurrency(e.target.value || null)}>
-        <option value="">{t('currency.asListedShort')}</option>
-        {DISPLAY_CURRENCIES.map((c) => <option key={c} value={c}>{c}</option>)}
-      </Select>
-    </label>
+    <>
+      <label className={`lang-select ${className}`} title={ratesUnavailable ? t('currency.ratesUnavailable') : undefined}>
+        <Coins size={16} aria-hidden="true" />
+        <Select aria-label={t('currency.title')} value={currency ?? ''} onChange={(e) => setCurrency(e.target.value || null)}>
+          <option value="">{t('currency.asListedShort')}</option>
+          {DISPLAY_CURRENCIES.map((c) => <option key={c} value={c}>{c}</option>)}
+        </Select>
+      </label>
+      {/* In the header bar there is no room for a sentence: it is read out and shown on hover; in the menu it is shown. */}
+      {ratesUnavailable && (
+        <span className={className.includes('is-block') ? 'muted small' : 'visually-hidden'} role="status">{t('currency.ratesUnavailable')}</span>
+      )}
+    </>
   )
 }

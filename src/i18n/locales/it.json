@@ -1272,7 +1272,8 @@
     "title": "Mostra i prezzi in",
     "asListed": "Come nell'annuncio",
     "asListedShort": "Originale",
-    "converted": "Approssimativo, al cambio del giorno. Prezzo dell'annuncio: {{price}}"
+    "converted": "Approssimativo, al cambio del giorno. Prezzo dell'annuncio: {{price}}",
+    "ratesUnavailable": "Impossibile caricare i tassi di cambio; i prezzi sono mostrati come pubblicati."
   },
   "site": {
     "nav": {

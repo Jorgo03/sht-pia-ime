@@ -19,6 +19,21 @@ const loaders = import.meta.glob(['../../src/i18n/locales/*.json', '!../../src/i
 const STORAGE_KEY = 'fho_lang'
 
 function initialLanguage() {
+  // A link that names its language (?lang=en, as the old site and the
+  // hreflang alternates write) opens in it, and the choice is kept.
+  try {
+    const fromUrl = new URLSearchParams(window.location.search).get('lang')
+    if (isLanguage(fromUrl)) {
+      try {
+        localStorage.setItem(STORAGE_KEY, fromUrl)
+      } catch {
+        // Not remembered, still shown.
+      }
+      return fromUrl
+    }
+  } catch {
+    // No usable address: fall through.
+  }
   try {
     const saved = localStorage.getItem(STORAGE_KEY)
     if (isLanguage(saved)) return saved

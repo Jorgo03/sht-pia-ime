@@ -387,7 +387,7 @@ export default function AuthScreen({ start = 'signin' }) {
 
   const handleProvider = async (provider) => {
     clearErrors()
-    const { error } = await auth.signInWithProvider(provider)
+    const { error } = await auth.signInWithProvider(provider, next)
     if (error) setFormError(friendlyError(error, t))
   }
 

@@ -18,6 +18,12 @@ export function FavoritesProvider({ children }) {
   const [status, setStatus] = useState('idle') // idle | loading | ready | error
   const idsRef = useRef(ids)
   const uid = user?.id ?? null
+  // Who the latest load is for: a reply for someone who has since signed out
+  // (or for the previous account) is dropped.
+  const uidRef = useRef(uid)
+  useEffect(() => {
+    uidRef.current = uid
+  }, [uid])
 
   const apply = (next) => {
     idsRef.current = next
@@ -38,6 +44,7 @@ export function FavoritesProvider({ children }) {
       .eq('user_id', uid)
       .order('created_at', { ascending: false })
       .limit(500)
+    if (uidRef.current !== uid) return
     if (error) return setStatus('error')
     const props = (data ?? []).map((f) => f.properties).filter((p) => p && p.status === 'active')
     apply(new Set((data ?? []).map((f) => f.property_id)))

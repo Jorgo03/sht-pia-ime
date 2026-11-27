@@ -32,7 +32,18 @@ export default function ReportDialog({ open, onClose, propertyId, userId, conver
   }
 
   return (
-    <dialog ref={ref} className="dialog" onClose={onClose} aria-labelledby="report-title">
+    <dialog
+      ref={ref}
+      className="dialog"
+      onClose={() => {
+        // Opened again (for another listing or person), it starts blank.
+        setReason('')
+        setDetails('')
+        setResult(null)
+        onClose?.()
+      }}
+      aria-labelledby="report-title"
+    >
       <form method="dialog" className="dialog-body" onSubmit={send}>
         <h2 id="report-title">{t('safety.reportTitle')}</h2>
         {result === 'sent' || result === 'already' ? (

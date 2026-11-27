@@ -38,12 +38,18 @@ export default function SaveSearchButton({ filters }) {
     if (!user) return navigate(`/login?next=${encodeURIComponent(location.pathname + location.search)}`)
     setSaving(true)
     setFailed(false)
-    // Start from what matches today, so only later listings count as new.
-    const current = await countMatches(supabase, saved)
-    const { error } = await supabase.from('saved_searches').insert({ user_id: user.id, name: savedLabel(saved, t), filters: saved, alerts_enabled: true, last_match_count: current ?? 0 })
-    setSaving(false)
-    if (error) return setFailed(true)
-    qc.invalidateQueries({ queryKey })
+    try {
+      // Start from what matches today, so only later listings count as new.
+      const current = await countMatches(supabase, saved)
+      const { error } = await supabase.from('saved_searches').insert({ user_id: user.id, name: savedLabel(saved, t), filters: saved, alerts_enabled: true, last_match_count: current ?? 0 })
+      if (error) return setFailed(true)
+      qc.invalidateQueries({ queryKey })
+    } catch {
+      // Offline: the request itself failed rather than returning an error.
+      setFailed(true)
+    } finally {
+      setSaving(false)
+    }
   }
 
   const Icon = already ? BellRing : Bell

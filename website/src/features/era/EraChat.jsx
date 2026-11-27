@@ -93,6 +93,12 @@ export default function EraChat({ variant = 'page', propertyId = null, initialTe
   const [restoredKey, setRestoredKey] = useState(null)
   const endRef = useRef(null)
   const restored = restoredKey === key
+  // The conversation an answer belongs to: one that arrives after the person
+  // signed in or out is dropped rather than added to the other account's chat.
+  const keyRef = useRef(key)
+  useEffect(() => {
+    keyRef.current = key
+  }, [key])
 
   useEffect(() => {
     if (!panel) document.title = `${t('era.name')} · ${t('aiAssistant.title')} | ${t('common.appName')}`
@@ -122,9 +128,11 @@ export default function EraChat({ variant = 'page', propertyId = null, initialTe
   }, [messages.length, sending])
 
   const ask = async (question, before) => {
+    const askedFor = key
     setSending(true)
     const result = await askAssistant({ messages: before, question, state, language: i18n.resolvedLanguage, propertyId })
     setSending(false)
+    if (keyRef.current !== askedFor) return
     if (result.ok) {
       const a = result.answer
       setState(a.state)

@@ -1282,7 +1282,8 @@
     "title": "Pokazuj ceny w",
     "asListed": "Jak w ogłoszeniu",
     "asListedShort": "Oryginał",
-    "converted": "Orientacyjnie, po dzisiejszym kursie. Cena w ogłoszeniu: {{price}}"
+    "converted": "Orientacyjnie, po dzisiejszym kursie. Cena w ogłoszeniu: {{price}}",
+    "ratesUnavailable": "Nie udało się wczytać kursów walut; ceny są pokazane tak, jak je podano."
   },
   "site": {
     "nav": {

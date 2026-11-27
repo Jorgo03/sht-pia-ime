@@ -1262,7 +1262,8 @@
     "title": "Preise anzeigen in",
     "asListed": "Wie inseriert",
     "asListedShort": "Original",
-    "converted": "Ungefähr, zum Tageskurs. Inserierter Preis: {{price}}"
+    "converted": "Ungefähr, zum Tageskurs. Inserierter Preis: {{price}}",
+    "ratesUnavailable": "Wechselkurse konnten nicht geladen werden; Preise werden wie angegeben angezeigt."
   },
   "site": {
     "nav": {

@@ -105,32 +105,52 @@ export async function getCityTiles() {
 }
 
 /** Agents and agencies with live listings (profiles.role is not public). */
+// Supabase answers at most 1000 rows per request, and a long id list in the
+// address can pass the URL limit, so both reads go in pages.
+const ROW_PAGE = 1000
+const ID_CHUNK = 100
+const MAX_DIRECTORY_ROWS = 50000
+
 export async function getAgentDirectory() {
-  const { data, error } = await supabase
-    .from('properties')
-    .select('agent_id')
-    .eq('status', 'active')
-    .not('agent_id', 'is', null)
-    .limit(1000)
-  if (error) throw error
-  const tally = tallyAgents(data)
+  const rows = []
+  for (let from = 0; from < MAX_DIRECTORY_ROWS; from += ROW_PAGE) {
+    const { data, error } = await supabase
+      .from('properties')
+      .select('agent_id')
+      .eq('status', 'active')
+      .not('agent_id', 'is', null)
+      .order('id', { ascending: true })
+      .range(from, from + ROW_PAGE - 1)
+    if (error) throw error
+    rows.push(...(data ?? []))
+    if ((data ?? []).length < ROW_PAGE) break
+  }
+  const tally = tallyAgents(rows)
   if (tally.length === 0) return []
-  const { data: profiles, error: profilesError } = await supabase
-    .from('profiles')
-    .select('id, full_name, agency_name, avatar_url')
-    .in('id', tally.map((a) => a.id))
-  if (profilesError) throw profilesError
-  return joinAgents(tally, profiles)
+  const ids = tally.map((a) => a.id)
+  const chunks = []
+  for (let i = 0; i < ids.length; i += ID_CHUNK) chunks.push(ids.slice(i, i + ID_CHUNK))
+  const results = await Promise.all(
+    chunks.map((chunk) => supabase.from('profiles').select('id, full_name, agency_name, avatar_url').in('id', chunk)),
+  )
+  const failed = results.find((r) => r.error)
+  if (failed) throw failed.error
+  return joinAgents(tally, results.flatMap((r) => r.data ?? []))
 }
 
-/** One listing with its agent; null when it is gone, thrown when offline. */
+/**
+ * One listing with its agent; null when it is gone, thrown when offline.
+ * No status filter: the database already shows a paused, sold or held listing
+ * only to its owner, its agent and moderators, so they can still open it.
+ */
 export async function getProperty(id) {
   const res = await supabase
     .from('properties')
     .select('*, agent:profiles(id, full_name, phone, agency_name, avatar_url)')
     .eq('id', id)
-    .eq('status', 'active')
     .single()
+  // Not a listing id at all (an old or mistyped link): not found, not an error.
+  if (res.error?.code === '22P02') return null
   return propertyOrNotFound(res)
 }
 

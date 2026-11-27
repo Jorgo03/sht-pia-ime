@@ -33,6 +33,7 @@ export async function logActivity(propertyId, type) {
 }
 
 const RECENT_KEY = 'fho_recently_viewed'
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 /** Newest first, ten at most, as in the app's useRecentlyViewed. */
 export function addRecentlyViewed(id) {
   try {
@@ -45,7 +46,8 @@ export function addRecentlyViewed(id) {
 export function recentlyViewedIds() {
   try {
     const list = JSON.parse(localStorage.getItem(RECENT_KEY) || '[]')
-    return Array.isArray(list) ? list.filter((x) => typeof x === 'string') : []
+    // Only real listing ids: one junk value would fail the whole lookup.
+    return Array.isArray(list) ? list.filter((x) => typeof x === 'string' && UUID.test(x)) : []
   } catch {
     return []
   }

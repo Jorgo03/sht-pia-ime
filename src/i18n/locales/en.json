@@ -1262,7 +1262,8 @@
     "title": "Show prices in",
     "asListed": "As listed",
     "asListedShort": "Original",
-    "converted": "Approximate, at today's rate. Listed price: {{price}}"
+    "converted": "Approximate, at today's rate. Listed price: {{price}}",
+    "ratesUnavailable": "Exchange rates could not be loaded; prices are shown as listed."
   },
   "site": {
     "nav": {

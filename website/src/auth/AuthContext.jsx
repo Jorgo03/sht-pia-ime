@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { supabase, storage } from '../lib/supabase'
 import { existingAccountError, isExistingAccount, isUnverifiedEmailUser } from '@/src/features/auth/lib/signupCode.js'
 import { createLoginThrottle, isWrongPassword, THROTTLE_STORAGE_KEY, tooManyAttemptsError } from '@/src/features/auth/lib/loginThrottle.js'
@@ -17,6 +17,22 @@ const throttle = createLoginThrottle({
   save: (raw) => storage.setItem(THROTTLE_STORAGE_KEY, raw),
 })
 
+// Where a Google or LinkedIn sign-in should land: the provider always returns
+// to /account (the address on the Supabase allow-list), so the page the person
+// came from is kept here for one return trip.
+const OAUTH_NEXT_KEY = 'fho_oauth_next'
+const safePath = (p) => (typeof p === 'string' && p.startsWith('/') && !p.startsWith('//') ? p : null)
+
+function takeOAuthNext() {
+  try {
+    const next = safePath(sessionStorage.getItem(OAUTH_NEXT_KEY))
+    sessionStorage.removeItem(OAUTH_NEXT_KEY)
+    return next
+  } catch {
+    return null
+  }
+}
+
 const PROFILE_COLUMNS = 'id, full_name, role, agency_name, phone, avatar_url'
 
 async function loadProfile(id) {
@@ -27,8 +43,12 @@ async function loadProfile(id) {
 
 export function AuthProvider({ children }) {
   const [session, setSession] = useState(null)
+  // The user object stays the same while the same person is signed in, so
+  // pages keyed on it do not refetch on every token refresh or tab refocus.
+  const [user, setUser] = useState(null)
   const [profile, setProfile] = useState(null)
   const [ready, setReady] = useState(false)
+  const uidRef = useRef(null)
 
   useEffect(() => {
     let alive = true
@@ -39,24 +59,41 @@ export function AuthProvider({ children }) {
         s = null
       }
       if (!alive) return
+      const uid = s?.user?.id ?? null
+      const switched = uid !== uidRef.current
+      uidRef.current = uid
       setSession(s)
+      setUser((prev) => (prev && s?.user && prev.id === s.user.id && prev.updated_at === s.user.updated_at ? prev : s?.user ?? null))
       if (!s) {
         setProfile(null)
         setReady(true)
         return
       }
+      // Another account: never show the previous person's profile or role.
+      if (switched) setProfile(null)
       try {
         const p = await loadProfile(s.user.id)
-        if (alive) setProfile(p)
+        if (alive && uidRef.current === uid) setProfile(p)
       } catch {
         // Signed in even when the profile cannot be read right now.
       }
-      if (alive) setReady(true)
+      if (!alive) return
+      setReady(true)
+      // Back from Google or LinkedIn: go on to the page the person came from.
+      if (switched && window.location.pathname === '/account') {
+        const next = takeOAuthNext()
+        if (next && next !== '/account') window.location.replace(next)
+      }
     }
     supabase.auth.getSession().then(({ data }) => apply(data.session))
     const { data: sub } = supabase.auth.onAuthStateChange((event, s) => {
-      // Token refreshes do not change who is signed in.
-      if (event === 'TOKEN_REFRESHED') return setSession(s)
+      // Token refreshes, and the SIGNED_IN supabase-js repeats when a tab
+      // regains focus, do not change who is signed in.
+      if (event === 'TOKEN_REFRESHED' || (event === 'SIGNED_IN' && s?.user?.id && s.user.id === uidRef.current)) {
+        setSession(s)
+        setUser((prev) => (prev && prev.id === s?.user?.id && prev.updated_at === s?.user?.updated_at ? prev : s?.user ?? null))
+        return
+      }
       // Deferred: supabase-js holds a lock during this callback.
       setTimeout(() => apply(s), 0)
     })
@@ -118,7 +155,14 @@ export function AuthProvider({ children }) {
     return { error }
   }, [])
 
-  const signInWithProvider = useCallback(async (provider) => {
+  const signInWithProvider = useCallback(async (provider, next) => {
+    try {
+      const path = safePath(next)
+      if (path && path !== '/account') sessionStorage.setItem(OAUTH_NEXT_KEY, path)
+      else sessionStorage.removeItem(OAUTH_NEXT_KEY)
+    } catch {
+      // Storage blocked: the person lands on their account instead.
+    }
     const { error } = await supabase.auth.signInWithOAuth({
       provider,
       options: { redirectTo: `${window.location.origin}/account`, queryParams: oauthQueryParams(provider) },
@@ -128,18 +172,20 @@ export function AuthProvider({ children }) {
 
   const signOut = useCallback(async () => {
     await supabase.auth.signOut().catch(() => {})
+    uidRef.current = null
     setSession(null)
+    setUser(null)
     setProfile(null)
   }, [])
 
   const refreshProfile = useCallback(async () => {
-    if (!session) return
-    setProfile(await loadProfile(session.user.id))
-  }, [session])
+    if (!user) return
+    setProfile(await loadProfile(user.id))
+  }, [user])
 
   const value = useMemo(
-    () => ({ session, user: session?.user ?? null, profile, ready, signIn, signUp, verifyCode, resendSignupCode, sendResetCode, updatePassword, sendEmailCode, signInWithProvider, signOut, refreshProfile }),
-    [session, profile, ready, signIn, signUp, verifyCode, resendSignupCode, sendResetCode, updatePassword, sendEmailCode, signInWithProvider, signOut, refreshProfile],
+    () => ({ session, user, profile, ready, signIn, signUp, verifyCode, resendSignupCode, sendResetCode, updatePassword, sendEmailCode, signInWithProvider, signOut, refreshProfile }),
+    [session, user, profile, ready, signIn, signUp, verifyCode, resendSignupCode, sendResetCode, updatePassword, sendEmailCode, signInWithProvider, signOut, refreshProfile],
   )
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }

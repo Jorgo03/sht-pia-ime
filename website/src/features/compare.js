@@ -28,6 +28,17 @@ function write(next) {
   listeners.forEach((l) => l())
 }
 
+// Another tab changed the list: pick it up here too, so the last write in one
+// tab does not quietly undo the other's.
+if (typeof window !== 'undefined') {
+  window.addEventListener('storage', (e) => {
+    if (e.key !== KEY && e.key !== null) return
+    ids = read()
+    snapshot = ids.join(',')
+    listeners.forEach((l) => l())
+  })
+}
+
 export function toggleCompare(id) {
   write(toggleCompareId(ids, id, MAX_COMPARE))
 }

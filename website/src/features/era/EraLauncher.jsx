@@ -24,6 +24,7 @@ export default function EraLauncher() {
   const [loaded, setLoaded] = useState(false)
   const buttonRef = useRef(null)
   const inputRef = useRef(null)
+  const panelRef = useRef(null)
   const [lastPath, setLastPath] = useState(pathname)
 
   if (lastPath !== pathname) {
@@ -43,22 +44,40 @@ export default function EraLauncher() {
     return () => document.removeEventListener('keydown', onKey)
   }, [open])
 
-  // Ready to type on a computer; on a phone the keyboard waits for a tap.
+  // Focus moves into the window when it opens: ready to type on a computer;
+  // on a touch screen the window itself takes focus (so a screen reader
+  // starts there) and the keyboard waits for a tap.
   useEffect(() => {
-    if (!open || !window.matchMedia('(pointer: fine)').matches) return
-    const timer = setTimeout(() => inputRef.current?.focus(), 80)
+    if (!open) return
+    const timer = setTimeout(() => {
+      if (window.matchMedia('(pointer: fine)').matches && inputRef.current) inputRef.current.focus()
+      else panelRef.current?.focus()
+    }, 80)
     return () => clearTimeout(timer)
   }, [open])
 
-  // On a phone the window covers the page: the page behind it must not scroll.
+  // On a phone the window covers the page: the page behind it must not scroll,
+  // and keyboard and screen-reader users must not land in it (inert).
+  const [fullScreen, setFullScreen] = useState(false)
   useEffect(() => {
-    if (!open || !window.matchMedia('(max-width: 599px)').matches) return
+    if (!open) return
+    const mq = window.matchMedia('(max-width: 599px)')
+    const sync = () => setFullScreen(mq.matches)
+    sync()
+    mq.addEventListener('change', sync)
+    return () => mq.removeEventListener('change', sync)
+  }, [open])
+  useEffect(() => {
+    if (!open || !fullScreen) return
     const { overflow } = document.body.style
     document.body.style.overflow = 'hidden'
+    const behind = [...document.querySelectorAll('body > #root > :not(.era-panel):not(.era-launcher)')]
+    behind.forEach((el) => el.setAttribute('inert', ''))
     return () => {
       document.body.style.overflow = overflow
+      behind.forEach((el) => el.removeAttribute('inert'))
     }
-  }, [open])
+  }, [open, fullScreen])
 
   if (!AI_CHAT_ENABLED || HIDDEN.some((r) => r.test(pathname))) return null
 
@@ -74,7 +93,15 @@ export default function EraLauncher() {
   return (
     <>
       {loaded && (
-        <section className={`era-panel${open ? ' is-open' : ''}`} role="dialog" aria-labelledby="era-title" hidden={!open}>
+        <section
+          ref={panelRef}
+          tabIndex={-1}
+          className={`era-panel${open ? ' is-open' : ''}`}
+          role="dialog"
+          aria-modal={open && fullScreen ? 'true' : undefined}
+          aria-labelledby="era-title"
+          hidden={!open}
+        >
           <Suspense fallback={<div className="era-loading" aria-busy="true"><EraAvatar size={56} /></div>}>
             <EraChat variant="panel" onClose={close} inputRef={inputRef} />
           </Suspense>
