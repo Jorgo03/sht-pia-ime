@@ -632,7 +632,8 @@
     "meetings": "Takime",
     "favourites": "Të preferuara",
     "recentActivity": "Aktiviteti i fundit",
-    "noActivity": "Nuk ka aktivitet të regjistruar"
+    "noActivity": "Nuk ka aktivitet të regjistruar",
+    "lastDays": "{{n}} ditët e fundit"
   },
   "map": {
     "openInMaps": "Hap në Google Maps",

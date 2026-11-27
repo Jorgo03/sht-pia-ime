@@ -580,7 +580,8 @@
     "meetings": "Termine",
     "favourites": "Favoriten",
     "recentActivity": "Letzte Aktivitäten",
-    "noActivity": "Noch keine Aktivität"
+    "noActivity": "Noch keine Aktivität",
+    "lastDays": "Letzte {{n}} Tage"
   },
   "map": {
     "openInMaps": "In Google Maps öffnen",

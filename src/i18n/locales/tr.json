@@ -632,7 +632,8 @@
     "meetings": "Görüşmeler",
     "favourites": "Favoriler",
     "recentActivity": "Son etkinlik",
-    "noActivity": "Henüz kayıtlı etkinlik yok"
+    "noActivity": "Henüz kayıtlı etkinlik yok",
+    "lastDays": "Son {{n}} gün"
   },
   "map": {
     "openInMaps": "Google Haritalar'da aç",

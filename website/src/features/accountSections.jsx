@@ -59,7 +59,7 @@ export function AvatarEditor() {
 
   return (
     <div className="avatar-editor">
-      {profile?.avatar_url ? <img className="profile-avatar" src={profile.avatar_url} alt="" /> : <span className="profile-avatar agent-initials" aria-hidden="true">{profileInitials(name)}</span>}
+      {profile?.avatar_url ? <img className="profile-avatar" src={profile.avatar_url} alt="" decoding="async" /> : <span className="profile-avatar agent-initials" aria-hidden="true">{profileInitials(name)}</span>}
       <div className="row-actions">
         <input ref={input} id="avatar-file" type="file" accept="image/jpeg,image/png,image/webp" className="visually-hidden" onChange={(e) => choose(e.target.files?.[0])} disabled={busy} />
         <label htmlFor="avatar-file" className="btn btn-outline btn-sm" aria-disabled={busy}>

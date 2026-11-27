@@ -589,7 +589,8 @@
     "meetings": "Reuniones",
     "favourites": "Favoritos",
     "recentActivity": "Actividad reciente",
-    "noActivity": "Sin actividad registrada"
+    "noActivity": "Sin actividad registrada",
+    "lastDays": "Últimos {{n}} días"
   },
   "map": {
     "openInMaps": "Abrir en Google Maps",

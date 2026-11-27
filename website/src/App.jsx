@@ -10,6 +10,7 @@ import Property from './pages/Property'
 import NotFound from './pages/NotFound'
 import ErrorBoundary from './components/ErrorBoundary'
 import AuthScreen from './auth/AuthScreen'
+import RequireAuth from './auth/RequireAuth'
 const Account = lazy(() => import('./pages/Account'))
 const Favorites = lazy(() => import('./pages/Favorites'))
 const Messages = lazy(() => import('./pages/Messages'))
@@ -33,7 +34,6 @@ const Moderation = lazy(() => import('./pages/Moderation'))
 const Assistant = lazy(() => import('./pages/Assistant'))
 const Pricing = lazy(() => import('./pages/Pricing'))
 const NewListing = lazy(() => import('./listing/NewListing'))
-import RequireAuth from './auth/RequireAuth'
 
 function OldEdit() {
   const { id } = useParams()

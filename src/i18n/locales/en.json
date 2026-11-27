@@ -632,7 +632,8 @@
     "meetings": "Meetings",
     "favourites": "Favourites",
     "recentActivity": "Recent Activity",
-    "noActivity": "No activity recorded yet"
+    "noActivity": "No activity recorded yet",
+    "lastDays": "Last {{n}} days"
   },
   "map": {
     "openInMaps": "Open in Google Maps",

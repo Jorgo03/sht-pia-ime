@@ -598,7 +598,8 @@
     "meetings": "Встречи",
     "favourites": "Избранное",
     "recentActivity": "Последняя активность",
-    "noActivity": "Активность не зарегистрирована"
+    "noActivity": "Активность не зарегистрирована",
+    "lastDays": "Последние {{n}} дн."
   },
   "map": {
     "openInMaps": "Открыть в Google Maps",

@@ -69,7 +69,7 @@ export default function PublicProfile() {
   return (
     <div className="page container section">
       <header className="profile-head">
-        {view?.avatarUrl ? <img className="profile-avatar" src={view.avatarUrl} alt="" /> : <span className="profile-avatar agent-initials" aria-hidden="true">{profileInitials(name)}</span>}
+        {view?.avatarUrl ? <img className="profile-avatar" src={view.avatarUrl} alt="" decoding="async" /> : <span className="profile-avatar agent-initials" aria-hidden="true">{profileInitials(name)}</span>}
         <div>
           <p className="muted small">{view?.kind === 'agent' ? t('publicProfile.agent') : t('auth.roleClient')}</p>
           <h1 className="page-title">{prof.isPending ? ' ' : name}</h1>

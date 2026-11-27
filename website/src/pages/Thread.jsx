@@ -43,7 +43,7 @@ function Attachment({ value }) {
       </span>
     )
   }
-  if (file.kind === 'image' && url) return <img className="bubble-img" src={url} alt={file.name} />
+  if (file.kind === 'image' && url) return <img className="bubble-img" src={url} alt={file.name} loading="lazy" decoding="async" />
   return (
     <a className="bubble-file" href={url ?? undefined} target="_blank" rel="noopener noreferrer" aria-label={t('messages.openAttachment', { name: file.name })}>
       <Paperclip size={16} aria-hidden="true" />

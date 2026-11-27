@@ -11,9 +11,9 @@ import ListingAssistant from '../components/ListingAssistant'
 import { AI_CHAT_ENABLED } from '../lib/features'
 import { getProperty } from '../lib/api'
 import { addRecentlyViewed, ContactPanel, logActivity, PriceHistory, SimilarHomes } from '../features/listing'
+import { cityName, getLocalizedText, titleOf } from '../lib/format'
 
 const LocationMap = lazy(() => import('../components/LocationMap'))
-import { cityName, getLocalizedText, titleOf } from '../lib/format'
 
 function Gallery({ photos, title, id }) {
   const { t } = useTranslation()
