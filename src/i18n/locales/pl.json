@@ -587,7 +587,8 @@
         "media": "Zdjęcia i wideo",
         "publish": "Jak kupujący się z Tobą skontaktują"
       }
-    }
+    },
+    "tooManyImages": "Możesz dodać maksymalnie {{max}} zdjęć."
   },
   "dashboard": {
     "title": "Dashboard nieruchomości",

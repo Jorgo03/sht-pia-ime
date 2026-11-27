@@ -621,7 +621,8 @@
         "media": "Fotoğraflar ve video",
         "publish": "Alıcılar size nasıl ulaşır"
       }
-    }
+    },
+    "tooManyImages": "En fazla {{max}} fotoğraf ekleyebilirsiniz."
   },
   "dashboard": {
     "title": "Mülk paneli",

@@ -41,6 +41,10 @@
   height: 350px;
   height: clamp(240px, calc(100svh - 200px), 350px);
   position: relative;
+  /* Its own stacking context: Leaflet's panes and the hint pill (z-index
+     400-500) must not paint over the sticky header or the action bar. */
+  isolation: isolate;
+  z-index: 0;
 }
 
 

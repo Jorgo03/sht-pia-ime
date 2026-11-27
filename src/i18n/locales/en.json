@@ -621,7 +621,8 @@
         "media": "Photos and video",
         "publish": "How buyers reach you"
       }
-    }
+    },
+    "tooManyImages": "You can add up to {{max}} photos."
   },
   "dashboard": {
     "title": "Property Dashboard",

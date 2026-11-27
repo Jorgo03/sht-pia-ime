@@ -578,7 +578,8 @@
         "media": "Photos et vidéo",
         "publish": "Comment les acheteurs vous joignent"
       }
-    }
+    },
+    "tooManyImages": "Vous pouvez ajouter jusqu'à {{max}} photos."
   },
   "dashboard": {
     "title": "Tableau de bord du bien",

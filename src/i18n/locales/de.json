@@ -569,7 +569,8 @@
         "media": "Fotos und Video",
         "publish": "Wie Käufer Sie erreichen"
       }
-    }
+    },
+    "tooManyImages": "Du kannst bis zu {{max}} Fotos hinzufügen."
   },
   "dashboard": {
     "title": "Immobilien-Dashboard",

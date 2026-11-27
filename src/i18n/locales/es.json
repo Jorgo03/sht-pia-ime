@@ -578,7 +578,8 @@
         "media": "Fotos y vídeo",
         "publish": "Cómo te contactan los compradores"
       }
-    }
+    },
+    "tooManyImages": "Puedes añadir hasta {{max}} fotos."
   },
   "dashboard": {
     "title": "Dashboard de propiedad",

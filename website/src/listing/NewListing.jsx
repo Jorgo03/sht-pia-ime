@@ -51,6 +51,9 @@ const STREET_ZOOM = 17
  * re-render that rebuilds an equal object does not yank the camera back while
  * the agent is panning to fine-tune the marker.
  */
+// Visitors who asked for less motion get jumps instead of animated travel.
+const reducedMotion = () => typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+
 function MapFocus({ focus }) {
   const map = useMap()
   const lat = focus?.latitude
@@ -58,7 +61,8 @@ function MapFocus({ focus }) {
 
   useEffect(() => {
     if (lat == null || lng == null) return
-    map.flyTo([lat, lng], STREET_ZOOM, { duration: 0.65 })
+    if (reducedMotion()) map.setView([lat, lng], STREET_ZOOM)
+    else map.flyTo([lat, lng], STREET_ZOOM, { duration: 0.65 })
   }, [map, lat, lng])
 
   return null
@@ -66,9 +70,13 @@ function MapFocus({ focus }) {
 
 function compressImage(file, maxWidth = 1600, quality = 0.8) {
   return new Promise((resolve) => {
-    if (!file.type.startsWith('image/')) { resolve(file); return }
+    // PNG and GIF stay as they are: a JPEG would lose transparency (drawn on
+    // black) and animation.
+    if (!file.type.startsWith('image/') || file.type === 'image/png' || file.type === 'image/gif') { resolve(file); return }
     const img = new Image()
+    const src = URL.createObjectURL(file)
     img.onload = () => {
+      URL.revokeObjectURL(src)
       if (img.width <= maxWidth) { resolve(file); return }
       const canvas = document.createElement('canvas')
       const ratio = maxWidth / img.width
@@ -79,8 +87,8 @@ function compressImage(file, maxWidth = 1600, quality = 0.8) {
         resolve(blob ? new File([blob], file.name, { type: 'image/jpeg' }) : file)
       }, 'image/jpeg', quality)
     }
-    img.onerror = () => resolve(file)
-    img.src = URL.createObjectURL(file)
+    img.onerror = () => { URL.revokeObjectURL(src); resolve(file) }
+    img.src = src
   })
 }
 
@@ -114,6 +122,7 @@ const MAX_YEAR = new Date().getFullYear() + 2
 // apart is how a form ends up demanding three while saying it needs one.
 // lib/upload.ts holds the Expo twin — keep them in step.
 const MIN_IMAGES = 1
+const MAX_IMAGES = 20
 
 // Storage-side validation: the file picker's accept="image/*" is only a
 // hint — anything can be dropped in. Enforce type + size before upload.
@@ -233,9 +242,16 @@ export default function NewListing() {
       return
     }
     const top = topRef.current
-    if (top && top.getBoundingClientRect().top < 0) top.scrollIntoView({ block: 'start', behavior: 'smooth' })
+    if (top && top.getBoundingClientRect().top < 0) top.scrollIntoView({ block: 'start', behavior: reducedMotion() ? 'auto' : 'smooth' })
   }, [step])
   const [submitting, setSubmitting] = useState(false)
+  // Closing the tab mid-save would leave the uploads half done: ask first.
+  useEffect(() => {
+    if (!submitting) return
+    const warn = (e) => { e.preventDefault(); e.returnValue = '' }
+    window.addEventListener('beforeunload', warn)
+    return () => window.removeEventListener('beforeunload', warn)
+  }, [submitting])
   const [errors, setErrors] = useState({})
   const [draftRestored, setDraftRestored] = useState(Boolean(draft))
 
@@ -305,7 +321,13 @@ export default function NewListing() {
     try { if (user) localStorage.removeItem(draftKeyFor(user.id)) } catch { /* ignore */ }
     setForm(INITIAL_FORM)
     setStep(0)
-    setImages([])
+    setImages(prev => {
+      for (const img of prev) if (!img.existing) URL.revokeObjectURL(img.preview)
+      return []
+    })
+    setVideo(null)
+    setMapFocus(null)
+    translation.selectLanguage('sq')
     setErrors({})
     setDraftRestored(false)
   }
@@ -348,7 +370,10 @@ export default function NewListing() {
     const files = Array.from(e.target.files)
     e.target.value = ''
     const total = images.length + files.length
-    if (total > 20) return
+    if (total > MAX_IMAGES) {
+      setErrors(prev => ({ ...prev, images: t('listing.tooManyImages', { max: MAX_IMAGES }) }))
+      return
+    }
     if (files.some(f => !ALLOWED_IMAGE_TYPES.includes(f.type))) {
       setErrors(prev => ({ ...prev, images: t('errors.imageInvalidType') }))
       return
@@ -458,6 +483,22 @@ export default function NewListing() {
     return true
   }
 
+  // A draft may be incomplete, but a value the database refuses (an
+  // out-of-range number, a pin outside the city) is caught here, before the
+  // uploads, instead of coming back as a generic error.
+  const validateDraft = () => {
+    const required = t('listing.required')
+    for (const s of [1, 2]) {
+      const errs = Object.fromEntries(Object.entries(errorsFor(s)).filter(([, msg]) => msg !== required))
+      if (Object.keys(errs).length > 0) {
+        setStep(s)
+        setErrors(errs)
+        return false
+      }
+    }
+    return true
+  }
+
   const next = () => { if (validate()) setStep(s => Math.min(s + 1, STEPS.length - 1)) }
   const prev = () => setStep(s => Math.max(s - 1, 0))
 
@@ -486,6 +527,16 @@ export default function NewListing() {
 
   const submit = async (asDraft = false) => {
     if (!asDraft && !validateAll()) return
+    if (asDraft && !validateDraft()) return
+    // The saved draft is cleared before the save, so leaving mid-save and
+    // coming back cannot publish the same listing twice; a failure puts it back.
+    let savedDraft = null
+    if (!isEdit) {
+      try {
+        savedDraft = localStorage.getItem(draftKeyFor(user.id))
+        localStorage.removeItem(draftKeyFor(user.id))
+      } catch { /* storage blocked */ }
+    }
     setSubmitting(true)
 
     let uploadedPaths = []
@@ -556,6 +607,7 @@ export default function NewListing() {
       if (!err?.uploadFailed && uploadedPaths.length) {
         await supabase.storage.from('property-images').remove(uploadedPaths).catch(() => {})
       }
+      if (savedDraft) { try { localStorage.setItem(draftKeyFor(user.id), savedDraft) } catch { /* ignore */ } }
       setErrors({ submit: err?.uploadFailed ? t('errors.imageUploadFailed') : friendlySubmitError(err, t) })
     } finally {
       setSubmitting(false)
@@ -589,7 +641,7 @@ export default function NewListing() {
   return (
     <div className="page container section-tight new-listing-page">
       <header className="nl-head" ref={topRef}>
-        <button type="button" onClick={() => navigate(-1)} className="text-link nl-leave">
+        <button type="button" onClick={() => navigate(-1)} className="text-link nl-leave" disabled={submitting}>
           <ArrowLeft size={16} aria-hidden="true" />
           {t('common.back')}
         </button>
@@ -645,23 +697,23 @@ export default function NewListing() {
         {step === 0 && (
           <>
             <div className="nl-field">
-              <label>{t('listing.listingType')}</label>
-              <div className="nl-radio-group">
+              <span className="nl-label" id="nl-listing-type">{t('listing.listingType')}</span>
+              <div className="nl-radio-group" role="group" aria-labelledby="nl-listing-type">
                 {LISTING_TYPES.map(lt => (
-                  <button key={lt} className={`nl-radio ${form.listing_type === lt ? 'active' : ''}`} onClick={() => update('listing_type', lt)}>
+                  <button key={lt} type="button" aria-pressed={form.listing_type === lt} className={`nl-radio ${form.listing_type === lt ? 'active' : ''}`} onClick={() => update('listing_type', lt)}>
                     {t(`listing.type.${lt}`)}
                   </button>
                 ))}
               </div>
             </div>
             <div className="nl-field">
-              <label>{t('search.propertyType')}</label>
-              <Select value={form.property_type} onChange={e => update('property_type', e.target.value)}>
+              <label htmlFor="nl-property-type">{t('search.propertyType')}</label>
+              <Select id="nl-property-type" value={form.property_type} onChange={e => update('property_type', e.target.value)}>
                 {PROPERTY_TYPES.map(pt => <option key={pt} value={pt}>{t(`search.${pt}`)}</option>)}
               </Select>
             </div>
             <div className="nl-field">
-              <label>{t('listing.title')}</label>
+              <label htmlFor="nl-title">{t('listing.title')}</label>
               {/* One selector for both fields: picking a language translates
                   the title and description together, in a single request. */}
               <TranslationBar
@@ -680,6 +732,7 @@ export default function NewListing() {
                 canRegenerate={translation.canRegenerate}
               />
               <input
+                id="nl-title"
                 type="text"
                 maxLength={FORM_LIMITS.listingTitle}
                 value={translation.title}
@@ -699,8 +752,9 @@ export default function NewListing() {
               {errors.title && <span className="nl-error">{errors.title}</span>}
             </div>
             <div className="nl-field">
-              <label>{t('listing.description')}</label>
+              <label htmlFor="nl-description">{t('listing.description')}</label>
               <textarea
+                id="nl-description"
                 rows={4}
                 maxLength={FORM_LIMITS.listingDescription}
                 value={translation.description}
@@ -722,8 +776,8 @@ export default function NewListing() {
         {step === 1 && (
           <>
             <div className="nl-field">
-              <label>{t('listing.city')}</label>
-              <Select value={form.city} onChange={e => selectCity(e.target.value)}>
+              <label htmlFor="nl-city">{t('listing.city')}</label>
+              <Select id="nl-city" value={form.city} onChange={e => selectCity(e.target.value)}>
                 {CITIES.map(c => <option key={c} value={c}>{cityLabel(c)}</option>)}
               </Select>
               {errors.city && <span className="nl-error">{errors.city}</span>}
@@ -738,8 +792,9 @@ export default function NewListing() {
               </div>
             )}
             <div className="nl-field">
-              <label>{t('listing.address')}</label>
+              <label htmlFor="nl-address">{t('listing.address')}</label>
               <RoadField
+                id="nl-address"
                 city={form.city}
                 value={form.address}
                 placeholder={t('listing.addressPlaceholder')}
@@ -750,7 +805,7 @@ export default function NewListing() {
               />
             </div>
             <div className="nl-field">
-              <label>{t('listing.pinLocation')}</label>
+              <span className="nl-label">{t('listing.pinLocation')}</span>
               <div className="map-wrapper" style={{ height: 260 }}>
                 <MapContainer
                   center={form.latitude != null && form.longitude != null ? [form.latitude, form.longitude] : TIRANA_CENTER}
@@ -816,13 +871,13 @@ export default function NewListing() {
           <>
             <div className="nl-row">
               <div className="nl-field" style={{ flex: 2 }}>
-                <label>{t('listing.price')}</label>
-                <input type="number" min="0" max={MAX_PRICE} value={form.price} onChange={e => update('price', e.target.value)} placeholder="0" />
+                <label htmlFor="nl-price">{t('listing.price')}</label>
+                <input id="nl-price" type="number" min="0" max={MAX_PRICE} value={form.price} onChange={e => update('price', e.target.value)} placeholder="0" />
                 {errors.price && <span className="nl-error">{errors.price}</span>}
               </div>
               <div className="nl-field" style={{ flex: 1 }}>
-                <label>{t('listing.currency')}</label>
-                <Select value={form.currency} onChange={e => update('currency', e.target.value)}>
+                <label htmlFor="nl-currency">{t('listing.currency')}</label>
+                <Select id="nl-currency" value={form.currency} onChange={e => update('currency', e.target.value)}>
                   <option value="EUR">EUR</option>
                   <option value="ALL">ALL</option>
                   <option value="USD">USD</option>
@@ -830,44 +885,44 @@ export default function NewListing() {
               </div>
             </div>
             <div className="nl-field">
-              <label>{t('listing.surface')} (m²)</label>
-              <input type="number" min="1" max={MAX_SQFT} value={form.sqft} onChange={e => update('sqft', e.target.value)} placeholder="0" />
+              <label htmlFor="nl-sqft">{t('listing.surface')} (m²)</label>
+              <input id="nl-sqft" type="number" min="1" max={MAX_SQFT} value={form.sqft} onChange={e => update('sqft', e.target.value)} placeholder="0" />
               {errors.sqft && <span className="nl-error">{errors.sqft}</span>}
             </div>
             <div className="nl-row">
               <div className="nl-field">
-                <label>{t('property.beds')}</label>
-                <input type="number" min="0" max={MAX_BEDS} value={form.beds} onChange={e => update('beds', e.target.value)} placeholder="0" />
+                <label htmlFor="nl-beds">{t('property.beds')}</label>
+                <input id="nl-beds" type="number" min="0" max={MAX_BEDS} value={form.beds} onChange={e => update('beds', e.target.value)} placeholder="0" />
                 {errors.beds && <span className="nl-error">{errors.beds}</span>}
               </div>
               <div className="nl-field">
-                <label>{t('property.baths')}</label>
-                <input type="number" min="0" max={MAX_BATHS} value={form.baths} onChange={e => update('baths', e.target.value)} placeholder="0" />
+                <label htmlFor="nl-baths">{t('property.baths')}</label>
+                <input id="nl-baths" type="number" min="0" max={MAX_BATHS} value={form.baths} onChange={e => update('baths', e.target.value)} placeholder="0" />
                 {errors.baths && <span className="nl-error">{errors.baths}</span>}
               </div>
             </div>
             <div className="nl-row">
               <div className="nl-field">
-                <label>{t('listing.floor')}</label>
-                <input type="number" min={MIN_FLOOR} max={MAX_FLOOR} value={form.floor} onChange={e => update('floor', e.target.value)} placeholder="0" />
+                <label htmlFor="nl-floor">{t('listing.floor')}</label>
+                <input id="nl-floor" type="number" min={MIN_FLOOR} max={MAX_FLOOR} value={form.floor} onChange={e => update('floor', e.target.value)} placeholder="0" />
                 {errors.floor && <span className="nl-error">{errors.floor}</span>}
               </div>
               <div className="nl-field">
-                <label>{t('listing.totalFloors')}</label>
-                <input type="number" min="1" max={MAX_FLOOR} value={form.total_floors} onChange={e => update('total_floors', e.target.value)} placeholder="0" />
+                <label htmlFor="nl-total-floors">{t('listing.totalFloors')}</label>
+                <input id="nl-total-floors" type="number" min="1" max={MAX_FLOOR} value={form.total_floors} onChange={e => update('total_floors', e.target.value)} placeholder="0" />
                 {errors.total_floors && <span className="nl-error">{errors.total_floors}</span>}
               </div>
               <div className="nl-field">
-                <label>{t('listing.yearBuilt')}</label>
-                <input type="number" min={MIN_YEAR} max={MAX_YEAR} value={form.year_built} onChange={e => update('year_built', e.target.value)} placeholder="2024" />
+                <label htmlFor="nl-year">{t('listing.yearBuilt')}</label>
+                <input id="nl-year" type="number" min={MIN_YEAR} max={MAX_YEAR} value={form.year_built} onChange={e => update('year_built', e.target.value)} placeholder="2024" />
                 {errors.year_built && <span className="nl-error">{errors.year_built}</span>}
               </div>
             </div>
             <div className="nl-field">
-              <label>{t('listing.features')}</label>
-              <div className="nl-chips">
+              <span className="nl-label" id="nl-features">{t('listing.features')}</span>
+              <div className="nl-chips" role="group" aria-labelledby="nl-features">
                 {FEATURES_LIST.map(f => (
-                  <button key={f} className={`nl-chip ${form.features.includes(f) ? 'active' : ''}`} onClick={() => toggleFeature(f)}>
+                  <button key={f} type="button" aria-pressed={form.features.includes(f)} className={`nl-chip ${form.features.includes(f) ? 'active' : ''}`} onClick={() => toggleFeature(f)}>
                     {t(`listing.feature.${f}`)}
                   </button>
                 ))}
@@ -879,14 +934,14 @@ export default function NewListing() {
         {step === 3 && (
           <>
             <div className="nl-field">
-              <label>{t('listing.images')} ({images.length}/20)</label>
-              <div className="nl-upload-zone" onClick={() => fileInputRef.current?.click()}>
-                <Upload size={24} />
-                <div>{t('listing.dropImages')}</div>
-                <div style={{ fontSize: 11, color: 'var(--fho-text-muted)' }}>{t('listing.minImages', { min: MIN_IMAGES })}</div>
-              </div>
+              <label htmlFor="nl-images">{t('listing.images')} ({images.length}/{MAX_IMAGES})</label>
+              <button type="button" id="nl-images" className="nl-upload-zone" onClick={() => fileInputRef.current?.click()} aria-describedby={errors.images ? 'nl-images-error' : undefined}>
+                <Upload size={24} aria-hidden="true" />
+                <span>{t('listing.dropImages')}</span>
+                <span style={{ fontSize: 11, color: 'var(--fho-text-muted)' }}>{t('listing.minImages', { min: MIN_IMAGES })}</span>
+              </button>
               <input ref={fileInputRef} type="file" accept="image/*" multiple hidden onChange={handleImages} />
-              {errors.images && <span className="nl-error">{errors.images}</span>}
+              {errors.images && <span id="nl-images-error" className="nl-error" role="alert">{errors.images}</span>}
             </div>
             {images.length > 0 && (
               <div className="nl-image-grid">
@@ -894,13 +949,13 @@ export default function NewListing() {
                   <div key={i} className="nl-image-thumb">
                     <img src={img.preview} alt="" />
                     {i === 0 && <span className="nl-cover-badge">{t('listing.cover')}</span>}
-                    <button className="nl-image-remove" onClick={() => removeImage(i)} aria-label={t('listing.removePhoto')}><X size={12} /></button>
+                    <button type="button" className="nl-image-remove" onClick={() => removeImage(i)} aria-label={t('listing.removePhoto')}><X size={14} aria-hidden="true" /></button>
                   </div>
                 ))}
               </div>
             )}
             <div className="nl-field">
-              <label>{t('listing.videoUpload')}</label>
+              <label htmlFor="nl-video">{t('listing.videoUpload')}</label>
               {video ? (
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 14px', border: '1px solid var(--fho-border)', borderRadius: 'var(--r-md)', background: 'var(--fho-surface-2)' }}>
                   <Film size={18} style={{ color: 'var(--fho-orange-1)', flexShrink: 0 }} />
@@ -908,19 +963,21 @@ export default function NewListing() {
                     <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--fho-text)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{video.existing ? t('listing.currentVideo') : video.file.name}</div>
                     {!video.existing && <div style={{ fontSize: 11, color: 'var(--fho-text-muted)' }}>{t('listing.fileSizeMb', { size: (video.file.size / (1024 * 1024)).toFixed(1) })}</div>}
                   </div>
-                  <button className="nl-image-remove" style={{ position: 'static' }} onClick={removeVideo} aria-label={t('listing.removeVideo')}><X size={12} /></button>
+                  <button type="button" className="nl-image-remove" style={{ position: 'static' }} onClick={removeVideo} aria-label={t('listing.removeVideo')}><X size={14} aria-hidden="true" /></button>
                 </div>
               ) : (
-                <div
+                <button
+                  type="button"
+                  id="nl-video"
                   className="nl-upload-zone"
                   style={{ padding: 20 }}
                   onClick={() => videoInputRef.current?.click()}
                   onDragOver={e => e.preventDefault()}
                   onDrop={e => { e.preventDefault(); handleVideo(e.dataTransfer.files?.[0]) }}
                 >
-                  <Film size={22} />
-                  <div style={{ fontSize: 12 }}>{t('listing.dropVideo')}</div>
-                </div>
+                  <Film size={22} aria-hidden="true" />
+                  <span style={{ fontSize: 12 }}>{t('listing.dropVideo')}</span>
+                </button>
               )}
               <input ref={videoInputRef} type="file" accept="video/mp4, video/quicktime" hidden onChange={e => { handleVideo(e.target.files?.[0]); e.target.value = '' }} />
               {errors.video && <span className="nl-error">{errors.video}</span>}
@@ -931,8 +988,8 @@ export default function NewListing() {
         {step === 4 && (
           <>
             <div className="nl-field">
-              <label>{t('listing.phone')}</label>
-              <input type="tel" value={form.contact_phone} onChange={e => { update('contact_phone', e.target.value); if (errors.phone) setErrors(prev => ({ ...prev, phone: undefined })) }} placeholder="+355 69..." />
+              <label htmlFor="nl-phone">{t('listing.phone')}</label>
+              <input id="nl-phone" type="tel" value={form.contact_phone} onChange={e => { update('contact_phone', e.target.value); if (errors.phone) setErrors(prev => ({ ...prev, phone: undefined })) }} placeholder="+355 69..." />
               {errors.phone && <span className="nl-error">{errors.phone}</span>}
             </div>
             <div className="nl-field">
@@ -942,8 +999,8 @@ export default function NewListing() {
               </label>
             </div>
             <div className="nl-field">
-              <label>{t('listing.email')}</label>
-              <input type="email" maxLength={FORM_LIMITS.email} value={form.contact_email} onChange={e => { update('contact_email', e.target.value); if (errors.email) setErrors(prev => ({ ...prev, email: undefined })) }} placeholder="john.doe@gmail.com" />
+              <label htmlFor="nl-email">{t('listing.email')}</label>
+              <input id="nl-email" type="email" maxLength={FORM_LIMITS.email} value={form.contact_email} onChange={e => { update('contact_email', e.target.value); if (errors.email) setErrors(prev => ({ ...prev, email: undefined })) }} placeholder="john.doe@gmail.com" />
               {errors.email && <span className="nl-error">{errors.email}</span>}
             </div>
             {errors.submit && <div className="nl-error" style={{ marginBottom: 12 }}>{errors.submit}</div>}
@@ -956,7 +1013,7 @@ export default function NewListing() {
               stops where the form ends, so it never covers the footer. */}
           <div className="nl-bar">
             {step > 0 ? (
-              <button type="button" className="btn btn-outline" onClick={prev} aria-label={t('listing.back')}>
+              <button type="button" className="btn btn-outline" onClick={prev} aria-label={t('listing.back')} disabled={submitting}>
                 <ArrowLeft size={16} aria-hidden="true" />
                 <span className="nl-bar-label">{t('listing.back')}</span>
               </button>

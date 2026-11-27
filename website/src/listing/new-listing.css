@@ -1,3 +1,7 @@
+/* Error text: 5.9:1 on the light paper, 5.5:1 on the dark one. */
+:root { --nl-error: #c0392b; }
+@media (prefers-color-scheme: dark) { :root { --nl-error: #ff8a7a; } }
+
 /* Section label */
 
 .nl-section-label {
@@ -33,7 +37,8 @@
   gap: 6px;
 }
 
-.nl-field label {
+.nl-field label,
+.nl-field .nl-label {
   font-size: 13px;
   font-weight: 600;
   color: var(--fho-text);
@@ -50,8 +55,21 @@
   color: var(--fho-text);
   font-size: 14px;
   font-family: var(--font-sans);
-  outline: none;
   transition: border-color 150ms;
+}
+
+/* The border turns orange on focus; keyboard focus also gets the site's ring
+   (the global :focus-visible rule loses to the field rules above). */
+.nl-field input:focus-visible,
+.nl-field .sel-trigger:focus-visible,
+.nl-field textarea:focus-visible,
+.nl-upload-zone:focus-visible,
+.nl-radio:focus-visible,
+.nl-chip:focus-visible,
+.nl-lang-tab:focus-visible,
+.nl-image-remove:focus-visible {
+  outline: 3px solid var(--door);
+  outline-offset: 1px;
 }
 
 .nl-field input:focus,
@@ -165,7 +183,8 @@
 
 .nl-lang-tab.active {
   background: var(--fho-orange-2);
-  color: white;
+  /* Orange carries ink text (styles.css): white on it was 3.6:1. */
+  color: #1a1714;
   border-color: transparent;
 }
 
@@ -202,7 +221,7 @@
 
 /* Same red as .nl-error above — this file has no error custom property. */
 .nl-translation-status--error {
-  color: #e74c3c;
+  color: var(--nl-error);
 }
 
 .nl-translation-action {
@@ -265,6 +284,9 @@
 /* Upload */
 
 .nl-upload-zone {
+  width: 100%;
+  background: transparent;
+  font: inherit;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -320,8 +342,8 @@
   position: absolute;
   top: 4px;
   right: 4px;
-  width: 22px;
-  height: 22px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   border: none;
   background: rgba(0,0,0,0.6);
@@ -335,7 +357,7 @@
 /* Error */
 
 .nl-error {
-  color: #e74c3c;
+  color: var(--nl-error);
   font-size: 12px;
 }
 
@@ -406,6 +428,7 @@
 .nl-mono { margin-top: 4px; font-family: 'JetBrains Mono', ui-monospace, monospace; }
 .nl-map-hint { pointer-events: none; position: absolute; bottom: 8px; left: 8px; z-index: 500; display: flex; align-items: center; gap: 6px; border-radius: 999px; border: 1px solid var(--line); background: var(--paper); padding: 6px 10px; font-size: 11px; font-weight: 600; color: var(--ink); }
 .rf-spin { pointer-events: none; position: absolute; right: 12px; top: 50%; margin-top: -8px; color: var(--fho-orange-2); }
+.rf-wrap { isolation: isolate; z-index: 30; }
 .rf-list { position: absolute; left: 0; right: 0; top: 100%; z-index: 1000; margin: 6px 0 0; max-height: 192px; list-style: none; overflow-y: auto; border-radius: var(--r-m); border: 1px solid var(--line); background: var(--paper); padding: 0; box-shadow: var(--shadow); }
 .rf-item { display: flex; width: 100%; align-items: center; gap: 10px; border: 0; border-bottom: 1px solid var(--line); background: transparent; padding: 10px 12px; text-align: left; color: var(--ink); }
 .rf-list li:last-child .rf-item { border-bottom: 0; }
@@ -480,3 +503,11 @@
 
 /* Text boxes keep one size: no drag handle, long text scrolls inside. */
 .nl-field textarea { resize: none; height: 160px; overflow-y: auto; }
+
+/* Bigger hit areas on touch screens: the photo delete button, the language
+   tabs, and the type and feature toggles. */
+@media (pointer: coarse), (max-width: 599px) {
+  .nl-image-remove { width: 40px; height: 40px; }
+  .nl-lang-tab { min-height: 40px; padding: 8px 12px; font-size: 12px; }
+  .nl-chip, .nl-radio { min-height: 44px; }
+}

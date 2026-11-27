@@ -578,7 +578,8 @@
         "media": "Foto e video",
         "publish": "Come ti contattano gli acquirenti"
       }
-    }
+    },
+    "tooManyImages": "Puoi aggiungere fino a {{max}} foto."
   },
   "dashboard": {
     "title": "Dashboard immobile",

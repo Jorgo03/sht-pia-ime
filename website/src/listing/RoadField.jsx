@@ -22,7 +22,7 @@ const MIN_QUERY = 2
  * one and it fills itself in, ignore them and type whatever you like. Nothing
  * here can block a publish.
  */
-export function RoadField({ value, onChange, city, onSelectRoad, placeholder }) {
+export function RoadField({ id, value, onChange, city, onSelectRoad, placeholder }) {
   const { t } = useTranslation()
   const [suggestions, setSuggestions] = useState([])
   const [loading, setLoading] = useState(false)
@@ -91,9 +91,10 @@ export function RoadField({ value, onChange, city, onSelectRoad, placeholder }) 
   const showList = open && (loading || suggestions.length > 0)
 
   return (
-    <div className="relative" ref={wrapRef}>
+    <div className="relative rf-wrap" ref={wrapRef}>
       <div className="relative">
         <input
+          id={id}
           type="text"
           value={value}
           placeholder={placeholder}

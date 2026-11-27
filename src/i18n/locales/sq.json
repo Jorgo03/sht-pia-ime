@@ -621,7 +621,8 @@
         "media": "Fotot dhe videoja",
         "publish": "Si ju kontaktojnë blerësit"
       }
-    }
+    },
+    "tooManyImages": "Mund të shtosh deri në {{max}} foto."
   },
   "dashboard": {
     "title": "Paneli i pronës",
