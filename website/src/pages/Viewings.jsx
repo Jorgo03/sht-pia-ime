@@ -10,6 +10,8 @@ import { cityName, getLocalizedText } from '../lib/format'
 // Viewings, as in the app (app/viewings/index.tsx): what the person asked for
 // and, for agents and owners, the requests for their homes. RLS scopes rows.
 
+const PAGE = 24
+
 export default function Viewings() {
   const { t, i18n } = useTranslation()
   const lang = i18n.resolvedLanguage
@@ -19,27 +21,62 @@ export default function Viewings() {
   const [status, setStatus] = useState('loading')
   const [loadedAt, setLoadedAt] = useState(0)
   const [failed, setFailed] = useState(false)
+  const [hasMore, setHasMore] = useState(false)
+  const [moreBusy, setMoreBusy] = useState(false)
+  const [moreFailed, setMoreFailed] = useState(false)
+
+  // One page of viewings from a year ago on, 24 at a time.
+  const fetchPage = useCallback(
+    async (from) => {
+      const { data, error } = await supabase
+        .from('viewings')
+        .select('*, property:properties(id, title, title_i18n, city, owner_id, agent_id)')
+        .gte('scheduled_at', new Date(Date.now() - 365 * 864e5).toISOString())
+        .order('scheduled_at', { ascending: true })
+        .order('id', { ascending: true })
+        .range(from, from + PAGE - 1)
+      if (error) throw error
+      const list = data ?? []
+      const ids = [...new Set(list.filter((v) => v.client_id !== user.id).map((v) => v.client_id))]
+      if (ids.length) {
+        const { data: profs } = await supabase.from('profiles').select('id, full_name, agency_name').in('id', ids)
+        setNames((n) => ({ ...n, ...Object.fromEntries((profs ?? []).map((p) => [p.id, p.full_name || p.agency_name || '?'])) }))
+      }
+      return list
+    },
+    [user],
+  )
 
   const load = useCallback(async () => {
     if (!user) return
     setStatus('loading')
-    const { data, error } = await supabase
-      .from('viewings')
-      .select('*, property:properties(id, title, title_i18n, city, owner_id, agent_id)')
-      .gte('scheduled_at', new Date(Date.now() - 365 * 864e5).toISOString())
-      .order('scheduled_at', { ascending: true })
-      .limit(500)
-    if (error) return setStatus('error')
-    const list = data ?? []
-    setLoadedAt(Date.now())
-    setRows(list)
-    const ids = [...new Set(list.filter((v) => v.client_id !== user.id).map((v) => v.client_id))]
-    if (ids.length) {
-      const { data: profs } = await supabase.from('profiles').select('id, full_name, agency_name').in('id', ids)
-      setNames(Object.fromEntries((profs ?? []).map((p) => [p.id, p.full_name || p.agency_name || '?'])))
+    try {
+      const list = await fetchPage(0)
+      setLoadedAt(Date.now())
+      setRows(list)
+      setHasMore(list.length === PAGE)
+      setStatus('ready')
+    } catch {
+      setStatus('error')
     }
-    setStatus('ready')
-  }, [user])
+  }, [user, fetchPage])
+
+  const more = async () => {
+    setMoreBusy(true)
+    setMoreFailed(false)
+    try {
+      const list = await fetchPage(rows.length)
+      setRows((prev) => {
+        const seen = new Set(prev.map((v) => v.id))
+        return [...prev, ...list.filter((v) => !seen.has(v.id))]
+      })
+      setHasMore(list.length === PAGE)
+    } catch {
+      setMoreFailed(true)
+    } finally {
+      setMoreBusy(false)
+    }
+  }
 
   useEffect(() => {
     load()
@@ -121,6 +158,12 @@ export default function Viewings() {
               <h2 id="mine-title">{t('viewings.mine')}</h2>
               <ul className="viewings">{mine.map((v) => card(v, false))}</ul>
             </section>
+          )}
+          {moreFailed && <p className="form-error" role="alert">{t('errors.generic')}</p>}
+          {hasMore && (
+            <div className="load-more">
+              <button type="button" className="btn btn-outline" disabled={moreBusy} onClick={more}>{t('common.loadMore')}</button>
+            </div>
           )}
         </>
       )}

@@ -15,7 +15,7 @@ import { cityName, formatPrice, getLocalizedText, titleOf } from '../lib/format'
 export default function AgentDashboard() {
   const { t, i18n } = useTranslation()
   const lang = i18n.resolvedLanguage
-  const { user, profile, ready } = useAuth()
+  const { user, profile, ready, refreshProfile } = useAuth()
   const [data, setData] = useState(null)
   const [error, setError] = useState(false)
   const [actionError, setActionError] = useState(false)
@@ -73,6 +73,11 @@ export default function AgentDashboard() {
   }, [t])
 
   if (ready && !user) return <Navigate to="/login?next=/agent-dashboard" replace />
+  // Signed in but the profile could not be read: say so, with a retry,
+  // rather than a skeleton that never ends or the wrong role's page.
+  if (ready && user && !profile) {
+    return <div className="page container section"><ErrorState onRetry={() => refreshProfile().catch(() => {})} /></div>
+  }
   if (ready && profile && profile.role !== 'agent') {
     return <div className="page container section"><p className="state">{t('site.agentsOnly')}</p></div>
   }

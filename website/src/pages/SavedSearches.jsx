@@ -108,14 +108,14 @@ export default function SavedSearches() {
   }
 
   const update = async (table, id, patch, apply) => {
-    const { error } = await supabase.from(table).update(patch).eq('id', id)
-    if (error) return fail()
+    const { data, error } = await supabase.from(table).update(patch).eq('id', id).select('id')
+    if (error || !data?.length) return fail()
     apply()
   }
   const remove = async (table, id, confirmKey, apply) => {
     if (!window.confirm(t(confirmKey))) return
-    const { error } = await supabase.from(table).delete().eq('id', id)
-    if (error) return fail()
+    const { data, error } = await supabase.from(table).delete().eq('id', id).select('id')
+    if (error || !data?.length) return fail()
     apply()
   }
 

@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next'
 import { batches, buildImport, COLUMN_NAMES, MAX_IMPORT_BYTES, MAX_IMPORT_ROWS, REQUIRED_COLUMNS } from '@/src/features/listings/lib/bulkImport.js'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../auth/AuthContext'
+import { ErrorState } from '../components/States'
 
 const ERRORS_SHOWN = 30
 const OPTIONAL = Object.keys(COLUMN_NAMES).filter((c) => !REQUIRED_COLUMNS.includes(c))
@@ -15,7 +16,7 @@ const OPTIONAL = Object.keys(COLUMN_NAMES).filter((c) => !REQUIRED_COLUMNS.inclu
 // in batches, skipping duplicates of the agent's existing listings.
 export default function ImportListings() {
   const { t } = useTranslation()
-  const { user, profile, ready: authReady } = useAuth()
+  const { user, profile, ready: authReady, refreshProfile } = useAuth()
   const qc = useQueryClient()
   const input = useRef(null)
   const publishing = useRef(false)
@@ -30,6 +31,11 @@ export default function ImportListings() {
   }, [t])
 
   if (authReady && !user) return <Navigate to="/login?next=/listing/import" replace />
+  // Signed in but the profile could not be read: say so, with a retry,
+  // rather than a skeleton that never ends or the wrong role's page.
+  if (authReady && user && !profile) {
+    return <div className="page container section"><ErrorState onRetry={() => refreshProfile().catch(() => {})} /></div>
+  }
   if (authReady && profile && profile.role !== 'agent') {
     return <div className="page container section"><p className="state">{t('import.agentsOnly')}</p></div>
   }

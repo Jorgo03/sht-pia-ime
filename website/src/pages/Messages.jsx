@@ -13,13 +13,17 @@ import { formatRelativeTime } from '@/src/lib/format.js'
 // conversations, newest first, with the other side's name, the home it is
 // about and the unread count; kept current by a realtime subscription.
 
-const PAGE = 50
+const PAGE = 24
 
 export default function Messages() {
   const { t, i18n } = useTranslation()
   const lang = i18n.resolvedLanguage
   const { user, ready } = useAuth()
-  const [state, setState] = useState({ status: 'loading', convos: [], profiles: {}, homes: {}, blocked: new Set() })
+  const [state, setState] = useState({ status: 'loading', convos: [], profiles: {}, homes: {}, blocked: new Set(), hasMore: false })
+  // How many conversations are on screen; "Load more" adds a page, and a
+  // realtime change reloads all of them so none drop off.
+  const [shown, setShown] = useState(PAGE)
+  const [moreBusy, setMoreBusy] = useState(false)
 
   const load = useCallback(async () => {
     if (!user) return
@@ -28,8 +32,9 @@ export default function Messages() {
       .select('*')
       .or(`client_id.eq.${user.id},agent_id.eq.${user.id}`)
       .order('last_message_at', { ascending: false })
-      .limit(PAGE)
-    if (error) return setState((s) => ({ ...s, status: 'error' }))
+      .range(0, shown - 1)
+    setMoreBusy(false)
+    if (error) return setState((s) => ({ ...s, status: s.convos.length ? s.status : 'error' }))
     const convos = data ?? []
     const others = [...new Set(convos.map((c) => (c.client_id === user.id ? c.agent_id : c.client_id)))]
     const propIds = [...new Set(convos.map((c) => c.property_id).filter(Boolean))]
@@ -44,8 +49,9 @@ export default function Messages() {
       profiles: Object.fromEntries((prof.data ?? []).map((p) => [p.id, p])),
       homes: Object.fromEntries((props.data ?? []).map((p) => [p.id, p])),
       blocked,
+      hasMore: convos.length === shown,
     })
-  }, [user])
+  }, [user, shown])
 
   useEffect(() => {
     document.title = `${t('common.messages')} | ${t('common.appName')}`
@@ -65,7 +71,7 @@ export default function Messages() {
 
   if (ready && !user) return <Navigate to="/login?next=/messages" replace />
 
-  const { status, convos, profiles, homes, blocked } = state
+  const { status, convos, profiles, homes, blocked, hasMore } = state
 
   return (
     <div className="page container section narrow">
@@ -124,6 +130,13 @@ export default function Messages() {
             )
           })}
         </ul>
+      )}
+      {status === 'ready' && hasMore && (
+        <div className="load-more">
+          <button type="button" className="btn btn-outline" disabled={moreBusy} onClick={() => { setMoreBusy(true); setShown((n) => n + PAGE) }}>
+            {t('common.loadMore')}
+          </button>
+        </div>
       )}
     </div>
   )

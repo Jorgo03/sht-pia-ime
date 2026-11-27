@@ -8,6 +8,7 @@ import Home from './pages/Home'
 import Search from './pages/Search'
 import Property from './pages/Property'
 import NotFound from './pages/NotFound'
+import ErrorBoundary from './components/ErrorBoundary'
 import AuthScreen from './auth/AuthScreen'
 const Account = lazy(() => import('./pages/Account'))
 const Favorites = lazy(() => import('./pages/Favorites'))
@@ -57,6 +58,7 @@ export default function App() {
       <Header overHero={pathname === '/'} dark={AUTH_PATHS.includes(pathname)} />
       <main id="main" tabIndex={-1}>
         {/* Pages other than home, search and listings load when first opened. */}
+        <ErrorBoundary resetKey={pathname}>
         <Suspense fallback={<div className="page container section" aria-busy="true" />}>
         <Routes>
           <Route path="/" element={<Home />} />
@@ -97,6 +99,7 @@ export default function App() {
           <Route path="*" element={<NotFound />} />
         </Routes>
         </Suspense>
+        </ErrorBoundary>
       </main>
       {/* Like the app, the sign-in screen has no footer: its card carries the legal links. */}
       {!AUTH_PATHS.includes(pathname) && <Footer />}

@@ -50,8 +50,9 @@ export default function MyListings() {
 
   const setListingStatus = async (id, next) => {
     setFailed(false)
-    const { error } = await supabase.from('properties').update({ status: next }).eq('id', id)
-    if (error) return setFailed(true)
+    // .select() so a write RLS filtered out (no row changed) counts as failed.
+    const { data, error } = await supabase.from('properties').update({ status: next }).eq('id', id).select('id')
+    if (error || !data?.length) return setFailed(true)
     setRows((l) => l.map((p) => (p.id === id ? { ...p, status: next } : p)))
   }
   const close = (p) => {
@@ -60,8 +61,8 @@ export default function MyListings() {
   }
   const remove = async (id) => {
     if (!window.confirm(t('listing.confirmDelete'))) return
-    const { error } = await supabase.from('properties').delete().eq('id', id)
-    if (error) return setFailed(true)
+    const { data, error } = await supabase.from('properties').delete().eq('id', id).select('id')
+    if (error || !data?.length) return setFailed(true)
     setRows((l) => l.filter((p) => p.id !== id))
   }
 
@@ -104,7 +105,7 @@ export default function MyListings() {
                   </Link>
                   <div className="my-listing-body">
                     <div className="viewing-top">
-                      <span className={`pill status-${p.status === 'active' ? 'confirmed' : p.status === 'paused' ? 'requested' : 'declined'}`}>{t(`listing.status.${p.status}`, { defaultValue: p.status })}</span>
+                      <span className={`pill status-${p.status === 'active' ? 'confirmed' : p.status === 'paused' ? 'requested' : 'declined'}`}>{p.status === 'pending_review' ? t('moderation.hiddenBadge') : t(`listing.status.${p.status}`, { defaultValue: p.status })}</span>
                       {p.ref_code && <span className="muted small">{t('detail.reference')} {p.ref_code}</span>}
                     </div>
                     <Link to={`/property/${p.id}`} className="viewing-title">{titleOf(p, lang)}</Link>

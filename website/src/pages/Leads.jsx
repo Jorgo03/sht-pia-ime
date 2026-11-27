@@ -28,6 +28,7 @@ export default function Leads() {
   const [editing, setEditing] = useState(null) // null | 'new' | lead
   const [form, setForm] = useState(EMPTY)
   const [formError, setFormError] = useState(null)
+  const [listFailed, setListFailed] = useState(false)
   const [busy, setBusy] = useState(false)
   const dialog = useRef(null)
   const seq = useRef(0)
@@ -94,8 +95,10 @@ export default function Leads() {
     setEditing(null)
   }
   const setLeadStatus = async (lead, next) => {
+    setListFailed(false)
     const { error } = await supabase.from('leads').update({ status: next }).eq('id', lead.id)
-    if (!error) setRows((l) => l.map((x) => (x.id === lead.id ? { ...x, status: next } : x)))
+    if (error) return setListFailed(true)
+    setRows((l) => l.map((x) => (x.id === lead.id ? { ...x, status: next } : x)))
   }
   const remove = async (lead) => {
     if (!window.confirm(`${t('leads.deleteTitle')}\n\n${t('leads.deleteBody', { name: lead.name })}`)) return
@@ -104,8 +107,9 @@ export default function Leads() {
     setRows((l) => l.filter((x) => x.id !== lead.id))
   }
   const more = async () => {
+    setListFailed(false)
     const data = await page(rows.length)
-    if (!data) return
+    if (!data) return setListFailed(true)
     setRows((l) => [...l, ...data.filter((d) => !l.some((x) => x.id === d.id))])
     setHasMore(data.length === PAGE)
   }
@@ -164,6 +168,7 @@ export default function Leads() {
               </li>
             ))}
           </ul>
+          {listFailed && <p className="form-error" role="alert">{t('errors.generic')}</p>}
           {hasMore && <div className="load-more"><button type="button" className="btn btn-outline" onClick={more}>{t('common.loadMore')}</button></div>}
         </>
       )}

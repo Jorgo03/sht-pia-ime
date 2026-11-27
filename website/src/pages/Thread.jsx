@@ -21,14 +21,28 @@ function Attachment({ value }) {
   const { i18n, t } = useTranslation()
   const file = readAttachment(value)
   const [url, setUrl] = useState(null)
+  const [failed, setFailed] = useState(false)
+  const path = file?.path
   useEffect(() => {
-    if (!file) return
+    if (!path) return
     supabase.storage
       .from('message-attachments')
-      .createSignedUrl(file.path, 3600)
-      .then(({ data }) => setUrl(data?.signedUrl ?? null))
-  }, [file?.path]) // eslint-disable-line react-hooks/exhaustive-deps
+      .createSignedUrl(path, 3600)
+      .then(({ data, error }) => {
+        if (error || !data?.signedUrl) setFailed(true)
+        else setUrl(data.signedUrl)
+      })
+      .catch(() => setFailed(true))
+  }, [path])
   if (!file) return null
+  if (failed) {
+    return (
+      <span className="bubble-file" role="note">
+        <Paperclip size={16} aria-hidden="true" />
+        {file.name} · {t('errors.generic')}
+      </span>
+    )
+  }
   if (file.kind === 'image' && url) return <img className="bubble-img" src={url} alt={file.name} />
   return (
     <a className="bubble-file" href={url ?? undefined} target="_blank" rel="noopener noreferrer" aria-label={t('messages.openAttachment', { name: file.name })}>
@@ -56,6 +70,7 @@ export default function Thread() {
   const [reload, setReload] = useState(0)
   const endRef = useRef(null)
   const convoRef = useRef(null)
+  const shownId = useRef(id)
   const uid = user?.id
 
   const markRead = useCallback((c) => {
@@ -66,6 +81,13 @@ export default function Thread() {
   useEffect(() => {
     if (!id || !uid) return
     let cancelled = false
+    // Another conversation (a link from one thread to the next): start from
+    // empty instead of merging the previous thread's messages into it.
+    if (shownId.current !== id) {
+      shownId.current = id
+      setMessages([])
+      setState('loading')
+    }
     ;(async () => {
       const { data: c, error } = await supabase.from('conversations').select('id, client_id, agent_id, property_id').eq('id', id).single()
       if (cancelled) return
@@ -193,7 +215,8 @@ export default function Thread() {
           value={text}
           onChange={(e) => setText(e.target.value)}
           onKeyDown={(e) => {
-            if (e.key === 'Enter' && !e.shiftKey) send(e)
+            // Not the Enter that confirms an IME composition (Chinese, Japanese…).
+            if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) send(e)
           }}
           placeholder={t('messages.inputPlaceholder')}
           aria-label={t('messages.inputPlaceholder')}

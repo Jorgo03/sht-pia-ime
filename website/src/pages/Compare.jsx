@@ -34,6 +34,13 @@ export default function Compare() {
     document.title = `${t('compare.headlinePre')} ${t('compare.headlineEm')} | ${t('common.appName')}`
   }, [t])
 
+  // Homes no longer listed drop out of the saved list.
+  useEffect(() => {
+    if (!q.data) return
+    const live = new Set(q.data.map((h) => h.id))
+    for (const id of ids) if (!live.has(id)) removeCompare(id)
+  }, [q.data, ids])
+
   const homes = q.data ?? []
   const best = bestOf(homes)
   const none = t('aiAssistant.notSpecified')
@@ -44,7 +51,7 @@ export default function Compare() {
       const v = pricePerM2(h)
       return v ? <>{formatPrice(v, lang, h.currency)} {mark(h, best.perM2, t('aiAssistant.compare.best.perM2'))}</> : none
     }],
-    ['area', t('aiAssistant.compare.area'), (h) => (h.sqft ? <>{h.sqft} m² {mark(h, best.area, t('aiAssistant.compare.best.area'))}</> : none)],
+    ['area', t('aiAssistant.compare.area'), (h) => (h.sqft ? <>{h.sqft} {t('property.sqft')} {mark(h, best.area, t('aiAssistant.compare.best.area'))}</> : none)],
     ['beds', t('aiAssistant.compare.bedrooms'), (h) => (h.beds != null ? <>{h.beds} {mark(h, best.beds, t('aiAssistant.compare.best.beds'))}</> : none)],
     ['baths', t('aiAssistant.compare.bathrooms'), (h) => (h.baths != null ? h.baths : none)],
     ['floor', t('aiAssistant.compare.floor'), (h) => (h.floor != null ? (h.total_floors ? t('aiAssistant.compare.floorOf', { floor: h.floor, total: h.total_floors }) : h.floor) : none)],
@@ -61,7 +68,7 @@ export default function Compare() {
           {t('compare.headlinePre')} {t('compare.headlineEm')}
         </h1>
       </div>
-      {ids.length === 0 ? (
+      {ids.length === 0 || (q.isSuccess && homes.length === 0) ? (
         <EmptyState title={t('compare.empty')} hint={t('compare.emptyHint')}>
           <Link to="/search" className="btn btn-primary">{t('compare.browse')}</Link>
         </EmptyState>

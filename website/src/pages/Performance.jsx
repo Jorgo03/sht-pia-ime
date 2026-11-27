@@ -43,7 +43,7 @@ function Metric({ label, value }) {
 export default function Performance() {
   const { t, i18n } = useTranslation()
   const lang = i18n.resolvedLanguage
-  const { user, profile, ready } = useAuth()
+  const { user, profile, ready, refreshProfile } = useAuth()
   const qc = useQueryClient()
   const [period, setPeriod] = useState('month')
   const [custom, setCustom] = useState({ from: '', to: '' })
@@ -94,6 +94,11 @@ export default function Performance() {
   }, [editing])
 
   if (ready && !user) return <Navigate to="/login?next=/performance" replace />
+  // Signed in but the profile could not be read: say so, with a retry,
+  // rather than a skeleton that never ends or the wrong role's page.
+  if (ready && user && !profile) {
+    return <div className="page container section"><ErrorState onRetry={() => refreshProfile().catch(() => {})} /></div>
+  }
   if (ready && profile && profile.role !== 'agent') {
     return <div className="page container section"><p className="state">{t('performance.agentsOnly')}</p></div>
   }
@@ -177,9 +182,9 @@ export default function Performance() {
           <section className="perf-section">
             <h2 className="panel-title">{t('performance.sections.deals')}</h2>
             <div className="stat-grid">
-              <Metric label={t('performance.metrics.sales')} value={fmt(r.deals.sales)} />
-              <Metric label={t('performance.metrics.rentals')} value={fmt(r.deals.rentals)} />
-              <Metric label={t('performance.metrics.transactions')} value={fmt(r.deals.sales + r.deals.rentals)} />
+              <Metric label={t('performance.metrics.sales')} value={fmt(r.deals?.sales ?? 0)} />
+              <Metric label={t('performance.metrics.rentals')} value={fmt(r.deals?.rentals ?? 0)} />
+              <Metric label={t('performance.metrics.transactions')} value={fmt((r.deals?.sales ?? 0) + (r.deals?.rentals ?? 0))} />
             </div>
             <p className="muted small">{t('performance.notes.deals')}</p>
           </section>

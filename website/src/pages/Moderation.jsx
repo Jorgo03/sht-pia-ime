@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { Link, Navigate } from 'react-router-dom'
 import { Building2, Eye, EyeOff, ShieldCheck, User } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
@@ -16,6 +16,7 @@ export default function Moderation() {
   const { user, ready } = useAuth()
   const [allowed, setAllowed] = useState(null)
   const [queue, setQueue] = useState('open')
+  const queueRef = useRef('open')
   const [rows, setRows] = useState([])
   const [more, setMore] = useState(false)
   const [state, setState] = useState('loading')
@@ -56,6 +57,7 @@ export default function Moderation() {
     if (next === queue) return
     setState('loading')
     setRows([])
+    queueRef.current = next
     setQueue(next)
   }
   const retry = () => {
@@ -63,9 +65,12 @@ export default function Moderation() {
     loadReports(supabase, { queue }).then(apply)
   }
   const loadMore = async () => {
+    const asked = queue
     setLoadingMore(true)
     const result = await loadReports(supabase, { queue, offset: rows.length })
     setLoadingMore(false)
+    // The queue was switched while this page loaded: its rows belong elsewhere.
+    if (queueRef.current !== asked) return
     if (!result) return setState('error')
     setRows((prev) => [...prev, ...result.rows])
     setMore(result.more)

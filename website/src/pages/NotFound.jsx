@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { EmptyState } from '../components/States'
+import { SearchX } from 'lucide-react'
 
 export default function NotFound({ title, hint }) {
   const { t } = useTranslation()
@@ -10,11 +10,15 @@ export default function NotFound({ title, hint }) {
   }, [t, title])
   return (
     <div className="page container section">
-      <EmptyState title={title ?? t('notFound.title')} hint={hint ?? t('notFound.subtitle')}>
+      {/* EmptyState's look, with the title as the page's heading. */}
+      <div className="state">
+        <SearchX size={28} aria-hidden="true" />
+        <h1 className="state-title">{title ?? t('notFound.title')}</h1>
+        <p>{hint ?? t('notFound.subtitle')}</p>
         <Link to="/search" className="btn btn-primary">
           {t('site.cta.search')}
         </Link>
-      </EmptyState>
+      </div>
     </div>
   )
 }

@@ -27,6 +27,9 @@ function useStats(user, isAgent) {
           ? supabase.from('properties').select('id', head).eq('owner_id', user.id).eq('status', 'active')
           : supabase.from('viewings').select('id', head).eq('client_id', user.id).in('status', ['requested', 'confirmed']),
       ])
+      // A failed count shows "–", never a false 0.
+      const failed = [f, s, third].find((r) => r.error)
+      if (failed) throw failed.error
       return { saved: f.count ?? 0, searches: s.count ?? 0, third: third.count ?? 0 }
     },
   })

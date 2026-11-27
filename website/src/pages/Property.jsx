@@ -33,7 +33,8 @@ function Gallery({ photos, title, id }) {
       }}
     >
       <div className="gallery-main">
-        <img src={photos[i]} alt={t('web.gallery.count', { n: i + 1, total: photos.length })} decoding="async" />
+        {/* The first photo is what the page opens on, so it loads at once. */}
+        <img src={photos[i]} alt={t('web.gallery.count', { n: i + 1, total: photos.length })} loading={i === 0 ? 'eager' : 'lazy'} decoding="async" />
         {photos.length > 1 && (
           <>
             <button type="button" className="gallery-btn is-prev" onClick={() => go(-1)} aria-label={t('web.gallery.prev')}>
@@ -116,7 +117,16 @@ export default function Property() {
       </Link>
       <div className="property">
         <div className="property-main">
-          <Gallery photos={p.image_urls ?? []} title={title} id={p.id} />
+          <Gallery key={p.id} photos={p.image_urls ?? []} title={title} id={p.id} />
+          {p.status !== 'active' && (
+            // Only the owner, the agent or a moderator can open a listing
+            // that is not live; say so, so it is not mistaken for public.
+            <p className="property-status" role="status">
+              <span className={`pill status-${p.status === 'paused' ? 'requested' : 'declined'}`}>
+                {p.status === 'pending_review' ? t('moderation.hiddenBadge') : t(`listing.status.${p.status}`, { defaultValue: p.status })}
+              </span>
+            </p>
+          )}
           <header className="property-head">
             <h1>{title}</h1>
             {place && (

@@ -16,7 +16,7 @@ const PAGE = 24
 export default function Wanted() {
   const { t, i18n } = useTranslation()
   const lang = i18n.resolvedLanguage
-  const { user, profile } = useAuth()
+  const { user, profile, ready, refreshProfile } = useAuth()
   const isAgent = profile?.role === 'agent'
   const board = useInfiniteQuery({
     queryKey: ['wanted-board', user?.id ?? null],
@@ -39,6 +39,12 @@ export default function Wanted() {
   useEffect(() => {
     document.title = `${t('wanted.boardPre')} ${t('wanted.boardEm')} | ${t('common.appName')}`
   }, [t])
+
+  // Signed in but the profile could not be read: say so, with a retry,
+  // rather than a skeleton that never ends or the wrong role's page.
+  if (ready && user && !profile) {
+    return <div className="page container section"><ErrorState onRetry={() => refreshProfile().catch(() => {})} /></div>
+  }
 
   return (
     <div className="page container section narrow">

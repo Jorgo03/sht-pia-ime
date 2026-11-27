@@ -21,6 +21,8 @@ export default function Notifications() {
   const [items, setItems] = useState([])
   const [status, setStatus] = useState('loading')
   const [hasMore, setHasMore] = useState(false)
+  const [moreFailed, setMoreFailed] = useState(false)
+  const [writeFailed, setWriteFailed] = useState(false)
   const seq = useRef(0)
 
   const page = useCallback(
@@ -39,6 +41,7 @@ export default function Notifications() {
     const { data, error } = await page(0, PAGE - 1)
     if (run !== seq.current) return
     if (error) return setStatus('error')
+    setMoreFailed(false)
     setItems(data ?? [])
     setHasMore((data ?? []).length === PAGE)
     setStatus('ready')
@@ -51,30 +54,59 @@ export default function Notifications() {
     if (!user) return
     const ch = supabase
       .channel(`web-notifications-${user.id}`)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'notifications', filter: `user_id=eq.${user.id}` }, load)
+      // Patch the one row that changed, so pages already loaded with
+      // "Load more" stay on screen (reloading page 0 would drop them).
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'notifications', filter: `user_id=eq.${user.id}` }, (payload) => {
+        const row = payload.new
+        if (payload.eventType === 'DELETE') {
+          setItems((l) => l.filter((n) => n.id !== payload.old?.id))
+          return
+        }
+        if (!row?.id) return
+        const fits = filter === 'all' || (filter === 'unread' ? !row.read_at : !!row.read_at)
+        setItems((l) => {
+          const has = l.some((n) => n.id === row.id)
+          if (!fits) return has ? l.filter((n) => n.id !== row.id) : l
+          if (has) return l.map((n) => (n.id === row.id ? { ...n, ...row } : n))
+          return payload.eventType === 'INSERT' ? [row, ...l] : l
+        })
+      })
       .subscribe()
     return () => {
       supabase.removeChannel(ch)
     }
-  }, [user, load])
+  }, [user, filter])
   useEffect(() => {
     document.title = `${t('notifications.headlinePre')} ${t('notifications.headlineEm')} | ${t('common.appName')}`
   }, [t])
 
   if (ready && !user) return <Navigate to="/login?next=/notifications" replace />
 
+  // Shown read at once; put back as unread if the write fails.
   const markRead = async (id) => {
     const at = new Date().toISOString()
+    setWriteFailed(false)
     setItems((l) => l.map((n) => (n.id === id ? { ...n, read_at: at } : n)))
-    await supabase.from('notifications').update({ read_at: at }).eq('id', id)
+    const { error } = await supabase.from('notifications').update({ read_at: at }).eq('id', id)
+    if (error) {
+      setItems((l) => l.map((n) => (n.id === id && n.read_at === at ? { ...n, read_at: null } : n)))
+      setWriteFailed(true)
+    }
   }
   const markAll = async () => {
     const at = new Date().toISOString()
+    setWriteFailed(false)
     setItems((l) => l.map((n) => (n.read_at ? n : { ...n, read_at: at })))
-    await supabase.from('notifications').update({ read_at: at }).eq('user_id', user.id).is('read_at', null)
+    const { error } = await supabase.from('notifications').update({ read_at: at }).eq('user_id', user.id).is('read_at', null)
+    if (error) {
+      setItems((l) => l.map((n) => (n.read_at === at ? { ...n, read_at: null } : n)))
+      setWriteFailed(true)
+    }
   }
   const more = async () => {
-    const { data } = await page(items.length, items.length + PAGE - 1)
+    setMoreFailed(false)
+    const { data, error } = await page(items.length, items.length + PAGE - 1)
+    if (error) return setMoreFailed(true)
     const seen = new Set(items.map((n) => n.id))
     setItems((l) => [...l, ...(data ?? []).filter((n) => !seen.has(n.id))])
     setHasMore((data ?? []).length === PAGE)
@@ -101,11 +133,16 @@ export default function Notifications() {
       </div>
       <div className="tabs" role="tablist">
         {['all', 'unread', 'read'].map((f) => (
-          <button key={f} type="button" role="tab" aria-selected={filter === f} className={filter === f ? 'is-on' : ''} onClick={() => { setStatus('loading'); setFilter(f) }}>
+          <button key={f} type="button" role="tab" aria-selected={filter === f} className={filter === f ? 'is-on' : ''} onClick={() => {
+            if (f === filter) return
+            setStatus('loading')
+            setFilter(f)
+          }}>
             {t(`notifications.${f}`)}
           </button>
         ))}
       </div>
+      {writeFailed && <p className="form-error" role="alert">{t('web.error')}</p>}
       {status === 'error' ? (
         <>
           <p className="state">{t('notifications.loadFailed')}</p>
@@ -139,6 +176,7 @@ export default function Notifications() {
               )
             })}
           </ul>
+          {moreFailed && <p className="form-error" role="alert">{t('web.error')}</p>}
           {hasMore && (
             <div className="load-more">
               <button type="button" className="btn btn-outline" onClick={more}>{t('notifications.loadMore')}</button>
