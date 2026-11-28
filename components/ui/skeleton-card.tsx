@@ -59,13 +59,13 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     borderRadius: 6,
     backgroundColor: colors.glass,
   },
-  // Same photo shape as PropertyCard's grid card: 90 high on phones, 16:10
-  // once the grid has 3+ columns.
+  // Same photo shape as PropertyCard's grid card (4:3 on phones), so the
+  // grid does not jump when the homes arrive; 16:10 with 3+ columns.
   image: {
     marginBottom: 8,
   },
   imagePhone: {
-    height: 90,
+    aspectRatio: 4 / 3,
   },
   imageWide: {
     aspectRatio: 16 / 10,

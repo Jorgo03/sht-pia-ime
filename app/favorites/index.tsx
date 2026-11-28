@@ -5,14 +5,15 @@ import { Image } from 'expo-image';
 import { useRouter, type Href } from 'expo-router';
 import { useMemo } from 'react';
 import {
-  ActivityIndicator,
   FlatList,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useCurrency } from '@/contexts/currency-context';
+import { cardImageUrl } from '@/lib/image';
 import { useTranslation } from 'react-i18next';
 
 import { AppHeader } from '@/components/ui/app-header';
@@ -22,7 +23,7 @@ import { type AtticoPalette, Fonts, Radii } from '@/constants/theme';
 import { useFavorites } from '@/contexts/favorites-context';
 import { useTheme } from '@/contexts/theme-context';
 import { Property } from '@/data/types';
-import { formatPrice, getLocalizedText, priceSuffixKey } from '@/lib/format';
+import { getLocalizedText, priceSuffixKey } from '@/lib/format';
 import { useReadableColumn } from '@/hooks/use-responsive';
 
 // Matches web's Favorites.jsx exactly — a vertical list of image+details
@@ -34,6 +35,7 @@ export default function FavoritesScreen() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
   const { t, i18n } = useTranslation();
+  const insets = useSafeAreaInsets();
   const { favoriteProperties, loading, error, reload, toggle } = useFavorites();
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
@@ -60,8 +62,11 @@ export default function FavoritesScreen() {
         />
 
         {loading ? (
-          <View style={styles.center}>
-            <ActivityIndicator size="large" color={colors.accent} />
+          // Rows in the list's own shape while favourites load.
+          <View style={styles.list} accessibilityState={{ busy: true }}>
+            {[0, 1, 2].map((i) => (
+              <View key={i} style={[styles.row, styles.rowSkeleton]} />
+            ))}
           </View>
         ) : error && favoriteProperties.length === 0 ? (
           <View style={styles.center}>
@@ -86,7 +91,7 @@ export default function FavoritesScreen() {
           <FlatList
             data={favoriteProperties}
             keyExtractor={(item) => item.id}
-            contentContainerStyle={styles.list}
+            contentContainerStyle={[styles.list, { paddingBottom: 24 + insets.bottom }]}
             showsVerticalScrollIndicator={false}
             renderItem={({ item }) => (
               <FavRow
@@ -118,7 +123,9 @@ function FavRow({
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
   const title = getLocalizedText(property.title_i18n, lang) || property.title;
-  const price = formatPrice(property.price, lang, property.currency);
+  // The visitor's chosen currency, as on every card and row.
+  const { formatListingPrice } = useCurrency();
+  const price = formatListingPrice(property.price, property.currency);
   const suffixKey = priceSuffixKey(property.listing_type);
   const suffix = suffixKey ? t(suffixKey) : '';
 
@@ -126,7 +133,7 @@ function FavRow({
     <TouchableOpacity accessibilityRole="button" style={styles.row} onPress={onTap} activeOpacity={0.85}>
       <View style={styles.rowImageWrap}>
         {property.image_urls?.[0] ? (
-          <Image accessibilityLabel={title} source={{ uri: property.image_urls[0] }} style={styles.rowImage} contentFit="cover" />
+          <Image accessibilityLabel={title} source={{ uri: cardImageUrl(property.image_urls[0], 110) }} style={styles.rowImage} contentFit="cover" />
         ) : (
           <View style={[styles.rowImage, styles.rowImagePlaceholder]} />
         )}
@@ -213,13 +220,17 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     backgroundColor: colors.primaryLight,
     borderWidth: 1,
     borderColor: colors.border,
-    borderRadius: 16,
+    borderRadius: Radii.lg,
     alignItems: 'center',
+  },
+  rowSkeleton: {
+    height: 98,
+    opacity: 0.6,
   },
   rowImageWrap: {
     width: 110,
     height: 80,
-    borderRadius: 10,
+    borderRadius: Radii.sm,
     overflow: 'hidden',
   },
   rowImage: {

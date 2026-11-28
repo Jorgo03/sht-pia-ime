@@ -20,8 +20,9 @@ import {
   TouchableOpacity,
   View,
   useWindowDimensions,
+  type ScrollViewInstance,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { SheetCloseButton } from '@/components/ui/sheet-close-button';
 import { formatRef } from '@/src/features/properties/lib/searchFilters';
@@ -35,7 +36,7 @@ import { AI_CHAT_ENABLED } from '@/constants/features';
 import { LocationPreviewMap } from '@/components/property/location-preview-map';
 import { PropertyCard } from '@/components/property/property-card';
 import { KeyboardDoneBar } from '@/components/ui/keyboard-done-bar';
-import { Fonts, InlineTarget, Site, type AtticoPalette } from '@/constants/theme';
+import { Fonts, InlineTarget, Radii, Site, type AtticoPalette } from '@/constants/theme';
 import { useAuth } from '@/contexts/auth-context';
 import { useFavorites } from '@/contexts/favorites-context';
 import { useTheme } from '@/contexts/theme-context';
@@ -83,6 +84,11 @@ export default function PropertyDetailScreen() {
   const { isFavorite, toggle } = useFavorites();
   const { colors } = useTheme();
   const styles = useMemo(() => createStyles(colors), [colors]);
+  const insets = useSafeAreaInsets();
+  // The page's scroll view and where the message card sits in it, for the
+  // bottom bar's "Contact" button when the publisher left no phone.
+  const pageScrollRef = useRef<ScrollViewInstance>(null);
+  const messageCardY = useRef(0);
   const { height: screenHeight, width: layoutWidth, isTablet } = useResponsive();
   // Two columns only when the right one gets a phone's width: at 600-819
   // (Fold open 673x841) it was ~210-240px, too narrow for the agent row,
@@ -289,9 +295,19 @@ export default function PropertyDetailScreen() {
   };
 
   if (loading) {
+    // The page's shape while it loads (photo, title, price), with a way back.
     return (
-      <View style={styles.errorContainer}>
-        <ActivityIndicator size="large" color={colors.accent} />
+      <View style={styles.container} accessibilityState={{ busy: true }}>
+        <SafeAreaView edges={['top']}>
+          <AppHeader showControls={false} onBack={() => router.back()} />
+        </SafeAreaView>
+        <View style={styles.loadingHero} />
+        <View style={styles.loadingBody}>
+          <View style={[styles.shimmerLine, { width: '40%' }]} />
+          <View style={[styles.shimmerLine, { width: '85%', height: 22 }]} />
+          <View style={[styles.shimmerLine, { width: '55%' }]} />
+          <ActivityIndicator color={colors.accent} style={{ marginTop: 24 }} />
+        </View>
       </View>
     );
   }
@@ -345,6 +361,8 @@ export default function PropertyDetailScreen() {
   // a bare rent-only check silently mislabels daily-rent listings as "For
   // Sale", matching the bug already found and fixed on the property cards.
   const badge = t(listingBadgeKey(property.listing_type));
+  // Phones only: the website and the tablet split show the contact card beside the listing.
+  const showContactBar = !IS_WEB && !split && !isOwnListing;
   // defaultValue: a type with no translation shows as stored, never as a key.
   const propertyTypeLabel = property.property_type
     ? t(`search.${property.property_type}`, { defaultValue: property.property_type })
@@ -459,6 +477,41 @@ export default function PropertyDetailScreen() {
         </Text>
       ) : null}
 
+      {/* The price right under the title and place, where buyers look first
+          (it used to come after the description, map and publisher). */}
+      <View style={styles.priceRow}>
+        <View>
+          <Text style={styles.priceLabel}>{t('listing.priceLabel')}</Text>
+          <Text style={styles.price}>
+            {price}
+            <Text style={styles.priceSuffix}>{suffix}</Text>
+          </Text>
+          {pricePerSqm != null && (
+            <Text style={styles.pricePerSqm}>
+              ≈ {formatListingPrice(pricePerSqm, property.currency).replace(/^≈ /, '')}{t('detail.perSqm')}
+            </Text>
+          )}
+        </View>
+        {/* A full list opens the comparison, where one can be taken out. */}
+        <TouchableOpacity
+          accessibilityRole="button"
+          accessibilityLabel={compare.has(property.id) ? t('compare.added') : t('compare.add')}
+          accessibilityState={{ selected: compare.has(property.id) }}
+          style={[styles.compareBtn, compare.has(property.id) && styles.compareBtnOn]}
+          onPress={() => (compare.full && !compare.has(property.id) ? router.push('/compare' as Href) : compare.toggle(property.id))}
+          activeOpacity={0.75}>
+          <MaterialIcons name={compare.has(property.id) ? 'check' : 'compare-arrows'} size={18} color={colors.accentText} />
+          <Text style={styles.compareBtnText}>{compare.has(property.id) ? t('compare.added') : t('compare.add')}</Text>
+        </TouchableOpacity>
+      </View>
+      {price.startsWith('≈') && (
+        // A converted price says so, with the lister's own figure.
+        <Text style={styles.pricePerSqm}>
+          {t('currency.converted', { price: formatPrice(property.price, i18n.language, property.currency) })}
+        </Text>
+      )}
+
+
       {translating ? (
         <View style={styles.shimmerGroup}>
           <View style={styles.shimmerLine} />
@@ -563,7 +616,7 @@ export default function PropertyDetailScreen() {
       {split && publisherCard}
 
       {!isOwnListing && (
-        <View style={styles.sectionCard}>
+        <View style={styles.sectionCard} onLayout={(e) => { messageCardY.current = e.nativeEvent.layout.y; }}>
           <View style={styles.sectionHeader}>
             <MaterialIcons name="mail" size={22} color={colors.accent} />
             <Text style={styles.sectionTitle}>{t('detail.message')}</Text>
@@ -600,38 +653,6 @@ export default function PropertyDetailScreen() {
             </TouchableOpacity>
           ) : null}
         </View>
-      )}
-
-      <View style={styles.priceRow}>
-        <View>
-          <Text style={styles.priceLabel}>{t('listing.priceLabel')}</Text>
-          <Text style={styles.price}>
-            {price}
-            <Text style={styles.priceSuffix}>{suffix}</Text>
-          </Text>
-          {pricePerSqm != null && (
-            <Text style={styles.pricePerSqm}>
-              ≈ {formatListingPrice(pricePerSqm, property.currency).replace(/^≈ /, '')}{t('detail.perSqm')}
-            </Text>
-          )}
-        </View>
-        {/* A full list opens the comparison, where one can be taken out. */}
-        <TouchableOpacity
-          accessibilityRole="button"
-          accessibilityLabel={compare.has(property.id) ? t('compare.added') : t('compare.add')}
-          accessibilityState={{ selected: compare.has(property.id) }}
-          style={[styles.compareBtn, compare.has(property.id) && styles.compareBtnOn]}
-          onPress={() => (compare.full && !compare.has(property.id) ? router.push('/compare' as Href) : compare.toggle(property.id))}
-          activeOpacity={0.75}>
-          <MaterialIcons name={compare.has(property.id) ? 'check' : 'compare-arrows'} size={18} color={colors.accentText} />
-          <Text style={styles.compareBtnText}>{compare.has(property.id) ? t('compare.added') : t('compare.add')}</Text>
-        </TouchableOpacity>
-      </View>
-      {price.startsWith('≈') && (
-        // A converted price says so, with the lister's own figure.
-        <Text style={styles.pricePerSqm}>
-          {t('currency.converted', { price: formatPrice(property.price, i18n.language, property.currency) })}
-        </Text>
       )}
 
       <PriceHistory propertyId={property.id} />
@@ -697,6 +718,7 @@ export default function PropertyDetailScreen() {
                 <TouchableOpacity
                   accessibilityRole="button" accessibilityLabel={t('detail.share')}
                   style={styles.headerButton}
+                  hitSlop={4}
                   onPress={handleShare}
                   activeOpacity={0.7}>
                   <MaterialIcons name="share" size={20} color="#fff" />
@@ -704,6 +726,7 @@ export default function PropertyDetailScreen() {
                 <TouchableOpacity
                   accessibilityRole="button" accessibilityLabel={t('common.save')}
                   style={styles.headerButton}
+                  hitSlop={4}
                   onPress={() => toggle(id ?? '')}
                   activeOpacity={0.7}>
                   <MaterialIcons
@@ -737,11 +760,16 @@ export default function PropertyDetailScreen() {
       </View>
 
       <ScrollView
+        ref={pageScrollRef}
         style={styles.content}
         contentContainerStyle={[
           styles.contentInner,
           !split && readable && { paddingHorizontal: 24 + readable.paddingHorizontal },
+          // Room for the bottom contact bar, so the last button is never under it.
+          showContactBar && { paddingBottom: 104 + CONTACT_BAR_HEIGHT },
         ]}
+        // The message box sits mid-page; iOS scrolls it above the keyboard.
+        automaticallyAdjustKeyboardInsets
         showsVerticalScrollIndicator={false}
         keyboardDismissMode={Platform.OS === 'ios' ? 'interactive' : 'on-drag'}>
         {split ? (
@@ -756,6 +784,43 @@ export default function PropertyDetailScreen() {
           </>
         )}
       </ScrollView>
+      {showContactBar && (
+        // Phones: the price and the quickest ways to reach the publisher stay
+        // on screen while reading (the full contact card follows the listing).
+        <View style={[styles.contactBar, { paddingBottom: 10 + insets.bottom }]}>
+          <Text style={styles.contactBarPrice} numberOfLines={1}>
+            {price}
+            <Text style={styles.priceSuffix}>{suffix}</Text>
+          </Text>
+          <View style={styles.contactBarActions}>
+            {contactPhone ? (
+              <>
+                <TouchableOpacity
+                  accessibilityRole="button"
+                  accessibilityLabel="WhatsApp"
+                  style={styles.contactBarOutline}
+                  onPress={handleWhatsApp}
+                  activeOpacity={0.8}>
+                  <MaterialIcons name="chat" size={18} color={colors.accentText} />
+                </TouchableOpacity>
+                <TouchableOpacity accessibilityRole="button" style={styles.contactBarPrimary} onPress={handleCall} activeOpacity={0.85}>
+                  <MaterialIcons name="phone" size={18} color={Site.onAccent} />
+                  <Text style={styles.contactBarPrimaryText}>{t('property.call')}</Text>
+                </TouchableOpacity>
+              </>
+            ) : (
+              <TouchableOpacity
+                accessibilityRole="button"
+                style={styles.contactBarPrimary}
+                onPress={() => pageScrollRef.current?.scrollTo({ y: Math.max(0, messageCardY.current - 16), animated: true })}
+                activeOpacity={0.85}>
+                <MaterialIcons name="mail" size={18} color={Site.onAccent} />
+                <Text style={styles.contactBarPrimaryText}>{t('detail.message')}</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+        </View>
+      )}
       <KeyboardDoneBar />
 
       <Modal visible={viewingSheetOpen} transparent animationType="slide" onRequestClose={() => setViewingSheetOpen(false)}>
@@ -818,7 +883,7 @@ export default function PropertyDetailScreen() {
         <View style={styles.lightboxBackdrop}>
           <TouchableOpacity
             accessibilityRole="button" accessibilityLabel={t('common.close')}
-            style={styles.lightboxClose}
+            style={[styles.lightboxClose, { top: insets.top + 8 }]}
             onPress={() => setLightboxOpen(false)}
             activeOpacity={0.7}
             hitSlop={8}>
@@ -854,16 +919,80 @@ export default function PropertyDetailScreen() {
       {/* Web gates this on `status === 'active'` too — a paused/draft/sold
           listing shouldn't invite questions the agent isn't fielding. */}
       {AI_CHAT_ENABLED && property.status === 'active' && (
-        <ListingAssistant property={property} contact={assistantContact} />
+        // Lifted above the bottom contact bar when there is one.
+        <View
+          pointerEvents="box-none"
+          style={[StyleSheet.absoluteFill, showContactBar && { bottom: CONTACT_BAR_HEIGHT }]}>
+          <ListingAssistant property={property} contact={assistantContact} />
+        </View>
       )}
     </View>
   );
 }
 
+// The bottom contact bar above the safe area: 10 + 44 + 10.
+const CONTACT_BAR_HEIGHT = 64;
+
 const createStyles = (colors: AtticoPalette) => StyleSheet.create({
+  contactBar: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 12,
+    paddingTop: 10,
+    paddingHorizontal: 16,
+    backgroundColor: colors.primary,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: colors.border,
+  },
+  contactBarPrice: {
+    flexShrink: 1,
+    fontFamily: Fonts.sansBold,
+    fontSize: 18,
+    color: colors.accentText,
+  },
+  contactBarActions: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  contactBarOutline: {
+    width: 44,
+    height: 44,
+    borderRadius: Radii.pill,
+    borderWidth: 1,
+    borderColor: colors.border,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  contactBarPrimary: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    minHeight: 44,
+    paddingHorizontal: 18,
+    borderRadius: Radii.pill,
+    backgroundColor: colors.accent,
+  },
+  contactBarPrimaryText: {
+    fontFamily: Fonts.sansSemiBold,
+    fontSize: 15,
+    color: Site.onAccent,
+  },
   container: {
     flex: 1,
     backgroundColor: colors.primary,
+  },
+  loadingHero: {
+    height: 260,
+    backgroundColor: colors.primaryLight,
+  },
+  loadingBody: {
+    padding: 24,
+    gap: 12,
   },
   errorContainer: {
     flex: 1,
@@ -999,7 +1128,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     fontFamily: Fonts.sansSemiBold,
     paddingHorizontal: 16,
     paddingVertical: 6,
-    borderRadius: 12,
+    borderRadius: Radii.md,
     overflow: 'hidden',
   },
   content: {
@@ -1061,6 +1190,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     marginBottom: 16,
   },
   location: {
+    flex: 1,
     fontFamily: Fonts.sans,
     fontSize: 14,
     color: colors.textSecondary,
@@ -1272,13 +1402,13 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   },
   publisherSkeleton: {
     height: 52,
-    borderRadius: 12,
+    borderRadius: Radii.md,
     backgroundColor: colors.glass,
   },
 
   contactInput: {
     backgroundColor: colors.glass,
-    borderRadius: 12,
+    borderRadius: Radii.md,
     paddingHorizontal: 16,
     paddingVertical: 14,
     fontFamily: Fonts.sans,
@@ -1310,7 +1440,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     justifyContent: 'center',
     gap: 6,
     paddingVertical: 12,
-    borderRadius: 12,
+    borderRadius: Radii.md,
     borderWidth: 1,
     borderColor: colors.border,
   },

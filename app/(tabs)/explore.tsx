@@ -23,7 +23,8 @@ import { PropertyCard } from '@/components/property/property-card';
 import { FilterTabs } from '@/components/ui/filter-tabs';
 import { GradientBackground } from '@/components/ui/gradient-background';
 import { RiseIn } from '@/components/ui/motion';
-import { type AtticoPalette, Fonts } from '@/constants/theme';
+import { type AtticoPalette, Fonts, Radii, Site } from '@/constants/theme';
+import { SkeletonCard } from '@/components/ui/skeleton-card';
 import { SaveSearchButton } from '@/components/property/save-search-button';
 import { useFilters } from '@/contexts/filters-context';
 import { KeyboardDoneBar } from '@/components/ui/keyboard-done-bar';
@@ -216,23 +217,25 @@ export default function ExploreScreen() {
               <Pressable
                 accessibilityRole="button"
                 style={[styles.viewToggleButton, viewMode === 'list' && styles.viewToggleButtonActive]}
+                hitSlop={6}
                 onPress={() => setViewMode('list')}
                 accessibilityLabel={t('search.listView')}>
                 <MaterialIcons
                   name="grid-view"
                   size={15}
-                  color={viewMode === 'list' ? colors.textPrimary : colors.textSecondary}
+                  color={viewMode === 'list' ? Site.onAccent : colors.textSecondary}
                 />
               </Pressable>
               <Pressable
                 accessibilityRole="button"
                 style={[styles.viewToggleButton, viewMode === 'map' && styles.viewToggleButtonActive]}
+                hitSlop={6}
                 onPress={() => setViewMode('map')}
                 accessibilityLabel={t('search.mapView')}>
                 <MaterialIcons
                   name="map"
                   size={15}
-                  color={viewMode === 'map' ? colors.textPrimary : colors.textSecondary}
+                  color={viewMode === 'map' ? Site.onAccent : colors.textSecondary}
                 />
               </Pressable>
             </View>
@@ -297,9 +300,16 @@ export default function ExploreScreen() {
     />
   );
 
+  // The grid's shape while results load, not a lone spinner.
   const loader = (
-    <View style={styles.loader}>
-      <ActivityIndicator size="large" color={colors.accent} />
+    <View style={styles.loader} accessibilityState={{ busy: true }}>
+      {[0, 1].map((row) => (
+        <View key={row} style={styles.loaderRow}>
+          {Array.from({ length: columns }, (_, i) => (
+            <SkeletonCard key={i} />
+          ))}
+        </View>
+      ))}
     </View>
   );
 
@@ -496,14 +506,14 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     backgroundColor: colors.glass,
     borderWidth: 1,
     borderColor: colors.border,
-    borderRadius: 12,
+    borderRadius: Radii.md,
     padding: 3,
     gap: 2,
   },
   viewToggleButton: {
     width: 32,
     height: 32,
-    borderRadius: 9,
+    borderRadius: Radii.sm,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -534,10 +544,11 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     backgroundColor: colors.accent,
     alignItems: 'center',
   },
+  // Ink on the orange in both themes (cream on orange was 2.6:1 in dark).
   badgeText: {
     fontSize: 12,
     fontFamily: Fonts.sansBold,
-    color: colors.textPrimary,
+    color: Site.onAccent,
   },
   searchField: {
     flexDirection: 'row',
@@ -604,8 +615,11 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     color: colors.textSecondary,
   },
   loader: {
-    paddingTop: 100,
-    alignItems: 'center',
+    paddingHorizontal: 14,
+    paddingTop: 8,
+  },
+  loaderRow: {
+    flexDirection: 'row',
   },
   footer: {
     paddingVertical: 20,

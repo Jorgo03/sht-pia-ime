@@ -24,7 +24,7 @@ import { RiseIn } from '@/components/ui/motion';
 import { AppHeader } from '@/components/ui/app-header';
 import { SearchHeader } from '@/components/ui/search-header';
 import { SkeletonCard } from '@/components/ui/skeleton-card';
-import { Fonts, InlineTarget, type AtticoPalette } from '@/constants/theme';
+import { Fonts, InlineTarget, Radii, type AtticoPalette } from '@/constants/theme';
 import { useFilters } from '@/contexts/filters-context';
 import { useIsDesktopWeb } from '@/hooks/use-app-dimensions';
 import { useTheme } from '@/contexts/theme-context';
@@ -176,7 +176,7 @@ export default function HomeScreen() {
                must stay on screen rather than be swapped for this card. */
             <View style={styles.errorCard}>
               <Text style={styles.errorText}>{t('common.error')}</Text>
-              <TouchableOpacity accessibilityRole="button" onPress={() => refetch()} activeOpacity={0.7}>
+              <TouchableOpacity accessibilityRole="button" style={styles.textAction} onPress={() => refetch()} activeOpacity={0.7}>
                 <Text style={styles.retryText}>{t('common.retry')}</Text>
               </TouchableOpacity>
             </View>
@@ -185,8 +185,13 @@ export default function HomeScreen() {
                headline and then nothing at all. Distinct from the error branch
                above, which means the fetch failed rather than genuinely
                returning no homes. Mirrors the web Home. */
+            // Nothing listed yet: say so, and offer the next step (post what
+            // you are looking for) rather than a dead end.
             <View style={styles.errorCard}>
               <Text style={styles.errorText}>{t('search.empty')}</Text>
+              <TouchableOpacity accessibilityRole="button" style={styles.textAction} onPress={() => router.push('/wanted' as Href)} activeOpacity={0.7}>
+                <Text style={styles.retryText}>{t('wanted.postCta')}</Text>
+              </TouchableOpacity>
             </View>
           ) : (
             <>
@@ -400,7 +405,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     marginHorizontal: 16,
     marginTop: 16,
     minHeight: 48,
-    borderRadius: 16,
+    borderRadius: Radii.lg,
     borderWidth: 1,
     borderColor: colors.border,
     backgroundColor: colors.glass,
@@ -426,6 +431,12 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     fontFamily: Fonts.sans,
     fontSize: 14,
     color: colors.textPrimary,
+  },
+  // A text-only action with a full 44pt tap row.
+  textAction: {
+    minHeight: 44,
+    justifyContent: 'center',
+    paddingHorizontal: 12,
   },
   retryText: {
     fontSize: 14,

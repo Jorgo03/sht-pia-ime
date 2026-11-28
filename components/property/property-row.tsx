@@ -7,7 +7,7 @@ import Animated from 'react-native-reanimated';
 import { useTranslation } from 'react-i18next';
 
 import { useHeartPop, usePressScale } from '@/components/ui/motion';
-import { type AtticoPalette, Fonts } from '@/constants/theme';
+import { type AtticoPalette, Fonts, Site } from '@/constants/theme';
 import { useFavorites } from '@/contexts/favorites-context';
 import { useTheme } from '@/contexts/theme-context';
 import { Property } from '@/data/types';
@@ -212,8 +212,9 @@ const createStyles = (colors: AtticoPalette) =>
       fontSize: 12,
       letterSpacing: 0.3,
     },
+    // Ink on the orange (6.5:1); white was 2.9:1.
     badgeTextSale: {
-      color: '#fff',
+      color: Site.onAccent,
     },
     badgeTextRent: {
       color: '#faf6ef',

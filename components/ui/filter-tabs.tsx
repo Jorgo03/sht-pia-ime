@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-import { type AtticoPalette, Fonts } from '@/constants/theme';
+import { type AtticoPalette, Fonts, Radii, Site } from '@/constants/theme';
 import { useTheme } from '@/contexts/theme-context';
 
 interface FilterTabsProps {
@@ -67,7 +67,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   tab: {
     paddingHorizontal: 20,
     paddingVertical: 10,
-    borderRadius: 24,
+    borderRadius: Radii.pill,
     borderWidth: 1,
     borderColor: colors.border,
     backgroundColor: colors.glass,
@@ -81,7 +81,8 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     fontFamily: Fonts.sansSemiBold,
     color: colors.textSecondary,
   },
+  // Ink on the orange (6.5:1); white was 2.9:1.
   activeTabText: {
-    color: '#fff',
+    color: Site.onAccent,
   },
 });

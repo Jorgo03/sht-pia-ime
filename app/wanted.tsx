@@ -17,7 +17,7 @@ import { useTheme } from '@/contexts/theme-context';
 import { PAGE_SIZE } from '@/data/properties';
 import { useAppDimensions } from '@/hooks/use-app-dimensions';
 import { useReadableColumn } from '@/hooks/use-responsive';
-import { formatPrice } from '@/lib/format';
+import { useCurrency } from '@/contexts/currency-context';
 import { supabase } from '@/lib/supabase';
 
 interface WantedRow {
@@ -169,6 +169,8 @@ const WantedCard = memo(function WantedCard({ row, lang, styles, iconColor }: {
   iconColor: string;
 }) {
   const { t } = useTranslation();
+  // Budgets are entered in euros; shown in the visitor's currency like every price.
+  const { formatListingPrice } = useCurrency();
   const date = new Date(row.created_at).toLocaleDateString(lang);
   return (
     <View style={styles.card}>
@@ -180,7 +182,7 @@ const WantedCard = memo(function WantedCard({ row, lang, styles, iconColor }: {
         <Text style={styles.cardDate}>{date}</Text>
       </View>
       <View style={styles.metaRow}>
-        {row.max_price ? <Text style={styles.meta}>{t('addSheet.maxPrice')}: {formatPrice(row.max_price, lang)}</Text> : null}
+        {row.max_price ? <Text style={styles.meta}>{t('addSheet.maxPrice')}: {formatListingPrice(row.max_price, 'EUR')}</Text> : null}
         {row.min_bedrooms ? <Text style={styles.meta}>{t('addSheet.minBedrooms')}: {row.min_bedrooms}+</Text> : null}
       </View>
       {row.notes ? <Text style={styles.notes}>{row.notes}</Text> : null}

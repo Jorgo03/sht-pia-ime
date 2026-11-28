@@ -9,7 +9,7 @@ import { formatRef } from '@/src/features/properties/lib/searchFilters';
 
 import { useHeartPop, usePressScale } from '@/components/ui/motion';
 
-import { type AtticoPalette, Fonts, Site } from '@/constants/theme';
+import { type AtticoPalette, Fonts, Radii, Site } from '@/constants/theme';
 import { useFavorites } from '@/contexts/favorites-context';
 import { useTheme } from '@/contexts/theme-context';
 import { useResponsive } from '@/hooks/use-responsive';
@@ -304,7 +304,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   // card (the image sits inset within it, not flush to the card edges).
   card: {
     flex: 1,
-    borderRadius: 14,
+    borderRadius: Radii.md,
     padding: 8,
     backgroundColor: colors.primaryLight,
     margin: 6,
@@ -408,17 +408,19 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     marginTop: 3,
   },
   // Matches web's .mini-price — serif, not the plain sans used elsewhere.
+  // The figure people scan the grid for: larger and in the accent text colour,
+  // like the compact card and the rows.
   price: {
     fontFamily: Fonts?.serif,
-    fontSize: 14,
-    color: colors.textPrimary,
+    fontSize: IS_WEB ? 14 : 16,
+    color: IS_WEB ? colors.textPrimary : colors.accentText,
     marginBottom: 2,
   },
   compactCard: {
     // width is set inline per-render via getCompactCardWidth() — screen
     // width isn't known at StyleSheet-creation time.
     flexShrink: 0,
-    borderRadius: 18,
+    borderRadius: Radii.lg,
     overflow: 'hidden',
     backgroundColor: colors.primaryLight,
     borderWidth: 1,

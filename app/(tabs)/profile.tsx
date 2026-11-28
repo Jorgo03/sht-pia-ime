@@ -27,7 +27,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 
-import { type AtticoPalette, Fonts, InlineTarget, Radii } from '@/constants/theme';
+import { type AtticoPalette, Fonts, InlineTarget, Radii, Site } from '@/constants/theme';
 import { useAuth } from '@/contexts/auth-context';
 import { useFavorites } from '@/contexts/favorites-context';
 import { KeyboardDoneBar } from '@/components/ui/keyboard-done-bar';
@@ -717,15 +717,15 @@ export default function ProfileScreen() {
             <View style={styles.statsBar}>
               <View style={[styles.statItem, styles.statItemBorder]}>
                 <Text style={styles.statValue}>{stats.loading ? '–' : stats.saved}</Text>
-                <Text style={styles.statLabel}>{t('profile.statSaved')}</Text>
+                <Text style={styles.statLabel} numberOfLines={2}>{t('profile.statSaved')}</Text>
               </View>
               <View style={[styles.statItem, styles.statItemBorder]}>
                 <Text style={styles.statValue}>{stats.loading ? '–' : stats.searches}</Text>
-                <Text style={styles.statLabel}>{t('profile.statSearches')}</Text>
+                <Text style={styles.statLabel} numberOfLines={2}>{t('profile.statSearches')}</Text>
               </View>
               <View style={styles.statItem}>
                 <Text style={styles.statValue}>{stats.loading ? '–' : stats.third}</Text>
-                <Text style={styles.statLabel}>
+                <Text style={styles.statLabel} numberOfLines={2}>
                   {isAgentAccount ? t('profile.statListings') : t('profile.statViewings')}
                 </Text>
               </View>
@@ -1738,7 +1738,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     backgroundColor: colors.primaryLight,
     borderWidth: 1,
     borderColor: colors.border,
-    borderRadius: 16,
+    borderRadius: Radii.lg,
     paddingVertical: 16,
     marginBottom: 16,
   },
@@ -1756,10 +1756,14 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     fontSize: 20,
     color: colors.textPrimary,
   },
+  // Long words (Russian, German) in a ~100px column: two lines, centred,
+  // never broken mid-word by wide letter-spacing.
   statLabel: {
     fontFamily: Fonts?.mono,
     fontSize: 12,
-    letterSpacing: 1,
+    letterSpacing: 0.5,
+    textAlign: 'center',
+    paddingHorizontal: 4,
     textTransform: 'uppercase',
     color: colors.textSecondary,
   },
@@ -1767,7 +1771,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
   // Matches web's .profile-settings / .profile-row exactly.
   menuList: {
     backgroundColor: colors.primaryLight,
-    borderRadius: 16,
+    borderRadius: Radii.lg,
     borderWidth: 1,
     borderColor: colors.border,
     overflow: 'hidden',
@@ -1795,10 +1799,11 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  // Ink on the orange (6.5:1); white was 2.9:1.
   menuBadgeText: {
     fontFamily: Fonts?.monoMedium,
     fontSize: 12,
-    color: '#fff',
+    color: Site.onAccent,
   },
   menuDivider: {
     height: 1,
@@ -1812,7 +1817,7 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     justifyContent: 'center',
     gap: 8,
     paddingVertical: 14,
-    borderRadius: 16,
+    borderRadius: Radii.lg,
     borderWidth: 1.5,
     borderColor: colors.signOut,
   },
@@ -1849,9 +1854,9 @@ const createStyles = (colors: AtticoPalette) => StyleSheet.create({
     gap: 8,
     paddingBottom: 8,
   },
-  // 12px text; the vertical padding makes a ~34px tap row instead of 14px.
+  // 12px text; the vertical padding makes a ~44px tap row instead of 14px.
   legalLink: {
-    paddingVertical: 10,
+    paddingVertical: 14,
     fontFamily: Fonts.sans,
     fontSize: 12,
     color: colors.textSecondary,
