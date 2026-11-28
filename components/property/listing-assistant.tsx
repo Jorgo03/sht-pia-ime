@@ -314,9 +314,13 @@ const createStyles = (
   const panelHeight = Math.max(160, Math.min(460, screenHeight - 180, roomAboveKeyboard));
   const bottomOffset = insetBottom + 16;
 
+  // On the web the button floats over the page (fixed), so it stays in view
+  // while reading and is never drawn on top of the buttons in the page flow.
+  const floating = (Platform.OS === 'web' ? 'fixed' : 'absolute') as 'absolute';
+
   return StyleSheet.create({
     fab: {
-      position: 'absolute',
+      position: floating,
       right: 16,
       bottom: bottomOffset,
       flexDirection: 'row',
@@ -334,7 +338,7 @@ const createStyles = (
       color: '#fff',
     },
     panelWrap: {
-      position: 'absolute',
+      position: floating,
       right: 16,
       bottom: bottomOffset,
     },

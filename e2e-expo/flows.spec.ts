@@ -624,8 +624,9 @@ test('X10 a wide screen shows a website: a full-width header with the menu, and 
   await expect(page.getByRole('tablist')).toHaveCount(0);
   await expect(page.getByRole('link', { name: t('site.nav.agencies'), exact: true }).first()).toBeVisible();
   const brand = await page.getByRole('link', { name: 'Shtëpia.ime' }).first().boundingBox();
-  // Inside the site gutter (constants/theme siteGutter: 104 from 1280 wide).
-  expect(brand!.x).toBeLessThanOrEqual(105);
+  // Inside the site gutter (constants/theme siteGutter: 104 from 1280 wide);
+  // the door mark (26) and its gap (6) come first, then the name.
+  expect(brand!.x).toBeLessThanOrEqual(105 + 32);
   const heading = await page.getByRole('heading', { level: 1 }).boundingBox();
   expect(heading!.width).toBeGreaterThan(480);
 });

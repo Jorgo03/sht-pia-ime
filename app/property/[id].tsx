@@ -391,6 +391,43 @@ export default function PropertyDetailScreen() {
   // One rule for every screen (src/features/properties/lib/compare.js): sales
   // only; a rental's price per m² means nothing.
   const pricePerSqm = pricePerM2(property);
+  // Price, per m², compare and the converted note: under the title on
+  // phones, after the message card in the Expo web build.
+  const priceBlock = (
+    <>
+    <View style={styles.priceRow}>
+      <View>
+        <Text style={styles.priceLabel}>{t('listing.priceLabel')}</Text>
+        <Text style={styles.price}>
+          {price}
+          <Text style={styles.priceSuffix}>{suffix}</Text>
+        </Text>
+        {pricePerSqm != null && (
+          <Text style={styles.pricePerSqm}>
+            ≈ {formatListingPrice(pricePerSqm, property.currency).replace(/^≈ /, '')}{t('detail.perSqm')}
+          </Text>
+        )}
+      </View>
+      {/* A full list opens the comparison, where one can be taken out. */}
+      <TouchableOpacity
+        accessibilityRole="button"
+        accessibilityLabel={compare.has(property.id) ? t('compare.added') : t('compare.add')}
+        accessibilityState={{ selected: compare.has(property.id) }}
+        style={[styles.compareBtn, compare.has(property.id) && styles.compareBtnOn]}
+        onPress={() => (compare.full && !compare.has(property.id) ? router.push('/compare' as Href) : compare.toggle(property.id))}
+        activeOpacity={0.75}>
+        <MaterialIcons name={compare.has(property.id) ? 'check' : 'compare-arrows'} size={18} color={colors.accentText} />
+        <Text style={styles.compareBtnText}>{compare.has(property.id) ? t('compare.added') : t('compare.add')}</Text>
+      </TouchableOpacity>
+    </View>
+    {price.startsWith('≈') && (
+      // A converted price says so, with the lister's own figure.
+      <Text style={styles.pricePerSqm}>
+        {t('currency.converted', { price: formatPrice(property.price, i18n.language, property.currency) })}
+      </Text>
+    )}
+    </>
+  );
 
   const amenities = [
     // *Count keys: property.beds/baths are the form-field labels and have no
@@ -477,40 +514,10 @@ export default function PropertyDetailScreen() {
         </Text>
       ) : null}
 
-      {/* The price right under the title and place, where buyers look first
-          (it used to come after the description, map and publisher). */}
-      <View style={styles.priceRow}>
-        <View>
-          <Text style={styles.priceLabel}>{t('listing.priceLabel')}</Text>
-          <Text style={styles.price}>
-            {price}
-            <Text style={styles.priceSuffix}>{suffix}</Text>
-          </Text>
-          {pricePerSqm != null && (
-            <Text style={styles.pricePerSqm}>
-              ≈ {formatListingPrice(pricePerSqm, property.currency).replace(/^≈ /, '')}{t('detail.perSqm')}
-            </Text>
-          )}
-        </View>
-        {/* A full list opens the comparison, where one can be taken out. */}
-        <TouchableOpacity
-          accessibilityRole="button"
-          accessibilityLabel={compare.has(property.id) ? t('compare.added') : t('compare.add')}
-          accessibilityState={{ selected: compare.has(property.id) }}
-          style={[styles.compareBtn, compare.has(property.id) && styles.compareBtnOn]}
-          onPress={() => (compare.full && !compare.has(property.id) ? router.push('/compare' as Href) : compare.toggle(property.id))}
-          activeOpacity={0.75}>
-          <MaterialIcons name={compare.has(property.id) ? 'check' : 'compare-arrows'} size={18} color={colors.accentText} />
-          <Text style={styles.compareBtnText}>{compare.has(property.id) ? t('compare.added') : t('compare.add')}</Text>
-        </TouchableOpacity>
-      </View>
-      {price.startsWith('≈') && (
-        // A converted price says so, with the lister's own figure.
-        <Text style={styles.pricePerSqm}>
-          {t('currency.converted', { price: formatPrice(property.price, i18n.language, property.currency) })}
-        </Text>
-      )}
-
+      {/* Phones: the price right under the title and place, where buyers look
+          first (it used to come after the description, map and publisher).
+          The Expo web build keeps it after the message card. */}
+      {!IS_WEB && priceBlock}
 
       {translating ? (
         <View style={styles.shimmerGroup}>
@@ -654,6 +661,8 @@ export default function PropertyDetailScreen() {
           ) : null}
         </View>
       )}
+
+      {IS_WEB && priceBlock}
 
       <PriceHistory propertyId={property.id} />
 
@@ -919,12 +928,15 @@ export default function PropertyDetailScreen() {
       {/* Web gates this on `status === 'active'` too — a paused/draft/sold
           listing shouldn't invite questions the agent isn't fielding. */}
       {AI_CHAT_ENABLED && property.status === 'active' && (
-        // Lifted above the bottom contact bar when there is one.
-        <View
-          pointerEvents="box-none"
-          style={[StyleSheet.absoluteFill, showContactBar && { bottom: CONTACT_BAR_HEIGHT }]}>
+        // Lifted above the bottom contact bar on phones; elsewhere (web,
+        // tablet split) it keeps its own position.
+        showContactBar ? (
+          <View pointerEvents="box-none" style={[StyleSheet.absoluteFill, { bottom: CONTACT_BAR_HEIGHT }]}>
+            <ListingAssistant property={property} contact={assistantContact} />
+          </View>
+        ) : (
           <ListingAssistant property={property} contact={assistantContact} />
-        </View>
+        )
       )}
     </View>
   );
